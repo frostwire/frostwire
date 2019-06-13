@@ -21,13 +21,10 @@ package com.limegroup.gnutella.gui.tables;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class ColoredCellImpl implements ColoredCell, Comparable<Object> {
-
     private final Object val;
     private final Color col;
     private final Class<?> clazz;

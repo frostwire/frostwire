@@ -24,7 +24,6 @@ package com.frostwire.gui.library;
  * @author aldenml
  */
 class PlaylistItemStarProperty extends PlaylistItemProperty<PlaylistItemStarProperty> {
-
     PlaylistItemStarProperty(LibraryPlaylistsTableDataLine line, boolean isPlaying, boolean exists) {
         super(line, isPlaying, exists);
     }

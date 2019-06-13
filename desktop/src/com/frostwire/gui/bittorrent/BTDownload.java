@@ -30,7 +30,6 @@ import java.util.Date;
  * @author aldenml
  */
 public interface BTDownload {
-
     double getSize();
 
     String getName();

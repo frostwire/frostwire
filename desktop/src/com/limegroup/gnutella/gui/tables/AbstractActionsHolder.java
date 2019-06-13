@@ -21,15 +21,12 @@ package com.limegroup.gnutella.gui.tables;
 import java.io.File;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractActionsHolder {
-
-    private boolean playing;
     private final DataLine<?> dataLine;
+    private boolean playing;
 
     public AbstractActionsHolder(DataLine<?> dataLine, boolean playing) {
         this.playing = playing;

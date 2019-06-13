@@ -29,31 +29,28 @@ import java.util.MissingResourceException;
 
 /**
  * Associates a MediaType with a LimeXMLSchema.
- *
+ * <p>
  * Also contains factory methods for retrieving all media types,
  * and retrieving the media type associated with a specific TableLine.
  */
 public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaType> {
-
-    /** image resource directory. */
+    /**
+     * image resource directory.
+     */
     private static final String IMAGE_RESOURCE_PATH = "org/limewire/xml/image/";
-
     /**
      * The cached mapping of description -> media type,
      * for easy looking up from incoming results.
      */
     private static final Map<String, NamedMediaType> CACHED_TYPES = new HashMap<>();
-
     /**
      * The MediaType this is describing.
      */
     private final MediaType _mediaType;
-
     /**
      * The name used to describe this MediaType/LimeXMLSchema.
      */
     private final String _name;
-
     /**
      * The icon used to display this mediaType/LimeXMLSchema.
      */
@@ -66,10 +63,72 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
     private NamedMediaType(MediaType mt) {
         if (mt == null)
             throw new NullPointerException("Null media type.");
-
         this._mediaType = mt;
         this._name = constructName(_mediaType);
         this._icon = getIcon(_mediaType);
+    }
+
+    /**
+     * Retrieves the named media type for the specified schema uri.
+     * <p>
+     * This should only be used if you are positive that the media type
+     * is already cached for this description OR it is not a default
+     * type.
+     */
+    public static NamedMediaType getFromDescription(String description) {
+        NamedMediaType type = CACHED_TYPES.get(description);
+        if (type != null)
+            return type;
+        MediaType mt = MediaType.getMediaTypeForSchema(description);
+        return getFromMediaType(mt);
+    }
+
+    /**
+     * Retrieves the named media type from the specified extension.
+     * <p>
+     * This should only be used if you are positive that the media type
+     * is already cached for this extension.
+     */
+    public static NamedMediaType getFromExtension(String extension) {
+        MediaType mt = MediaType.getMediaTypeForExtension(extension);
+        if (mt == null)
+            return null;
+        String description = mt.getMimeType();
+        return getFromDescription(description);
+    }
+
+    /**
+     * Retrieves the named media type for the specified media type.
+     */
+    public static NamedMediaType getFromMediaType(MediaType media) {
+        String description = media.getMimeType();
+        NamedMediaType type = CACHED_TYPES.get(description);
+        if (type != null)
+            return type;
+        type = new NamedMediaType(media);
+        CACHED_TYPES.put(description, type);
+        return type;
+    }
+
+    /**
+     * Returns the human-readable description of this MediaType/Schema.
+     */
+    private static String constructName(MediaType type) {
+        // If we can act off the MediaType.
+        String name = null;
+        String key = type.getDescriptionKey();
+        try {
+            if (key != null)
+                name = I18n.tr(key);
+        } catch (MissingResourceException mre) {
+            // oh well, will capitalize the mime-type
+        }
+        // If still no name, capitalize the mime-type.
+        if (name == null) {
+            name = type.getMimeType();
+            name = name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
+        }
+        return name;
     }
 
     /**
@@ -114,56 +173,10 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
         }
         return obj instanceof NamedMediaType && _name.equals(((NamedMediaType) obj)._name);
     }
-    
+
     @Override
     public int hashCode() {
         return _mediaType.hashCode() + _name.hashCode() + _icon.hashCode();
-    }
-
-    /**
-     * Retrieves the named media type for the specified schema uri.
-     *
-     * This should only be used if you are positive that the media type
-     * is already cached for this description OR it is not a default
-     * type.
-     */
-    public static NamedMediaType getFromDescription(String description) {
-        NamedMediaType type = CACHED_TYPES.get(description);
-        if (type != null)
-            return type;
-
-        MediaType mt = MediaType.getMediaTypeForSchema(description);
-
-        return getFromMediaType(mt);
-    }
-
-    /**
-     * Retrieves the named media type from the specified extension.
-     *
-     * This should only be used if you are positive that the media type
-     * is already cached for this extension.
-     */
-    public static NamedMediaType getFromExtension(String extension) {
-        MediaType mt = MediaType.getMediaTypeForExtension(extension);
-        if (mt == null)
-            return null;
-
-        String description = mt.getMimeType();
-        return getFromDescription(description);
-    }
-
-    /**
-     * Retrieves the named media type for the specified media type.
-     */
-    public static NamedMediaType getFromMediaType(MediaType media) {
-        String description = media.getMimeType();
-        NamedMediaType type = CACHED_TYPES.get(description);
-        if (type != null)
-            return type;
-
-        type = new NamedMediaType(media);
-        CACHED_TYPES.put(description, type);
-        return type;
     }
 
     /**
@@ -171,7 +184,6 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
      */
     private Icon getIcon(MediaType type) {
         final ImageIcon icon;
-
         if (type == MediaType.getAnyTypeMediaType())
             icon = GUIMediator.getThemeImage("lime");
         else {
@@ -181,32 +193,7 @@ public class NamedMediaType implements IconAndNameHolder, Comparable<NamedMediaT
                 return new GUIUtils.EmptyIcon(getName(), 16, 16);
             }
         }
-
         icon.setDescription(getName());
         return icon;
-    }
-
-    /**
-     * Returns the human-readable description of this MediaType/Schema.
-     */
-    private static String constructName(MediaType type) {
-        // If we can act off the MediaType.
-        String name = null;
-
-        String key = type.getDescriptionKey();
-        try {
-            if (key != null)
-                name = I18n.tr(key);
-        } catch (MissingResourceException mre) {
-            // oh well, will capitalize the mime-type
-        }
-
-        // If still no name, capitalize the mime-type.
-        if (name == null) {
-            name = type.getMimeType();
-            name = name.substring(0, 1).toUpperCase(Locale.US) + name.substring(1);
-        }
-
-        return name;
     }
 }

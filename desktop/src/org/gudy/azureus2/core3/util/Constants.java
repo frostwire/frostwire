@@ -24,11 +24,19 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 /**
- *
  * @author Olivier
  * @author gubatron
  */
 public class Constants {
+    static final String INFINITY_STRING = "\u221E"; // "oo";pa
+    // keep the CVS style constant coz version checkers depend on it!
+    // e.g. 2.0.8.3
+    //      2.0.8.3_CVS
+    //      2.0.8.3_Bnn       // incremental build
+    private static final String OSName = System.getProperty("os.name");
+    private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
+    // If it isn't windows or osx, it's most likely an unix flavor
+    private static final boolean isWindowsVista;
 
     static {
         try {
@@ -44,20 +52,6 @@ public class Constants {
         }
     }
 
-    static final String INFINITY_STRING = "\u221E"; // "oo";pa
-
-    // keep the CVS style constant coz version checkers depend on it!
-    // e.g. 2.0.8.3
-    //      2.0.8.3_CVS
-    //      2.0.8.3_Bnn       // incremental build
-
-
-    private static final String OSName = System.getProperty("os.name");
-    private static final boolean isWindows = OSName.toLowerCase().startsWith("windows");
-    // If it isn't windows or osx, it's most likely an unix flavor
-
-    private static final boolean isWindowsVista;
-
     static {
         if (isWindows) {
             Float ver = null;
@@ -65,18 +59,13 @@ public class Constants {
                 ver = Float.valueOf(System.getProperty("os.version"));
             } catch (Throwable ignored) {
             }
-
             if (ver == null) {
                 isWindowsVista = false;
             } else {
                 float f_ver = ver;
-
                 isWindowsVista = f_ver == 6;
-
                 if (isWindowsVista) {
-
                     LineNumberReader lnr = null;
-
                     try {
                         Process p =
                                 Runtime.getRuntime().exec(
@@ -86,20 +75,13 @@ public class Constants {
                                                 "HKLM\\Software\\Microsoft\\Windows NT\\CurrentVersion",
                                                 "/v",
                                                 "CSDVersion"});
-
                         lnr = new LineNumberReader(new InputStreamReader(p.getInputStream()));
-
                         while (true) {
-
                             String line = lnr.readLine();
-
                             if (line == null) {
-
                                 break;
                             }
-
                             if (line.matches(".*CSDVersion.*")) {
-
                                 break;
                             }
                         }
@@ -114,10 +96,7 @@ public class Constants {
                     }
                 }
             }
-
-
         } else {
-
             isWindowsVista = false;
         }
     }
@@ -129,44 +108,31 @@ public class Constants {
         try {
             version_1 = version_1.replaceAll("_CVS", "_B100");
             version_2 = version_2.replaceAll("_CVS", "_B100");
-
             if (version_1.startsWith(".")) {
                 version_1 = "0" + version_1;
             }
             if (version_2.startsWith(".")) {
                 version_2 = "0" + version_2;
             }
-
             version_1 = version_1.replaceAll("[^0-9.]", ".");
             version_2 = version_2.replaceAll("[^0-9.]", ".");
-
             StringTokenizer tok1 = new StringTokenizer(version_1, ".");
             StringTokenizer tok2 = new StringTokenizer(version_2, ".");
-
             while (true) {
                 if (tok1.hasMoreTokens() && tok2.hasMoreTokens()) {
-
                     int i1 = Integer.parseInt(tok1.nextToken());
                     int i2 = Integer.parseInt(tok2.nextToken());
-
                     if (i1 != i2) {
-
                         return (i1 - i2);
                     }
                 } else if (tok1.hasMoreTokens()) {
-
                     int i1 = Integer.parseInt(tok1.nextToken());
-
                     if (i1 != 0) {
-
                         return (1);
                     }
                 } else if (tok2.hasMoreTokens()) {
-
                     int i2 = Integer.parseInt(tok2.nextToken());
-
                     if (i2 != 0) {
-
                         return (-1);
                     }
                 } else {
@@ -174,9 +140,7 @@ public class Constants {
                 }
             }
         } catch (Throwable e) {
-
             e.printStackTrace();
-
             return (0);
         }
     }

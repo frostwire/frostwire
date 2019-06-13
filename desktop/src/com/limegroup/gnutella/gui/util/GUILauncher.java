@@ -11,17 +11,6 @@ import java.io.File;
  * displaying error messages.
  */
 public class GUILauncher {
-
-    /**
-     * Provides a downloader or a file that should be launched.
-     */
-    public interface LaunchableProvider {
-        /**
-         * Can return null if only a downloader is avaialable 
-         */
-        File getFile();
-    }
-
     /**
      * Launches an array of <code>providers</code> delegating the time
      * consuming construction of {@link Downloader#getDownloadFragment()}
@@ -37,5 +26,15 @@ public class GUILauncher {
             }
         }
         GUIMediator.instance().setFrameCursor(Cursor.getDefaultCursor());
+    }
+
+    /**
+     * Provides a downloader or a file that should be launched.
+     */
+    public interface LaunchableProvider {
+        /**
+         * Can return null if only a downloader is avaialable
+         */
+        File getFile();
     }
 }

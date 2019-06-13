@@ -27,9 +27,7 @@ import java.awt.*;
  * @author gubatron
  */
 public class LabeledRangeSlider extends JPanel {
-
     private final RangeSlider slider;
-
     private final JLabel titleLabel;
     private final JLabel minLabel;
     private final JLabel maxLabel;
@@ -42,46 +40,37 @@ public class LabeledRangeSlider extends JPanel {
         slider = new RangeSlider();
         slider.setValue(minValue);
         slider.setUpperValue(maxValue);
-
         titleLabel = new JLabel(I18n.tr(title));
-
         minLabel = new JLabel(String.valueOf(minValue));
-
         if (defaultMaxText == null) {
             maxLabel = new JLabel(I18n.tr("Max"));
         } else {
             maxLabel = new JLabel(I18n.tr(defaultMaxText));
         }
-
         initComponents();
     }
 
     private void initComponents() {
         setLayout(new GridBagLayout());
-
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = GridBagConstraints.REMAINDER;
         //add the title
         add(titleLabel, c);
-
         //add the slider
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         add(slider, c);
-
         //add the min and max labels
         c = new GridBagConstraints();
         c.gridx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         add(minLabel, c);
-
         c = new GridBagConstraints();
         c.gridx = 1;
         c.weightx = 1.0;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(Box.createGlue(), c);
-
         c = new GridBagConstraints();
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_START;
@@ -92,15 +81,15 @@ public class LabeledRangeSlider extends JPanel {
         slider.addChangeListener(listener);
     }
 
+    int getLowerValue() {
+        return slider.getLowerValue();
+    }
+
     /**
      * Sets the lower value in the range.
      */
     void setLowerValue(@SuppressWarnings("SameParameterValue") int value) {
         slider.setLowerValue(value);
-    }
-
-    int getLowerValue() {
-        return slider.getLowerValue();
     }
 
     int getUpperValue() {

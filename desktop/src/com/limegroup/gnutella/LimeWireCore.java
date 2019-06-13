@@ -9,31 +9,30 @@ package com.limegroup.gnutella;
  * option to retrieving the individual objects from this class.
  */
 public class LimeWireCore {
-    
     private static LimeWireCore INSTANCE;
-    
+
+    private LimeWireCore() {
+    }
+
     public static LimeWireCore instance() {
         if (INSTANCE == null) {
             INSTANCE = new LimeWireCore();
         }
         return INSTANCE;
     }
-        
-    private LimeWireCore() {
-    }
-    
+
     public DownloadManager getDownloadManager() {
         return LimeWireCoreModule.instance().getDownloadManager();
     }
-    
+
     public LifecycleManager getLifecycleManager() {
         return LimeWireCoreModule.instance().getLifecycleManager();
     }
-    
+
     public ExternalControl getExternalControl() {
         return ExternalControl.instance(LimeWireCoreModule.instance().getActivityCallback());
     }
-    
+
     public LimeCoreGlue getLimeCoreGlue() {
         return LimeCoreGlue.instance();
     }

@@ -9,25 +9,20 @@ import org.limewire.setting.SettingsFactory;
  * Manages settings for tables and their associated components.
  */
 public class TableSettings {
-    
     /**
      * The SettingsFactory settings will be added/read to/from.
      */
-    protected static final SettingsFactory FACTORY = TablesHandlerSettings.instance().getFactory();    
-    
-    public static final IntSetting DEFAULT_TABLE_ROW_HEIGHT = FACTORY.createIntSetting("TABLE_ROW_HEIGHT",22);
-    
+    protected static final SettingsFactory FACTORY = TablesHandlerSettings.instance().getFactory();
+    public static final IntSetting DEFAULT_TABLE_ROW_HEIGHT = FACTORY.createIntSetting("TABLE_ROW_HEIGHT", 22);
     /**
      * Additions to the ID to identify the setting.
      */
     private static final String SORT = "_SORT";
     private static final String TOOLTIP = " _TOOLTIP";
-    
     /**
      * The setting for whether or not to sort in real time.
      */
     public BooleanSetting REAL_TIME_SORT;
-    
     /**
      * The setting for whether or not to display tooltips.
      */
@@ -51,14 +46,14 @@ public class TableSettings {
     private boolean getDefaultSorting() {
         return true;
     }
-    
+
     /**
      * Returns the default value for displaying tooltips.
      */
     protected boolean getDefaultTooltips() {
         return true;
     }
-    
+
     /**
      * Reverts all options to their default for this table.
      */
@@ -66,7 +61,7 @@ public class TableSettings {
         REAL_TIME_SORT.revertToDefault();
         DISPLAY_TOOLTIPS.revertToDefault();
     }
-    
+
     /**
      * Determines if all the options are already at their defaults.
      */

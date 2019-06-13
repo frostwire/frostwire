@@ -5,8 +5,9 @@ package com.limegroup.gnutella.gui.notify;
  * notification mechanism, such as the "system tray" on Windows.
  */
 public interface NotifyUser {
-    
-    /** Returns true if the NotifyUser implementation supports a system tray icon. */
+    /**
+     * Returns true if the NotifyUser implementation supports a system tray icon.
+     */
     boolean supportsSystemTray();
 
     /**

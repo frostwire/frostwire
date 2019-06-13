@@ -25,7 +25,6 @@ import java.awt.*;
  * has a background image which is painted.
  */
 public class DitherPanel extends JPanel {
-
     private final Ditherer DITHERER;
 
     /**

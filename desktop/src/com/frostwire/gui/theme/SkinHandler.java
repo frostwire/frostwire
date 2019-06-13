@@ -3,7 +3,6 @@ package com.frostwire.gui.theme;
 import java.awt.*;
 
 public class SkinHandler {
-
     /**
      * Setting for the window 8 Color.
      */
@@ -15,7 +14,7 @@ public class SkinHandler {
      * Setting for the table header background Color.
      */
     public static Color getTableHeaderBackgroundColor() {
-        return new Color(184,210,238);
+        return new Color(184, 210, 238);
     }
 
     /**

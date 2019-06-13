@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,12 +25,9 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * 
  * @author aldenml
- *
  */
 class MPlayerParser extends AbstractTagParser {
-
     private static final Logger LOG = Logger.getLogger(MPlayerParser.class);
 
     public MPlayerParser(File file) {
@@ -40,16 +37,12 @@ class MPlayerParser extends AbstractTagParser {
     @Override
     public TagsData parse() {
         TagsData data = null;
-
         try {
             MPlayer mplayer = new MPlayer();
-
             try {
                 Map<String, String> properties = mplayer.getProperties(file.getAbsolutePath());
-
                 int duration = parseDuration(properties.get("ID_LENGTH"));
                 String bitrate = parseBitrate(properties.get("ID_AUDIO_BITRATE"));
-
                 String title = properties.get("Title");
                 String artist = properties.get("Artist");
                 String album = properties.get("Album");
@@ -59,14 +52,12 @@ class MPlayerParser extends AbstractTagParser {
                 String year = properties.get("Year");
                 String lyrics = properties.get("Lyrics");
                 data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
-
             } finally {
                 mplayer.dispose();
             }
         } catch (Exception e) {
             LOG.warn("Unable to parse file with mplayer: " + file, e);
         }
-
         return data;
     }
 

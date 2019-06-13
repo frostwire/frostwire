@@ -103,5 +103,4 @@ public class ShellFolderColumnInfo {
     boolean isCompareByColumn() {
         return compareByColumn;
     }
-
 }

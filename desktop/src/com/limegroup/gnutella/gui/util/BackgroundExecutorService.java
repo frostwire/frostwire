@@ -25,12 +25,11 @@ import java.util.concurrent.Future;
  * Static helper class that allows background tasks to be scheduled from the GUI.
  */
 public class BackgroundExecutorService {
-
     /**
      * Queue for items to be run in the background.
      */
     private static final ExecutorService QUEUE = ExecutorsHelper.newProcessingQueue(" ");
-    
+
     private BackgroundExecutorService() {
     }
 
@@ -40,9 +39,8 @@ public class BackgroundExecutorService {
     public static void schedule(Runnable r) {
         QUEUE.execute(r);
     }
-    
+
     public static <T> Future<T> submit(Callable<T> c) {
         return QUEUE.submit(c);
     }
-
 }

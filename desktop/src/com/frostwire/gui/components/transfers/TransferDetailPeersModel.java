@@ -21,8 +21,7 @@ package com.frostwire.gui.components.transfers;
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
 class TransferDetailPeersModel extends
-        BasicDataLineModel<TransferDetailPeersDataLine, TransferDetailPeers.PeerItemHolder>{
-
+        BasicDataLineModel<TransferDetailPeersDataLine, TransferDetailPeers.PeerItemHolder> {
     TransferDetailPeersModel() {
         super(TransferDetailPeersDataLine.class);
     }

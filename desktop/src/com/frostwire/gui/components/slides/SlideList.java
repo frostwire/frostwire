@@ -20,10 +20,8 @@ package com.frostwire.gui.components.slides;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SlideList {
     public List<Slide> slides;

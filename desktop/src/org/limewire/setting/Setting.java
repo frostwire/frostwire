@@ -7,7 +7,6 @@ import org.limewire.setting.evt.SettingListener;
  * within this package.
  */
 public interface Setting {
-
     /**
      * Returns all {@link SettingListener}s or null of there are none
      */
@@ -40,23 +39,27 @@ public interface Setting {
     Setting setAlwaysSave(boolean alwaysSave);
 
     /**
-     * Sets whether or not this setting should be reported in bug reports.
-     */
-    Setting setPrivate(boolean isPrivate);
-
-    /**
      * Determines whether or not a setting is private.
      */
     boolean isPrivate();
+
+    /**
+     * Sets whether or not this setting should be reported in bug reports.
+     */
+    Setting setPrivate(boolean isPrivate);
 
     /**
      * Determines whether or not the current value is the default value.
      */
     boolean isDefault();
 
-    /** Get the key for this setting.     */
+    /**
+     * Get the key for this setting.
+     */
     String getKey();
 
-    /**  Returns the value as stored in the properties file.    */
+    /**
+     * Returns the value as stored in the properties file.
+     */
     String getValueAsString();
 }

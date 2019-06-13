@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,12 +29,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * 
  * @author aldenml
- *
  */
 class MP3Parser extends JaudiotaggerParser {
-
     private static final Logger LOG = Logger.getLogger(MP3Parser.class);
 
     public MP3Parser(File file) {
@@ -44,7 +41,6 @@ class MP3Parser extends JaudiotaggerParser {
     @Override
     public BufferedImage getArtwork() {
         BufferedImage image = super.getArtwork();
-
         if (image == null) {
             try {
                 MP3File mp3 = new MP3File(file.getAbsoluteFile());
@@ -60,7 +56,6 @@ class MP3Parser extends JaudiotaggerParser {
                 LOG.error("Unable to read cover art from mp3");
             }
         }
-
         return image;
     }
 
@@ -98,7 +93,6 @@ class MP3Parser extends JaudiotaggerParser {
 
     private String getValueSafe(String currentValue, AudioFile audioFile, String identifier) {
         String value = currentValue;
-
         if (value == null || value.length() == 0) {
             if (audioFile instanceof MP3File && ((MP3File) audioFile).hasID3v2Tag()) {
                 try {
@@ -109,7 +103,6 @@ class MP3Parser extends JaudiotaggerParser {
                 }
             }
         }
-
         return value;
     }
 }

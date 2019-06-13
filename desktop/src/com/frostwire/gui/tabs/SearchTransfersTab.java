@@ -24,8 +24,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * Created on 6/15/16.
@@ -34,7 +32,6 @@ import java.beans.PropertyChangeListener;
  * @author aldenml
  */
 public final class SearchTransfersTab extends AbstractTab {
-
     private final JSplitPane searchDownloadSplitPane;
 
     public SearchTransfersTab(SearchTab searchTab, TransfersTab transfersTab) {
@@ -42,16 +39,13 @@ public final class SearchTransfersTab extends AbstractTab {
         super(I18n.tr("Search"),
                 I18n.tr("Search and Download Files from the Internet."),
                 "search_tab");
-
         searchDownloadSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                 searchTab.getComponent(),
                 transfersTab.getComponent());
-
         searchDownloadSplitPane.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
         searchDownloadSplitPane.setContinuousLayout(true);
         searchDownloadSplitPane.setResizeWeight(0.6);
         searchDownloadSplitPane.setDividerLocation(UISettings.UI_TRANSFERS_DIVIDER_LOCATION.getValue());
-
         searchDownloadSplitPane.addPropertyChangeListener(JSplitPane.LAST_DIVIDER_LOCATION_PROPERTY, evt -> {
             JSplitPane splitPane = (JSplitPane) evt.getSource();
             int current = splitPane.getDividerLocation();

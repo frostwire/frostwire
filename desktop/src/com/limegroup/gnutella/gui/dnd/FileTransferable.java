@@ -37,75 +37,69 @@ import java.util.List;
  * (in response to a getTransferData call).
  */
 public class FileTransferable implements Transferable {
-    
-	private final List<File> files;
-	
-    private final List<? extends FileTransfer> lazyFiles;
-	
     /**
-	 * Holds the data flavor used on linux desktops for file drags.
-	 */
-	static final DataFlavor URIFlavor = createURIFlavor();
-	
-	static final DataFlavor URIFlavor16 = createURIFlavor16();
-	
-	private static final List<? extends FileTransfer> EMPTY_FILE_TRANSFER_LiST =
-		Collections.emptyList();
+     * Holds the data flavor used on linux desktops for file drags.
+     */
+    static final DataFlavor URIFlavor = createURIFlavor();
+    static final DataFlavor URIFlavor16 = createURIFlavor16();
+    private static final List<? extends FileTransfer> EMPTY_FILE_TRANSFER_LiST =
+            Collections.emptyList();
+    private final List<File> files;
+    private final List<? extends FileTransfer> lazyFiles;
 
-	private static DataFlavor createURIFlavor() {
-		try {
-			return new DataFlavor("text/uri-list;class=java.lang.String");
-		} catch (ClassNotFoundException cnfe) {
-			return null;
-		}
-	}
-
-	private static DataFlavor createURIFlavor16() {
-		try {
-			return new DataFlavor("text/uri-list;representationclass=java.lang.String");
-		} catch (ClassNotFoundException cnfe) {
-			return null;
-		}
-	}
-	
-	
-	public FileTransferable(List<File> files) {
+    public FileTransferable(List<File> files) {
         this(files, EMPTY_FILE_TRANSFER_LiST);
     }
-	
+
     /**
      * @param realFiles
      * @param lazyFiles
      */
-	FileTransferable(List<File> realFiles,
-					 List<? extends FileTransfer> lazyFiles) {
-		if (realFiles == null) { 
-			throw new NullPointerException("realFiles must not be null");
-		}
-		if (lazyFiles == null) {
-			throw new NullPointerException("lazyFiles must not be empty");
-		}
-		// copy, given list might not me mutable
+    FileTransferable(List<File> realFiles,
+                     List<? extends FileTransfer> lazyFiles) {
+        if (realFiles == null) {
+            throw new NullPointerException("realFiles must not be null");
+        }
+        if (lazyFiles == null) {
+            throw new NullPointerException("lazyFiles must not be empty");
+        }
+        // copy, given list might not me mutable
         this.files = new ArrayList<>(realFiles);
         this.lazyFiles = new ArrayList<>(lazyFiles);
     }
 
-	private List<File> getFiles() {
-		if (!lazyFiles.isEmpty()) {
-			for (FileTransfer transfer : lazyFiles) {
-				File f = transfer.getFile();
-				if (f != null) 
-					files.add(f);
-			}
-			lazyFiles.clear();
-		}
-		return files;
-	}
-	
-    public Object getTransferData(DataFlavor flavor) 
-      throws UnsupportedFlavorException, IOException {
-    	if (flavor.equals(DataFlavor.javaFileListFlavor)) {
-    		return getFiles();
+    private static DataFlavor createURIFlavor() {
+        try {
+            return new DataFlavor("text/uri-list;class=java.lang.String");
+        } catch (ClassNotFoundException cnfe) {
+            return null;
+        }
+    }
+
+    private static DataFlavor createURIFlavor16() {
+        try {
+            return new DataFlavor("text/uri-list;representationclass=java.lang.String");
+        } catch (ClassNotFoundException cnfe) {
+            return null;
+        }
+    }
+
+    private List<File> getFiles() {
+        if (!lazyFiles.isEmpty()) {
+            for (FileTransfer transfer : lazyFiles) {
+                File f = transfer.getFile();
+                if (f != null)
+                    files.add(f);
+            }
+            lazyFiles.clear();
+        }
+        return files;
+    }
+
+    public Object getTransferData(DataFlavor flavor)
+            throws UnsupportedFlavorException, IOException {
+        if (flavor.equals(DataFlavor.javaFileListFlavor)) {
+            return getFiles();
         } else if ((URIFlavor != null && URIFlavor.equals(flavor)) ||
                 (URIFlavor16 != null && URIFlavor16.equals(flavor))) {
             StringBuilder sb = new StringBuilder();
@@ -118,23 +112,22 @@ public class FileTransferable implements Transferable {
                 sb.append(uri.toString());
             }
             return sb.toString();
-    	}
-    	else {
-    		throw new UnsupportedFlavorException(flavor);
-    	}
+        } else {
+            throw new UnsupportedFlavorException(flavor);
+        }
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        if(OSUtils.isWindows()) {
-            return new DataFlavor[] { DataFlavor.javaFileListFlavor };
+        if (OSUtils.isWindows()) {
+            return new DataFlavor[]{DataFlavor.javaFileListFlavor};
         } else {
-            return new DataFlavor[] { DataFlavor.javaFileListFlavor, URIFlavor, URIFlavor16 };
+            return new DataFlavor[]{DataFlavor.javaFileListFlavor, URIFlavor, URIFlavor16};
         }
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(DataFlavor.javaFileListFlavor)
-        	|| flavor.equals(URIFlavor)
-        	|| flavor.equals(URIFlavor16);
+                || flavor.equals(URIFlavor)
+                || flavor.equals(URIFlavor16);
     }
 }

@@ -3,17 +3,16 @@ package org.limewire.setting;
 import org.limewire.service.Switch;
 
 /**
- * Provides a boolean setting value. As a subclass of 
+ * Provides a boolean setting value. As a subclass of
  * <code>Setting</code>, the setting has a key.
  * <p>
- * You can create a <code>BooleanSetting</code> object with a 
+ * You can create a <code>BooleanSetting</code> object with a
  * {@link SettingsFactory#createBooleanSetting(String, boolean)}.
  */
 public interface BooleanSetting extends Setting, Switch {
-
     /**
      * Returns the value of this setting.
-     * 
+     *
      * @return the value of this setting
      */
     boolean getValue();
@@ -30,5 +29,4 @@ public interface BooleanSetting extends Setting, Switch {
      * sets it to false and vice versa.
      */
     void invert();
-
 }

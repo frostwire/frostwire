@@ -28,18 +28,26 @@ import java.sql.DriverManager;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class SQLiteOpenHelper {
-
     private static final Logger LOG = Logger.getLogger(SQLiteOpenHelper.class);
-
     private final SQLiteDatabase db;
     private String folderpath;
 
     public SQLiteOpenHelper(Context context, String name, int version, String extraArgs) {
         String dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
+    }
+
+    private static long folderSize(File directory) {
+        long length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile())
+                length += file.length();
+            else
+                length += folderSize(file);
+        }
+        return length;
     }
 
     public synchronized SQLiteDatabase getWritableDatabase() {
@@ -69,7 +77,7 @@ public abstract class SQLiteOpenHelper {
      * you can use ALTER TABLE to rename the old table, then create the new table and then
      * populate the new table with the contents of the old table.
      *
-     * @param db The database.
+     * @param db         The database.
      * @param oldVersion The old database version.
      * @param newVersion The new database version.
      */
@@ -80,20 +88,15 @@ public abstract class SQLiteOpenHelper {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("jdbc:h2:");
-
             folderpath = dbpath + "." + version;
             String fullpath = folderpath + File.separator + name;
             sb.append(fullpath);
-
             if (extraArgs != null) {
                 sb.append(";").append(extraArgs);
             }
-
             boolean create = !(new File(folderpath).exists());
-
             Connection connection = DriverManager.getConnection(sb.toString(), "SA", "");
             SQLiteDatabase db = new SQLiteDatabase(fullpath, connection);
-
             if (create) {
                 onCreate(db);
             }
@@ -112,16 +115,5 @@ public abstract class SQLiteOpenHelper {
             }
         }
         return 0;
-    }
-
-    private static long folderSize(File directory) {
-        long length = 0;
-        for (File file : directory.listFiles()) {
-            if (file.isFile())
-                length += file.length();
-            else
-                length += folderSize(file);
-        }
-        return length;
     }
 }

@@ -30,7 +30,6 @@ public class AESemaphore {
     private int dont_wait;
     private int total_reserve = 0;
     private int total_release;
-
     private boolean released_forever = false;
 
     public AESemaphore() {
@@ -62,73 +61,45 @@ public class AESemaphore {
             if (released_forever) {
                 return;
             }
-
             if (dont_wait == 0) {
-
                 try {
                     waiting++;
-
                     if ((long) 0 == 0) {
-
                         // we can get spurious wakeups (see Object javadoc) so we need to guard against
                         // their possibility
-
                         int spurious_count = 0;
-
                         while (true) {
-
                             wait();
-
                             if (total_reserve == total_release) {
-
                                 spurious_count++;
-
                                 if (spurious_count > 1024) {
-
                                     LOG.error("AESemaphore: spurious wakeup limit exceeded");
-
                                     throw (new Throwable("die die die"));
-
                                 }
                             } else {
-
                                 break;
                             }
                         }
                     } else {
-
                         // we don't hugely care about spurious wakeups here, it'll just appear
                         // as a failed reservation a bit early
                         wait(0);
                     }
-
                     if (total_reserve == total_release) {
-
                         // here we have timed out on the wait without acquiring
-
                         waiting--;
-
                         return;
                     }
-
                     total_reserve++;
-
                 } catch (Throwable e) {
-
                     waiting--;
-
                     LOG.error("**** semaphore operation interrupted ****");
-
                     throw (new RuntimeException("Semaphore: operation interrupted", e));
-
                 }
             } else {
                 int num_to_get = 1 > dont_wait ? dont_wait : 1;
-
                 dont_wait -= num_to_get;
-
                 total_reserve += num_to_get;
-
             }
         }
     }
@@ -136,17 +107,11 @@ public class AESemaphore {
     public void
     release() {
         synchronized (this) {
-
             //System.out.println( name + "::release");
-
             total_release++;
-
             if (waiting != 0) {
-
                 waiting--;
-
                 notify();
-
             } else {
                 dont_wait++;
             }
@@ -156,9 +121,7 @@ public class AESemaphore {
     private void
     releaseAllWaiters() {
         synchronized (this) {
-
             int x = waiting;
-
             for (int i = 0; i < x; i++) {
                 release();
             }
@@ -168,11 +131,8 @@ public class AESemaphore {
     public void
     releaseForever() {
         synchronized (this) {
-
             releaseAllWaiters();
-
             released_forever = true;
         }
     }
-
 }

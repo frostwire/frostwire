@@ -32,9 +32,20 @@ import java.io.File;
 
 /**
  * @author aldenml
- *
  */
 public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, MediaPlayerListener {
+    private static final int JMPlayer_addNotify = 1;
+    private static final int JMPlayer_dispose = 2;
+    // ui events
+    private static final int JMPlayer_volumeChanged = 3;
+    private static final int JMPlayer_timeInitialized = 4;
+    private static final int JMPlayer_progressChanged = 5;
+    private static final int JMPlayer_stateChanged = 6;
+    private static final int JMPlayer_toggleFS = 7;
+    // states
+    private static final int JMPlayer_statePlaying = 1;
+    private static final int JMPlayer_statePaused = 2;
+    private static final int JMPlayer_stateClosed = 3;
 
     static {
         try {
@@ -45,22 +56,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     private long view;
-
-    private static final int JMPlayer_addNotify = 1;
-    private static final int JMPlayer_dispose = 2;
-
-    // ui events
-    private static final int JMPlayer_volumeChanged = 3;
-    private static final int JMPlayer_timeInitialized = 4;
-    private static final int JMPlayer_progressChanged = 5;
-    private static final int JMPlayer_stateChanged = 6;
-    private static final int JMPlayer_toggleFS = 7;
-
-    // states
-    private static final int JMPlayer_statePlaying = 1;
-    private static final int JMPlayer_statePaused = 2;
-    private static final int JMPlayer_stateClosed = 3;
-
     private boolean refreshPlayTime = false;
 
     public MPlayerComponentOSX2() {
@@ -85,7 +80,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public void addNotify() {
         super.addNotify();
-
         com.apple.concurrent.Dispatch.getInstance().getBlockingMainQueueExecutor().execute(() -> {
             view = createNSView(getImagesPath());
             sendMsg(JMPlayer_addNotify);
@@ -148,11 +142,11 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     public void onProgressSliderEnded() {
         SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onProgressSlideEnd());
     }
-    
+
     public void onMouseMoved() {
         SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().showOverlayControls());
     }
-    
+
     public void onMouseDoubleClick() {
         SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().toggleFullScreen());
     }
@@ -160,7 +154,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public void mediaOpened(MediaPlayer mediaPlayer, MediaSource mediaSource) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -176,31 +169,27 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public void stateChange(MediaPlayer mediaPlayer, MediaPlaybackState state) {
         int s;
-
         switch (state) {
-        case Playing:
-            s = JMPlayer_statePlaying;
-            break;
-        case Paused:
-            s = JMPlayer_statePaused;
-            break;
-        case Closed:
-            s = JMPlayer_stateClosed;
-            break;
-        default:
-            s = -1;
-            break;
+            case Playing:
+                s = JMPlayer_statePlaying;
+                break;
+            case Paused:
+                s = JMPlayer_statePaused;
+                break;
+            case Closed:
+                s = JMPlayer_stateClosed;
+                break;
+            default:
+                s = -1;
+                break;
         }
-
         if (state == MediaPlaybackState.Playing && refreshPlayTime) {
             refreshPlayTime = false;
             sendMsg(JMPlayer_timeInitialized, MediaPlayer.instance().getDurationInSecs());
         }
-
         if (state != MediaPlaybackState.Playing) {
             refreshPlayTime = true;
         }
-
         if (s != -1) {
             sendMsg(JMPlayer_stateChanged, s);
         }
@@ -209,7 +198,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public void icyInfo(String data) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -238,7 +226,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
         f = new File(f, "Resources");
-
         return f.getAbsolutePath() + File.separator;
     }
 

@@ -18,6 +18,5 @@
 package com.frostwire.gui.filters;
 
 public interface SearchFilterFactory {
-
     SearchFilter createFilter();
 }

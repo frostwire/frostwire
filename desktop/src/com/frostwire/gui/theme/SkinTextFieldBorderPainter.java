@@ -28,7 +28,6 @@ import java.awt.*;
  * @author aldenml
  */
 public final class SkinTextFieldBorderPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinTextFieldBorderPainter(State state) {

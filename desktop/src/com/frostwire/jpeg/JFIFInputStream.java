@@ -1,6 +1,6 @@
 /*
  * @(#)JFIFInputStream.java  1.3  2011-01-28
- * 
+ *
  * Copyright (c) 2008-2011 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.
  *
@@ -44,7 +44,6 @@ import java.util.HashSet;
  *   Chapmann & Hall, New York.<br>
  *   ISBN 0-442-01272-1<br>
  *
- *
  * @author Werner Randelshofer, Hausmatt 10, CH-6405 Immensee
  * @version 1.3 2011-01-28 Adds SOF markers.
  * <br>1.2 2011-01-23 Adds method skipFully.
@@ -54,75 +53,29 @@ import java.util.HashSet;
  * <br>1.0 2008-10-14 Created.
  */
 public class JFIFInputStream extends FilterInputStream {
-
     /**
-     * This hash set holds the Id's of markers which stand alone,
-     * respectively do no have a data segment.
+     * JUNK_MARKER Marker (for data which is not part of the JFIF stream.
      */
-    private final HashSet<Integer> standaloneMarkers = new HashSet<>();
-    /** 
-     * This hash set holds the Id's of markers which have a data
-     * segment followed by a entropy-coded data segment.
-     */
-    private final HashSet<Integer> doubleSegMarkers = new HashSet<>();
-
-    /** Represents a segment within a JFIF File. 
-     */
-    public static class Segment {
-
-        /**
-         * Holds the marker code.
-         * A marker is an unsigned short between 0xff01 and 0xfffe.
-         */
-        final int marker;
-        /**
-         * Holds the offset of the first data byte to the beginning
-         * of the stream.
-         */
-        public final long offset;
-        /**
-         * If the marker starts a marker segment, holds the length
-         * of the data in the data segment.
-         * If the marker starts a entropy-coded data segment, holds
-         * the value -1.
-         */
-        public final int length;
-
-        Segment(int marker, long offset, int length) {
-            this.marker = marker;
-            this.offset = offset;
-            this.length = length;
-        }
-
-        boolean isEntropyCoded() {
-            return length == -1;
-        }
-
-        @Override
-        public String toString() {
-            return "Segment marker=0x" + Integer.toHexString(marker) + " offset=" + offset + "=0x" + Long.toHexString(offset);
-        }
-    }
-    private Segment segment;
-    /** 
-     * This variable is set to true, if a 0xff byte has been found in 
-     * entropy-code data.
-     */
-    private boolean markerFound;
-    private int marker = JUNK_MARKER;
-    private long offset = 0;
-    private boolean isStuffed0xff = false;
-    /** JUNK_MARKER Marker (for data which is not part of the JFIF stream. */
     private final static int JUNK_MARKER = -1;
-    /** Start of image */
+    /**
+     * Start of image
+     */
     private final static int SOI_MARKER = 0xffd8;
-    /** End of image */
+    /**
+     * End of image
+     */
     private final static int EOI_MARKER = 0xffd9;
-    /** Temporary private use in arithmetic coding */
+    /**
+     * Temporary private use in arithmetic coding
+     */
     private final static int TEM_MARKER = 0xff01;
-    /** Start of scan */
+    /**
+     * Start of scan
+     */
     private final static int SOS_MARKER = 0xffda;
-    /** Reserved for JPEG extensions */
+    /**
+     * Reserved for JPEG extensions
+     */
     private final static int JPG0_MARKER = 0xfff0;
     private final static int JPG1_MARKER = 0xfff1;
     private final static int JPG2_MARKER = 0xfff2;
@@ -137,14 +90,30 @@ public class JFIFInputStream extends FilterInputStream {
     private final static int JPGB_MARKER = 0xfffB;
     private final static int JPGC_MARKER = 0xfffC;
     private final static int JPGD_MARKER = 0xfffD;
-
     // Restart markers
     private final static int RST0_MARKER = 0xffd0;
     private final static int RST7_MARKER = 0xffd7;
-
+    /**
+     * This hash set holds the Id's of markers which stand alone,
+     * respectively do no have a data segment.
+     */
+    private final HashSet<Integer> standaloneMarkers = new HashSet<>();
+    /**
+     * This hash set holds the Id's of markers which have a data
+     * segment followed by a entropy-coded data segment.
+     */
+    private final HashSet<Integer> doubleSegMarkers = new HashSet<>();
+    private Segment segment;
+    /**
+     * This variable is set to true, if a 0xff byte has been found in
+     * entropy-code data.
+     */
+    private boolean markerFound;
+    private int marker = JUNK_MARKER;
+    private long offset = 0;
+    private boolean isStuffed0xff = false;
     JFIFInputStream(InputStream in) {
         super(in);
-
         for (int i = RST0_MARKER; i <= RST7_MARKER; i++) {
             standaloneMarkers.add(i); // RST(i) Restart interval termination
         }
@@ -167,14 +136,13 @@ public class JFIFInputStream extends FilterInputStream {
         standaloneMarkers.add(JPGD_MARKER);
         standaloneMarkers.add(0xffff); // Illegal marker
         doubleSegMarkers.add(SOS_MARKER); // SOS_MARKER Start of Scan
-
         // Start with a dummy entropy-coded data segment.
         segment = new Segment(-1, 0, -1);
     }
 
     /**
      * Gets the next segment from the input stream.
-     * 
+     *
      * @return The next segment. Returns null, if we encountered
      * the end of the stream.
      */
@@ -191,13 +159,11 @@ public class JFIFInputStream extends FilterInputStream {
                 }
                 offset += skipped;
             } while (offset < segment.length + segment.offset);
-
             if (doubleSegMarkers.contains(segment.marker)) {
                 segment = new Segment(0, offset, -1);
                 return segment;
             }
         }
-
         // Scan the input stream for the next marker.
         while (!markerFound) {
             while (true) {
@@ -234,7 +200,6 @@ public class JFIFInputStream extends FilterInputStream {
         if (marker <= 0xff00 || marker >= 0xffff) {
         throw new IOException("JFIFInputStream found illegal marker " + Integer.toHexString(marker) + " at offset " + offset + " 0x"+Long.toHexString(offset)+".");
         }*/
-
         // Note: 0xffff is an illegal marker segment, we process it here
         // for robustness.
         if (standaloneMarkers.contains(marker)) {
@@ -258,28 +223,27 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Reads the next byte of data from this input stream. The value 
-     * byte is returned as an <code>int</code> in the range 
-     * <code>0</code> to <code>255</code>. If no byte is available 
-     * because the end of the stream has been reached, the value 
-     * <code>-1</code> is returned. This method blocks until input data 
-     * is available, the end of the stream is detected, or an exception 
-     * is thrown. 
+     * Reads the next byte of data from this input stream. The value
+     * byte is returned as an <code>int</code> in the range
+     * <code>0</code> to <code>255</code>. If no byte is available
+     * because the end of the stream has been reached, the value
+     * <code>-1</code> is returned. This method blocks until input data
+     * is available, the end of the stream is detected, or an exception
+     * is thrown.
      * <p>
      * This method
      * simply performs <code>in.read()</code> and returns the result.
      *
-     * @return     the next byte of data, or <code>-1</code> if the end of the
-     *             stream is reached.
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
+     * @return the next byte of data, or <code>-1</code> if the end of the
+     * stream is reached.
+     * @throws IOException if an I/O error occurs.
+     * @see java.io.FilterInputStream#in
      */
     @Override
     public int read() throws IOException {
         if (markerFound) {
             return -1;
         }
-
         int b;
         if (isStuffed0xff) {
             isStuffed0xff = false;
@@ -287,7 +251,6 @@ public class JFIFInputStream extends FilterInputStream {
         } else {
             b = read0();
         }
-
         if (segment.isEntropyCoded()) {
             if (b == 0xff) {
                 b = read0();
@@ -308,37 +271,35 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Reads up to <code>len</code> b of data from this input stream 
-     * into an array of b. This method blocks until some input is 
-     * available. 
+     * Reads up to <code>len</code> b of data from this input stream
+     * into an array of b. This method blocks until some input is
+     * available.
      * <p>
-     * This method simply performs <code>in.read(b, off, len)</code> 
+     * This method simply performs <code>in.read(b, off, len)</code>
      * and returns the result.
      *
-     * @param      b     the buffer into which the data is read.
-     * @param      off   the start offset of the data.
-     * @param      len   the maximum number of b read.
-     * @return     the total number of b read into the buffer, or
-     *             <code>-1</code> if there is no more data because the end of
-     *             the stream has been reached.
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
+     * @param b   the buffer into which the data is read.
+     * @param off the start offset of the data.
+     * @param len the maximum number of b read.
+     * @return the total number of b read into the buffer, or
+     * <code>-1</code> if there is no more data because the end of
+     * the stream has been reached.
+     * @throws IOException if an I/O error occurs.
+     * @see java.io.FilterInputStream#in
      */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (markerFound) {
             return -1;
         }
-
         int count = 0;
         if (segment.isEntropyCoded()) {
             for (; count < len; count++) {
                 int data = read();
                 if (data == -1) {
-                    if (count==0) return -1;
+                    if (count == 0) return -1;
                     break;
                 }
-
                 b[off + count] = (byte) data;
             }
         } else {
@@ -358,25 +319,24 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Skips over and discards <code>n</code> b of data from the 
-     * input stream. The <code>skip</code> method may, for a variety of 
+     * Skips over and discards <code>n</code> b of data from the
+     * input stream. The <code>skip</code> method may, for a variety of
      * reasons, end up skipping over some smaller number of b,
      * possibly <code>0</code>. The actual number of b skipped is
-     * returned. 
+     * returned.
      * <p>
      * This method
      * simply performs <code>in.skip(n)</code>.
      *
-     * @param      n   the number of b to be skipped.
-     * @return     the actual number of b skipped.
-     * @exception  IOException  if an I/O error occurs.
+     * @param n the number of b to be skipped.
+     * @return the actual number of b skipped.
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public long skip(long n) throws IOException {
         if (markerFound) {
             return -1;
         }
-
         long count = 0;
         if (segment.isEntropyCoded()) {
             for (; count < n; count++) {
@@ -399,20 +359,20 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Marks the current position in this input stream. A subsequent 
-     * call to the <code>reset</code> method repositions this stream at 
+     * Marks the current position in this input stream. A subsequent
+     * call to the <code>reset</code> method repositions this stream at
      * the last marked position so that subsequent reads re-read the same b.
      * <p>
-     * The <code>readlimit</code> argument tells this input stream to 
-     * allow that many b to be read before the mark position gets 
-     * invalidated. 
+     * The <code>readlimit</code> argument tells this input stream to
+     * allow that many b to be read before the mark position gets
+     * invalidated.
      * <p>
      * This method simply performs <code>in.mark(readlimit)</code>.
      *
-     * @param   readlimit   the maximum limit of b that can be read before
-     *                      the mark position becomes invalid.
-     * @see     java.io.FilterInputStream#in
-     * @see     java.io.FilterInputStream#reset()
+     * @param readlimit the maximum limit of b that can be read before
+     *                  the mark position becomes invalid.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.FilterInputStream#reset()
      */
     @Override
     public synchronized void mark(int readlimit) {
@@ -420,8 +380,8 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Repositions this stream to the position at the time the 
-     * <code>mark</code> method was last called on this input stream. 
+     * Repositions this stream to the position at the time the
+     * <code>mark</code> method was last called on this input stream.
      * <p>
      * This method
      * simply performs <code>in.reset()</code>.
@@ -435,10 +395,10 @@ public class JFIFInputStream extends FilterInputStream {
      * If this happens within readlimit b, it allows the outer
      * code to reset the stream and try another parser.
      *
-     * @exception  IOException  if the stream has not been marked or if the
-     *               mark has been invalidated.
-     * @see        java.io.FilterInputStream#in
-     * @see        java.io.FilterInputStream#mark(int)
+     * @throws IOException if the stream has not been marked or if the
+     *                     mark has been invalidated.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.FilterInputStream#mark(int)
      */
     @Override
     public synchronized void reset() throws IOException {
@@ -446,20 +406,58 @@ public class JFIFInputStream extends FilterInputStream {
     }
 
     /**
-     * Tests if this input stream supports the <code>mark</code> 
-     * and <code>reset</code> methods. 
+     * Tests if this input stream supports the <code>mark</code>
+     * and <code>reset</code> methods.
      * This method
      * simply performs <code>in.markSupported()</code>.
      *
-     * @return  <code>true</code> if this stream type supports the
-     *          <code>mark</code> and <code>reset</code> method;
-     *          <code>false</code> otherwise.
-     * @see     java.io.FilterInputStream#in
-     * @see     java.io.InputStream#mark(int)
-     * @see     java.io.InputStream#reset()
+     * @return <code>true</code> if this stream type supports the
+     * <code>mark</code> and <code>reset</code> method;
+     * <code>false</code> otherwise.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.InputStream#mark(int)
+     * @see java.io.InputStream#reset()
      */
     @Override
     public boolean markSupported() {
         return false;
+    }
+
+    /**
+     * Represents a segment within a JFIF File.
+     */
+    public static class Segment {
+        /**
+         * Holds the offset of the first data byte to the beginning
+         * of the stream.
+         */
+        public final long offset;
+        /**
+         * If the marker starts a marker segment, holds the length
+         * of the data in the data segment.
+         * If the marker starts a entropy-coded data segment, holds
+         * the value -1.
+         */
+        public final int length;
+        /**
+         * Holds the marker code.
+         * A marker is an unsigned short between 0xff01 and 0xfffe.
+         */
+        final int marker;
+
+        Segment(int marker, long offset, int length) {
+            this.marker = marker;
+            this.offset = offset;
+            this.length = length;
+        }
+
+        boolean isEntropyCoded() {
+            return length == -1;
+        }
+
+        @Override
+        public String toString() {
+            return "Segment marker=0x" + Integer.toHexString(marker) + " offset=" + offset + "=0x" + Long.toHexString(offset);
+        }
     }
 }

@@ -28,13 +28,10 @@ import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractUISearchResult implements UISearchResult {
-
     private final FileSearchResult sr;
     private final SearchEngine se;
     private final String query;

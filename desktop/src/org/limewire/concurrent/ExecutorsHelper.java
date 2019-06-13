@@ -19,7 +19,6 @@ package org.limewire.concurrent;
 
 import java.util.concurrent.*;
 
-
 /**
  * A factory that builds {@link ExecutorService}, {@link ThreadFactory}
  * and {@link ScheduledExecutorService} objects via static methods.
@@ -33,7 +32,6 @@ import java.util.concurrent.*;
  * of worker threads never die.
  */
 public class ExecutorsHelper {
-
     /**
      * Creates a new "ProcessingQueue" using
      * {@link #daemonThreadFactory(String)} as thread factory.

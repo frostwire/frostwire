@@ -15,82 +15,11 @@
 
 package org.limewire.util;
 
-
 /**
- * Converts and splits strings to a normalized versions for internationalization. 
+ * Converts and splits strings to a normalized versions for internationalization.
  * Implementations should use the provided string composition method.
  */
 abstract class AbstractI18NConverter {
-
-    /**
-     * This method should return the converted form of the string s
-     * this method should also split s into the different
-     * unicode blocks
-     * @param s String to be converted
-     * @return the converted string
-     */
-    public abstract String getNorm(String s);
-    
-    /**
-     * Simple composition of a string.
-     */
-    public abstract String compose(String s);
-
-    /**
-     * Returns a string split according to the unicode blocks.  A
-     * space '\u0020' will be splaced between the blocks.
-     * The index to the blockStarts array will be used to compare
-     * when splitting the string.
-     * @param String s
-     * @return string split into blocks with '\u0020' as the delim
-     */
-    String blockSplit(String s) {
-        if(s.length() == 0) return s;
-        else {
-            int blockb4 = of(s.charAt(0));
-            int curBlock;
-            StringBuilder buf = new StringBuilder();
-            buf.append(s.charAt(0));
-            for(int i = 1, n = s.length(); i < n; i++) {
-                curBlock = of(s.charAt(i));
-                //compare the blocks of the current char and the char
-                //right before. Also, make sure we don't add too many 
-                //'\u0020' chars
-                if(curBlock != blockb4 && 
-                   (s.charAt(i) != '\u0020' && s.charAt(i - 1) != '\u0020'))
-                    buf.append("\u0020");
-                buf.append(s.charAt(i));
-                blockb4 = curBlock;
-            }
-            
-            //get rid of trailing space (if any)
-            return buf.toString().trim();
-        }
-    }
-
-    /**
-     * Returns which unicode block the parameter c
-     * belongs to. The returned int is the index to the blockStarts
-     * array. 
-     * @param char c 
-     * @return index to array
-     */
-    int of(char c) {
-	    int top, bottom, current;
-	    bottom = 0;
-	    top = blockStarts.length;
-	    current = top/2;
-	    while (top - bottom > 1) {
-    		if (c >= blockStarts[current]) {
-    		    bottom = current;
-    		} else {
-    		    top = current;
-    		}
-    		current = (top + bottom) / 2;
-	    }
-	    return current;
-	}
-
     /**
      * copy from Character.java
      * the boundaries for each of the unicode blocks
@@ -189,4 +118,74 @@ abstract class AbstractI18NConverter {
             '\uFFF0'
     };
 
+    /**
+     * This method should return the converted form of the string s
+     * this method should also split s into the different
+     * unicode blocks
+     *
+     * @param s String to be converted
+     * @return the converted string
+     */
+    public abstract String getNorm(String s);
+
+    /**
+     * Simple composition of a string.
+     */
+    public abstract String compose(String s);
+
+    /**
+     * Returns a string split according to the unicode blocks.  A
+     * space '\u0020' will be splaced between the blocks.
+     * The index to the blockStarts array will be used to compare
+     * when splitting the string.
+     *
+     * @param String s
+     * @return string split into blocks with '\u0020' as the delim
+     */
+    String blockSplit(String s) {
+        if (s.length() == 0) return s;
+        else {
+            int blockb4 = of(s.charAt(0));
+            int curBlock;
+            StringBuilder buf = new StringBuilder();
+            buf.append(s.charAt(0));
+            for (int i = 1, n = s.length(); i < n; i++) {
+                curBlock = of(s.charAt(i));
+                //compare the blocks of the current char and the char
+                //right before. Also, make sure we don't add too many
+                //'\u0020' chars
+                if (curBlock != blockb4 &&
+                        (s.charAt(i) != '\u0020' && s.charAt(i - 1) != '\u0020'))
+                    buf.append("\u0020");
+                buf.append(s.charAt(i));
+                blockb4 = curBlock;
+            }
+            //get rid of trailing space (if any)
+            return buf.toString().trim();
+        }
+    }
+
+    /**
+     * Returns which unicode block the parameter c
+     * belongs to. The returned int is the index to the blockStarts
+     * array.
+     *
+     * @param char c
+     * @return index to array
+     */
+    int of(char c) {
+        int top, bottom, current;
+        bottom = 0;
+        top = blockStarts.length;
+        current = top / 2;
+        while (top - bottom > 1) {
+            if (c >= blockStarts[current]) {
+                bottom = current;
+            } else {
+                top = current;
+            }
+            current = (top + bottom) / 2;
+        }
+        return current;
+    }
 }

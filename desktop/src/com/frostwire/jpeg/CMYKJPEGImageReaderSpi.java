@@ -1,6 +1,6 @@
 /*
  * @(#)CMYKJPEGImageReaderSpi.java  1.2  2011-02-17
- * 
+ *
  * Copyright (c) 2010-2011 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.
  *
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-
 /**
  * A reader for JPEG images in the CMYK color space.
  *
@@ -26,15 +25,14 @@ import java.util.Locale;
  * <br>1.0 2010-07-23 Created.
  */
 public class CMYKJPEGImageReaderSpi extends ImageReaderSpi {
-
     public CMYKJPEGImageReaderSpi() {
         super("Werner Randelshofer",//vendor name
                 "1.0",//version
-                new String[]{"JPEG","JPG"},//names
+                new String[]{"JPEG", "JPG"},//names
                 new String[]{"jpg"},//suffixes,
                 new String[]{"image/jpg"},// MIMETypes,
                 "ch.randelshofer.media.jpeg.CMYKJPEGImageReader",// readerClassName,
-                new Class[]{ImageInputStream.class,InputStream.class,byte[].class},// inputTypes,
+                new Class[]{ImageInputStream.class, InputStream.class, byte[].class},// inputTypes,
                 null,// writerSpiNames,
                 false,// supportsStandardStreamMetadataFormat,
                 null,// nativeStreamMetadataFormatName,
@@ -46,7 +44,7 @@ public class CMYKJPEGImageReaderSpi extends ImageReaderSpi {
                 null,// nativeImageMetadataFormatClassName,
                 null,// extraImageMetadataFormatNames,
                 null// extraImageMetadataFormatClassNames
-                );
+        );
     }
 
     @Override

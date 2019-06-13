@@ -75,11 +75,9 @@ public final class SwingContainerWrapper extends SwingComponentWrapper implement
         Component c = (Component) getComponent();
         if (!c.isShowing())
             return;
-
         Graphics2D g = (Graphics2D) c.getGraphics();
         if (g == null)
             return;
-
         g.setStroke(new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10f, new float[]{2f, 3f}, 0));
         g.setPaint(DB_CELL_OUTLINE);
         g.drawRect(x, y, width - 1, height - 1);

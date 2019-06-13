@@ -19,7 +19,10 @@ package com.limegroup.gnutella.gui.options.panes.ipfilter;
 
 public interface IPFilterInputStreamReader {
     IPRange readLine();
+
     int bytesRead();
+
     int available();
+
     void close();
 }

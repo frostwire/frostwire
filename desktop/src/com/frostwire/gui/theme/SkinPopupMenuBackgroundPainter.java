@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
-
     public SkinPopupMenuBackgroundPainter(State state) {
     }
 
@@ -44,7 +41,6 @@ public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
             Shape s = shapeGenerator.createRectangle(0, 0, w, h);
             g.setPaint(SkinColors.LIGHT_BACKGROUND_COLOR);
             g.fill(s);
-
             // border
             g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
             g.draw(s);

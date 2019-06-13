@@ -39,16 +39,11 @@ import java.util.List;
  */
 @SuppressWarnings("RedundantThrows")
 final class UpdateMessageReader implements ContentHandler {
-
     //private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
     private static final String DEFAULT_UPDATE_URL = "https://update.frostwire.com";
-
     private HashSet<UpdateMessage> _announcements = null;
-
     private UpdateMessage _bufferMessage = null;
-
     private LinkedList<UpdateMessage> _overlays = null;
-
     private UpdateMessage _updateMessage = null;
 
     /**
@@ -58,7 +53,6 @@ final class UpdateMessageReader implements ContentHandler {
         if (_announcements == null) {
             _announcements = new HashSet<>();
         }
-
         if (msg.getMessageType().equals("announcement") && !msg.hasExpired()) {
             _announcements.add(msg);
         }
@@ -68,27 +62,25 @@ final class UpdateMessageReader implements ContentHandler {
      * As overlay messages are interpreted, this method will add them to
      * _overlays. It will replace old intro messages for newer, and old
      * afterSearch messages for newer.
-     * 
+     * <p>
      * When I say 'old' I mean, a message that was received just a while ago as
      * we were parsing the document.
-     * 
+     * <p>
      * The idea is that update.frostwire.com defines first the more generic
      * update overlays, and further down in the document the more specific
      * overlays, so that we can ignore generic configuration if we are fit for a
      * more specific overlay
-     * 
+     * <p>
      * e.g. An intro for a specific frostwire version, language.
-     * 
+     * <p>
      * which message to keep for the client.
-     * 
+     *
      * @see UpdateManager::updateOverlays(HashSet<UpdateMessage>,UpdateMessageReader me)
      */
     private void addOverlay(UpdateMessage msg) {
         if (msg != null && msg.getMessageType().equals("overlay")) {
-
             if (_overlays == null)
                 _overlays = new LinkedList<>();
-
             // Replace newly found intro, or after search
             // for previously added message of same nature.
             if (!_overlays.isEmpty()) {
@@ -101,7 +93,6 @@ final class UpdateMessageReader implements ContentHandler {
                     }
                 }// while to find what to replace
             }// if we can iterate
-
             // if I make it here, then I need to add a new overlay
             _overlays.add(msg);
         } // if we actually receive an overlay
@@ -110,7 +101,6 @@ final class UpdateMessageReader implements ContentHandler {
         }
     }
 
-
     public void endDocument() throws SAXException {
     }
 
@@ -118,17 +108,16 @@ final class UpdateMessageReader implements ContentHandler {
      * When the tag closes, if we have a _buffer message, we check what type it
      * is and set it as the Update Message (if its for this client/os) or if its
      * an announcement, we add it to the announcements collection.
-     * 
+     * <p>
      * This function will make use of 'isMessageForMe', to try to discard the
      * message in case its addressed to another OS different than the one where
      * this client is running on top of.
-     * 
+     * <p>
      * If its an update message and no update message has been spotted so far,
      * the UpdateReader sets it as the update message object available
-     * 
+     * <p>
      * If its an announcement we attempt adding it as another announcement. That
      * method will only add it if the message has not expired.
-     * 
      */
     public void endElement(String uri, String name, String qName) throws SAXException {
         // discard buffer message if its not meant for me right away.
@@ -137,9 +126,7 @@ final class UpdateMessageReader implements ContentHandler {
             _bufferMessage = null;
             return;
         }
-
         if (_bufferMessage != null && name.equalsIgnoreCase("message")) {
-
             if (_bufferMessage.getMessageType().equalsIgnoreCase("update")) {
                 setUpdateMessage(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
@@ -148,14 +135,12 @@ final class UpdateMessageReader implements ContentHandler {
                 // System.out.println("UpdateMessageReader.endElement() - addOverlay");
                 addOverlay(_bufferMessage);
             }
-
             _bufferMessage = null;
         }
     } // endElement
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-
     }
 
     public void endPrefixMapping(String arg0) throws SAXException {
@@ -167,6 +152,17 @@ final class UpdateMessageReader implements ContentHandler {
 
     UpdateMessage getUpdateMessage() {
         return _updateMessage;
+    }
+
+    /**
+     * Sets only the first update message it finds. Make sure to put only a
+     * single update message every time on the server, If you plan to leave old
+     * messages there, keep the newest one at the beginning of the file.
+     */
+    private void setUpdateMessage(UpdateMessage msg) {
+        if (_updateMessage == null && msg != null && msg.getMessageType().equals("update")) {
+            _updateMessage = msg;
+        }
     }
 
     boolean hasAnnouncements() {
@@ -185,48 +181,38 @@ final class UpdateMessageReader implements ContentHandler {
      * If no language is specified in the message, then it returns true right
      * away the message is meant for everyone, unless there's a more specific
      * message ahead.
-     * 
-     * 
+     * <p>
+     * <p>
      * If you want a full blown validation use isMessageForMe()
-     * 
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {
         String langInMsg = msg.getLanguage(); // current language in message
-
         if (langInMsg == null || langInMsg.equals("*"))
             return true;
-
         String langinapp = ApplicationSettings.getLanguage().toLowerCase();
-
         if (langInMsg.length() == 2)
             return langinapp.toLowerCase().startsWith(langInMsg.toLowerCase());
-
         if (langInMsg.endsWith("*")) {
             langinapp = ApplicationSettings.getLanguage().substring(0, 2);
             langInMsg = langInMsg.substring(0, langInMsg.indexOf("*")); // removes
-                                                                        // last
-                                                                        // char
+            // last
+            // char
         }
-
         return langInMsg.equalsIgnoreCase(langinapp);
     }
 
     /**
      * Checks if this message should be shown for the OS on which this FrostWire
      * is running on.
-     * 
+     * <p>
      * If you want a full blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
         if (msg.getOs() == null)
             return true;
-
         boolean im_mac_msg_for_me = msg.getOs().equals("mac") && OSUtils.isMacOSX();
-
         boolean im_windows_msg_for_me = msg.getOs().equals("windows") && (OSUtils.isWindows() || OSUtils.isWindowsXP() || OSUtils.isWindowsNT() || OSUtils.isWindows98() || OSUtils.isWindows95() || OSUtils.isWindowsMe() || OSUtils.isWindowsVista());
-
         boolean im_linux_msg_for_me = msg.getOs().equals("linux") && OSUtils.isLinux();
-
         return im_mac_msg_for_me || im_windows_msg_for_me || im_linux_msg_for_me;
     }
 
@@ -234,26 +220,26 @@ final class UpdateMessageReader implements ContentHandler {
      * Checks if FrostWire isn't too old for this message. If the message has no
      * version info, it doesn't matter then, it should be eligible for all
      * versions.
-     * 
+     * <p>
      * When it's an update message: If the message is an update message then it
      * doesn't matter what version it's sent, it should be valid because we need
      * to use the version in it to see if we have to update or not.
-     * 
+     * <p>
      * If you want a full blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyVersion(UpdateMessage msg) {
         return msg.getVersion() == null ||
-               msg.getMessageType().equalsIgnoreCase("update") ||
-               !UpdateManager.isFrostWireOld(msg);
+                msg.getMessageType().equalsIgnoreCase("update") ||
+                !UpdateManager.isFrostWireOld(msg);
     }
 
     /**
      * Tells me if I'm supposed to keep the given update message. Compares the
      * message's OS string against the current operating system.
-     * 
+     * <p>
      * Compares: - version (If message matches all versions before me [not exact
      * match])
-     * 
+     * <p>
      * If the message is an announcement, it cares about the version number not
      * being outdated.
      */
@@ -280,7 +266,6 @@ final class UpdateMessageReader implements ContentHandler {
     void readUpdateFile() {
         HttpURLConnection connection = null;
         InputSource src;
-
         try {
             String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
             connection = (HttpURLConnection) (new URL(DEFAULT_UPDATE_URL)).openConnection();
@@ -289,15 +274,12 @@ final class UpdateMessageReader implements ContentHandler {
             connection.setRequestProperty("User-Agent", userAgent);
             connection.setRequestProperty("Connection", "close");
             connection.setReadTimeout(10000); // 10 secs timeout
-
             if (connection.getResponseCode() >= 400) {
                 // invalid URL for sure
                 connection.disconnect();
                 return;
             }
-
             src = new InputSource(connection.getInputStream());
-
             XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
             rdr.setContentHandler(this);
             rdr.parse(src);
@@ -325,17 +307,6 @@ final class UpdateMessageReader implements ContentHandler {
     public void setDocumentLocator(Locator arg0) {
     }
 
-    /**
-     * Sets only the first update message it finds. Make sure to put only a
-     * single update message every time on the server, If you plan to leave old
-     * messages there, keep the newest one at the beginning of the file.
-     */
-    private void setUpdateMessage(UpdateMessage msg) {
-        if (_updateMessage == null && msg != null && msg.getMessageType().equals("update")) {
-            _updateMessage = msg;
-        }
-    }
-
     public void skippedEntity(String arg0) throws SAXException {
     }
 
@@ -346,10 +317,8 @@ final class UpdateMessageReader implements ContentHandler {
         // deal with the opening tag
         if (localName.equalsIgnoreCase("update")) {
             UpdateManager.getInstance().setServerTime(atts.getValue("time"));
-
             if (atts.getValue("torrentDetailsUrl") != null && atts.getValue("torrentDetailsUrl").length() > 0) {
                 String torrentDetailsUrl = atts.getValue("torrentDetailsUrl");
-
                 List<SearchEngine> searchEngines = SearchEngine.getEngines();
                 for (SearchEngine searchEngine : searchEngines) {
                     searchEngine.setRedirectUrl(torrentDetailsUrl);
@@ -367,7 +336,6 @@ final class UpdateMessageReader implements ContentHandler {
             String build = atts.getValue("build");
             String src = atts.getValue("src");
             String saveAs = atts.getValue("saveAs");
-
             _bufferMessage = new UpdateMessage(type, message);
             _bufferMessage.setUrl(url);
             _bufferMessage.setTorrent(torrent);
@@ -377,34 +345,28 @@ final class UpdateMessageReader implements ContentHandler {
             _bufferMessage.setVersion(version);
             _bufferMessage.setBuild(build);
             _bufferMessage.setSaveAs(saveAs);
-
             if (atts.getValue("md5") != null) {
                 _bufferMessage.setRemoteMD5(atts.getValue("md5"));
                 //LOG.debug("UpdateMessageReader.startElement overlay md5=" + atts.getValue("md5"));
             }
-
             // language properties available only inside overlay
             if (atts.getValue("language") != null) {
                 _bufferMessage.setLanguage(atts.getValue("language"));
                 // System.out.println("UpdateMessageReader.startElement overlay language="
                 // + atts.getValue("lang"));
             }
-
             if (atts.getValue("valueInstallerReady") != null) {
                 _bufferMessage.setMessageInstallerReady(atts.getValue("valueInstallerReady"));
                 // System.out.println("UpdateMessageReader.startElement overlay md5="
                 // + atts.getValue("md5"));
             }
-
             if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
                 _bufferMessage.setExpiration(atts.getValue("expiration"));
             }
-
             // deal with overlay messages specific properties
             if (_bufferMessage.getMessageType().equalsIgnoreCase("overlay")) {
                 // System.out.println("UpdateMessageReader.startElement overlay msg found");
                 _bufferMessage.setSrc(src);
-
                 if (atts.getValue("intro") != null && (atts.getValue("intro").equals("1") || atts.getValue("intro").equalsIgnoreCase("true") || atts.getValue("intro").equalsIgnoreCase("yes"))) {
                     _bufferMessage.setIntro(true);
                     // System.out.println("UpdateMessageReader.startElement overlay intro=true");
@@ -414,7 +376,6 @@ final class UpdateMessageReader implements ContentHandler {
                 }
             } // overlays
         }
-
     }
 
     @Override

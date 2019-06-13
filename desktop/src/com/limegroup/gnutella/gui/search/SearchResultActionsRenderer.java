@@ -35,10 +35,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCellRenderer {
     private final static float BUTTONS_TRANSPARENCY = 0.85f;
@@ -50,24 +48,21 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private final static AlphaIcon details_transparent;
     private final static ImageIcon speaker_icon;
 
+    static {
+        play_solid = GUIMediator.getThemeImage("search_result_play_over");
+        play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
+        download_solid = GUIMediator.getThemeImage("search_result_download_over");
+        download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
+        details_solid = GUIMediator.getThemeImage("search_result_details_over");
+        details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
+        speaker_icon = GUIMediator.getThemeImage("speaker");
+    }
+
     private JLabel labelPlay;
     private JLabel labelPartialDownload;
     private JLabel labelDownload;
     private UISearchResult searchResult;
     private boolean showSolid;
-
-    static {
-        play_solid = GUIMediator.getThemeImage("search_result_play_over");
-        play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-
-        download_solid = GUIMediator.getThemeImage("search_result_download_over");
-        download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-
-        details_solid = GUIMediator.getThemeImage("search_result_details_over");
-        details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-
-        speaker_icon = GUIMediator.getThemeImage("speaker");
-    }
 
     public SearchResultActionsRenderer() {
         setupUI();
@@ -76,7 +71,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private void setupUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints c;
-
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
         labelPlay.addMouseListener(new MouseAdapter() {
@@ -89,7 +83,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPlay, c);
-
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
         labelDownload.addMouseListener(new MouseAdapter() {
@@ -102,7 +95,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
-
         labelPartialDownload = new JLabel(details_solid);
         labelPartialDownload.setToolTipText(I18n.tr("Select content to download from this torrent."));
         labelPartialDownload.addMouseListener(new MouseAdapter() {
@@ -115,7 +107,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPartialDownload, c);
-
         setEnabled(true);
     }
 
@@ -130,7 +121,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             return;
         }
         searchResult = actionsHolder.getSearchResult();
-
         if (searchResult == null) {
             return;
         }
@@ -151,12 +141,10 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
             playable = ((StreamableSearchResult) searchResult.getSearchResult()).getStreamUrl() != null;
         }
-
         if (playable && searchResult.getExtension() != null) {
             MediaType mediaType = MediaType.getMediaTypeForExtension(searchResult.getExtension());
             playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
         }
-
         return playable;
     }
 
@@ -178,7 +166,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             SearchResult sr = searchResult.getSearchResult();
             if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
                 searchResult.download(true);
-
                 if (sr instanceof ArchiveorgTorrentSearchResult) {
                     GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                 }

@@ -16,7 +16,6 @@ import java.awt.dnd.*;
  * a TransferSupport class that takes care of all this.
  */
 public class BasicDropTargetListener implements DropTargetListener {
-
     private boolean actionSupported(int action) {
         return (action & (TransferHandler.COPY_OR_MOVE)) != TransferHandler.NONE;
     }
@@ -27,7 +26,6 @@ public class BasicDropTargetListener implements DropTargetListener {
         JComponent c = (JComponent) ctx.getComponent();
         LimeTransferHandler handler = (LimeTransferHandler) c.getTransferHandler();
         DropDragInfo ddi = new DropDragInfo(e);
-
         if (handler != null && handler.canImport(c, flavors, ddi) && actionSupported(ddi.action))
             e.acceptDrag(ddi.action);
         else
@@ -40,7 +38,6 @@ public class BasicDropTargetListener implements DropTargetListener {
         JComponent c = (JComponent) ctx.getComponent();
         LimeTransferHandler handler = (LimeTransferHandler) c.getTransferHandler();
         DropDragInfo ddi = new DropDragInfo(e);
-
         if (handler != null && handler.canImport(c, flavors, ddi) && actionSupported(ddi.action))
             e.acceptDrag(ddi.action);
         else
@@ -53,7 +50,6 @@ public class BasicDropTargetListener implements DropTargetListener {
         JComponent c = (JComponent) ctx.getComponent();
         LimeTransferHandler handler = (LimeTransferHandler) c.getTransferHandler();
         DropDragInfo ddi = new DropDragInfo(e);
-
         if (handler != null && handler.canImport(c, flavors, ddi) && actionSupported(ddi.action))
             e.acceptDrag(ddi.action);
         else
@@ -69,10 +65,8 @@ public class BasicDropTargetListener implements DropTargetListener {
         JComponent c = (JComponent) ctx.getComponent();
         LimeTransferHandler handler = (LimeTransferHandler) c.getTransferHandler();
         DropDropInfo ddi = new DropDropInfo(e);
-
         if (handler != null && handler.canImport(c, flavors, ddi) && actionSupported(ddi.action)) {
             e.acceptDrop(ddi.action);
-
             try {
                 Transferable t = e.getTransferable();
                 e.dropComplete(handler.importData(c, t, ddi));

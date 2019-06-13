@@ -18,31 +18,26 @@
 
 package com.frostwire.gui.components.slides;
 
-import com.frostwire.gui.components.slides.ImageCache.OnLoadedListener;
 import com.limegroup.gnutella.gui.GUIMediator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
  * The Slide panel which has the image and controls.
  * Contained by {@link MultimediaSlideshowPanel}
- * 
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 class SlidePanel extends JPanel {
-
     private final int index;
-    private JLabel imageLabel;
-
     private final SlidePanelController controller;
+    private JLabel imageLabel;
     private SlideControlsOverlay overlayControls;
 
     public SlidePanel(Slide slide, int index) {
@@ -61,7 +56,6 @@ class SlidePanel extends JPanel {
         layeredPane.setMinimumSize(new Dimension(717, 380));
         layeredPane.setPreferredSize(new Dimension(717, 380));
         //layeredPane.setMaximumSize(new Dimension(717,380));
-
         layeredPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -75,12 +69,9 @@ class SlidePanel extends JPanel {
                 }
             }
         });
-
         imageLabel = new JLabel();
-
         overlayControls = new SlideControlsOverlay(controller);
         overlayControls.setVisible(false);
-
         if (controller.getSlide().method != Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL) {
             layeredPane.add(overlayControls, Integer.valueOf(1));
         } else {
@@ -95,11 +86,8 @@ class SlidePanel extends JPanel {
                 }
             });
         }
-
         layeredPane.add(imageLabel, Integer.valueOf(0));
-
         add(layeredPane, BorderLayout.CENTER);
-
         try {
             ImageCache.instance().getImage(new URL(controller.getSlide().imageSrc), (url, image, fromCache, fail) -> GUIMediator.safeInvokeLater(() -> {
                 if (image != null) {

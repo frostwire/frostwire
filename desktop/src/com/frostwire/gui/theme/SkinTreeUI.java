@@ -27,14 +27,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 @SuppressWarnings("unused")
 public final class SkinTreeUI extends SynthTreeUI {
-
     private SkinMouseListener mouseListener;
 
     public static ComponentUI createUI(JComponent comp) {
@@ -60,7 +57,6 @@ public final class SkinTreeUI extends SynthTreeUI {
             TreePath path = getClosestPathForLocation(tree, 0, y);
             int row = treeState.getRowForPath(path);
             boolean selected = tree.isRowSelected(row);
-
             if (selected) {
                 g.setColor(SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
             } else if (row % 2 == 1) {
@@ -68,7 +64,6 @@ public final class SkinTreeUI extends SynthTreeUI {
             } else if (row % 2 == 0) {
                 g.setColor(Color.WHITE);
             }
-
             g.fillRect(0, y, tree.getWidth(), h);
         } catch (Throwable e) {
             // just eat, not critical
@@ -76,7 +71,6 @@ public final class SkinTreeUI extends SynthTreeUI {
     }
 
     private final class SkinCellRendererPane extends CellRendererPane {
-
         // the following code is copied from the parent method
         @Override
         public void paintComponent(Graphics g, Component c, Container p, int x, int y, int w, int h, boolean shouldValidate) {
@@ -89,23 +83,18 @@ public final class SkinTreeUI extends SynthTreeUI {
                 }
                 return;
             }
-
             if (c.getParent() != this) {
                 this.add(c);
             }
-
             c.setBounds(x, y, w, h);
-
             if (shouldValidate) {
                 c.validate();
             }
-
             boolean wasDoubleBuffered = false;
             if ((c instanceof JComponent) && c.isDoubleBuffered()) {
                 wasDoubleBuffered = true;
                 ((JComponent) c).setDoubleBuffered(false);
             }
-
             paintRowBackground(g, x, y, w, h);
             Graphics cg = g.create(x, y, w, h);
             try {
@@ -113,17 +102,14 @@ public final class SkinTreeUI extends SynthTreeUI {
             } finally {
                 cg.dispose();
             }
-
             if (wasDoubleBuffered && (c instanceof JComponent)) {
                 ((JComponent) c).setDoubleBuffered(true);
             }
-
             c.setBounds(-w, -h, 0, 0);
         }
     }
 
     private final class SkinMouseListener implements MouseListener {
-
         private final MouseListener delegate;
 
         public SkinMouseListener(MouseListener delegate) {

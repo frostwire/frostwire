@@ -21,10 +21,15 @@ import com.limegroup.gnutella.gui.I18n;
 import javax.swing.*;
 
 /**
- * This class acts as a mediator among all of the various items of the 
+ * This class acts as a mediator among all of the various items of the
  * application's menus.
  */
 public final class MenuMediator {
+    /**
+     * Constant handle to the instance of this class for following
+     * the singleton pattern.
+     */
+    private static MenuMediator INSTANCE;
 
     /**
      * We call this so that the menu won't be covered by the SWT Browser.
@@ -34,38 +39,18 @@ public final class MenuMediator {
     }
 
     /**
-     * Constant handle to the instance of this class for following 
-     * the singleton pattern.
-     */
-    private static MenuMediator INSTANCE;
-
-    /**
      * Constant handle to the <tt>JMenuBar</tt> instance that holds all
      * of the <tt>JMenu</tt> instances.
      */
     private final JMenuBar MENU_BAR = new JMenuBar();
 
     /**
-     * Singleton accessor method for obtaining the <tt>MenuMediator</tt>
-     * instance.
-     *
-     * @return the <tt>MenuMediator</tt> instance
-     */
-    public static MenuMediator instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new MenuMediator();
-        }
-        return INSTANCE;
-    }
-
-    /**
-     * Private constructor that ensures that a <tt>MenuMediator</tt> 
-     * cannot be constructed from outside this class.  It adds all of 
+     * Private constructor that ensures that a <tt>MenuMediator</tt>
+     * cannot be constructed from outside this class.  It adds all of
      * the menus.
      */
     private MenuMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
-
         /**
          * Constant handle to the single <tt>FileMenu</tt> instance for
          * the application.
@@ -93,6 +78,19 @@ public final class MenuMediator {
     }
 
     /**
+     * Singleton accessor method for obtaining the <tt>MenuMediator</tt>
+     * instance.
+     *
+     * @return the <tt>MenuMediator</tt> instance
+     */
+    public static MenuMediator instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new MenuMediator();
+        }
+        return INSTANCE;
+    }
+
+    /**
      * Returns the <tt>JMenuBar</tt> for the application.
      *
      * @return the application's <tt>JMenuBar</tt> instance
@@ -104,11 +102,10 @@ public final class MenuMediator {
     /**
      * Adds a <tt>Menu</tt> to the next position on the menu bar.
      *
-     * @param menu to the <tt>Menu</tt> instance that allows access to 
+     * @param menu to the <tt>Menu</tt> instance that allows access to
      *             its wrapped <tt>JMenu</tt> instance
      */
     private void addMenu(Menu menu) {
         MENU_BAR.add(menu.getMenu());
     }
-
 }

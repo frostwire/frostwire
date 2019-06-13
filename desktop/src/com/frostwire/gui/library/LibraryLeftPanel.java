@@ -29,52 +29,42 @@ import java.awt.event.ComponentEvent;
 /**
  * @author gubatron
  * @author aldenml
- * 
  */
 public class LibraryLeftPanel extends JPanel {
-
     static final int MIN_WIDTH = 155;
     static final int MAX_WIDTH = 300;
-
     private final LibraryExplorer libraryExplorer;
     private final LibraryPlaylists libraryPlaylists;
     private final LibraryCoverArtPanel libraryCoverArtPanel;
-
     private final JSplitPane splitPane;
 
     LibraryLeftPanel(LibraryExplorer libraryExplorer, LibraryPlaylists libraryPlaylists, LibraryCoverArtPanel libraryCoverArtPanel) {
         this.libraryExplorer = libraryExplorer;
         this.libraryPlaylists = libraryPlaylists;
         this.libraryCoverArtPanel = libraryCoverArtPanel;
-
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         setupUI();
     }
 
     protected void setupUI() {
         setLayout(new BorderLayout());
-
         //Prepare a split pane with explorers
         splitPane.setTopComponent(libraryExplorer);
         splitPane.setBottomComponent(libraryPlaylists);
         splitPane.setAutoscrolls(true);
-
         add(splitPane, BorderLayout.CENTER);
-
         Dimension minSize = new Dimension(MIN_WIDTH, MIN_WIDTH);
         Dimension maxSize = new Dimension(MAX_WIDTH, MAX_WIDTH);
         libraryCoverArtPanel.setPreferredSize(minSize);
         libraryCoverArtPanel.setMinimumSize(minSize);
         libraryCoverArtPanel.setMaximumSize(maxSize);
         add(libraryCoverArtPanel, BorderLayout.PAGE_END);
-
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 layoutComponents();
             }
         });
-
         DividerLocationSettingUpdater.install(splitPane, UISettings.UI_LIBRARY_EXPLORER_DIVIDER_POSITION);
     }
 
@@ -83,7 +73,6 @@ public class LibraryLeftPanel extends JPanel {
         size.height = size.width;
         libraryCoverArtPanel.setSize(size);
         libraryCoverArtPanel.setPreferredSize(size);
-
         revalidate();
     }
 }

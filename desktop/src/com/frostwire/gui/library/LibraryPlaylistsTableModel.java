@@ -27,19 +27,17 @@ import java.io.File;
  * Library specific DataLineModel.
  * Uses HashBasedDataLineModel instead of BasicDataLineModel
  * for quicker access to row's based on the file.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 final class LibraryPlaylistsTableModel extends HashBasedDataLineModel<LibraryPlaylistsTableDataLine, PlaylistItem> {
+    private static final long serialVersionUID = 2859783399965055446L;
 
-	private static final long serialVersionUID = 2859783399965055446L;
-    
     LibraryPlaylistsTableModel() {
-	    super(LibraryPlaylistsTableDataLine.class);
-	}
-	
+        super(LibraryPlaylistsTableDataLine.class);
+    }
+
     /**
      * Creates a new LibraryTableDataLine
      */
@@ -47,16 +45,16 @@ final class LibraryPlaylistsTableModel extends HashBasedDataLineModel<LibraryPla
         return new LibraryPlaylistsTableDataLine();
     }
 
-	/**
-	 * Override the normal refresh.
-	 * Because the DataLine's don't cache any data,
-	 * we can just call update & they'll show the correct info
-	 * now.
-	 */
-	public Object refresh() {
-	    fireTableRowsUpdated(0, getRowCount());
-	    return null;
-	}
+    /**
+     * Override the normal refresh.
+     * Because the DataLine's don't cache any data,
+     * we can just call update & they'll show the correct info
+     * now.
+     */
+    public Object refresh() {
+        fireTableRowsUpdated(0, getRowCount());
+        return null;
+    }
 
     /**
      * OVerride default so new ones get added to the end
@@ -66,29 +64,26 @@ final class LibraryPlaylistsTableModel extends HashBasedDataLineModel<LibraryPla
         return addSorted(o);
     }
 
-	/**
-	 * Returns the file object stored in the given row.
-	 *
-	 * @param row  The row of the file
-	 *
-	 * @return  The <code>File</code> object stored at the specified row
-	 */
-	File getFile(int row) {
-	    return new File(get(row).getInitializeObject().getFilePath());
-	}
+    /**
+     * Returns the file object stored in the given row.
+     *
+     * @param row The row of the file
+     * @return The <code>File</code> object stored at the specified row
+     */
+    File getFile(int row) {
+        return new File(get(row).getInitializeObject().getFilePath());
+    }
 
-	/**
-	 * Returns a boolean specifying whether or not specific cell in the table
-	 * is editable.
-	 *
-	 * @param row the row of the table to access
-	 *
-	 * @param col the column of the table to access
-	 *
-	 * @return <code>true</code> if the specified cell is editable,
-	 *         <code>false</code> otherwise
-	 */
-	public boolean isCellEditable(int row, int col) {
-	    return col == LibraryPlaylistsTableDataLine.STARRED_IDX || col == LibraryPlaylistsTableDataLine.ACTIONS_IDX;
-	}
+    /**
+     * Returns a boolean specifying whether or not specific cell in the table
+     * is editable.
+     *
+     * @param row the row of the table to access
+     * @param col the column of the table to access
+     * @return <code>true</code> if the specified cell is editable,
+     * <code>false</code> otherwise
+     */
+    public boolean isCellEditable(int row, int col) {
+        return col == LibraryPlaylistsTableDataLine.STARRED_IDX || col == LibraryPlaylistsTableDataLine.ACTIONS_IDX;
+    }
 }

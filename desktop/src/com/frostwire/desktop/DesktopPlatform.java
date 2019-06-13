@@ -26,7 +26,6 @@ import com.frostwire.platform.VPNMonitor;
  * @author aldenml
  */
 public final class DesktopPlatform extends AbstractPlatform {
-
     private final DesktopVPNMonitor vpn;
 
     public DesktopPlatform() {

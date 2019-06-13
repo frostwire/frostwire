@@ -25,13 +25,10 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPanelUI extends SynthPanelUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinPanelUI();
@@ -40,7 +37,6 @@ public final class SkinPanelUI extends SynthPanelUI {
     @Override
     public void installUI(JComponent c) {
         super.installUI(c);
-
         updateOpaque(c);
     }
 
@@ -75,7 +71,6 @@ public final class SkinPanelUI extends SynthPanelUI {
     @Override
     public void propertyChange(PropertyChangeEvent pce) {
         super.propertyChange(pce);
-
         if (ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND.equals(pce.getPropertyName())) {
             if (pce.getSource() instanceof JComponent) {
                 updateOpaque((JComponent) pce.getSource());

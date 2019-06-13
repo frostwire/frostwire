@@ -2,7 +2,7 @@
  * File    : TimerEventPerformer.java
  * Created : 23-Nov-2003
  * By      : parg
- * 
+ *
  * Azureus - a Java Bittorrent client
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,12 +24,10 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
-public interface 
-TimerEventPerformer 
-{
-	void
-	perform(
+public interface
+TimerEventPerformer {
+    void
+    perform(
             TimerEvent event);
 }

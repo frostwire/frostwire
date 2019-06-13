@@ -23,38 +23,16 @@ import com.limegroup.gnutella.settings.FilterSettings;
 import java.util.Vector;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SearchFilterFactoryImpl implements SearchFilterFactory {
-
     public SearchFilterFactoryImpl() {
-    }
-
-    public SearchFilter createFilter() {
-
-        Vector<SearchFilter> buf = new Vector<>();
-
-        String[] badWords = FilterSettings.BANNED_WORDS.getValue();
-
-        boolean filterAdult = FilterSettings.FILTER_ADULT.getValue();
-
-        if (badWords.length != 0 || filterAdult) {
-            KeywordFilter kf = new KeywordFilter();
-            for (String badWord : badWords) kf.disallow(badWord);
-            if (filterAdult)
-                kf.disallowAdult();
-
-            buf.add(kf);
-        }
-
-        return compose(buf);
     }
 
     /**
      * Returns a composite filter of the given filters.
+     *
      * @param filters a Vector of SpamFilter.
      */
     private static SearchFilter compose(Vector<? extends SearchFilter> filters) {
@@ -69,5 +47,19 @@ public class SearchFilterFactoryImpl implements SearchFilterFactory {
             filters.copyInto(delegates);
             return new CompositeFilter(delegates);
         }
+    }
+
+    public SearchFilter createFilter() {
+        Vector<SearchFilter> buf = new Vector<>();
+        String[] badWords = FilterSettings.BANNED_WORDS.getValue();
+        boolean filterAdult = FilterSettings.FILTER_ADULT.getValue();
+        if (badWords.length != 0 || filterAdult) {
+            KeywordFilter kf = new KeywordFilter();
+            for (String badWord : badWords) kf.disallow(badWord);
+            if (filterAdult)
+                kf.disallowAdult();
+            buf.add(kf);
+        }
+        return compose(buf);
     }
 }

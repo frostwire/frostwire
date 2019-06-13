@@ -29,25 +29,21 @@ public class DisplayFormatters {
     final private static boolean ROUND_NO = true;
     final private static boolean TRUNCZEROS_NO = false;
     final private static boolean TRUNCZEROS_YES = true;
-
     private final static int UNIT_B = 0;
     private final static int UNIT_KB = 1;
     private final static int UNIT_MB = 2;
     private final static int UNIT_GB = 3;
     private final static int UNIT_TB = 4;
-
     final private static int[] UNITS_PRECISION = {0, // B
             1, //KB
             2, //MB
             2, //GB
             3 //TB
     };
-
     final private static NumberFormat[] cached_number_formats = new NumberFormat[20];
-
+    private static final int unitsStopAt = UNIT_TB;
     private static String[] units;
     private static String[] units_rate;
-    private static final int unitsStopAt = UNIT_TB;
 
     static {
         setUnits();
@@ -56,12 +52,9 @@ public class DisplayFormatters {
     private static void setUnits() {
         // (1) http://physics.nist.gov/cuu/Units/binary.html
         // (2) http://www.isi.edu/isd/LOOM/documentation/unit-definitions.text
-
         units = new String[unitsStopAt + 1];
         String[] units_bits = new String[unitsStopAt + 1];
         units_rate = new String[unitsStopAt + 1];
-
-
         switch (unitsStopAt) {
             case UNIT_TB:
                 units[UNIT_TB] = getUnit("TB");
@@ -85,17 +78,12 @@ public class DisplayFormatters {
                 units_bits[UNIT_B] = getUnit("bit");
                 units_rate[UNIT_B] = getUnit("B");
         }
-
-
         String per_sec = "/s";
-
         for (int i = 0; i <= unitsStopAt; i++) {
             units[i] = units[i];
             units_rate[i] = units_rate[i] + per_sec;
         }
-
         Arrays.fill(cached_number_formats, null);
-
         NumberFormat percentage_format = NumberFormat.getPercentInstance();
         percentage_format.setMinimumFractionDigits(1);
         percentage_format.setMaximumFractionDigits(1);
@@ -116,21 +104,15 @@ public class DisplayFormatters {
             boolean bTruncateZeros,
             int precision) {
         double dbl = n;
-
         int unitIndex = UNIT_B;
-
         long div = 1000;
-
         while (dbl >= div && unitIndex < unitsStopAt) {
-
             dbl /= div;
             unitIndex++;
         }
-
         if (precision < 0) {
             precision = UNITS_PRECISION[unitIndex];
         }
-
         // round for rating, because when the user enters something like 7.3kbps
         // they don't want it truncated and displayed as 7.2
         // (7.3*1024 = 7475.2; 7475/1024.0 = 7.2998;  trunc(7.2998, 1 prec.) == 7.2
@@ -138,7 +120,6 @@ public class DisplayFormatters {
         // Truncate for rest, otherwise we get complaints like:
         // "I have a 1.0GB torrent and it says I've downloaded 1.0GB.. why isn't
         //  it complete? waaah"
-
         return formatDecimal(dbl, precision, bTruncateZeros, rate)
                 + (rate ? units_rate[unitIndex] : units[unitIndex]);
     }
@@ -146,7 +127,6 @@ public class DisplayFormatters {
     public static String formatByteCountToKiBEtcPerSec(long n) {
         return formatByteCountToKiBEtc(n);
     }
-
     //
     // End methods
     //
@@ -165,7 +145,6 @@ public class DisplayFormatters {
             int precision) {
         return formatDecimal(value, precision, TRUNCZEROS_NO, ROUND_NO);
     }
-
 
     /**
      * Format a real number
@@ -186,7 +165,6 @@ public class DisplayFormatters {
         if (Double.isNaN(value) || Double.isInfinite(value)) {
             return Constants.INFINITY_STRING;
         }
-
         double tValue;
         if (bRound) {
             tValue = value;
@@ -199,16 +177,12 @@ public class DisplayFormatters {
                 tValue = ((long) (value * shift)) / shift;
             }
         }
-
         int cache_index = (precision << 2) + ((bTruncateZeros ? 1 : 0) << 1)
                 + (bRound ? 1 : 0);
-
         NumberFormat nf = null;
-
         if (cache_index < cached_number_formats.length) {
             nf = cached_number_formats[cache_index];
         }
-
         if (nf == null) {
             nf = NumberFormat.getNumberInstance();
             nf.setGroupingUsed(false); // no commas
@@ -218,12 +192,10 @@ public class DisplayFormatters {
             if (bRound) {
                 nf.setMaximumFractionDigits(precision);
             }
-
             if (cache_index < cached_number_formats.length) {
                 cached_number_formats[cache_index] = nf;
             }
         }
-
         return nf.format(tValue);
     }
 

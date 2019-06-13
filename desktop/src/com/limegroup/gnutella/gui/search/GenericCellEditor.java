@@ -26,10 +26,8 @@ import java.awt.*;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class GenericCellEditor extends AbstractCellEditor implements TableCellEditor {
-    
     protected final TableCellRenderer renderer;
 
     public GenericCellEditor(TableCellRenderer searchResultNameRenderer) {

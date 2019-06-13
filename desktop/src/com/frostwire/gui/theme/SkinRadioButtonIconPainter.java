@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinRadioButtonIconPainter extends AbstractSkinPainter {
-
     private final Image image;
 
     public SkinRadioButtonIconPainter(State state) {
@@ -42,34 +39,32 @@ public final class SkinRadioButtonIconPainter extends AbstractSkinPainter {
 
     private String getImageName(State state) {
         String imageName = null;
-
         switch (state) {
-        case DisabledSelected:
-            imageName = "radio_btn_checked_disabled";
-            break;
-        case Disabled:
-            imageName = "radio_btn_unchecked_disabled";
-            break;
-        case Enabled:
-        case FocusedMouseOver:
-        case Focused:
-        case MouseOver:
-            imageName = "radio_btn_unchecked_active";
-            break;
-        case FocusedMouseOverSelected:
-        case FocusedPressedSelected:
-        case FocusedPressed:
-        case FocusedSelected:
-        case MouseOverSelected:
-        case PressedSelected:
-        case Pressed:
-        case Selected:
-            imageName = "radio_btn_checked_active";
-            break;
-        default:
-            throw new RuntimeException("Not supported state");
+            case DisabledSelected:
+                imageName = "radio_btn_checked_disabled";
+                break;
+            case Disabled:
+                imageName = "radio_btn_unchecked_disabled";
+                break;
+            case Enabled:
+            case FocusedMouseOver:
+            case Focused:
+            case MouseOver:
+                imageName = "radio_btn_unchecked_active";
+                break;
+            case FocusedMouseOverSelected:
+            case FocusedPressedSelected:
+            case FocusedPressed:
+            case FocusedSelected:
+            case MouseOverSelected:
+            case PressedSelected:
+            case Pressed:
+            case Selected:
+                imageName = "radio_btn_checked_active";
+                break;
+            default:
+                throw new RuntimeException("Not supported state");
         }
-
         return imageName;
     }
 

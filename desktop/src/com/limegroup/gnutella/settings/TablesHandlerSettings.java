@@ -16,32 +16,29 @@ import java.util.Map;
  * more mutable than other settings classes.
  */
 public final class TablesHandlerSettings extends LimeWireSettings {
-
     private static final TablesHandlerSettings INSTANCE =
-        new TablesHandlerSettings();
+            new TablesHandlerSettings();
     private static final SettingsFactory FACTORY =
-        INSTANCE.getFactory();
-
-    public static TablesHandlerSettings instance() {
-        return INSTANCE;
-    }
+            INSTANCE.getFactory();
+    private static final String WIDTH = "_WIDTH";
+    private static final String ORDER = "_ORDER";
+    private static final String VISBL = "_VISIBLE";
+    /**
+     * The list of settings.  The Key is the name of the setting,
+     * and the Setting is the actual setting.  The subclass of
+     * Setting is either BooleanSetting or IntSetting.
+     * The name of the setting is in the format of:
+     * <columnId>_<width|order|visible>
+     */
+    private static final Map<String, Setting> SETS = new HashMap<>();
 
     private TablesHandlerSettings() {
         super("tables.props", "FrostWire tables file");
     }
 
-    private static final String WIDTH = "_WIDTH";
-    private static final String ORDER = "_ORDER";
-    private static final String VISBL = "_VISIBLE";
-
-   /**
-    * The list of settings.  The Key is the name of the setting,
-    * and the Setting is the actual setting.  The subclass of
-    * Setting is either BooleanSetting or IntSetting.
-    * The name of the setting is in the format of:
-    * <columnId>_<width|order|visible>
-    */
-    private static final Map<String, Setting> SETS = new HashMap<>();
+    public static TablesHandlerSettings instance() {
+        return INSTANCE;
+    }
 
     /**
      * Returns the IntSetting for the specified column's width.
@@ -69,7 +66,7 @@ public final class TablesHandlerSettings extends LimeWireSettings {
      * If none exists, one is created.
      */
     private static IntSetting getSetting(String id, int def) {
-        IntSetting set = (IntSetting)SETS.get(id);
+        IntSetting set = (IntSetting) SETS.get(id);
         if (set == null) {
             set = FACTORY.createIntSetting(id, def);
             SETS.put(id, set);
@@ -82,7 +79,7 @@ public final class TablesHandlerSettings extends LimeWireSettings {
      * If none exists, one is created.
      */
     private static BooleanSetting getSetting(String id, boolean def) {
-        BooleanSetting set = (BooleanSetting)SETS.get(id);
+        BooleanSetting set = (BooleanSetting) SETS.get(id);
         if (set == null) {
             set = FACTORY.createBooleanSetting(id, def);
             SETS.put(id, set);

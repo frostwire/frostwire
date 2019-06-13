@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinSliderThumbPainter extends AbstractSkinPainter {
-
     private final Image image;
 
     public SkinSliderThumbPainter(State state) {
@@ -42,25 +39,23 @@ public final class SkinSliderThumbPainter extends AbstractSkinPainter {
 
     private String getImageName(State state) {
         String imageName = null;
-
         switch (state) {
-        case Disabled:
-            imageName = "slider_inactive";
-            break;
-        case Focused:
-        case Enabled:
-            imageName = "slider_active";
-            break;
-        case FocusedMouseOver:
-        case MouseOver:
-        case FocusedPressed:
-        case Pressed:
-            imageName = "slider_pressed";
-            break;
-        default:
-            throw new RuntimeException("Not supported state");
+            case Disabled:
+                imageName = "slider_inactive";
+                break;
+            case Focused:
+            case Enabled:
+                imageName = "slider_active";
+                break;
+            case FocusedMouseOver:
+            case MouseOver:
+            case FocusedPressed:
+            case Pressed:
+                imageName = "slider_pressed";
+                break;
+            default:
+                throw new RuntimeException("Not supported state");
         }
-
         return imageName;
     }
 

@@ -31,11 +31,11 @@ import java.util.Map;
 public class IPFilterHttpListener implements HttpClient.HttpClientListener {
     private static Logger LOG = Logger.getLogger(IPFilterHttpListener.class);
     private final IPFilterPaneItem ipFilterPaneItem;
-    private int totalRead = 0;
-    private long contentLength = -1;
     private final File downloadedFile;
     private final FileOutputStream fos;
     private final String downloadingString = I18n.tr("Downloading");
+    private int totalRead = 0;
+    private long contentLength = -1;
 
     public IPFilterHttpListener(IPFilterPaneItem ipFilterPaneItem, File downloadedFile) throws FileNotFoundException {
         this.downloadedFile = downloadedFile;
@@ -54,7 +54,6 @@ public class IPFilterHttpListener implements HttpClient.HttpClientListener {
         LOG.error(e.getMessage(), e);
         enableImportControls();
     }
-
 
     @Override
     public void onData(HttpClient client, byte[] buffer, int offset, int length) {
@@ -113,5 +112,4 @@ public class IPFilterHttpListener implements HttpClient.HttpClientListener {
     private void importFromIPBlockFileAsync(File downloadedFile) {
         ipFilterPaneItem.importFromIPBlockFileAsync(downloadedFile, true);
     }
-
 }

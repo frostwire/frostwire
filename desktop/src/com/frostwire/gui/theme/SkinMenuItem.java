@@ -21,13 +21,10 @@ package com.frostwire.gui.theme;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinMenuItem extends JMenuItem {
-
     public SkinMenuItem() {
         super();
     }

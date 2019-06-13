@@ -31,9 +31,7 @@ import java.io.File;
  * @author Michael Martak
  * @since 1.4
  */
-
 class DefaultShellFolder extends ShellFolder {
-
     /**
      * Create a file system shell folder from a file
      */
@@ -91,5 +89,4 @@ class DefaultShellFolder extends ShellFolder {
     public String getDisplayName() {
         return getName();
     }
-
 }

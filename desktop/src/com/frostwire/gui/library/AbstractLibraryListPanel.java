@@ -30,36 +30,34 @@ import java.util.List;
  * The left hand side JPanels that contain JLists when used
  * switch and refresh the right hand side mediators (aka Tables)
  * as necessary.
- * 
+ * <p>
  * Since it takes some time to refresh the contents of the table,
  * we cannot order these tables to scroll down to a certain position
  * until all the data has been loaded.
- * 
+ * <p>
  * This Abstract class has been created to enqueue Runnable tasks
  * that should be performed once the right hand side mediators
  * have finished loading.
- * 
+ * <p>
  * Use enqueueRunnable on your implementations of the {@link AbstractLibraryListPanel}
- * 
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 abstract class AbstractLibraryListPanel extends JPanel implements RefreshListener {
-
     private final List<Runnable> PENDING_RUNNABLES;
-    
+
     AbstractLibraryListPanel() {
-    	    PENDING_RUNNABLES = Collections.synchronizedList(new ArrayList<>());
+        PENDING_RUNNABLES = Collections.synchronizedList(new ArrayList<>());
     }
-    
+
     void enqueueRunnable(Runnable r) {
         PENDING_RUNNABLES.add(r);
     }
-    
+
     void executePendingRunnables() {
         if (PENDING_RUNNABLES != null && PENDING_RUNNABLES.size() > 0) {
-            synchronized(PENDING_RUNNABLES) {
+            synchronized (PENDING_RUNNABLES) {
                 Iterator<Runnable> it = PENDING_RUNNABLES.iterator();
                 while (it.hasNext()) {
                     try {

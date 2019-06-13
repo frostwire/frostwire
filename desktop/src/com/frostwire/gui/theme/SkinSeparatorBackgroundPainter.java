@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
-
     private final Color color;
 
     public SkinSeparatorBackgroundPainter(State state, Color color) {

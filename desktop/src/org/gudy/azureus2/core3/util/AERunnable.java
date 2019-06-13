@@ -22,15 +22,12 @@ package org.gudy.azureus2.core3.util;
 /**
  * @author parg
  */
-
 abstract class AERunnable implements Runnable {
     public void
     run() {
         try {
             runSupport();
-
         } catch (Throwable e) {
-
             e.printStackTrace();
         }
     }

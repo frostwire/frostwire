@@ -26,7 +26,7 @@
 package com.apple.concurrent;
 
 class LibDispatchQueue extends LibDispatchRetainedResource {
-        LibDispatchQueue(final long queuePtr) {
-                super(queuePtr);
-        }
+    LibDispatchQueue(final long queuePtr) {
+        super(queuePtr);
+    }
 }

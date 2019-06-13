@@ -20,9 +20,8 @@ package com.frostwire.gui.player;
 
 public enum RepeatMode {
     NONE(0), ALL(1), SONG(2);
-
-    private final int value;
     private static final RepeatMode[] vals = RepeatMode.values();
+    private final int value;
 
     RepeatMode(int value) {
         this.value = value;

@@ -25,12 +25,16 @@ import java.awt.event.ActionListener;
  * Utilities relating to JPopupMenu & JMenus.
  */
 public class PopupUtils {
-
-    /** Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not. */
+    /**
+     * Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not.
+     */
     public static void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable) {
         addMenuItem(s, l, m, enable, -1);
     }
-    /** Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not at the given index. */
+
+    /**
+     * Adds a menu item defined by the ActionListener & String to the JPopupMenu, enabled or not at the given index.
+     */
     public static void addMenuItem(String s, ActionListener l, JPopupMenu m, boolean enable, int idx) {
         JMenuItem item = m instanceof SkinPopupMenu ? new SkinMenuItem(s) : new JMenuItem(s);
         item.addActionListener(l);

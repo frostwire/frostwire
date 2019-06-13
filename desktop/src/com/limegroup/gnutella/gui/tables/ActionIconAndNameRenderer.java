@@ -23,14 +23,13 @@ import java.awt.*;
 
 /**
  * Renders an icon along with a label.
- * 
+ *
  * @author gubatron
  * @author aldenml
  */
 public final class ActionIconAndNameRenderer extends DefaultTableBevelledCellRenderer {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8244672573299436077L;
 
@@ -50,14 +49,12 @@ public final class ActionIconAndNameRenderer extends DefaultTableBevelledCellRen
      * based on the <tt>IconAndNameHolder</tt> object.
      */
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
         ActionIconAndNameHolder in = (ActionIconAndNameHolder) value;
         Icon icon = null;
         String name = null;
         if (in != null) {
             icon = in.getIcon();
             name = in.getName();
-
             if (name != null) {
                 String strValue = name;
                 strValue = strValue.replace("<html>", "<html><div width=\"1000000px\">");

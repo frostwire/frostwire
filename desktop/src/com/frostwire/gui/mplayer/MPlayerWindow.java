@@ -30,32 +30,23 @@ import java.awt.geom.Point2D;
 import java.util.List;
 
 public class MPlayerWindow extends JFrame {
-
     private static final long serialVersionUID = -9154474667503959284L;
-
-    private MPlayerOverlayControls overlayControls;
+    private static final int HIDE_DELAY = 3000;
+    private final MediaPlayer player;
+    private final ScreenSaverDisabler screenSaverDisabler;
     MPlayerComponent mplayerComponent;
     Component videoCanvas;
+    private MPlayerOverlayControls overlayControls;
     private boolean isFullscreen = false;
-
     private AlphaAnimationThread animateAlphaThread;
-
     private Timer hideTimer;
-    private static final int HIDE_DELAY = 3000;
-
-    private final MediaPlayer player;
-
     private Point2D prevMousePosition = null;
     private boolean handleVideoResize = true;
-
-    private final ScreenSaverDisabler screenSaverDisabler;
     private int visibleCounterFlag = 0;
 
     MPlayerWindow() {
         initializeUI();
-
         screenSaverDisabler = new ScreenSaverDisabler();
-        
         player = MediaPlayer.instance();
         player.addMediaPlayerListener(new MediaPlayerAdapter() {
             @Override
@@ -65,12 +56,10 @@ public class MPlayerWindow extends JFrame {
 
             @Override
             public void stateChange(MediaPlayer audioPlayer, MediaPlaybackState state) {
-
                 if (state == MediaPlaybackState.Playing && handleVideoResize) {
                     handleVideoResize = false;
                     resizeCanvas();
                 }
-
                 if (state != MediaPlaybackState.Playing) {
                     handleVideoResize = true;
                 }
@@ -88,7 +77,6 @@ public class MPlayerWindow extends JFrame {
         } else {
             return null;
         }
-
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -96,38 +84,30 @@ public class MPlayerWindow extends JFrame {
     }
 
     private void initializeUI() {
-
         Dimension d = new Dimension(800, 600);
-
         // initialize auto-hide timer
         hideTimer = new Timer(HIDE_DELAY, arg0 -> MPlayerWindow.this.onHideTimerExpired());
         hideTimer.setRepeats(false);
-
         // initialize window
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setPlayerWindowTitle();
         setBackground(new Color(0, 0, 0));
         initWindowIcon();
-
         // initialize events
         addMouseMotionListener(new MPlayerMouseMotionAdapter());
         addComponentListener(new MPlayerComponentHandler());
         addWindowListener(new MPlayerWindowAdapter());
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MPlayerKeyEventDispatcher());
-
         // initialize content pane & video canvas
         Container pane = getContentPane();
         pane.setBackground(Color.black);
         pane.setLayout(null);
         pane.setSize(d);
         pane.setPreferredSize(d);
-
         mplayerComponent = MPlayerComponentFactory.instance().createPlayerComponent();
-
         if (mplayerComponent == null) {
             throw new RuntimeException("MPlayerComponent instantiation isn't supported in your OS, or your OS hasn't correctly been detected by FrostWire");
         }
-
         videoCanvas = mplayerComponent.getComponent();
         videoCanvas.setBackground(Color.black);
         videoCanvas.setSize(d);
@@ -135,10 +115,8 @@ public class MPlayerWindow extends JFrame {
         videoCanvas.addMouseMotionListener(new MPlayerMouseMotionAdapter());
         videoCanvas.addMouseListener(new MPlayerMouseAdapter());
         pane.add(videoCanvas);
-
         // adjust frame size
         pack();
-
         // initialize overlay controls
         overlayControls = new MPlayerOverlayControls(hideTimer);
         overlayControls.setVisible(false);
@@ -147,7 +125,6 @@ public class MPlayerWindow extends JFrame {
         overlayControls.addMouseListener(new MPlayerMouseAdapter());
         overlayControls.addMouseMotionListener(new MPlayerMouseMotionAdapter());
         overlayControls.addWindowListener(new WindowAdapter() {
-
             @Override
             public void windowDeactivated(WindowEvent e) {
                 if (!OSUtils.isWindows()) {
@@ -158,12 +135,10 @@ public class MPlayerWindow extends JFrame {
                 }
             }
         });
-
         // initialize animation alpha thread
         animateAlphaThread = new AlphaAnimationThread(overlayControls);
         animateAlphaThread.setDaemon(true);
         animateAlphaThread.start();
-
     }
 
     /**
@@ -174,7 +149,6 @@ public class MPlayerWindow extends JFrame {
             //no need.
             return;
         }
-
         for (Window w : getWindows()) {
             if (w.getParent() == null && w instanceof LimeJFrame) {
                 List<Image> iconImages = w.getIconImages();
@@ -189,7 +163,6 @@ public class MPlayerWindow extends JFrame {
 
     private void setPlayerWindowTitle() {
         MediaSource source = MediaPlayer.instance().getCurrentMedia();
-
         if (source != null) {
             setTitle("FrostWire Media Player -  " + source.getTitleText());
         } else {
@@ -202,17 +175,13 @@ public class MPlayerWindow extends JFrame {
      */
     @Override
     public void setVisible(boolean visible) {
-
         visibleCounterFlag = 0;
         if (isVisible() && visible) {
             visibleCounterFlag = 1;
         }
-
         if (visible != isVisible()) {
-
             super.setVisible(visible);
             overlayControls.setVisible(visible);
-
             if (visible) {
                 centerOnScreen();
                 positionOverlayControls();
@@ -221,12 +190,10 @@ public class MPlayerWindow extends JFrame {
                 hideOverlay(OSUtils.isMacOSX());
             }
         }
-
         if (visible) {
             // make sure window is on top of visible windows & has focus
             toFront();
             requestFocus();
-            
             // disable screen saver
             screenSaverDisabler.start();
         } else {
@@ -252,26 +219,21 @@ public class MPlayerWindow extends JFrame {
     }
 
     private void resizeCanvas() {
-
         Dimension videoSize = MediaPlayer.instance().getCurrentVideoSize();
         Dimension contentSize = getContentPane().getSize();
         if (contentSize == null || videoSize == null) {
             return; // can not resize until videoSize is available
         }
-
         Dimension canvasSize = new Dimension(contentSize);
         float targetAspectRatio = (float) videoSize.width / (float) videoSize.height;
-
         if (canvasSize.width / targetAspectRatio < contentSize.height) {
             canvasSize.height = (int) (canvasSize.width / targetAspectRatio);
         } else {
             canvasSize.width = (int) (canvasSize.height * targetAspectRatio);
         }
-
         Point tl = new Point();
         tl.x = (int) ((float) (contentSize.width - canvasSize.width) / 2.0f);
         tl.y = (int) ((float) (contentSize.height - canvasSize.height) / 2.0f);
-
         videoCanvas.setBounds(tl.x, tl.y, canvasSize.width, canvasSize.height);
     }
 
@@ -279,10 +241,8 @@ public class MPlayerWindow extends JFrame {
      * centers the window in the current screen
      */
     private void centerOnScreen() {
-
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension window = getSize();
-
         Point pos = new Point((screen.width - window.width) / 2, (screen.height - window.height) / 2);
         setLocation(pos);
     }
@@ -291,16 +251,13 @@ public class MPlayerWindow extends JFrame {
      * positions the overlay control centered horizontally and 80% down vertically
      */
     private void positionOverlayControls() {
-
         if (isVisible()) {
             Dimension controlsSize = overlayControls.getSize();
             Dimension windowSize = getSize();
             Point windowPos = getLocationOnScreen();
-
             Point controlPos = new Point();
             controlPos.x = (int) ((windowSize.width - controlsSize.width) * 0.5 + windowPos.x);
             controlPos.y = (windowSize.height - controlsSize.height) - 20 + windowPos.y;
-
             overlayControls.setLocation(controlPos);
         }
     }
@@ -319,9 +276,7 @@ public class MPlayerWindow extends JFrame {
     public void paint(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.0f));
-
         super.paint(g2);
-
         g2.dispose();
     }
 
@@ -331,7 +286,6 @@ public class MPlayerWindow extends JFrame {
         } else {
             overlayControls.setVisible(true);
         }
-
         hideTimer.restart();
     }
 
@@ -341,8 +295,11 @@ public class MPlayerWindow extends JFrame {
         } else {
             overlayControls.setVisible(false);
         }
-
         hideTimer.stop();
+    }
+
+    void showOverlayControls() {
+        showOverlay(true);
     }
 
     private class MPlayerComponentHandler extends ComponentAdapter {
@@ -361,68 +318,62 @@ public class MPlayerWindow extends JFrame {
     private class MPlayerKeyEventDispatcher implements KeyEventDispatcher {
         @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
-
             if (!isVisible()) {
                 return false;
             }
-
             // limit keyboard processing for only when the MPlayerWindow is the focused window
             Window focusWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusedWindow();
             if (focusWindow != MPlayerWindow.this &&
-                focusWindow != overlayControls) {
+                    focusWindow != overlayControls) {
                 return false;
             }
-            
             if (e.getID() == KeyEvent.KEY_PRESSED) {
                 switch (e.getKeyCode()) {
-                case KeyEvent.VK_P:
-                case KeyEvent.VK_SPACE:
-                    MPlayerUIEventHandler.instance().onTogglePlayPausePressed();
-                    return true;
-                case KeyEvent.VK_W:
-                    if (OSUtils.isMacOSX() && e.isMetaDown()) {
-                        player.stop();
-                        MPlayerWindow.this.setVisible(false);
+                    case KeyEvent.VK_P:
+                    case KeyEvent.VK_SPACE:
+                        MPlayerUIEventHandler.instance().onTogglePlayPausePressed();
                         return true;
-                    }
-                case KeyEvent.VK_F:
-                    toggleFullScreen();
-                    return true;
-                case KeyEvent.VK_RIGHT:
-                case KeyEvent.VK_PERIOD:
-                    MPlayerUIEventHandler.instance().onFastForwardPressed();
-                    return true;
-                case KeyEvent.VK_LEFT:
-                case KeyEvent.VK_COMMA:
-                    MPlayerUIEventHandler.instance().onRewindPressed();
-                    return true;
-                case KeyEvent.VK_UP:
-                case KeyEvent.VK_PLUS:
-                    MPlayerUIEventHandler.instance().onVolumeIncremented();
-                    return true;
-                case KeyEvent.VK_DOWN:
-                case KeyEvent.VK_MINUS:
-                    MPlayerUIEventHandler.instance().onVolumeDecremented();
-                    return true;
-                case KeyEvent.VK_ESCAPE:
-                    if (isFullscreen) {
-                        MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
-                    }
+                    case KeyEvent.VK_W:
+                        if (OSUtils.isMacOSX() && e.isMetaDown()) {
+                            player.stop();
+                            MPlayerWindow.this.setVisible(false);
+                            return true;
+                        }
+                    case KeyEvent.VK_F:
+                        toggleFullScreen();
+                        return true;
+                    case KeyEvent.VK_RIGHT:
+                    case KeyEvent.VK_PERIOD:
+                        MPlayerUIEventHandler.instance().onFastForwardPressed();
+                        return true;
+                    case KeyEvent.VK_LEFT:
+                    case KeyEvent.VK_COMMA:
+                        MPlayerUIEventHandler.instance().onRewindPressed();
+                        return true;
+                    case KeyEvent.VK_UP:
+                    case KeyEvent.VK_PLUS:
+                        MPlayerUIEventHandler.instance().onVolumeIncremented();
+                        return true;
+                    case KeyEvent.VK_DOWN:
+                    case KeyEvent.VK_MINUS:
+                        MPlayerUIEventHandler.instance().onVolumeDecremented();
+                        return true;
+                    case KeyEvent.VK_ESCAPE:
+                        if (isFullscreen) {
+                            MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
+                        }
                 }
-
                 // shift + - for volume increment
                 if (e.getKeyCode() == KeyEvent.VK_EQUALS) {
                     MPlayerUIEventHandler.instance().onVolumeIncremented();
                     return true;
                 }
-
                 // Alt+Enter, Ctrl+Enter full screen shortcuts - seen in other players.
                 if ((e.isAltDown() || e.isMetaDown() || e.isControlDown()) && e.getKeyCode() == KeyEvent.VK_ENTER) {
                     MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
                     return true;
                 }
             }
-
             return false;
         }
     }
@@ -451,27 +402,21 @@ public class MPlayerWindow extends JFrame {
     private class MPlayerMouseMotionAdapter extends MouseMotionAdapter {
         @Override
         public void mouseMoved(MouseEvent e) {
-
             if (MPlayerWindow.this.isActive()) {
                 Point2D currMousePosition = e.getPoint();
-
                 if (prevMousePosition == null) {
                     prevMousePosition = currMousePosition;
                 }
-
                 double distance = currMousePosition.distance(prevMousePosition);
-
                 if (distance > 10) {
                     showOverlay(true);
                 }
-
                 prevMousePosition = currMousePosition;
             }
         }
     }
 
     private class MPlayerWindowAdapter extends WindowAdapter {
-
         @Override
         public void windowClosing(WindowEvent e) {
             player.stop();
@@ -494,20 +439,15 @@ public class MPlayerWindow extends JFrame {
                 showOverlay(false);
             }
         }
-        
+
         @Override
         public void windowIconified(WindowEvent e) {
             hideOverlay(OSUtils.isMacOSX());
         }
-        
+
         @Override
         public void windowDeiconified(WindowEvent e) {
             showOverlay(false);
-            
         }
-    }
-
-    void showOverlayControls() {
-        showOverlay(true);
     }
 }

@@ -27,16 +27,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class LibraryDatabase {
-
     public static final int OBJECT_NOT_SAVED_ID = -1;
     public static final int OBJECT_INVALID_ID = -2;
     public static final int STARRED_PLAYLIST_ID = -3;
-    private static final int LIBRARY_DATABASE_VERSION = 5;
-
     static final String STARRED_TABLE_NAME_DO_NOT_TRANSLATE_THIS = "starred";
-
-    private Connection _connection;
-    private boolean _closed;
+    private static final int LIBRARY_DATABASE_VERSION = 5;
 
     static {
         try {
@@ -46,11 +41,13 @@ public class LibraryDatabase {
         }
     }
 
+    private Connection _connection;
+    private boolean _closed;
+
     public LibraryDatabase(File databaseFile) {
         if (databaseFile != null && !databaseFile.isDirectory() && !databaseFile.exists()) {
             databaseFile.mkdirs();
         }
-
         if (databaseFile != null && databaseFile.isDirectory() && databaseFile.canRead() && databaseFile.canWrite()) {
             String _name = databaseFile.getName();
             _connection = openOrCreateDatabase(databaseFile, _name);
@@ -82,7 +79,6 @@ public class LibraryDatabase {
         if (isClosed()) {
             return -1;
         }
-
         return update(_connection, statementSql, arguments);
     }
 
@@ -94,15 +90,12 @@ public class LibraryDatabase {
         if (isClosed()) {
             return OBJECT_INVALID_ID;
         }
-
         if (!statementSql.toUpperCase().startsWith("INSERT")) {
             return OBJECT_INVALID_ID;
         }
-
         if (update(statementSql, arguments) != -1) {
             return getIdentity();
         }
-
         return OBJECT_INVALID_ID;
     }
 
@@ -110,9 +103,7 @@ public class LibraryDatabase {
         if (isClosed()) {
             return;
         }
-
         _closed = true;
-
         try {
             Statement statement = _connection.createStatement();
             statement.execute("SHUTDOWN");
@@ -121,7 +112,6 @@ public class LibraryDatabase {
             e.printStackTrace();
         }
     }
-
 //    public synchronized void dump() {
 //        if (isClosed()) {
 //            return;
@@ -138,8 +128,6 @@ public class LibraryDatabase {
         if (oldVersion == 3 && LIBRARY_DATABASE_VERSION == 4) {
             addSortIndexColumnToPlaylistItemsTable(connection);
         }
-
-
         update(connection, "UPDATE Library SET version = ?", LIBRARY_DATABASE_VERSION);
     }
 
@@ -148,7 +136,6 @@ public class LibraryDatabase {
             StringBuilder sb = new StringBuilder();
             sb.append("jdbc:h2:");
             sb.append(new File(path, name).getAbsolutePath());
-
             if (!createIfNotExists) {
                 sb.append(";ifexists=true");
             }
@@ -160,28 +147,21 @@ public class LibraryDatabase {
 
     private Connection createDatabase(File path, String name) {
         Connection connection = openConnection(path, name, true);
-
         // STRUCTURE CREATION
-
         //update(connection, "DROP TABLE Library IF EXISTS CASCADE");
         update(connection, "CREATE TABLE Library (libraryId INTEGER IDENTITY, name VARCHAR(500), version INTEGER)");
-
         //update(connection, "DROP TABLE Playlists IF EXISTS CASCADE");
         update(connection, "CREATE TABLE Playlists (playlistId INTEGER IDENTITY, name VARCHAR(500), description VARCHAR(10000))");
         update(connection, "CREATE INDEX idx_Playlists_name ON Playlists (name)");
-
         //update(connection, "DROP TABLE PlaylistItems IF EXISTS CASCADE");
         update(connection,
                 "CREATE TABLE PlaylistItems (playlistItemId INTEGER IDENTITY, filePath VARCHAR(10000), fileName VARCHAR(500), fileSize BIGINT, fileExtension VARCHAR(10), trackTitle VARCHAR(500), trackDurationInSecs REAL, trackArtist VARCHAR(500), trackAlbum VARCHAR(500), coverArtPath VARCHAR(10000), trackBitrate VARCHAR(10), trackComment VARCHAR(500), trackGenre VARCHAR(20), trackNumber VARCHAR(6), trackYear VARCHAR(6), playlistId INTEGER, starred BOOLEAN, sortIndex INTEGER)");
         update(connection, "CREATE INDEX idx_PlaylistItems_filePath ON PlaylistItems (filePath)");
         update(connection, "CREATE INDEX idx_PlaylistItems_starred ON PlaylistItems (starred)");
-
         // INITIAL DATA
         update(connection, "INSERT INTO Library (name , version) VALUES (?, ?)", name, LIBRARY_DATABASE_VERSION);
-
         return connection;
     }
-
 
     private Connection openOrCreateDatabase(File path, String name) {
         Connection connection = openConnection(path, name, false);
@@ -189,7 +169,6 @@ public class LibraryDatabase {
             connection = createDatabase(path, name);
         } else {
             int version = getDatabaseVersion(connection);
-
             if (version < LIBRARY_DATABASE_VERSION) {
                 onUpdateDatabase(connection, version);
                 try {
@@ -201,7 +180,6 @@ public class LibraryDatabase {
                 }
             }
         }
-        
         return connection;
     }
 
@@ -209,9 +187,7 @@ public class LibraryDatabase {
         ResultSetMetaData meta = resultSet.getMetaData();
         int numColumns = meta.getColumnCount();
         int i;
-
         List<List<Object>> result = new LinkedList<>();
-
         while (resultSet.next()) {
             List<Object> row = new ArrayList<>(numColumns);
             for (i = 1; i <= numColumns; i++) {
@@ -226,58 +202,44 @@ public class LibraryDatabase {
         if (isClosed()) {
             return OBJECT_INVALID_ID;
         }
-
         ResultSet resultSet;
-
         try (Statement statement = _connection.createStatement()) {
             resultSet = statement.executeQuery("CALL IDENTITY()");
-
             resultSet.next();
-
             return resultSet.getInt(1);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return OBJECT_INVALID_ID;
     }
 
     private List<List<Object>> query(Connection connection, String statementSql, Object... arguments) {
         ResultSet resultSet;
-
         try (PreparedStatement statement = connection.prepareStatement(statementSql)) {
-
             if (arguments != null && arguments.length > 0) {
                 for (int i = 0; i < arguments.length; i++) {
                     statement.setObject(i + 1, arguments[i]);
                 }
             }
-
             resultSet = statement.executeQuery();
-
             return convertResultSetToList(resultSet);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return new ArrayList<>();
     }
 
     private int update(Connection connection, String statementSql, Object... arguments) {
-
         try (PreparedStatement statement = connection.prepareStatement(statementSql)) {
-
             if (arguments != null) {
                 for (int i = 0; i < arguments.length; i++) {
                     statement.setObject(i + 1, arguments[i]);
                 }
             }
-
             return statement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return -1;
     }
 
@@ -287,19 +249,15 @@ public class LibraryDatabase {
     }
 
     private void addSortIndexColumnToPlaylistItemsTable(final Connection connection) {
-        
         // add new column
         update(connection, "ALTER TABLE PlayListItems ADD sortIndex INTEGER");
-        
         // set initial playlist indexes
         List<Playlist> playlists = PlaylistDB.getPlaylists(this);
-        
-        for( Playlist playlist : playlists ) {
+        for (Playlist playlist : playlists) {
             List<PlaylistItem> items = playlist.getItems();
-            
-            for(int i=0; i < items.size(); i++) {
+            for (int i = 0; i < items.size(); i++) {
                 PlaylistItem item = items.get(i);
-                item.setSortIndexByTrackNumber(i+1); // set initial sort index (1-based)
+                item.setSortIndexByTrackNumber(i + 1); // set initial sort index (1-based)
                 item.save();
             }
         }

@@ -23,7 +23,6 @@ package com.frostwire.gui.bittorrent;
  * @author aldenml
  */
 public final class TorrentFileInfo {
-
     public final String path;
     public final long size;
     public boolean selected;

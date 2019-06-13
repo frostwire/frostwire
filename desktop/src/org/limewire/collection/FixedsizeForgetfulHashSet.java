@@ -40,14 +40,12 @@ import java.util.Set;
  * </pre>
  */
 public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable {
-
+    // Dummy value to associate with an Object in the backing Map
+    private static final Object PRESENT = new Object();
     /**
      * Backing map which the set delegates.
      */
     private transient FixedsizeForgetfulHashMap<E, Object> map;
-
-    // Dummy value to associate with an Object in the backing Map
-    private static final Object PRESENT = new Object();
 
     /**
      * Constructs a new, empty set, using the given initialCapacity.
@@ -140,5 +138,4 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
             throw new InternalError();
         }
     }
-
 }

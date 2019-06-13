@@ -10,39 +10,34 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.Executor;
 
-
 /**
  * Groups all {@link SettingsGroup} objects in one location to reload, revert to
- * a default value, save, or mark as save-able all <code>Settings</code> 
+ * a default value, save, or mark as save-able all <code>Settings</code>
  * objects at once.
  */
 public final class SettingsGroupManager {
-    
     /**
      * The singleton instance of SettingsHandler
      */
     private static final SettingsGroupManager INSTANCE = new SettingsGroupManager();
-    
+    /**
+     * A list of Settings this SettingsHandler is managing
+     */
+    private final Collection<SettingsGroup> PROPS = Collections.synchronizedList(new ArrayList<>());
+    /**
+     * The Executor for the Events
+     */
+    private volatile Executor executor = ExecutorsHelper.newFixedSizeThreadPool(1, "SettingsHandlerEventDispatcher");
+    // never instantiate this class.
+    private SettingsGroupManager() {
+    }
+
     /**
      * Returns the singleton instance of the SettingsHandler
      */
     public static SettingsGroupManager instance() {
         return INSTANCE;
     }
-    
-    /**
-     * A list of Settings this SettingsHandler is managing
-     */
-    private final Collection<SettingsGroup> PROPS = Collections.synchronizedList(new ArrayList<>());
-
-
-    /**
-     * The Executor for the Events
-     */
-    private volatile Executor executor = ExecutorsHelper.newFixedSizeThreadPool(1, "SettingsHandlerEventDispatcher");
-    
-    // never instantiate this class.
-    private SettingsGroupManager() {}
 
     /**
      * Returns all {@link SettingsGroupManagerListener}s or null if there are none
@@ -50,9 +45,9 @@ public final class SettingsGroupManager {
     private SettingsGroupManagerListener[] getSettingsHandlerListeners() {
         return null;
     }
-    
+
     /**
-     * Adds a settings class to the list of factories that 
+     * Adds a settings class to the list of factories that
      * this handler will act upon.
      */
     void addSettingsGroup(SettingsGroup group) {
@@ -69,10 +64,9 @@ public final class SettingsGroupManager {
                 group.reload();
             }
         }
-        
         fireSettingsHandlerEvent(EventType.RELOAD, null);
     }
-    
+
     /**
      * Save property settings to the property file.
      */
@@ -83,14 +77,12 @@ public final class SettingsGroupManager {
                 any |= group.save();
             }
         }
-        
         if (any) {
             fireSettingsHandlerEvent(EventType.SAVE, null);
         }
-        
         return any;
     }
-    
+
     /**
      * Revert all settings to their default value.
      */
@@ -101,21 +93,19 @@ public final class SettingsGroupManager {
                 any |= group.revertToDefault();
             }
         }
-        
         if (any) {
             fireSettingsHandlerEvent(EventType.REVERT_TO_DEFAULT, null);
         }
-        
         return any;
     }
-    
+
     /**
      * Fires a SettingsHandlerEvent
      */
     private void fireSettingsHandlerEvent(EventType type, SettingsGroup group) {
         fireSettingsHandlerEvent(new SettingsGroupManagerEvent(type, this, group));
     }
-    
+
     /**
      * Fires a SettingsHandlerEvent
      */
@@ -124,12 +114,11 @@ public final class SettingsGroupManager {
             throw new NullPointerException("SettingsHandlerEvent is null");
         }
     }
-    
+
     /**
      * Fires a event on the Executor Thread
      */
     protected void execute(Runnable evt) {
         executor.execute(evt);
     }
-
 }

@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Library extends LibraryDatabaseEntity {
-
     private int _id;
     private String _name;
     private int _version;

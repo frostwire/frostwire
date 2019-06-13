@@ -23,7 +23,7 @@ import java.io.File;
 public interface FileTransfer {
     /**
      * Retrieve the file for transfer.
-     *
+     * <p>
      * Null means no file availabe.  A folder means
      * all sub-files available.  A file means that file only.
      */

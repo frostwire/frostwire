@@ -27,26 +27,19 @@ import javax.swing.*;
 import java.io.IOException;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class DetailsPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Details Page");
-
     public final static String DETAILS = I18n.tr("Show details web page after a download starts.");
-
     private final JCheckBox DETAILS_CHECK_BOX = new JCheckBox();
 
     public DetailsPaneItem() {
         super(TITLE, "");
-
         BoxPanel panel = new BoxPanel();
         LabeledComponent comp = new LabeledComponent(I18n.tr(DETAILS), DETAILS_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         panel.add(comp.getComponent());
-
         add(panel);
     }
 
@@ -66,7 +59,6 @@ public class DetailsPaneItem extends AbstractPaneItem {
         if (SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.getValue() != DETAILS_CHECK_BOX.isSelected()) {
             return true;
         }
-
         return false;
     }
 }

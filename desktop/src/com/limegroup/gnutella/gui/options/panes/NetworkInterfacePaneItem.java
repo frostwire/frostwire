@@ -22,8 +22,6 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -37,27 +35,19 @@ import java.util.Random;
  * Allows the user to pick a custom interface/address to bind to.
  */
 public class NetworkInterfacePaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Network Interface");
-
     public final static String LABEL = I18n.tr("You can tell FrostWire to bind outgoing connections to an IP address from a specific network interface. Listening sockets will still listen on all available interfaces. This is useful on multi-homed hosts. If you later disable this interface, FrostWire will revert to binding to an arbitrary address.");
-
     private static final String ADDRESS = "frostwire.networkinterfacepane.address";
-
     private final ButtonGroup GROUP = new ButtonGroup();
-
     private final JCheckBox CUSTOM;
-
     private List<JRadioButton> activeButtons = new ArrayList<>();
 
     public NetworkInterfacePaneItem() {
         super(TITLE, LABEL);
-
         CUSTOM = new JCheckBox(I18n.tr("Use a specific network interface."));
         CUSTOM.setSelected(ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue());
         CUSTOM.addItemListener(e -> updateButtons(CUSTOM.isSelected()));
         add(CUSTOM);
-
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             JPanel panel = new JPanel(new GridBagLayout());
@@ -65,17 +55,14 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.fill = GridBagConstraints.NONE;
             gbc.gridwidth = GridBagConstraints.REMAINDER;
-
             // Add the available interfaces / addresses
             while (interfaces.hasMoreElements()) {
                 NetworkInterface ni = interfaces.nextElement();
                 JLabel label = new JLabel(ni.getDisplayName());
                 gbc.insets = new Insets(5, 0, 2, 0);
                 panel.add(label, gbc);
-
                 Enumeration<InetAddress> addresses = ni.getInetAddresses();
                 gbc.insets = new Insets(0, 6, 0, 0);
-
                 while (addresses.hasMoreElements()) {
                     InetAddress address = addresses.nextElement();
                     JRadioButton button = new JRadioButton(address.getHostAddress());
@@ -91,9 +78,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
                     panel.add(button, gbc);
                 }
             }
-
             initializeSelection();
-
             gbc.weightx = 1;
             gbc.weighty = 1;
             gbc.fill = GridBagConstraints.BOTH;
@@ -104,7 +89,6 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             JScrollPane pane = new JScrollPane(panel);
             pane.setBorder(BorderFactory.createEmptyBorder());
             add(pane);
-
             // initialize
             updateButtons(CUSTOM.isSelected());
         } catch (SocketException se) {
@@ -151,11 +135,9 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
      */
     public boolean applyOptions() throws IOException {
         boolean isDirty = isDirty();
-
         if (!isDirty) {
             return false;
         }
-
         ConnectionSettings.CUSTOM_NETWORK_INTERFACE.setValue(CUSTOM.isSelected());
         Enumeration<AbstractButton> buttons = GROUP.getElements();
         while (buttons.hasMoreElements()) {
@@ -165,9 +147,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
                 ConnectionSettings.CUSTOM_INETADRESS.setValue(addr.getHostAddress());
             }
         }
-
         String iface = "0.0.0.0";
-
         if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue()) {
             iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         }
@@ -175,7 +155,6 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             iface = "0.0.0.0";
             ConnectionSettings.CUSTOM_INETADRESS.setValue(iface);
         }
-
         if (iface.equals("0.0.0.0")) {
             iface = "0.0.0.0:%1$d,[::]:%1$d";
         } else {
@@ -185,17 +164,13 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
             }
             iface = iface + ":%1$d";
         }
-
         // TODO: consider the actual port range
         int port0 = 37000 + new Random().nextInt(20000);
-
         if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
             port0 = ConnectionSettings.PORT_RANGE_0.getValue();
         }
-
         String if_string = String.format(iface, port0);
         BTEngine.getInstance().listenInterfaces(if_string);
-
         return false;
     }
 
@@ -203,7 +178,6 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
         if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue() != CUSTOM.isSelected()) {
             return true;
         }
-
         String expect = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         Enumeration<AbstractButton> buttons = GROUP.getElements();
         while (buttons.hasMoreElements()) {
@@ -214,7 +188,6 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
                     return false;
             }
         }
-
         return true;
     }
 

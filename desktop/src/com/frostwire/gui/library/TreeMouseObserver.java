@@ -24,7 +24,6 @@ import javax.swing.tree.TreePath;
 import java.awt.event.MouseEvent;
 
 final class TreeMouseObserver implements MouseObserver {
-
     private final JTree tree;
     private final JPopupMenu popup;
 

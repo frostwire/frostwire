@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,23 +25,20 @@ import java.awt.*;
 
 /**
  * So that table cells look beveled, details that make the difference.
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
-
     private boolean isSelected;
 
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
-
         if (!isSelected) {
             BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
         }
-
-        setBorder(new EmptyBorder(3,3,3,3));
+        setBorder(new EmptyBorder(3, 3, 3, 3));
     }
 
     @Override

@@ -23,7 +23,6 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
 
 public class MediaPlayerOSX extends MediaPlayer {
-
     @Override
     protected String getPlayerPath() {
         //System.out.println("MediaPlayerOSX: getFrostWireJarPath() -> " + FrostWireUtils.getFrostWireJarPath());
@@ -37,7 +36,7 @@ public class MediaPlayerOSX extends MediaPlayer {
     protected float getVolumeGainFactor() {
         return 30.0f;
     }
-    
+
     private String getReleasePlayerPath() {
         String javaHome = System.getProperty("java.home");
         File f = new File(javaHome).getAbsoluteFile();
@@ -46,7 +45,6 @@ public class MediaPlayerOSX extends MediaPlayer {
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
         f = new File(f, "MacOS" + File.separator + "fwplayer_osx");
-
         return f.getAbsolutePath();
     }
 

@@ -26,7 +26,6 @@ import java.util.Comparator;
  * @author Sam Berlin, gubatron
  */
 public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, TableModel {
-
     /**
      * Whether or not the underlying data is sorted.
      */
@@ -208,5 +207,4 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Gets the 'type ahead' column.
      */
     int getTypeAheadColumn();
-
 }

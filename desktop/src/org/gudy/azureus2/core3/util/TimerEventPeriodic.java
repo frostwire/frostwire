@@ -35,7 +35,6 @@ TimerEventPeriodic
     private final long frequency;
     private final boolean absolute;
     private final TimerEventPerformer performer;
-
     private String name;
     private TimerEvent current_event;
 
@@ -56,11 +55,8 @@ TimerEventPeriodic
     setName(
             String _name) {
         name = _name;
-
         synchronized (this) {
-
             if (current_event != null) {
-
                 current_event.setName(name);
             }
         }
@@ -74,17 +70,14 @@ TimerEventPeriodic
     public void
     perform(
             TimerEvent event) {
-
         try {
             performer.perform(event);
         } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
         }
-
         synchronized (this) {
             long now = SystemTime.getCurrentTime();
             current_event = timer.addEvent(name, now + frequency, absolute, this);
         }
-
     }
 }

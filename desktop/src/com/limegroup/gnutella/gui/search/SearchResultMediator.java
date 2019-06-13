@@ -59,55 +59,39 @@ import java.util.List;
 import static com.limegroup.gnutella.gui.I18n.tr;
 
 public final class SearchResultMediator extends AbstractTableMediator<TableRowFilteredModel, SearchResultDataLine, UISearchResult> {
-
     private static final String SEARCH_TABLE = "SEARCH_TABLE";
-
     /**
      * The TableSettings that all ResultPanels will use.
      */
     private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
     private static final String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-" + UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
-
     /**
      * The search info of this class.
      */
     private final SearchInformation SEARCH_INFO;
-
-    /**
-     * The search token of the last search. (Use this to match up results.)
-     */
-    private long token;
-
     private final List<String> searchTokens;
-
-    /**
-     * The CompositeFilter for this ResultPanel.
-     */
-    private CompositeFilter FILTER;
-
     /**
      * The download listener.
      */
     ActionListener DOWNLOAD_LISTENER;
-
     /**
      * The browse host listener.
      */
-
     MouseAdapter TORRENT_DETAILS_LISTENER;
-
-    private ActionListener COPY_MAGNET_ACTION_LISTENER;
-
-    private ActionListener COPY_HASH_ACTION_LISTENER;
-
     ActionListener CONFIGURE_SHARING_LISTENER;
-
     ActionListener DOWNLOAD_PARTIAL_FILES_LISTENER;
-
     ActionListener STOP_SEARCH_LISTENER;
-
+    /**
+     * The search token of the last search. (Use this to match up results.)
+     */
+    private long token;
+    /**
+     * The CompositeFilter for this ResultPanel.
+     */
+    private CompositeFilter FILTER;
+    private ActionListener COPY_MAGNET_ACTION_LISTENER;
+    private ActionListener COPY_HASH_ACTION_LISTENER;
     private Box SOUTH_PANEL;
-
     private SchemaBox schemaBox;
     private SearchOptionsPanel searchOptionsPanel;
     private JScrollPane scrollPaneSearchOptions;
@@ -119,7 +103,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     SearchResultMediator(JPanel overlay) {
         super(SEARCH_TABLE);
         setupFakeTable(overlay);
-
         SEARCH_INFO = SearchInformation.createKeywordSearch("", null, MediaType.getAnyTypeMediaType());
         FILTER = null;
         this.token = 0;
@@ -160,9 +143,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         TableColumnModel model = TABLE.getColumnModel();
         TableColumn tc;
         tc = model.getColumn(SearchTableColumns.ACTIONS_IDX);
-
         tc.setCellEditor(new GenericCellEditor(getSearchResultsActionsRenderer()));
-
         tc = model.getColumn(SearchTableColumns.SOURCE_IDX);
         tc.setCellEditor(new GenericCellEditor(getSourceRenderer()));
     }
@@ -185,14 +166,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * FILTER, MAIN_PANEL, DATA_MODEL, TABLE, BUTTON_ROW.
      */
     protected void setupConstants() {
-
         FILTER = new CompositeFilter(4);
         MAIN_PANEL = new PaddedPanel(0);
-
         setupDataModel();
-
         TABLE = new LimeJTable(DATA_MODEL);
-
         BUTTON_ROW = new SearchButtons(this).getComponent();
     }
 
@@ -222,9 +199,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     protected void buildListeners() {
         super.buildListeners();
-
         DOWNLOAD_LISTENER = e -> SearchMediator.doDownload(SearchResultMediator.this);
-
         TORRENT_DETAILS_LISTENER = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -237,7 +212,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 }
             }
         };
-
         COPY_MAGNET_ACTION_LISTENER = e -> {
             SearchResultDataLine[] lines = getAllSelectedLines();
             StringBuilder sb = new StringBuilder();
@@ -247,7 +221,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
             GUIMediator.setClipboardContent(sb.toString());
         };
-
         COPY_HASH_ACTION_LISTENER = e -> {
             SearchResultDataLine[] lines = getAllSelectedLines();
             StringBuilder sb = new StringBuilder();
@@ -257,9 +230,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
             GUIMediator.setClipboardContent(sb.toString());
         };
-
         CONFIGURE_SHARING_LISTENER = e -> GUIMediator.instance().setOptionsVisible(true, tr("Options"));
-
         DOWNLOAD_PARTIAL_FILES_LISTENER = e -> {
             SearchResultDataLine[] lines = getAllSelectedLines();
             if (lines.length == 1 && lines[0] != null) {
@@ -274,7 +245,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 }
             }
         };
-
         STOP_SEARCH_LISTENER = e -> {
             SearchMediator.instance().stopSearch(token);
             updateSearchIcon(false);
@@ -295,9 +265,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         //  do not return a menu if right-clicking on the dummy panel
         if (!isKillable())
             return null;
-
         JPopupMenu menu = new SkinPopupMenu();
-
         if (lines.length > 0) {
             boolean allWithHash = true;
             for (SearchResultDataLine line : lines) {
@@ -308,7 +276,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
             PopupUtils.addMenuItem(tr("Copy Magnet"), COPY_MAGNET_ACTION_LISTENER, menu, allWithHash);
             PopupUtils.addMenuItem(tr("Copy Hash"), COPY_HASH_ACTION_LISTENER, menu, allWithHash);
-
             menu.add(createSearchAgainMenu(lines[0]));
         } else {
             SeasonalContentSearchSuggestion.attemptToAddSeasonalContentSearchSuggestion(null, menu, searchTokens);
@@ -319,7 +286,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             menu.add(new SkinMenuItem(new CloseOtherTabsAction()));
             menu.add(new SkinMenuItem(new CloseTabsToTheRight()));
         }
-
         return (new SearchResultMenu(this)).addToMenu(menu, lines);
     }
 
@@ -329,12 +295,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     private JMenu createSearchAgainMenu(SearchResultDataLine line) {
         JMenu menu = new SkinMenu(tr("Search More"));
         menu.add(new SkinMenuItem(new RepeatSearchAction()));
-
         if (line == null) {
             menu.setEnabled(isRepeatSearchEnabled());
             return menu;
         }
-
         menu.addSeparator();
         String keywords = QueryUtils.createQueryString(line.getFilename());
         SearchInformation info = SearchInformation.createKeywordSearch(keywords, null, MediaType.getAnyTypeMediaType());
@@ -342,7 +306,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             SeasonalContentSearchSuggestion.attemptToAddSeasonalContentSearchSuggestion(menu, null, searchTokens);
             menu.add(new SkinMenuItem(new SearchAction(info, tr("Search for Keywords: {0}"))));
         }
-
         return menu;
     }
 
@@ -366,9 +329,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     public void handleSelection(int i) {
         setButtonEnabled(SearchButtons.DOWNLOAD_BUTTON_INDEX, true);
-
         setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, !isStopped());
-
         // Buy button only enabled for single selection.
         SearchResultDataLine[] allSelectedLines = getAllSelectedLines();
         setButtonEnabled(SearchButtons.TORRENT_DETAILS_BUTTON_INDEX, allSelectedLines != null && allSelectedLines.length == 1);
@@ -430,7 +391,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         FILTER.setFilter(depth, filter);
         //if(!FILTER.setFilter(depth, filter))
         //    return false;
-
         // store the selection & visible rows
         int[] rows = TABLE.getSelectedRows();
         SearchResultDataLine[] lines = new SearchResultDataLine[rows.length];
@@ -442,10 +402,8 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             if (TABLE.isRowVisible(row))
                 inView.add(line);
         }
-
         // change the table.
         DATA_MODEL.filtersChanged();
-
         // reselect & move the viewpoint to the first still visible row.
         for (int i = 0; i < rows.length; i++) {
             SearchResultDataLine line = lines[i];
@@ -458,7 +416,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 }
             }
         }
-
         // update the tab count.
         SearchMediator.setTabDisplayCount(this);
     }
@@ -483,7 +440,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         clearTable();
         resetFilters();
         schemaBox.resetCounters();
-
         SearchMediator.setTabDisplayCount(this);
         SearchMediator.instance().repeatSearch(this, SEARCH_INFO);
         setButtonEnabled(SearchButtons.TORRENT_DETAILS_BUTTON_INDEX, false);
@@ -502,15 +458,15 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         return this.token == token;
     }
 
-    void setToken(long token) {
-        this.token = token;
-    }
-
     /**
      * Returns the search token this is responsible for.
      */
     long getToken() {
         return token;
+    }
+
+    void setToken(long token) {
+        this.token = token;
     }
 
     /**
@@ -522,7 +478,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         int[] rows = TABLE.getSelectedRows();
         if (rows == null)
             return new SearchResultDataLine[0];
-
         SearchResultDataLine[] lines = new SearchResultDataLine[rows.length];
         for (int i = 0; i < rows.length; i++)
             lines[i] = DATA_MODEL.get(rows[i]);
@@ -560,41 +515,31 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     protected JComponent getScrolledTablePane() {
         if (TABLE_PANE != null)
             return TABLE_PANE;
-
         JPanel tablePane = new JPanel();
         tablePane.setLayout(new BoxLayout(tablePane, BoxLayout.LINE_AXIS));
-
         SCROLL_PANE = new JScrollPane(TABLE);
         SCROLL_PANE.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 6, 0, 6), SCROLL_PANE.getBorder()));
-
         tablePane.add(SCROLL_PANE);
-
         scrollPaneSearchOptions = createSearchOptionsPanel();
         scrollPaneSearchOptions.setVisible(false); // put this in a configuration
         tablePane.add(scrollPaneSearchOptions);
-
         TABLE_PANE = tablePane;
-
         return tablePane;
     }
 
     private JComponent createSchemaBox() {
         schemaBox = new SchemaBox(this);
-
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-
         final String strShowOpts = tr("Search tools");
         final String strHideOpts = tr("Search tools");
-
         // reusing schema box panel for more options button
         // minor optimization to keep the layout as flat as possible
         final JButton buttonOptions = new JButton(strShowOpts);
         buttonOptions.setContentAreaFilled(false);
         //buttonOptions.setBorderPainted(false);
         buttonOptions.setOpaque(false);
-
         Dimension dim = new Dimension(140, 30);
         buttonOptions.setMinimumSize(dim);
         buttonOptions.setMaximumSize(dim);
@@ -602,36 +547,29 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         buttonOptions.setSize(dim);
         buttonOptions.setIcon(GUIMediator.getThemeImage("search_tools_left"));
         buttonOptions.setHorizontalTextPosition(SwingConstants.RIGHT);
-
         //buttonOptions.setMargin(new Insets(0, 0, 0, 0));
         //buttonOptions.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-
         buttonOptions.addActionListener(e -> {
             scrollPaneSearchOptions.setVisible(!scrollPaneSearchOptions.isVisible());
             buttonOptions.setText(scrollPaneSearchOptions.isVisible() ? strHideOpts : strShowOpts);
             buttonOptions.setIcon(!scrollPaneSearchOptions.isVisible() ? GUIMediator.getThemeImage("search_tools_left") : GUIMediator.getThemeImage("search_tools_right"));
             buttonOptions.setHorizontalTextPosition(!scrollPaneSearchOptions.isVisible() ? SwingConstants.RIGHT : SwingConstants.LEFT);
-
             if (scrollPaneSearchOptions.isVisible()) {
                 searchOptionsPanel.onOptionsPanelShown();
             }
         });
-
         JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
         sep.setMaximumSize(new Dimension(2, 100));
-
         panel.add(schemaBox);
         panel.add(Box.createHorizontalGlue());
         panel.add(sep);
         panel.add(buttonOptions);
-
         return panel;
     }
 
     private JScrollPane createSearchOptionsPanel() {
         searchOptionsPanel = new SearchOptionsPanel(this);
         searchOptionsPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
-
         JScrollPane sp = new JScrollPane(searchOptionsPanel);
         Border border = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(), BorderFactory.createMatteBorder(0, 1, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
         sp.setBorder(border);
@@ -639,7 +577,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         Dimension d = new Dimension(250, 70000);
         sp.setPreferredSize(d);
         sp.setMaximumSize(d);
-
         return sp;
     }
 
@@ -648,7 +585,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     protected void setupMainPanel() {
         //MAIN_PANEL.add(createSecurityWarning()); //No warnings
-
         setupMainPanelBase();
     }
 
@@ -658,39 +594,29 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     private void setupFakeTable(JPanel overlay) {
         MAIN_PANEL.removeAll();
-
         // fixes flickering!
         JPanel background = new JPanel() {
             public boolean isOptimizedDrawingEnabled() {
                 return false;
             }
         };
-
         background.setLayout(new OverlayLayout(background));
-
         //overlay.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-
         JPanel overlayPanel = new JPanel();
         overlayPanel.setOpaque(false);
         overlayPanel.setLayout(new MigLayout("fill, wrap"));
         overlayPanel.add(overlay, "center");
-
         // Browse All Free Downloads Button
         overlayPanel.add(getBrowseAllFeaturedDownloadsButton(), "center");
-
-
         JScrollPane scrollPane = new JScrollPane(overlayPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(28, 10, 4, 10));
-
         JComponent table = getScrolledTablePane();
         table.setOpaque(false);
         background.add(scrollPane);
         background.add(table);
-
-
         MAIN_PANEL.add(background);
         addButtonRow();
     }
@@ -719,31 +645,50 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         if (BUTTON_ROW != null) {
             SOUTH_PANEL = Box.createVerticalBox();
             SOUTH_PANEL.setOpaque(false);
-
             SOUTH_PANEL.add(Box.createVerticalStrut(GUIConstants.SEPARATOR));
-
             JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new GridBagLayout());
-
             GridBagConstraints gbc = new GridBagConstraints();
-
             gbc.gridx = 1;
             gbc.gridy = 0;
             gbc.anchor = GridBagConstraints.CENTER;
             gbc.fill = GridBagConstraints.NONE;
             gbc.gridwidth = GridBagConstraints.RELATIVE;
             gbc.weightx = 1;
-
             buttonPanel.add(BUTTON_ROW, gbc);
-
             buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 64));
             SOUTH_PANEL.add(buttonPanel);
-
             MAIN_PANEL.add(SOUTH_PANEL);
         }
     }
 
     public void cleanup() {
+    }
+
+    void updateSearchIcon(boolean active) {
+        SearchMediator.getSearchResultDisplayer().updateSearchIcon(this, active);
+        setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, active);
+    }
+
+    List<String> getSearchTokens() {
+        return searchTokens;
+    }
+
+    void updateFiltersPanel() {
+        schemaBox.applyFilters();
+        searchOptionsPanel.updateFiltersPanel();
+    }
+
+    void resetFiltersPanel() {
+        schemaBox.applyFilters();
+        searchOptionsPanel.resetFilters();
+        searchOptionsPanel.updateFiltersPanel();
+    }
+
+    @Override
+    public void add(UISearchResult o, int index) {
+        super.add(o, index);
+        schemaBox.updateCounters(o);
     }
 
     private final class RepeatSearchAction extends AbstractAction {
@@ -775,7 +720,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             putValue(Action.NAME, SearchMediator.CLOSE_ALL_TABS);
             setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 0);
         }
-
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -811,32 +755,5 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 tabsToRemove--;
             }
         }
-    }
-
-    void updateSearchIcon(boolean active) {
-        SearchMediator.getSearchResultDisplayer().updateSearchIcon(this, active);
-        setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, active);
-    }
-
-    List<String> getSearchTokens() {
-        return searchTokens;
-    }
-
-    void updateFiltersPanel() {
-        schemaBox.applyFilters();
-        searchOptionsPanel.updateFiltersPanel();
-    }
-
-    void resetFiltersPanel() {
-        schemaBox.applyFilters();
-        searchOptionsPanel.resetFilters();
-        searchOptionsPanel.updateFiltersPanel();
-    }
-
-    @Override
-    public void add(UISearchResult o, int index) {
-        super.add(o, index);
-
-        schemaBox.updateCounters(o);
     }
 }

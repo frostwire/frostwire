@@ -26,20 +26,19 @@ import javax.swing.*;
 import java.io.File;
 
 public class TorrentDirectoryHolder extends FileSettingDirectoryHolder {
+    private final MediaType type;
 
-  private final MediaType type;
+    public TorrentDirectoryHolder() {
+        super(SharingSettings.TORRENTS_DIR_SETTING, I18n.tr("Torrents"));
+        type = MediaType.getTorrentMediaType();
+    }
 
-	public TorrentDirectoryHolder() {
-    super(SharingSettings.TORRENTS_DIR_SETTING, I18n.tr("Torrents"));
-		type = MediaType.getTorrentMediaType();
-	}
+    public Icon getIcon() {
+        NamedMediaType nmt = NamedMediaType.getFromMediaType(type);
+        return nmt.getIcon();
+    }
 
-	public Icon getIcon() {
-		NamedMediaType nmt = NamedMediaType.getFromMediaType(type);
-		return nmt.getIcon();
-	}
-
-	public boolean accept(File file) {
-    return super.accept(file) && type.matches(file.getName());
-  }
+    public boolean accept(File file) {
+        return super.accept(file) && type.matches(file.getName());
+    }
 }

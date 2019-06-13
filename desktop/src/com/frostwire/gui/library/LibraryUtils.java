@@ -50,10 +50,8 @@ import java.util.concurrent.ExecutorService;
  * @author aldenml
  */
 public class LibraryUtils {
-
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(LibraryUtils.class);
-
     private static final ExecutorService executor;
 
     static {
@@ -95,7 +93,7 @@ public class LibraryUtils {
                 // update all sort indexes from insertion point onwards
                 for (int i = index; i < items.size(); i++) {
                     PlaylistItem curItem = items.get(i);
-                    curItem.setSortIndexByTrackNumber(i+1);
+                    curItem.setSortIndexByTrackNumber(i + 1);
                     curItem.save();
                 }
             } else {
@@ -157,6 +155,7 @@ public class LibraryUtils {
             @Override
             public void onDialogCancelled() {
             }
+
             @Override
             public void onDialogOk(String playlistName) {
                 if (playlistName != null && playlistName.length() > 0) {
@@ -219,7 +218,6 @@ public class LibraryUtils {
                 }
             }
         };
-
         GUIMediator.safeInvokeAndWait(() -> {
             File[] mediaFiles = files;
             if (files.length == 1 && files[0].isDirectory()) {
@@ -246,11 +244,11 @@ public class LibraryUtils {
                 @Override
                 public void onDialogCancelled() {
                 }
+
                 @Override
                 public void onDialogOk(String playlistName) {
                     if (playlistName != null && playlistName.length() > 0) {
                         final Playlist playlist = LibraryMediator.getLibrary().newPlaylist(playlistName, playlistName);
-
                         Thread t = new Thread(() -> {
                             try {
                                 playlist.save();
@@ -268,7 +266,6 @@ public class LibraryUtils {
             };
             FrostwireInputDialog.showInputDialog(GUIMediator.getAppFrame(), I18n.tr("Playlist name"), I18n.tr("Playlist name"), GUIMediator.getThemeImage("playlist"), suggestPlaylistName(playlistItems), listener);
         }
-
     }
 
     private static void createStarredPlaylist(final PlaylistItem[] playlistItems) {
@@ -718,12 +715,15 @@ public class LibraryUtils {
 
     public abstract static class OnLyricsParsedUICallback implements Runnable {
         private String lyrics;
-        void setLyrics(String lyrics) {
-            this.lyrics = lyrics;
-        }
+
         String getLyrics() {
             return lyrics;
         }
+
+        void setLyrics(String lyrics) {
+            this.lyrics = lyrics;
+        }
+
         public abstract void run();
     }
 }

@@ -21,28 +21,11 @@ import java.util.HashMap;
 import java.util.Set;
 
 class CryptoCurrencyTextField extends LimeTextField {
-
-    public enum CurrencyURIPrefix {
-        BITCOIN("bitcoin:");
-
-        private final String prefix;
-
-        CurrencyURIPrefix(String p) {
-            prefix = p;
-        }
-
-        public String toString() {
-            return prefix;
-        }
-    }
-
     private final String prefix;
-
     private final HashMap<String, String> firstValidCharsOnAddress;
 
     CryptoCurrencyTextField(CurrencyURIPrefix p) {
         prefix = p.toString();
-
         firstValidCharsOnAddress = new HashMap<>();
         initFirstValidChars();
     }
@@ -66,14 +49,12 @@ class CryptoCurrencyTextField extends LimeTextField {
         boolean hasPrefix;
         boolean hasValidPrefix = false;
         String text = getText();
-
         if (text.contains(":")) {
             hasPrefix = true;
             hasValidPrefix = text.startsWith(prefix);
         } else {
             hasPrefix = false;
         }
-
         return !hasPrefix || hasValidPrefix;
     }
 
@@ -112,7 +93,19 @@ class CryptoCurrencyTextField extends LimeTextField {
                 }
             }
         }
-
         return foundChar;
+    }
+
+    public enum CurrencyURIPrefix {
+        BITCOIN("bitcoin:");
+        private final String prefix;
+
+        CurrencyURIPrefix(String p) {
+            prefix = p;
+        }
+
+        public String toString() {
+            return prefix;
+        }
     }
 }

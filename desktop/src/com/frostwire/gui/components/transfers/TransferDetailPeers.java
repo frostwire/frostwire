@@ -27,9 +27,7 @@ import javax.swing.*;
 import java.util.List;
 
 public final class TransferDetailPeers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-
     private static final Logger LOG = Logger.getLogger(TransferDetailPeers.class);
-
     private final TransferDetailPeersTableMediator tableMediator;
     private BittorrentDownload btDownload;
 

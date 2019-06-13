@@ -23,13 +23,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthProgressBarUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinProgressBarUI extends SynthProgressBarUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinProgressBarUI();

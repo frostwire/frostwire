@@ -40,8 +40,12 @@ import java.util.concurrent.ExecutorService;
  * @since Java for Mac OS X 10.6 Update 2
  */
 public final class Dispatch {
-
     private final static Dispatch instance = new Dispatch();
+    private Executor nonBlockingMainQueue = null;
+    private Executor blockingMainQueue = null;
+
+    private Dispatch() {
+    }
 
     /**
      * Factory method returns an instance of Dispatch if supported by the
@@ -53,7 +57,6 @@ public final class Dispatch {
     public static Dispatch getInstance() {
         checkSecurity();
         if (!LibDispatchNative.nativeIsDispatchSupported()) return null;
-
         return instance;
     }
 
@@ -61,11 +64,6 @@ public final class Dispatch {
         final SecurityManager security = System.getSecurityManager();
         if (security != null) security.checkPermission(new RuntimePermission("canInvokeInSystemThreadGroup"));
     }
-
-    private Dispatch() {
-    }
-
-    private Executor nonBlockingMainQueue = null;
 
     /**
      * Returns an {@link Executor} that performs the provided Runnables on the main queue of the process.
@@ -79,8 +77,6 @@ public final class Dispatch {
         if (nonBlockingMainQueue != null) return nonBlockingMainQueue;
         return nonBlockingMainQueue = new LibDispatchMainQueue.ASync();
     }
-
-    private Executor blockingMainQueue = null;
 
     /**
      * Returns an {@link Executor} that performs the provided Runnables on the main queue of the process.

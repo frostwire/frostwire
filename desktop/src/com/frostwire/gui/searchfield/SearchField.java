@@ -37,19 +37,115 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class SearchField extends JXSearchField {
-
     /**
      * The sole JPopupMenu that's shared among all the text fields.
      */
     private static JPopupMenu POPUP;
-
+    /**
+     * The undo action.
+     */
+    private static Action UNDO_ACTION = new FieldAction(I18n.tr("Undo")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).undo();
+        }
+    };
+    /**
+     * The cut action
+     */
+    private static Action CUT_ACTION = new FieldAction(I18n.tr("Cut")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).cut();
+        }
+    };
+    /**
+     * The copy action.
+     */
+    private static Action COPY_ACTION = new FieldAction(I18n.tr("Copy")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).copy();
+        }
+    };
+    /**
+     * The paste action.
+     */
+    private static Action PASTE_ACTION = new FieldAction(I18n.tr("Paste")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).paste();
+        }
+    };
+    /**
+     * The delete action.
+     */
+    private static Action DELETE_ACTION = new FieldAction(I18n.tr("Delete")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).replaceSelection("");
+        }
+    };
+    /**
+     * The select all action.
+     */
+    private static Action SELECT_ALL_ACTION = new FieldAction(I18n.tr("Select All")) {
+        public void actionPerformed(ActionEvent e) {
+            getField(e).selectAll();
+        }
+    };
+    /**
+     * The popup the scroll pane is in
+     */
+    protected Popup popup;
+    //----------------------------------------------------------------------------
+    // Fields
+    //----------------------------------------------------------------------------
+    AutoCompleteDictionary dict;
+    /**
+     * The list auto-completable items are shown in
+     */
+    AutoCompleteList entryList;
+    /**
+     * The panel the popup is shown in.
+     */
+    JPanel entryPanel;
     /**
      * Our UndoManager.
      */
     private UndoManager undoManager;
+    /**
+     * Whether or not we tried to show a popup while this wasn't showing
+     */
+    private boolean showPending;
 
     public SearchField() {
         init();
+    }
+
+    /**
+     * Creates the JPopupMenu that all LimeTextFields will share.
+     */
+    private static JPopupMenu createPopup() {
+        if (POPUP != null) {
+            return POPUP;
+        }
+        // initialize the JPopupMenu with necessary stuff.
+        POPUP = new SkinPopupMenu() {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -6004124495511263059L;
+
+            public void show(Component invoker, int x, int y) {
+                ((SearchField) invoker).updateActions();
+                super.show(invoker, x, y);
+            }
+        };
+        POPUP.add(new SkinMenuItem(UNDO_ACTION));
+        POPUP.addSeparator();
+        POPUP.add(new SkinMenuItem(CUT_ACTION));
+        POPUP.add(new SkinMenuItem(COPY_ACTION));
+        POPUP.add(new SkinMenuItem(PASTE_ACTION));
+        POPUP.add(new SkinMenuItem(DELETE_ACTION));
+        POPUP.addSeparator();
+        POPUP.add(new SkinMenuItem(SELECT_ALL_ACTION));
+        return POPUP;
     }
 
     /**
@@ -79,54 +175,23 @@ public class SearchField extends JXSearchField {
             undoManager = null;
         super.setDocument(doc);
     }
+    ///// from AutoCompleteTextField
+    //----------------------------------------------------------------------------
+    // Public methods
+    //----------------------------------------------------------------------------
 
     /**
      * Initialize the necessary events.
      */
     private void init() {
         setComponentPopupMenu(createPopup());
-
         undoManager = new UndoManager();
         undoManager.setLimit(1);
         getDocument().addUndoableEditListener(undoManager);
-
         enableEvents(AWTEvent.KEY_EVENT_MASK);
         enableEvents(AWTEvent.HIERARCHY_EVENT_MASK);
         enableEvents(AWTEvent.FOCUS_EVENT_MASK);
-
         ThemeMediator.fixKeyStrokes(this);
-    }
-
-    /**
-     * Creates the JPopupMenu that all LimeTextFields will share.
-     */
-    private static JPopupMenu createPopup() {
-        if (POPUP != null) {
-            return POPUP;
-        }
-
-        // initialize the JPopupMenu with necessary stuff.
-        POPUP = new SkinPopupMenu() {
-            /**
-             * 
-             */
-            private static final long serialVersionUID = -6004124495511263059L;
-
-            public void show(Component invoker, int x, int y) {
-                ((SearchField) invoker).updateActions();
-                super.show(invoker, x, y);
-            }
-        };
-
-        POPUP.add(new SkinMenuItem(UNDO_ACTION));
-        POPUP.addSeparator();
-        POPUP.add(new SkinMenuItem(CUT_ACTION));
-        POPUP.add(new SkinMenuItem(COPY_ACTION));
-        POPUP.add(new SkinMenuItem(PASTE_ACTION));
-        POPUP.add(new SkinMenuItem(DELETE_ACTION));
-        POPUP.addSeparator();
-        POPUP.add(new SkinMenuItem(SELECT_ALL_ACTION));
-        return POPUP;
     }
 
     /**
@@ -136,10 +201,8 @@ public class SearchField extends JXSearchField {
         String selectedText = getSelectedText();
         if (selectedText == null)
             selectedText = "";
-
         boolean stuffSelected = !selectedText.equals("");
         boolean allSelected = selectedText.equals(getText());
-
         UNDO_ACTION.setEnabled(isEnabled() && isEditable() && isUndoAvailable());
         CUT_ACTION.setEnabled(isEnabled() && isEditable() && stuffSelected);
         COPY_ACTION.setEnabled(isEnabled() && stuffSelected);
@@ -154,6 +217,9 @@ public class SearchField extends JXSearchField {
     private boolean isUndoAvailable() {
         return getUndoManager() != null && getUndoManager().canUndoOrRedo();
     }
+    //----------------------------------------------------------------------------
+    // Protected methods
+    //----------------------------------------------------------------------------
 
     /**
      * Determines if paste is currently available.
@@ -168,117 +234,29 @@ public class SearchField extends JXSearchField {
     }
 
     /**
-     * Base Action that all LimeTextField actions extend.
+     * Creates the default dictionary object
      */
-    private static abstract class FieldAction extends AbstractAction {
-
-        /**
-         * Constructs a new FieldAction looking up the name from the MessagesBundles.
-         */
-        FieldAction(String name) {
-            super(I18n.tr(name));
-        }
-
-        /**
-         * Gets the LimeTextField for the given ActionEvent.
-         */
-        SearchField getField(ActionEvent e) {
-            JMenuItem source = (JMenuItem) e.getSource();
-            JPopupMenu menu = (JPopupMenu) source.getParent();
-            return (SearchField) menu.getInvoker();
-        }
-    }
-
-    /**
-     * The undo action.
-     */
-    private static Action UNDO_ACTION = new FieldAction(I18n.tr("Undo")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).undo();
-        }
-    };
-
-    /**
-     * The cut action
-     */
-    private static Action CUT_ACTION = new FieldAction(I18n.tr("Cut")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).cut();
-        }
-    };
-
-    /**
-     * The copy action.
-     */
-    private static Action COPY_ACTION = new FieldAction(I18n.tr("Copy")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).copy();
-        }
-    };
-
-    /**
-     * The paste action.
-     */
-    private static Action PASTE_ACTION = new FieldAction(I18n.tr("Paste")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).paste();
-        }
-    };
-
-    /**
-     * The delete action.
-     */
-    private static Action DELETE_ACTION = new FieldAction(I18n.tr("Delete")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).replaceSelection("");
-        }
-    };
-
-    /**
-     * The select all action.
-     */
-    private static Action SELECT_ALL_ACTION = new FieldAction(I18n.tr("Select All")) {
-
-        public void actionPerformed(ActionEvent e) {
-            getField(e).selectAll();
-        }
-    };
-
-    ///// from AutoCompleteTextField
-
-    //----------------------------------------------------------------------------
-    // Public methods
-    //----------------------------------------------------------------------------
-
-    /**
-    * Creates the default dictionary object
-    */
     AutoCompleteDictionary createDefaultDictionary() {
         return new StringTrieSet(true);
     }
+    /// from ClearableAutoComplete
 
     /**
-    * Gets whether the component is currently performing autocomplete lookups as
-    * keystrokes are performed. Looks up the value in UISettings.
-    *
-    * @return True or false.
-    */
+     * Gets whether the component is currently performing autocomplete lookups as
+     * keystrokes are performed. Looks up the value in UISettings.
+     *
+     * @return True or false.
+     */
     boolean getAutoComplete() {
         return UISettings.AUTOCOMPLETE_ENABLED.getValue();
     }
 
     /**
-    * Adds the current value of the field underlying dictionary
-    */
+     * Adds the current value of the field underlying dictionary
+     */
     public void addToDictionary() {
         if (!getAutoComplete())
             return;
-
         if (dict == null) {
             setUp();
             this.dict = createDefaultDictionary();
@@ -286,26 +264,15 @@ public class SearchField extends JXSearchField {
         dict.addEntry(getText().trim());
     }
 
-    //----------------------------------------------------------------------------
-    // Protected methods
-    //----------------------------------------------------------------------------
-
     protected String lookup(String s) {
         if (dict != null && getAutoComplete() && !s.equals(""))
             return dict.lookup(s);
         return null;
     }
 
-    //----------------------------------------------------------------------------
-    // Fields
-    //----------------------------------------------------------------------------
-    AutoCompleteDictionary dict;
-
-    /// from ClearableAutoComplete
-
     /**
      * Fires an action event.
-     *
+     * <p>
      * If the popup is visible, this resets the current
      * text to be the selection on the popup (if something was selected)
      * prior to firing the event.
@@ -319,9 +286,11 @@ public class SearchField extends JXSearchField {
                 return;
             }
         }
-
         super.fireActionPerformed();
     }
+    //----------------------------------------------------------------------------
+    // Protected methods
+    //----------------------------------------------------------------------------
 
     /**
      * Forwards necessary events to the AutoCompleteList.
@@ -329,38 +298,36 @@ public class SearchField extends JXSearchField {
     public void processKeyEvent(KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_UP || evt.getKeyCode() == KeyEvent.VK_DOWN)
             evt.consume();
-
         super.processKeyEvent(evt);
-
         if (dict != null) {
             switch (evt.getID()) {
-            case KeyEvent.KEY_PRESSED:
-                switch (evt.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    if (popup != null)
-                        entryList.decrementSelection();
-                    else
-                        showPopup(dict.iterator());
-                    break;
-                case KeyEvent.VK_DOWN:
-                    if (popup != null)
-                        entryList.incrementSelection();
-                    else
-                        showPopup(dict.iterator());
-                    break;
-                case KeyEvent.VK_ESCAPE:
-                    if (popup != null) {
-                        hidePopup();
-                        selectAll();
+                case KeyEvent.KEY_PRESSED:
+                    switch (evt.getKeyCode()) {
+                        case KeyEvent.VK_UP:
+                            if (popup != null)
+                                entryList.decrementSelection();
+                            else
+                                showPopup(dict.iterator());
+                            break;
+                        case KeyEvent.VK_DOWN:
+                            if (popup != null)
+                                entryList.incrementSelection();
+                            else
+                                showPopup(dict.iterator());
+                            break;
+                        case KeyEvent.VK_ESCAPE:
+                            if (popup != null) {
+                                hidePopup();
+                                selectAll();
+                            }
+                            break;
                     }
                     break;
-                }
-                break;
-            case KeyEvent.KEY_TYPED:
-                if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
-                } else {
-                    autoCompleteInput();
-                }
+                case KeyEvent.KEY_TYPED:
+                    if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+                    } else {
+                        autoCompleteInput();
+                    }
             }
         }
     }
@@ -372,7 +339,6 @@ public class SearchField extends JXSearchField {
      */
     protected void processHierarchyEvent(HierarchyEvent evt) {
         super.processHierarchyEvent(evt);
-
         if ((evt.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) == HierarchyEvent.SHOWING_CHANGED) {
             boolean showing = isShowing();
             if (!showing && popup != null)
@@ -387,16 +353,11 @@ public class SearchField extends JXSearchField {
      */
     protected void processFocusEvent(FocusEvent evt) {
         super.processFocusEvent(evt);
-
         if (evt.getID() == FocusEvent.FOCUS_LOST) {
             if (popup != null)
                 hidePopup();
         }
     }
-
-    //----------------------------------------------------------------------------
-    // Protected methods
-    //----------------------------------------------------------------------------
 
     // overwritten to disable
     private void setUp() {
@@ -408,22 +369,18 @@ public class SearchField extends JXSearchField {
     protected JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;
-
         entryPanel = new JPanel(new GridBagLayout());
         entryPanel.setBorder(UIManager.getBorder("List.border"));
         entryPanel.setBackground(UIManager.getColor("List.background"));
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-
         entryList = new AutoCompleteList();
         JScrollPane entryScrollPane = new JScrollPane(entryList);
         entryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         entryScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         entryPanel.add(entryScrollPane, c);
-
         entryPanel.add(new ClearHistory(), c);
-
         return entryPanel;
     }
 
@@ -432,29 +389,27 @@ public class SearchField extends JXSearchField {
      */
     void showPopup(Iterator<String> iter) {
         getPopupComponent(); // construct the component.
-
         boolean different = false;
         Vector<String> v = new Vector<>();
         ListModel<String> model = entryList.getModel();
         for (int i = 0; iter.hasNext(); i++) {
             String next = iter.next();
             v.add(next);
-
             if (!different && i < model.getSize())
                 different |= !next.equals(model.getElementAt(i));
         }
-
         different |= model.getSize() != v.size();
-
         // if things were different, reset the data.
         if (different) {
             entryList.setListData(v);
             entryList.clearSelection();
         }
-
         entryList.setCurrentText(getText());
         showPopup();
     }
+    //----------------------------------------------------------------------------
+    // Fields
+    //----------------------------------------------------------------------------
 
     /**
      * Shows the popup.
@@ -518,25 +473,42 @@ public class SearchField extends JXSearchField {
         }
     }
 
-    //----------------------------------------------------------------------------
-    // Fields
-    //----------------------------------------------------------------------------
-    /** The list auto-completable items are shown in */
-    AutoCompleteList entryList;
-    /** The panel the popup is shown in. */
-    JPanel entryPanel;
-    /** The popup the scroll pane is in */
-    protected Popup popup;
-    /** Whether or not we tried to show a popup while this wasn't showing */
-    private boolean showPending;
+    /**
+     * Base Action that all LimeTextField actions extend.
+     */
+    private static abstract class FieldAction extends AbstractAction {
+        /**
+         * Constructs a new FieldAction looking up the name from the MessagesBundles.
+         */
+        FieldAction(String name) {
+            super(I18n.tr(name));
+        }
+
+        /**
+         * Gets the LimeTextField for the given ActionEvent.
+         */
+        SearchField getField(ActionEvent e) {
+            JMenuItem source = (JMenuItem) e.getSource();
+            JPopupMenu menu = (JPopupMenu) source.getParent();
+            return (SearchField) menu.getInvoker();
+        }
+    }
+
+    /**
+     * Subclass that provides access to the constructor.
+     */
+    private static class MyPopup extends Popup {
+        MyPopup(Component owner, Component contents, int x, int y) {
+            super(owner, contents, x, y);
+        }
+    }
 
     /**
      * Component that clears the history of the dictionary when clicked.
      */
     private class ClearHistory extends JButton {
-
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 601999394867955024L;
 
@@ -548,7 +520,6 @@ public class SearchField extends JXSearchField {
 
         protected void processMouseEvent(MouseEvent me) {
             super.processMouseEvent(me);
-
             if (me.getID() == MouseEvent.MOUSE_CLICKED) {
                 SearchField.this.dict.clear();
                 hidePopup();
@@ -561,7 +532,7 @@ public class SearchField extends JXSearchField {
      */
     protected class AutoCompleteList extends JList<String> {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -7324769835640667828L;
         private String currentText;
@@ -581,7 +552,6 @@ public class SearchField extends JXSearchField {
          */
         protected void processMouseEvent(MouseEvent me) {
             super.processMouseEvent(me);
-
             if (me.getID() == MouseEvent.MOUSE_CLICKED) {
                 int idx = locationToIndex(me.getPoint());
                 if (idx != -1 && isSelectedIndex(idx)) {
@@ -641,15 +611,6 @@ public class SearchField extends JXSearchField {
             int rows = Math.min(getModel().getSize(), 8);
             int height = rows * getCellBounds(0, 0).height;
             return new Dimension(width, height);
-        }
-    }
-
-    /**
-     * Subclass that provides access to the constructor.
-     */
-    private static class MyPopup extends Popup {
-        MyPopup(Component owner, Component contents, int x, int y) {
-            super(owner, contents, x, y);
         }
     }
 }

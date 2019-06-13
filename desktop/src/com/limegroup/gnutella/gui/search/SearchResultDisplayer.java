@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
@@ -46,55 +45,49 @@ import java.util.List;
  * This class handles the display of search results.
  */
 public final class SearchResultDisplayer implements RefreshListener {
-
+    /**
+     * The contents of tabbedPane.
+     * INVARIANT: entries.size()==# of tabs in tabbedPane
+     * LOCKING: +obtain entries' monitor before adjusting number of
+     * outstanding searches, i.e., the number of tabs
+     * +obtain a ResultPanel's monitor before adding or removing
+     * results + to prevent deadlock, never obtain ResultPanel's
+     * lock if holding entries'.
+     */
+    private static final List<SearchResultMediator> entries = new ArrayList<>();
+    private static final int MIN_HEIGHT = 220;
+    /**
+     * Listener for events on the tabbed pane.
+     */
+    private final PaneListener PANE_LISTENER = new PaneListener();
     /**
      * <tt>JPanel</tt> containing the primary components of the search result
      * display.
      */
     private JPanel MAIN_PANEL;
-
     /**
      * The main tabbed pane for displaying different search results.
      */
     private SearchTabbedPane tabbedPane;
-
-    /** The contents of tabbedPane. 
-     *  INVARIANT: entries.size()==# of tabs in tabbedPane 
-     *  LOCKING: +obtain entries' monitor before adjusting number of
-     *            outstanding searches, i.e., the number of tabs
-     *           +obtain a ResultPanel's monitor before adding or removing 
-     *            results + to prevent deadlock, never obtain ResultPanel's
-     *            lock if holding entries'.
+    /**
+     * Results is a panel that displays either a JTabbedPane when lots of
+     * results exist OR a blank ResultPanel when nothing is showing.
+     * Use switcher to switch between the two.  The first entry is the
+     * blank results panel; the second is the tabbed panel.
      */
-    private static final List<SearchResultMediator> entries = new ArrayList<>();
-
-    private static final int MIN_HEIGHT = 220;
-
-    /** Results is a panel that displays either a JTabbedPane when lots of
-     *  results exist OR a blank ResultPanel when nothing is showing.
-     *  Use switcher to switch between the two.  The first entry is the
-     *  blank results panel; the second is the tabbed panel. */
     private JPanel results;
-
     /**
      * The layout that switches between the dummy result panel
      * and the JTabbedPane.
      */
     private CardLayout switcher = new CardLayout();
-
     /**
      * The listener to notify about the currently displaying search
      * changing.
-     *
+     * <p>
      * TODO: Allow more than one.
      */
     private ChangeListener _activeSearchListener;
-
-    /**
-     * Listener for events on the tabbed pane.
-     */
-    private final PaneListener PANE_LISTENER = new PaneListener();
-
     private SlideshowPanel promoSlides;
 
     /**
@@ -103,25 +96,20 @@ public final class SearchResultDisplayer implements RefreshListener {
     SearchResultDisplayer() {
         MAIN_PANEL = new BoxPanel(BoxPanel.Y_AXIS);
         MAIN_PANEL.setMinimumSize(new Dimension(0, 0));
-
         tabbedPane = new SearchTabbedPane();
         results = new JPanel();
-
         // make the results panel take up as much space as possible
         // for when the window is resized. 
         results.setPreferredSize(new Dimension(10000, 10000));
         results.setLayout(switcher);
         //results.setBackground(Color.WHITE);
-
         //Add SlideShowPanel here.
         promoSlides = null;
-
         if (!UpdateManagerSettings.SHOW_PROMOTION_OVERLAYS.getValue()) {
             promoSlides = new MultimediaSlideshowPanel(getDefaultSlides());
         } else {
             promoSlides = new MultimediaSlideshowPanel(UpdateManagerSettings.OVERLAY_SLIDESHOW_JSON_URL.getValue(), getDefaultSlides());
         }
-
         JPanel p = (JPanel) promoSlides;
         //p.setBackground(Color.WHITE);
         Dimension promoDimensions = new Dimension(717, 380);
@@ -146,7 +134,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         MAIN_PANEL.add(results);
         CancelSearchIconProxy.updateTheme();
     }
-    
+
     public void switchToTabByOffset(int offset) {
         if (tabbedPane != null) {
             tabbedPane.switchToTabByOffset(offset);
@@ -158,7 +146,6 @@ public final class SearchResultDisplayer implements RefreshListener {
                 null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
         Slide s2 = new Slide("http://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "http://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
                 null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
-
         return Arrays.asList(s1, s2);
     }
 
@@ -171,11 +158,9 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     SearchResultMediator addResultTab(long token, List<String> searchTokens, SearchInformation info) {
         SearchResultMediator panel = new SearchResultMediator(token, searchTokens, info);
-
         if (MAIN_PANEL.getHeight() < SearchResultDisplayer.MIN_HEIGHT) {
             GUIMediator.instance().getMainFrame().resizeSearchTransferDivider(SearchResultDisplayer.MIN_HEIGHT);
         }
-
         return addResultPanelInternal(panel, info.getTitle());
     }
 
@@ -198,7 +183,6 @@ public final class SearchResultDisplayer implements RefreshListener {
     /**
      * Create a new JTabbedPane and add the necessary
      * listeners.
-     * 
      */
     private void setupTabbedPane() {
         removeTabbedPaneListeners();
@@ -215,24 +199,19 @@ public final class SearchResultDisplayer implements RefreshListener {
      * titles from the current tabbed pane, create a new
      * tabbed pane and add all of the components and titles
      * back in.
-     * 
      */
     private void resetTabbedPane() {
         ArrayList<SearchResultMediator> ents = new ArrayList<>();
         ArrayList<Component> tabs = new ArrayList<>();
         ArrayList<String> titles = new ArrayList<>();
-
         for (int i = 0; i < tabbedPane.getTabCount() && i < entries.size(); ++i) {
             tabs.add(tabbedPane.getComponent(i));
             titles.add(tabbedPane.getTitleAt(i));
             ents.add(entries.get(i));
         }
-
         tabbedPane.removeAll();
         entries.clear();
-
         setupTabbedPane();
-
         for (int i = 0; i < tabs.size(); ++i) {
             entries.add(ents.get(i));
             tabbedPane.addTab(titles.get(i), tabs.get(i));
@@ -241,24 +220,20 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     private SearchResultMediator addResultPanelInternal(SearchResultMediator panel, String title) {
         entries.add(panel);
-
         // XXX: LWC-1214 (hack)
         try {
             tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), panel.getComponent());
         } catch (ArrayIndexOutOfBoundsException e) {
             resetTabbedPane();
-
             entries.add(panel);
             tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), panel.getComponent());
         }
-
         // XXX: LWC-1088 (hack)
         try {
             tabbedPane.setSelectedIndex(entries.size() - 1);
         } catch (java.lang.IndexOutOfBoundsException ioobe) {
             resetTabbedPane();
             tabbedPane.setSelectedIndex(entries.size() - 1);
-
             // This will happen under OS X in apple.laf.CUIAquaTabbedPaneTabState.getIndex().
             // we grab all of the components from the current 
             // tabbed pane, create a new tabbed pane, and dump
@@ -267,30 +242,24 @@ public final class SearchResultDisplayer implements RefreshListener {
             // For steps-to-reproduce, see:
             // https://www.limewire.org/jira/browse/LWC-1088
         }
-
         try {
             tabbedPane.setProgressActiveAt(entries.size() - 1, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //Make sure Parallel searches are not beyond the maximum to avoid CPU from burning
         if (SearchSettings.PARALLEL_SEARCH.getValue() > SearchSettings.MAXIMUM_PARALLEL_SEARCH) {
             SearchSettings.PARALLEL_SEARCH.revertToDefault();
         }
-
         //Remove an old search if necessary
         if (entries.size() > SearchSettings.PARALLEL_SEARCH.getValue()) {
             killSearchAtIndex(0);
         }
-
         promoSlides.setVisible(false);
         switcher.last(results); //show tabbed results
-
         // If there are lots of tabs, this ensures everything
         // is properly visible. 
         MAIN_PANEL.revalidate();
-
         return panel;
     }
 
@@ -303,22 +272,17 @@ public final class SearchResultDisplayer implements RefreshListener {
         if (rp.isStopped()) {
             return;
         }
-
         //Actually add the line.   Must obtain rp's monitor first.
         if (!rp.matches(token))//GUID of rp!=replyGuid
             throw new IllegalArgumentException("guids don't match");
-
         rp.add(line);
-
         int resultPanelIndex;
         // Search for the ResultPanel to verify it exists.
         resultPanelIndex = entries.indexOf(rp);
-
         // If we couldn't find it, silently exit.
         if (resultPanelIndex == -1) {
             return;
         }
-
         //Update index on tab.  Don't forget to add 1 since line hasn't
         //actually been added!
         tabbedPane.setTitleAt(resultPanelIndex, titleOf(rp));
@@ -328,12 +292,10 @@ public final class SearchResultDisplayer implements RefreshListener {
         int resultPanelIndex;
         // Search for the ResultPanel to verify it exists.
         resultPanelIndex = entries.indexOf(rp);
-
         // If we couldn't find it, silently exit.
         if (resultPanelIndex == -1) {
             return;
         }
-
         //Update index on tab.  Don't forget to add 1 since line hasn't
         //actually been added!
         tabbedPane.setProgressActiveAt(resultPanelIndex, active);
@@ -361,7 +323,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      * Returns the currently selected <tt>ResultPanel</tt> instance.
      *
      * @return the currently selected <tt>ResultPanel</tt> instance,
-     *  or <tt>null</tt> if there is no currently selected panel
+     * or <tt>null</tt> if there is no currently selected panel
      */
     SearchResultMediator getSelectedResultPanel() {
         int i = tabbedPane.getSelectedIndex();
@@ -376,8 +338,9 @@ public final class SearchResultDisplayer implements RefreshListener {
 
     /**
      * Returns the <tt>ResultPanel</tt> for the specified GUID.
+     *
      * @return the ResultPanel that matches the specified GUID, or null
-     *  if none match.
+     * if none match.
      */
     SearchResultMediator getResultPanelForGUID(long token) {
         for (SearchResultMediator rp : entries) {
@@ -419,7 +382,8 @@ public final class SearchResultDisplayer implements RefreshListener {
             if (searchResultMediator != null) {
                 killSearchAtIndex(i);
             }
-        } catch (Throwable ignored) { }
+        } catch (Throwable ignored) {
+        }
     }
 
     void closeAllTabs() {
@@ -433,11 +397,10 @@ public final class SearchResultDisplayer implements RefreshListener {
             //nothing to close.
             return;
         }
-
         int index = tabbedPane.getSelectedIndex();
         if (index != -1) {
             final SearchResultMediator currentMediator = entries.get(index);
-            int i=0;
+            int i = 0;
             while (entries.size() > 1 && i < entries.size()) {
                 if (entries.get(i) != currentMediator) {
                     closeTabAt(i);
@@ -449,9 +412,7 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     void killSearchAtIndex(int i) {
-
         SearchResultMediator killed = entries.remove(i);
-
         try {
             tabbedPane.removeTabAt(i);
         } catch (IllegalArgumentException iae) {
@@ -461,10 +422,8 @@ public final class SearchResultDisplayer implements RefreshListener {
             resetTabbedPane();
             tabbedPane.removeTabAt(i);
         }
-
         fixIcons();
         SearchMediator.searchKilled(killed);
-
         if (entries.size() == 0) {
             try {
                 promoSlides.setVisible(true);
@@ -507,7 +466,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      * result ui components.
      *
      * @return the <tt>JComponent</tt> instance containing all of the search
-     *  result ui components
+     * result ui components
      */
     JComponent getComponent() {
         return MAIN_PANEL;
@@ -544,12 +503,10 @@ public final class SearchResultDisplayer implements RefreshListener {
      */
     private String titleOf(SearchResultMediator rp) {
         int total = rp.totalResults();
-        
         String title = rp.getTitle();
         if (title.length() > 40) {
-            title = title.substring(0,39) + "...";
+            title = title.substring(0, 39) + "...";
         }
-
         return title + " (" + total + " " + I18n.tr("results") + ")";
     }
 
@@ -558,7 +515,6 @@ public final class SearchResultDisplayer implements RefreshListener {
         if (entries != null && !entries.isEmpty()) {
             result = entries.size();
         }
-
         return result;
     }
 
@@ -570,7 +526,6 @@ public final class SearchResultDisplayer implements RefreshListener {
      * Listens for events on the JTabbedPane and dispatches commands.
      */
     private class PaneListener extends MouseAdapter implements MouseListener, MouseMotionListener, ChangeListener {
-
         /**
          * The last index that was rolled over.
          */
@@ -583,18 +538,15 @@ public final class SearchResultDisplayer implements RefreshListener {
         public void mouseClicked(MouseEvent e) {
             if (tryPopup(e))
                 return;
-
             if (SwingUtilities.isLeftMouseButton(e)) {
                 int x = e.getX();
                 int y = e.getY();
                 int idx;
-
                 idx = shouldKillIndex(x, y);
                 if (idx != -1) {
                     lastIdx = -1;
                     killSearchAtIndex(idx);
                 }
-
                 if (idx == -1)
                     stateChanged(null);
             }

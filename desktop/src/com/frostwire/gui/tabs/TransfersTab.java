@@ -35,28 +35,23 @@ import java.awt.event.*;
  * @author aldenml
  */
 public final class TransfersTab extends AbstractTab {
-
+    public static final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
     private final BTDownloadMediator downloadMediator; // holds the JTable
-
+    private final boolean dedicatedTransfersTabAvailable;
     /**
      * Visible only on non search/transfer split mode and
      * upon a Torrent Download selection.
      */
     private JSplitPane transferDetailSplitter;
     private TransferDetailComponent transferDetailComponent;
-
     // it will be a reference to the download mediator above who is the one interested.
     private TransfersFilterModeListener transfersFilterModeListener;
-
-    public static final String FILTER_TEXT_HINT = I18n.tr("filter transfers here");
     private JToggleButton filterAllButton;
     private JToggleButton filterDownloadingButton;
     private JToggleButton filterSeedingButton;
     private JToggleButton filterFinishedButton;
     private JPanel mainComponent;
     private JTextArea filterText;
-
-    private final boolean dedicatedTransfersTabAvailable;
     private int lastSplitterLocationWithDetailsVisible = -1;
 
     public TransfersTab(BTDownloadMediator downloadMediator) {
@@ -66,13 +61,6 @@ public final class TransfersTab extends AbstractTab {
         dedicatedTransfersTabAvailable = !UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue();
         this.downloadMediator = downloadMediator;
         initComponents();
-    }
-
-    public enum FilterMode {
-        ALL,
-        DOWNLOADING,
-        SEEDING,
-        FINISHED
     }
 
     public void showTransfers(FilterMode mode) {
@@ -87,64 +75,21 @@ public final class TransfersTab extends AbstractTab {
         }
     }
 
-    public interface TransfersFilterModeListener {
-        void onFilterUpdate(FilterMode mode, String searchKeywords);
-
-        void onFilterUpdate(String searchKeywords);
-    }
-
-    private class TransferTableSelectionListener implements BTDownloadMediator.BTDownloadSelectionListener {
-        /**
-         * @param selected null if nothing has been selected, a BTDownload otherwise
-         */
-        @Override
-        public void onTransferSelected(BTDownload selected) {
-            if (!dedicatedTransfersTabAvailable) {
-                hideTransferDetailsComponent();
-                return;
-            }
-            if (selected == null ||
-                    selected instanceof SoundcloudDownload ||
-                    selected instanceof HttpDownload ||
-                    selected instanceof TorrentFetcherDownload) {
-                hideTransferDetailsComponent();
-            } else if (selected instanceof BittorrentDownload) {
-                BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
-                showTransferDetailsComponent(bittorrentDownload);
-                // TODO: remove this hack and the validate call inside ensureDownloadVisible
-                // Hack. Need to let the UI thread re-calculate the dimensions
-                // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
-                // to calculate the new location of the row that's to be scrolled to.
-                BackgroundExecutorService.schedule(() -> {
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ignored) {
-                    }
-                    GUIMediator.safeInvokeLater(() -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
-                });
-            }
-        }
-    }
-
     private void initComponents() {
         mainComponent = new JPanel(new MigLayout("fill, insets 6px 0px 0px 0px, gap 0", "[][][grow]"));
         // removed last parameter: rowConstraints="[][grow]"
         // it was causing the entire transfer tab not to grow vertically on bigger screens
-
         // Transfers [ text filter]           [filter buttons] row
         mainComponent.add(new JLabel(I18n.tr("Transfers")), "h 30!, gapleft 10px, left");
         mainComponent.add(createTextFilterComponent(), "w 200!, h 30!, gapleft 5px, center, shrink");
         mainComponent.add(createFilterToggleButtons(), "w 500!, h 30!, pad 2 0 0 0, right, wrap");
-
         if (dedicatedTransfersTabAvailable) {
             transferDetailSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
             transferDetailSplitter.setDividerLocation(270);
             transferDetailSplitter.setResizeWeight(1); // Top component gets all the weight
-
             JComponent transfersComponent = downloadMediator.getComponent();
             transfersComponent.setMinimumSize(new Dimension(100, 200));
             transferDetailSplitter.add(transfersComponent);
-
             transferDetailComponent = new TransferDetailComponent(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -152,12 +97,10 @@ public final class TransfersTab extends AbstractTab {
                 }
             });
             transferDetailSplitter.add(transferDetailComponent);
-
             mainComponent.add(transferDetailSplitter, "cell 0 1 3 1, grow, pushy, hmax 10000px, wrap"); // "cell <column> <row> <width> <height>"
         } else {
             mainComponent.add(downloadMediator.getComponent(), "cell 0 1 3 1, grow, pushy, wrap"); // "cell <column> <row> <width> <height>"
         }
-
         setTransfersFilterModeListener(downloadMediator);
         downloadMediator.setBTDownloadSelectionListener(new TransferTableSelectionListener());
     }
@@ -177,7 +120,6 @@ public final class TransfersTab extends AbstractTab {
         boolean transferDetailComponentWasAlreadyVisible = transferDetailComponent.isVisible();
         transferDetailComponent.setVisible(true);
         transferDetailComponent.updateData(selected);
-
         if (!transferDetailComponentWasAlreadyVisible) {
             Container parent = transferDetailSplitter.getParent();
             int h = parent.getSize().height;
@@ -278,6 +220,52 @@ public final class TransfersTab extends AbstractTab {
     private void onFilterTextFocusLost() {
         if (filterText.getText().equals("")) {
             restoreFilterTextHint();
+        }
+    }
+
+    public enum FilterMode {
+        ALL,
+        DOWNLOADING,
+        SEEDING,
+        FINISHED
+    }
+
+    public interface TransfersFilterModeListener {
+        void onFilterUpdate(FilterMode mode, String searchKeywords);
+
+        void onFilterUpdate(String searchKeywords);
+    }
+
+    private class TransferTableSelectionListener implements BTDownloadMediator.BTDownloadSelectionListener {
+        /**
+         * @param selected null if nothing has been selected, a BTDownload otherwise
+         */
+        @Override
+        public void onTransferSelected(BTDownload selected) {
+            if (!dedicatedTransfersTabAvailable) {
+                hideTransferDetailsComponent();
+                return;
+            }
+            if (selected == null ||
+                    selected instanceof SoundcloudDownload ||
+                    selected instanceof HttpDownload ||
+                    selected instanceof TorrentFetcherDownload) {
+                hideTransferDetailsComponent();
+            } else if (selected instanceof BittorrentDownload) {
+                BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
+                showTransferDetailsComponent(bittorrentDownload);
+                // TODO: remove this hack and the validate call inside ensureDownloadVisible
+                // Hack. Need to let the UI thread re-calculate the dimensions
+                // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
+                // to calculate the new location of the row that's to be scrolled to.
+                BackgroundExecutorService.schedule(() -> {
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException ignored) {
+                    }
+                    GUIMediator.safeInvokeLater(() -> downloadMediator.ensureDownloadVisible(bittorrentDownload));
+                });
+            }
         }
     }
 

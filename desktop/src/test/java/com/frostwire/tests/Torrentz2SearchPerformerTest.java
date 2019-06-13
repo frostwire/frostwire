@@ -26,11 +26,9 @@ import com.frostwire.util.UrlUtils;
 
 import java.util.List;
 
-
 public class Torrentz2SearchPerformerTest {
     public static void main(String[] args) {
         String TEST_SEARCH_TERM = UrlUtils.encode("foo");
-
         Torrentz2SearchPerformer nyaa = new Torrentz2SearchPerformer(1, TEST_SEARCH_TERM, 5000);
         nyaa.setListener(new SearchListener() {
             @Override
@@ -51,15 +49,12 @@ public class Torrentz2SearchPerformerTest {
 
             @Override
             public void onError(long token, SearchError error) {
-
             }
 
             @Override
             public void onStopped(long token) {
-
             }
         });
-
         try {
             nyaa.perform();
         } catch (Throwable t) {

@@ -9,7 +9,7 @@ public interface SimpleColumnListener {
      * Signifies this column was just added to the table.
      */
     void columnAdded(LimeTableColumn column, LimeJTable table);
-    
+
     /**
      * Signifies this column was just added to the table.
      */

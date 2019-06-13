@@ -25,20 +25,19 @@ import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 
 /**
- * Provides a skeletal implementation of the <tt>Menu</tt> interface to 
+ * Provides a skeletal implementation of the <tt>Menu</tt> interface to
  * minimize the necessary work in classes that extend <tt>AbstractMenu</tt>.
  */
 abstract class AbstractMenu implements Menu {
-
     /**
-     * Constant handle to the <tt>JMenu</tt> instance for this 
+     * Constant handle to the <tt>JMenu</tt> instance for this
      * <tt>AbstractMenu</tt>.
      */
     protected final JMenu MENU;
 
     /**
-     * Creates a new <tt>AbstractMenu</tt>, using the <tt>key</tt> 
-     * argument for setting the locale-specific title and 
+     * Creates a new <tt>AbstractMenu</tt>, using the <tt>key</tt>
+     * argument for setting the locale-specific title and
      * accessibility text.
      *
      * @param key the key for locale-specific string resources unique
@@ -52,8 +51,8 @@ abstract class AbstractMenu implements Menu {
 
     /**
      * Returns the <tt>JMenu</tt> instance for this <tt>AbstractMenu</tt>.
-     * 
-     * @return the <tt>JMenu</tt> instance for this <tt>AbstractMenu</tt>   
+     *
+     * @return the <tt>JMenu</tt> instance for this <tt>AbstractMenu</tt>
      */
     public JMenu getMenu() {
         return MENU;
@@ -62,7 +61,7 @@ abstract class AbstractMenu implements Menu {
     protected JMenuItem addMenuItem(Action action) {
         return addMenuItem(action, null);
     }
-    
+
     protected JMenuItem addMenuItem(Action action, KeyStroke acceleratorKeyStroke) {
         JMenuItem item = new JMenuItem(action);
         if (acceleratorKeyStroke != null) {
@@ -81,7 +80,6 @@ abstract class AbstractMenu implements Menu {
         }
         item.setSelected(selected);
         MENU.add(item);
-
         return item;
     }
 
@@ -99,8 +97,18 @@ abstract class AbstractMenu implements Menu {
     protected void refresh() {
     }
 
-    private class RefreshMenuListener implements MenuListener {
+    private static class MenuAction extends AbstractAction {
+        private static final long serialVersionUID = -4311768902578846258L;
 
+        public MenuAction(String name) {
+            super(name);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+        }
+    }
+
+    private class RefreshMenuListener implements MenuListener {
         @Override
         public void menuSelected(MenuEvent e) {
             refresh();
@@ -112,18 +120,6 @@ abstract class AbstractMenu implements Menu {
 
         @Override
         public void menuCanceled(MenuEvent e) {
-        }
-    }
-
-    private static class MenuAction extends AbstractAction {
-
-        private static final long serialVersionUID = -4311768902578846258L;
-
-        public MenuAction(String name) {
-            super(name);
-        }
-
-        public void actionPerformed(ActionEvent e) {
         }
     }
 }

@@ -23,7 +23,6 @@ import javax.swing.plaf.IconUIResource;
 import javax.swing.plaf.InsetsUIResource;
 
 public class JXSearchFieldAddon {
-
     public static final String SEARCH_FIELD_SOURCE = "searchField";
 
     public JXSearchFieldAddon() {

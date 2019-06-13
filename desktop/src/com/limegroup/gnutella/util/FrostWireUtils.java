@@ -30,23 +30,19 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-
 /**
  * This class handles common utility functions that many classes
  * may want to access.
  */
 public final class FrostWireUtils {
-
     /**
      * Constant for the current version of FrostWire.
      */
     private static final String FROSTWIRE_VERSION = "6.8.0";
-
     /**
      * Build number for the current version, gets reset to 1 on every version bump
      */
     private static final int BUILD_NUMBER = 281;
-
     private static final boolean IS_RUNNING_FROM_SOURCE = new File("README.md").exists();
 
     /**
@@ -67,7 +63,9 @@ public final class FrostWireUtils {
         return BUILD_NUMBER;
     }
 
-    public static boolean isIsRunningFromSource() { return IS_RUNNING_FROM_SOURCE; }
+    public static boolean isIsRunningFromSource() {
+        return IS_RUNNING_FROM_SOURCE;
+    }
 
     /**
      * Returns whether or not failures were encountered in load/save settings on startup.
@@ -94,46 +92,37 @@ public final class FrostWireUtils {
      */
     public static File getFrostWireRootFolder() {
         String root = null;
-
         if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
             root = SystemUtils.getSpecialPath(SpecialLocations.DOWNLOADS);
         } else if (OSUtils.isWindows()) {
             root = SystemUtils.getSpecialPath(SpecialLocations.DOCUMENTS);
         }
-
         if (root == null || "".equals(root))
             root = CommonUtils.getUserHomeDir().getPath();
-
         return new File(root, "FrostWire");
     }
 
     public static Set<File> getFrostWire4SaveDirectories() {
         Set<File> result = new HashSet<>();
-
         try {
             File settingFile = new File(CommonUtils.getFrostWire4UserSettingsDir(), "frostwire.props");
             Properties props = new Properties();
             FileInputStream fis = new FileInputStream(settingFile);
             props.load(fis);
             IOUtils.closeQuietly(fis);
-
             if (props.containsKey("DIRECTORY_FOR_SAVING_FILES")) {
                 result.add(new File(props.getProperty("DIRECTORY_FOR_SAVING_FILES")));
             }
-
             String[] types = new String[]{"document", "application", "audio", "video", "image"};
-
             for (String type : types) {
                 String key = "DIRECTORY_FOR_SAVING_" + type + "_FILES";
                 if (props.containsKey(key)) {
                     result.add(new File(props.getProperty(key)));
                 }
             }
-
         } catch (Exception e) {
             // ignore
         }
-
         return result;
     }
 
@@ -150,7 +139,6 @@ public final class FrostWireUtils {
         } else {
             musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
         }
-
         return musicFile;
     }
 
@@ -167,12 +155,10 @@ public final class FrostWireUtils {
         } else {
             videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
         }
-
         return videoFile;
     }
 
     /**
-     *
      * @return 4 int array with { MAJOR.MINOR.REVISION.BUILD
      */
     public static void getFrostWireVersionBuild(final int[] result) {

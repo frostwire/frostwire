@@ -23,11 +23,11 @@ import java.awt.event.ActionEvent;
 import java.util.Locale;
 
 public class FilePaneEx extends FilePane {
+    private static final int VIEWTYPE_COUNT = 2;
     private SkinPopupMenu contextMenu;
     private SkinMenu viewMenu;
     private String viewMenuLabelText;
     private boolean listViewWindowsStyle;
-    private static final int VIEWTYPE_COUNT = 2;
     private String[] viewTypeActionNames;
 
     @SuppressWarnings("unused")
@@ -39,11 +39,8 @@ public class FilePaneEx extends FilePane {
     protected void installDefaults() {
         super.installDefaults();
         Locale l = getFileChooser().getLocale();
-
         listViewWindowsStyle = UIManager.getBoolean("FileChooser.listViewWindowsStyle");
-
         viewMenuLabelText = UIManager.getString("FileChooser.viewMenuLabelText", l);
-
         viewTypeActionNames = new String[VIEWTYPE_COUNT];
         viewTypeActionNames[VIEWTYPE_LIST] = UIManager.getString("FileChooser.listViewActionLabelText", l);
         viewTypeActionNames[VIEWTYPE_DETAILS] = UIManager.getString("FileChooser.detailsViewActionLabelText", l);
@@ -54,7 +51,6 @@ public class FilePaneEx extends FilePane {
         if (viewMenu == null) {
             viewMenu = new SkinMenu(viewMenuLabelText);
             ButtonGroup viewButtonGroup = new ButtonGroup();
-
             for (int i = 0; i < VIEWTYPE_COUNT; i++) {
                 SkinRadioButtonMenuItem mi = new SkinRadioButtonMenuItem(new ViewTypeAction(i));
                 viewButtonGroup.add(mi);
@@ -110,18 +106,15 @@ public class FilePaneEx extends FilePane {
     }
 
     class ViewTypeAction extends AbstractAction {
-
         /**
          *
          */
         private static final long serialVersionUID = 3795594739034737323L;
-
         private int viewType;
 
         ViewTypeAction(int viewType) {
             super(viewTypeActionNames[viewType]);
             this.viewType = viewType;
-
             String cmd;
             switch (viewType) {
                 case VIEWTYPE_LIST:

@@ -21,8 +21,11 @@ package com.frostwire.gui.player;
 import java.util.LinkedList;
 
 public class MPlayerUIEventHandler {
-
     private static MPlayerUIEventHandler instance = null;
+    private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
+
+    private MPlayerUIEventHandler() {
+    }
 
     public static MPlayerUIEventHandler instance() {
         if (instance == null) {
@@ -30,12 +33,6 @@ public class MPlayerUIEventHandler {
         }
         return instance;
     }
-
-    private MPlayerUIEventHandler() {
-
-    }
-
-    private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
 
     void addListener(MPlayerUIEventListener listener) {
         listeners.add(listener);

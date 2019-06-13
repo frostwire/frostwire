@@ -41,26 +41,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class HttpDownload extends HttpBTDownload {
     private static final Executor HTTP_THREAD_POOL = new ThreadPool("HttpDownloaders", 1, 6, 5000, new LinkedBlockingQueue<>(), true); // daemon=true, doesn't hold VM from shutting down.
     private static final Logger LOG = Logger.getLogger(HttpDownload.class);
-
     private final String url;
     private final String title;
     private final String saveAs;
-
-    private File saveFile;
     private final File completeFile;
     private final File incompleteFile;
-
     private final String md5; //optional
-
-    /** If false it should delete any temporary data and start from the beginning. */
+    /**
+     * If false it should delete any temporary data and start from the beginning.
+     */
     private final boolean deleteDataWhenCancelled;
+    private File saveFile;
     private int md5CheckingProgress;
-
     private boolean isResumable;
 
     HttpDownload(String theURL, String theTitle, String saveFileAs, double fileSize, String md5hash, boolean shouldResume, boolean deleteFileWhenTransferCancelled) {
@@ -68,15 +64,18 @@ public class HttpDownload extends HttpBTDownload {
         url = theURL;
         title = theTitle;
         saveAs = saveFileAs;
-
         md5 = md5hash;
         deleteDataWhenCancelled = deleteFileWhenTransferCancelled;
-
         completeFile = FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
         incompleteFile = buildIncompleteFile(completeFile);
-
         isResumable = shouldResume;
         start(shouldResume);
+    }
+
+    private static File buildIncompleteFile(File file) {
+        String prefix = FilenameUtils.getBaseName(file.getName());
+        String ext = FilenameUtils.getExtension(file.getAbsolutePath());
+        return new File(HttpBTDownload.getIncompleteFolder(), prefix + ".incomplete." + ext);
     }
 
     @Override
@@ -145,15 +144,13 @@ public class HttpDownload extends HttpBTDownload {
 
     private void start(final boolean resume) {
         state = TransferState.WAITING;
-
         saveFile = completeFile;
-
         HTTP_THREAD_POOL.execute(() -> {
             try {
                 File expectedFile = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
                 if (md5 != null &&
-                    expectedFile.length() == size &&
-                    checkMD5(expectedFile)) {
+                        expectedFile.length() == size &&
+                        checkMD5(expectedFile)) {
                     saveFile = expectedFile;
                     bytesReceived = expectedFile.length();
                     state = TransferState.FINISHED;
@@ -165,7 +162,6 @@ public class HttpDownload extends HttpBTDownload {
                         bytesReceived = incompleteFile.length();
                     }
                 }
-
                 httpClient.save(url, incompleteFile, resume);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -183,7 +179,6 @@ public class HttpDownload extends HttpBTDownload {
         state = TransferState.CHECKING;
         md5CheckingProgress = 0;
         return file.exists() && DigestUtils.checkMD5(file, md5, new DigestProgressListener() {
-
             @Override
             public void onProgress(int progressPercentage) {
                 md5CheckingProgress = progressPercentage;
@@ -196,10 +191,21 @@ public class HttpDownload extends HttpBTDownload {
         });
     }
 
-    private static File buildIncompleteFile(File file) {
-        String prefix = FilenameUtils.getBaseName(file.getName());
-        String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-        return new File(HttpBTDownload.getIncompleteFolder(), prefix + ".incomplete." + ext);
+    /**
+     * Meant to be overwritten by children classes that want to do something special
+     * after the download is completed.
+     */
+    protected void onComplete() {
+    }
+
+    @Override
+    public boolean canPreview() {
+        return false;
+    }
+
+    @Override
+    public File getPreviewFile() {
+        return null;
     }
 
     private final class HttpDownloadListenerImpl implements HttpClientListener {
@@ -236,20 +242,16 @@ public class HttpDownload extends HttpBTDownload {
                 cleanupIncomplete();
                 return;
             }
-
             boolean renameTo = incompleteFile.renameTo(completeFile);
-
             if (!renameTo) {
                 state = TransferState.ERROR_MOVING_INCOMPLETE;
                 LOG.error("Could not rename [" + incompleteFile.getAbsolutePath() + "] into [" + completeFile.getAbsolutePath() + "]");
             } else {
                 state = TransferState.FINISHED;
                 cleanupIncomplete();
-
                 if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
                 }
-
                 HttpDownload.this.onComplete();
             }
         }
@@ -273,50 +275,32 @@ public class HttpDownload extends HttpBTDownload {
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
             if (headerFields == null) {
                 isResumable = false;
-                size=-1;
+                size = -1;
                 return;
             }
-
             if (headerFields.containsKey("Accept-Ranges")) {
                 isResumable = headerFields.get("Accept-Ranges").contains("bytes");
             } else {
                 isResumable = headerFields.containsKey("Content-Range");
             }
-
             if (headerFields.containsKey("Content-Length")) {
                 try {
                     size = Long.parseLong(headerFields.get("Content-Length").get(0));
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
-            
             //try figuring out file size from HTTP headers depending on the response.
             if (size < 0) {
                 String responseCodeStr = headerFields.get(null).get(0);
-                
                 if (responseCodeStr.contains(String.valueOf(HttpURLConnection.HTTP_OK))) {
                     if (headerFields.containsKey("Content-Length")) {
                         try {
                             size = Long.parseLong(headerFields.get("Content-Length").get(0));
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
-                } 
-            } 
+                }
+            }
         }
-    }
-
-    /** Meant to be overwritten by children classes that want to do something special
-     * after the download is completed. */
-    protected void onComplete() {
-
-    }
-
-    @Override
-    public boolean canPreview() {
-        return false;
-    }
-
-    @Override
-    public File getPreviewFile() {
-        return null;
     }
 }

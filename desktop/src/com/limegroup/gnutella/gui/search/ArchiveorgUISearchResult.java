@@ -28,10 +28,8 @@ import javax.swing.*;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
-
     private final ArchiveorgCrawledSearchResult sr;
 
     ArchiveorgUISearchResult(ArchiveorgCrawledSearchResult sr, SearchEngine se, String query) {

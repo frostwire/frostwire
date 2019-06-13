@@ -23,7 +23,6 @@ import java.io.IOException;
  * Signals that an exception occurred during execution of a command.
  */
 public class LaunchException extends IOException {
-
     private static final long serialVersionUID = -3994751041116114570L;
     private final String[] command;
 
@@ -33,7 +32,6 @@ public class LaunchException extends IOException {
      */
     LaunchException(IOException cause, String... command) {
         this.command = command;
-
         initCause(cause);
     }
 
@@ -47,5 +45,4 @@ public class LaunchException extends IOException {
     public String[] getCommand() {
         return command;
     }
-
 }

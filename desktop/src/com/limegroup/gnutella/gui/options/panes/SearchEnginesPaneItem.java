@@ -41,23 +41,23 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     private SearchEngineCheckboxListener searchEnginesCheckboxListener;
     private JCheckBox allCheckbox;
 
-	public SearchEnginesPaneItem() {
-	    super(TITLE, LABEL);
+    public SearchEnginesPaneItem() {
+        super(TITLE, LABEL);
         searchEngineCheckboxes = new LinkedList<>();
         cBoxes = new HashMap<>();
         searchEnginesCheckboxListener = new SearchEngineCheckboxListener(cBoxes);
-		add(createSearchEnginesCheckboxPanel());
+        add(createSearchEnginesCheckboxPanel());
         add(createToggleAllCheckbox());
-	}
+    }
 
     /**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
-	 * Sets the options for the fields in this <tt>PaneItem</tt> when the 
-	 * window is shown.
-	 */
-	public void initOptions() {
-	}
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
+     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * window is shown.
+     */
+    public void initOptions() {
+    }
 
     public boolean applyOptions() throws IOException {
         return false;
@@ -70,12 +70,12 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     private Component createToggleAllCheckbox() {
         JPanel panel = new JPanel();
         panel.setMinimumSize(new Dimension(300, 60));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,60));
-        BoxLayout layout = new BoxLayout(panel,BoxLayout.PAGE_AXIS);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
         panel.setLayout(layout);
         panel.add(Box.createHorizontalGlue());
         panel.add(new JSeparator());
-        panel.add(Box.createRigidArea(new Dimension(0,10)));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         allCheckbox = new JCheckBox(I18n.tr("Check/Uncheck all"));
         panel.add(allCheckbox);
         allCheckbox.setSelected(areAll(true));
@@ -85,7 +85,6 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         });
         return panel;
     }
-
 
     private JComponent createSearchEnginesCheckboxPanel() {
         JPanel panel = new JPanel();
@@ -104,6 +103,39 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
             parent.add(cBox);
             cBoxes.put(cBox, se.getEnabledSetting());
             cBox.addItemListener(searchEnginesCheckboxListener);
+        }
+    }
+
+    private boolean areAll(boolean selected) {
+        for (JCheckBox cBox : searchEngineCheckboxes) {
+            if (selected && !cBox.isSelected() || !selected && cBox.isSelected()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void checkAll(boolean checked) {
+        searchEnginesCheckboxListener.enable(false);
+        for (JCheckBox cBox : searchEngineCheckboxes) {
+            cBox.setSelected(checked);
+            cBoxes.get(cBox).setValue(cBox.isSelected());
+        }
+        searchEnginesCheckboxListener.enable(true);
+        // Check the first if all unchecked.
+        if (!checked) {
+            searchEngineCheckboxes.get(0).setSelected(true);
+        }
+    }
+
+    private void autoSelectAllCheckbox(boolean allSelected) {
+        final ItemListener[] itemListeners = allCheckbox.getItemListeners();
+        for (ItemListener l : itemListeners) {
+            allCheckbox.removeItemListener(l);
+        }
+        allCheckbox.setSelected(allSelected);
+        for (ItemListener l : itemListeners) {
+            allCheckbox.addItemListener(l);
         }
     }
 
@@ -129,42 +161,7 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
                 }
                 cBoxes.get(cBox).setValue(cBox.isSelected());
             }
-
             autoSelectAllCheckbox(areAll(true));
-        }
-    }
-
-    private boolean areAll(boolean selected) {
-        for (JCheckBox cBox : searchEngineCheckboxes) {
-            if (selected && !cBox.isSelected() || !selected && cBox.isSelected()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void checkAll(boolean checked) {
-        searchEnginesCheckboxListener.enable(false);
-        for (JCheckBox cBox : searchEngineCheckboxes) {
-            cBox.setSelected(checked);
-            cBoxes.get(cBox).setValue(cBox.isSelected());
-        }
-        searchEnginesCheckboxListener.enable(true);
-
-        // Check the first if all unchecked.
-        if (!checked) {
-            searchEngineCheckboxes.get(0).setSelected(true);
-        }
-    }
-
-    private void autoSelectAllCheckbox(boolean allSelected) {
-        final ItemListener[] itemListeners = allCheckbox.getItemListeners();
-        for (ItemListener l : itemListeners) {
-            allCheckbox.removeItemListener(l);
-        }
-        allCheckbox.setSelected(allSelected);
-        for (ItemListener l : itemListeners) {
-            allCheckbox.addItemListener(l);
         }
     }
 }

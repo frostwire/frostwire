@@ -25,13 +25,10 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinApplicationHeaderUI extends BasicPanelUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinApplicationHeaderUI();
@@ -41,19 +38,16 @@ public final class SkinApplicationHeaderUI extends BasicPanelUI {
     public void update(Graphics g, JComponent c) {
         Point2D start = new Point2D.Float(0, 0);
         Point2D end = new Point2D.Float(0, c.getHeight());
-        float[] dist = { 0.0f, 1.0f };
+        float[] dist = {0.0f, 1.0f};
         Color[] colors = SkinColors.APPLICATION_HEADER_GRADIENT_COLORS;
         LinearGradientPaint paint = new LinearGradientPaint(start, end, dist, colors);
-
         Graphics2D graphics = (Graphics2D) g.create();
         // optimization - do not call fillRect on graphics
         // with anti-alias turned on
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         graphics.setPaint(paint);
         graphics.fillRect(0, 0, c.getWidth(), c.getHeight());
-
         graphics.dispose();
-
         super.paint(g, c);
     }
 }

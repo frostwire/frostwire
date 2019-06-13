@@ -15,68 +15,159 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.bittorrent.PaymentOptions;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class Slide {
-
-    /** Just Open The URL */
+    /**
+     * Just Open The URL
+     */
     public static final int SLIDE_DOWNLOAD_METHOD_OPEN_URL = 0;
-
-    /** Download using the torrent URL */
-    static final int SLIDE_DOWNLOAD_METHOD_TORRENT = 1;
-
-    /** Download via HTTP */
-    static final int SLIDE_DOWNLOAD_METHOD_HTTP = 2;
-
     @SuppressWarnings("unused")
     public static final int POST_DOWNLOAD_UNZIP = 1;
     @SuppressWarnings("unused")
     public static final int POST_DOWNLOAD_DELETE_ZIP_FILE = 1 << 1;
+    @SuppressWarnings("unused")
+    public static final int PREVIEW_VIDEO_USING_BROWSER = 1 << 6;
+    public static final int OPEN_CLICK_URL_ON_DOWNLOAD = 1 << 9;
+    @SuppressWarnings("unused")
+    public static final int IS_ADVERTISEMENT = 1 << 11;
+    /**
+     * Download using the torrent URL
+     */
+    static final int SLIDE_DOWNLOAD_METHOD_TORRENT = 1;
+    /**
+     * Download via HTTP
+     */
+    static final int SLIDE_DOWNLOAD_METHOD_HTTP = 2;
     static final int POST_DOWNLOAD_EXECUTE = 1 << 2;
     static final int PREVIEW_AUDIO_USING_FWPLAYER = 1 << 3;
     static final int PREVIEW_AUDIO_USING_BROWSER = 1 << 4;
     static final int PREVIEW_VIDEO_USING_FWPLAYER = 1 << 5;
-    @SuppressWarnings("unused")
-    public static final int PREVIEW_VIDEO_USING_BROWSER = 1 << 6;
     static final int SHOW_AUDIO_PREVIEW_BUTTON = 1 << 7;
     static final int SHOW_VIDEO_PREVIEW_BUTTON = 1 << 8;
-    public static final int OPEN_CLICK_URL_ON_DOWNLOAD = 1 << 9;
     static final int SHOW_PREVIEW_BUTTONS_ON_THE_LEFT = 1 << 10;
-    @SuppressWarnings("unused")
-    public static final int IS_ADVERTISEMENT = 1 << 11;
+    /**
+     * url of torrent file that should be opened if user clicks on this slide
+     */
+    public String torrent;
+    /**
+     *
+     */
+    public String httpDownloadURL;
+    /**
+     * length of time this slide will be shown
+     */
+    public long duration;
+    /**
+     * language (optional filter) = Can be given in the forms of:
+     * *
+     * en
+     * en_US
+     */
+    public String language;
+    /**
+     * os (optional filter) = Can be given in the forms of comma separated:
+     * windows
+     * mac
+     * linux
+     * android
+     */
+    public String os;
+    /**
+     * The Download title.
+     */
+    public String title;
+    /**
+     * Content creator name
+     */
+    public String author;
+    /**
+     * Download size in bytes.
+     */
+    public long size;
+    /**
+     * decide what to do with this Slide onClick.
+     */
+    public int method;
+    /**
+     * Optional MD5 hash
+     */
+    public String md5;
+    /**
+     * If != null, rename file to this file name.
+     */
+    public String saveFileAs;
+    /**
+     * Twitter page associated with slide
+     */
+    public String twitter;
+    /**
+     * Use these flags to determine how the slide will behave.
+     */
+    public int flags;
+    public PaymentOptions paymentOptions;
+    /**
+     * http address where to go if user clicks on this slide
+     */
+    String clickURL;
+    /**
+     * url of image that will be displayed on this slide
+     */
+    String imageSrc;
+    /**
+     * Comma separated list of versions that should not use this
+     */
+    String includedVersions;
+    /**
+     * audio file url so user can play preview/promotional audio for promo.
+     */
+    String audioURL;
+    /**
+     * video file url so frostwire player can be opened, could be a youtube url, player
+     * should default to high quality playback
+     */
+    String videoURL;
+    /**
+     * Facebook page associated with slide
+     */
+    String facebook;
+    /**
+     * Youtube channel
+     */
+    String youtube;
+    /**
+     * Instagram feed
+     */
+    String instagram;
 
     /**
-     * 
-     * @param imgSrc - slide overlay image url
-     * @param clickUrl - url where to take user on click (optional)
+     * @param imgSrc                 - slide overlay image url
+     * @param clickUrl               - url where to take user on click (optional)
      * @param durationInMilliseconds - for how long to show the overlay before auto switching
-     * @param torrentURL - .torrent file (optional)
-     * @param httpDownloadUrl - an http url where to download the file from (check downloadMethod on how to proceed)
-     * @param lang - language code in case you want to filter slides by language
-     * @param OS - comma separated os names (windows,mac,linux,android)
-     * @param theTitle - the title of this download (useful for download manager and human presentation)
-     * @param theAuthor - content creator(s) name(s)
-     * @param theSize - size in bytes of this download
-     * @param downloadMethod - what to do with the slide.
-     * @param md5hash - optional, string with md5 hash of the finished http download
-     * @param saveAs - optional, name of the file if downloaded via http
-     * @param includeTheseVersions - comma separated versions that are not supposed to see this slide.
-     * @param audioPreviewURL - HTTP URL of audio file so user can preview before download.
-     * @param videoPreviewURL - HTTP URL of video file (youtube maybe) so user can preview promo.
-     * @param facebookURL - optional, related Facebook page url
-     * @param twitterURL - optional, related Twitter page url
-     * @param youtubeURL - optional, youtube channel
-     * @param instagramURL - optional, Instagram feed
-     * @param slideFlags - these determine how the slide will behave
+     * @param torrentURL             - .torrent file (optional)
+     * @param httpDownloadUrl        - an http url where to download the file from (check downloadMethod on how to proceed)
+     * @param lang                   - language code in case you want to filter slides by language
+     * @param OS                     - comma separated os names (windows,mac,linux,android)
+     * @param theTitle               - the title of this download (useful for download manager and human presentation)
+     * @param theAuthor              - content creator(s) name(s)
+     * @param theSize                - size in bytes of this download
+     * @param downloadMethod         - what to do with the slide.
+     * @param md5hash                - optional, string with md5 hash of the finished http download
+     * @param saveAs                 - optional, name of the file if downloaded via http
+     * @param includeTheseVersions   - comma separated versions that are not supposed to see this slide.
+     * @param audioPreviewURL        - HTTP URL of audio file so user can preview before download.
+     * @param videoPreviewURL        - HTTP URL of video file (youtube maybe) so user can preview promo.
+     * @param facebookURL            - optional, related Facebook page url
+     * @param twitterURL             - optional, related Twitter page url
+     * @param youtubeURL             - optional, youtube channel
+     * @param instagramURL           - optional, Instagram feed
+     * @param slideFlags             - these determine how the slide will behave
      */
     public Slide(String imgSrc, String clickUrl, long durationInMilliseconds, String torrentURL, String httpDownloadUrl, String lang, String OS, String theTitle, String theAuthor, long theSize, int downloadMethod, String md5hash, String saveAs,
                  String includeTheseVersions, String audioPreviewURL, String videoPreviewURL, String facebookURL, String twitterURL, String youtubeURL, String instagramURL, int slideFlags) {
@@ -103,102 +194,6 @@ public class Slide {
         instagram = instagramURL;
         flags = slideFlags;
     }
-
-    /**
-     * http address where to go if user clicks on this slide
-     */
-    String clickURL;
-
-    /**
-     * url of torrent file that should be opened if user clicks on this slide
-     */
-    public String torrent;
-
-    /**
-     * 
-     */
-    public String httpDownloadURL;
-
-    /**
-     * url of image that will be displayed on this slide
-     */
-    String imageSrc;
-
-    /**
-     * length of time this slide will be shown
-     */
-    public long duration;
-
-    /**
-     * language (optional filter) = Can be given in the forms of:
-     * *
-     * en
-     * en_US
-     * 
-     */
-    public String language;
-
-    /**
-     * os (optional filter) = Can be given in the forms of comma separated:
-     * windows
-     * mac
-     * linux
-     * android
-     */
-    public String os;
-
-    /**
-     * The Download title.
-     */
-    public String title;
-
-    /**
-     * Content creator name
-     */
-    public String author;
-
-    /**
-     * Download size in bytes.
-     */
-    public long size;
-
-    /**
-     * decide what to do with this Slide onClick.
-     */
-    public int method;
-
-    /** Optional MD5 hash */
-    public String md5;
-
-    /** If != null, rename file to this file name. */
-    public String saveFileAs;
-
-    /** Comma separated list of versions that should not use this */
-    String includedVersions;
-
-    /** audio file url so user can play preview/promotional audio for promo. */
-    String audioURL;
-
-    /** video file url so frostwire player can be opened, could be a youtube url, player
-     * should default to high quality playback */
-    String videoURL;
-
-    /** Facebook page associated with slide */
-    String facebook;
-
-    /** Twitter page associated with slide */
-    public String twitter;
-
-    /** Youtube channel */
-    String youtube;
-
-    /** Instagram feed */
-    String instagram;
-
-    /** Use these flags to determine how the slide will behave. */
-    public int flags;
-    
-    public PaymentOptions paymentOptions;
 
     boolean hasFlag(int flag) {
         return (flags & flag) == flag;

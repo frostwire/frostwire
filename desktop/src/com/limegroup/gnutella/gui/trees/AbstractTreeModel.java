@@ -29,19 +29,17 @@ import javax.swing.tree.TreePath;
 /**
  * AbstractTreeModel provides a base class for tree models that is not based on
  * TreeNode objects.
- * 
+ *
  * @author Steffen Pingel
  */
 public abstract class AbstractTreeModel implements TreeModel {
-
     protected transient EventListenerList listenerList = new EventListenerList();
-
     protected StringBuilder root;
 
     public AbstractTreeModel(String root) {
         this.root = new StringBuilder(root);
     }
-    
+
     public void changeRootText(String newText) {
         root.setLength(0);
         root.append(newText);
@@ -70,7 +68,6 @@ public abstract class AbstractTreeModel implements TreeModel {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == TreeModelListener.class)
                 ((TreeModelListener) listeners[i + 1]).treeNodesRemoved(e);
-
         }
     }
 
@@ -82,7 +79,6 @@ public abstract class AbstractTreeModel implements TreeModel {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == TreeModelListener.class)
                 ((TreeModelListener) listeners[i + 1]).treeStructureChanged(e);
-
         }
     }
 
@@ -94,7 +90,6 @@ public abstract class AbstractTreeModel implements TreeModel {
         for (int i = listeners.length - 2; i >= 0; i -= 2) {
             if (listeners[i] == TreeModelListener.class)
                 ((TreeModelListener) listeners[i + 1]).treeNodesChanged(e);
-
         }
     }
 
@@ -115,7 +110,5 @@ public abstract class AbstractTreeModel implements TreeModel {
     }
 
     public void valueForPathChanged(TreePath path, Object value) {
-
     }
-
 }

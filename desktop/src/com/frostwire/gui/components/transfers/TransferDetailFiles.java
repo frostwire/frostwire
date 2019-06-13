@@ -27,9 +27,7 @@ import javax.swing.*;
 import java.util.List;
 
 public final class TransferDetailFiles extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-
     private static final Logger LOG = Logger.getLogger(TransferDetailFiles.class);
-
     private final TransferDetailFilesTableMediator tableMediator;
     private BittorrentDownload btDownload;
 
@@ -72,8 +70,8 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
      */
     public class TransferItemHolder {
-        final int fileOffset;
         public final TransferItem transferItem;
+        final int fileOffset;
 
         TransferItemHolder(int fileOffset, TransferItem transferItem) {
             this.fileOffset = fileOffset;

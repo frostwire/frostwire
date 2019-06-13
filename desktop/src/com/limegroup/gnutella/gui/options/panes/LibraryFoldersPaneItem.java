@@ -24,30 +24,21 @@ import java.util.Set;
  * to change the directory that are shared.
  */
 public final class LibraryFoldersPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Library Included Folders");
-    
     public final static String LABEL = I18n.tr("You can choose the folders for include files when browsing the library.");
-
     private final JButton buttonRemoveLibraryDirectory;
-    
-	private final RecursiveLibraryDirectoryPanel directoryPanel = new RecursiveLibraryDirectoryPanel(true);
-
-	private Set<File> initialFoldersToInclude;
-	
-	private Set<File> initialFoldersToExclude;
+    private final RecursiveLibraryDirectoryPanel directoryPanel = new RecursiveLibraryDirectoryPanel(true);
+    private Set<File> initialFoldersToInclude;
+    private Set<File> initialFoldersToExclude;
 
     public LibraryFoldersPaneItem() {
-	    super(TITLE, LABEL);
+        super(TITLE, LABEL);
         boolean isPortable = CommonUtils.isPortable();
-
         JButton buttonAddLibraryDirectory = new JButton(new AddLibraryDirectoryAction(directoryPanel, directoryPanel));
-	    buttonRemoveLibraryDirectory = new JButton(new RemoveLibraryDirectoryAction(directoryPanel));
-	    
-		directoryPanel.getTree().setRootVisible(false);
-		directoryPanel.getTree().setShowsRootHandles(true);
-		
-		if (!isPortable) {
+        buttonRemoveLibraryDirectory = new JButton(new RemoveLibraryDirectoryAction(directoryPanel));
+        directoryPanel.getTree().setRootVisible(false);
+        directoryPanel.getTree().setShowsRootHandles(true);
+        if (!isPortable) {
             directoryPanel.getTree().addTreeSelectionListener(e -> {
                 Object comp = e.getPath().getLastPathComponent();
                 if (comp instanceof File) {
@@ -58,24 +49,22 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
                 }
                 buttonRemoveLibraryDirectory.setEnabled(true);
             });
-		} else {
-		    removeTreeSelectionListeners();
-		}
-		
-		JPanel buttonPanel = new JPanel(new BorderLayout());
-		buttonPanel.setBorder(new EmptyBorder(0, 4, 0, 0));
-		JPanel buttons = new JPanel(new BorderLayout());
-		buttons.add(buttonAddLibraryDirectory, BorderLayout.NORTH);
-		buttons.add(Box.createVerticalStrut(4), BorderLayout.CENTER);
-		buttons.add(buttonRemoveLibraryDirectory, BorderLayout.SOUTH);
-		buttonPanel.add(buttons, BorderLayout.NORTH);
-		directoryPanel.addEastPanel(buttonPanel);		
-		add(directoryPanel);
-		
-		directoryPanel.getTree().setEnabled(!isPortable);
+        } else {
+            removeTreeSelectionListeners();
+        }
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.setBorder(new EmptyBorder(0, 4, 0, 0));
+        JPanel buttons = new JPanel(new BorderLayout());
+        buttons.add(buttonAddLibraryDirectory, BorderLayout.NORTH);
+        buttons.add(Box.createVerticalStrut(4), BorderLayout.CENTER);
+        buttons.add(buttonRemoveLibraryDirectory, BorderLayout.SOUTH);
+        buttonPanel.add(buttons, BorderLayout.NORTH);
+        directoryPanel.addEastPanel(buttonPanel);
+        add(directoryPanel);
+        directoryPanel.getTree().setEnabled(!isPortable);
         buttonAddLibraryDirectory.setEnabled(!isPortable);
         buttonRemoveLibraryDirectory.setEnabled(!isPortable);
-	}
+    }
 
     private void removeTreeSelectionListeners() {
         TreeSelectionListener[] treeSelectionListeners = directoryPanel.getTree().getTreeSelectionListeners();
@@ -84,62 +73,58 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
         }
     }
 
-	/**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
-	 * Sets the options for the fields in this <tt>PaneItem</tt> when the 
-	 * window is shown.
-	 */
-	public void initOptions() {
-		initialFoldersToInclude = LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue();
-		initialFoldersToExclude = LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue();
-		
-		List<File> roots = new ArrayList<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
-		roots.addAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
-		directoryPanel.setRoots(roots.toArray(new File[0]));
-		directoryPanel.setFoldersToExclude(initialFoldersToExclude);
-	}
+    /**
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
+     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * window is shown.
+     */
+    public void initOptions() {
+        initialFoldersToInclude = LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue();
+        initialFoldersToExclude = LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue();
+        List<File> roots = new ArrayList<>(LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue());
+        roots.addAll(LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue());
+        directoryPanel.setRoots(roots.toArray(new File[0]));
+        directoryPanel.setFoldersToExclude(initialFoldersToExclude);
+    }
 
-	/**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
+    /**
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
      * This makes sure that the shared directories have, in fact, changed to
      * make sure that we don't load the <tt>FileManager</tt> twice.  This is
      * particularly relevant to the case where the save directory has changed,
-     * in which case we only want to reload the <tt>FileManager</tt> once for 
+     * in which case we only want to reload the <tt>FileManager</tt> once for
      * any changes.<p>
-     * 
-	 * Applies the options currently set in this window, displaying an
-	 * error message to the user if a setting could not be applied.
-	 **/
-	public boolean applyOptions() {
-	    
-	    LibrarySettings.DIRECTORIES_TO_INCLUDE.setValue(new HashSet<>());
-	    LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.setValue(new HashSet<>());
-	    
-	    for(File f : directoryPanel.getRootsToInclude()) {
-	        if (f != null) {
-	            LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
-	        }
-	    }
-	    for(File f : directoryPanel.getFoldersToExclude()) {
-	        if (f != null) {
-        	        if (f.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
-        	            LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
-        	        } else {
-        	            System.out.println("Not including " + f.getAbsolutePath());
-        	            LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.add(f);
-        	        }
-	        }
+     * <p>
+     * Applies the options currently set in this window, displaying an
+     * error message to the user if a setting could not be applied.
+     **/
+    public boolean applyOptions() {
+        LibrarySettings.DIRECTORIES_TO_INCLUDE.setValue(new HashSet<>());
+        LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.setValue(new HashSet<>());
+        for (File f : directoryPanel.getRootsToInclude()) {
+            if (f != null) {
+                LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
+            }
         }
-
-	    LibraryMediator.instance().clearDirectoryHolderCaches();
+        for (File f : directoryPanel.getFoldersToExclude()) {
+            if (f != null) {
+                if (f.equals(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue())) {
+                    LibrarySettings.DIRECTORIES_TO_INCLUDE.add(f);
+                } else {
+                    System.out.println("Not including " + f.getAbsolutePath());
+                    LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.add(f);
+                }
+            }
+        }
+        LibraryMediator.instance().clearDirectoryHolderCaches();
         return false;
-	}
+    }
 
-	public boolean isDirty() {
-	    return !initialFoldersToInclude.equals(directoryPanel.getRootsToInclude())
-	    || !initialFoldersToExclude.equals(directoryPanel.getFoldersToExclude());
+    public boolean isDirty() {
+        return !initialFoldersToInclude.equals(directoryPanel.getRootsToInclude())
+                || !initialFoldersToExclude.equals(directoryPanel.getFoldersToExclude());
     }
 }
 

@@ -2,26 +2,10 @@ package com.limegroup.gnutella.gui.search;
 
 import java.awt.*;
 
-
 /**
  * Optimized class to draw vertical fades from one color to another.
  */
 public final class Ditherer {
-
-    private final int _redT;
-    private final int _greenT;
-    private final int _blueT;
-
-    private final int _redB;
-    private final int _greenB;
-    private final int _blueB;
-
-    private int STEPS;
-    private boolean fixedSteps;
-
-    private Shader shader;
-    private int orientation;
-
     /**
      * Specifies that the gradient is drawn along horizontal axis.
      */
@@ -30,6 +14,16 @@ public final class Ditherer {
      * Specifies that the gradient is drawn along the vertical axis.
      */
     public static final int Y_AXIS = 1;
+    private final int _redT;
+    private final int _greenT;
+    private final int _blueT;
+    private final int _redB;
+    private final int _greenB;
+    private final int _blueB;
+    private int STEPS;
+    private boolean fixedSteps;
+    private Shader shader;
+    private int orientation;
 
     /**
      * Constructs a ditherer.
@@ -57,13 +51,18 @@ public final class Ditherer {
         _redT = from.getRed();
         _greenT = from.getGreen();
         _blueT = from.getBlue();
-
         _redB = to.getRed();
         _greenB = to.getGreen();
         _blueB = to.getBlue();
-
         this.shader = shader;
         this.orientation = orientation;
+    }
+
+    private static int round(float color) {
+        int ret = Math.round(color);
+        if (ret < 0)
+            return 0;
+        return Math.min(ret, 255);
     }
 
     /**
@@ -79,7 +78,6 @@ public final class Ditherer {
             changingDim = height;
             constantDim = width;
         }
-
         int dimStep;
         if (fixedSteps) {
             dimStep = changingDim / STEPS;
@@ -87,13 +85,10 @@ public final class Ditherer {
             dimStep = 2;
             STEPS = changingDim / dimStep;
         }
-
         float red = _redT;
         float green = _greenT;
         float blue = _blueT;
-
         int offset = 0;
-
         //Draw a rectangle for each step
         for (int i = 0; i < STEPS; i++) {
             Color c = new Color(round(red), round(green), round(blue));
@@ -105,7 +100,6 @@ public final class Ditherer {
             green = _greenT + (_greenB - _greenT) * value;
             blue = _blueT + (_blueB - _blueT) * value;
         }
-
         //Ensure bottom is filled.
         Color c = new Color(round(red), round(green), round(blue));
         g.setColor(c);
@@ -118,13 +112,6 @@ public final class Ditherer {
         } else {
             g.fillRect(offset, 0, changingDim, constantDim);
         }
-    }
-
-    private static int round(float color) {
-        int ret = Math.round(color);
-        if (ret < 0)
-            return 0;
-        return Math.min(ret, 255);
     }
 
     /**
@@ -141,7 +128,6 @@ public final class Ditherer {
      * Provides a polygonal gradient between the two colors.
      */
     public static class PolygonShader implements Shader {
-
         private float exponent;
 
         /**

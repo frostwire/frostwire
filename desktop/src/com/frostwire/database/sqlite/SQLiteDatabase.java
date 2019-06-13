@@ -33,16 +33,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SQLiteDatabase {
-
     private static final Logger LOG = Logger.getLogger(SQLiteDatabase.class);
-
-    private String path;
-    private final Connection connection;
-
-    private final AtomicBoolean open = new AtomicBoolean(false);
 
     static {
         try {
@@ -52,10 +45,13 @@ public class SQLiteDatabase {
         }
     }
 
+    private final Connection connection;
+    private final AtomicBoolean open = new AtomicBoolean(false);
+    private String path;
+
     SQLiteDatabase(String path, Connection connection) {
         this.path = path;
         this.connection = connection;
-
         open.set(true);
     }
 
@@ -71,33 +67,27 @@ public class SQLiteDatabase {
     /**
      * Runs the provided SQL and returns a cursor over the result set.
      *
-     * @param sql the SQL query. The SQL string must not be ; terminated
+     * @param sql           the SQL query. The SQL string must not be ; terminated
      * @param selectionArgs You may include ?s in where clause in the query,
-     *     which will be replaced by the values from selectionArgs. The
-     *     values will be bound as Strings.
+     *                      which will be replaced by the values from selectionArgs. The
+     *                      values will be bound as Strings.
      * @return A {@link Cursor} object, which is positioned before the first entry. Note that
      * {@link Cursor}s are not synchronized, see the documentation for more details.
      */
     Cursor rawQueryWithFactory(String sql, String[] selectionArgs) {
         verifyDbIsOpen();
-
         Cursor cursor = null;
-
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-
         try {
             synchronized (connection) {
                 statement = prepareStatement(connection, sql, selectionArgs);
-
                 resultSet = statement.executeQuery();
-
                 return new Cursor(statement, resultSet);
             }
         } catch (Throwable e) {
             LOG.warn("Error performing SQL statement: " + sql, e);
         }
-
         return cursor;
     }
 
@@ -109,8 +99,9 @@ public class SQLiteDatabase {
      * Instead, you're encouraged to use {@link #insert(String, String, ContentValues)},
      * {@link #update(String, ContentValues, String, String[])}, et al, when possible.
      * </p>*
+     *
      * @param sql the SQL statement to be executed. Multiple statements separated by semicolons are
-     * not supported.
+     *            not supported.
      * @throws SQLException if the SQL string is invalid
      */
     public void execSQL(String sql) throws SQLException {
@@ -120,28 +111,26 @@ public class SQLiteDatabase {
     /**
      * Convenience method for inserting a row into the database.
      *
-     * @param table the table to insert the row into
+     * @param table          the table to insert the row into
      * @param nullColumnHack optional; may be <code>null</code>.
-     *            SQL doesn't allow inserting a completely empty row without
-     *            naming at least one column name.  If your provided <code>values</code> is
-     *            empty, no column names are known and an empty row can't be inserted.
-     *            If not set to null, the <code>nullColumnHack</code> parameter
-     *            provides the name of nullable column name to explicitly insert a NULL into
-     *            in the case where your <code>values</code> is empty.
-     * @param values this map contains the initial column values for the
-     *            row. The keys should be the column names and the values the
-     *            column values
+     *                       SQL doesn't allow inserting a completely empty row without
+     *                       naming at least one column name.  If your provided <code>values</code> is
+     *                       empty, no column names are known and an empty row can't be inserted.
+     *                       If not set to null, the <code>nullColumnHack</code> parameter
+     *                       provides the name of nullable column name to explicitly insert a NULL into
+     *                       in the case where your <code>values</code> is empty.
+     * @param values         this map contains the initial column values for the
+     *                       row. The keys should be the column names and the values the
+     *                       column values
      * @return the row ID of the newly inserted row, or -1 if an error occurred
      */
     public long insert(String table, String nullColumnHack, ContentValues values) {
         verifyDbIsOpen();
-
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT");
         sql.append(" INTO ");
         sql.append(table);
         sql.append(" (");
-
         Object[] bindArgs = null;
         int size = (values != null && values.size() > 0) ? values.size() : 0;
         if (size > 0) {
@@ -161,23 +150,21 @@ public class SQLiteDatabase {
             sql.append(nullColumnHack).append(") VALUES (NULL");
         }
         sql.append(')');
-
         return executeSql(sql.toString(), bindArgs);
     }
 
     /**
      * Convenience method for deleting rows in the database.
      *
-     * @param table the table to delete from
+     * @param table       the table to delete from
      * @param whereClause the optional WHERE clause to apply when deleting.
-     *            Passing null will delete all rows.
+     *                    Passing null will delete all rows.
      * @return the number of rows affected if a whereClause is passed in, 0
-     *         otherwise. To remove all rows and get a count pass "1" as the
-     *         whereClause.
+     * otherwise. To remove all rows and get a count pass "1" as the
+     * whereClause.
      */
     public int delete(String table, String whereClause, String[] whereArgs) {
         verifyDbIsOpen();
-
         String sql = "DELETE FROM " + table + (!StringUtils.isEmpty(whereClause) ? " WHERE " + whereClause : "");
         return executeSql(sql, whereArgs);
     }
@@ -185,25 +172,22 @@ public class SQLiteDatabase {
     /**
      * Convenience method for updating rows in the database.
      *
-     * @param table the table to update in
-     * @param values a map from column names to new column values. null is a
-     *            valid value that will be translated to NULL.
+     * @param table       the table to update in
+     * @param values      a map from column names to new column values. null is a
+     *                    valid value that will be translated to NULL.
      * @param whereClause the optional WHERE clause to apply when updating.
-     *            Passing null will update all rows.
+     *                    Passing null will update all rows.
      * @return the number of rows affected
      */
     public int update(String table, ContentValues values, String whereClause, String[] whereArgs) {
         verifyDbIsOpen();
-
         if (values == null || values.size() == 0) {
             throw new IllegalArgumentException("Empty values");
         }
-
         StringBuilder sql = new StringBuilder(120);
         sql.append("UPDATE ");
         sql.append(table);
         sql.append(" SET ");
-
         // move all bind args to one array
         int setValuesSize = values.size();
         int bindArgsSize = (whereArgs == null) ? setValuesSize : (setValuesSize + whereArgs.length);
@@ -224,7 +208,6 @@ public class SQLiteDatabase {
             sql.append(" WHERE ");
             sql.append(whereClause);
         }
-
         return executeSql(sql.toString(), bindArgs);
     }
 
@@ -252,7 +235,6 @@ public class SQLiteDatabase {
         try {
             synchronized (connection) {
                 statement = prepareStatement(connection, sql, bindArgs);
-
                 return statement.executeUpdate();
             }
         } catch (Throwable e) {
@@ -275,9 +257,7 @@ public class SQLiteDatabase {
     }
 
     private PreparedStatement prepareStatement(Connection connection, String sql, Object... arguments) throws Exception {
-
         PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY);
-
         if (arguments != null) {
             for (int i = 0; i < arguments.length; i++) {
                 statement.setObject(i + 1, arguments[i]);

@@ -20,12 +20,9 @@ package com.frostwire.mplayer;
 import java.util.Locale;
 
 public class Language {
-
     String id;
-    private String name;
     LanguageSource source;
-
-
+    private String name;
     private Locale language;
 
     public Language(LanguageSource source, String id) {
@@ -33,9 +30,8 @@ public class Language {
         this.id = id;
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    public Locale getLanguage() {
+        return language;
     }
 
     public void setLanguage(String isoCode) {
@@ -46,12 +42,12 @@ public class Language {
         language = locale;
     }
 
-    public Locale getLanguage() {
-        return language;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getId() {
@@ -61,7 +57,6 @@ public class Language {
     public LanguageSource getSource() {
         return source;
     }
-
 
     public void setSourceInfo(String sourceInfo) {
     }

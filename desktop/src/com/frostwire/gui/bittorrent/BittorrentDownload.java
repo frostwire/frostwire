@@ -47,15 +47,12 @@ import java.util.Set;
 public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownload {
     private static final Logger LOG = Logger.getLogger(BittorrentDownload.class);
     private final BTDownload dl;
-
     private String displayName;
     private double size;
     private List<TransferItem> items;
     private boolean partial;
-
     private boolean deleteTorrentWhenRemove;
     private boolean deleteDataWhenRemove;
-
     private BTInfoAdditionalMetadataHolder holder;
     private CopyrightLicenseBroker licenseBroker;
     private PaymentOptions paymentOptions;
@@ -63,21 +60,51 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
     public BittorrentDownload(BTDownload dl) {
         this.dl = dl;
         this.dl.setListener(new StatusListener());
-
         this.displayName = dl.getDisplayName();
         this.size = calculateSize(dl);
         this.items = calculateItems(dl);
         this.partial = dl.isPartial();
-
         if (dl.isFinished(true) &&
                 !SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
             dl.pause();
             finalCleanup(dl.getIncompleteFiles());
         }
-
         if (!dl.wasPaused()) {
             dl.resume();
         }
+    }
+
+    private static boolean deleteEmptyDirectoryRecursive(File directory) {
+        // make sure we only delete canonical children of the parent file we
+        // wish to delete. I have a hunch this might be an issue on OSX and
+        // Linux under certain circumstances.
+        // If anyone can test whether this really happens (possibly related to
+        // symlinks), I would much appreciate it.
+        String canonicalParent;
+        try {
+            canonicalParent = directory.getCanonicalPath();
+        } catch (IOException ioe) {
+            return false;
+        }
+        if (!directory.isDirectory()) {
+            return false;
+        }
+        boolean canDelete = true;
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                try {
+                    if (!file.getCanonicalPath().startsWith(canonicalParent))
+                        continue;
+                } catch (IOException ioe) {
+                    canDelete = false;
+                }
+                if (!deleteEmptyDirectoryRecursive(file)) {
+                    canDelete = false;
+                }
+            }
+        }
+        return canDelete && directory.delete();
     }
 
     public BTDownload getDl() {
@@ -298,7 +325,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
 
     private BTDownloadItem getFirstBiggestItem() {
         BTDownloadItem item = null;
-
         for (TransferItem it : items) {
             if (it instanceof BTDownloadItem) {
                 BTDownloadItem bit = (BTDownloadItem) it;
@@ -311,36 +337,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 }
             }
         }
-
         return item;
-    }
-
-    private class StatusListener implements BTDownloadListener {
-        @Override
-        public void finished(BTDownload dl) {
-            if (!SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
-                dl.pause();
-                finalCleanup(dl.getIncompleteFiles());
-            }
-            if (dl.getName() != null) {
-                File saveLocation = new File(dl.getSavePath(), dl.getName());
-                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
-                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                        iTunesMediator.instance().scanForSongs(saveLocation);
-                    }
-                }
-                if (!LibraryMediator.instance().isScanned(dl.hashCode())) {
-                    LibraryMediator.instance().scan(dl.hashCode(), saveLocation);
-                }
-            }
-            //if you have to hide seeds, do so.
-            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
-        }
-
-        @Override
-        public void removed(BTDownload dl, Set<File> incompleteFiles) {
-            finalCleanup(incompleteFiles);
-        }
     }
 
     String makeMagnetUri() {
@@ -356,12 +353,10 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             File torrent;
             try {
                 torrent = dl.getTorrentFile();
-
                 if (torrent != null && torrent.exists() && torrent.canRead()) {
                     holder = new BTInfoAdditionalMetadataHolder(torrent, getDisplayName());
                     licenseBroker = holder.getLicenseBroker();
                     paymentOptions = holder.getPaymentOptions();
-
                     if (paymentOptions != null) {
                         paymentOptions.setItemName(getDisplayName());
                     }
@@ -385,7 +380,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 }
             }
             File saveLocation = dl.getContentSavePath();
-
             if (saveLocation != null) {
                 deleteEmptyDirectoryRecursive(saveLocation);
                 iTunesImportSettings.IMPORT_FILES.remove(saveLocation);
@@ -393,58 +387,17 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         }
     }
 
-    private static boolean deleteEmptyDirectoryRecursive(File directory) {
-        // make sure we only delete canonical children of the parent file we
-        // wish to delete. I have a hunch this might be an issue on OSX and
-        // Linux under certain circumstances.
-        // If anyone can test whether this really happens (possibly related to
-        // symlinks), I would much appreciate it.
-        String canonicalParent;
-        try {
-            canonicalParent = directory.getCanonicalPath();
-        } catch (IOException ioe) {
-            return false;
-        }
-
-        if (!directory.isDirectory()) {
-            return false;
-        }
-
-        boolean canDelete = true;
-
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                try {
-                    if (!file.getCanonicalPath().startsWith(canonicalParent))
-                        continue;
-                } catch (IOException ioe) {
-                    canDelete = false;
-                }
-
-                if (!deleteEmptyDirectoryRecursive(file)) {
-                    canDelete = false;
-                }
-            }
-        }
-
-        return canDelete && directory.delete();
-    }
-
     private double calculateSize(BTDownload dl) {
         double size = dl.getSize();
-
         boolean partial = dl.isPartial();
         if (partial) {
             List<TransferItem> items = dl.getItems();
-
             long totalSize = 0;
             for (TransferItem item : items) {
                 if (!item.isSkipped()) {
                     totalSize += item.getSize();
                 }
             }
-
             if (totalSize > 0) {
                 size = totalSize;
             }
@@ -473,14 +426,12 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                 System.out.println("Not doing anything.");
                 return;
             }
-
             if (dl instanceof BittorrentDownload &&
                     dl.getState().equals(TransferState.SEEDING) &&
                     !showShareTorrentDialog) {
                 dl.pause();
                 return;
             }
-
             GUIMediator.safeInvokeLater(() -> {
                 if (dl instanceof BittorrentDownload &&
                         TorrentUtil.askForPermissionToSeedAndSeedDownloads(new com.frostwire.gui.bittorrent.BTDownload[]{dl}) &&
@@ -499,6 +450,34 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                     }
                 }
             });
+        }
+    }
+
+    private class StatusListener implements BTDownloadListener {
+        @Override
+        public void finished(BTDownload dl) {
+            if (!SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
+                dl.pause();
+                finalCleanup(dl.getIncompleteFiles());
+            }
+            if (dl.getName() != null) {
+                File saveLocation = new File(dl.getSavePath(), dl.getName());
+                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
+                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
+                        iTunesMediator.instance().scanForSongs(saveLocation);
+                    }
+                }
+                if (!LibraryMediator.instance().isScanned(dl.hashCode())) {
+                    LibraryMediator.instance().scan(dl.hashCode(), saveLocation);
+                }
+            }
+            //if you have to hide seeds, do so.
+            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
+        }
+
+        @Override
+        public void removed(BTDownload dl, Set<File> incompleteFiles) {
+            finalCleanup(incompleteFiles);
         }
     }
 }

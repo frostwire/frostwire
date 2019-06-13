@@ -11,7 +11,6 @@ import java.awt.*;
  * @see BuddySupport
  */
 class JXTextField extends JTextField {
-
     private static final long serialVersionUID = 7120788755640067659L;
 
     JXTextField(String promptText) {
@@ -43,16 +42,16 @@ class JXTextField extends JTextField {
     }
 
     /**
-     * @see BuddySupport#setOuterMargin(JTextField, Insets)
-     */
-    void setOuterMargin(Insets margin) {
-        BuddySupport.setOuterMargin(this, margin);
-    }
-
-    /**
      * @see BuddySupport#getOuterMargin(JTextField)
      */
     Insets getOuterMargin() {
         return BuddySupport.getOuterMargin(this);
+    }
+
+    /**
+     * @see BuddySupport#setOuterMargin(JTextField, Insets)
+     */
+    void setOuterMargin(Insets margin) {
+        BuddySupport.setOuterMargin(this, margin);
     }
 }

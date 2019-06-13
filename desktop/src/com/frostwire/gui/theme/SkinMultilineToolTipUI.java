@@ -32,32 +32,27 @@ import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinMultilineToolTipUI extends SynthToolTipUI {
-
     private static final int TOOLTIP_WIDTH = 400;
-
     private final JTextArea textArea;
     private final CellRendererPane rendererPane;
-
-    public static ComponentUI createUI(JComponent comp) {
-        ThemeMediator.testComponentCreationThreadingViolation();
-        return new SkinPanelUI();
-    }
 
     public SkinMultilineToolTipUI() {
         this.textArea = new JTextArea();
         this.rendererPane = new CellRendererPane();
-
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setEditable(false);
         textArea.setOpaque(false);
         textArea.setUI(new BasicTextAreaUI());
+    }
+
+    public static ComponentUI createUI(JComponent comp) {
+        ThemeMediator.testComponentCreationThreadingViolation();
+        return new SkinPanelUI();
     }
 
     @Override
@@ -79,13 +74,10 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
     @Override
     protected void paint(SynthContext context, Graphics g) {
         JToolTip toolTip = (JToolTip) context.getComponent();
-
         Insets insets = toolTip.getInsets();
         Rectangle paintTextR = new Rectangle(insets.left, insets.top, toolTip.getWidth() - (insets.left + insets.right), toolTip.getHeight() - (insets.top + insets.bottom));
-
         g.setColor(context.getStyle().getColor(context, ColorType.TEXT_FOREGROUND));
         g.setFont(toolTip.getFont());
-
         rendererPane.paintComponent(g, textArea, toolTip, insets.left + 2, insets.top, paintTextR.width, paintTextR.height, true);
     }
 
@@ -104,26 +96,21 @@ public final class SkinMultilineToolTipUI extends SynthToolTipUI {
                 LineBreakMeasurer lineMeasurer = new LineBreakMeasurer(charIt, frc);
                 float formatWidth = (float) (TOOLTIP_WIDTH - 48);
                 lineMeasurer.setPosition(charIt.getBeginIndex());
-
                 int noLines = 0;
                 while (lineMeasurer.getPosition() < charIt.getEndIndex()) {
                     lineMeasurer.nextLayout(formatWidth);
                     noLines++;
                 }
-
                 if (lineMeasurer.getPosition() < textAreaText.length()) {
                     noLines++;
                 }
-
                 int height = fm.getHeight() * noLines + 10;
-
                 dimension = new Dimension(TOOLTIP_WIDTH, height);
             }
         } catch (Throwable e) {
             // in case there is a problem with swing
             dimension = new Dimension(0, 0);
         }
-
         return dimension;
     }
 }

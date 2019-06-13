@@ -36,13 +36,20 @@ final class LibDispatchNative {
                 });
     }
 
-    static native boolean nativeIsDispatchSupported();
-    static native long nativeGetMainQueue();
-    static native long nativeCreateConcurrentQueue(int priority);
-    static native long nativeCreateSerialQueue(String name);
-    static native void nativeReleaseQueue(long nativeQueue);
-    static native void nativeExecuteAsync(long nativeQueue, Runnable task);
-    static native void nativeExecuteSync(long nativeQueue, Runnable task);
+    private LibDispatchNative() {
+    }
 
-    private LibDispatchNative() { }
+    static native boolean nativeIsDispatchSupported();
+
+    static native long nativeGetMainQueue();
+
+    static native long nativeCreateConcurrentQueue(int priority);
+
+    static native long nativeCreateSerialQueue(String name);
+
+    static native void nativeReleaseQueue(long nativeQueue);
+
+    static native void nativeExecuteAsync(long nativeQueue, Runnable task);
+
+    static native void nativeExecuteSync(long nativeQueue, Runnable task);
 }

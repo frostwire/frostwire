@@ -5,18 +5,20 @@ package com.limegroup.gnutella.gui.notify;
  * It currently displays notifications only.
  */
 public final class BasicNotifier implements NotifyUser {
-
-	BasicNotifier() {
-	}
-
-	@Override
-	public boolean supportsSystemTray() {
-	    return false;
-	}
+    BasicNotifier() {
+    }
 
     @Override
-    public boolean showTrayIcon() { return true; }
+    public boolean supportsSystemTray() {
+        return false;
+    }
 
     @Override
-    public void hideTrayIcon() {}
+    public boolean showTrayIcon() {
+        return true;
+    }
+
+    @Override
+    public void hideTrayIcon() {
+    }
 }

@@ -29,7 +29,6 @@ import javax.swing.*;
  * @author aldenml
  */
 public final class SoundcloudUISearchResult extends AbstractUISearchResult {
-
     private final SoundcloudSearchResult sr;
 
     SoundcloudUISearchResult(SoundcloudSearchResult sr, SearchEngine se, String query) {
@@ -48,7 +47,6 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp) {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.SOUNDCLOUD_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 2);
-
         return popupMenu;
     }
 

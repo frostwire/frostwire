@@ -67,10 +67,8 @@ public class ShareTorrentDialog extends JDialog {
     private void initURLShortenerListeners() {
         final URLShortenerHttpClientListener tinyurlShortenerListener = new URLShortenerHttpClientListener(
                 "http://tinyurl.com/api-create.php?url=" + getLink());
-
         // this one is different because google got fancy with POST and Json.
         final URLShortenerHttpClientListener googShortenerListener = new GoogleURLShortenerListener("https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyDw6xPSKYZyOIv7rq2A0R9fDvzsrpI25I0");
-
         // we'll use one at random to not exhaust the monthly quotas.
         shortenerListeners = new LinkedList<>(Arrays.asList(
                 googShortenerListener,
@@ -90,7 +88,6 @@ public class ShareTorrentDialog extends JDialog {
         initTorrentName();
         initInfoHash();
         GridBagConstraints c = new GridBagConstraints();
-
         // INTRO LABEL
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -105,7 +102,6 @@ public class ShareTorrentDialog extends JDialog {
                 torrent_name));
         _introLabel.setFont(new Font("Dialog", Font.BOLD, 13));
         container.add(_introLabel, c);
-
         // TEXT AREA
         c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
@@ -114,11 +110,9 @@ public class ShareTorrentDialog extends JDialog {
         c.weighty = 0.6;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(1, 10, 1, 10);
-
         textArea = new JEditorPane();
         textArea.setEditable(false);
         updateTextArea();
-
         Font f = new Font("Dialog", Font.PLAIN, 14);
         textArea.setFont(f);
         textArea.setMargin(new Insets(10, 10, 10, 10));
@@ -129,12 +123,10 @@ public class ShareTorrentDialog extends JDialog {
                 textArea.selectAll();
             }
         });
-
         textArea.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 boolean allTextAlreadySelected = textArea.getSelectedText() != null && textArea.getSelectedText().equals(textArea.getText());
-
                 if (allTextAlreadySelected || SwingUtilities.isRightMouseButton(e)) {
                     textArea.select(0, 0);
                     return;
@@ -142,35 +134,27 @@ public class ShareTorrentDialog extends JDialog {
                 textArea.selectAll();
             }
         });
-
         container.add(textArea, c);
-
         initURLShortenerListeners();
         performAsyncURLShortening(shortenerListeners.get(new Random().nextInt(shortenerListeners.size() - 1)));
-
         // BUTTON ROW
         initActions();
-
         c = new GridBagConstraints();
         c.anchor = GridBagConstraints.CENTER;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(10, 10, 10, 10);
         ButtonRow buttonRow = new ButtonRow(actions, ButtonRow.X_AXIS,
                 ButtonRow.RIGHT_GLUE);
-
         fixButtonsFont(buttonRow);
         fixButtonBorders(buttonRow);
         ToolTipManager.sharedInstance().setInitialDelay(200);
-
         container.add(buttonRow, c);
-
         // TIPS LABEL
         c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.insets = new Insets(0, 10, 0, 10);
         container.add(new JLabel(I18n.tr("Tips")), c);
-
         // TIPS HTML BULLETS.
         c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
@@ -178,7 +162,6 @@ public class ShareTorrentDialog extends JDialog {
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1.0;
         c.insets = new Insets(10, 10, 10, 10); //component distance from others.
-
         JLabel _tipsLabel = new JLabel("<html><p> > " +
                 I18n.tr("<strong>Keep FrostWire Open</strong> until the file has been downloaded by at least one other friend.") + "</p><p>&nbsp;</p><p> >" +
                 I18n.tr("<strong>The more, the merrier.</strong> The more people sharing the faster it can be downloaded by others.") + "</p><p>&nbsp;</p><p> >" +
@@ -187,10 +170,7 @@ public class ShareTorrentDialog extends JDialog {
         Border tipsBorder = BorderFactory.createSoftBevelBorder(BevelBorder.LOWERED);
         tipsBorder.getBorderInsets(_tipsLabel).set(20, 20, 20, 20);
         _tipsLabel.setBorder(tipsBorder);
-
-
         container.add(_tipsLabel, c);
-
         // FEEDBACK LABEL
         JPanel glass = (JPanel) getGlassPane();
         glass.setLayout(null);
@@ -199,11 +179,8 @@ public class ShareTorrentDialog extends JDialog {
         feedbackLabel.setVisible(false);
         feedbackLabel.setFont(new Font("Arial", Font.BOLD, 14));
         glass.add(feedbackLabel);
-
         feedbackLabel.setBounds(100, 100, 300, 20);
-
         addEscapeKeyListener();
-
         GUIUtils.addHideAction((JComponent) getContentPane());
         pack();
     }
@@ -213,7 +190,6 @@ public class ShareTorrentDialog extends JDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
-
 
     private void fixButtonsFont(ButtonRow buttonRow) {
         if (actions == null) {
@@ -258,31 +234,24 @@ public class ShareTorrentDialog extends JDialog {
 
     private void initActions() {
         actions = new Action[4];
-
         actions[0] = new TwitterAction();
         actions[1] = new CopyToClipboardAction();
         actions[2] = new CopyLinkAction();
         actions[3] = new CopyMagnetAction();
-
     }
 
     private void setupWindow() {
         setTitle(I18n.tr("All done! Now share the link"));
-
         Dimension prefDimension = new Dimension(640, 390);
-
         setSize(prefDimension);
         setMinimumSize(prefDimension);
         setPreferredSize(prefDimension);
         setResizable(false);
-
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         GUIUtils.addHideAction((JComponent) getContentPane());
-
         container = getContentPane();
         container.setLayout(new GridBagLayout());
-
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -303,7 +272,6 @@ public class ShareTorrentDialog extends JDialog {
      */
     public void showFeedback(String title, double x, double y) {
         int startY = (int) (y - getLocationOnScreen().getY() - 40);
-
         feedbackLabel.setLocation((int) (x - getLocationOnScreen().getX()), startY);
         feedbackLabel.setVisible(true);
         feedbackLabel.setText(title);
@@ -322,7 +290,6 @@ public class ShareTorrentDialog extends JDialog {
             if (shortenerListeners.size() > 1) {
                 shortenerListeners.remove(0);
                 performAsyncURLShortening(shortenerListeners.get(0));
-
                 System.out.println(">>> URLShortenerHttpClientListener ERROR >>>");
                 e.printStackTrace();
                 System.out.println();
@@ -352,7 +319,6 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class GoogleURLShortenerListener extends URLShortenerHttpClientListener {
-
         public GoogleURLShortenerListener(String uri) {
             super(uri);
         }
@@ -373,7 +339,6 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class TwitterAction extends AbstractAction {
-
         public TwitterAction() {
             putValue(Action.NAME, I18n.tr("Twitter it"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send the message above to Twitter"));
@@ -389,7 +354,6 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class CopyToClipboardAction extends AbstractAction {
-
         public CopyToClipboardAction() {
             putValue(Action.NAME, I18n.tr("Copy Text"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy entire message to Clipboard"));
@@ -400,14 +364,12 @@ public class ShareTorrentDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             GUIMediator.setClipboardContent(textArea.getText());
             setTitle(I18n.tr("Message copied to clipboard."));
-
             JButton source = (JButton) e.getSource();
             showFeedback(getTitle(), source.getLocationOnScreen().getX(), source.getLocationOnScreen().getY());
         }
     }
 
     public class CopyLinkAction extends AbstractAction {
-
         public CopyLinkAction() {
             putValue(Action.NAME, I18n.tr("Copy Link"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Link to Clipboard"));
@@ -418,16 +380,12 @@ public class ShareTorrentDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             GUIMediator.setClipboardContent(link);
             setTitle(I18n.tr("Link copied to clipboard."));
-
             JButton source = (JButton) e.getSource();
             showFeedback(getTitle(), source.getLocationOnScreen().getX(), source.getLocationOnScreen().getY());
-
         }
-
     }
 
     private class CopyMagnetAction extends AbstractAction {
-
         public CopyMagnetAction() {
             putValue(Action.NAME, I18n.tr("Copy Magnet"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Magnet URL to Clipboard"));
@@ -438,7 +396,6 @@ public class ShareTorrentDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             GUIMediator.setClipboardContent(TorrentUtil.getMagnet(info_hash) + BTEngine.getInstance().magnetPeers());
             setTitle(I18n.tr("Magnet copied to clipboard."));
-
             JButton source = (JButton) e.getSource();
             showFeedback(getTitle(), source.getLocationOnScreen().getX(), source.getLocationOnScreen().getY());
         }

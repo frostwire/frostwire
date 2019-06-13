@@ -37,7 +37,6 @@ import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPL
  * which tabs should be viewable at runtime & themes to use.
  */
 final class ViewMenu extends AbstractMenu {
-
     ViewMenu() {
         super(I18n.tr("&View"));
         addToggleMenuItem(new SearchTransfersSplitTabsAction(UI_SEARCH_TRANSFERS_SPLIT_VIEW, I18n.tr("&Search/Transfers split screen")));
@@ -67,6 +66,7 @@ final class ViewMenu extends AbstractMenu {
         ToggleIconSettingAction(BooleanSetting setting, String name, String description) {
             super(setting, name, description);
         }
+
         public void actionPerformed(ActionEvent e) {
             super.actionPerformed(e);
             GUIMediator.instance().buttonViewChanged();
@@ -75,11 +75,13 @@ final class ViewMenu extends AbstractMenu {
 
     private static class ChangeFontSizeAction extends AbstractAction {
         private final int increment;
+
         ChangeFontSizeAction(int inc, String name, String description) {
             super(name);
             putValue(LONG_DESCRIPTION, description);
             increment = inc;
         }
+
         public void actionPerformed(ActionEvent e) {
             ThemeMediator.modifyTablesFont(increment);
         }

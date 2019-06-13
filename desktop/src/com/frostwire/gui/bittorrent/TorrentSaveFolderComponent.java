@@ -32,26 +32,20 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class TorrentSaveFolderComponent extends JPanel {
-
-    private JTextField folderTextField;
     private static String errorMessage;
+    private JTextField folderTextField;
 
     public TorrentSaveFolderComponent(boolean border) {
         folderTextField = new JTextField(SharingSettings.TORRENT_DATA_DIR_SETTING.getValueAsString());
-
         setLayout(new GridBagLayout());
         if (border) {
             setBorder(ThemeMediator.createTitledBorder(I18n.tr("Torrent Data Save Folder")));
         }
-
         GridBagConstraints gbc = new GridBagConstraints();
-
         // "Save Folder" text field
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
@@ -59,17 +53,38 @@ public final class TorrentSaveFolderComponent extends JPanel {
         gbc.gridwidth = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.LINE_START;
         add(folderTextField, gbc);
-
         // "Save Folder" buttons "User Default", "Browse..."
         gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.LINE_END;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
-        
-        ButtonRow buttonRow = new ButtonRow(new Action[] { new DefaultAction(), new BrowseAction() }, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
+        ButtonRow buttonRow = new ButtonRow(new Action[]{new DefaultAction(), new BrowseAction()}, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
         boolean isPortable = CommonUtils.isPortable();
         folderTextField.setEnabled(!isPortable);
         buttonRow.setButtonsEnabled(!isPortable);
         add(buttonRow, gbc);
+    }
+
+    /**
+     * The torrent save path is only valid as long as it's not inside (anywhere)
+     * the Gnutella Save Folder.
+     * <p>
+     * This folder cannot also be a parent of the Gnutella Save folder.
+     */
+    private static boolean isTorrentSaveFolderPathValid(boolean checkExist, File folder) {
+        if (checkExist) {
+            //is folder useable
+            if (!(folder.exists() && folder.isDirectory() && folder.canWrite())) {
+                errorMessage = I18n.tr("Please enter a valid path for the Torrent Data Folder");
+                return false;
+            }
+        }
+        String lowerCaseFolderPath = folder.getAbsolutePath().toLowerCase();
+        //avoid user stupidity, do not save files anywhere in program files.
+        return !OSUtils.isWindows() || !lowerCaseFolderPath.contains(System.getenv("ProgramFiles").toLowerCase());
+    }
+
+    public static String getError() {
+        return errorMessage;
     }
 
     public String getTorrentSaveFolderPath() {
@@ -82,37 +97,12 @@ public final class TorrentSaveFolderComponent extends JPanel {
             errorMessage = I18n.tr("You forgot to enter a path for the Torrent Data Folder.");
             return false;
         }
-
         String path = folderTextField.getText().trim();
         File folder = new File(path);
-
         return isTorrentSaveFolderPathValid(checkExist, folder);
     }
 
-    /**
-     * The torrent save path is only valid as long as it's not inside (anywhere)
-     * the Gnutella Save Folder.
-     * 
-     * This folder cannot also be a parent of the Gnutella Save folder.
-     *
-     */
-    private static boolean isTorrentSaveFolderPathValid(boolean checkExist, File folder) {
-
-        if (checkExist) {
-            //is folder useable
-            if (!(folder.exists() && folder.isDirectory() && folder.canWrite())) {
-                errorMessage = I18n.tr("Please enter a valid path for the Torrent Data Folder");
-                return false;
-            }
-        }
-        String lowerCaseFolderPath = folder.getAbsolutePath().toLowerCase();
-
-        //avoid user stupidity, do not save files anywhere in program files.
-        return !OSUtils.isWindows() || !lowerCaseFolderPath.contains(System.getenv("ProgramFiles").toLowerCase());
-    }
-
     private class DefaultAction extends AbstractAction {
-
         private static final long serialVersionUID = 7266666461649699221L;
 
         DefaultAction() {
@@ -126,7 +116,6 @@ public final class TorrentSaveFolderComponent extends JPanel {
     }
 
     private class BrowseAction extends AbstractAction {
-
         private static final long serialVersionUID = 2976380710515726420L;
 
         BrowseAction() {
@@ -140,9 +129,5 @@ public final class TorrentSaveFolderComponent extends JPanel {
                 return;
             folderTextField.setText(saveDir.getAbsolutePath());
         }
-    }
-
-    public static String getError() {
-        return errorMessage;
     }
 }

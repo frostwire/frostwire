@@ -48,9 +48,7 @@ import java.util.List;
  * @author aldenml
  */
 public class TorrentFetcherDownload implements BTDownload {
-
     private static final Logger LOG = Logger.getLogger(TorrentFetcherDownload.class);
-
     private final String uri;
     private final String referer;
     private final String cookie;
@@ -58,35 +56,27 @@ public class TorrentFetcherDownload implements BTDownload {
     private final boolean partial;
     private final String relativePath;
     private final String hash;
-
     private final Date dateCreated;
-
     private TransferState state;
 
     public TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath) {
         this.uri = uri;
-
         if (uri.startsWith("magnet")) {
             hash = PerformersHelper.parseInfoHash(uri);
         } else {
             hash = "";
         }
-
         this.referer = referrer;
         this.cookie = cookie;
         this.displayName = displayName;
         this.partial = partial;
-
         if (!partial) {
             this.relativePath = relativePath;
         } else {
             this.relativePath = null;
         }
-
         this.dateCreated = new Date();
-
         state = TransferState.DOWNLOADING_TORRENT;
-
         Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + uri);
         t.setDaemon(true);
         t.start();
@@ -102,6 +92,37 @@ public class TorrentFetcherDownload implements BTDownload {
 
     public TorrentFetcherDownload(String uri, boolean partial) {
         this(uri, null, getDownloadNameFromMagnetURI(uri), partial);
+    }
+
+    private static String getDownloadNameFromMagnetURI(String uri) {
+        if (!uri.startsWith("magnet:")) {
+            return uri;
+        }
+        if (uri.contains("dn=")) {
+            String[] split = uri.split("&");
+            for (String s : split) {
+                if (s.toLowerCase().startsWith("dn=") && s.length() > 3) {
+                    return UrlUtils.decode(s.split("=")[1]);
+                }
+            }
+        }
+        return uri;
+    }
+
+    private static List<TcpEndpoint> parsePeers(String magnet) {
+        if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
+            return Collections.emptyList();
+        }
+        // TODO: replace this with the public API
+        error_code ec = new error_code();
+        add_torrent_params params = add_torrent_params.parse_magnet_uri(magnet, ec);
+        tcp_endpoint_vector v = params.get_peers();
+        int size = (int) v.size();
+        ArrayList<TcpEndpoint> l = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            l.add(new TcpEndpoint(v.get(i)));
+        }
+        return l;
     }
 
     public String getUri() {
@@ -251,9 +272,7 @@ public class TorrentFetcherDownload implements BTDownload {
             } else {
                 GUIMediator.safeInvokeLater(() -> {
                     try {
-
                         boolean[] selection = null;
-
                         if (partial) {
                             PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), data, displayName);
                             dlg.setVisible(true);
@@ -275,7 +294,6 @@ public class TorrentFetcherDownload implements BTDownload {
 
     private boolean[] calculateSelection(TorrentInfo ti, String path) {
         boolean[] selection = new boolean[ti.numFiles()];
-
         FileStorage fs = ti.files();
         for (int i = 0; i < selection.length; i++) {
             String filePath = fs.filePath(i);
@@ -283,35 +301,15 @@ public class TorrentFetcherDownload implements BTDownload {
                 selection[i] = true;
             }
         }
-
         return selection;
     }
 
-    private static String getDownloadNameFromMagnetURI(String uri) {
-        if (!uri.startsWith("magnet:")) {
-            return uri;
-        }
-
-        if (uri.contains("dn=")) {
-            String[] split = uri.split("&");
-            for (String s : split) {
-                if (s.toLowerCase().startsWith("dn=") && s.length() > 3) {
-                    return UrlUtils.decode(s.split("=")[1]);
-                }
-            }
-        }
-
-        return uri;
-    }
-
     private class FetcherRunnable implements Runnable {
-
         @Override
         public void run() {
             if (state == TransferState.CANCELED) {
                 return;
             }
-
             try {
                 byte[] data;
                 if (uri.startsWith("http")) {
@@ -319,11 +317,9 @@ public class TorrentFetcherDownload implements BTDownload {
                 } else {
                     data = BTEngine.getInstance().fetchMagnet(uri, 90, true);
                 }
-
                 if (state == TransferState.CANCELED) {
                     return;
                 }
-
                 if (data != null) {
                     try {
                         downloadTorrent(data, parsePeers(uri));
@@ -338,24 +334,5 @@ public class TorrentFetcherDownload implements BTDownload {
                 LOG.error("Error downloading torrent from uri", e);
             }
         }
-    }
-
-    private static List<TcpEndpoint> parsePeers(String magnet) {
-        if (magnet == null || magnet.isEmpty() || magnet.startsWith("http")) {
-            return Collections.emptyList();
-        }
-
-        // TODO: replace this with the public API
-        error_code ec = new error_code();
-        add_torrent_params params = add_torrent_params.parse_magnet_uri(magnet, ec);
-        tcp_endpoint_vector v = params.get_peers();
-        int size = (int) v.size();
-        ArrayList<TcpEndpoint> l = new ArrayList<>();
-
-        for (int i = 0; i < size; i++) {
-            l.add(new TcpEndpoint(v.get(i)));
-        }
-
-        return l;
     }
 }

@@ -34,32 +34,50 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MPlayer extends BaseMediaPlayer {
-
+    private static final String ANS_LENGTH = "ANS_LENGTH=";
+    private static final String ANS_POSITION = "ANS_TIME_POSITION=";
+    private static final String ANS_VOLUME = "ANS_VOLUME=";
+    private static final String ANS_SUB = "ANS_SUB=";
+    private static final String ANS_WIDTH = "ANS_WIDTH=";
+    private static final String ANS_HEIGHT = "ANS_HEIGHT=";
+    private static final String ANS_ASPECT = "ANS_ASPECT=";
+    private static final String ID_AUDIO_ID = "ID_AUDIO_ID=";
+    private static final String ID_SUBTITLE_ID = "ID_SUBTITLE_ID=";
+    private static final String ID_AUDIO_TRACK = "ID_AUDIO_TRACK=";
+    private static final String ID_SUBTITLE_TRACK = "ID_SUBTITLE_TRACK=";
+    private static final String ID_FILE_SUB_ID = "ID_FILE_SUB_ID=";
+    private static final String ID_FILE_SUB_FILENAME = "ID_FILE_SUB_FILENAME=";
+    private static final String ID_EXIT = "ID_EXIT=";
+    private static final String ICY_INFO = "ICY Info:";
+    private static final Pattern v_timeInfo = Pattern
+            .compile("A:\\s*([0-9\\.]+) V:\\s*[0-9\\.]* .*");
+    private static final Pattern a_timeInfo = Pattern
+            .compile("A:\\s*([0-9\\.]+) .*");
     private static Logger LOG = Logger.getLogger(MPlayer.class);
-
-    public static void initialise(File path) {
-        MPlayerInstance.initialise(path);
-    }
-
     private final List<String> output;
-
     private volatile boolean disposed = false;
-
     private Dimension videoSize = null;
+    private boolean firstLengthReceived = false;
+    private boolean firstVolumeReceived = false;
+    private MPlayerInstance current_instance;
+    private boolean parsingLanguage;
+    private boolean isAudioTrack;
+    private Language language;
+    private int width;
+    private float aspect;
+    private MetaDataListener metaDataListener;
+    private StateListener stateListener;
+    private VolumeListener volumeListener;
+    private PositionListener positionListener;
+    private IcyInfoListener icyInfoListener;
 
     public MPlayer() {
         this(null);
     }
 
-    private boolean firstLengthReceived = false;
-    private boolean firstVolumeReceived = false;
-
     private MPlayer(PlayerPreferences preferences) {
-
         super(preferences);
-
         output = new LinkedList<>();
-
         // System.out.println(line);
         Thread outputParser = new Thread("MPlayer output parser") {
             public void run() {
@@ -68,18 +86,13 @@ public class MPlayer extends BaseMediaPlayer {
                         String line = null;
                         synchronized (output) {
                             if (!output.isEmpty()) {
-
                                 line = output.remove(0);
-
                             } else {
                                 output.wait();
                             }
                         }
-
                         if (line != null) {
-
                             // System.out.println(line);
-
                             try {
                                 parseOutput(line);
                             } catch (Throwable e) {
@@ -94,48 +107,14 @@ public class MPlayer extends BaseMediaPlayer {
         };
         outputParser.setDaemon(true);
         outputParser.start();
-
     }
 
-    private static final String ANS_LENGTH = "ANS_LENGTH=";
-    private static final String ANS_POSITION = "ANS_TIME_POSITION=";
-    private static final String ANS_VOLUME = "ANS_VOLUME=";
-    private static final String ANS_SUB = "ANS_SUB=";
-
-    private static final String ANS_WIDTH = "ANS_WIDTH=";
-    private static final String ANS_HEIGHT = "ANS_HEIGHT=";
-    private static final String ANS_ASPECT = "ANS_ASPECT=";
-
-    private static final String ID_AUDIO_ID = "ID_AUDIO_ID=";
-    private static final String ID_SUBTITLE_ID = "ID_SUBTITLE_ID=";
-
-    private static final String ID_AUDIO_TRACK = "ID_AUDIO_TRACK=";
-    private static final String ID_SUBTITLE_TRACK = "ID_SUBTITLE_TRACK=";
-
-    private static final String ID_FILE_SUB_ID = "ID_FILE_SUB_ID=";
-    private static final String ID_FILE_SUB_FILENAME = "ID_FILE_SUB_FILENAME=";
-
-    private static final String ID_EXIT = "ID_EXIT=";
-
-    private static final String ICY_INFO = "ICY Info:";
-
-    private static final Pattern v_timeInfo = Pattern
-            .compile("A:\\s*([0-9\\.]+) V:\\s*[0-9\\.]* .*");
-    private static final Pattern a_timeInfo = Pattern
-            .compile("A:\\s*([0-9\\.]+) .*");
-
-    private MPlayerInstance current_instance;
-
-    private boolean parsingLanguage;
-    private boolean isAudioTrack;
-    private Language language;
-
-    private int width;
-    private float aspect;
+    public static void initialise(File path) {
+        MPlayerInstance.initialise(path);
+    }
 
     private void parseOutput(String line) {
         boolean stillParsing = false;
-
         // if ( !line.startsWith( "A:")){
         // System.out.println(line);
         // }
@@ -144,7 +123,6 @@ public class MPlayer extends BaseMediaPlayer {
         if (v_matcher.matches()) {
             float time = Float.parseFloat(v_matcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
-
             if (instance != null) {
                 instance.positioned(time);
             }
@@ -152,7 +130,6 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (a_matcher.matches()) {
             float time = Float.parseFloat(a_matcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
-
             if (instance != null) {
                 instance.positioned(time);
             }
@@ -160,23 +137,17 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.startsWith("Starting playback...")) {
             // Ok, so the file is initialized, let's gather information
             stateListener.stateChanged(MediaPlaybackState.Playing);
-
             MPlayerInstance instance = getCurrentInstance();
-
             if (instance != null) {
-
                 instance.initialised();
             }
-
             reportNewState(MediaPlaybackState.Playing);
         } else if (line.startsWith(ANS_POSITION)) {
             try {
                 MPlayerInstance instance = getCurrentInstance();
-
                 if (instance != null) {
                     instance.positioned();
                 }
-
                 float position = Float.parseFloat(line.substring(ANS_POSITION
                         .length()));
                 reportPosition(position);
@@ -220,7 +191,6 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.startsWith(ANS_WIDTH)) {
             try {
                 width = Integer.parseInt(line.substring(ANS_WIDTH.length()));
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -229,9 +199,7 @@ public class MPlayer extends BaseMediaPlayer {
                 int videoWidth = width;
                 int videoHeight = Integer.parseInt(line.substring(ANS_HEIGHT
                         .length()));
-
                 int displayWidth = videoWidth;
-
                 if (aspect > 0
                         && abs(aspect - (float) videoWidth
                         / (float) videoHeight) > 0.1) {
@@ -249,7 +217,6 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.startsWith(ANS_ASPECT)) {
             try {
                 aspect = Float.parseFloat(line.substring(ANS_ASPECT.length()));
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -357,16 +324,12 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.contains("VO: ")) {
             parseVideoSize(line);
         }
-
         // else System.out.println(line);
-
         if (parsingLanguage && !stillParsing) {
             Language parsed = language;
             reportParsingDone();
             MPlayerInstance instance = getCurrentInstance();
-
             if (instance != null) {
-
                 if (instance.activateNextSubtitleLoaded) {
                     instance.activateNextSubtitleLoaded = false;
                     setSubtitles(parsed);
@@ -383,7 +346,6 @@ public class MPlayer extends BaseMediaPlayer {
         String[] arr = line.split(" ")[2].split("x");
         int w = Integer.parseInt(arr[0]);
         int h = Integer.parseInt(arr[1]);
-
         videoSize = new Dimension(w, h);
     }
 
@@ -393,9 +355,7 @@ public class MPlayer extends BaseMediaPlayer {
 
     public void doLoadSubtitlesFile(String file, boolean autoPlay) {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doLoadSubtitlesFile(file, autoPlay);
         }
     }
@@ -426,21 +386,14 @@ public class MPlayer extends BaseMediaPlayer {
     }
 
     public void doOpen(String fileOrUrl, int initialVolume) {
-
         MPlayerInstance instance;
-
         synchronized (this) {
-
             doStop(false);
-
             instance = current_instance = new MPlayerInstance();
         }
-
         reportNewState(MediaPlaybackState.Opening);
-
         firstLengthReceived = false;
         firstVolumeReceived = false;
-
         if (fileOrUrl.startsWith("http://")) {
             // perform a 302 check, mplayer having issues with redirects.
             final HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
@@ -456,7 +409,6 @@ public class MPlayer extends BaseMediaPlayer {
                 LOG.error(e.getMessage(), e);
             }
         }
-
         instance.doOpen(fileOrUrl, initialVolume, line -> {
             synchronized (output) {
                 output.add(line);
@@ -467,67 +419,51 @@ public class MPlayer extends BaseMediaPlayer {
 
     private MPlayerInstance getCurrentInstance() {
         synchronized (this) {
-
             return (current_instance);
         }
     }
 
     public void doPause() {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doPause();
         }
-
         reportNewState(MediaPlaybackState.Paused);
     }
 
     public void doResume() {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doResume();
         }
-
         reportNewState(MediaPlaybackState.Playing);
     }
 
     public void doSeek(float timeInSecs) {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doSeek(timeInSecs);
         }
     }
 
     public void doSetVolume(int volume) {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doSetVolume(volume);
         }
-
         reportVolume(volume);
     }
 
     public void mute(boolean on) {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             instance.doMute(on);
         }
     }
 
     private void setSubtitles(Language language) {
         MPlayerInstance instance = getCurrentInstance();
-
         if (instance != null) {
-
             reportSubtitleChanged(instance.setSubtitles(language),
                     language != null ? language.getSource() : null);
         }
@@ -539,36 +475,23 @@ public class MPlayer extends BaseMediaPlayer {
 
     private void doStop(boolean report_state) {
         synchronized (this) {
-
             if (current_instance != null) {
-
                 if (preferences != null) {
                     preferences.setPositionForFile(getOpenedFile(),
                             getPositionInSecs());
                 }
-
                 current_instance.doStop();
-
                 current_instance = null;
             }
-
             synchronized (output) {
                 output.clear();
                 output.notifyAll();
             }
         }
-
         if (report_state) {
-
             reportNewState(MediaPlaybackState.Stopped);
         }
     }
-
-    private MetaDataListener metaDataListener;
-    private StateListener stateListener;
-    private VolumeListener volumeListener;
-    private PositionListener positionListener;
-    private IcyInfoListener icyInfoListener;
 
     public void setMetaDataListener(MetaDataListener listener) {
         this.metaDataListener = listener;
@@ -576,12 +499,10 @@ public class MPlayer extends BaseMediaPlayer {
 
     public void setStateListener(StateListener listener) {
         this.stateListener = listener;
-
     }
 
     public void setVolumeListener(VolumeListener listener) {
         this.volumeListener = listener;
-
     }
 
     public void setPositionListener(PositionListener listener) {
@@ -636,7 +557,6 @@ public class MPlayer extends BaseMediaPlayer {
 
     public void dispose() {
         disposed = true;
-
         doStop();
     }
 
@@ -644,7 +564,6 @@ public class MPlayer extends BaseMediaPlayer {
     public Map<String, String> getProperties(String fileOrUrl) {
         MPlayerInstance instance = new MPlayerInstance();
         final Map<String, String> properties = new HashMap<>();
-
         instance.doGetProperties(fileOrUrl,
                 new MPlayerInstance.OutputConsumer() {
                     private String lastKey = null;
@@ -653,11 +572,9 @@ public class MPlayer extends BaseMediaPlayer {
                         if (line.split("=").length < 2) {
                             return;
                         }
-
                         if (line.startsWith("ID_CLIP_INFO_NAME")) {
                             lastKey = line.split("=")[1];
                         } else if (line.startsWith("ID_CLIP_INFO_VALUE")) {
-
                             if (lastKey != null) {
                                 properties.put(lastKey, line.split("=")[1]);
                                 lastKey = null;

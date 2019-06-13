@@ -27,23 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 class SlideshowPanelControls extends JPanel implements SlideshowListener {
-
     private final SlideshowPanel _thePanel;
-
     private List<JRadioButton> _buttons;
-
     private ItemListener _selectionAdapter;
 
     public SlideshowPanelControls(SlideshowPanel panel) {
         _thePanel = panel;
         _thePanel.setListener(this);
-
         buildButtons();
         autoSelectCurrentSlideButton();
         buildItemListener();
@@ -74,19 +68,14 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
 
     private void buildButtons() {
         int numSlides = _thePanel.getNumSlides();
-
         ButtonGroup _buttonGroup = new ButtonGroup();
         _buttons = new ArrayList<>(numSlides);
-
         for (int i = 0; i < numSlides; i++) {
             JRadioButton radio = new JRadioButton();
-
             //add to the list
             _buttons.add(radio);
-
             //add to the button group
             _buttonGroup.add(radio);
-
             //add to the panel
             add(radio);
         }
@@ -102,19 +91,13 @@ class SlideshowPanelControls extends JPanel implements SlideshowListener {
     public void onSlideChanged() {
         int currentSlideIndex = _thePanel.getCurrentSlideIndex();
         JRadioButton button = _buttons.get(currentSlideIndex);
-
         ItemListener[] itemListeners = button.getItemListeners();
-
         for (ItemListener listener : itemListeners) {
             button.removeItemListener(listener);
         }
-
         button.setSelected(true);
-
         for (ItemListener listener : itemListeners) {
             button.addItemListener(listener);
         }
-
     }
-
 }

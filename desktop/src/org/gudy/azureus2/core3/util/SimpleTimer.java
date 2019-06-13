@@ -22,7 +22,6 @@ package org.gudy.azureus2.core3.util;
 /**
  * @author parg
  */
-
 public class
 SimpleTimer {
     /**
@@ -30,15 +29,12 @@ SimpleTimer {
      * low-overhead events (i.e. when fired the event shouldn't take significant processing
      * time as there is a limited thread pool to service it
      */
-
     private static final Timer timer;
-
     private static final CopyOnWriteList<TimerTickReceiver> tick_receivers = new CopyOnWriteList<>(true);
 
     static {
         timer = new Timer("Simple Timer", 32);
         timer.setWarnWhenFull();
-
         addPeriodicEvent(
                 "SimpleTimer:ticker",
                 1000,
@@ -49,18 +45,12 @@ SimpleTimer {
                     perform(
                             TimerEvent event) {
                         tick_count++;
-
                         if (tick_receivers.size() > 0) {
-
                             long mono_now = SystemTime.getMonotonousTime();
-
                             for (TimerTickReceiver ttr : tick_receivers) {
-
                                 try {
                                     ttr.tick(mono_now, tick_count);
-
                                 } catch (Throwable e) {
-
                                     e.printStackTrace();
                                 }
                             }
@@ -74,7 +64,6 @@ SimpleTimer {
             String name,
             long when,
             TimerEventPerformer performer) {
-
         timer.addEvent(name, when, performer);
     }
 
@@ -83,7 +72,6 @@ SimpleTimer {
             String name,
             long frequency,
             TimerEventPerformer performer) {
-
         timer.addPeriodicEvent(name, frequency, performer);
     }
 

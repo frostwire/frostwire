@@ -29,7 +29,6 @@ import java.util.Set;
  * way for listing the files in the directory.
  */
 public abstract class AbstractDirectoryHolder implements DirectoryHolder {
-
     Set<File> _hideFiles;
 
     /**
@@ -37,9 +36,7 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
      * {@link #getDirectory}.
      */
     public File[] getFiles() {
-
         _hideFiles = TorrentUtil.getIgnorableFiles();
-
         File[] files = getDirectory().listFiles(this);
         return (files != null) ? files : new File[0];
     }
@@ -50,7 +47,6 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
                 || isPartsFile(file))) {
             return false;
         }
-
         File parent = file.getParentFile();
         return parent != null && parent.equals(getDirectory());
     }
@@ -87,5 +83,4 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
     public Icon getIcon() {
         return null;
     }
-
 }

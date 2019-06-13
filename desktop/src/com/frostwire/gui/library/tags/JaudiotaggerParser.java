@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,14 +30,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
- * 
  * @author aldenml
- *
  */
 class JaudiotaggerParser extends AbstractTagParser {
-
     private static final Logger LOG = Logger.getLogger(JaudiotaggerParser.class);
-
     private final AudioFileReader fileReader;
 
     public JaudiotaggerParser(File file, AudioFileReader fileReader) {
@@ -52,15 +48,11 @@ class JaudiotaggerParser extends AbstractTagParser {
     @Override
     public TagsData parse() {
         TagsData data = null;
-
         try {
             AudioFile audioFile = fileReader != null ? fileReader.read(file) : AudioFileIO.read(file);
-
             AudioHeader header = audioFile.getAudioHeader();
-
             int duration = header.getTrackLength();
             String bitrate = header.getBitRate();
-
             String title = getTitle(audioFile);
             String artist = getArtist(audioFile);
             String album = getAlbum(audioFile);
@@ -69,20 +61,16 @@ class JaudiotaggerParser extends AbstractTagParser {
             String track = getTrack(audioFile);
             String year = getYear(audioFile);
             String lyrics = getLyrics(audioFile);
-
             data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
-
         } catch (Exception e) {
             LOG.warn("Unable to parse file using Jaudiotagger: " + file);
         }
-
         return data;
     }
 
     @Override
     public BufferedImage getArtwork() {
         BufferedImage data = null;
-
         try {
             AudioFile audioFile = fileReader != null ? fileReader.read(file) : AudioFileIO.read(file);
             Tag tag = audioFile.getTag();
@@ -96,7 +84,6 @@ class JaudiotaggerParser extends AbstractTagParser {
         } catch (Exception e) {
             LOG.warn("Unable to read artwork of file using Jaudiotagger: " + file);
         }
-
         return data;
     }
 
@@ -134,13 +121,11 @@ class JaudiotaggerParser extends AbstractTagParser {
 
     private String getValueSafe(Tag tag, FieldKey id) {
         String value = null;
-
         try {
             value = tag.getFirst(id);
         } catch (Exception e) {
             //LOG.warn("Unable to get value for key: " + id);
         }
-
         return value;
     }
 }

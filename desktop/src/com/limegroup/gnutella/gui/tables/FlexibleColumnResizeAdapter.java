@@ -50,10 +50,11 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
      * Create a FlexibleColumnResizeAdapter with the specified settings.
      * When multiple modifiers are pressed, only one is processed. The
      * priority matches the order of these parameters.
-     * @param defaultMode   The resize mode when no modifier keys are pressed
-     * @param shiftMode     The resize mode when the shift key is pressed
-     * @param controlMode   The resize mode when the control key is pressed
-     * @param altMode       The resize mode when the alt key is pressed
+     *
+     * @param defaultMode The resize mode when no modifier keys are pressed
+     * @param shiftMode   The resize mode when the shift key is pressed
+     * @param controlMode The resize mode when the control key is pressed
+     * @param altMode     The resize mode when the alt key is pressed
      */
     public FlexibleColumnResizeAdapter(int defaultMode, int shiftMode,
                                        int controlMode, int altMode) {
@@ -66,6 +67,7 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
     /**
      * Sets the JTable's auto-resize mode depending on which modifier key is
      * pressed.
+     *
      * @param e
      */
     public void mousePressed(MouseEvent e) {

@@ -20,10 +20,8 @@
 
 package com.frostwire.util.filetypes;
 
-
 import java.util.*;
 //import org.jdesktop.jdic.filetypes.internal.AppUtility;
-
 
 /**
  * This class represents a file type association.
@@ -41,23 +39,19 @@ import java.util.*;
  * @see AssociationService
  */
 public class Association {
-
     /**
      * The name of the generated or removed MIME files on Gnome while
      * registering/unregistering an association.
      */
     private String name;
-
     /**
      * Description of the association.
      */
     private String description;
-
     /**
      * Mime type of the association.
      */
     private String mimeType;
-
     /**
      * File extension list of the association.
      * <p>
@@ -65,17 +59,14 @@ public class Association {
      * For Microsoft Windows platforms, only the first file extension in the list is used.
      */
     private List<String> fileExtensionList;
-
     /**
      * Icon file name of the association.
      */
     private String iconFileName;
-
     /**
      * Action list of the association.
      */
     private List<Action> actionList;
-
     /**
      * Hashcode for this association
      */
@@ -91,7 +82,6 @@ public class Association {
         if (name == null) {
             throw new IllegalArgumentException("The given MIME file name is null.");
         }
-
         this.name = name;
     }
 
@@ -113,7 +103,6 @@ public class Association {
         if (description == null) {
             throw new IllegalArgumentException("The given description is null.");
         }
-
         this.description = description;
     }
 
@@ -135,7 +124,6 @@ public class Association {
         if (mimeType == null) {
             throw new IllegalArgumentException("The given MIME type is null.");
         }
-
         this.mimeType = mimeType;
     }
 
@@ -155,14 +143,11 @@ public class Association {
         if (fileExt == null) {
             throw new IllegalArgumentException("The given file extension is null.");
         }
-
-        // Add the leading '.' character to the given file extension if not exists.    
+        // Add the leading '.' character to the given file extension if not exists.
         fileExt = AppUtility.addDotToFileExtension(fileExt);
-
         if (fileExtensionList == null) {
             fileExtensionList = new ArrayList<>();
         }
-
         fileExtensionList.add(fileExt);
     }
 
@@ -201,7 +186,6 @@ public class Association {
         if (fileName == null) {
             throw new IllegalArgumentException("The given icon file name is null.");
         }
-
         this.iconFileName = fileName;
     }
 
@@ -221,18 +205,15 @@ public class Association {
         if (action == null) {
             throw new IllegalArgumentException("The given action is null.");
         }
-
         // Check the specified action object has no null verb and command field.
         if (action.getVerb() == null) {
             throw new IllegalArgumentException("the given action object has null verb field.");
         } else if (action.getCommand() == null) {
             throw new IllegalArgumentException("the given action object has null command field.");
         }
-
         if (actionList == null) {
             actionList = new ArrayList<>();
         }
-
         actionList.add(new Action(action.getVerb(), action.getCommand(),
                 action.getDescription()));
     }
@@ -246,7 +227,6 @@ public class Association {
         // Make defensive copy
         if (actionList == null || actionList.isEmpty()) {
             return Collections.emptyList();
-
         } else {
             return new ArrayList<>(actionList);
         }
@@ -261,21 +241,18 @@ public class Association {
      */
     public Action getActionByVerb(String verb) {
         Iterator<Action> iter;
-
         if (actionList != null) {
             iter = actionList.iterator();
             if (iter != null) {
                 while (iter.hasNext()) {
                     Action temAction = iter.next();
                     String temVerb = temAction.getVerb();
-
                     if (temVerb.equalsIgnoreCase(verb)) {
                         return temAction;
                     }
                 }
             }
         }
-
         return null;
     }
 
@@ -305,15 +282,12 @@ public class Association {
         String otherDesc = otherAssoc.getDescription();
         String otherIconFileName = otherAssoc.getIconFileName();
         String otherMimeType = otherAssoc.getMimeType();
-
         isBasicEquals = ((Objects.equals(description, otherDesc))
                 && (Objects.equals(iconFileName, otherIconFileName))
                 && (Objects.equals(mimeType, otherMimeType)));
-
         if (!isBasicEquals) {
             return false;
         }
-
         //Compare if the file extension list equals
         List<String> otherFileExtList = otherAssoc.getFileExtList();
         isFileExtListEquals = false;
@@ -331,7 +305,6 @@ public class Association {
         if (!isFileExtListEquals) {
             return false;
         }
-
         //Compare if the action list equals
         List<Action> otherActionList = otherAssoc.getActionList();
         isActionListEquals = false;
@@ -346,7 +319,6 @@ public class Association {
                 isActionListEquals = true;
             }
         }
-
         return isActionListEquals;
     }
 
@@ -383,7 +355,6 @@ public class Association {
         return hashcode;
     }
 
-
     /**
      * Overrides the same method of <code>java.lang.Object</code>.
      * <p>
@@ -409,32 +380,26 @@ public class Association {
         String crlfString = "\r\n";
         String content = "";
         Iterator<?> temIter;
-
         content = content.concat("MIME File Name: ");
         if (this.name != null) {
             content = content.concat(name);
         }
         content = content.concat(crlfString);
-
         content = content.concat("Description: ");
         if (this.description != null) {
             content = content.concat(description);
         }
         content = content.concat(crlfString);
-
         content = content.concat("MIME Type: ");
         if (this.mimeType != null) {
             content = content.concat(mimeType);
         }
         content = content.concat(crlfString);
-
-
         content = content.concat("Icon File: ");
         if (this.iconFileName != null) {
             content = content.concat(iconFileName);
         }
         content = content.concat(crlfString);
-
         content = content.concat("File Extension: ");
         if (fileExtensionList != null) {
             temIter = fileExtensionList.iterator();
@@ -448,7 +413,6 @@ public class Association {
             }
         }
         content = content.concat(crlfString);
-
         content = content.concat("Action List: ");
         if (actionList != null) {
             temIter = actionList.iterator();
@@ -461,7 +425,6 @@ public class Association {
             }
         }
         content = content.concat(crlfString);
-
         return content;
     }
 }

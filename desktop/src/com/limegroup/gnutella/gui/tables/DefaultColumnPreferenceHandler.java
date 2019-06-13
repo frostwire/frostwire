@@ -28,21 +28,18 @@ import java.util.Iterator;
 
 /**
  * Handles column preferences through a settings file.
- *
+ * <p>
  * This is the default implementation for ColumnPreferences.
  */
 public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, TableColumnModelListener, MouseListener {
-
     /**
      * The table that this is storing the column preferences for.
      */
     protected final LimeJTable table;
-
     /**
      * The current SimpleColumnListener for callbacks.
      */
     protected SimpleColumnListener listener = null;
-
     /**
      * Indicates a margin has been changed since we last released the mouse.
      */
@@ -73,41 +70,33 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
         LimeTableColumn addedColumn = getToColumn(e);
         LimeTableColumn ltc = addedColumn;
         setVisibility(ltc, true);
-
         TableColumnModel tcm = table.getColumnModel();
         int order = getOrder(ltc);
         int current = tcm.getColumnIndex(ltc.getId());
         int max = tcm.getColumnCount();
-
         // move this column to where we want it.
         if (order != current) {
             stopListening();
-
             // make sure we don't try to put this after the end.
             order = Math.min(order, max - 1);
             tcm.moveColumn(current, order);
-
             // traverse through and reset the saved order of columns.
             for (current = order + 1; current < max; current++) {
                 ltc = (LimeTableColumn) tcm.getColumn(current);
                 setOrder(ltc, current);
             }
-
             // traverse through the hidden columns and tell them to
             // move back up a notch if they're above us.
-            for (Iterator<LimeTableColumn> i = table.getHiddenColumns(); i.hasNext();) {
+            for (Iterator<LimeTableColumn> i = table.getHiddenColumns(); i.hasNext(); ) {
                 ltc = i.next();
                 current = getOrder(ltc);
                 if (current > order)
                     setOrder(ltc, current + 1);
             }
-
             startListening();
         }
-
         if (listener != null)
             listener.columnAdded(addedColumn, table);
-
         save();
     }
 
@@ -123,7 +112,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
         // if this is null, it means we resized the app or a scrollbar appeared
         if (table.getTableHeader().getResizingColumn() == null)
             return;
-
         marginChanged = true;
     }
 
@@ -135,12 +123,10 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
     public void columnMoved(TableColumnModelEvent e) {
         if (e.getFromIndex() == e.getToIndex())
             return;
-
         LimeTableColumn from = getFromColumn(e);
         LimeTableColumn to = getToColumn(e);
         setOrder(from, e.getFromIndex());
         setOrder(to, e.getToIndex());
-
         save();
     }
 
@@ -152,31 +138,26 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
      */
     public void columnRemoved(TableColumnModelEvent e) {
         LimeTableColumn ltc;
-
         //save the reordered columns
         TableColumnModel tcm = table.getColumnModel();
         for (int i = 0; i < tcm.getColumnCount(); i++) {
             ltc = (LimeTableColumn) tcm.getColumn(i);
             setOrder(ltc, i);
         }
-
         LimeTableColumn removedColumn = table.getLastRemovedColumn();
         ltc = removedColumn;
         setVisibility(ltc, false);
-
         //decrease the order in hidden columns by one if they were
         //before the hidden column's order.
         int order = getOrder(ltc);
-        for (Iterator<LimeTableColumn> i = table.getHiddenColumns(); i.hasNext();) {
+        for (Iterator<LimeTableColumn> i = table.getHiddenColumns(); i.hasNext(); ) {
             ltc = i.next();
             int current = getOrder(ltc);
             if (current > order)
                 setOrder(ltc, current - 1);
         }
-
         if (listener != null)
             listener.columnRemoved(removedColumn, table);
-
         save();
     }
 
@@ -218,16 +199,13 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
         // if the margins haven't changed, exit.
         if (!marginChanged)
             return;
-
         // iterate through and save the widths we wanted.
         TableColumnModel tcm = table.getColumnModel();
         for (int i = 0; i < tcm.getColumnCount(); i++) {
             LimeTableColumn ltc = (LimeTableColumn) tcm.getColumn(i);
             setWidth(ltc, ltc.getWidth());
         }
-
         marginChanged = false;
-
         save();
     }
 
@@ -237,7 +215,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
      */
     public void revertToDefault() {
         stopListening();
-
         // Traverse & change settings, and make everything visible
         // so we can traverse back through & set the order and width.
         DataLineModel<?, ?> dlm = (DataLineModel<?, ?>) table.getModel();
@@ -254,9 +231,7 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                 }
             } catch (LastColumnException ignored) {
             }
-
         }
-
         // traverse to set the order ...
         TableColumnModel tcm = table.getColumnModel();
         for (int i = 0; i < dlm.getColumnCount(); i++) {
@@ -267,7 +242,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                 tcm.moveColumn(current, order);
             ltc.setPreferredWidth(ltc.getDefaultWidth());
         }
-
         // traverse to set the visibility ...
         for (int i = 0; i < dlm.getColumnCount(); i++) {
             LimeTableColumn ltc = dlm.getTableColumn(i);
@@ -281,9 +255,7 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
             } catch (LastColumnException ignored) {
             }
         }
-
         startListening();
-
         save();
     }
 
@@ -312,7 +284,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
      */
     public void setWidths() {
         stopListening();
-
         //traverse through each possible column and set its preferred
         //width.  this MUST use the DataLineModel to traverse, to ensure
         //that we set the future preferred width for any added columns.
@@ -326,7 +297,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                 }
             }
         }
-
         startListening();
     }
 
@@ -337,7 +307,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
     public void setOrder() {
         stopListening();
         boolean changed = false;
-
         //traverse through each possible column, and if it's visible,
         //put it in the correct place.  this MUST use the DataLineModel
         //to traverse, so reordering doesn't confuse what we're looking at.
@@ -361,10 +330,8 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                 }
             }
         }
-
         if (changed)
             TablesHandlerSettings.instance().save();
-
         startListening();
     }
 
@@ -374,7 +341,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
      */
     public void setVisibility() {
         stopListening();
-
         //traverse through each possible column, and set its
         //visibility appropriately
         DataLineModel<?, ?> dlm = (DataLineModel<?, ?>) table.getModel();
@@ -398,7 +364,6 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
                 // ignore it -- we can't show an error while starting up.
             }
         }
-
         startListening();
     }
 

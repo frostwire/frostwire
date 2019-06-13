@@ -24,97 +24,83 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 
-
 class ProgressSlider extends JPanel {
+    private static final long serialVersionUID = 8000075870624583383L;
+    private JSlider progressSlider;
+    private JLabel remainingTime;
+    private JLabel elapsedTime;
+    private float totalTime = 0;
+    private float currentTime = 0;
+    private boolean mousePressed = false;
+    private LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
 
-	private static final long serialVersionUID = 8000075870624583383L;
-	private JSlider progressSlider;
-	private JLabel remainingTime;
-	private JLabel elapsedTime;
-	
-	private float totalTime = 0;
-	private float currentTime = 0;
-	
-	private boolean mousePressed = false;
-	
-	private LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
-	
-	ProgressSlider() {
-		
-		setLayout(new BorderLayout());
-		setOpaque(false);
+    ProgressSlider() {
+        setLayout(new BorderLayout());
+        setOpaque(false);
         setSize(new Dimension(411, 17));
-        
         elapsedTime = new JLabel("--:--");
-        Font font = new Font(elapsedTime.getFont().getFontName(), Font.BOLD, 14 );
+        Font font = new Font(elapsedTime.getFont().getFontName(), Font.BOLD, 14);
         elapsedTime.setFont(font);
         elapsedTime.setForeground(Color.white);
         add(elapsedTime, BorderLayout.WEST);
-        
         progressSlider = new JSlider();
         progressSlider.setOpaque(false);
         progressSlider.setFocusable(false);
         progressSlider.addChangeListener(e -> {
-            if ( mousePressed ) {
+            if (mousePressed) {
                 float seconds = (float) (progressSlider.getValue() / 100.0 * totalTime);
-                for (ProgressSliderListener l : listeners ) {
+                for (ProgressSliderListener l : listeners) {
                     l.onProgressSliderTimeValueChange(seconds);
                 }
             }
         });
-        
-        progressSlider.addMouseListener( new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				mousePressed = true;
-				for (ProgressSliderListener l : listeners ) {
-					l.onProgressSliderMouseDown();
-				}
-			}
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				mousePressed = false;
-				for (ProgressSliderListener l : listeners ) {
-					l.onProgressSliderMouseUp();
-				}
-			}
+        progressSlider.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mousePressed = true;
+                for (ProgressSliderListener l : listeners) {
+                    l.onProgressSliderMouseDown();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mousePressed = false;
+                for (ProgressSliderListener l : listeners) {
+                    l.onProgressSliderMouseUp();
+                }
+            }
         });
-        
         add(progressSlider, BorderLayout.CENTER);
-        
         remainingTime = new JLabel("--:--");
         remainingTime.setFont(font);
         remainingTime.setForeground(Color.white);
         add(remainingTime, BorderLayout.EAST);
-        
-	}
-	
-	void addProgressSliderListener(ProgressSliderListener listener) {
-		listeners.add(listener);
-	}
+    }
 
-	void setTotalTime(float seconds) {
-		if ( seconds != totalTime ) {
-			totalTime = seconds;
-			currentTime = 0;
-			updateUIControls();
-		}
-	}
-	
-	void setCurrentTime(float seconds) {
-		if ( seconds != currentTime) {
-			currentTime = seconds;
-			updateUIControls();
-		}
-	}
-	
-	private void updateUIControls() {
-		elapsedTime.setText(TimeUtils.getTimeFormatedString((int) currentTime));
-		remainingTime.setText(TimeUtils.getTimeFormatedString((int) (totalTime - currentTime)));
-		
-		int progressValue = (int) (currentTime / totalTime * 100.0);
+    void addProgressSliderListener(ProgressSliderListener listener) {
+        listeners.add(listener);
+    }
 
-		progressSlider.setValue(Math.max(0, Math.min(100,progressValue)));
-	}
+    void setTotalTime(float seconds) {
+        if (seconds != totalTime) {
+            totalTime = seconds;
+            currentTime = 0;
+            updateUIControls();
+        }
+    }
 
+    void setCurrentTime(float seconds) {
+        if (seconds != currentTime) {
+            currentTime = seconds;
+            updateUIControls();
+        }
+    }
+
+    private void updateUIControls() {
+        elapsedTime.setText(TimeUtils.getTimeFormatedString((int) currentTime));
+        remainingTime.setText(TimeUtils.getTimeFormatedString((int) (totalTime - currentTime)));
+        int progressValue = (int) (currentTime / totalTime * 100.0);
+        progressSlider.setValue(Math.max(0, Math.min(100, progressValue)));
+    }
 }

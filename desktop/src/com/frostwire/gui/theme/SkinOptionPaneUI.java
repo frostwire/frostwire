@@ -26,13 +26,10 @@ import javax.swing.plaf.synth.SynthOptionPaneUI;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinOptionPaneUI extends SynthOptionPaneUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinOptionPaneUI();
@@ -41,12 +38,10 @@ public class SkinOptionPaneUI extends SynthOptionPaneUI {
     @Override
     protected void addMessageComponents(Container container, GridBagConstraints cons, final Object msg, int maxll, boolean internallyCreated) {
         super.addMessageComponents(container, cons, msg, maxll, internallyCreated);
-
         if (msg instanceof JLabel) {
             ThemeMediator.fixComponentFont((JLabel) msg, getMessage());
         } else if (msg instanceof JTextField) {
             ThemeMediator.fixKeyStrokes((JTextField) msg);
-
             ((JTextField) msg).getDocument().addDocumentListener(new DocumentListener() {
                 public void changedUpdate(DocumentEvent e) {
                     update();

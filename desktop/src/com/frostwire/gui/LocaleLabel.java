@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,13 +24,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class LocaleLabel extends JLabel {
-
     public void setText(LocaleString text) {
         if (OSUtils.isWindows()) {
             Font f;
@@ -39,7 +36,6 @@ public class LocaleLabel extends JLabel {
             } else {
                 f = ThemeMediator.DIALOG_FONT;
             }
-
             changeFont(f);
         }
         setText(text.getValue());
@@ -52,9 +48,7 @@ public class LocaleLabel extends JLabel {
     }
 
     public static class LocaleString {
-
         private final String value;
-
         private Boolean canDisplay;
 
         public LocaleString(String value) {
@@ -70,7 +64,6 @@ public class LocaleLabel extends JLabel {
             if (canDisplay == null) {
                 canDisplay = getDefaultFont().canDisplayUpTo(value) == -1;
             }
-
             return canDisplay;
         }
 

@@ -22,11 +22,8 @@ package org.gudy.azureus2.core3.util;
 import java.util.*;
 
 public class CopyOnWriteList<T> implements Iterable<T> {
-
-    private List list = Collections.EMPTY_LIST;
-
     private final boolean use_linked_list;
-
+    private List list = Collections.EMPTY_LIST;
     private boolean visible = false;
 
     CopyOnWriteList(boolean _use_linked_list) {
@@ -45,7 +42,6 @@ public class CopyOnWriteList<T> implements Iterable<T> {
             }
         }
     }
-
 
     public Iterator<T>
     iterator() {
@@ -81,17 +77,14 @@ public class CopyOnWriteList<T> implements Iterable<T> {
         public T
         next() {
             last = it.next();
-
             return (last);
         }
 
         public void
         remove() {
             if (last == null) {
-
                 throw (new IllegalStateException("next has not been called!"));
             }
-
             CopyOnWriteList.this.remove(last);
         }
     }

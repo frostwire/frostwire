@@ -48,24 +48,18 @@ import java.util.List;
 import static com.limegroup.gnutella.gui.I18n.tr;
 
 /**
- * @author gubatron
- * @author aldenml
- *
  * @param <T>
  * @param <E>
  * @param <I>
+ * @author gubatron
+ * @author aldenml
  */
 abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E extends AbstractLibraryTableDataLine<I>, I> extends AbstractTableMediator<T, E, I> {
-
-    private MediaType mediaType;
-
     private static final LibraryActionsRenderer ACTION_RENDERER = new LibraryActionsRenderer();
-
     Action SEND_TO_FRIEND_ACTION;
     Action OPTIONS_ACTION;
-
+    private MediaType mediaType;
     private int needToScrollTo;
-
     private AdjustmentListener adjustmentListener;
 
     AbstractLibraryTableMediator(String id) {
@@ -73,6 +67,10 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         GUIMediator.addRefreshListener(this);
         mediaType = MediaType.getAnyTypeMediaType();
         needToScrollTo = -1;
+    }
+
+    private static String getTruncatedString(String string, int MAX_LENGTH) {
+        return string.length() > MAX_LENGTH ? (string.substring(0, MAX_LENGTH - 1) + "...") : string;
     }
 
     @Override
@@ -114,7 +112,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
      */
     boolean setItemSelected(I item) {
         int i = DATA_MODEL.getRow(item);
-
         if (i != -1) {
             TABLE.setSelectedRow(i);
             TABLE.ensureSelectionVisible();
@@ -134,12 +131,10 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
     @Override
     protected JComponent getScrolledTablePane() {
         JComponent comp = super.getScrolledTablePane();
-
         if (adjustmentListener == null) {
             adjustmentListener = this::adjustmentListener_adjustmentValueChanged;
             SCROLL_PANE.getVerticalScrollBar().addAdjustmentListener(adjustmentListener);
         }
-
         return comp;
     }
 
@@ -205,79 +200,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         }
     }
 
-    private class CreateNewPlaylistAction extends AbstractAction {
-
-        private static final long serialVersionUID = 3460908036485828909L;
-
-        CreateNewPlaylistAction() {
-            super(tr("Create New Playlist"));
-            putValue(Action.LONG_DESCRIPTION, tr("Create and add to a new playlist"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LibraryUtils.createNewPlaylist(getSelectedLines());
-        }
-    }
-
-    /**
-     * NOTE: Make sure to check out BTDownloadActions.AddToPlaylistAction, which is a similar action to this one.
-     * @author gubatron
-     *
-     */
-    private final class AddToPlaylistAction extends AbstractAction {
-        private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
-        private Playlist playlist;
-
-        AddToPlaylistAction(Playlist playlist) {
-            super(getTruncatedString(playlist.getName(),MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU));
-            putValue(Action.LONG_DESCRIPTION, tr("Add to playlist") + " \"" + playlist.getName() + "\"");
-            this.playlist = playlist;
-        }
-        
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            LibraryUtils.asyncAddToPlaylist(playlist, getSelectedLines());
-        }
-
-        public void setName(String name) {
-            putValue(Action.NAME, name);
-        }
-    }
-
-    private static String getTruncatedString(String string, int MAX_LENGTH) {
-        return string.length() > MAX_LENGTH ? (string.substring(0, MAX_LENGTH-1) + "...") : string;            
-    }
-    
-    static class SendToFriendAction extends AbstractAction {
-
-        private static final long serialVersionUID = 1329472129818371471L;
-
-        SendToFriendAction() {
-            super(tr("Send to friend"));
-            putValue(LimeAction.SHORT_NAME, tr("Send"));
-            putValue(Action.LONG_DESCRIPTION, tr("Send to friend"));
-            //putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("share"));
-            putValue(LimeAction.ICON_NAME, "LIBRARY_SEND");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            File file = LibraryMediator.instance().getSelectedFile();
-
-            if (file == null) {
-              return;
-            }
-
-            DialogOption result = GUIMediator.showYesNoMessage(tr("Do you want to send this file to a friend?") + "\n\n\"" + file.getName() + "\"", tr("Send files with FrostWire"), JOptionPane.QUESTION_MESSAGE);
-
-            if (result == DialogOption.YES) {
-                new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
-                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
-            }
-        }
-    }
-
     void scrollTo(int value) {
         needToScrollTo = value;
     }
@@ -294,7 +216,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         if (line == null) {
             return;
         }
-
         try {
             MediaSource mediaSource = createMediaSource(line);
             if (mediaSource != null) {
@@ -311,5 +232,69 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
     public void removeSelection() {
         super.removeSelection();
         LibraryMediator.instance().clearDirectoryHolderCaches();
+    }
+
+    static class SendToFriendAction extends AbstractAction {
+        private static final long serialVersionUID = 1329472129818371471L;
+
+        SendToFriendAction() {
+            super(tr("Send to friend"));
+            putValue(LimeAction.SHORT_NAME, tr("Send"));
+            putValue(Action.LONG_DESCRIPTION, tr("Send to friend"));
+            //putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("share"));
+            putValue(LimeAction.ICON_NAME, "LIBRARY_SEND");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File file = LibraryMediator.instance().getSelectedFile();
+            if (file == null) {
+                return;
+            }
+            DialogOption result = GUIMediator.showYesNoMessage(tr("Do you want to send this file to a friend?") + "\n\n\"" + file.getName() + "\"", tr("Send files with FrostWire"), JOptionPane.QUESTION_MESSAGE);
+            if (result == DialogOption.YES) {
+                new SendFileProgressDialog(GUIMediator.getAppFrame(), file).setVisible(true);
+                GUIMediator.instance().setWindow(GUIMediator.Tabs.TRANSFERS);
+            }
+        }
+    }
+
+    private class CreateNewPlaylistAction extends AbstractAction {
+        private static final long serialVersionUID = 3460908036485828909L;
+
+        CreateNewPlaylistAction() {
+            super(tr("Create New Playlist"));
+            putValue(Action.LONG_DESCRIPTION, tr("Create and add to a new playlist"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LibraryUtils.createNewPlaylist(getSelectedLines());
+        }
+    }
+
+    /**
+     * NOTE: Make sure to check out BTDownloadActions.AddToPlaylistAction, which is a similar action to this one.
+     *
+     * @author gubatron
+     */
+    private final class AddToPlaylistAction extends AbstractAction {
+        private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
+        private Playlist playlist;
+
+        AddToPlaylistAction(Playlist playlist) {
+            super(getTruncatedString(playlist.getName(), MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU));
+            putValue(Action.LONG_DESCRIPTION, tr("Add to playlist") + " \"" + playlist.getName() + "\"");
+            this.playlist = playlist;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            LibraryUtils.asyncAddToPlaylist(playlist, getSelectedLines());
+        }
+
+        public void setName(String name) {
+            putValue(Action.NAME, name);
+        }
     }
 }

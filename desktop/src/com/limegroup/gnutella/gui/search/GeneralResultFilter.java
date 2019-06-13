@@ -25,28 +25,23 @@ import com.limegroup.gnutella.gui.GUIUtils;
  * @author aldenml
  */
 public final class GeneralResultFilter implements TableLineFilter<SearchResultDataLine> {
-
     private SearchResultMediator _rp;
     private LabeledRangeSlider _rangeSliderSeeds;
     private LabeledRangeSlider _rangeSliderSize;
-
     private int _minResultsSeeds;
     private int _maxResultsSeeds;
     private double _minResultsSize;
     private double _maxResultsSize;
-
     private int _minSeeds;
     private int _maxSeeds;
     private int _minSize;
     private int _maxSize;
-
     private String _keywords;
 
     GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
         _rp = rp;
         _rangeSliderSeeds = rangeSliderSeeds;
         _rangeSliderSize = rangeSliderSize;
-
         _minResultsSeeds = Integer.MAX_VALUE;
         _maxResultsSeeds = 0;
         _minResultsSize = Long.MAX_VALUE;
@@ -58,7 +53,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
     }
 
     public boolean allow(SearchResultDataLine node) {
-
         boolean seedsNeedUpdate = false;
         int seeds = node.getSeeds();
         if (seeds < _minResultsSeeds) {
@@ -79,7 +73,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _maxResultsSize = size;
             sizeNeedUpdate = true;
         }
-
         if (seedsNeedUpdate) {
             _rangeSliderSeeds.getMinimumValueLabel().setText(String.valueOf(_minResultsSeeds));
             _rangeSliderSeeds.getMaximumValueLabel().setText(String.valueOf(_maxResultsSeeds));
@@ -88,12 +81,9 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _rangeSliderSize.getMinimumValueLabel().setText(GUIUtils.getBytesInHuman(_minResultsSize));
             _rangeSliderSize.getMaximumValueLabel().setText(GUIUtils.getBytesInHuman(_maxResultsSize));
         }
-
         boolean inSeedRange;
-
         if (_maxResultsSeeds > _minResultsSeeds) {
             int seedNorm = ((seeds - _minResultsSeeds) * 1000) / (_maxResultsSeeds - _minResultsSeeds);
-
             if (_minSeeds == 0 && _maxSeeds == 1000) {
                 inSeedRange = true;
             } else if (seeds == _minSeeds || seeds == _maxSeeds) {
@@ -108,12 +98,9 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         } else {
             inSeedRange = seeds == _maxResultsSeeds;
         }
-
         boolean inSizeRange;
-
         if (_maxResultsSize > _minResultsSize) {
             double sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
-
             if (_minSize == 0 && _maxSize == 1000) {
                 inSizeRange = true;
             } else if (_minSize == 0) {
@@ -126,7 +113,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         } else {
             inSizeRange = size == _maxResultsSize;
         }
-
         String sourceName = getSourceName(node);
         boolean hasKeywords = hasKeywords(node.getDisplayName() + " " + node.getExtension() + " " + sourceName);
         return inSeedRange && inSizeRange && hasKeywords;
@@ -142,16 +128,12 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
     }
 
     private boolean hasKeywords(String filename) {
-
         String keywordText = _keywords;
-
         if (keywordText == null || keywordText.trim().length() == 0) {
             return true;
         }
-
         //if it's just one keyword.
         String[] keywords = keywordText.split(" ");
-
         if (keywords.length == 1) {
             return filename.toLowerCase().contains(keywordText.toLowerCase());
         } else {
@@ -163,7 +145,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
                 }
             }
         }
-
         return true;
     }
 

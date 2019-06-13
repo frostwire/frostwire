@@ -26,13 +26,10 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer {
-
     private LocaleLabel labelText;
 
     NameHolderRenderer() {
@@ -41,7 +38,7 @@ public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer 
 
     private void setupUI() {
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(1,5,1,5));
+        setBorder(new EmptyBorder(1, 5, 1, 5));
         labelText = new LocaleLabel();
         add(labelText, BorderLayout.CENTER);
     }

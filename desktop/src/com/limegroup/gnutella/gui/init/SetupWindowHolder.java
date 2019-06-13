@@ -25,7 +25,6 @@ import java.awt.*;
  * that handles the actual drawing.
  */
 final class SetupWindowHolder extends JPanel {
-
     /**
      * The <tt>CardLayout</tt> instance for the setup windows.
      */

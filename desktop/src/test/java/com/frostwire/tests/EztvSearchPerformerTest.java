@@ -39,18 +39,14 @@ public final class EztvSearchPerformerTest {
             System.out.println("Aborting test.");
             return;
         }
-
         Pattern searchResultsDetailURLPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
         Pattern detailPagePattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
-
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
-
         int found = 0;
         while (searchResultsMatcher.find()) {
             found++;
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
-
             String detailUrl = "https://eztv.re" + searchResultsMatcher.group(1);
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
@@ -67,7 +63,6 @@ public final class EztvSearchPerformerTest {
             long downloadTime = System.currentTimeMillis() - start;
             System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
-
             if (sm.find()) {
                 System.out.println("magneturl: [" + sm.group("magneturl") + "]");
                 System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");

@@ -25,7 +25,6 @@ import com.frostwire.alexandria.db.PlaylistItemDB;
 import static com.frostwire.util.StringUtils.isNullOrEmpty;
 
 public class PlaylistItem extends LibraryDatabaseEntity {
-
     private Playlist playlist;
     private int id;
     private String filePath;
@@ -52,7 +51,7 @@ public class PlaylistItem extends LibraryDatabaseEntity {
     }
 
     public PlaylistItem(Playlist playlist, int id, String filePath, String fileName, long fileSize, String fileExtension, String trackTitle, float trackDurationInSecs, String trackArtist, String trackAlbum, String coverArtPath, String trackBitrate, String trackComment, String trackGenre,
-            String trackNumber, String trackYear, boolean starred) {
+                        String trackNumber, String trackYear, boolean starred) {
         super(playlist != null ? playlist.getLibraryDatabase() : null);
         this.playlist = playlist;
         this.id = id;
@@ -256,8 +255,9 @@ public class PlaylistItem extends LibraryDatabaseEntity {
     /**
      * Attempts to look for the track number to set this number as the sorting index.
      * In case it cannot find a track number it will use the fallback value.
-     *
+     * <p>
      * Indexes start at 1. (not 0)
+     *
      * @param fallBackIndexValue the sorting index to use if a track number isn't found.
      */
     public void setSortIndexByTrackNumber(int fallBackIndexValue) {

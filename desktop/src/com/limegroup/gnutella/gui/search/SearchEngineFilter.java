@@ -6,10 +6,9 @@ import javax.swing.*;
 import java.util.Map;
 
 class SearchEngineFilter implements TableLineFilter<SearchResultDataLine> {
+    private final Map<SearchEngine, JCheckBox> engineCheckboxes;
 
-    private final Map<SearchEngine,JCheckBox> engineCheckboxes;
-
-    public SearchEngineFilter(Map<SearchEngine,JCheckBox> engineCheckboxes) {
+    public SearchEngineFilter(Map<SearchEngine, JCheckBox> engineCheckboxes) {
         this.engineCheckboxes = engineCheckboxes;
     }
 

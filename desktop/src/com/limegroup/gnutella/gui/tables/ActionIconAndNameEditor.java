@@ -31,16 +31,11 @@ import java.awt.event.MouseEvent;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ActionIconAndNameEditor extends AbstractCellEditor implements TableCellEditor {
-
     private static final long serialVersionUID = 2661028644256459921L;
-
     private static final Logger LOG = Logger.getLogger(ActionIconAndNameEditor.class);
-
     private final Rectangle actionRegion;
-
     private ActionListener action;
 
     public ActionIconAndNameEditor(Rectangle actionRegion) {
@@ -58,7 +53,6 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
     public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, int row, int column) {
         ActionIconAndNameHolder in = (ActionIconAndNameHolder) value;
         action = in.getAction();
-
         final Component component = new ActionIconAndNameRenderer().getTableCellRendererComponent(table, value, isSelected, true, row, column);
         component.addMouseListener(new MouseAdapter() {
             @Override
@@ -80,7 +74,6 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
                 }
             }
         });
-
         return component;
     }
 

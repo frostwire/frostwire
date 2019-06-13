@@ -10,35 +10,32 @@ import com.limegroup.gnutella.gui.VisualConnectionCallback;
  * ActivityCallback.
  */
 public class LimeWireCoreModule {
-    
     private static LimeWireCoreModule INSTANCE;
-    
+    private final ActivityCallback activityCallback;
+    private final LifecycleManager lifecycleManager;
+    private final DownloadManager downloadManager;
+    private LimeWireCoreModule() {
+        this.activityCallback = VisualConnectionCallback.instance();
+        this.downloadManager = new DownloadManagerImpl(activityCallback);
+        this.lifecycleManager = new LifecycleManagerImpl(LimeCoreGlue.instance());
+    }
+
     public static LimeWireCoreModule instance() {
         if (INSTANCE == null) {
             INSTANCE = new LimeWireCoreModule();
         }
         return INSTANCE;
     }
- 
-    private final ActivityCallback activityCallback;
-    private final LifecycleManager lifecycleManager;
-    private final DownloadManager downloadManager;
-    
-    private LimeWireCoreModule() {
-        this.activityCallback = VisualConnectionCallback.instance();
-        this.downloadManager = new DownloadManagerImpl(activityCallback);
-        this.lifecycleManager = new LifecycleManagerImpl(LimeCoreGlue.instance());
-    }
-    
+
     public ActivityCallback getActivityCallback() {
         return activityCallback;
     }
 
-	public LifecycleManager getLifecycleManager() {
-	    return lifecycleManager;
-	}
-	
-	public DownloadManager getDownloadManager() {
-	    return downloadManager;
-	}
+    public LifecycleManager getLifecycleManager() {
+        return lifecycleManager;
+    }
+
+    public DownloadManager getDownloadManager() {
+        return downloadManager;
+    }
 }

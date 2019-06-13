@@ -19,9 +19,8 @@
 package com.frostwire.gui.library;
 
 class PlaylistItemStringProperty extends PlaylistItemProperty<PlaylistItemStringProperty> {
-    
     protected final String stringValue;
-    
+
     public PlaylistItemStringProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean playing, boolean exists) {
         super(line, playing, exists);
         this.stringValue = stringValue;
@@ -31,7 +30,7 @@ class PlaylistItemStringProperty extends PlaylistItemProperty<PlaylistItemString
     public int compareTo(PlaylistItemStringProperty o) {
         return stringValue.compareTo(o.stringValue);
     }
-    
+
     @Override
     public String getStringValue() {
         return stringValue;

@@ -27,20 +27,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 final class SearchTabbedPane extends JTabbedPane {
-
     SearchTabbedPane() {
     }
 
     @Override
     public void addTab(String title, Icon icon, Component component) {
         super.addTab(title, icon, component);
-
         int tabIndex = getTabCount() - 1;
         setTabComponentAt(tabIndex, new SearchTabHeader(component, title));
     }
@@ -59,34 +55,30 @@ final class SearchTabbedPane extends JTabbedPane {
             ((SearchTabHeader) c).setProgressActive(active);
         }
     }
-    
+
     void switchToTabByOffset(int offset) {
-      int oldIndex = (getSelectedIndex()<0) ? 0 : getSelectedIndex();
-      int newIndex = (oldIndex+offset) % getTabCount();
-      //java's modulo will return negative numbers... damn you Gosling.
-      if (newIndex < 0) {
-          newIndex += getTabCount();
-      }
-      setSelectedIndex(newIndex);  
+        int oldIndex = (getSelectedIndex() < 0) ? 0 : getSelectedIndex();
+        int newIndex = (oldIndex + offset) % getTabCount();
+        //java's modulo will return negative numbers... damn you Gosling.
+        if (newIndex < 0) {
+            newIndex += getTabCount();
+        }
+        setSelectedIndex(newIndex);
     }
 
     private final class SearchTabHeader extends JPanel {
-
         private final Component component;
         private final JLabel labelText;
 
         SearchTabHeader(Component component, String text) {
             this.component = component;
-
             setLayout(new MigLayout("insets 0, gap 0"));
-
             JButton buttonClose = new JButton(CancelSearchIconProxy.createSelected());
             buttonClose.setOpaque(false);
             buttonClose.setContentAreaFilled(false);
             buttonClose.setBorderPainted(false);
             buttonClose.addActionListener(new CloseActionHandler());
             add(buttonClose, "h 17!, w 23!");
-
             labelText = new JLabel(text.trim());
             labelText.setHorizontalTextPosition(SwingConstants.LEADING);
             labelText.setAlignmentX(SwingConstants.RIGHT);
@@ -107,7 +99,6 @@ final class SearchTabbedPane extends JTabbedPane {
         }
 
         class CloseActionHandler implements ActionListener {
-
             CloseActionHandler() {
             }
 

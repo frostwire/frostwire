@@ -28,7 +28,6 @@ import java.util.List;
  * @author aldenml
  */
 public class LCS {
-
     public static String lcsHtml(String s1, String s2) {
         String rs1 = new StringBuffer(s1).reverse().toString();
         String rs2 = new StringBuffer(s2).reverse().toString();
@@ -54,7 +53,6 @@ public class LCS {
          * initValues(VALUE[] x, VALUE[] y)
          */
         LongestCommonSubsequence() {
-
         }
 
         protected abstract int lengthOfY();
@@ -89,7 +87,6 @@ public class LCS {
             for (int i = 0; i < c.length; i++) {
                 c[i] = new int[lengthOfY() + 1];
             }
-
             for (int i = 1; i < c.length; i++) {
                 for (int j = 1; j < c[i].length; j++) {
                     if (isXYEqual(i, j)) {
@@ -103,7 +100,6 @@ public class LCS {
 
         List<DiffEntry<VALUE>> diff() {
             calculateLcs();
-
             if (this.diff == null) {
                 this.diff = new ArrayList<>();
                 diff(lengthOfX(), lengthOfY());
@@ -113,33 +109,27 @@ public class LCS {
 
         private void diff(int i, int j) {
             calculateLcs();
-
             while (!(i == 0 && j == 0)) {
                 if (i > 0 && j > 0 && isXYEqual(i, j)) {
                     this.diff.add(new DiffEntry<>(DiffType.NONE, valueOfYInternal(j)));
                     i--;
                     j--;
-
                 } else {
                     if (j > 0 && (i == 0 || c[i][j - 1] >= c[i - 1][j])) {
                         this.diff.add(new DiffEntry<>(DiffType.ADD, valueOfYInternal(j)));
                         j--;
-
                     } else if (i > 0 && (j == 0 || c[i][j - 1] < c[i - 1][j])) {
-
                         this.diff.add(new DiffEntry<>(DiffType.REMOVE, valueOfXInternal(i)));
                         i--;
                     }
                 }
             }
-
             Collections.reverse(this.diff);
         }
 
         @Override
         public String toString() {
             calculateLcs();
-
             StringBuilder buf = new StringBuilder();
             buf.append("  ");
             for (int j = 1; j <= lengthOfY(); j++) {
@@ -163,7 +153,6 @@ public class LCS {
 
         public enum DiffType {
             ADD("+", "add"), REMOVE("-", "remove"), NONE(" ", "none");
-
             private String val;
             private String name;
 
@@ -216,15 +205,13 @@ public class LCS {
             public String toString() {
                 return type.toString() + value.toString();
             }
-
         }
     }
 
     public static class LcsString extends LongestCommonSubsequence<Character> {
-
+        private final boolean ignoreCase;
         private String x;
         private String y;
-        private final boolean ignoreCase;
 
         LcsString(String from, String to, boolean ignoreCase) {
             this.x = from;
@@ -260,11 +247,8 @@ public class LCS {
         private String getHtml() {
             DiffType type = null;
             List<DiffEntry<Character>> diffs = diff();
-
             Collections.reverse(diffs);
-
             StringBuilder buf = new StringBuilder();
-
             for (DiffEntry<Character> entry : diffs) {
                 if (type != entry.getType()) {
                     if (type != null) {
@@ -285,7 +269,6 @@ public class LCS {
                             type = entry.getType();
                     }
                 }
-
                 switch (entry.getType()) {
                     case REMOVE:
                         break;

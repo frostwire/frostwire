@@ -26,52 +26,36 @@ import java.util.MissingResourceException;
  * search tabs.
  */
 final class CancelSearchIconProxy implements Icon {
-
     private static final int PLAIN = 0;
     private static final int SELECTED = 1;
     private static final int ARMED = 2;
-
     private static Icon PLAIN_ICON;
     private static Icon SELECTED_ICON;
     private static Icon ARMED_ICON;
-
-    /**
-     * The <tt>ImageIcon</tt> for our cancel image.
-     */
-    private Icon _cancelIcon;
-
-    /**
-     * The width of the icon in pixels.
-     */
-    private int _width;
-
-    /**
-     * The height of the icon in pixels.
-     */
-    private int _height;
-
-    /**
-     * The x position of the icon within its tab.
-     */
-    private int _x;
-
-    /**
-     * The y position of the icon within its tab.
-     */
-    private int _y;
-
     /**
      * The style of this icon.
      */
     private final int style;
-
-    static CancelSearchIconProxy createPlain() {
-        return new CancelSearchIconProxy(PLAIN);
-    }
-
-    static CancelSearchIconProxy createSelected() {
-        return new CancelSearchIconProxy(SELECTED);
-    }
+    /**
+     * The <tt>ImageIcon</tt> for our cancel image.
+     */
+    private Icon _cancelIcon;
+    /**
+     * The width of the icon in pixels.
+     */
+    private int _width;
+    /**
+     * The height of the icon in pixels.
+     */
+    private int _height;
+    /**
+     * The x position of the icon within its tab.
+     */
+    private int _x;
+    /**
+     * The y position of the icon within its tab.
+     */
+    private int _y;
 
     /**
      * the constructor loads the image icon and stores the location
@@ -82,31 +66,17 @@ final class CancelSearchIconProxy implements Icon {
         setIcon();
     }
 
-    /**
-     * Sets the appropriate icon.
-     */
-    private void setIcon() {
-        switch (style) {
-        case ARMED:
-            _cancelIcon = ARMED_ICON;
-            break;
-        case SELECTED:
-            _cancelIcon = SELECTED_ICON;
-            break;
-        case PLAIN:
-            _cancelIcon = PLAIN_ICON;
-            break;
-        }
-        _width = _cancelIcon.getIconWidth();
-        _height = _cancelIcon.getIconHeight();
-        _x = 0;
-        _y = 0;
+    static CancelSearchIconProxy createPlain() {
+        return new CancelSearchIconProxy(PLAIN);
+    }
+
+    static CancelSearchIconProxy createSelected() {
+        return new CancelSearchIconProxy(SELECTED);
     }
 
     // resets the cached icons for each kind of icon
     static void updateTheme() {
         GUIMediator.safeInvokeAndWait(() -> {
-
 //                if (ThemeSettings.isWindowsTheme() && WindowsXPIcon.isAvailable()) {
 //                    try {
 //                        PLAIN_ICON = new WindowsXPIcon(PLAIN);
@@ -122,7 +92,6 @@ final class CancelSearchIconProxy implements Icon {
 //                    }
 //                    // if construction failed, fall through...
 //                }
-
             PLAIN_ICON = GUIMediator.getThemeImage("kill");
             try {
                 SELECTED_ICON = GUIMediator.getThemeImage("kill_on");
@@ -134,9 +103,30 @@ final class CancelSearchIconProxy implements Icon {
     }
 
     /**
+     * Sets the appropriate icon.
+     */
+    private void setIcon() {
+        switch (style) {
+            case ARMED:
+                _cancelIcon = ARMED_ICON;
+                break;
+            case SELECTED:
+                _cancelIcon = SELECTED_ICON;
+                break;
+            case PLAIN:
+                _cancelIcon = PLAIN_ICON;
+                break;
+        }
+        _width = _cancelIcon.getIconWidth();
+        _height = _cancelIcon.getIconHeight();
+        _x = 0;
+        _y = 0;
+    }
+
+    /**
      * implements Icon interface.
      * Gets the width of the icon.
-     * 
+     *
      * @return the width in pixels of this icon
      */
     public int getIconWidth() {
@@ -167,13 +157,11 @@ final class CancelSearchIconProxy implements Icon {
     /**
      * Determines whether or not a click at the given x, y position
      * is a "hit" on the kill search icon.
-     * 
+     *
      * @param x the x location of the mouse event
-     *
      * @param y the y location of the mouse event
-     *
-     * @return <tt>true</tt> if the mouse event occurred within the 
-     *         bounding rectangle of the icon, <tt>false</tt> otherwise.
+     * @return <tt>true</tt> if the mouse event occurred within the
+     * bounding rectangle of the icon, <tt>false</tt> otherwise.
      */
     boolean shouldKill(int x, int y) {
         int xMax = _x + _width;

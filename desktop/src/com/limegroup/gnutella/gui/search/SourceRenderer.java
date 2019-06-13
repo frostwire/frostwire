@@ -35,7 +35,6 @@ import java.util.Map;
  * @author aldenml
  */
 public class SourceRenderer extends DefaultTableBevelledCellRenderer implements TableCellRenderer {
-
     private static final Map<String, ImageIcon> sourceIcons = new HashMap<>();
 
     static {
@@ -73,7 +72,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
         }
         updateUI((SourceHolder) value, table);
-
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
     }
 
@@ -87,7 +85,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
                 }
             }
         };
-
         addMouseListener(mouseAdapter);
     }
 
@@ -103,7 +100,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             if (sourceName.contains("-")) {
                 sourceName = sourceName.substring(0, sourceName.indexOf("-")).trim();
             }
-
             ImageIcon icon = sourceIcons.get(sourceName);
             if (icon != null) {
                 setIcon(icon);

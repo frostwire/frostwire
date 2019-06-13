@@ -6,12 +6,15 @@ import org.limewire.util.CommonUtils;
  * A collection of utility methods for OSX.
  * These methods should only be called if run from OSX,
  * otherwise ClassNotFoundErrors may occur.
- *
+ * <p>
  * To determine if the Cocoa Foundation classes are present,
  * use the method CommonUtils.isCocoaFoundationAvailable().
  */
 public class MacOSXUtils {
-
+    /**
+     * The name of the app that launches.
+     */
+    private static final String APP_NAME = "FrostWire.app";
     private static boolean initialized = false;
 
     static {
@@ -27,18 +30,12 @@ public class MacOSXUtils {
     }
 
     /**
-     * The name of the app that launches.
-     */
-    private static final String APP_NAME = "FrostWire.app";
-
-    /**
      * Modifies mac OSX environment to run this application on startup
      */
     public static void setLoginStatus(boolean allow) {
         if (initialized) {
             String rawDir = CommonUtils.getExecutableDirectory();
             String path = rawDir.substring(0, rawDir.indexOf(APP_NAME) + APP_NAME.length());
-
             SetLoginStatusNative(allow, path);
         }
     }

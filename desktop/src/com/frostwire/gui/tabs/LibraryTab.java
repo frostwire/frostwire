@@ -27,17 +27,14 @@ import java.awt.*;
 /**
  * This class handles access to the tab that contains the library
  * as well as the playlist to the user.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class LibraryTab extends AbstractTab {
-
     private static JPanel PANEL;
-
     private static LibraryMediator LIBRARY_MEDIATOR;
-    
+
     /**
      * Constructs the elements of the tab.
      *
@@ -48,10 +45,6 @@ public final class LibraryTab extends AbstractTab {
         LIBRARY_MEDIATOR = lm;
     }
 
-    public JComponent getComponent() {
-        return getPanel();
-    }
-
     private static JPanel getPanel() {
         if (PANEL == null) {
             PANEL = createPanel();
@@ -60,20 +53,19 @@ public final class LibraryTab extends AbstractTab {
     }
 
     private static JPanel createPanel() {
-
         JPanel panel = new JPanel(new BorderLayout());
-
         /**
          * Constant for the <tt>Component</tt> instance containing the
          * elements of this tab.
          */
         JComponent COMPONENT = LIBRARY_MEDIATOR.getComponent();
-
         panel.add(COMPONENT, BorderLayout.CENTER);
-
         panel.invalidate();
         panel.validate();
-
         return panel;
+    }
+
+    public JComponent getComponent() {
+        return getPanel();
     }
 }

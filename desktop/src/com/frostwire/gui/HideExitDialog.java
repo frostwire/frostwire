@@ -25,46 +25,35 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class HideExitDialog extends JDialog {
-
     public static final int NONE = 0;
     public static final int HIDE = 1;
     public static final int EXIT = 2;
-
     private JCheckBox _checkBox;
-
     private int _result;
 
     public HideExitDialog(JFrame frame) {
         super(frame, I18n.tr("Do you want to hide FrostWire?"));
-        
         _result = NONE;
-        
         setupUI();
         setLocationRelativeTo(frame);
     }
 
     protected void setupUI() {
         setResizable(false);
-
         getContentPane().setLayout(new GridBagLayout());
-
         GridBagConstraints c;
-
         JLabel _label = new JLabel("<html>" + I18n.tr("Closing the FrostWire window will only hide the application") + "<p>" + I18n.tr("This way file transfers may continue in the background.") + "</html>");
         c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(_label, c);
-
         _checkBox = new JCheckBox(I18n.tr("Don't show this again"));
         _checkBox.setSelected(true);
         c = new GridBagConstraints();
@@ -72,7 +61,6 @@ public class HideExitDialog extends JDialog {
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(_checkBox, c);
-
         // hide button
         JButton _buttonHide = new JButton(I18n.tr("Hide"));
         _buttonHide.addActionListener(e -> buttonHide_actionPerformed(e));
@@ -83,7 +71,6 @@ public class HideExitDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         c.ipadx = 20;
         getContentPane().add(_buttonHide, c);
-
         // exit button
         JButton _buttonExit = new JButton(I18n.tr("Exit"));
         _buttonExit.addActionListener(e -> buttonExit_actionPerformed(e));
@@ -94,7 +81,6 @@ public class HideExitDialog extends JDialog {
         c.anchor = GridBagConstraints.EAST;
         c.ipadx = 18;
         getContentPane().add(_buttonExit, c);
-
         pack();
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);

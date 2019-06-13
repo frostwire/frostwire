@@ -28,32 +28,25 @@ import java.io.IOException;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class PlayerPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("FrostWire Media Player");
-
     public final static String LABEL = I18n.tr("You can play your media with the native operating system player if the format is supported.");
-
     private final JCheckBox CHECK_BOX = new JCheckBox();
-    
     private final JCheckBox VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX = new JCheckBox();
 
     /**
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
-     * 
+     *
      * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *        superclass uses to generate locale-specific keys
+     *            superclass uses to generate locale-specific keys
      */
     public PlayerPaneItem() {
         super(TITLE, LABEL);
-
         String CHECK_BOX_LABEL = I18n.tr("Play with the native media player");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL, CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(comp.getComponent());
-
         String VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX_LABEL = I18n.tr("Play search result video previews with internal player");
         add(new LabeledComponent(VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX_LABEL, VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT).getComponent());
     }
@@ -61,7 +54,7 @@ public final class PlayerPaneItem extends AbstractPaneItem {
     /**
      * Defines the abstract method in <tt>AbstractPaneItem</tt>.
      * <p>
-     * 
+     * <p>
      * Sets the options for the fields in this <tt>PaneItem</tt> when the
      * window is shown.
      */
@@ -72,7 +65,7 @@ public final class PlayerPaneItem extends AbstractPaneItem {
 
     /**
      * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-     *
+     * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
@@ -86,6 +79,6 @@ public final class PlayerPaneItem extends AbstractPaneItem {
 
     public boolean isDirty() {
         return PlayerSettings.USE_OS_DEFAULT_PLAYER.getValue() != CHECK_BOX.isSelected() ||
-               PlayerSettings.USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS.getValue() != VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX.isSelected();
+                PlayerSettings.USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS.getValue() != VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX.isSelected();
     }
 }

@@ -29,9 +29,7 @@ import java.io.File;
  * Removes selected root folders from a {@link RecursiveLibraryDirectoryPanel}.
  */
 public class RemoveLibraryDirectoryAction extends AbstractAction {
-
     private static final long serialVersionUID = -6729288511779797455L;
-    
     private final RecursiveLibraryDirectoryPanel recursiveSharingPanel;
 
     public RemoveLibraryDirectoryAction(RecursiveLibraryDirectoryPanel recursiveSharingPanel) {
@@ -40,26 +38,23 @@ public class RemoveLibraryDirectoryAction extends AbstractAction {
         setEnabled(false);
         recursiveSharingPanel.getTree().addTreeSelectionListener(new EnablementSelectionListener());
     }
-    
+
     public void actionPerformed(ActionEvent e) {
         File dir = (File) recursiveSharingPanel.getTree().getSelectionPath().getLastPathComponent();
         recursiveSharingPanel.removeRoot(dir);
     }
-    
+
     /**
      * Enables action when a root folder is selected.
      */
     private class EnablementSelectionListener implements TreeSelectionListener {
-
         public void valueChanged(TreeSelectionEvent e) {
             Object obj = e.getPath().getLastPathComponent();
             if (obj instanceof File) {
-                setEnabled(recursiveSharingPanel.isRoot(((File)obj)));
+                setEnabled(recursiveSharingPanel.isRoot(((File) obj)));
             } else {
                 setEnabled(false);
             }
         }
-
     }
-
 }

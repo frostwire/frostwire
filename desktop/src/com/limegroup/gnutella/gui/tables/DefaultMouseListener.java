@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
  * This class handles mouse input to the component.
  */
 public final class DefaultMouseListener implements MouseListener {
-
     private MouseObserver cm;
 
     public DefaultMouseListener(MouseObserver mo) {
@@ -23,7 +22,6 @@ public final class DefaultMouseListener implements MouseListener {
     public void mouseClicked(MouseEvent event) {
         if (tryPopup(event))
             return;
-
         if (SwingUtilities.isRightMouseButton(event)) {
             cm.handleRightMouseClick(event);
         } else if (event.getClickCount() >= 2) {

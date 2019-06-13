@@ -22,7 +22,6 @@ package com.frostwire.gui.library;
  * @author aldenml
  */
 class PlaylistItemIntProperty extends PlaylistItemProperty<PlaylistItemIntProperty> {
-
     private final String stringValue;
     private final int intValue;
 

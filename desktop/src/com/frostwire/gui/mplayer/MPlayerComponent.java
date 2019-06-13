@@ -21,12 +21,11 @@ package com.frostwire.gui.mplayer;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
  */
 public interface MPlayerComponent {
+    Component getComponent();
 
-	Component getComponent();
-	boolean toggleFullScreen();
+    boolean toggleFullScreen();
 }

@@ -26,7 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.util.Date;
 
-/** 
+/**
  * A single line of a search result.
  */
 public final class SearchResultDataLine extends AbstractDataLine<UISearchResult> {
@@ -34,17 +34,14 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * The SearchTableColumns.
      */
     private final SearchTableColumns COLUMNS;
-
     /**
      * The SearchResult that created this particular line.
      */
     private UISearchResult RESULT;
-
     /**
      * The media type of this document.
      */
     private NamedMediaType _mediaType;
-
     /**
      * The date this was added to the network.
      */
@@ -65,7 +62,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      */
     public void initialize(UISearchResult sr) {
         super.initialize(sr);
-
         RESULT = sr;
         _mediaType = NamedMediaType.getFromExtension(getExtension());
         addedOn = sr.getCreationTime() > 0 ? new Date(sr.getCreationTime()) : null;
@@ -81,7 +77,6 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * Updates cached data about this line.
      */
     public void update() {
-
     }
 
     public String toString() {
@@ -103,16 +98,13 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * Returns the icon.
      */
     Icon getIcon() {
-
         //gubs: seems like this didn't fly
         //maybe the icon isn't refreshed.
         //see MetadataModel.addProperties()
         if (isDownloading()) {
             return GUIMediator.getThemeImage("downloading");
         }
-
         String ext = FilenameUtils.getExtension(getFilename());
-
         return IconManager.instance().getIconForExtension(ext);
     }
 
@@ -169,11 +161,11 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      */
     public boolean isClippable(int idx) {
         switch (idx) {
-        case SearchTableColumns.COUNT_IDX:
-        case SearchTableColumns.TYPE_IDX:
-            return false;
-        default:
-            return true;
+            case SearchTableColumns.COUNT_IDX:
+            case SearchTableColumns.TYPE_IDX:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -186,24 +178,24 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      */
     public Object getValueAt(int index) {
         switch (index) {
-        case SearchTableColumns.ACTIONS_IDX:
-            return actionsHolder;
-        case SearchTableColumns.COUNT_IDX:
-            return seeds;
-        case SearchTableColumns.TYPE_IDX:
-            return icon;
-        case SearchTableColumns.NAME_IDX:
-            return name;
-        case SearchTableColumns.SIZE_IDX:
-            return size;
-        case SearchTableColumns.SOURCE_IDX:
-            return source;
-        case SearchTableColumns.ADDED_IDX:
-            return addedOn;
-        case SearchTableColumns.EXTENSION_IDX:
-            return getExtension();
-        default:
-            return null;
+            case SearchTableColumns.ACTIONS_IDX:
+                return actionsHolder;
+            case SearchTableColumns.COUNT_IDX:
+                return seeds;
+            case SearchTableColumns.TYPE_IDX:
+                return icon;
+            case SearchTableColumns.NAME_IDX:
+                return name;
+            case SearchTableColumns.SIZE_IDX:
+                return size;
+            case SearchTableColumns.SOURCE_IDX:
+                return source;
+            case SearchTableColumns.ADDED_IDX:
+                return addedOn;
+            case SearchTableColumns.EXTENSION_IDX:
+                return getExtension();
+            default:
+                return null;
         }
     }
 
@@ -211,11 +203,11 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      * Returns <code>true</code> if <code>this</code> {@link UISearchResult}
      * is the same kind as <code>line</code>'s, e.g. one from gnutella and
      * one from gnutella. Currently we compare classes.
-     * 
+     *
      * @param line line to which we compare
      * @return <code>true</code> if <code>this</code> {@link UISearchResult}
-     *         is the same kind as <code>line</code>'s, e.g. one from
-     *         gnutella and one from gnutella
+     * is the same kind as <code>line</code>'s, e.g. one from
+     * gnutella and one from gnutella
      */
     final boolean isSameKindAs(SearchResultDataLine line) {
         return getSearchResult().getClass().equals(line.getSearchResult().getClass());
@@ -223,7 +215,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
 
     /**
      * Returns the underlying search result.
-     * 
+     *
      * @return the underlying search result
      */
     final UISearchResult getSearchResult() {

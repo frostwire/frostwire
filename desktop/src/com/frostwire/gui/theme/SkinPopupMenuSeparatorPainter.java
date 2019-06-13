@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuSeparatorPainter extends AbstractSkinPainter {
-
     public SkinPopupMenuSeparatorPainter(State state) {
     }
 

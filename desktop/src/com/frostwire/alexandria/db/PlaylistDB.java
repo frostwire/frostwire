@@ -9,14 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 public class PlaylistDB {
-
-    private PlaylistDB() { } // don't allow explicit constructions
+    private PlaylistDB() {
+    } // don't allow explicit constructions
 
     public static void fill(List<Object> row, Playlist p) {
         int id = (Integer) row.get(0);
         String name = (String) row.get(1);
         String description = (String) row.get(2);
-
         p.setId(id);
         p.setName(name);
         p.setDescription(description);
@@ -27,7 +26,6 @@ public class PlaylistDB {
         if (obj.getId() == LibraryDatabase.OBJECT_INVALID_ID) {
             return;
         }
-
         if (obj.getId() == LibraryDatabase.OBJECT_NOT_SAVED_ID) {
             int id = db.insert("INSERT INTO Playlists (name, description) VALUES (LEFT(?, 500), LEFT(?, 10000))", obj.getName(), obj.getDescription());
             obj.setId(id);
@@ -36,9 +34,7 @@ public class PlaylistDB {
             Object[] statementObjects = createPlaylistUpdateStatement(obj);
             db.update((String) statementObjects[0], (Object[]) statementObjects[1]);
         }
-        
         List<PlaylistItem> items = new ArrayList<>(obj.getItems());
-
         for (PlaylistItem item : items) {
             item.setId(LibraryDatabase.OBJECT_NOT_SAVED_ID);
             item.save();
@@ -52,15 +48,12 @@ public class PlaylistDB {
 
     public static List<Playlist> getPlaylists(LibraryDatabase db) {
         List<List<Object>> result = db.query("SELECT playlistId, name, description FROM Playlists");
-
         List<Playlist> playlists = new ArrayList<>(result.size());
-
         for (List<Object> row : result) {
             Playlist playlist = new Playlist(db);
             PlaylistDB.fill(row, playlist);
             playlists.add(playlist);
         }
-
         return playlists;
     }
 
@@ -89,16 +82,13 @@ public class PlaylistDB {
 
     private static Object[] createPlaylistItemPropertiesUpdate(String filePath, String title, String artist, String album, String comment, String genre, String track, String year) {
         String sql = "UPDATE PlaylistItems SET trackTitle = LEFT(?, 500), trackArtist = LEFT(?, 500), trackAlbum = LEFT(?, 500), trackComment = LEFT(?, 500), trackGenre = LEFT(?, 20), trackNumber = LEFT(?, 6), trackYear = LEFT(?, 6) WHERE filePath = LEFT(?, 10000)";
-
-        Object[] values = new Object[] { title, artist, album, comment, genre, track, year, filePath };
-
-        return new Object[] { sql, values };
+        Object[] values = new Object[]{title, artist, album, comment, genre, track, year, filePath};
+        return new Object[]{sql, values};
     }
-    
+
     private static Object[] createPlaylistUpdateStatement(Playlist obj) {
         String sql = "UPDATE Playlists SET name = LEFT(?, 500), description = LEFT(?, 10000) WHERE playlistId = ?";
-        Object[] values = new Object[] { obj.getName(), obj.getDescription(), obj.getId() };
-        return new Object[] { sql, values };
+        Object[] values = new Object[]{obj.getName(), obj.getDescription(), obj.getId()};
+        return new Object[]{sql, values};
     }
-
 }

@@ -7,86 +7,66 @@ import java.util.StringTokenizer;
 
 /**
  * TODO: Make all these SetSetting classes extend from an AbstractSetSetting<T> class
- * 
- * Provides a <code>String</code> <code>Set</code> setting value. As a 
+ * <p>
+ * Provides a <code>String</code> <code>Set</code> setting value. As a
  * subclass of <code>Setting</code>, the setting has a key.
  * <p>
- * <code>StringSetSetting</code> class includes methods to add/remove 
- * <code>String</code>s, get <code>String</code> values as an array and return 
+ * <code>StringSetSetting</code> class includes methods to add/remove
+ * <code>String</code>s, get <code>String</code> values as an array and return
  * the number of <code>String</code>s. Unlike {@link StringArraySetting}, you
- * can add and remove individual <code>String</code>s to the set while 
+ * can add and remove individual <code>String</code>s to the set while
  * maintaining the existing set.
  * <p>
- * Create a <code>StringSetSetting</code> object with a 
+ * Create a <code>StringSetSetting</code> object with a
  * {@link SettingsFactory#createStringSetSetting(String, String)}.
- * 
  */
 public class StringSetSetting extends AbstractSetting {
-
     private Set<String> value;
 
     StringSetSetting(Properties defaultProps, Properties props,
-            String key, String defaultValue) {
+                     String key, String defaultValue) {
         super(defaultProps, props, key, defaultValue);
     }
-    
-    /**
-     * Returns the value of this setting.
-     * 
-     * @return the value of this setting
-     */
-    public synchronized Set<String> getValue() {
-        return value;
-    }
-    
-    /**
-     * Gets the value as an array.
-     */
-    public synchronized String[] getValueAsArray() {
-        return value.toArray(new String[0]);
-    }
 
-    /** Load value from property string value
-     * @param sValue property string value
-     *
-     */
-    protected synchronized void loadValue(String sValue) {
-        value = encode(sValue);
-    }
-    
     /**
      * Splits the string into a Set
      */
     private static Set<String> encode(String src) {
-        if (src == null || src.length()==0)
+        if (src == null || src.length() == 0)
             return new HashSet<>();
-        
         StringTokenizer tokenizer = new StringTokenizer(src, ";");
         int size = tokenizer.countTokens();
         Set<String> set = new HashSet<>();
-        for(int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++)
             set.add(tokenizer.nextToken());
         return set;
     }
-    
+
     /**
      * Separates each field of the array by a semicolon
      */
     private static String decode(Set<String> src) {
         if (src == null || src.isEmpty())
             return "";
-        
         StringBuilder buffer = new StringBuilder();
         for (String str : src) {
             buffer.append(str).append(';');
         }
-        
         if (buffer.length() > 0) {
-            buffer.setLength(buffer.length()-1);
+            buffer.setLength(buffer.length() - 1);
         }
         return buffer.toString();
     }
-    
+
+    /**
+     * Returns the value of this setting.
+     *
+     * @return the value of this setting
+     */
+    public synchronized Set<String> getValue() {
+        return value;
+    }
+
     /**
      * Mutator for this setting.
      *
@@ -94,6 +74,22 @@ public class StringSetSetting extends AbstractSetting {
      */
     public synchronized void setValue(Set<String> value) {
         setValueInternal(decode(value));
+    }
+
+    /**
+     * Gets the value as an array.
+     */
+    public synchronized String[] getValueAsArray() {
+        return value.toArray(new String[0]);
+    }
+
+    /**
+     * Load value from property string value
+     *
+     * @param sValue property string value
+     */
+    protected synchronized void loadValue(String sValue) {
+        value = encode(sValue);
     }
 
     public synchronized boolean add(String s) {

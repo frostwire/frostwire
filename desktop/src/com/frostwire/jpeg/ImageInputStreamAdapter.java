@@ -1,6 +1,6 @@
 /*
  * @(#)ImageInputStreamAdapter.java  1.0  2009-12-17
- * 
+ *
  * Copyright (c) 2009 Werner Randelshofer, Immensee, Switzerland.
  * All rights reserved.
  *
@@ -23,9 +23,10 @@ import java.io.IOException;
  */
 public class ImageInputStreamAdapter extends FilterInputStream {
     private ImageInputStream iis;
+
     public ImageInputStreamAdapter(ImageInputStream iis) {
         super(null);
-        this.iis=iis;
+        this.iis = iis;
     }
 
     /**
@@ -40,14 +41,14 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * This method
      * simply performs <code>in.read()</code> and returns the result.
      *
-     * @return     the next byte of data, or <code>-1</code> if the end of the
-     *             stream is reached.
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
+     * @return the next byte of data, or <code>-1</code> if the end of the
+     * stream is reached.
+     * @throws IOException if an I/O error occurs.
+     * @see java.io.FilterInputStream#in
      */
     @Override
     public int read() throws IOException {
-	return iis.read();
+        return iis.read();
     }
 
     /**
@@ -59,22 +60,22 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * This method simply performs <code>in.read(b, off, len)</code>
      * and returns the result.
      *
-     * @param      b     the buffer into which the data is read.
-     * @param      off   the start offset in the destination array <code>b</code>
-     * @param      len   the maximum number of bytes read.
-     * @return     the total number of bytes read into the buffer, or
-     *             <code>-1</code> if there is no more data because the end of
-     *             the stream has been reached.
-     * @exception  NullPointerException If <code>b</code> is <code>null</code>.
-     * @exception  IndexOutOfBoundsException If <code>off</code> is negative,
-     * <code>len</code> is negative, or <code>len</code> is greater than
-     * <code>b.length - off</code>
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
+     * @param b   the buffer into which the data is read.
+     * @param off the start offset in the destination array <code>b</code>
+     * @param len the maximum number of bytes read.
+     * @return the total number of bytes read into the buffer, or
+     * <code>-1</code> if there is no more data because the end of
+     * the stream has been reached.
+     * @throws NullPointerException      If <code>b</code> is <code>null</code>.
+     * @throws IndexOutOfBoundsException If <code>off</code> is negative,
+     *                                   <code>len</code> is negative, or <code>len</code> is greater than
+     *                                   <code>b.length - off</code>
+     * @throws IOException               if an I/O error occurs.
+     * @see java.io.FilterInputStream#in
      */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-	return iis.read(b, off, len);
+        return iis.read(b, off, len);
     }
 
     /**
@@ -84,7 +85,7 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      */
     @Override
     public long skip(long n) throws IOException {
-	return iis.skipBytes(n);
+        return iis.skipBytes(n);
     }
 
     /**
@@ -96,15 +97,15 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * <p>
      * This method returns the result of {@link #in in}.available().
      *
-     * @return     an estimate of the number of bytes that can be read (or skipped
-     *             over) from this input stream without blocking.
-     * @exception  IOException  if an I/O error occurs.
+     * @return an estimate of the number of bytes that can be read (or skipped
+     * over) from this input stream without blocking.
+     * @throws IOException if an I/O error occurs.
      */
     @Override
     public int available() throws IOException {
-	return  (iis.isCached()) ? //
-            (int)Math.min(Integer.MAX_VALUE, iis.length() - iis.getStreamPosition()) :
-            0;
+        return (iis.isCached()) ? //
+                (int) Math.min(Integer.MAX_VALUE, iis.length() - iis.getStreamPosition()) :
+                0;
     }
 
     /**
@@ -113,12 +114,12 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * This
      * method simply performs <code>in.close()</code>.
      *
-     * @exception  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
+     * @throws IOException if an I/O error occurs.
+     * @see java.io.FilterInputStream#in
      */
     @Override
     public void close() throws IOException {
-	iis.close();
+        iis.close();
     }
 
     /**
@@ -132,14 +133,14 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * <p>
      * This method simply performs <code>in.mark(readlimit)</code>.
      *
-     * @param   readlimit   the maximum limit of bytes that can be read before
-     *                      the mark position becomes invalid.
-     * @see     java.io.FilterInputStream#in
-     * @see     java.io.FilterInputStream#reset()
+     * @param readlimit the maximum limit of bytes that can be read before
+     *                  the mark position becomes invalid.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.FilterInputStream#reset()
      */
     @Override
     public synchronized void mark(int readlimit) {
-	iis.mark();
+        iis.mark();
     }
 
     /**
@@ -158,14 +159,14 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * If this happens within readlimit bytes, it allows the outer
      * code to reset the stream and try another parser.
      *
-     * @exception  IOException  if the stream has not been marked or if the
-     *               mark has been invalidated.
-     * @see        java.io.FilterInputStream#in
-     * @see        java.io.FilterInputStream#mark(int)
+     * @throws IOException if the stream has not been marked or if the
+     *                     mark has been invalidated.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.FilterInputStream#mark(int)
      */
     @Override
     public synchronized void reset() throws IOException {
-	iis.reset();
+        iis.reset();
     }
 
     /**
@@ -174,16 +175,15 @@ public class ImageInputStreamAdapter extends FilterInputStream {
      * This method
      * simply performs <code>in.markSupported()</code>.
      *
-     * @return  <code>true</code> if this stream type supports the
-     *          <code>mark</code> and <code>reset</code> method;
-     *          <code>false</code> otherwise.
-     * @see     java.io.FilterInputStream#in
-     * @see     java.io.InputStream#mark(int)
-     * @see     java.io.InputStream#reset()
+     * @return <code>true</code> if this stream type supports the
+     * <code>mark</code> and <code>reset</code> method;
+     * <code>false</code> otherwise.
+     * @see java.io.FilterInputStream#in
+     * @see java.io.InputStream#mark(int)
+     * @see java.io.InputStream#reset()
      */
     @Override
     public boolean markSupported() {
-	return true;
+        return true;
     }
-
 }

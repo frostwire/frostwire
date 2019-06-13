@@ -23,17 +23,12 @@ import org.limewire.setting.IntSetting;
  * Settings for Music Player
  */
 public class PlayerSettings extends LimeProps {
+    public static IntSetting LOOP_PLAYLIST = FACTORY.createIntSetting("LOOP_PLAYLIST", 0);//RepeatMode.NONE == 0
+    public static BooleanSetting SHUFFLE_PLAYLIST = FACTORY.createBooleanSetting("SHUFFLE_PLAYLIST", false);
+    public static FloatSetting PLAYER_VOLUME = FACTORY.createFloatSetting("PLAYER_VOLUME", 0.5f);
+    public static BooleanSetting USE_OS_DEFAULT_PLAYER = FACTORY.createBooleanSetting("USE_OS_DEFAULT_PLAYER", false);
+    public static BooleanSetting USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS = FACTORY.createBooleanSetting("USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS", false);
 
     private PlayerSettings() {
     }
-
-    public static IntSetting LOOP_PLAYLIST = FACTORY.createIntSetting("LOOP_PLAYLIST", 0);//RepeatMode.NONE == 0
-
-    public static BooleanSetting SHUFFLE_PLAYLIST = FACTORY.createBooleanSetting("SHUFFLE_PLAYLIST", false);
-
-    public static FloatSetting PLAYER_VOLUME = FACTORY.createFloatSetting("PLAYER_VOLUME", 0.5f);
-
-    public static BooleanSetting USE_OS_DEFAULT_PLAYER = FACTORY.createBooleanSetting("USE_OS_DEFAULT_PLAYER", false);
-    
-    public static BooleanSetting USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS = FACTORY.createBooleanSetting("USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS", false);
 }

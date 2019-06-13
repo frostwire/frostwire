@@ -41,9 +41,6 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private static final AlphaIcon play_transparent;
     private static final ImageIcon share_solid;
     private static final AlphaIcon share_faded;
-    private JLabel labelPlay;
-    private JLabel labelShare;
-    private BTDownload dl;
 
     static {
         play_solid = GUIMediator.getThemeImage("search_result_play_over");
@@ -51,6 +48,10 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
         share_faded = new AlphaIcon(share_solid, 0.1f);
     }
+
+    private JLabel labelPlay;
+    private JLabel labelShare;
+    private BTDownload dl;
 
     public TransferActionsRenderer() {
         setupUI();
@@ -63,9 +64,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
         c.anchor = GridBagConstraints.LINE_START;
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
-
-        c.insets = new Insets(2,5,2,5);
-
+        c.insets = new Insets(2, 5, 2, 5);
         labelShare = new JLabel(share_solid);
         labelShare.setToolTipText(I18n.tr("SHARE the download url/magnet of this seeding transfer"));
         labelShare.addMouseListener(new MouseAdapter() {
@@ -75,13 +74,11 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
                     if (dl.getState().equals(TransferState.DOWNLOADING)) {
                         return;
                     }
-
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, true);
                 }
             }
         });
         add(labelShare, c);
-
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
         labelPlay.addMouseListener(new MouseAdapter() {
@@ -92,7 +89,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
                 }
             }
         });
-        add(labelPlay,c);
+        add(labelPlay, c);
         setEnabled(true);
     }
 

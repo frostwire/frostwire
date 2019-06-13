@@ -20,27 +20,23 @@ import java.io.IOException;
  * window that allows the user to select the
  * default image behavior.
  */
-public class ImageViewerPaneItem extends AbstractPaneItem { 
-    
+public class ImageViewerPaneItem extends AbstractPaneItem {
     public final static String TITLE = I18n.tr("Image Options");
-    
     public final static String LABEL = I18n.tr("You can choose which image viewer to use.");
-
     /**
      * Handle to the <tt>JTextField</tt> that displays the viewer name
-     */    
+     */
     private JTextField _viewerField;
-    
+
     /**
-	 * Creates new ImageViewerOptionsPaneItem
-	 * 
-	 * @param key the key for this <tt>AbstractPaneItem</tt> that the
-	 *        superclass uses to generate locale-specific keys
-	 */
-	public ImageViewerPaneItem() {
-	    super(TITLE, LABEL);
-	    
-		_viewerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
+     * Creates new ImageViewerOptionsPaneItem
+     *
+     * @param key the key for this <tt>AbstractPaneItem</tt> that the
+     *            superclass uses to generate locale-specific keys
+     */
+    public ImageViewerPaneItem() {
+        super(TITLE, LABEL);
+        _viewerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
         /**
          * Constant for the key of the locale-specific <code>String</code> for the
          * label on the component that allows to user to change the setting for
@@ -48,9 +44,9 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
          */
         String OPTION_LABEL = I18n.tr("Image Viewer");
         LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _viewerField);
-		add(comp.getComponent());
-	}
-    
+        add(comp.getComponent());
+    }
+
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
@@ -60,7 +56,7 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
         URLHandlerSettings.IMAGE_VIEWER.setValue(_viewerField.getText());
         return false;
     }
-    
+
     public boolean isDirty() {
         return !URLHandlerSettings.IMAGE_VIEWER.getValue().equals(_viewerField.getText());
     }
@@ -72,5 +68,4 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
     public void initOptions() {
         _viewerField.setText(URLHandlerSettings.IMAGE_VIEWER.getValue());
     }
-    
 }

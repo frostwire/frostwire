@@ -22,13 +22,11 @@ import org.limewire.setting.evt.SettingsGroupEvent.EventType;
 import java.io.File;
 import java.util.Properties;
 
-
 /**
  * Gives basic features including get, reload and save for a
  * {@link SettingsFactory}.
  */
 public class BasicSettingsGroup extends AbstractSettingsGroup {
-
     /**
      * Constant for the <tt>SettingsFactory</tt> that subclasses can use
      * to create new settings which will be stored in the properties file.

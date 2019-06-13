@@ -23,7 +23,6 @@ import com.limegroup.gnutella.gui.ButtonRow;
  * indexes in the row.
  */
 final class BTDownloadButtons {
-
     /**
      * The row of buttons for the download window.
      */

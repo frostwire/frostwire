@@ -11,27 +11,22 @@ import java.util.List;
  * from the selection of a LimeJTable.
  */
 class BasicTransferableCreator {
-    
-  //  private JComponent component;
-    
+    //  private JComponent component;
+
     BasicTransferableCreator(JComponent component) {
-    //    this.component = component;
+        //    this.component = component;
     }
-    
+
     Transferable getTransferable() {
         List<File> l = new LinkedList<>();
         List<FileTransfer> lazy = new LinkedList<>();
-  
 //      TODO dnd
 //        if (component instanceof LimeJTable)
 //            fillFromTable(component, l, lazy);
-        
-        if(l.size() == 0 && lazy.size() == 0)
+        if (l.size() == 0 && lazy.size() == 0)
             return null;
-        
-       return new FileTransferable(l, lazy);
+        return new FileTransferable(l, lazy);
     }
-    
     /**
      * Fills up the lists 'l' and 'lazy' with files or Lazy Files.
      */
@@ -43,7 +38,6 @@ class BasicTransferableCreator {
 //    TODO dnd file transfer/lazy file transfer interfaces slightly changed
 //            addFileTransfer((FileTransfer)lines[i], l, lazy);
 //    }
-    
     /**
      * Adds the specified FileTransfer to the lists.
      */
@@ -57,7 +51,6 @@ class BasicTransferableCreator {
 //            addFile(l, f);
 //        }
 //    }
-    
     /**
      * Adds a file to a list as the canonical file.
      */
@@ -67,5 +60,4 @@ class BasicTransferableCreator {
 //        } catch(IOException ignored) {}
 //        l.add(f);
 //    }     
-
 }

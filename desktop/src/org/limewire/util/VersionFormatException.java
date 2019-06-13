@@ -1,14 +1,12 @@
 package org.limewire.util;
 
 /**
- * Thrown upon a version parsing error when the provided version format 
+ * Thrown upon a version parsing error when the provided version format
  * is malformed.
- * 
  */
 class VersionFormatException extends Exception {
-    
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 8633755784769968524L;
 

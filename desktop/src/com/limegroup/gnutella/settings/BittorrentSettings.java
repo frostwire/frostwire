@@ -22,19 +22,17 @@ import org.limewire.setting.IntSetting;
  * Bittorrent settings
  */
 public final class BittorrentSettings extends LimeProps {
-
-    private BittorrentSettings() {
-    }
-
     /**
      * Records what was the last sorting order of the sort column for the transfer manager.
      * false -> Descending
      * true -> Ascending
      */
     public static BooleanSetting BTMEDIATOR_COLUMN_SORT_ORDER = FACTORY.createBooleanSetting("BTMEDIATOR_COLUMN_SORT_ORDER", true);
-
     /**
      * Records what was the last column you used to sort the transfers table.
      */
     public static IntSetting BTMEDIATOR_COLUMN_SORT_INDEX = FACTORY.createIntSetting("BTMEDIATOR_COLUMN_SORT_INDEX", -1);
+
+    private BittorrentSettings() {
+    }
 }

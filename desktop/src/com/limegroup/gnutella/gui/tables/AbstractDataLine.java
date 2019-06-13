@@ -22,7 +22,6 @@ package com.limegroup.gnutella.gui.tables;
  * in all DataLine instances
  */
 public abstract class AbstractDataLine<T> implements DataLine<T> {
-
     /**
      * The object that initialized the dataline.
      */
@@ -38,15 +37,20 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     /**
      * @implements DataLine interface
      */
-    public T getInitializeObject() { return initializer; }
+    public T getInitializeObject() {
+        return initializer;
+    }
 
     /**
      * @implements DataLine interface
      */
-    public void setInitializeObject(T o) { initializer = o; }
+    public void setInitializeObject(T o) {
+        initializer = o;
+    }
 
     /**
      * A blank implementation of setValueAt, because it is not necessary.
+     *
      * @implements DataLine interface
      */
     public void setValueAt(Object o, int col) {
@@ -54,6 +58,7 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
 
     /**
      * A blank implementatino of cleanup, because it is not necessary.
+     *
      * @implements DataLine interface
      */
     public void cleanup() {
@@ -61,6 +66,7 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
 
     /**
      * A blank implementation of update, because it is not necessary.
+     *
      * @implements DataLine interface
      */
     public void update() {
@@ -69,8 +75,14 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     /**
      * By default, DataLines will have no tooltip.
      */
-    public String[] getToolTipArray(int col) { return null; }
-    
-    /** By default, no tooltip is ever required. */
-    public boolean isTooltipRequired(int col) { return false; }
+    public String[] getToolTipArray(int col) {
+        return null;
+    }
+
+    /**
+     * By default, no tooltip is ever required.
+     */
+    public boolean isTooltipRequired(int col) {
+        return false;
+    }
 }

@@ -21,13 +21,10 @@ package com.frostwire.gui.components.slides;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface SlideshowPanel {
-
     void setListener(SlideshowListener listener);
 
     int getCurrentSlideIndex();

@@ -5,75 +5,74 @@ import javax.swing.event.MouseInputListener;
 import javax.swing.table.JTableHeader;
 import java.awt.event.MouseEvent;
 
-
 /**
  * This class handles mouse input to the table.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class HeaderMouseListener implements MouseInputListener {
-
     private HeaderMouseObserver hmo;
     private boolean isResizing = false;
-    
+
     public HeaderMouseListener(HeaderMouseObserver hmo) {
         this.hmo = hmo;
     }
 
     /**
      * Invoked when the mouse has been clicked on a component.
-	 *
-	 * @param event the <tt>MouseEvent</tt> that triggered this call
+     *
+     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mouseClicked(MouseEvent ev) {
-        if ( !tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
-            if ( !isResizing  )
+        if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
+            if (!isResizing)
                 //generally used for sorting.
-    	        hmo.handleHeaderColumnLeftClick(ev.getPoint());
-    	    else
-    	        isResizing = false;
-		}
-	}
+                hmo.handleHeaderColumnLeftClick(ev.getPoint());
+            else
+                isResizing = false;
+        }
+    }
 
     /**
      * Invoked when a mouse button has been pressed on a component.
-	 *
-	 * @param event the <tt>MouseEvent</tt> that triggered this call
+     *
+     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mousePressed(MouseEvent ev) {
-        if ( !tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
-            if (((JTableHeader)ev.getSource()).getResizingColumn() == null)
+        if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
+            if (((JTableHeader) ev.getSource()).getResizingColumn() == null)
                 hmo.handleHeaderColumnPressed(ev.getPoint());
             else
                 isResizing = true;
-            
         }
     }
 
     /**
      * Invoked when a mouse button has been released on a component.
-	 *
-	 * @param event the <tt>MouseEvent</tt> that triggered this call
+     *
+     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mouseReleased(MouseEvent ev) {
-        if( !tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
+        if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
             hmo.handleHeaderColumnReleased(ev.getPoint());
         }
     }
 
     /**
      * Invoked when the mouse enters a component.
-	 *
-	 * @param event the <tt>MouseEvent</tt> that triggered this call
+     *
+     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
-    public void mouseEntered(MouseEvent event) {}
+    public void mouseEntered(MouseEvent event) {
+    }
 
     /**
      * Invoked when the mouse exits a component.
-	 *
-	 * @param event the <tt>MouseEvent</tt> that triggered this call
+     *
+     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
-    public void mouseExited(MouseEvent event) {}
-    
+    public void mouseExited(MouseEvent event) {
+    }
+
     /**
      * Invoked when the mouse drags on a component.
      */
@@ -83,12 +82,13 @@ public final class HeaderMouseListener implements MouseInputListener {
         // false here.
         isResizing = false;
     }
-    
-    public void mouseMoved(MouseEvent ev) { }
-    
+
+    public void mouseMoved(MouseEvent ev) {
+    }
+
     private boolean tryPopup(MouseEvent ev) {
-        if ( ev.isPopupTrigger() ) {
-            hmo.handleHeaderPopupMenu( ev.getPoint() );
+        if (ev.isPopupTrigger()) {
+            hmo.handleHeaderPopupMenu(ev.getPoint());
             return true;
         }
         return false;

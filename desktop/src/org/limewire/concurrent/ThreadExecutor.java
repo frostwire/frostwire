@@ -6,22 +6,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * Creates {@link ManagedThread} daemon threads and executes {@link Runnable 
- * Runnables} on threads from a thread pool. Since the created threads are of 
- * type <code> ManagedThread</code>, uncaught errors are reported to {@link 
+ * Creates {@link ManagedThread} daemon threads and executes {@link Runnable
+ * Runnables} on threads from a thread pool. Since the created threads are of
+ * type <code> ManagedThread</code>, uncaught errors are reported to {@link
  * ErrorService}.
  */
-
 public class ThreadExecutor {
-    
-    /** The factory threads are created from. */
+    /**
+     * The factory threads are created from.
+     */
     private static final ThreadFactory FACTORY =
-        ExecutorsHelper.daemonThreadFactory("IdleThread");
-    
-    /** The thread pool to use when running threads. */
+            ExecutorsHelper.daemonThreadFactory("IdleThread");
+    /**
+     * The thread pool to use when running threads.
+     */
     private static final ExecutorService THREAD_POOL =
-        ExecutorsHelper.newThreadPool(FACTORY);
-    
+            ExecutorsHelper.newThreadPool(FACTORY);
+
     /**
      * A static helper Method to create Threads
      */
@@ -46,16 +47,15 @@ public class ThreadExecutor {
             try {
                 Thread.currentThread().setName(name);
                 runner.run();
-            } catch(Throwable t) {
+            } catch (Throwable t) {
                 // Forward throwables to the handler,
                 // and reset the name back to idle.
                 Thread.currentThread().
-                  getUncaughtExceptionHandler().
-                    uncaughtException(Thread.currentThread(), t);
+                        getUncaughtExceptionHandler().
+                        uncaughtException(Thread.currentThread(), t);
             } finally {
                 Thread.currentThread().setName("IdleThread");
             }
         });
     }
-
 }

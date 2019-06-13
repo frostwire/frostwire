@@ -25,9 +25,7 @@ import java.io.IOException;
  * that are being transferred.
  */
 public class SearchResultTransferable implements Transferable {
-
     public static final DataFlavor dataFlavor = new DataFlavor(SearchResultTransferable.class, "FrostWire Search Result");
-
     private SearchResultMediator panel;
     private SearchResultDataLine[] lines;
 
@@ -45,7 +43,7 @@ public class SearchResultTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] { dataFlavor };
+        return new DataFlavor[]{dataFlavor};
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {

@@ -26,13 +26,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthPopupMenuUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuUI extends SynthPopupMenuUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         if (OSUtils.isMacOSX() && !(comp instanceof SkinPopupMenu)) {

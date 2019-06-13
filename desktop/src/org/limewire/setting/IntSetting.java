@@ -15,11 +15,9 @@
  * limitations under the License.
  */
 
-
 package org.limewire.setting;
 
 import java.util.Properties;
-
 
 /**
  * Provides an int setting value. As a subclass of <code>Setting</code>,
@@ -29,7 +27,6 @@ import java.util.Properties;
  * {@link SettingsFactory#createIntSetting(String, int)}.
  */
 public final class IntSetting extends AbstractNumberSetting<Integer> {
-
     private int value;
 
     /**
@@ -80,7 +77,6 @@ public final class IntSetting extends AbstractNumberSetting<Integer> {
     @Override
     public Integer getDefaultValue() {
         Object valueObj = super.getDefaultValue();
-
         try {
             return Integer.parseInt(valueObj.toString().trim());
         } catch (Exception e) {

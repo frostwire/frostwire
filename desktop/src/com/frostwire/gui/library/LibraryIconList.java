@@ -32,7 +32,6 @@ import java.awt.*;
  * @author aldenml
  */
 public class LibraryIconList extends JList<Object> {
-
     private Image speaker;
     private Image loading;
 
@@ -45,7 +44,6 @@ public class LibraryIconList extends JList<Object> {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         MediaPlayer player = MediaPlayer.instance();
-
         if (player.getState() != MediaPlaybackState.Stopped &&
                 player.getState() != MediaPlaybackState.Closed &&
                 player.getState() != MediaPlaybackState.Failed) {
@@ -56,7 +54,6 @@ public class LibraryIconList extends JList<Object> {
                 }
             }
         }
-
         paintImportingIcons(g);
     }
 
@@ -73,7 +70,6 @@ public class LibraryIconList extends JList<Object> {
     }
 
     private int getPlaylistIndex(Playlist playlist) {
-
         int n = getModel().getSize();
         for (int i = 0; i < n; i++) {
             Object value = getModel().getElementAt(i);
@@ -84,7 +80,6 @@ public class LibraryIconList extends JList<Object> {
                 }
             }
         }
-
         return -1;
     }
 

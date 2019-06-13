@@ -17,40 +17,26 @@
  *
  */
 
-
 package org.gudy.azureus2.core3.util;
 
 import java.util.LinkedList;
 
-
 abstract class AEThread2 {
     private static final int MIN_RETAINED = Math.max(Runtime.getRuntime().availableProcessors(), 2);
     private static final int MAX_RETAINED = Math.max(MIN_RETAINED * 4, 16);
-
     private static final int THREAD_TIMEOUT_CHECK_PERIOD = 10 * 1000;
     private static final int THREAD_TIMEOUT = 60 * 1000;
-
     private static final LinkedList daemon_threads = new LinkedList();
-
-    private static final class JoinLock {
-        volatile boolean released = false;
-    }
-
     private static long last_timeout_check;
-
-
-    private threadWrapper wrapper;
-
-    private String name;
     private final boolean daemon;
+    private threadWrapper wrapper;
+    private String name;
     private int priority = Thread.NORM_PRIORITY;
     private volatile JoinLock lock = new JoinLock();
-
     AEThread2(String _name, boolean _daemon) {
         name = _name;
         daemon = _daemon;
     }
-
 
     /**
      * multiple invocations of start() are possible, but discouraged if combined
@@ -58,39 +44,26 @@ abstract class AEThread2 {
      */
     void
     start() {
-
         synchronized (lock) {
             if (lock.released)
                 lock = new JoinLock();
         }
-
         if (daemon) {
-
             synchronized (daemon_threads) {
-
                 if (daemon_threads.isEmpty()) {
-
                     wrapper = new threadWrapper(name, true);
-
                 } else {
-
                     wrapper = (threadWrapper) daemon_threads.removeLast();
-
                     wrapper.setName(name);
                 }
             }
         } else {
-
             wrapper = new threadWrapper(name, false);
         }
-
         if (priority != wrapper.getPriority()) {
-
             wrapper.setPriority(priority);
         }
-
         wrapper.currentLock = lock;
-
         wrapper.start(this, name);
     }
 
@@ -98,20 +71,8 @@ abstract class AEThread2 {
     setPriority(
             int _priority) {
         priority = _priority;
-
         if (wrapper != null) {
             wrapper.setPriority(priority);
-        }
-    }
-
-    void
-    setName(
-            String s) {
-        name = s;
-
-        if (wrapper != null) {
-
-            wrapper.setName(name);
         }
     }
 
@@ -120,14 +81,20 @@ abstract class AEThread2 {
         return (name);
     }
 
+    void
+    setName(
+            String s) {
+        name = s;
+        if (wrapper != null) {
+            wrapper.setName(name);
+        }
+    }
+
     public String
     toString() {
         if (wrapper == null) {
-
             return (name + " [daemon=" + daemon + ",priority=" + priority + "]");
-
         } else {
-
             return (wrapper.toString());
         }
     }
@@ -135,96 +102,68 @@ abstract class AEThread2 {
     protected abstract void
     run();
 
+    private static final class JoinLock {
+        volatile boolean released = false;
+    }
+
     static class
     threadWrapper
             extends Thread {
         private AESemaphore2 sem;
         private AEThread2 target;
         private JoinLock currentLock;
-
         private long last_active_time;
 
         threadWrapper(
                 String name,
                 boolean daemon) {
             super(name);
-
             setDaemon(daemon);
         }
 
         public void
         run() {
             while (true) {
-
                 synchronized (currentLock) {
                     try {
                         target.run();
-
                     } catch (Throwable e) {
-
                         e.printStackTrace();
-
                     } finally {
-
                         target = null;
-
                         currentLock.released = true;
-
                         currentLock.notifyAll();
                     }
                 }
-
                 if (isInterrupted() || !Thread.currentThread().isDaemon()) {
-
                     break;
-
                 } else {
-
                     synchronized (daemon_threads) {
-
                         last_active_time = SystemTime.getCurrentTime();
-
                         if (last_active_time < last_timeout_check ||
                                 last_active_time - last_timeout_check > THREAD_TIMEOUT_CHECK_PERIOD) {
-
                             last_timeout_check = last_active_time;
-
                             while (daemon_threads.size() > 0 && daemon_threads.size() > MIN_RETAINED) {
-
                                 threadWrapper thread = (threadWrapper) daemon_threads.getFirst();
-
                                 long thread_time = thread.last_active_time;
-
                                 if (last_active_time < thread_time ||
                                         last_active_time - thread_time > THREAD_TIMEOUT) {
-
                                     daemon_threads.removeFirst();
-
                                     thread.retire();
-
                                 } else {
-
                                     break;
                                 }
                             }
                         }
-
                         if (daemon_threads.size() >= MAX_RETAINED) {
-
                             return;
                         }
-
                         daemon_threads.addLast(this);
-
                         setName("AEThread2:parked[" + daemon_threads.size() + "]");
-
                         // System.out.println( "AEThread2: queue=" + daemon_threads.size() + ",creates=" + total_creates + ",starts=" + total_starts );
                     }
-
                     sem.reserve();
-
                     if (target == null) {
-
                         break;
                     }
                 }
@@ -236,17 +175,11 @@ abstract class AEThread2 {
                 AEThread2 _target,
                 String _name) {
             target = _target;
-
             setName(_name);
-
             if (sem == null) {
-
                 sem = new AESemaphore2();
-
                 super.start();
-
             } else {
-
                 sem.release();
             }
         }
@@ -255,6 +188,5 @@ abstract class AEThread2 {
         retire() {
             sem.release();
         }
-
     }
 }

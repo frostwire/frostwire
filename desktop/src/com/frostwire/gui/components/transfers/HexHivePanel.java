@@ -28,37 +28,22 @@ import java.util.concurrent.ExecutorService;
 
 public class HexHivePanel extends JPanel {
     private final boolean forceCubes;
+    private final Object drawingPropertiesLock = new Object();
+    private final Object bitmapLock = new Object();
+    private final int topPadding;
+    private final int rightPadding;
+    private final int bottomPadding;
+    private final int leftPadding;
     private int hexSideLength;
     private ColoredStroke hexagonBorderPaint;
     private CubePaint emptyHexPaint;
     private CubePaint fullHexPaint;
     private DrawingProperties drawingProperties;
-    private final Object drawingPropertiesLock = new Object();
     private BufferedImage bitmap;
-    private final Object bitmapLock = new Object();
-
     private int lastWidth;
     private int lastHeight;
-
     private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
-
-    private final int topPadding;
-    private final int rightPadding;
-    private final int bottomPadding;
-    private final int leftPadding;
-
     private Color backgroundColor;
-
-    // Drawing/Geometry functions
-    public interface HexDataAdapter<T> {
-        void updateData(T data);
-
-        int getTotalHexagonsCount();
-
-        int getFullHexagonsCount();
-
-        boolean isFull(int hexOffset);
-    }
 
     /**
      * @param hexSideLength - if -1 hexLength is calculated out of the available container area.
@@ -88,11 +73,158 @@ public class HexHivePanel extends JPanel {
         lastHeight = getHeight();
     }
 
+    private static float getHexWidth(float sideLength) {
+        return (float) (2 * (Math.cos(Math.toRadians(30)) * sideLength));
+    }
+
+    private static float getHexHeight(float sideLength) {
+        return 2 * sideLength;
+    }
+
+    private static float getHexagonSideLength(final int drawingAreaWidth, final int drawingAreaHeight, final int numHexagons) {
+        final float THREE_HALVES_SQRT_OF_THREE = 2.59807621135f;
+        final int fullArea = drawingAreaWidth * drawingAreaHeight;
+        // fullArea             numHexagons                     fullArea
+        // --------         =                => s = sqrt(-----------------------)
+        // 3/2*sqrt(3)*s^2                               3/2*sqrt(3)*numHexagons
+        final float preliminarySideLength = (float) Math.sqrt(fullArea / (THREE_HALVES_SQRT_OF_THREE * numHexagons));
+        float spaceToUse = 0.9f;
+        if (numHexagons < 50) {
+            spaceToUse = 0.85f;
+        }
+        if (numHexagons < 15) {
+            spaceToUse = 0.8f;
+        }
+        return preliminarySideLength * spaceToUse;
+    }
+
+    /**
+     * @param outCorner    - a re-usable Point buffer to output the
+     * @param inCenter     - a reusable Point buffer representing the center coordinates of a hexagon
+     * @param sideLength   - length of hexagon side
+     * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
+     */
+    private static void getHexCorner(final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
+        double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
+        outCorner.setLocation((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
+    }
+
+    private static void drawHexagon(final DrawingProperties drawingProperties, final Graphics2D graphics,
+                                    final ColoredStroke borderStroke,
+                                    final CubePaint fillPaint, final boolean drawCube) {
+        // Create outer shape for Hexagon
+        drawingProperties.hexagonBorderPath.reset();
+        for (int i = 0; i <= 7; i++) {
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, i, drawingProperties.hexSideLength);
+            if (i == 0) {
+                drawingProperties.hexagonBorderPath.moveTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            } else {
+                drawingProperties.hexagonBorderPath.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            }
+        }
+        // Fill hexagon with base color
+        graphics.setPaint(fillPaint.getBaseColor());
+        graphics.fill(drawingProperties.hexagonBorderPath);
+        drawingProperties.fillPathBuffer.reset();
+        if (drawCube) {
+            // LEFT FACE (DARK)
+            // bottom corner - 90 degrees (with zero at horizon on the right side)
+            // angles move clockwise - corner 1 is at the bottom (90 degrees down from the right)
+            // Create shape for left face
+            drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 2, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
+            // Fill left face
+            graphics.setPaint(fillPaint.getDarkColor()); // might be setColor in case this doesn't work
+            graphics.fill(drawingProperties.fillPathBuffer);
+            // TOP FACE (LIGHT)
+            // Create shape for top face
+            drawingProperties.fillPathBuffer.reset();
+            drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 4, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
+            // Fill top face
+            graphics.setPaint(fillPaint.getLightColor());
+            graphics.fill(drawingProperties.fillPathBuffer);
+            // Now paint inner faces border, 3 line.
+            // From center to 1, center to 3 and center to 5
+            graphics.setPaint(borderStroke.getColor());
+            graphics.setStroke(borderStroke);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
+            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
+            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
+            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
+            graphics.setPaint(fillPaint.getBaseColor());
+        }
+        // Paint outer border
+        graphics.setPaint(borderStroke.getColor());
+        graphics.setStroke(borderStroke);
+        graphics.draw(drawingProperties.hexagonBorderPath);
+        drawingProperties.hexagonBorderPath.reset();
+        drawingProperties.cornerBuffer.setLocation(-1, -1);
+    }
+
+    public static void main(String[] args) {
+        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5, 0xffffff, 0, 0, 0, 0, true);
+        final HexDataAdapter mockAdapter = new HexDataAdapter() {
+            @Override
+            public void updateData(Object data) {
+            }
+
+            @Override
+            public int getTotalHexagonsCount() {
+                return 10;
+            }
+
+            @Override
+            public int getFullHexagonsCount() {
+                return 0;
+            }
+
+            @Override
+            public boolean isFull(int hexOffset) {
+                return hexOffset % 2 == 0;
+            }
+        };
+        JFrame frame = new JFrame("HexHive Testing Area");
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(true);
+        frame.setVisible(true);
+        frame.add(hexPanel);
+        frame.setSize(640, 480);
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                hexPanel.updateData(mockAdapter);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                super.componentMoved(e);
+                hexPanel.updateData(mockAdapter);
+            }
+        });
+        hexPanel.updateData(mockAdapter);
+    }
+
     void updateData(HexDataAdapter hexDataAdapter) {
         final int canvasWidth = getWidth();
         final int canvasHeight = getHeight();
         if (canvasHeight > 0 && canvasWidth > 0 && hexDataAdapter != null) {
-            synchronized(drawingPropertiesLock) {
+            synchronized (drawingPropertiesLock) {
                 drawingProperties = new DrawingProperties(
                         hexDataAdapter,
                         hexSideLength,
@@ -105,7 +237,6 @@ public class HexHivePanel extends JPanel {
             lastHeight = drawingProperties.height;
             lastWidth = getWidth();
         }
-
         if (drawingProperties == null) {
             // not ready yet (perhaps during animation or rotation)
             return;
@@ -152,17 +283,12 @@ public class HexHivePanel extends JPanel {
             drawingProperties.hexCenterBuffer.x = drawingProperties.center.x;
             drawingProperties.hexCenterBuffer.y = drawingProperties.center.y;
         }
-
         boolean drawCubes = (forceCubes) || drawingProperties.numHexs <= 500;
-
         BufferedImage bitmap = new BufferedImage(drawingProperties.width, drawingProperties.height, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = bitmap.createGraphics();
         graphics.setPaint(backgroundColor);
-
         graphics.fillRect(0, 0, drawingProperties.width, drawingProperties.height);
-
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         while (pieceIndex < drawingProperties.numHexs) {
             drawHexagon(drawingProperties, graphics, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
@@ -177,124 +303,15 @@ public class HexHivePanel extends JPanel {
         return bitmap;
     }
 
-    private static float getHexWidth(float sideLength) {
-        return (float) (2 * (Math.cos(Math.toRadians(30)) * sideLength));
-    }
+    // Drawing/Geometry functions
+    public interface HexDataAdapter<T> {
+        void updateData(T data);
 
-    private static float getHexHeight(float sideLength) {
-        return 2 * sideLength;
-    }
+        int getTotalHexagonsCount();
 
-    private static float getHexagonSideLength(final int drawingAreaWidth, final int drawingAreaHeight, final int numHexagons) {
-        final float THREE_HALVES_SQRT_OF_THREE = 2.59807621135f;
-        final int fullArea = drawingAreaWidth * drawingAreaHeight;
-        // fullArea             numHexagons                     fullArea
-        // --------         =                => s = sqrt(-----------------------)
-        // 3/2*sqrt(3)*s^2                               3/2*sqrt(3)*numHexagons
-        final float preliminarySideLength = (float) Math.sqrt(fullArea / (THREE_HALVES_SQRT_OF_THREE * numHexagons));
+        int getFullHexagonsCount();
 
-        float spaceToUse = 0.9f;
-
-        if (numHexagons < 50) {
-            spaceToUse = 0.85f;
-        }
-
-        if (numHexagons < 15) {
-            spaceToUse = 0.8f;
-        }
-
-        return preliminarySideLength * spaceToUse;
-    }
-
-    /**
-     * @param outCorner    - a re-usable Point buffer to output the
-     * @param inCenter     - a reusable Point buffer representing the center coordinates of a hexagon
-     * @param sideLength   - length of hexagon side
-     * @param cornerNumber - from 0 to 6 (we count 7 because we have to get back to the origin)
-     */
-    private static void getHexCorner(final Point outCorner, final Point inCenter, int cornerNumber, float sideLength) {
-        double angle_rad = Math.toRadians((60 * cornerNumber) + 30);
-        outCorner.setLocation((int) (inCenter.x + sideLength * Math.cos(angle_rad)), (int) (inCenter.y + sideLength * Math.sin(angle_rad)));
-    }
-
-    private static void drawHexagon(final DrawingProperties drawingProperties, final Graphics2D graphics,
-                                    final ColoredStroke borderStroke,
-                                    final CubePaint fillPaint, final boolean drawCube) {
-
-        // Create outer shape for Hexagon
-        drawingProperties.hexagonBorderPath.reset();
-        for (int i = 0; i <= 7; i++) {
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, i, drawingProperties.hexSideLength);
-            if (i == 0) {
-                drawingProperties.hexagonBorderPath.moveTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            } else {
-                drawingProperties.hexagonBorderPath.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            }
-        }
-
-        // Fill hexagon with base color
-        graphics.setPaint(fillPaint.getBaseColor());
-        graphics.fill(drawingProperties.hexagonBorderPath);
-
-        drawingProperties.fillPathBuffer.reset();
-
-        if (drawCube) {
-            // LEFT FACE (DARK)
-            // bottom corner - 90 degrees (with zero at horizon on the right side)
-            // angles move clockwise - corner 1 is at the bottom (90 degrees down from the right)
-
-            // Create shape for left face
-            drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 2, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-
-            // Fill left face
-            graphics.setPaint(fillPaint.getDarkColor()); // might be setColor in case this doesn't work
-            graphics.fill(drawingProperties.fillPathBuffer);
-
-            // TOP FACE (LIGHT)
-
-            // Create shape for top face
-            drawingProperties.fillPathBuffer.reset();
-            drawingProperties.fillPathBuffer.moveTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 4, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            drawingProperties.fillPathBuffer.lineTo(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y);
-
-            // Fill top face
-            graphics.setPaint(fillPaint.getLightColor());
-            graphics.fill(drawingProperties.fillPathBuffer);
-
-            // Now paint inner faces border, 3 line.
-            // From center to 1, center to 3 and center to 5
-            graphics.setPaint(borderStroke.getColor());
-            graphics.setStroke(borderStroke);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 1, drawingProperties.hexSideLength);
-            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 3, drawingProperties.hexSideLength);
-            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-            getHexCorner(drawingProperties.cornerBuffer, drawingProperties.hexCenterBuffer, 5, drawingProperties.hexSideLength);
-            graphics.drawLine(drawingProperties.hexCenterBuffer.x, drawingProperties.hexCenterBuffer.y, drawingProperties.cornerBuffer.x, drawingProperties.cornerBuffer.y);
-
-            graphics.setPaint(fillPaint.getBaseColor());
-        }
-
-        // Paint outer border
-        graphics.setPaint(borderStroke.getColor());
-        graphics.setStroke(borderStroke);
-        graphics.draw(drawingProperties.hexagonBorderPath);
-        drawingProperties.hexagonBorderPath.reset();
-
-        drawingProperties.cornerBuffer.setLocation(-1, -1);
+        boolean isFull(int hexOffset);
     }
 
     private static final class ColoredStroke extends BasicStroke {
@@ -365,12 +382,10 @@ public class HexHivePanel extends JPanel {
          * Path object we'll reuse to draw the filled areas of the hexagons
          */
         private final GeneralPath fillPathBuffer = new GeneralPath();
-
         /**
          * Path object we'll reuse to draw the hexagons outer shapes
          */
         private final GeneralPath hexagonBorderPath = new GeneralPath();
-
         /**
          * Drawing area top-left
          */
@@ -439,20 +454,16 @@ public class HexHivePanel extends JPanel {
             end.y = bottom;
             width = right - left;
             height = bottom - top;
-
             if (hexSideLength == -1) {
                 hexSideLength = getHexagonSideLength(width, height, numHexs);
             }
-
             hexHeight = getHexHeight(hexSideLength) + (2 * hexBorderStrokeWidth);
             hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
-
             evenRowOrigin.x = (int) (origin.x + (hexWidth / 2) + hexBorderStrokeWidth);
             evenRowOrigin.y = (int) (origin.y + (hexHeight / 2) + hexBorderStrokeWidth);
             // calculate number of hexagons in an even row
             oddRowOrigin.x = (int) (evenRowOrigin.x + (hexWidth / 2) + hexBorderStrokeWidth);
             oddRowOrigin.y = (int) (evenRowOrigin.y + hexHeight + hexBorderStrokeWidth);
-
             if (hexSideLength != -1) {
                 // we need to calculate the end.y and the new drawing total height depending
                 // on how many rows we'll have.
@@ -463,7 +474,6 @@ public class HexHivePanel extends JPanel {
                 boolean evenRow = true;
                 float heightQuarter = hexHeight / 4;
                 float threeQuarters = heightQuarter * 3;
-
                 while (consideredHexagons <= numHexs) {
                     while ((bufferCenter.x + (hexWidth / 2) + 2 * hexBorderStrokeWidth) <= right) {
                         lastCenterX = bufferCenter.x;
@@ -483,52 +493,5 @@ public class HexHivePanel extends JPanel {
                 height = end.y - top;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        final HexHivePanel hexPanel = new HexHivePanel(50, 0x264053, 0xf2f2f2, 0x33b5e5, 0xffffff, 0, 0, 0, 0, true);
-        final HexDataAdapter mockAdapter = new HexDataAdapter() {
-            @Override
-            public void updateData(Object data) {
-            }
-
-            @Override
-            public int getTotalHexagonsCount() {
-                return 10;
-            }
-
-            @Override
-            public int getFullHexagonsCount() {
-                return 0;
-            }
-
-            @Override
-            public boolean isFull(int hexOffset) {
-                return hexOffset % 2 == 0;
-            }
-        };
-
-        JFrame frame = new JFrame("HexHive Testing Area");
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(true);
-        frame.setVisible(true);
-        frame.add(hexPanel);
-        frame.setSize(640, 480);
-
-        frame.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                super.componentResized(e);
-                hexPanel.updateData(mockAdapter);
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                super.componentMoved(e);
-                hexPanel.updateData(mockAdapter);
-            }
-        });
-
-        hexPanel.updateData(mockAdapter);
     }
 }

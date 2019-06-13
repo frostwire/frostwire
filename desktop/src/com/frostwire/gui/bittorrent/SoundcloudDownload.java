@@ -96,7 +96,6 @@ public class SoundcloudDownload extends HttpBTDownload {
 
     private void start(final File temp) {
         state = TransferState.WAITING;
-
         SOUNDCLOUD_THREAD_POOL.execute(() -> {
             try {
                 httpClient.save(sr.getDownloadUrl(), temp, false);
@@ -112,8 +111,43 @@ public class SoundcloudDownload extends HttpBTDownload {
         cleanupFile(tempAudio);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SoundcloudDownload && sr.getDownloadUrl().equals(((SoundcloudDownload) obj).sr.getDownloadUrl());
+    }
+
+    private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
+        try {
+            byte[] imageBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(sr.getThumbnailUrl());
+            Mp3File mp3 = new Mp3File(mp3Filename);
+            ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
+            newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
+            newId3Wrapper.setArtist(sr.getUsername());
+            newId3Wrapper.setTitle(sr.getDisplayName());
+            newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
+            newId3Wrapper.setUrl(sr.getDetailsUrl());
+            newId3Wrapper.getId3v2Tag().setPadding(true);
+            mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
+            mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
+            mp3.save(mp3outputFilename);
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    @Override
+    public File getPreviewFile() {
+        if (isCompleted()) {
+            return completeFile;
+        } else {
+            return tempAudio;
+        }
+    }
+
     private final class HttpDownloadListenerImpl implements HttpClientListener {
         private final SoundcloudDownload dl;
+
         HttpDownloadListenerImpl(SoundcloudDownload soundcloudDownload) {
             dl = soundcloudDownload;
         }
@@ -157,12 +191,10 @@ public class SoundcloudDownload extends HttpBTDownload {
                     }
                 }
                 state = TransferState.FINISHED;
-
                 if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
                     // TODO: Rich DHT announcement.
                 }
-
                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
                     if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                         iTunesMediator.instance().scanForSongs(completeFile);
@@ -190,46 +222,6 @@ public class SoundcloudDownload extends HttpBTDownload {
                 String lengthStr = headerFields.get("Content-Length").get(0);
                 SoundcloudDownload.this.size = Long.parseLong(lengthStr);
             }
-        }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof SoundcloudDownload && sr.getDownloadUrl().equals(((SoundcloudDownload) obj).sr.getDownloadUrl());
-    }
-
-    private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
-        try {
-            byte[] imageBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(sr.getThumbnailUrl());
-
-            Mp3File mp3 = new Mp3File(mp3Filename);
-
-            ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
-
-            newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
-            newId3Wrapper.setArtist(sr.getUsername());
-            newId3Wrapper.setTitle(sr.getDisplayName());
-            newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
-            newId3Wrapper.setUrl(sr.getDetailsUrl());
-            newId3Wrapper.getId3v2Tag().setPadding(true);
-
-            mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
-            mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
-
-            mp3.save(mp3outputFilename);
-
-            return true;
-        } catch (Throwable e) {
-            return false;
-        }
-    }
-
-    @Override
-    public File getPreviewFile() {
-        if (isCompleted()) {
-            return completeFile;
-        } else {
-            return tempAudio;
         }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,14 +34,11 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Default Save Folder");
-
     private TorrentSaveFolderComponent COMPONENT;
 
     public TorrentSaveFolderPaneItem() {
         super(TITLE, I18n.tr("Choose the folder where downloads will be saved to"));
-
         COMPONENT = new TorrentSaveFolderComponent(false);
         add(COMPONENT);
     }
@@ -57,14 +54,12 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
             GUIMediator.showError(TorrentSaveFolderComponent.getError());
             throw new IOException();
         }
-
         boolean dirty = isDirty();
         if (dirty) {
             final File newSaveFolder = new File(COMPONENT.getTorrentSaveFolderPath());
             updateLibraryFolders(newSaveFolder);
             updateDefaultSaveFolders(newSaveFolder);
         }
-
         return dirty;
     }
 
@@ -76,7 +71,6 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
      */
     private void updateLibraryFolders(final File newSaveFolder) {
         LibrarySettings.DIRECTORIES_TO_INCLUDE.add(newSaveFolder);
-
         //if we don't re-init the Library Folders Pane, it will exclude this folder when options are applied.
         //so we reload it with our new folder from here.
         OptionsMediator.instance().reinitPane(OptionsConstructor.LIBRARY_KEY);
@@ -84,7 +78,6 @@ public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
 
     private void updateDefaultSaveFolders(File newSaveFolder) {
         SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(newSaveFolder);
-
         BTEngine.getInstance().moveStorage(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue());
     }
 

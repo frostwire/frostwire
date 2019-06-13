@@ -21,13 +21,11 @@ import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-
 /**
  * Keeps track of the divider location changes of a {@link JSplitPane} and updates
  * an {@link IntSetting}.
  */
 public class DividerLocationSettingUpdater {
-
     private static final LocationChangeListener propertyListener = new LocationChangeListener();
 
     /**
@@ -46,7 +44,6 @@ public class DividerLocationSettingUpdater {
     }
 
     private static class LocationChangeListener implements PropertyChangeListener {
-
         public void propertyChange(PropertyChangeEvent evt) {
             JSplitPane pane = (JSplitPane) evt.getSource();
             IntSetting setting = (IntSetting) pane.getClientProperty(this);

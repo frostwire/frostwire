@@ -27,13 +27,10 @@ import javax.swing.plaf.basic.BasicPopupMenuSeparatorUI;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuSeparatorUI extends BasicPopupMenuSeparatorUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         if (OSUtils.isMacOSX() && !(comp instanceof SkinPopupMenu.Separator)) {

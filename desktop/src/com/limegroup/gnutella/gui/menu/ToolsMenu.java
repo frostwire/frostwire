@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
  * Contains all of the menu items for the tools menu.
  */
 final class ToolsMenu extends AbstractMenu {
-
     private final UpdateAction updateAction;
 
     /**
@@ -40,13 +39,10 @@ final class ToolsMenu extends AbstractMenu {
      */
     ToolsMenu() {
         super(I18n.tr("&Tools"));
-
         this.updateAction = new UpdateAction();
-
         if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
             addMenuItem(new RebuildiTunesPlaylist());
         }
-
         addMenuItem(new ShowOptionsAction());
         addMenuItem(updateAction);
     }
@@ -57,7 +53,6 @@ final class ToolsMenu extends AbstractMenu {
     }
 
     private static class RebuildiTunesPlaylist extends AbstractAction {
-
         private static final long serialVersionUID = 8348355619323878579L;
 
         RebuildiTunesPlaylist() {
@@ -67,7 +62,6 @@ final class ToolsMenu extends AbstractMenu {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-
             DialogOption result = GUIMediator.showYesNoMessage(I18n.tr(
                     "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
                             + "it with one containing all the iTunes compatible files in your \n"
@@ -76,7 +70,6 @@ final class ToolsMenu extends AbstractMenu {
                             + "and this could result in duplicate files on your iTunes library\n\n"
                             + "Are you sure you want to continue?"),
                     I18n.tr("Warning"), JOptionPane.WARNING_MESSAGE);
-
             if (result == DialogOption.YES) {
                 iTunesMediator.instance().resetFrostWirePlaylist();
             }
@@ -97,7 +90,6 @@ final class ToolsMenu extends AbstractMenu {
     }
 
     private static class UpdateAction extends AbstractAction {
-
         private static final long serialVersionUID = 2915214339056016808L;
 
         UpdateAction() {
@@ -116,7 +108,6 @@ final class ToolsMenu extends AbstractMenu {
         public void refresh() {
             String text;
             boolean enabled = true;
-
             if (UpdateMediator.instance().isUpdated()) {
                 text = I18n.tr("You are up to date with FrostWire") + " v." + UpdateMediator.instance().getLatestVersion();
             } else if (UpdateMediator.instance().isUpdateDownloading()) {
@@ -127,7 +118,6 @@ final class ToolsMenu extends AbstractMenu {
             } else {
                 text = I18n.tr("Check for update");
             }
-
             putValue(NAME, text);
             putValue(LONG_DESCRIPTION, text);
             setEnabled(enabled);

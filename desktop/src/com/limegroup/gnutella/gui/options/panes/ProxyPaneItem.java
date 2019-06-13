@@ -32,23 +32,18 @@ import java.io.IOException;
  * select a proxy to use.
  */
 public final class ProxyPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Proxy Options");
-
     public final static String LABEL = I18n.tr("Configure Proxy Options for FrostWire.");
-
     private final JRadioButton NO_PROXY_BUTTON = new JRadioButton(I18n.tr("No Proxy"));
     private final JRadioButton SOCKS4_PROXY_BUTTON = new JRadioButton("Socks v4");
     private final JRadioButton SOCKS5_PROXY_BUTTON = new JRadioButton("Socks v5");
     private final JRadioButton HTTP_PROXY_BUTTON = new JRadioButton("HTTP");
-
     /**
      * Constant <tt>JTextField</tt> instance that holds the ip address to use
      * as a proxy.
      */
     private final JTextField PROXY_HOST_FIELD =
             new SizedTextField(12, SizePolicy.RESTRICT_HEIGHT);
-
     /**
      * Constant <tt>WholeNumberField</tt> instance that holds the port of the
      * proxy.
@@ -62,7 +57,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
      */
     public ProxyPaneItem() {
         super(TITLE, LABEL);
-
         /**
          * Constant handle to the check box that enables or disables this feature.
          */
@@ -71,15 +65,12 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         BUTTONS.add(SOCKS4_PROXY_BUTTON);
         BUTTONS.add(SOCKS5_PROXY_BUTTON);
         BUTTONS.add(HTTP_PROXY_BUTTON);
-
         NO_PROXY_BUTTON.addItemListener(new LocalProxyListener());
-
         add(NO_PROXY_BUTTON);
         add(SOCKS4_PROXY_BUTTON);
         add(SOCKS5_PROXY_BUTTON);
         add(HTTP_PROXY_BUTTON);
         add(getHorizontalSeparator());
-
         BoxPanel panel = new BoxPanel(BoxPanel.X_AXIS);
         /**
          * Constant for the key of the locale-specific <tt>String</tt> for the
@@ -113,7 +104,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         String proxy = ConnectionSettings.PROXY_HOST.getValue();
         int proxyPort = ConnectionSettings.PROXY_PORT.getValue();
         int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
-
         PROXY_PORT_FIELD.setValue(proxyPort);
         NO_PROXY_BUTTON.setSelected(
                 connectionMethod == ConnectionSettings.C_NO_PROXY);
@@ -138,7 +128,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
      */
     public boolean applyOptions() throws IOException {
         int connectionMethod = ConnectionSettings.C_NO_PROXY;
-
         if (SOCKS4_PROXY_BUTTON.isSelected()) {
             connectionMethod = ConnectionSettings.C_SOCKS4_PROXY;
         } else if (SOCKS5_PROXY_BUTTON.isSelected()) {
@@ -146,14 +135,11 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         } else if (HTTP_PROXY_BUTTON.isSelected()) {
             connectionMethod = ConnectionSettings.C_HTTP_PROXY;
         }
-
         final int proxyPort = PROXY_PORT_FIELD.getValue();
         final String proxyHost = PROXY_HOST_FIELD.getText();
-
         ConnectionSettings.PROXY_PORT.setValue(proxyPort);
         ConnectionSettings.CONNECTION_METHOD.setValue(connectionMethod);
         ConnectionSettings.PROXY_HOST.setValue(proxyHost);
-
         SettingsPack settings = new SettingsPack();
         if (connectionMethod == ConnectionSettings.C_NO_PROXY) {
             settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.none.swigValue());
@@ -167,7 +153,6 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         settings.setString(settings_pack.string_types.proxy_hostname.swigValue(), proxyHost);
         settings.setInteger(settings_pack.int_types.proxy_port.swigValue(), proxyPort);
         BTEngine.getInstance().applySettings(settings);
-
         return false;
     }
 

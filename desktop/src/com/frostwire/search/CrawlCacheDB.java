@@ -37,6 +37,11 @@ import java.io.IOException;
  */
 public final class CrawlCacheDB {
     private static final Logger LOG = Logger.getLogger(CrawlCacheDB.class);
+    private static final String DATABASE_NAME = "crawldb";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "CacheData";
+    private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
+    private final static CrawlCacheDB instance = new CrawlCacheDB();
 
     static {
         try {
@@ -46,19 +51,14 @@ public final class CrawlCacheDB {
         }
     }
 
-    private static final String DATABASE_NAME = "crawldb";
-    private static final int DATABASE_VERSION = 1;
-    private static final String TABLE_NAME = "CacheData";
-    private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
-    private final static CrawlCacheDB instance = new CrawlCacheDB();
     private DatabaseHelper databaseHelper;
-
-    public static CrawlCacheDB instance() {
-        return instance;
-    }
 
     private CrawlCacheDB() {
         databaseHelper = new DatabaseHelper(new Context());
+    }
+
+    public static CrawlCacheDB instance() {
+        return instance;
     }
 
     public Cursor query(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
@@ -112,13 +112,12 @@ public final class CrawlCacheDB {
     }
 
     public static final class Columns {
+        public static final String ID = "id";
+        public static final String DATA = "data";
+        static final String KEY = "key";
+        static final String DATE_ADDED = "dateAdded";
         private Columns() {
         }
-
-        public static final String ID = "id";
-        static final String KEY = "key";
-        public static final String DATA = "data";
-        static final String DATE_ADDED = "dateAdded";
     }
 
     /**

@@ -23,18 +23,15 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthTabbedPaneUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinTabbedPaneUI extends SynthTabbedPaneUI {
+    public SkinTabbedPaneUI() {
+    }
 
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinTabbedPaneUI();
-    }
-
-    public SkinTabbedPaneUI() {
     }
 }

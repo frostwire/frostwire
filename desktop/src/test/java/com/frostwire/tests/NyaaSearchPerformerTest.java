@@ -29,7 +29,6 @@ import java.util.List;
 public class NyaaSearchPerformerTest {
     public static void main(String[] args) {
         String TEST_SEARCH_TERM = UrlUtils.encode("foo");
-
         NyaaSearchPerformer nyaa = new NyaaSearchPerformer("nyaa.si", 1, TEST_SEARCH_TERM, 5000);
         nyaa.setListener(new SearchListener() {
             @Override
@@ -50,15 +49,12 @@ public class NyaaSearchPerformerTest {
 
             @Override
             public void onError(long token, SearchError error) {
-
             }
 
             @Override
             public void onStopped(long token) {
-
             }
         });
-
         try {
             nyaa.perform();
         } catch (Throwable t) {

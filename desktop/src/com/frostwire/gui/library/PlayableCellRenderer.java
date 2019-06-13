@@ -24,20 +24,18 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- *  Creates both a renderer and an editor for cells in the playlist table that display the name
- *  of the file being played.
- *  
- *  @author gubatron
- *  @author aldenml
+ * Creates both a renderer and an editor for cells in the playlist table that display the name
+ * of the file being played.
+ *
+ * @author gubatron
+ * @author aldenml
  */
 class PlayableCellRenderer extends DefaultTableBevelledCellRenderer {
-
     PlayableCellRenderer() {
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         PlayableCell cell = (PlayableCell) value;
-
         super.getTableCellRendererComponent(table, cell.toString(), isSelected, hasFocus, row, column);
         return this;
     }

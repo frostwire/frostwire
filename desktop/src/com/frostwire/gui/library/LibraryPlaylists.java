@@ -59,27 +59,11 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
  * @author votaguz
- *
  */
 public class LibraryPlaylists extends AbstractLibraryListPanel {
-
-    private DefaultListModel<Object> model;
-    private int selectedIndexToRename;
-
-    private LibraryPlaylistsListCell newPlaylistCell;
-    private LibraryPlaylistsListCell starredPlaylistCell;
-
-    private ActionListener selectedPlaylistAction;
-
-    private ListSelectionListener listSelectionListener;
-
-    private JList<Object> list;
-    private JTextField textName;
-
     private final byte REFRESH_ACTION = 0;
     private final byte REFRESH_ID3_TAGS_ACTION = 1;
     private final byte DELETE_ACTION = 2;
@@ -89,8 +73,15 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private final byte IMPORT_TO_PLAYLIST_ACTION = 5;
     private final byte IMPORT_TO_NEW_PLAYLIST_ACTION = 6;
     private final byte CONFIGURE_OPTIONS_ACTION = 0xa;
+    private DefaultListModel<Object> model;
+    private int selectedIndexToRename;
+    private LibraryPlaylistsListCell newPlaylistCell;
+    private LibraryPlaylistsListCell starredPlaylistCell;
+    private ActionListener selectedPlaylistAction;
+    private ListSelectionListener listSelectionListener;
+    private JList<Object> list;
+    private JTextField textName;
     private Action[] actions;
-
     private List<Playlist> importingPlaylists;
 
     LibraryPlaylists() {
@@ -114,22 +105,21 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
     protected void setupUI() {
         setLayout(new BorderLayout());
-        setMinimumSize(new Dimension(177,94));
+        setMinimumSize(new Dimension(177, 94));
         GUIMediator.addRefreshListener(this);
         initPopupMenuActions();
         LibraryUtils.getExecutor().execute(() -> {
             setupModel();
-            GUIMediator.safeInvokeLater(()->{
+            GUIMediator.safeInvokeLater(() -> {
                 setupList();
                 JScrollPane _scrollPane = new JScrollPane(list);
                 add(_scrollPane);
             });
         });
-
     }
 
     private void initPopupMenuActions() {
-        actions = new Action[] {
+        actions = new Action[]{
                 new RefreshAction(), // 0
                 new RefreshID3TagsAction(), // 1
                 new DeleteAction(), // 2
@@ -234,7 +224,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             if (o2 == newPlaylistCell || o2 == starredPlaylistCell) {
                 return 1;
             }
-
             return o1.getText().compareTo(o2.getText());
         });
         list = new LibraryIconList(sortedModel);
@@ -294,7 +283,6 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         } else if (key == KeyEvent.VK_DELETE || (OSUtils.isMacOSX() && key == KeyEvent.VK_BACK_SPACE)) {
             actions[DELETE_ACTION].actionPerformed(null);
         }
-
         if (LibraryUtils.isRefreshKeyEvent(e)) {
             refreshSelection();
         }
@@ -322,7 +310,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         }
         Playlist playlist = cell.getPlaylist();
         if (playlist != null) {
-            if (playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+            if (playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
                 playlist = LibraryMediator.getLibrary().getStarredPlaylist();
             } else {
                 playlist.refresh();
@@ -337,7 +325,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         cancelEdit();
         int index = list.getSelectedIndex();
         Playlist playlist = ((LibraryPlaylistsListCell) list.getSelectedValue()).getPlaylist();
-        if (playlist != null && playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID){
+        if (playlist != null && playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
             return;
         }
         if (index != -1) {
@@ -419,8 +407,8 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         selectedIndexToRename = -1;
         textName.setVisible(false);
     }
-
     //// handle m3u import/export
+
     /**
      * Loads a playlist.
      */
@@ -450,6 +438,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
      * the PlayList. Once we have done the heavy weight construction of the PlayListItem
      * list, the list is handed to the swing event queue to process adding the files to
      * the actual table model
+     *
      * @param path - path of file to open
      */
     private void loadM3U(final Playlist playlist, final String path) {
@@ -508,7 +497,8 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     }
 
     /**
-     * Handles actually copying and writing the playlist to disk. 
+     * Handles actually copying and writing the playlist to disk.
+     *
      * @param path - file location to save the list to
      */
     private void saveM3U(final Playlist playlist, final String path) {
@@ -528,6 +518,44 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
                 GUIMediator.safeInvokeLater(() -> GUIMediator.showError("Unable to save playlist"));
             }
         });
+    }
+
+    void reselectPlaylist() {
+        listSelectionListener.valueChanged(null);
+    }
+
+    @Override
+    public void refresh() {
+        if (list != null) {
+            list.repaint();
+        }
+    }
+
+    void markBeginImport(Playlist playlist) {
+        try {
+            if (!importingPlaylists.contains(playlist)) {
+                importingPlaylists.add(playlist);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void markEndImport(Playlist playlist) {
+        try {
+            importingPlaylists.remove(playlist);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    boolean isPlaylistImporting(Playlist playlist) {
+        try {
+            return importingPlaylists.contains(playlist);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static class LibraryPlaylistsListCell {
@@ -578,6 +606,75 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         }
     }
 
+    private static class PlaylistListFileFilter extends FileFilter {
+        public boolean accept(File f) {
+            return f.isDirectory() || f.getName().toLowerCase().endsWith("m3u");
+        }
+
+        public String getDescription() {
+            return I18n.tr("Playlist Files (*.m3u)");
+        }
+    }
+
+    public final static class CopyPlaylistFilesAction extends AbstractAction {
+        CopyPlaylistFilesAction() {
+            putValue(Action.NAME, I18n.tr("Export playlist files to folder"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy all playlist files to a folder of your choosing"));
+            putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            copyPlaylistFilesToFolder(LibraryMediator.instance().getSelectedPlaylist());
+        }
+
+        private void copyPlaylistFilesToFolder(Playlist playlist) {
+            if (playlist == null || playlist.getItems().isEmpty()) {
+                return;
+            }
+            File suggestedDirectory = FileChooserHandler.getLastInputDirectory();
+            if (suggestedDirectory.equals(CommonUtils.getCurrentDirectory())) {
+                suggestedDirectory = new File(CommonUtils.getUserHomeDir(), "Desktop");
+            }
+            final File selFolder = FileChooserHandler.getSaveAsDir(GUIMediator.getAppFrame(), I18n.tr("Where do you want the playlist files copied to?"), suggestedDirectory);
+            if (selFolder == null) {
+                return;
+            }
+            //let's make a copy of the list in case the playlist will be modified during the copying.
+            final List<PlaylistItem> playlistItems = new ArrayList<>(playlist.getItems());
+            BackgroundExecutorService.schedule(new Thread("Library-copy-playlist-files") {
+                @Override
+                public void run() {
+                    int n = 0;
+                    int total = playlistItems.size();
+                    String targetName = selFolder.getName();
+                    for (PlaylistItem item : playlistItems) {
+                        File f = new File(item.getFilePath());
+                        if (f.isFile() && f.exists() && f.canRead()) {
+                            try {
+                                Path source = f.toPath();
+                                Path target = FileSystems.getDefault().getPath(selFolder.getAbsolutePath(), f.getName());
+                                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                                n++;
+                                //invoked on UI thread later
+                                String status = String.format("Copied %d of %d to %s", n, total, targetName);
+                                LibraryMediator.instance().getLibrarySearch().pushStatus(status);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    GUIMediator.launchExplorer(selFolder);
+                    //and clear the output
+                    try {
+                        Thread.sleep(2000);
+                        LibraryMediator.instance().getLibrarySearch().pushStatus("");
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            });
+        }
+    }
+
     private class LibraryPlaylistsCellRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -589,7 +686,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             Icon icon = cell.getIcon();
             if (icon != null) {
                 setIcon(icon);
-                setBorder(new EmptyBorder(5,5,5,5));
+                setBorder(new EmptyBorder(5, 5, 5, 5));
             }
             this.setFont(list.getFont());
             ThemeMediator.fixLabelFont(this);
@@ -666,6 +763,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Refresh selected"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_REFRESH");
         }
+
         public void actionPerformed(ActionEvent e) {
             refreshSelection();
         }
@@ -677,6 +775,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Refresh the audio properties based on ID3 tags of selected items"));
             putValue(LimeAction.ICON_NAME, "LIBRARY_REFRESH");
         }
+
         public void actionPerformed(ActionEvent e) {
             Playlist playlist = getSelectedPlaylist();
             if (playlist != null) {
@@ -691,6 +790,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Delete Playlist"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_DELETE");
         }
+
         public void actionPerformed(ActionEvent e) {
             Playlist selectedPlaylist = getSelectedPlaylist();
             if (selectedPlaylist != null && selectedPlaylist.getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
@@ -711,6 +811,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Remove the deleted items"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_CLEANUP");
         }
+
         public void actionPerformed(ActionEvent e) {
             Playlist selectedPlaylist = getSelectedPlaylist();
             if (selectedPlaylist != null) {
@@ -726,30 +827,11 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Rename Playlist"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_RENAME");
         }
+
         public void actionPerformed(ActionEvent e) {
             if (((LibraryPlaylistsListCell) list.getSelectedValue()).getPlaylist().getId() != LibraryDatabase.STARRED_PLAYLIST_ID) {
                 startEdit(list.getSelectedIndex());
             }
-        }
-    }
-
-    void reselectPlaylist() {
-        listSelectionListener.valueChanged(null);
-    }
-
-    @Override
-    public void refresh() {
-        if (list != null) {
-            list.repaint();
-        }
-    }
-
-    private static class PlaylistListFileFilter extends FileFilter {
-        public boolean accept(File f) {
-            return f.isDirectory() || f.getName().toLowerCase().endsWith("m3u");
-        }
-        public String getDescription() {
-            return I18n.tr("Playlist Files (*.m3u)");
         }
     }
 
@@ -759,6 +841,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Import a .m3u file into the selected playlist"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_TO");
         }
+
         public void actionPerformed(ActionEvent e) {
             importM3U(getSelectedPlaylist());
         }
@@ -770,65 +853,9 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Import a .m3u file to a new playlist"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
         }
+
         public void actionPerformed(ActionEvent e) {
             importM3U(null);
-        }
-    }
-
-    public final static class CopyPlaylistFilesAction extends AbstractAction {
-        CopyPlaylistFilesAction() {
-            putValue(Action.NAME, I18n.tr("Export playlist files to folder"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy all playlist files to a folder of your choosing"));
-            putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
-        }
-        public void actionPerformed(ActionEvent e) {
-            copyPlaylistFilesToFolder(LibraryMediator.instance().getSelectedPlaylist());
-        }
-        private void copyPlaylistFilesToFolder(Playlist playlist) {
-            if (playlist == null || playlist.getItems().isEmpty()) {
-                return;
-            }
-            File suggestedDirectory = FileChooserHandler.getLastInputDirectory();
-            if (suggestedDirectory.equals(CommonUtils.getCurrentDirectory())) {
-                suggestedDirectory = new File(CommonUtils.getUserHomeDir(), "Desktop");
-            }
-            final File selFolder = FileChooserHandler.getSaveAsDir(GUIMediator.getAppFrame(), I18n.tr("Where do you want the playlist files copied to?"), suggestedDirectory);
-            if (selFolder == null) {
-                return;
-            }
-            //let's make a copy of the list in case the playlist will be modified during the copying.
-            final List<PlaylistItem> playlistItems = new ArrayList<>(playlist.getItems());
-            BackgroundExecutorService.schedule(new Thread("Library-copy-playlist-files") {
-                @Override
-                public void run() {
-                    int n = 0;
-                    int total = playlistItems.size();
-                    String targetName = selFolder.getName();
-                    for (PlaylistItem item : playlistItems) {
-                        File f = new File(item.getFilePath());
-                        if (f.isFile() && f.exists() && f.canRead()) {
-                            try {
-                                Path source = f.toPath();
-                                Path target = FileSystems.getDefault().getPath(selFolder.getAbsolutePath(), f.getName());
-                                Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-                                n++;
-                                //invoked on UI thread later
-                                String status = String.format("Copied %d of %d to %s", n, total, targetName);
-                                LibraryMediator.instance().getLibrarySearch().pushStatus(status);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    GUIMediator.launchExplorer(selFolder);
-                    //and clear the output
-                    try {
-                        Thread.sleep(2000);
-                        LibraryMediator.instance().getLibrarySearch().pushStatus("");
-                    } catch (InterruptedException ignored) {
-                    }
-                }
-            });
         }
     }
 
@@ -838,6 +865,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Export this playlist into a .m3u file"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
         }
+
         public void actionPerformed(ActionEvent e) {
             exportM3U(getSelectedPlaylist());
         }
@@ -849,6 +877,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Export this playlist into an iTunes playlist"));
             putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
         }
+
         public void actionPerformed(ActionEvent e) {
             Playlist playlist = getSelectedPlaylist();
             if (playlist != null) {
@@ -860,32 +889,5 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
                 iTunesMediator.instance().addSongsiTunes(playlist.getName(), files.toArray(new File[0]));
             }
         }
-    }
-
-    void markBeginImport(Playlist playlist) {
-        try {
-            if (!importingPlaylists.contains(playlist)) {
-                importingPlaylists.add(playlist);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void markEndImport(Playlist playlist) {
-        try {
-            importingPlaylists.remove(playlist);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    boolean isPlaylistImporting(Playlist playlist) {
-        try {
-            return importingPlaylists.contains(playlist);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return false;
     }
 }

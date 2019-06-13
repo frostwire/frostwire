@@ -6,6 +6,7 @@ public class LimeWireGUI {
     private static LimeWireGUI INSTANCE;
     private final LimeWireCore limewireCore;
     private final LocalClientInfoFactory localClientInfoFactory;
+
     private LimeWireGUI() {
         limewireCore = LimeWireCore.instance();
         localClientInfoFactory = LocalClientInfoFactoryImpl.instance();

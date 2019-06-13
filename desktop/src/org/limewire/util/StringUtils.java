@@ -24,7 +24,6 @@ import java.util.*;
  * compare strings, along with additional string utility methods.
  */
 public class StringUtils {
-
     /**
      * Collator used for internationalization.
      */
@@ -36,7 +35,9 @@ public class StringUtils {
         COLLATOR.setStrength(Collator.PRIMARY);
     }
 
-    /** Updates the locale that string-matching will use. */
+    /**
+     * Updates the locale that string-matching will use.
+     */
     public static void setLocale(Locale locale) {
         Collator later = Collator.getInstance(locale);
         later.setDecomposition(Collator.FULL_DECOMPOSITION);
@@ -44,10 +45,11 @@ public class StringUtils {
         COLLATOR = later;
     }
 
-    /** Returns true if input contains the given pattern, which may contain the
-     *  wildcard character '*'.  TODO: need more formal definition.  Examples:
+    /**
+     * Returns true if input contains the given pattern, which may contain the
+     * wildcard character '*'.  TODO: need more formal definition.  Examples:
      *
-     *  <pre>
+     * <pre>
      *  StringUtils.contains("", "") ==> true
      *  StringUtils.contains("abc", "") ==> true
      *  StringUtils.contains("abc", "b") ==> true
@@ -55,14 +57,16 @@ public class StringUtils {
      *  StringUtils.contains("abcd", "a*d") ==> true
      *  StringUtils.contains("abcd", "*a**d*") ==> true
      *  StringUtils.contains("abcd", "d*a") ==> false
-     *  </pre> 
+     *  </pre>
      */
     public static boolean contains(String input, String pattern) {
         return contains(input, pattern, false);
     }
 
-    /** Exactly like contains(input, pattern), but case is ignored if
-     *  ignoreCase==true. */
+    /**
+     * Exactly like contains(input, pattern), but case is ignored if
+     * ignoreCase==true.
+     */
     public static boolean contains(String input, String pattern, boolean ignoreCase) {
         //More efficient algorithms are possible, e.g. a modified version of the
         //Rabin-Karp algorithm, but they are unlikely to be faster with such
@@ -70,13 +74,12 @@ public class StringUtils {
         //combining the second FOR loop below with the subset(..) call, but that
         //just isn't important.  The important thing is to avoid needless
         //allocations.
-
         final int n = pattern.length();
         //Where to resume searching after last wildcard, e.g., just past
         //the last match in input.
         int last = 0;
         //For each token in pattern starting at i...
-        for (int i = 0; i < n;) {
+        for (int i = 0; i < n; ) {
             //1. Find the smallest j>i s.t. pattern[j] is space, *, or +.
             char c = ' ';
             int j = i;
@@ -87,13 +90,11 @@ public class StringUtils {
                     break;
                 }
             }
-
             //2. Match pattern[i..j-1] against input[last...].
             int k = subset(pattern, i, j, input, last, ignoreCase);
             if (k < 0) {
                 return false;
             }
-
             //3. Reset the starting search index if got ' ' or '+'.
             //Otherwise increment past the match in input.
             if (c == ' ' || c == '+') {
@@ -106,22 +107,22 @@ public class StringUtils {
         return true;
     }
 
-    /** 
+    /**
      * @requires TODO3: fill this in
      * @effects returns the smallest i>=bigStart
-     *  s.t. little[littleStart...littleStop-1] is a prefix of big[i...] 
-     *  or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
-     *  when comparing characters.
+     * s.t. little[littleStart...littleStop-1] is a prefix of big[i...]
+     * or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
+     * when comparing characters.
      */
     private static int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
         //Equivalent to
         // return big.indexOf(little.substring(littleStart, littleStop), bigStart);
         //but without an allocation.
         //Note special case for ignoreCase below.
-
         if (ignoreCase) {
             final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop: for (int i = bigStart; i < n; i++) {
+            outerLoop:
+            for (int i = bigStart; i < n; i++) {
                 //Check if little[littleStart...littleStop-1] matches with shift i
                 final int n2 = littleStop - littleStart;
                 for (int j = 0; j < n2; j++) {
@@ -136,7 +137,8 @@ public class StringUtils {
             return -1;
         } else {
             final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop: for (int i = bigStart; i < n; i++) {
+            outerLoop:
+            for (int i = bigStart; i < n; i++) {
                 final int n2 = littleStop - littleStart;
                 for (int j = 0; j < n2; j++) {
                     char c1 = big.charAt(i + j);
@@ -151,10 +153,11 @@ public class StringUtils {
         }
     }
 
-    /** If c is a lower case ASCII character, returns Character.toUpperCase(c).
-     *  Else if c is an upper case ASCII character, returns Character.toLowerCase(c),
-     *  Else returns c.
-     *  Note that this is <b>not internationalized</b>; but it is fast.
+    /**
+     * If c is a lower case ASCII character, returns Character.toUpperCase(c).
+     * Else if c is an upper case ASCII character, returns Character.toLowerCase(c),
+     * Else returns c.
+     * Note that this is <b>not internationalized</b>; but it is fast.
      */
     private static char toOtherCase(char c) {
         final int A = 'A'; //65
@@ -162,7 +165,6 @@ public class StringUtils {
         final int a = 'a'; //97
         final int z = 'z'; //122
         final int SHIFT = a - A;
-
         if ((int) c < A) { //non alphabetic
             return c;
         } else if ((int) c <= Z) { //upper-case
@@ -183,11 +185,11 @@ public class StringUtils {
         return split(s, Character.toString(delimiter));
     }
 
-    /** 
-     *  Returns the tokens of s delimited by the given delimiter, without
-     *  returning the delimiter.  Repeated sequences of delimiters are treated
-     *  as one. Examples:
-     *  <pre>
+    /**
+     * Returns the tokens of s delimited by the given delimiter, without
+     * returning the delimiter.  Repeated sequences of delimiters are treated
+     * as one. Examples:
+     * <pre>
      *    split("a//b/ c /","/")=={"a","b"," c "}
      *    split("a b", "/")=={"a b"}.
      *    split("///", "/")=={}.
@@ -202,14 +204,13 @@ public class StringUtils {
         List<String> tokens = new ArrayList<>();
         while (tokenizer.hasMoreTokens())
             tokens.add(tokenizer.nextToken());
-
         return tokens.toArray(new String[0]);
     }
 
     /**
-     * This method will compare the two strings using 
+     * This method will compare the two strings using
      * full decomposition and only look at primary differences
-     * The comparision will ignore case as well as  
+     * The comparision will ignore case as well as
      * differences like FULLWIDTH vs HALFWIDTH
      */
     public static int compareFullPrimary(String s1, String s2) {
@@ -219,10 +220,9 @@ public class StringUtils {
     /**
      * Replaces all occurrences of old_str in str with new_str
      *
-     * @param str the String to modify
+     * @param str     the String to modify
      * @param old_str the String to be replaced
      * @param new_str the String to replace old_str with
-     *
      * @return the modified str.
      */
     public static String replace(String str, String old_str, String new_str) {
@@ -268,7 +268,7 @@ public class StringUtils {
     /**
      * Returns the tokens of array concanated to a delimited by the given
      * delimiter, without Examples:
-     * 
+     *
      * <pre>
      *     explode({ "a", "b" }, " ") == "a b"
      *     explode({ "a", "b" }, "") == "ab"

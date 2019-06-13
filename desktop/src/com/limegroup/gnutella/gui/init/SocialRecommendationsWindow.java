@@ -24,12 +24,11 @@ import com.limegroup.gnutella.gui.IconButton;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * This class displays a setup window that recommends users to
  * follow FrostWire on different social networks.
+ *
  * @author gubatron
  * @author aldenml
  */
@@ -41,22 +40,19 @@ class SocialRecommendationsWindow extends SetupWindow {
 
     protected void createWindow() {
         super.createWindow();
-
         JPanel mainPanel = new JPanel(new MigLayout("fillx, insets 0, gap 4px",
                 "[]"));
         mainPanel.add(new IconButton("SOCIAL_MEDIA_CHECK", 150, 150), "growx, center, span, wrap");
-        mainPanel.add(new JLabel(I18n.tr("<html><b>Keep in Touch!</b></html>")),"center, span, wrap, height 40px");
+        mainPanel.add(new JLabel(I18n.tr("<html><b>Keep in Touch!</b></html>")), "center, span, wrap, height 40px");
         int socialButtonW = 100;
-
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER" , GUIConstants.TWITTER_FROSTWIRE_URL , socialButtonW), "alignx center");
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_TWITTER", GUIConstants.TWITTER_FROSTWIRE_URL, socialButtonW), "alignx center");
         mainPanel.add(createSocialButton("SOCIAL_WIZARD_FACEBOOK", GUIConstants.FACEBOOK_FROSTWIRE_URL, socialButtonW), "alignx center");
-        mainPanel.add(createSocialButton("SOCIAL_WIZARD_REDDIT"  , GUIConstants.REDDIT_FROSTWIRE_URL  , socialButtonW), "alignx center");
-
+        mainPanel.add(createSocialButton("SOCIAL_WIZARD_REDDIT", GUIConstants.REDDIT_FROSTWIRE_URL, socialButtonW), "alignx center");
         setSetupComponent(mainPanel);
     }
 
     private IconButton createSocialButton(String iconName, final String clickURL, int height) {
-        IconButton button = new IconButton(iconName,height,height);
+        IconButton button = new IconButton(iconName, height, height);
         button.addActionListener(e -> GUIMediator.openURL(clickURL));
         return button;
     }

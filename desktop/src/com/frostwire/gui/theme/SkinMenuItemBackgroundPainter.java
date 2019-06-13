@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinMenuItemBackgroundPainter extends AbstractSkinPainter {
-
     public SkinMenuItemBackgroundPainter(State state) {
     }
 

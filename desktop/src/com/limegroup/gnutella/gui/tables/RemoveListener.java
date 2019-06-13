@@ -8,15 +8,14 @@ import java.awt.event.ActionListener;
  * selected rows in the component
  */
 public final class RemoveListener implements ActionListener {
-    
     private ComponentMediator<?> cm;
-    
+
     RemoveListener(ComponentMediator<?> cm) {
         this.cm = cm;
-   }
+    }
 
-	public void actionPerformed(ActionEvent ae) {
-		//send message to the ComponentMediator
-	    cm.removeSelection();
-	}	
+    public void actionPerformed(ActionEvent ae) {
+        //send message to the ComponentMediator
+        cm.removeSelection();
+    }
 }

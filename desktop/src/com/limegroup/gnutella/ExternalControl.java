@@ -30,29 +30,23 @@ import java.net.URLDecoder;
 import java.util.*;
 
 public class ExternalControl {
-
     private static final Logger LOG = Logger.getLogger(ExternalControl.class);
-
+    private static final String NL = "\015\012";
+    private static final String LOCALHOST_IP = "127.0.0.1";
+    private static final String LOCALHOST_NAME = "localhost";
+    private static final int SERVER_PORT = 45099;
     private static ExternalControl INSTANCE;
+    private final ActivityCallback activityCallback;
+    private volatile String enqueuedRequest = null;
+    private ExternalControl(ActivityCallback activityCallback) {
+        this.activityCallback = activityCallback;
+    }
 
     public static ExternalControl instance(ActivityCallback activityCallback) {
         if (INSTANCE == null) {
             INSTANCE = new ExternalControl(activityCallback);
         }
         return INSTANCE;
-    }
-
-    private static final String NL = "\015\012";
-    private static final String LOCALHOST_IP = "127.0.0.1";
-    private static final String LOCALHOST_NAME = "localhost";
-    private static final int SERVER_PORT = 45099;
-
-    private volatile String enqueuedRequest = null;
-
-    private final ActivityCallback activityCallback;
-
-    private ExternalControl(ActivityCallback activityCallback) {
-        this.activityCallback = activityCallback;
     }
 
     public void startServer() {
@@ -62,25 +56,16 @@ public class ExternalControl {
                 while (true) {
                     final Socket socket = serverSocket.accept();
                     new Thread(() -> {
-
                         boolean closeSocket = true;
                         try {
                             String address = socket.getInetAddress().getHostAddress();
-
                             if (address.equals(LOCALHOST_NAME) || address.equals(LOCALHOST_IP)) {
-
                                 BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), GUIUtils.DEFAULT_ENCODING));
-
                                 String line = br.readLine();
-
                                 if (line != null) {
-
                                     if (line.toUpperCase().startsWith("GET ")) {
-
                                         line = line.substring(4);
-
                                         int pos = line.lastIndexOf(' ');
-
                                         line = line.substring(0, pos);
                                         closeSocket = process(line, socket.getOutputStream());
                                     }
@@ -111,23 +96,18 @@ public class ExternalControl {
         List<String> source_params = new ArrayList<>();
         int pos = get.indexOf('?');
         String arg_str;
-
         if (pos == -1) {
             arg_str = "";
         } else {
             arg_str = get.substring(pos + 1);
             pos = arg_str.lastIndexOf(' ');
-
             if (pos >= 0) {
                 arg_str = arg_str.substring(0, pos).trim();
             }
-
             StringTokenizer tok = new StringTokenizer(arg_str, "&");
-
             while (tok.hasMoreTokens()) {
                 String arg = tok.nextToken();
                 pos = arg.indexOf('=');
-
                 if (pos == -1) {
                     String lhs = arg.trim();
                     original_params.put(lhs, "");
@@ -139,7 +119,6 @@ public class ExternalControl {
                         String rhs = URLDecoder.decode(arg.substring(pos + 1).trim(), GUIUtils.DEFAULT_ENCODING);
                         original_params.put(lhs, rhs);
                         lc_params.put(lc_lhs, rhs);
-
                         if (lc_lhs.equals("xsource")) {
                             source_params.add(rhs);
                         }
@@ -149,11 +128,8 @@ public class ExternalControl {
                 }
             }
         }
-
         if (get.startsWith("/download")) {
-
             String info_hash = lc_params.get("info_hash");
-
             if (info_hash != null) {
                 if (activityCallback.isRemoteDownloadsAllowed()) {
                     writeJSReply(os, "checkResult(1);");
@@ -182,7 +158,6 @@ public class ExternalControl {
             restoreApplication();
             return true;
         }
-
         writeNotFound(os);
         return true;
     }
@@ -217,7 +192,6 @@ public class ExternalControl {
 
     public String preprocessArgs(String[] args) {
         LOG.info("enter proprocessArgs");
-
         StringBuilder arg = new StringBuilder();
         for (String s : args) {
             arg.append(s);
@@ -252,7 +226,6 @@ public class ExternalControl {
         if (enqueuedRequest != null) {
             String request = enqueuedRequest;
             enqueuedRequest = null;
-
             if (isTorrentMagnetRequest(request)) {
                 LOG.info("ExternalControl.runQueuedControlRequest() handleTorrentMagnetRequest() - " + request);
                 handleTorrentMagnetRequest(request);
@@ -290,16 +263,13 @@ public class ExternalControl {
     //refactored the download logic into a separate method
     public void handleMagnetRequest(String arg) {
         LOG.info("enter handleMagnetRequest");
-
         if (isTorrentMagnetRequest(arg)) {
             LOG.info("ExternalControl.handleMagnetRequest(" + arg + ") -> handleTorrentMagnetRequest()");
             handleTorrentMagnetRequest(arg);
             return;
         }
-
         //ActivityCallback callback = restoreApplication();
         MagnetOptions[] options = MagnetOptions.parseMagnet(arg);
-
         if (options.length == 0) {
             LOG.warn("Invalid magnet, ignoring: " + arg);
         }
@@ -327,24 +297,19 @@ public class ExternalControl {
     private boolean testForFrostWire(String arg) {
         try {
             //LOG.info("testForFrostWire(arg = ["+arg+"])");
-
             String urlParameter;
             if (arg != null && (arg.startsWith("http://") || arg.startsWith("https://") || arg.startsWith("magnet:?") || arg.endsWith(".torrent"))) {
                 urlParameter = "/download?url=" + UrlUtils.encode(arg);
             } else {
                 urlParameter = "/show";
             }
-
             //LOG.info("urlParameter = " + urlParameter);
             final String response = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).get("http://" + LOCALHOST_IP + ":" + SERVER_PORT + urlParameter, 1000);
-
             if (response != null) {
                 return true;
             }
-
         } catch (Exception ignored) {
         }
-
         return false;
     }
 }

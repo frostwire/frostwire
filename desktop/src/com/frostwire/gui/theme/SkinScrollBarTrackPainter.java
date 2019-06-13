@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinScrollBarTrackPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinScrollBarTrackPainter(State state) {
@@ -41,7 +38,6 @@ public final class SkinScrollBarTrackPainter extends AbstractSkinPainter {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(getScrollBarTrackPaint(s));
             g.fill(s);
-
             g.setColor(SkinColors.SCROLL_TRACK_BORDER_COLOR);
             g.draw(s);
         }
@@ -49,12 +45,12 @@ public final class SkinScrollBarTrackPainter extends AbstractSkinPainter {
 
     private Paint getScrollBarTrackPaint(Shape s) {
         switch (state) {
-        case Disabled:
-            return createVerticalGradient(s, SkinColors.SCROLL_TRACK_DISABLED_COLORS);
-        case Enabled:
-            return createVerticalGradient(s, SkinColors.SCROLL_TRACK_ENABLED_COLORS);
-        default:
-            throw new IllegalArgumentException("Not supported state");
+            case Disabled:
+                return createVerticalGradient(s, SkinColors.SCROLL_TRACK_DISABLED_COLORS);
+            case Enabled:
+                return createVerticalGradient(s, SkinColors.SCROLL_TRACK_ENABLED_COLORS);
+            default:
+                throw new IllegalArgumentException("Not supported state");
         }
     }
 

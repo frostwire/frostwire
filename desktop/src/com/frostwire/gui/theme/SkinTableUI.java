@@ -26,32 +26,26 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinTableUI extends SynthTableUI {
-
     private MouseInputListener mouseListener;
-
     private Point lastMousePosition;
+
+    public SkinTableUI() {
+    }
 
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinTableUI();
     }
 
-    public SkinTableUI() {
-    }
-
     public int getRowAtMouse() {
         int row = -1;
-
         if (lastMousePosition != null) {
             row = table.rowAtPoint(lastMousePosition);
         }
-
         return row;
     }
 
@@ -70,7 +64,6 @@ public class SkinTableUI extends SynthTableUI {
     }
 
     private class TableMouseInputListener implements MouseInputListener {
-
         private final MouseInputListener delegate;
 
         public TableMouseInputListener(MouseInputListener delegate) {

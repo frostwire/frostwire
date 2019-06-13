@@ -63,12 +63,19 @@ import java.util.HashSet;
  * @author gubatron
  */
 public final class UpdateManager implements Serializable {
-
     private static final int OPTION_OPEN_URL = 1;
     private static final int OPTION_LATER = 0;
     private static final int OPTION_DOWNLOAD_TORRENT = 2;
-
     transient private static HashSet<UpdateMessage> _seenMessages;
+    /**
+     * The singleton instance
+     */
+    private static UpdateManager INSTANCE = null;
+    // Time on the server for when we last checked the updates.
+    private Date _serverTime = null;
+
+    private UpdateManager() {
+    }
 
     /**
      * Starts an Update Task in <secondsAfter> seconds after.
@@ -81,7 +88,6 @@ public final class UpdateManager implements Serializable {
                 Thread.sleep(secondsAfter * 1000);
             } catch (InterruptedException ignored) {
             }
-
             //System.out.println("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
             UpdateManager um = UpdateManager.getInstance();
             um.checkForUpdates(force);
@@ -97,15 +103,97 @@ public final class UpdateManager implements Serializable {
         scheduleUpdateCheckTask(secondsAfter, false);
     }
 
+    static boolean isFrostWireOld(UpdateMessage message) {
+        if (message.getBuild() != null) {
+            try {
+                int buildNumber = Integer.parseInt(message.getBuild());
+                return buildNumber > FrostWireUtils.getBuildNumber();
+            } catch (Throwable t) {
+                System.err.println("UpdateManager::isFrostWireOld() invalid buildNumber ('" + message.getBuild() + "'), falling back to version check");
+                t.printStackTrace();
+            }
+        }
+        return isFrostWireOld(message.getVersion());
+    }
+
     /**
-     * The singleton instance
+     * Given a version string, it compares against the current frostwire
+     * version. If frostwire is old, it will return true.
+     * <p>
+     * A valid version string looks like this: "MAJOR.RELEASE.SERVICE"
+     * <p>
+     * 4.13.1 4.13.2 ... 4.13.134
+     * <p>
+     * It will compare each number of the current version to the version
+     * published by the update message.
      */
-    private static UpdateManager INSTANCE = null;
+    private static boolean isFrostWireOld(String messageVersion) {
+        // if there's nothing to compare with, then FrostWire shouldn't be old
+        // for it.
+        if (messageVersion == null)
+            return false;
+        String currentVersion = FrostWireUtils.getFrostWireVersion();
+        // first discard if we're the exact same version
+        if (currentVersion.equals(messageVersion)) {
+            return false;
+        }
+        // if there's a difference, maybe we have a higher version...
+        // being optimistic :)
+        try {
+            String[] fwVersionParts = currentVersion.split("\\.");
+            int fw_major = Integer.parseInt(fwVersionParts[0]);
+            int fw_release = Integer.parseInt(fwVersionParts[1]);
+            int fw_service = Integer.parseInt(fwVersionParts[2]);
+            String[] msgVersionParts = messageVersion.split("\\.");
+            int msg_major = Integer.parseInt(msgVersionParts[0]);
+            int msg_release = Integer.parseInt(msgVersionParts[1]);
+            int msg_service = Integer.parseInt(msgVersionParts[2]);
+            if (fw_major < msg_major) {
+                return true;
+            }
+            if (fw_major == msg_major && fw_release < msg_release) {
+                return true;
+            }
+            if (fw_major == msg_major && fw_release == msg_release && fw_service < msg_service) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
 
-    // Time on the server for when we last checked the updates.
-    private Date _serverTime = null;
+    public static synchronized UpdateManager getInstance() {
+        if (UpdateManager.INSTANCE == null) {
+            UpdateManager.INSTANCE = new UpdateManager();
+        }
+        return UpdateManager.INSTANCE;
+    } // getInstance
 
-    private UpdateManager() {
+    /**
+     * Starts a torrent download
+     */
+    private static void openTorrent(String uriStr) {
+        try {
+            URI uri = new URI(uriStr);
+            String scheme = uri.getScheme();
+            if (scheme == null || !scheme.equalsIgnoreCase("http")) {
+                // System.out.println("Not a torrent URL");
+                return;
+            }
+            String authority = uri.getAuthority();
+            if (authority == null || authority.equals("") || authority.indexOf(' ') != -1) {
+                // System.out.println("Invalid authority");
+                return;
+            }
+            GUIMediator.instance().openTorrentURI(uri.toString(), false);
+        } catch (URISyntaxException e) {
+            System.out.println(e);
+        }
+    }
+
+    Date getServerTime() {
+        return _serverTime;
     }
 
     void setServerTime(String serverTime) {
@@ -114,22 +202,15 @@ public final class UpdateManager implements Serializable {
         // rather have the message getting to our community than not getting to
         // them at all
         // we can always remove messages from update.frostwire.com
-
         _serverTime = null;
-
         try {
             _serverTime = new Date(Long.parseLong(serverTime));
         } catch (Exception e) {
             System.out.println("Warning: UpdateManager.setServerTime(): Could not set time from server, using local time");
         }
-
         if (_serverTime == null)
             _serverTime = Calendar.getInstance().getTime();
     } // setServerTime
-
-    Date getServerTime() {
-        return _serverTime;
-    }
 
     /**
      * Checks for updates, and shows message dialogs if needed.
@@ -139,20 +220,16 @@ public final class UpdateManager implements Serializable {
         // frostwire.com/update.xml
         // and parse the given XML.
         //System.out.println("UpdateManager.checkForUpdates() - Invoked");
-
         UpdateMessageReader umr = new UpdateMessageReader();
         umr.readUpdateFile();
         // if it fails to read an update, we just go on, might be that the
         // website is down, or the XML is malformed.
-
-        //show a message update, download a torrent update, or let user know update has been downloaded	
+        //show a message update, download a torrent update, or let user know update has been downloaded
         handlePossibleUpdateMessage(umr, force);
-
         // attempt to show available non expired announcements
         if (umr.hasAnnouncements()) {
             attemptShowAnnouncements(umr.getAnnouncements());
         }
-
     } // checkForUpdates
 
     /**
@@ -169,31 +246,25 @@ public final class UpdateManager implements Serializable {
      */
     private void handlePossibleUpdateMessage(UpdateMessageReader umr, boolean force) {
         UpdateMessage updateMessage = umr.getUpdateMessage();
-
         if (updateMessage != null) {
             UpdateMediator.instance().setUpdateMessage(updateMessage);
         } else {
             return;
         }
-
         // we might be testing and want to force the update message
         boolean forceUpdateMessage = System.getenv().get("FROSTWIRE_FORCE_UPDATE_MESSAGE") != null;
-
         // attempt to show system Update Message if needed
         if (umr.hasUpdateMessage()
-            &&
-            ((updateMessage.getBuild() != null && !updateMessage.getBuild().trim().equals("")) ||
-            (updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")))
-            && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage))) {
-
+                &&
+                ((updateMessage.getBuild() != null && !updateMessage.getBuild().trim().equals("")) ||
+                        (updateMessage.getVersion() != null && !updateMessage.getVersion().trim().equals("")))
+                && (forceUpdateMessage || UpdateManager.isFrostWireOld(updateMessage))) {
             boolean hasUrl = updateMessage.getUrl() != null;
             boolean hasTorrent = updateMessage.getTorrent() != null;
             boolean hasInstallerUrl = updateMessage.getInstallerUrl() != null;
-
             if (forceUpdateMessage) {
                 System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
             }
-
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
                 if (hasUrl && !hasTorrent && !hasInstallerUrl) {
@@ -223,34 +294,26 @@ public final class UpdateManager implements Serializable {
      */
     private void showUpdateMessage(final UpdateMessage msg) {
         final String title = (msg.getMessageType().equals("update")) ? I18n.tr("New FrostWire Update Available") : I18n.tr("FrostWire Team Announcement");
-
         int optionType = JOptionPane.CANCEL_OPTION;
-
         // check if there's an URL to link to
         if (msg.getUrl() != null && !msg.getUrl().trim().equals("")) {
             System.out.println("\t" + msg.getUrl());
             optionType |= JOptionPane.OK_OPTION;
         }
-
         String[] options = new String[3];
-
         if (msg.getTorrent() != null) {
             options[OPTION_DOWNLOAD_TORRENT] = I18n.tr("Download Torrent");
         } else {
             options = new String[2];
         }
-
         options[OPTION_LATER] = I18n.tr("Thanks, but not now");
         options[OPTION_OPEN_URL] = I18n.tr("Go to webpage");
-
         final int finalOptionType = optionType;
         final String[] finalOptions = options;
-
         SwingUtilities.invokeLater(() -> {
             int result = JOptionPane.showOptionDialog(null, msg.getMessage(), title, finalOptionType, JOptionPane.INFORMATION_MESSAGE, null, // Icon
                     finalOptions, // Options[]
                     null); // Initial value (Object)
-
             if (result == OPTION_OPEN_URL) {
                 GUIMediator.openURL(msg.getUrl());
             } else if (result == OPTION_DOWNLOAD_TORRENT) {
@@ -278,7 +341,6 @@ public final class UpdateManager implements Serializable {
         // de-serializes seen messages if available
         File f = new File(CommonUtils.getUserSettingsDir(), "seenMessages.dat");
         _seenMessages = new HashSet<>();
-
         if (!f.exists()) {
             try {
                 f.createNewFile();
@@ -287,10 +349,8 @@ public final class UpdateManager implements Serializable {
             }
             return;
         }
-
         if (f.length() == 0)
             return;
-
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));
             _seenMessages = (HashSet<UpdateMessage>) ois.readObject();
@@ -305,7 +365,6 @@ public final class UpdateManager implements Serializable {
         // serializes _seenMessages into seenMessages.dat
         if (_seenMessages == null || _seenMessages.size() < 1)
             return;
-
         File f = new File(CommonUtils.getUserSettingsDir(), "seenMessages.dat");
         if (!f.exists()) {
             try {
@@ -314,7 +373,6 @@ public final class UpdateManager implements Serializable {
                 System.out.println("UpdateManager.saveSeenMessages() cannot create file to serialize seen messages");
             }
         }
-
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(f));
             oos.writeObject(_seenMessages);
@@ -334,124 +392,14 @@ public final class UpdateManager implements Serializable {
         if (!msg.isShownOnce())
             return false; // we'll ignore messages that can be seen more than
         // once
-
         loadSeenMessages();
-
         if (_seenMessages == null || _seenMessages.size() == 0 || !_seenMessages.contains(msg)) {
-
             if (_seenMessages == null)
                 _seenMessages = new HashSet<>();
-
             _seenMessages.add(msg);
-
             saveSeenMessages();
             return false;
         }
-
         return true;
-    }
-
-    static boolean isFrostWireOld(UpdateMessage message) {
-        if (message.getBuild() != null) {
-            try {
-                int buildNumber = Integer.parseInt(message.getBuild());
-                return buildNumber > FrostWireUtils.getBuildNumber();
-            } catch (Throwable t) {
-                System.err.println("UpdateManager::isFrostWireOld() invalid buildNumber ('"+message.getBuild()+"'), falling back to version check");
-                t.printStackTrace();
-            }
-        }
-        return isFrostWireOld(message.getVersion());
-    }
-
-    /**
-     * Given a version string, it compares against the current frostwire
-     * version. If frostwire is old, it will return true.
-     * <p>
-     * A valid version string looks like this: "MAJOR.RELEASE.SERVICE"
-     * <p>
-     * 4.13.1 4.13.2 ... 4.13.134
-     * <p>
-     * It will compare each number of the current version to the version
-     * published by the update message.
-     */
-    private static boolean isFrostWireOld(String messageVersion) {
-        // if there's nothing to compare with, then FrostWire shouldn't be old
-        // for it.
-        if (messageVersion == null)
-            return false;
-
-        String currentVersion = FrostWireUtils.getFrostWireVersion();
-
-        // first discard if we're the exact same version
-        if (currentVersion.equals(messageVersion)) {
-            return false;
-        }
-
-        // if there's a difference, maybe we have a higher version...
-        // being optimistic :)
-        try {
-            String[] fwVersionParts = currentVersion.split("\\.");
-
-            int fw_major = Integer.parseInt(fwVersionParts[0]);
-            int fw_release = Integer.parseInt(fwVersionParts[1]);
-            int fw_service = Integer.parseInt(fwVersionParts[2]);
-
-            String[] msgVersionParts = messageVersion.split("\\.");
-
-            int msg_major = Integer.parseInt(msgVersionParts[0]);
-            int msg_release = Integer.parseInt(msgVersionParts[1]);
-            int msg_service = Integer.parseInt(msgVersionParts[2]);
-
-            if (fw_major < msg_major) {
-                return true;
-            }
-
-            if (fw_major == msg_major && fw_release < msg_release) {
-                return true;
-            }
-
-            if (fw_major == msg_major && fw_release == msg_release && fw_service < msg_service) {
-                return true;
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-
-        return false;
-    }
-
-    public static synchronized UpdateManager getInstance() {
-        if (UpdateManager.INSTANCE == null) {
-            UpdateManager.INSTANCE = new UpdateManager();
-        }
-
-        return UpdateManager.INSTANCE;
-    } // getInstance
-
-    /**
-     * Starts a torrent download
-     */
-    private static void openTorrent(String uriStr) {
-        try {
-            URI uri = new URI(uriStr);
-
-            String scheme = uri.getScheme();
-            if (scheme == null || !scheme.equalsIgnoreCase("http")) {
-                // System.out.println("Not a torrent URL");
-                return;
-            }
-
-            String authority = uri.getAuthority();
-            if (authority == null || authority.equals("") || authority.indexOf(' ') != -1) {
-                // System.out.println("Invalid authority");
-                return;
-            }
-
-            GUIMediator.instance().openTorrentURI(uri.toString(), false);
-        } catch (URISyntaxException e) {
-            System.out.println(e);
-        }
     }
 }

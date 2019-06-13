@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,31 +29,26 @@ import javax.swing.plaf.synth.SynthContext;
 import javax.swing.plaf.synth.SynthSliderUI;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-
 // adapted from http://www.java2s.com/Code/Java/Swing-Components/ThumbSliderExample2.htm
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinRangeSliderUI extends SynthSliderUI {
-
     private RangeSliderAdditionalUI additonalUi;
     private MouseInputAdapter thumbTrackListener;
-
     private Rectangle zeroRect = new Rectangle();
-
     private transient boolean mousePressed;
     private transient boolean mouseOver;
+
+    public SkinRangeSliderUI(JSlider c) {
+        super(c);
+    }
 
     public static ComponentUI createUI(JComponent c) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinRangeSliderUI((JSlider) c);
-    }
-
-    public SkinRangeSliderUI(JSlider c) {
-        super(c);
     }
 
     @Override
@@ -99,7 +94,6 @@ public class SkinRangeSliderUI extends SynthSliderUI {
         slider.addComponentListener(componentListener);
         slider.addPropertyChangeListener(propertyChangeListener);
         slider.getModel().addChangeListener(changeListener);
-
         if (slider instanceof RangeSlider) {
             RangeSlider rangeSlider = (RangeSlider) slider;
             for (int i = 0; i < rangeSlider.getThumbNum(); i++) {
@@ -116,7 +110,6 @@ public class SkinRangeSliderUI extends SynthSliderUI {
         slider.removeComponentListener(componentListener);
         slider.removePropertyChangeListener(propertyChangeListener);
         slider.getModel().removeChangeListener(changeListener);
-
         if (slider instanceof RangeSlider) {
             RangeSlider rangeSlider = (RangeSlider) slider;
             for (int i = 0; i < rangeSlider.getThumbNum(); i++) {
@@ -149,10 +142,8 @@ public class SkinRangeSliderUI extends SynthSliderUI {
 
     private void paintThumbs(SynthContext context, Graphics g) {
         Rectangle clip = g.getClipBounds();
-
         int thumbNum = additonalUi.getThumbNum();
         Rectangle[] thumbRects = additonalUi.getThumbRects();
-
         for (int i = thumbNum - 1; 0 <= i; i--) {
             if (clip.intersects(thumbRects[i])) {
                 thumbRect = thumbRects[i];
@@ -164,9 +155,7 @@ public class SkinRangeSliderUI extends SynthSliderUI {
     private void calculateThumbRect() {
         int thumbNum = additonalUi.getThumbNum();
         Rectangle[] thumbRects = additonalUi.getThumbRects();
-
         thumbRect = zeroRect;
-
         for (int i = thumbNum - 1; 0 <= i; i--) {
             Rectangle rect = thumbRects[i];
             SwingUtilities.computeUnion(rect.x, rect.y, rect.width, rect.height, thumbRect);
@@ -179,27 +168,21 @@ public class SkinRangeSliderUI extends SynthSliderUI {
 
     private SynthContext getThumbContext(SynthContext ctx) {
         SynthContext context = ctx;
-
         int state = ctx.getComponentState();
-
         if (mousePressed) {
             state |= SynthConstants.PRESSED;
         }
-
         // not working logic per thumb
         //        Point p = slider.getMousePosition();
         //        if (thumbRect != null && p != null && thumbRect.contains(p)) {
         //            state |= SynthConstants.MOUSE_OVER;
         //        }
-
         if (mouseOver) {
             state |= SynthConstants.MOUSE_OVER;
         }
-
         if (state != ctx.getComponentState()) {
             context = new SynthContext(ctx.getComponent(), ctx.getRegion(), ctx.getStyle(), state);
         }
-
         return context;
     }
 
@@ -218,22 +201,14 @@ public class SkinRangeSliderUI extends SynthSliderUI {
     }
 
     private static class RangeSliderAdditionalUI {
-
-        private RangeSlider mSlider;
-
-        private SkinRangeSliderUI ui;
-
-        private Rectangle[] thumbRects;
-
-        private int thumbNum;
-
-        private transient boolean isDragging;
-
-        private ChangeHandler changeHandler;
-
-        private TrackListener trackListener;
-
         private static Rectangle unionRect = new Rectangle();
+        private RangeSlider mSlider;
+        private SkinRangeSliderUI ui;
+        private Rectangle[] thumbRects;
+        private int thumbNum;
+        private transient boolean isDragging;
+        private ChangeHandler changeHandler;
+        private TrackListener trackListener;
 
         public RangeSliderAdditionalUI(SkinRangeSliderUI ui) {
             this.ui = ui;
@@ -268,7 +243,6 @@ public class SkinRangeSliderUI extends SynthSliderUI {
         public void setThumbLocationAt(int x, int y, int index) {
             Rectangle rect = thumbRects[index];
             unionRect.setBounds(rect);
-
             rect.setLocation(x, y);
             SwingUtilities.computeUnion(rect.x, rect.y, rect.width, rect.height, unionRect);
             mSlider.repaint(unionRect.x, unionRect.y, unionRect.width, unionRect.height);
@@ -311,7 +285,6 @@ public class SkinRangeSliderUI extends SynthSliderUI {
                     int valuePosition = ui.xPositionForValue(value);
                     thumbRects[i].x = valuePosition - (thumbRects[i].width / 2);
                     thumbRects[i].y = trackRect.y;
-
                 } else {
                     int valuePosition = ui.yPositionForValue(mSlider.getValueAt(i)); // need
                     thumbRects[i].x = trackRect.x;
@@ -331,15 +304,10 @@ public class SkinRangeSliderUI extends SynthSliderUI {
 
         public class TrackListener extends MouseInputAdapter {
             protected transient int offset;
-
             protected transient int currentMouseX, currentMouseY;
-
             protected Rectangle adjustingThumbRect = null;
-
             protected int adjustingThumbIndex;
-
             protected RangeSlider slider;
-
             protected Rectangle trackRect;
 
             TrackListener(RangeSlider slider) {
@@ -354,24 +322,21 @@ public class SkinRangeSliderUI extends SynthSliderUI {
                 currentMouseX = e.getX();
                 currentMouseY = e.getY();
                 slider.requestFocus();
-
                 for (int i = 0; i < thumbNum; i++) {
                     Rectangle rect = thumbRects[i];
                     if (rect.contains(currentMouseX, currentMouseY)) {
-
                         switch (slider.getOrientation()) {
-                        case JSlider.VERTICAL:
-                            offset = currentMouseY - rect.y;
-                            break;
-                        case JSlider.HORIZONTAL:
-                            offset = currentMouseX - rect.x;
-                            break;
+                            case JSlider.VERTICAL:
+                                offset = currentMouseY - rect.y;
+                                break;
+                            case JSlider.HORIZONTAL:
+                                offset = currentMouseX - rect.x;
+                                break;
                         }
                         isDragging = true;
                         slider.setValueIsAdjusting(true);
                         adjustingThumbRect = rect;
                         adjustingThumbIndex = i;
-
                         // since the slider have a bias towards the first thumb
                         // it is necessary to correct the actual selection once
                         // the second is behind the first one and both to the
@@ -397,48 +362,38 @@ public class SkinRangeSliderUI extends SynthSliderUI {
                 int thumbMiddle = 0;
                 currentMouseX = e.getX();
                 currentMouseY = e.getY();
-
                 Rectangle rect = thumbRects[adjustingThumbIndex];
                 trackRect = getTrackRect();
                 switch (slider.getOrientation()) {
-                case JSlider.VERTICAL:
-                    int halfThumbHeight = rect.height / 2;
-                    int thumbTop = e.getY() - offset;
-                    int trackTop = trackRect.y;
-                    int trackBottom = trackRect.y + (trackRect.height - 1);
-
-                    thumbTop = Math.max(thumbTop, trackTop - halfThumbHeight);
-                    thumbTop = Math.min(thumbTop, trackBottom - halfThumbHeight);
-
-                    // pending over-range control
-
-                    setThumbLocationAt(rect.x, thumbTop, adjustingThumbIndex);
-
-                    thumbMiddle = thumbTop + halfThumbHeight;
-                    mSlider.setValueAt(ui.valueForYPosition(thumbMiddle), adjustingThumbIndex);
-                    break;
-
-                case JSlider.HORIZONTAL:
-                    int halfThumbWidth = rect.width / 2;
-                    int thumbLeft = e.getX() - offset;
-                    int trackLeft = trackRect.x;
-                    int trackRight = trackRect.x + (trackRect.width - 1);
-
-                    thumbLeft = Math.max(thumbLeft, trackLeft - halfThumbWidth);
-                    thumbLeft = Math.min(thumbLeft, trackRight - halfThumbWidth);
-
-                    if (adjustingThumbIndex == 0) {
-                        thumbLeft = Math.min(thumbLeft, ui.xPositionForValue(mSlider.getValueAt(1) - 1) - halfThumbWidth);
-                    }
-                    if (adjustingThumbIndex == 1) {
-                        thumbLeft = Math.max(ui.xPositionForValue(mSlider.getValueAt(0) + 1) - halfThumbWidth, thumbLeft);
-                    }
-
-                    setThumbLocationAt(thumbLeft, rect.y, adjustingThumbIndex);
-
-                    thumbMiddle = thumbLeft + halfThumbWidth;
-                    mSlider.setValueAt(ui.valueForXPosition(thumbMiddle), adjustingThumbIndex);
-                    break;
+                    case JSlider.VERTICAL:
+                        int halfThumbHeight = rect.height / 2;
+                        int thumbTop = e.getY() - offset;
+                        int trackTop = trackRect.y;
+                        int trackBottom = trackRect.y + (trackRect.height - 1);
+                        thumbTop = Math.max(thumbTop, trackTop - halfThumbHeight);
+                        thumbTop = Math.min(thumbTop, trackBottom - halfThumbHeight);
+                        // pending over-range control
+                        setThumbLocationAt(rect.x, thumbTop, adjustingThumbIndex);
+                        thumbMiddle = thumbTop + halfThumbHeight;
+                        mSlider.setValueAt(ui.valueForYPosition(thumbMiddle), adjustingThumbIndex);
+                        break;
+                    case JSlider.HORIZONTAL:
+                        int halfThumbWidth = rect.width / 2;
+                        int thumbLeft = e.getX() - offset;
+                        int trackLeft = trackRect.x;
+                        int trackRight = trackRect.x + (trackRect.width - 1);
+                        thumbLeft = Math.max(thumbLeft, trackLeft - halfThumbWidth);
+                        thumbLeft = Math.min(thumbLeft, trackRight - halfThumbWidth);
+                        if (adjustingThumbIndex == 0) {
+                            thumbLeft = Math.min(thumbLeft, ui.xPositionForValue(mSlider.getValueAt(1) - 1) - halfThumbWidth);
+                        }
+                        if (adjustingThumbIndex == 1) {
+                            thumbLeft = Math.max(ui.xPositionForValue(mSlider.getValueAt(0) + 1) - halfThumbWidth, thumbLeft);
+                        }
+                        setThumbLocationAt(thumbLeft, rect.y, adjustingThumbIndex);
+                        thumbMiddle = thumbLeft + halfThumbWidth;
+                        mSlider.setValueAt(ui.valueForXPosition(thumbMiddle), adjustingThumbIndex);
+                        break;
                 }
             }
 

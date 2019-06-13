@@ -24,23 +24,22 @@ import org.limewire.setting.SettingsFactory;
  * settings to that factory.
  */
 public class LimeProps extends LimeWireSettings {
-        
     private static final LimeProps INSTANCE = new LimeProps();
-    
     // The FACTORY is used for subclasses of LimeProps, so they know
     // which factory to add classes to.
     protected static final SettingsFactory FACTORY = INSTANCE.getFactory();
-    
+
     // This is protected so that subclasses can extend from it, but
     // subclasses should NEVER instantiate a copy themselves.
     protected LimeProps() {
         super("frostwire.props", "FrostWire properties file");
         assert getClass() == LimeProps.class : "should not have a subclass instantiate";
     }
-    
+
     /**
      * Returns the only instance of this class.
      */
-    public static LimeProps instance() { return INSTANCE; }
-
+    public static LimeProps instance() {
+        return INSTANCE;
+    }
 }

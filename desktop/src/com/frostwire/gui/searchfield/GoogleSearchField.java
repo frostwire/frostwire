@@ -43,32 +43,34 @@ import java.util.List;
  * @author aldenml
  */
 public class GoogleSearchField extends SearchField {
-
     private static final String SUGGESTIONS_URL = buildSuggestionsUrl();
     private static final int HTTP_QUERY_TIMEOUT = 1000;
-
     private SuggestionsThread suggestionsThread;
 
     public GoogleSearchField() {
         this.dict = createDefaultDictionary();
-
         setPrompt(I18n.tr("Hints by Google"));
         setSearchMode(SearchMode.REGULAR);
+    }
+
+    private static String buildSuggestionsUrl() {
+        String lang = ApplicationSettings.LANGUAGE.getValue();
+        if (StringUtils.isNullOrEmpty(lang)) {
+            lang = "en";
+        }
+        return "https://clients1.google.com/complete/search?client=youtube&q=%s&hl=" + lang + "&gl=us&gs_rn=23&gs_ri=youtube&ds=yt&cp=2&gs_id=8&callback=google.sbox.p50";
     }
 
     public void autoCompleteInput() {
         String input = getText();
         if (input != null && input.length() > 0) {
-
             if (suggestionsThread != null) {
                 suggestionsThread.cancel();
             }
-
             if (getAutoComplete()) {
                 suggestionsThread = new SuggestionsThread(input, this);
                 suggestionsThread.start();
             }
-
         } else {
             hidePopup();
         }
@@ -76,7 +78,6 @@ public class GoogleSearchField extends SearchField {
 
     @Override
     public void setText(String t) {
-
         try {
             if (t != null) {
                 t = t.replace("<html>", "").replace("</html>", "").replace("<b>", "").replace("</b>", "");
@@ -90,44 +91,29 @@ public class GoogleSearchField extends SearchField {
     protected JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;
-
         entryPanel = new JPanel(new GridBagLayout());
         entryPanel.setBorder(UIManager.getBorder("List.border"));
         entryPanel.setBackground(UIManager.getColor("List.background"));
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;
-
         entryList = new AutoCompleteList();
         JScrollPane entryScrollPane = new JScrollPane(entryList);
         entryScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         entryScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         entryPanel.add(entryScrollPane, c);
-
         Font origFont = getFont();
         Font newFont = origFont;
         if (OSUtils.isWindows()) {
             newFont = ThemeMediator.DIALOG_FONT.deriveFont(origFont.getSize2D());
         }
         entryList.setFont(newFont);
-
         return entryPanel;
     }
 
-    private static String buildSuggestionsUrl() {
-        String lang = ApplicationSettings.LANGUAGE.getValue();
-        if (StringUtils.isNullOrEmpty(lang)) {
-            lang = "en";
-        }
-
-        return "https://clients1.google.com/complete/search?client=youtube&q=%s&hl=" + lang + "&gl=us&gs_rn=23&gs_ri=youtube&ds=yt&cp=2&gs_id=8&callback=google.sbox.p50";
-    }
-
     private static final class SuggestionsThread extends Thread {
-
         private final String constraint;
         private final GoogleSearchField input;
-
         private boolean cancelled;
 
         public SuggestionsThread(String constraint, GoogleSearchField input) {
@@ -148,16 +134,12 @@ public class GoogleSearchField extends SearchField {
         public void run() {
             try {
                 String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint, StandardCharsets.UTF_8));
-
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
-
                 String js = httpClient.get(url, HTTP_QUERY_TIMEOUT);
                 String json = stripJs(js);
-
                 if (!isCancelled()) {
                     JsonArray arr = new JsonParser().parse(json).getAsJsonArray();
                     final List<String> suggestions = readSuggestions(arr.get(1).getAsJsonArray());
-
                     GUIMediator.safeInvokeLater(() -> {
                         Iterator<String> it = suggestions.iterator();
                         if (it.hasNext())
@@ -191,7 +173,6 @@ public class GoogleSearchField extends SearchField {
         private String stripJs(String js) {
             js = js.replace("google.sbox.p50 && google.sbox.p50(", "");
             js = js.replace("}])", "}]");
-
             return js;
         }
     }

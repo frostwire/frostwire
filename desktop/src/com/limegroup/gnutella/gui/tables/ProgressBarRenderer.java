@@ -27,18 +27,15 @@ import java.awt.*;
 /**
  * This class handles rendering a <tt>JProgressBar</tt> for improved
  * performance in tables.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
-
     private boolean isSelected;
 
     /**
      * Sets the font, border, and colors for the progress bar.
-     *
      */
     ProgressBarRenderer() {
         setUI(SkinProgressBarUI.createUI(this));
@@ -49,9 +46,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
         this.isSelected = isSel;
         setValue(Math.min(100, getBarStatus(value)));
         setString(getDescription(value));
-
         syncFont(table, this);
-
         return this;
     }
 
@@ -74,23 +69,22 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
-
         if (!isSelected) {
             BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
         }
     }
-    
+
     /*
-     * The following methods are overridden as a performance measure to 
+     * The following methods are overridden as a performance measure to
      * to prune code-paths are often called in the case of renders
      * but which we know are unnecessary.  Great care should be taken
-     * when writing your own renderer to weigh the benefits and 
+     * when writing your own renderer to weigh the benefits and
      * drawbacks of overriding methods like these.
      */
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public boolean isOpaque() {
@@ -107,7 +101,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void validate() {
@@ -115,7 +109,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void revalidate() {
@@ -123,7 +117,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void repaint(long tm, int x, int y, int width, int height) {
@@ -131,7 +125,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void repaint(Rectangle r) {
@@ -139,7 +133,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {

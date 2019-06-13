@@ -23,13 +23,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthSplitPaneUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinSplitPaneUI extends SynthSplitPaneUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinSplitPaneUI();

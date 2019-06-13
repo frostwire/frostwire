@@ -46,7 +46,6 @@ import java.util.Properties;
  * access to that data in url-encoded form.
  */
 public final class LocalClientInfo extends LocalAbstractInfo {
-
     /**
      * Creates information about this bug from the bug, thread, and detail.
      */
@@ -68,8 +67,6 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         _settingsFreeSpace = getFreeSpace(CommonUtils.getUserSettingsDir());
         _incompleteFreeSpace = "";//getFreeSpace(SharingSettings.INCOMPLETE_DIRECTORY.getValue());
         //_downloadFreeSpace = getFreeSpace(SharingSettings.getSaveDirectory());
-
-
         //Store information about the bug and the current thread.
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -77,37 +74,29 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         pw.flush();
         _bug = sw.toString();
         _currentThread = threadName;
-
         _bugName = bug.getClass().getName();
-
         _fatalError = "" + fatal;
-
         //Store the properties.
         sw = new StringWriter();
         pw = new PrintWriter(sw);
         Properties props = new Properties();
         // Load the properties from SettingsFactory, excluding
         // FileSettings and FileArraySettings.
-
         SettingsFactory sf = LimeProps.instance().getFactory();
         for (Setting set : sf) {
             if (!set.isPrivate() && !set.isDefault())
                 props.put(set.getKey(), set.getValueAsString());
         }
-
         // list the properties in the PrintWriter.
         props.list(pw);
         pw.flush();
         _props = sw.toString();
-
         //Store extra debugging information.
         if (GUIMediator.isConstructed() && LimeWireCore.instance() != null) {
             LimeWireCore.instance().getLifecycleManager().isLoaded();
         }
-
         //Store the detail, thread counts, and other information.
         _detail = detail;
-
         Thread[] allThreads = new Thread[Thread.activeCount()];
         int copied = Thread.enumerate(allThreads);
         _threadCount = "" + copied;
@@ -128,7 +117,6 @@ public final class LocalClientInfo extends LocalAbstractInfo {
             pw.println(info.getKey() + ": " + info.getValue());
         pw.flush();
         _otherThreads = sw.toString();
-
     }
 
     /**
@@ -161,7 +149,6 @@ public final class LocalClientInfo extends LocalAbstractInfo {
     private static String invoke16Method(Object obj, Class<?> type, String method, Class<?> retType) {
         if (!VersionUtils.isJava16OrAbove())
             return "-1";
-
         try {
             Method m = type.getMethod(method);
             Object ret = m.invoke(obj);
@@ -190,5 +177,4 @@ public final class LocalClientInfo extends LocalAbstractInfo {
         if (value == null) return "?";
         else return value;
     }
-
 }

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.limegroup.gnutella.gui.options;
 
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
@@ -33,34 +32,32 @@ import org.limewire.service.ErrorService;
  * <tt>AbstractPaneItem</tt>.
  */
 class OptionsPaneFactory {
-    
     /**
      * Constructs a new OptionsPaneFactory.
-     *
+     * <p>
      * Due to intermixing within Saved & Shared pane items, these two need special
      * setups.
      */
     OptionsPaneFactory() {
     }
-    
-	/**
-	 * Creates the options pane for a key.
-	 */
-	OptionsPane createOptionsPane(OptionsTreeNode node) {
-	    Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
-	    if (clazzes != null) {
+
+    /**
+     * Creates the options pane for a key.
+     */
+    OptionsPane createOptionsPane(OptionsTreeNode node) {
+        Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
+        if (clazzes != null) {
             final OptionsPane pane = new OptionsPaneImpl(node.getTitleKey());
-	        for (Class<? extends AbstractPaneItem> clazz : clazzes) {
+            for (Class<? extends AbstractPaneItem> clazz : clazzes) {
                 try {
                     pane.add(clazz.getDeclaredConstructor().newInstance());
                 } catch (Exception e) {
                     ErrorService.error(e);
                 }
-	        }
-	        return pane;
-	    } else {
-	        throw new IllegalArgumentException("no options pane for this key: " + node.getTitleKey());
-		}
-	}
-
+            }
+            return pane;
+        } else {
+            throw new IllegalArgumentException("no options pane for this key: " + node.getTitleKey());
+        }
+    }
 }

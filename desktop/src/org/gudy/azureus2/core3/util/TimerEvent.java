@@ -25,18 +25,14 @@ package org.gudy.azureus2.core3.util;
 /**
  * @author parg
  */
-
 public class
 TimerEvent
         extends ThreadPoolTask
         implements Comparable<TimerEvent> {
-    private String name;
-
-    private long when;
     private final TimerEventPerformer performer;
-
     private final boolean absolute;
-
+    private String name;
+    private long when;
     private long unique_id = 1;
 
     TimerEvent(long _unique_id,
@@ -49,15 +45,15 @@ TimerEvent
         performer = _performer;
     }
 
+    public String
+    getName() {
+        return (name);
+    }
+
     public void
     setName(
             String _name) {
         name = _name;
-    }
-
-    public String
-    getName() {
-        return (name);
     }
 
     public long
@@ -91,7 +87,6 @@ TimerEvent
         performer.perform(this);
     }
 
-
     void
     setHasRun() {
     }
@@ -100,17 +95,12 @@ TimerEvent
     compareTo(
             TimerEvent other) {
         long res = when - other.when;
-
         if (res == 0) {
-
             res = unique_id - other.unique_id;
-
             if (res == 0) {
-
                 return (0);
             }
         }
-
         return res < 0 ? -1 : 1;
     }
 }

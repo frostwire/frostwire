@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinScrollBarThumbPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinScrollBarThumbPainter(State state) {
@@ -41,7 +38,6 @@ public final class SkinScrollBarThumbPainter extends AbstractSkinPainter {
             Shape s1 = shapeGenerator.createRectangle(0, 0, width, height);
             g.setColor(SkinColors.SCROLL_THUMB_BORDER_COLOR);
             g.fill(s1);
-
             Shape s2 = shapeGenerator.createRectangle(1, 1, width - 2, height - 1);
             g.setPaint(getScrollBarThumbPaint(s2));
             g.fill(s2);
@@ -50,15 +46,15 @@ public final class SkinScrollBarThumbPainter extends AbstractSkinPainter {
 
     private Paint getScrollBarThumbPaint(Shape s) {
         switch (state) {
-        case Enabled:
-            return createVerticalGradient(s, SkinColors.SCROLL_THUMB_ENABLED_COLORS);
-        case MouseOver:
-            return createVerticalGradient(s, SkinColors.SCROLL_THUMB_MOUSEOVER_COLORS);
-        case Pressed:
-            //gubatron: this one never happens
-            return createVerticalGradient(s, SkinColors.SCROLL_THUMB_PRESSED_COLORS);
-        default:
-            throw new IllegalArgumentException("Not supported state");
+            case Enabled:
+                return createVerticalGradient(s, SkinColors.SCROLL_THUMB_ENABLED_COLORS);
+            case MouseOver:
+                return createVerticalGradient(s, SkinColors.SCROLL_THUMB_MOUSEOVER_COLORS);
+            case Pressed:
+                //gubatron: this one never happens
+                return createVerticalGradient(s, SkinColors.SCROLL_THUMB_PRESSED_COLORS);
+            default:
+                throw new IllegalArgumentException("Not supported state");
         }
     }
 

@@ -38,12 +38,10 @@ public class LimeTableColumn extends TableColumn {
      * Variable for the HeaderRenderer for all components.
      */
     private static TableCellRenderer HEADER_RENDERER;
-
     /**
      * Variable for an invisible HeaderRenderer.
      */
     private static TableCellRenderer INVIS_RENDERER;
-
     private final boolean defaultVisibility;
     private final int defaultWidth;
     private final String messageId;
@@ -51,12 +49,7 @@ public class LimeTableColumn extends TableColumn {
     private final Icon icon;
     private final boolean visName;
     private final Class<?> clazz;
-
     private boolean initialized;
-
-    public String toString() {
-        return messageId;
-    }
 
     /**
      * Creates a new column.
@@ -84,27 +77,25 @@ public class LimeTableColumn extends TableColumn {
     public LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, boolean visName, Class<?> clazz) {
         super(model);
         initialized = true;
-
         this.defaultVisibility = vis;
-
         this.defaultWidth = width;
         if (defaultWidth != -1)
             super.setPreferredWidth(width);
-
         this.messageId = id;
         super.setIdentifier(id);
-
         this.name = name;
         this.icon = icon;
         this.visName = visName;
-
         this.clazz = clazz;
-
         setHeaderVisible(true);
     }
 
     public LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, Class<?> clazz) {
         this(model, id, name, icon, width, vis, true, clazz);
+    }
+
+    public String toString() {
+        return messageId;
     }
 
     /**

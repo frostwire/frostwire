@@ -21,58 +21,46 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
-
 abstract class
 ThreadPoolTask
-	extends AERunnable
-{
-	private static final int RELEASE_AUTO = 0x00;
-	private static final int RELEASE_MANUAL = 0x01;
-	private static final int RELEASE_MANUAL_ALLOWED = 0x02;
-	
-	private int manualRelease;
+        extends AERunnable {
+    private static final int RELEASE_AUTO = 0x00;
+    private static final int RELEASE_MANUAL = 0x01;
+    private static final int RELEASE_MANUAL_ALLOWED = 0x02;
+    private int manualRelease;
 
+    public String
+    getName() {
+        return (null);
+    }
 
-	public String
-	getName()
-	{
-		return( null );
-	}
+    /**
+     * only invoke this method after the first run of the thread pool task as it is only meant to join
+     * on a task when it has child tasks and thus is running in manual release mode
+     */
+    synchronized final void join() {
+        while (manualRelease != RELEASE_AUTO) {
+            try {
+                wait();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	/**
-	 * only invoke this method after the first run of the thread pool task as it is only meant to join
-	 * on a task when it has child tasks and thus is running in manual release mode
-	 */
-	synchronized final void join()
-	{
-		while(manualRelease != RELEASE_AUTO)
-		{
-			try
-			{
-				wait();
-			} catch (Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-	}
+    synchronized final void
+    setManualRelease() {
+        manualRelease = ThreadPoolTask.RELEASE_MANUAL;
+    }
 
-	synchronized final void
-	setManualRelease()
-	{
-		manualRelease = ThreadPoolTask.RELEASE_MANUAL;
-	}
-
-	/**
-	 * only invoke this method after the first run of the thread pool task as it is only meant to
-	 * update the state of a task when it has child tasks and thus is running in manual release mode
-	 */
-	synchronized final boolean isAutoReleaseAndAllowManual()
-	{
-		if(manualRelease == RELEASE_MANUAL)
-			manualRelease = RELEASE_MANUAL_ALLOWED;
-		return manualRelease == RELEASE_AUTO;
-	}
+    /**
+     * only invoke this method after the first run of the thread pool task as it is only meant to
+     * update the state of a task when it has child tasks and thus is running in manual release mode
+     */
+    synchronized final boolean isAutoReleaseAndAllowManual() {
+        if (manualRelease == RELEASE_MANUAL)
+            manualRelease = RELEASE_MANUAL_ALLOWED;
+        return manualRelease == RELEASE_AUTO;
+    }
 }

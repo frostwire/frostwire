@@ -27,7 +27,6 @@ import java.io.File;
  * @author aldenml
  */
 public final class DesktopPaths implements SystemPaths {
-
     @Override
     public File data() {
         return null;

@@ -41,19 +41,9 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class SearchEngine {
-
     private static final int DEFAULT_TIMEOUT = 5000;
-
-    private String redirectUrl = null;
-
-    private final int _id;
-    private final String _name;
-    private final String _domainName;
-    private final BooleanSetting _setting;
-
     private static final int TPB_ID = 6;
     private static final int SOUNDCLOUD_ID = 10;
     private static final int ARCHIVEORG_ID = 11;
@@ -66,29 +56,24 @@ public abstract class SearchEngine {
     private static final int ZOOQLE_ID = 21;
     private static final int NYAA_ID = 23;
     private static final int TORRENTZ2_ID = 24;
-
-
     private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine SOUNDCLOUD = new SearchEngine(SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine ARCHIVEORG = new SearchEngine(ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ArchiveorgSearchPerformer(ARCHIVEORG.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine FROSTCLICK = new SearchEngine(FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
         private final UserAgent userAgent = new UserAgent(org.limewire.util.OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
 
@@ -97,68 +82,103 @@ public abstract class SearchEngine {
             return new FrostClickSearchPerformer(FROSTCLICK.getDomainName(), token, keywords, DEFAULT_TIMEOUT, userAgent);
         }
     };
-
     private static final SearchEngine TORLOCK = new SearchEngine(TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorLockSearchPerformer(TORLOCK.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.cc") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine NYAA = new SearchEngine(NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.re") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine YIFY = new SearchEngine(YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine ZOOQLE = new SearchEngine(ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ZooqleSearchPerformer(ZOOQLE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine TORRENTZ2 = new SearchEngine(TORRENTZ2_ID, "Torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.eu") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
+    private final int _id;
+    private final String _name;
+    private final String _domainName;
+    private final BooleanSetting _setting;
+    private String redirectUrl = null;
 
     public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
         _setting = setting;
         _domainName = domainName;
+    }
+
+    // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
+    public static List<SearchEngine> getEngines() {
+        List<SearchEngine> list = Arrays.asList(
+                TORRENTZ2,
+                ZOOQLE,
+                TPB,
+                SOUNDCLOUD,
+                FROSTCLICK,
+                ARCHIVEORG,
+                TORLOCK,
+                NYAA,
+                YIFY,
+                EZTV,
+                TORRENTDOWNLOADS,
+                LIMETORRENTS);
+        // ensure that at least one is enabled
+        boolean oneEnabled = false;
+        for (SearchEngine se : list) {
+            if (se.isEnabled()) {
+                oneEnabled = true;
+            }
+        }
+        if (!oneEnabled) {
+            ARCHIVEORG._setting.setValue(true);
+        }
+        return list;
+    }
+
+    static SearchEngine getSearchEngineByName(String name) {
+        List<SearchEngine> searchEngines = getEngines();
+        for (SearchEngine engine : searchEngines) {
+            if (name.startsWith(engine.getName())) {
+                return engine;
+            }
+        }
+        return null;
     }
 
     public int getId() {
@@ -187,49 +207,7 @@ public abstract class SearchEngine {
         return _id;
     }
 
-    // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
-    public static List<SearchEngine> getEngines() {
-        List<SearchEngine>  list = Arrays.asList(
-                TORRENTZ2,
-                ZOOQLE,
-                TPB,
-                SOUNDCLOUD,
-                FROSTCLICK,
-                ARCHIVEORG,
-                TORLOCK,
-                NYAA,
-                YIFY,
-                EZTV,
-                TORRENTDOWNLOADS,
-                LIMETORRENTS);
-
-        // ensure that at least one is enabled
-        boolean oneEnabled = false;
-        for (SearchEngine se : list) {
-            if (se.isEnabled()) {
-                oneEnabled = true;
-            }
-        }
-        if (!oneEnabled) {
-            ARCHIVEORG._setting.setValue(true);
-        }
-
-        return list;
-    }
-
     public abstract SearchPerformer getPerformer(long token, String keywords);
-
-    static SearchEngine getSearchEngineByName(String name) {
-        List<SearchEngine> searchEngines = getEngines();
-
-        for (SearchEngine engine : searchEngines) {
-            if (name.startsWith(engine.getName())) {
-                return engine;
-            }
-        }
-
-        return null;
-    }
 
     public BooleanSetting getEnabledSetting() {
         return _setting;

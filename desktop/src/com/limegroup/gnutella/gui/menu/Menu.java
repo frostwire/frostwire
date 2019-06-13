@@ -22,11 +22,10 @@ import javax.swing.*;
  * menu bar.
  */
 public interface Menu {
-
     /**
      * Returns the <tt>JMenu</tt> instance for this <tt>Menu</tt>.
-     * 
-     * @return the <tt>JMenu</tt> instance for this <tt>Menu</tt>	
+     *
+     * @return the <tt>JMenu</tt> instance for this <tt>Menu</tt>
      */
     JMenu getMenu();
 }

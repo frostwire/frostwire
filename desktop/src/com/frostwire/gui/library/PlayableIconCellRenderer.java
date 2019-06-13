@@ -24,10 +24,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 class PlayableIconCellRenderer extends DefaultTableBevelledCellRenderer {
     public PlayableIconCellRenderer() {

@@ -33,61 +33,22 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 /**
- *
  * This singleton class listens to window activated events and parses the clipboard to see
  * if a magnet uri is present.  If it is it asks the user whether to download the file.
  */
 public class MagnetClipboardListener extends WindowAdapter {
-
     private static final Logger LOG = Logger.getLogger(MagnetClipboardListener.class);
-
     private static final MagnetClipboardListener instance = new MagnetClipboardListener();
-
     //the system clipboard
     private final static Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
-
     //dummy clipboard content
     private final StringSelection empty = new StringSelection("");
-
-    private volatile String copiedText;
-
     /**
      * a thread which parses the clipboard and launches magnet downloads.
      */
     private final ExecutorService clipboardParser = ExecutorsHelper.newProcessingQueue("clipboard parser");
-
+    private volatile String copiedText;
     private Runnable parser = this::parseAndLaunch;
-
-    /**
-     * @return true if no errors occurred.  False if we should not try to 
-     * parse the clipboard anymore.
-     */
-    private void parseAndLaunch() {
-        String contents = extractStringContentFromClipboard(this);
-
-        //could not extract the clipboard as text.
-        if (contents == null)
-            return;
-
-        String copied = copiedText;
-        if (copied != null && copied.equals(contents)) {
-            // it is the magnet we just created
-            return;
-        }
-
-        //check if the magnet is valid
-        final MagnetOptions[] opts = MagnetOptions.parseMagnets(contents);
-        if (opts.length == 0)
-            return; //not a valid magnet link
-
-        //at this point we know we have a valid magnet link in the clipboard.
-        LOG.info("clipboard contains " + contents);
-
-        //purge the clipboard at this point
-        purgeClipboard();
-
-        handleMagnets(opts);
-    }
 
     private MagnetClipboardListener() {
         super();
@@ -98,37 +59,17 @@ public class MagnetClipboardListener extends WindowAdapter {
     }
 
     /**
-     * ask the clipboard parser to see if there is a magnet.
-     */
-    public void windowActivated(WindowEvent e) {
-        clipboardParser.execute(parser);
-    }
-
-    /**
-     * clears the clipboard from the current string  
-     */
-    private void purgeClipboard() {
-        try {
-            CLIPBOARD.setContents(empty, empty);
-        } catch (IllegalStateException isx) {
-            //do nothing
-        }
-    }
-
-    /**
      * Handles an array of magnets:
-     * The magnets that are downloadable are shown in a dialog where the 
+     * The magnets that are downloadable are shown in a dialog where the
      * user can choose which ones he would like to download.
-     * 
-     * Once single search is also started for a magnet that is 
+     * <p>
+     * Once single search is also started for a magnet that is
      * {@link MagnetOptions#isKeywordTopicOnly()}.
-     *
      */
     public static void handleMagnets(final MagnetOptions[] magnets) {
         // get a nicer looking address from the magnet
         // turns out magnets are very liberal.. so display the whole thing
         //final MagnetOptions[] downloadCandidates = extractDownloadableMagnets(magnets);
-
         // and fire off the download
         Runnable r = () -> {
             boolean oneSearchStarted = false;
@@ -157,18 +98,14 @@ public class MagnetClipboardListener extends WindowAdapter {
                 //we can't use the clipboard, give up.
                 return null;
             }
-
             //is there anything in the clipboard?
             if (data == null)
                 return null;
-
             //then, check if the data in the clipboard is text
             if (!data.isDataFlavorSupported(DataFlavor.stringFlavor))
                 return null;
-
             //next, extract the content into a string
             String contents = null;
-
             try {
                 contents = (String) data.getTransferData(DataFlavor.stringFlavor);
             } catch (IOException iox) {
@@ -176,12 +113,10 @@ public class MagnetClipboardListener extends WindowAdapter {
             } catch (UnsupportedFlavorException ufx) {
                 LOG.error("UnsupportedFlavor??", ufx);
             }
-
             return contents;
         } catch (Throwable e) {
             // X11 related error reported from bug manager
         }
-
         return "";
     }
 
@@ -191,25 +126,63 @@ public class MagnetClipboardListener extends WindowAdapter {
     public static String getMagnetOrTorrentURLFromClipboard() {
         try {
             String clipboardText = extractStringContentFromClipboard(null);
-
             if (clipboardText == null) {
                 return "";
             }
-
             //if the text in the clipboard has several URLs it will only parse the first line.
             if (clipboardText.contains("\n")) {
                 clipboardText = clipboardText.split("\n")[0].trim();
             }
-
             if (clipboardText.startsWith("magnet:?xt=urn:btih:") || clipboardText.matches("^http.*\\.torrent$") || clipboardText.matches(".*soundcloud.com.*")) {
                 return clipboardText;
             }
-
         } catch (Throwable e) {
             // not a important error
             LOG.error("Error processing clipboard text", e);
         }
-
         return null;
+    }
+
+    /**
+     * @return true if no errors occurred.  False if we should not try to
+     * parse the clipboard anymore.
+     */
+    private void parseAndLaunch() {
+        String contents = extractStringContentFromClipboard(this);
+        //could not extract the clipboard as text.
+        if (contents == null)
+            return;
+        String copied = copiedText;
+        if (copied != null && copied.equals(contents)) {
+            // it is the magnet we just created
+            return;
+        }
+        //check if the magnet is valid
+        final MagnetOptions[] opts = MagnetOptions.parseMagnets(contents);
+        if (opts.length == 0)
+            return; //not a valid magnet link
+        //at this point we know we have a valid magnet link in the clipboard.
+        LOG.info("clipboard contains " + contents);
+        //purge the clipboard at this point
+        purgeClipboard();
+        handleMagnets(opts);
+    }
+
+    /**
+     * ask the clipboard parser to see if there is a magnet.
+     */
+    public void windowActivated(WindowEvent e) {
+        clipboardParser.execute(parser);
+    }
+
+    /**
+     * clears the clipboard from the current string
+     */
+    private void purgeClipboard() {
+        try {
+            CLIPBOARD.setContents(empty, empty);
+        } catch (IllegalStateException isx) {
+            //do nothing
+        }
     }
 }

@@ -52,7 +52,6 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 5,
                 true);
         hexHivePanelAdapter = new HexHiveAdapter();
-
         pieceSizeLabel = new JLabel("<html><b>" + I18n.tr("Piece Size") + "</b>:</html>");
         totalPiecesLabel = new JLabel("<html><b>" + I18n.tr("Total Pieces") + "</b>:</html>");
         add(totalPiecesLabel, "gapleft 10px");
@@ -62,7 +61,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
         jScrollPane.setOpaque(true);
         jScrollPane.setBackground(Color.WHITE);
-        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         add(jScrollPane, "push, grow, height 240px, gap 10px 10px 0px 5px, span 2");
@@ -73,12 +72,9 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
     public void updateData(BittorrentDownload btDownload) {
         pieceSizeAlreadySet = (bittorrentDownload == btDownload);
         bittorrentDownload = btDownload;
-
         hexHivePanelAdapter.updateData(bittorrentDownload);
-
         updatePieceSizeLabel(hexHivePanelAdapter.getPieceSizeInHuman());
         updateTotalPiecesLabel(hexHivePanelAdapter.getFullHexagonsCount() + "/" + hexHivePanelAdapter.getTotalHexagonsCount());
-
         if (hexHivePanelAdapter.getTotalHexagonsCount() >= 0) {
             hexHivePanel.updateData(hexHivePanelAdapter);
             hexHivePanel.invalidate();
@@ -98,7 +94,6 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
         totalPiecesLabel.paintImmediately(totalPiecesLabel.getVisibleRect());
     }
-
     ////////////////////////////////////////////////////////////////////////////////
 
     private final static class HexHiveAdapter implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
@@ -123,7 +118,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
                 numFullPieces = 0;
             } else {
                 numFullPieces = 0;
-                for(int i=0; i < pieces.count(); i++) {
+                for (int i = 0; i < pieces.count(); i++) {
                     if (pieces.getBit(i)) {
                         numFullPieces++;
                     }

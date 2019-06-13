@@ -27,13 +27,12 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class NodeRenderer extends DefaultTreeCellRenderer {
-    private static AbstractBorder DIRECTORY_HOLDER_NODE_BORDER = new EmptyBorder(5,5,5,5);
+    private static AbstractBorder DIRECTORY_HOLDER_NODE_BORDER = new EmptyBorder(5, 5, 5, 5);
+
     public NodeRenderer() {
         super();
     }
@@ -41,13 +40,11 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
         if (sel) {
             setBackgroundSelectionColor(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
         } else {
             setBackgroundNonSelectionColor(row % 2 == 0 ? Color.WHITE : ThemeMediator.TABLE_ALTERNATE_ROW_COLOR);
         }
-
         if (value instanceof DirectoryHolderNode) {
             DirectoryHolderNode node = (DirectoryHolderNode) value;
             DirectoryHolder dh = node.getDirectoryHolder();
@@ -59,7 +56,6 @@ public class NodeRenderer extends DefaultTreeCellRenderer {
                 setBorder(DIRECTORY_HOLDER_NODE_BORDER);
             }
         }
-
         return this;
     }
 }

@@ -66,14 +66,62 @@ import java.util.List;
  * @author aldenml
  */
 public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRowFilteredModel, BTDownloadDataLine, BTDownload> implements TransfersTab.TransfersFilterModeListener {
-
-    private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
-
     public static final int MIN_HEIGHT = 150;
+    private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
     /**
      * instance, for singleton access
      */
     private static BTDownloadMediator INSTANCE;
+    private BTDownloadSelectionListener transferTabSelectionListener;
+    /**
+     * Variables so only one ActionListener needs to be created for both
+     * the buttons & popup menu.
+     */
+    private Action removeAction;
+    private Action removeYouTubeAction;
+    private Action resumeAction;
+    private Action pauseAction;
+    private Action exploreAction;
+    private Action copyMagnetAction;
+    private Action copyHashAction;
+    private Action shareTorrentAction;
+    private Action showInLibraryAction;
+    private Action clearInactiveAction;
+    private TransfersFilter transfersFilter;
+    private Action sendToItunesAction;
+    private PlaySingleMediaFileAction playSingleMediaFileAction;
+
+    /**
+     * Constructs all of the elements of the download window, including
+     * the table, the buttons, etc.
+     */
+    private BTDownloadMediator() {
+        super("DOWNLOAD_TABLE");
+        TABLE.setRowHeight(30);
+        GUIMediator.addRefreshListener(this);
+        restoreSorting();
+    }
+
+    public static BTDownloadMediator instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new BTDownloadMediator();
+        }
+        return INSTANCE;
+    }
+
+    private static boolean isActive(BTDownload dl) {
+        if (dl == null) {
+            return false;
+        }
+        final TransferState state = dl.getState();
+        return state == TransferState.ALLOCATING ||
+                state == TransferState.CHECKING ||
+                state == TransferState.DOWNLOADING ||
+                state == TransferState.DOWNLOADING_METADATA ||
+                state == TransferState.DOWNLOADING_TORRENT ||
+                state == TransferState.SEEDING ||
+                state == TransferState.UPLOADING;
+    }
 
     public void selectBTDownload(BTDownload lastSelectedDownload) {
         if (lastSelectedDownload == null) {
@@ -106,40 +154,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         TABLE.validate();
         TABLE.ensureRowVisible(row);
     }
-
-    public interface BTDownloadSelectionListener {
-        void onTransferSelected(BTDownload selected);
-    }
-
-    private BTDownloadSelectionListener transferTabSelectionListener;
-
-    public static BTDownloadMediator instance() {
-        if (INSTANCE == null) {
-            INSTANCE = new BTDownloadMediator();
-        }
-        return INSTANCE;
-    }
-
-    /**
-     * Variables so only one ActionListener needs to be created for both
-     * the buttons & popup menu.
-     */
-    private Action removeAction;
-    private Action removeYouTubeAction;
-    private Action resumeAction;
-    private Action pauseAction;
-    private Action exploreAction;
-    private Action copyMagnetAction;
-    private Action copyHashAction;
-    private Action shareTorrentAction;
-    private Action showInLibraryAction;
-    private Action clearInactiveAction;
-
-    private TransfersFilter transfersFilter;
-
-    private Action sendToItunesAction;
-
-    private PlaySingleMediaFileAction playSingleMediaFileAction;
 
     /**
      * Overridden to have different default values for tooltips.
@@ -195,7 +209,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         DATA_MODEL = new BTDownloadRowFilteredModel(transfersFilter);//new BTDownloadModel();
         TABLE = new LimeJTable(DATA_MODEL);
         TABLE.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-
         // the actual download buttons instance.
         BTDownloadButtons downloadButtons = new BTDownloadButtons(this);
         BUTTON_ROW = downloadButtons.getComponent();
@@ -205,7 +218,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         if (saveLocation == null) {
             return null;
         }
-
         try {
             final List<BTDownload> downloads = getDownloads();
             for (BTDownload dl : downloads) {
@@ -213,7 +225,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 if (saveLocation.equals(dlSaveLocation)) {
                     return dl;
                 }
-
                 // special consideration if it is an actual torrent transfer
                 if (dl instanceof BittorrentDownload) {
                     dlSaveLocation = ((BittorrentDownload) dl).getDl().getContentSavePath();
@@ -225,24 +236,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         } catch (Throwable e) {
             LOG.error("Error looking for transfer by save location", e);
         }
-
         return null;
-    }
-
-    private static boolean isActive(BTDownload dl) {
-        if (dl == null) {
-            return false;
-        }
-
-        final TransferState state = dl.getState();
-
-        return state == TransferState.ALLOCATING ||
-                state == TransferState.CHECKING ||
-                state == TransferState.DOWNLOADING ||
-                state == TransferState.DOWNLOADING_METADATA ||
-                state == TransferState.DOWNLOADING_TORRENT ||
-                state == TransferState.SEEDING ||
-                state == TransferState.UPLOADING;
     }
 
     // Linear complexity, take it easy, try no to use on refresh methods, only on actions.
@@ -274,66 +268,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         transferTabSelectionListener = transferSelectionListener;
     }
 
-    /**
-     * Filter out all the models who are being seeded.
-     *
-     * @author gubatron
-     */
-    private class TransfersFilter implements TableLineFilter<BTDownloadDataLine> {
-        private TransfersTab.FilterMode mode = TransfersTab.FilterMode.ALL;
-        private String searchKeywords;
-
-        @Override
-        public boolean allow(BTDownloadDataLine line) {
-            if (line == null) {
-                return false;
-            }
-            boolean result = false;
-            if (mode == TransfersTab.FilterMode.SEEDING) {
-                result = line.isSeeding();
-            } else if (mode == TransfersTab.FilterMode.DOWNLOADING) {
-                result = line.isDownloading();
-            } else if (mode == TransfersTab.FilterMode.FINISHED) {
-                result = line.isFinished();
-            } else if (mode == TransfersTab.FilterMode.ALL) {
-                result = true;
-            }
-            return result && matchKeywords(line, searchKeywords);
-        }
-
-        private boolean matchKeywords(BTDownloadDataLine line, String searchKeywords) {
-            // "Steve Jobs" iTune's like search.
-            if (searchKeywords == null ||
-                    searchKeywords.equals("") ||
-                    searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
-                return true;
-            }
-
-            String hayStack = line.getDisplayName().toLowerCase();
-            final String[] tokens = searchKeywords.split("\\s");
-
-            if (tokens.length == 1) {
-                return hayStack.contains(tokens[0].toLowerCase());
-            } else {
-                for (String needle : tokens) {
-                    if (!hayStack.contains(needle.toLowerCase())) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        public void update(TransfersTab.FilterMode mode, String searchKeywords) {
-            this.mode = mode;
-            this.searchKeywords = searchKeywords;
-        }
-
-        public void update(String searchKeywords) {
-            this.searchKeywords = searchKeywords;
-        }
-    }
-
     void updateTableFilters() {
         if (TABLE == null || DATA_MODEL == null) {
             return;
@@ -351,7 +285,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 }
             }
         }
-
     }
 
     /**
@@ -362,17 +295,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     /**
-     * Constructs all of the elements of the download window, including
-     * the table, the buttons, etc.
-     */
-    private BTDownloadMediator() {
-        super("DOWNLOAD_TABLE");
-        TABLE.setRowHeight(30);
-        GUIMediator.addRefreshListener(this);
-        restoreSorting();
-    }
-
-    /**
      * Override the default refreshing so that we can
      * set the clear button appropriately.
      */
@@ -380,9 +302,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         if (DATA_MODEL == null) {
             return;
         }
-
         DATA_MODEL.refresh();
-
         if (TABLE != null) {
             int[] selRows = TABLE.getSelectedRows();
             if (selRows.length > 0) {
@@ -399,12 +319,10 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 }
             }
         }
-
         int n = DATA_MODEL.getRowCount();
         boolean anyClearable = false;
         for (int i = n - 1; i >= 0; i--) {
             BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
-
             if (btDownloadDataLine != null) {
                 BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
                 if (initializeObject != null && isClearable(initializeObject)) {
@@ -413,7 +331,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 }
             }
         }
-
         clearInactiveAction.setEnabled(anyClearable);
     }
 
@@ -441,7 +358,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             double httpBandwidth = 0;
             for (BTDownload btDownload : this.getDownloads()) {
                 if (btDownload instanceof HttpDownload ||
-                    btDownload instanceof SoundcloudDownload) {
+                        btDownload instanceof SoundcloudDownload) {
                     httpBandwidth += btDownload.getDownloadSpeed();
                 }
             }
@@ -515,44 +432,33 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Handles a double-click event in the table.
      */
     public void handleActionKey() {
-
         BTDownload[] selectedDownloaders = getSelectedDownloaders();
-
         if (selectedDownloaders.length == 1) {
             playSingleMediaFileAction.setEnabled(selectionHasMediaFiles(selectedDownloaders[0]));
         }
-
         if (playSingleMediaFileAction.isEnabled()) {
             playSingleMediaFileAction.actionPerformed(null);
         }
-
         if (showInLibraryAction.isEnabled()) {
             showInLibraryAction.actionPerformed(null);
         }
     }
 
     protected JPopupMenu createPopupMenu() {
-
         JPopupMenu menu = new SkinPopupMenu();
-
         if (playSingleMediaFileAction.isEnabled()) {
             menu.add(new SkinMenuItem(playSingleMediaFileAction));
         }
-
         menu.add(new SkinMenuItem(resumeAction));
         menu.add(new SkinMenuItem(pauseAction));
-
         menu.addSeparator();
         menu.add(new SkinMenuItem(showInLibraryAction));
         menu.add(new SkinMenuItem(exploreAction));
-
         menu.addSeparator();
         menu.add(new SkinMenuItem(shareTorrentAction));
-
         if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
             menu.add(new SkinMenuItem(sendToItunesAction));
         }
-
         menu.add(new SkinMenuItem(copyMagnetAction));
         menu.add(new SkinMenuItem(copyHashAction));
         SkinMenu addToPlaylistMenu = BTDownloadMediatorAdvancedMenuFactory.createAddToPlaylistSubMenu();
@@ -564,13 +470,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_ACTION));
         menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION));
         menu.add(new SkinMenuItem(removeYouTubeAction));
-
         SkinMenu advancedMenu = BTDownloadMediatorAdvancedMenuFactory.createAdvancedSubMenu();
         if (advancedMenu != null) {
             menu.addSeparator();
             menu.add(advancedMenu);
         }
-
         return menu;
     }
 
@@ -587,7 +491,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return true;
         }
         File saveLocation = d.getSaveLocation();
-
         //in case it's a single picked .torrent/magnet download
         if (saveLocation != null && saveLocation.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(saveLocation)) {
             try {
@@ -597,7 +500,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 saveLocation = null;
             }
         }
-
         return saveLocation != null && (LibraryUtils.directoryContainsPlayableExtensions(saveLocation) || (saveLocation.isFile() && MediaPlayer.isPlayableFile(saveLocation)));
     }
 
@@ -621,11 +523,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         shareTorrentAction.setEnabled(false);
         sendToItunesAction.setEnabled(false);
         playSingleMediaFileAction.setEnabled(false);
-
         BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(false);
         BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(false);
         removeYouTubeAction.setEnabled(false);
-
         notifyTransferTabSelectionListener(null);
     }
 
@@ -637,51 +537,35 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * @param row the selected row
      */
     public void handleSelection(int row) {
-
         BTDownloadDataLine dataLine = DATA_MODEL.get(row);
-
         boolean pausable = dataLine.getInitializeObject().isPausable();
         boolean resumable = dataLine.getInitializeObject().isResumable();
         boolean isTransferFinished = dataLine.getInitializeObject().isCompleted();
-
         File saveLocation = dataLine.getInitializeObject().getSaveLocation();
-
         boolean hasMediaFiles = selectionHasMediaFiles(dataLine.getInitializeObject());
         boolean hasMP4s = selectionHasMP4s(saveLocation);
-
         boolean isSingleFile = selectionIsSingleFile(saveLocation);
-
         removeAction.putValue(Action.NAME, I18n.tr("Cancel Download"));
         removeAction.putValue(LimeAction.SHORT_NAME, I18n.tr("Cancel"));
         removeAction.putValue(Action.SHORT_DESCRIPTION, I18n.tr("Cancel Selected Downloads"));
-
         BTDownload dl = dataLine.getInitializeObject();
-
         exploreAction.setEnabled(dl.isCompleted());
         showInLibraryAction.setEnabled(dl.isCompleted());
-
         removeAction.setEnabled(true);
         resumeAction.setEnabled(resumable);
         pauseAction.setEnabled(pausable);
         copyMagnetAction.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
         copyHashAction.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
-
         sendToItunesAction.setEnabled(isTransferFinished && (hasMediaFiles || hasMP4s));
-
         shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dataLine.getInitializeObject().isPausable());
-
         playSingleMediaFileAction.setEnabled(getSelectedDownloaders().length == 1 && hasMediaFiles && isSingleFile);
-
         removeYouTubeAction.setEnabled(isHttpTransfer(dataLine.getInitializeObject()));
-
         BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
         BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
-
         if (GUIMediator.Tabs.TRANSFERS.equals(GUIMediator.instance().getSelectedTab())) {
             notifyTransferTabSelectionListener(dataLine.getInitializeObject());
         }
     }
-
 
     private void notifyTransferTabSelectionListener(BTDownload selected) {
         if (transferTabSelectionListener != null) {
@@ -714,7 +598,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                                         torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
                     }
                 }
-
             });
         }
     }
@@ -739,7 +622,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             SwingUtilities.invokeLater(() -> {
                 try {
                     boolean[] filesSelection = null;
-
                     if (partialDownload) {
                         PartialFilesDialog dlg = new PartialFilesDialog(GUIMediator.getAppFrame(), torrentFile);
                         dlg.setVisible(true);
@@ -748,30 +630,22 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                             return;
                         }
                     }
-
                     if (onOpenRunnableForUIThread != null) {
                         onOpenRunnableForUIThread.run();
                     }
-
                     File saveDir = null;
-
                     // Check if there's a file named like the torrent in the same folder
                     // then that means the user wants to seed
                     String seedDataFilename = FilenameUtils.removeExtension(torrentFile.getName());
-
                     File seedDataFile = new File(torrentFile.getParentFile(), seedDataFilename);
                     if (seedDataFile.exists()) {
                         saveDir = torrentFile.getParentFile();
                     }
-
                     if (saveDir == null) {
                         BTEngine.getInstance().download(torrentFile, null, filesSelection);
                     } else {
                         GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
                     }
-
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     if (!e.toString().contains("No files selected by user")) {
@@ -848,7 +722,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         for (int i = n - 1; i >= 0; i--) {
             BTDownloadDataLine btDownloadDataLine = DATA_MODEL.get(i);
             BTDownload initializeObject = btDownloadDataLine.getInitializeObject();
-
             if (isClearable(initializeObject)) {
                 DATA_MODEL.remove(i);
             }
@@ -870,7 +743,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     public boolean isDownloading(String hash) {
         return DATA_MODEL.isDownloading(hash);
     }
-
 
     public void addDownload(com.frostwire.bittorrent.BTDownload dl) {
         try {
@@ -907,12 +779,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     private void restoreSorting() {
         int sortIndex = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_INDEX.getValue();
         boolean sortOrder = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_ORDER.getValue();
-
         LimeTableColumn column = BTDownloadDataLine.staticGetColumn(sortIndex);
-
         if (sortIndex != -1 && column != null && TablesHandlerSettings.getVisibility(column.getId(), column.getDefaultVisibility()).getValue()) {
             DATA_MODEL.sort(sortIndex); //ascending
-
             if (!sortOrder) { //descending
                 DATA_MODEL.sort(sortIndex);
             }
@@ -938,17 +807,13 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 if (trackUrl.contains("?in=")) {
                     url = trackUrl.substring(0, trackUrl.indexOf("?in="));
                 }
-
                 String resolveURL = SoundcloudSearchPerformer.resolveUrl(url);
-
                 HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                 String json = client.get(resolveURL, 10000);
-
                 LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson(json);
                 for (SoundcloudSearchResult urlSr : results) {
                     downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, urlSr);
                 }
-
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -970,7 +835,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     final File savedFile = getSaveLocation();
                     if (savedFile.exists()) {
                         GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
-
                         if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
                             if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                                 iTunesMediator.instance().scanForSongs(savedFile);
@@ -981,5 +845,67 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             };
             add(downloader);
         });
+    }
+
+    public interface BTDownloadSelectionListener {
+        void onTransferSelected(BTDownload selected);
+    }
+
+    /**
+     * Filter out all the models who are being seeded.
+     *
+     * @author gubatron
+     */
+    private class TransfersFilter implements TableLineFilter<BTDownloadDataLine> {
+        private TransfersTab.FilterMode mode = TransfersTab.FilterMode.ALL;
+        private String searchKeywords;
+
+        @Override
+        public boolean allow(BTDownloadDataLine line) {
+            if (line == null) {
+                return false;
+            }
+            boolean result = false;
+            if (mode == TransfersTab.FilterMode.SEEDING) {
+                result = line.isSeeding();
+            } else if (mode == TransfersTab.FilterMode.DOWNLOADING) {
+                result = line.isDownloading();
+            } else if (mode == TransfersTab.FilterMode.FINISHED) {
+                result = line.isFinished();
+            } else if (mode == TransfersTab.FilterMode.ALL) {
+                result = true;
+            }
+            return result && matchKeywords(line, searchKeywords);
+        }
+
+        private boolean matchKeywords(BTDownloadDataLine line, String searchKeywords) {
+            // "Steve Jobs" iTune's like search.
+            if (searchKeywords == null ||
+                    searchKeywords.equals("") ||
+                    searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
+                return true;
+            }
+            String hayStack = line.getDisplayName().toLowerCase();
+            final String[] tokens = searchKeywords.split("\\s");
+            if (tokens.length == 1) {
+                return hayStack.contains(tokens[0].toLowerCase());
+            } else {
+                for (String needle : tokens) {
+                    if (!hayStack.contains(needle.toLowerCase())) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void update(TransfersTab.FilterMode mode, String searchKeywords) {
+            this.mode = mode;
+            this.searchKeywords = searchKeywords;
+        }
+
+        public void update(String searchKeywords) {
+            this.searchKeywords = searchKeywords;
+        }
     }
 }

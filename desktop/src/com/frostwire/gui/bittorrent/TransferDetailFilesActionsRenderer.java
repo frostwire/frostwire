@@ -38,11 +38,6 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
     private final static ImageIcon share_solid;
     private final static AlphaIcon share_faded;
 
-    private JLabel playButton;
-    private JLabel shareButton;
-
-    private TransferDetailFiles.TransferItemHolder transferItemHolder;
-
     static {
         play_solid = GUIMediator.getThemeImage("search_result_play_over");
         play_transparent = new AlphaIcon(play_solid, 0.1f);
@@ -50,8 +45,12 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         share_faded = new AlphaIcon(share_solid, 0.1f);
     }
 
+    private JLabel playButton;
+    private JLabel shareButton;
+    private TransferDetailFiles.TransferItemHolder transferItemHolder;
+
     public TransferDetailFilesActionsRenderer() {
-        setLayout(new MigLayout("insets 2px 18px 0 0","align center"));
+        setLayout(new MigLayout("insets 2px 18px 0 0", "align center"));
         playButton = new JLabel(play_transparent);
         playButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -61,7 +60,6 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
                 }
             }
         });
-
         shareButton = new JLabel(share_faded);
         shareButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -71,7 +69,6 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
                 }
             }
         });
-
         add(playButton, "center");
         add(shareButton, "center");
     }
@@ -98,7 +95,6 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         if (!transferItemHolder.transferItem.isComplete()) {
             return;
         }
-
         File file = transferItemHolder.transferItem.getFile();
         if (MediaPlayer.isPlayableFile(file)) {
             MediaPlayer.instance().asyncLoadMedia(new MediaSource(file), false, false);

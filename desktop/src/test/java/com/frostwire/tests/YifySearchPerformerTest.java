@@ -33,20 +33,15 @@ public final class YifySearchPerformerTest {
         String TEST_SEARCH_TERM = "one";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = httpClient.get("https://www.yify-torrent.org/search/" + TEST_SEARCH_TERM);
-
         Pattern searchResultsDetailURLPattern = Pattern.compile(YifySearchPerformer.SEARCH_RESULTS_REGEX);
         Pattern detailPagePattern = Pattern.compile(YifySearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
-
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
-
         int found = 0;
         while (searchResultsMatcher.find()) {
             found++;
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
-
             String detailUrl = "https://www.yify-torrent.org/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
-
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage = httpClient.get(detailUrl, 5000);
@@ -57,7 +52,6 @@ public final class YifySearchPerformerTest {
             long downloadTime = System.currentTimeMillis() - start;
             System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
-
             if (sm.find()) {
                 System.out.println("displayname: [" + sm.group("displayName") + "]");
                 System.out.println("infohash: [" + sm.group("infohash") + "]");
@@ -65,7 +59,6 @@ public final class YifySearchPerformerTest {
                 System.out.println("creationDate: [" + sm.group("creationDate") + "]");
                 System.out.println("seeds: [" + sm.group("seeds") + "]");
                 System.out.println("magnet: [" + sm.group("magnet") + "]");
-
                 YifySearchResult sr = new YifySearchResult(detailUrl, sm);
                 System.out.println(sr);
             } else {
@@ -76,7 +69,6 @@ public final class YifySearchPerformerTest {
             Thread.sleep(5000);
         }
         System.out.println("-done-");
-
         if (found == 0) {
             System.out.println(fileStr);
         }

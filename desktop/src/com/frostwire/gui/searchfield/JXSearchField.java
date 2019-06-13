@@ -37,9 +37,7 @@ import java.awt.event.KeyEvent;
  * @see RecentSearches
  */
 public class JXSearchField extends JXTextField {
-
     private static final long serialVersionUID = -6555528038058656677L;
-
     /**
      * The default instant search delay.
      */
@@ -49,93 +47,21 @@ public class JXSearchField extends JXTextField {
      */
     private static final KeyStroke CANCEL_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
 
-    /**
-     * Defines, how the find and cancel button are layouted.
-     */
-    public enum LayoutStyle {
-        /**
-         * <p>
-         * In VISTA layout style, the find button is placed on the right side of
-         * the search field. If text is entered, the find button is replaced by
-         * the cancel button when the actual search mode is
-         * {@link SearchMode#INSTANT}. When the search mode is
-         * {@link SearchMode#REGULAR} the find button will always stay visible
-         * and the cancel button will never be shown. However, 'Escape' can
-         * still be pressed to clear the text.
-         * </p>
-         */
-        VISTA,
-        /**
-         * <p>
-         * In MAC layout style, the find button is placed on the left side of
-         * the search field and the cancel button on the right side. The cancel
-         * button is only visible when text is present.
-         * </p>
-         */
-        MAC
-    }
-
-    /**
-     * Defines when action events are posted.
-     */
-    public enum SearchMode {
-        /**
-         * <p>
-         * In REGULAR search mode, an action event is fired, when the user
-         * presses enter or clicks the find button.
-         * </p>
-         * <p>
-         * However, if a find popup menu is set and layout style is
-         * {@link LayoutStyle#MAC}, no action will be fired, when the find
-         * button is clicked, because instead the popup menu is shown. A search
-         * can therefore only be triggered, by pressing the enter key.
-         * </p>
-         * <p>
-         * The find button can have a rollover and a pressed icon, defined by
-         * the "SearchField.rolloverIcon" and "SearchField.pressedIcon" UI
-         * properties. When a find popup menu is set,
-         * "SearchField.popupRolloverIcon" and "SearchField.popupPressedIcon"
-         * are used.
-         * </p>
-         */
-        REGULAR,
-        /**
-         * In INSTANT search mode, an action event is fired, when the user
-         * presses enter or changes the search text.
-         * <p>
-         * The action event is delayed about the number of milliseconds
-         * specified by {@link JXSearchField#getInstantSearchDelay()}.
-         * <p>
-         * No rollover and pressed icon is used for the find button.
-         */
-        INSTANT
-    }
-
     // ensure at least the default ui is registered
     static {
         new JXSearchFieldAddon().addDefaults();
     }
 
     private JButton findButton;
-
     private JButton cancelButton;
-
     private JButton popupButton;
-
     private LayoutStyle layoutStyle;
-
     private SearchMode searchMode = SearchMode.INSTANT;
-
     private boolean useSeperatePopupButton;
-
     private boolean useSeperatePopupButtonSet;
-
     private boolean layoutStyleSet;
-
     private int instantSearchDelay = DEFAULT_INSTANT_SEARCH_DELAY;
-
     private boolean promptFontStyleSet;
-
     private Timer instantSearchTimer;
 
     /**
@@ -156,7 +82,6 @@ public class JXSearchField extends JXTextField {
         // install default actions
         setCancelAction(new ClearAction());
         setFindAction(new FindAction());
-
         // We cannot register the ClearAction through the Input- and
         // ActionMap because ToolTipManager registers the escape key with an
         // action that hides the tooltip every time the tooltip is changed and
@@ -169,7 +94,6 @@ public class JXSearchField extends JXTextField {
                 }
             }
         });
-
         // Map specific native properties to general JXSearchField properties.
         addPropertyChangeListener(NativeSearchFieldSupport.FIND_POPUP_PROPERTY, evt -> {
             JPopupMenu oldPopup = (JPopupMenu) evt.getOldValue();
@@ -195,6 +119,16 @@ public class JXSearchField extends JXTextField {
     }
 
     /**
+     * Sets the current search mode. See {@link SearchMode} for a description of
+     * the different search modes.
+     *
+     * @param searchMode {@link SearchMode#INSTANT} or {@link SearchMode#REGULAR}
+     */
+    public void setSearchMode(SearchMode searchMode) {
+        firePropertyChange("searchMode", this.searchMode, this.searchMode = searchMode);
+    }
+
+    /**
      * Returns <code>true</code> if the current {@link SearchMode} is
      * {@link SearchMode#INSTANT}.
      *
@@ -214,16 +148,6 @@ public class JXSearchField extends JXTextField {
      */
     boolean isRegularSearchMode() {
         return SearchMode.REGULAR.equals(getSearchMode());
-    }
-
-    /**
-     * Sets the current search mode. See {@link SearchMode} for a description of
-     * the different search modes.
-     *
-     * @param searchMode {@link SearchMode#INSTANT} or {@link SearchMode#REGULAR}
-     */
-    public void setSearchMode(SearchMode searchMode) {
-        firePropertyChange("searchMode", this.searchMode, this.searchMode = searchMode);
     }
 
     /**
@@ -264,6 +188,17 @@ public class JXSearchField extends JXTextField {
     }
 
     /**
+     * Set the current {@link LayoutStyle}. See {@link LayoutStyle} for a
+     * description of how this affects layout and behavior of the search field.
+     *
+     * @param layoutStyle {@link LayoutStyle#MAC} or {@link LayoutStyle#VISTA}
+     */
+    private void setLayoutStyle(LayoutStyle layoutStyle) {
+        layoutStyleSet = true;
+        firePropertyChange("layoutStyle", this.layoutStyle, this.layoutStyle = layoutStyle);
+    }
+
+    /**
      * Returns <code>true</code> if the current {@link LayoutStyle} is
      * {@link LayoutStyle#VISTA}.
      */
@@ -277,17 +212,6 @@ public class JXSearchField extends JXTextField {
      */
     boolean isMacLayoutStyle() {
         return LayoutStyle.MAC.equals(getLayoutStyle());
-    }
-
-    /**
-     * Set the current {@link LayoutStyle}. See {@link LayoutStyle} for a
-     * description of how this affects layout and behavior of the search field.
-     *
-     * @param layoutStyle {@link LayoutStyle#MAC} or {@link LayoutStyle#VISTA}
-     */
-    private void setLayoutStyle(LayoutStyle layoutStyle) {
-        layoutStyleSet = true;
-        firePropertyChange("layoutStyle", this.layoutStyle, this.layoutStyle = layoutStyle);
     }
 
     /**
@@ -348,7 +272,6 @@ public class JXSearchField extends JXTextField {
      * @see #getCancelButton()
      */
     private JButton createCancelButton() {
-
         return new BuddyButton();
     }
 
@@ -404,7 +327,6 @@ public class JXSearchField extends JXTextField {
      * @see #getFindButton()
      */
     private JButton createFindButton() {
-
         return new BuddyButton();
     }
 
@@ -500,6 +422,16 @@ public class JXSearchField extends JXTextField {
     }
 
     /**
+     * Returns the find popup menu.
+     *
+     * @return the find popup menu
+     * @see #setFindPopupMenu(JPopupMenu)
+     */
+    JPopupMenu getFindPopupMenu() {
+        return NativeSearchFieldSupport.getFindPopupMenu(this);
+    }
+
+    /**
      * Sets the popup menu that will be displayed when the popup button is
      * clicked. If a find popup menu is set and
      * {@link #isUseSeperatePopupButton()} returns <code>false</code>, the
@@ -521,18 +453,7 @@ public class JXSearchField extends JXTextField {
         if (isManagingRecentSearches()) {
             return;
         }
-
         NativeSearchFieldSupport.setFindPopupMenu(this, findPopupMenu);
-    }
-
-    /**
-     * Returns the find popup menu.
-     *
-     * @return the find popup menu
-     * @see #setFindPopupMenu(JPopupMenu)
-     */
-    JPopupMenu getFindPopupMenu() {
-        return NativeSearchFieldSupport.getFindPopupMenu(this);
     }
 
     private boolean isManagingRecentSearches() {
@@ -648,11 +569,72 @@ public class JXSearchField extends JXTextField {
     }
 
     /**
+     * Defines, how the find and cancel button are layouted.
+     */
+    public enum LayoutStyle {
+        /**
+         * <p>
+         * In VISTA layout style, the find button is placed on the right side of
+         * the search field. If text is entered, the find button is replaced by
+         * the cancel button when the actual search mode is
+         * {@link SearchMode#INSTANT}. When the search mode is
+         * {@link SearchMode#REGULAR} the find button will always stay visible
+         * and the cancel button will never be shown. However, 'Escape' can
+         * still be pressed to clear the text.
+         * </p>
+         */
+        VISTA,
+        /**
+         * <p>
+         * In MAC layout style, the find button is placed on the left side of
+         * the search field and the cancel button on the right side. The cancel
+         * button is only visible when text is present.
+         * </p>
+         */
+        MAC
+    }
+
+    /**
+     * Defines when action events are posted.
+     */
+    public enum SearchMode {
+        /**
+         * <p>
+         * In REGULAR search mode, an action event is fired, when the user
+         * presses enter or clicks the find button.
+         * </p>
+         * <p>
+         * However, if a find popup menu is set and layout style is
+         * {@link LayoutStyle#MAC}, no action will be fired, when the find
+         * button is clicked, because instead the popup menu is shown. A search
+         * can therefore only be triggered, by pressing the enter key.
+         * </p>
+         * <p>
+         * The find button can have a rollover and a pressed icon, defined by
+         * the "SearchField.rolloverIcon" and "SearchField.pressedIcon" UI
+         * properties. When a find popup menu is set,
+         * "SearchField.popupRolloverIcon" and "SearchField.popupPressedIcon"
+         * are used.
+         * </p>
+         */
+        REGULAR,
+        /**
+         * In INSTANT search mode, an action event is fired, when the user
+         * presses enter or changes the search text.
+         * <p>
+         * The action event is delayed about the number of milliseconds
+         * specified by {@link JXSearchField#getInstantSearchDelay()}.
+         * <p>
+         * No rollover and pressed icon is used for the find button.
+         */
+        INSTANT
+    }
+
+    /**
      * Invoked when the cancel button or the 'Esc' key is pressed. Sets the
      * text in the search field to <code>null</code>.
      */
     class ClearAction extends AbstractAction {
-
         private static final long serialVersionUID = -3349455592229414653L;
 
         ClearAction() {
@@ -680,7 +662,6 @@ public class JXSearchField extends JXTextField {
      * Invoked when the find button is pressed.
      */
     public class FindAction extends AbstractAction {
-
         private static final long serialVersionUID = 6512288404613230232L;
 
         FindAction() {

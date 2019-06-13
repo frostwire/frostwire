@@ -30,13 +30,10 @@ import java.awt.image.BufferedImage;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class LibraryCoverArtPanel extends JPanel {
-
     private final BufferedImage background;
     private final Image defaultCoverArt;
-
     private Image coverArtImage;
     private TagsReader tagsReader;
 
@@ -99,20 +96,15 @@ public final class LibraryCoverArtPanel extends JPanel {
 
     private void setPrivateImage(Image image) {
         coverArtImage = image;
-
         if (coverArtImage == null) {
             coverArtImage = defaultCoverArt;
         }
-
         Graphics2D g2 = background.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-
         g2.setBackground(new Color(255, 255, 255, 0));
         g2.clearRect(0, 0, getWidth(), getHeight());
-
         g2.drawImage(coverArtImage, 0, 0, getWidth(), getHeight(), null);
         g2.dispose();
-
         repaint();
         getToolkit().sync();
     }

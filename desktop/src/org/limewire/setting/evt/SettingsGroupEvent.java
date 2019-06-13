@@ -6,37 +6,10 @@ import org.limewire.setting.SettingsGroup;
  * SettingsEvent are fired when a {@link SettingsGroup} instance changed
  */
 public class SettingsGroupEvent {
-
-    /**
-     * Various SettingsEvent that may occur
-     */
-    public enum EventType {
-        /**
-         * The Settings were saved
-         */
-        SAVE,
-
-        /**
-         * The Settings were reloaded
-         */
-        RELOAD,
-
-        /**
-         * The Settings were reverted back to default
-         */
-        REVERT_TO_DEFAULT,
-
-        /**
-         * The 'should save' state of the Settings changed
-         */
-        SHOULD_SAVE
-    }
-
     /**
      * The type of the event
      */
     private final EventType type;
-
     /**
      * The {@link SettingsGroup} instance that created this event
      */
@@ -52,16 +25,36 @@ public class SettingsGroupEvent {
         if (type == null) {
             throw new NullPointerException("EventType is null");
         }
-
         if (group == null) {
             throw new NullPointerException("SettingsGroup is null");
         }
-
         this.type = type;
         this.group = group;
     }
 
     public String toString() {
         return type + ": " + group;
+    }
+
+    /**
+     * Various SettingsEvent that may occur
+     */
+    public enum EventType {
+        /**
+         * The Settings were saved
+         */
+        SAVE,
+        /**
+         * The Settings were reloaded
+         */
+        RELOAD,
+        /**
+         * The Settings were reverted back to default
+         */
+        REVERT_TO_DEFAULT,
+        /**
+         * The 'should save' state of the Settings changed
+         */
+        SHOULD_SAVE
     }
 }

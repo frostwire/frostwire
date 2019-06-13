@@ -25,7 +25,6 @@ import java.io.FileFilter;
  * Interface for the directory data model behind a node in the library tree.
  */
 public interface DirectoryHolder extends FileFilter {
-
     /**
      * @return Returns the name of the directory.
      */

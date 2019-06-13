@@ -2,19 +2,17 @@ package com.limegroup.gnutella.gui.tables;
 
 /**
  * Simple comparable holder so that the Transfer table can properly be sorted by the number of seeds.
- * @author gubatron
  *
+ * @author gubatron
  */
 public class SeedsHolder implements Comparable<SeedsHolder> {
-
+    private final String stringForm;
     public int connected;
     public int seeds;
-    private final String stringForm;
 
     public SeedsHolder(String seedsString) {
         stringForm = seedsString;
         String[] split = seedsString.split("/");
-
         try {
             connected = Integer.parseInt(split[0].trim());
             seeds = Integer.parseInt(split[1].trim());

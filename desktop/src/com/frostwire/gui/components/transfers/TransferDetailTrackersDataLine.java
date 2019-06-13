@@ -24,19 +24,17 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
 
 public final class TransferDetailTrackersDataLine extends AbstractDataLine<TransferDetailTrackers.TrackerItemHolder> {
-
     private static final int URL_COLUMN_ID = 0;
     private static final int STATUS_COLUMN_ID = 1;
     private static final int SEEDS_COLUMN_ID = 2;
     private static final int PEERS_COLUMN_ID = 3;
     private static final int DOWNLOADED_COLUMN_ID = 4;
-
     private static LimeTableColumn[] columns = new LimeTableColumn[]{
-        new LimeTableColumn(URL_COLUMN_ID, "URL", I18n.tr("URL"), 180, true, true, true, String.class),
-        new LimeTableColumn(STATUS_COLUMN_ID, "STATUS", I18n.tr("Status"), 180, true, true, true, String.class),
-        new LimeTableColumn(SEEDS_COLUMN_ID, "SEEDS", I18n.tr("Seeds"), 180, true, true, true, String.class),
-        new LimeTableColumn(PEERS_COLUMN_ID, "PEERS", I18n.tr("Peers"), 180, true, true, true, String.class),
-        new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 180, true, true, true, SizeHolder.class),
+            new LimeTableColumn(URL_COLUMN_ID, "URL", I18n.tr("URL"), 180, true, true, true, String.class),
+            new LimeTableColumn(STATUS_COLUMN_ID, "STATUS", I18n.tr("Status"), 180, true, true, true, String.class),
+            new LimeTableColumn(SEEDS_COLUMN_ID, "SEEDS", I18n.tr("Seeds"), 180, true, true, true, String.class),
+            new LimeTableColumn(PEERS_COLUMN_ID, "PEERS", I18n.tr("Peers"), 180, true, true, true, String.class),
+            new LimeTableColumn(DOWNLOADED_COLUMN_ID, "DOWNLOADED", I18n.tr("Downloaded"), 180, true, true, true, SizeHolder.class),
     };
 
     public TransferDetailTrackersDataLine() {
@@ -65,11 +63,9 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
     @Override
     public Object getValueAt(int col) {
         final TransferDetailTrackers.TrackerItemHolder holder = getInitializeObject();
-
         if (holder == null) {
             return null;
         }
-
         switch (col) {
             case URL_COLUMN_ID:
                 return holder.url;

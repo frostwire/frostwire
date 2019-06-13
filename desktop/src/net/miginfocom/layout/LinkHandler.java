@@ -47,7 +47,6 @@ public final class LinkHandler {
     static final int HEIGHT = 3;
     private static final int X2 = 4;
     private static final int Y2 = 5;
-
     private static final ArrayList<WeakReference<Object>> LAYOUTS = new ArrayList<>(4);
     private static final ArrayList<HashMap<String, int[]>> VALUES = new ArrayList<>(4);
     private static final ArrayList<HashMap<String, int[]>> VALUES_TEMP = new ArrayList<>(4);
@@ -58,7 +57,6 @@ public final class LinkHandler {
     public synchronized static Integer getValue(Object layout, String key, int type) {
         Integer ret = null;
         boolean cont = true;
-
         for (int i = LAYOUTS.size() - 1; i >= 0; i--) {
             Object l = LAYOUTS.get(i).get();
             if (ret == null && l == layout) {
@@ -71,7 +69,6 @@ public final class LinkHandler {
                 }
                 cont = false;
             }
-
             if (l == null) {
                 LAYOUTS.remove(i);
                 VALUES.remove(i);
@@ -102,21 +99,18 @@ public final class LinkHandler {
             if (l == layout) {
                 HashMap<String, int[]> map = (temporary ? VALUES_TEMP : VALUES).get(i);
                 int[] old = map.get(key);
-
                 if (old == null || old[X] != x || old[Y] != y || old[WIDTH] != width || old[HEIGHT] != height) {
                     if (old == null || !incCur) {
                         map.put(key, new int[]{x, y, width, height, x + width, y + height});
                         return true;
                     } else {
                         boolean changed = false;
-
                         if (x != LayoutUtil.NOT_SET) {
                             if (old[X] == LayoutUtil.NOT_SET || x < old[X]) {
                                 old[X] = x;
                                 old[WIDTH] = old[X2] - x;
                                 changed = true;
                             }
-
                             if (width != LayoutUtil.NOT_SET) {
                                 int x2 = x + width;
                                 if (old[X2] == LayoutUtil.NOT_SET || x2 > old[X2]) {
@@ -126,14 +120,12 @@ public final class LinkHandler {
                                 }
                             }
                         }
-
                         if (y != LayoutUtil.NOT_SET) {
                             if (old[Y] == LayoutUtil.NOT_SET || y < old[Y]) {
                                 old[Y] = y;
                                 old[HEIGHT] = old[Y2] - y;
                                 changed = true;
                             }
-
                             if (height != LayoutUtil.NOT_SET) {
                                 int y2 = y + height;
                                 if (old[Y2] == LayoutUtil.NOT_SET || y2 > old[Y2]) {
@@ -149,20 +141,16 @@ public final class LinkHandler {
                 return false;
             }
         }
-
         LAYOUTS.add(new WeakReference<>(layout));
         int[] bounds = new int[]{x, y, width, height, x + width, y + height};
-
         HashMap<String, int[]> values = new HashMap<>(4);
         if (temporary)
             values.put(key, bounds);
         VALUES_TEMP.add(values);
-
         values = new HashMap<>(4);
         if (!temporary)
             values.put(key, bounds);
         VALUES.add(values);
-
         return true;
     }
 

@@ -13,37 +13,31 @@ import java.awt.event.MouseEvent;
  * Works on Windows, Linux, and any other platforms JDIC supports.
  */
 public final class TrayNotifier implements NotifyUser {
-	
-	private SystemTray _tray;
-	private TrayIcon _icon;
-	
-	private boolean _supportsTray;
-	
-	public TrayNotifier() {
-		try {
-			_tray = SystemTray.getSystemTray();
-		} catch (Exception e) {
-			_tray = null;
-			_supportsTray = false;
-			return;
-		}
-		
-		_supportsTray = true;		
-		buildPopupMenu();
+    private SystemTray _tray;
+    private TrayIcon _icon;
+    private boolean _supportsTray;
 
-		String iconFileName = "frosticon";
-		if (OSUtils.isLinux()) {
-		    iconFileName += "_linux";
-		}
+    public TrayNotifier() {
+        try {
+            _tray = SystemTray.getSystemTray();
+        } catch (Exception e) {
+            _tray = null;
+            _supportsTray = false;
+            return;
+        }
+        _supportsTray = true;
+        buildPopupMenu();
+        String iconFileName = "frosticon";
+        if (OSUtils.isLinux()) {
+            iconFileName += "_linux";
+        }
+        buildTrayIcon(iconFileName);
+    }
 
-		buildTrayIcon(iconFileName);
-	}
-
-	private void buildTrayIcon(String imageFileName) {
-	    _icon = new TrayIcon(GUIMediator.getThemeImage(imageFileName).getImage(),
+    private void buildTrayIcon(String imageFileName) {
+        _icon = new TrayIcon(GUIMediator.getThemeImage(imageFileName).getImage(),
                 "FrostWire",
-				 GUIMediator.getTrayMenu());
-	    
+                GUIMediator.getTrayMenu());
         _icon.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -52,60 +46,51 @@ public final class TrayNotifier implements NotifyUser {
                 }
             }
         });
-        
-      // left click restores.  This happens on the awt thread.
-      _icon.addActionListener(e -> GUIMediator.restoreView());
-        
-	    _icon.setImageAutoSize(true);
-	}
-	
-	private void buildPopupMenu() {
-		PopupMenu menu = GUIMediator.getTrayMenu();
-		
-		// restore
-		MenuItem item = new MenuItem(I18n.tr("Restore"));
-		item.addActionListener(e -> GUIMediator.restoreView());
-		menu.add(item);
-		
-		menu.addSeparator();
-		
-		// about box
-		item = new MenuItem(I18n.tr("About"));
-		item.addActionListener(e -> GUIMediator.showAboutWindow());
-		menu.add(item);
-		
-		menu.addSeparator();
-		
-		// exit
-		item = new MenuItem(I18n.tr("Exit"));
-		item.addActionListener(e -> GUIMediator.shutdown());
-		menu.add(item);
-	}
+        // left click restores.  This happens on the awt thread.
+        _icon.addActionListener(e -> GUIMediator.restoreView());
+        _icon.setImageAutoSize(true);
+    }
 
-	@Override
-	public boolean showTrayIcon() {
-		if (_tray == null || !supportsSystemTray()) {
-			return false;
-		}
-		
-	    try {
-	        _tray.add(_icon);
-	    } catch(Exception iae) {
-	        // Sometimes JDIC can't load the trayIcon :(
-	        return false;
-	    }
-
-        return true;
-	}
-
-	@Override
-    public boolean supportsSystemTray() {
-		//gub: could be SystemTray.isSupported(), not sure how fast that is though.
-	    return _supportsTray;
+    private void buildPopupMenu() {
+        PopupMenu menu = GUIMediator.getTrayMenu();
+        // restore
+        MenuItem item = new MenuItem(I18n.tr("Restore"));
+        item.addActionListener(e -> GUIMediator.restoreView());
+        menu.add(item);
+        menu.addSeparator();
+        // about box
+        item = new MenuItem(I18n.tr("About"));
+        item.addActionListener(e -> GUIMediator.showAboutWindow());
+        menu.add(item);
+        menu.addSeparator();
+        // exit
+        item = new MenuItem(I18n.tr("Exit"));
+        item.addActionListener(e -> GUIMediator.shutdown());
+        menu.add(item);
     }
 
     @Override
-	public void hideTrayIcon() {
-		_tray.remove(_icon);
-	}
+    public boolean showTrayIcon() {
+        if (_tray == null || !supportsSystemTray()) {
+            return false;
+        }
+        try {
+            _tray.add(_icon);
+        } catch (Exception iae) {
+            // Sometimes JDIC can't load the trayIcon :(
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean supportsSystemTray() {
+        //gub: could be SystemTray.isSupported(), not sure how fast that is though.
+        return _supportsTray;
+    }
+
+    @Override
+    public void hideTrayIcon() {
+        _tray.remove(_icon);
+    }
 }

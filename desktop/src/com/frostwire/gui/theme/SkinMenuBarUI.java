@@ -26,19 +26,16 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthMenuBarUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinMenuBarUI extends SynthMenuBarUI {
-
-	public static ComponentUI createUI(JComponent comp) {
-	    ThemeMediator.testComponentCreationThreadingViolation();
-		if (OSUtils.isMacOSX()) {
-			return AquaMenuBarUI.createUI(comp);
-		} else {
-			return new SynthMenuBarUI();
-		}
-	}
+    public static ComponentUI createUI(JComponent comp) {
+        ThemeMediator.testComponentCreationThreadingViolation();
+        if (OSUtils.isMacOSX()) {
+            return AquaMenuBarUI.createUI(comp);
+        } else {
+            return new SynthMenuBarUI();
+        }
+    }
 }

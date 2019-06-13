@@ -22,20 +22,19 @@ import org.limewire.setting.StringArraySetting;
  * Settings for filters
  */
 public class FilterSettings extends LimeProps {
-    
-    private FilterSettings() {}
-
     /**
-	 * Sets whether or not search results including "adult content" are
-	 * banned.
-	 */
+     * Sets whether or not search results including "adult content" are
+     * banned.
+     */
     public static final BooleanSetting FILTER_ADULT =
-        FACTORY.createBooleanSetting("FILTER_ADULT", false);
-    
+            FACTORY.createBooleanSetting("FILTER_ADULT", false);
     /**
-	 * An array of words that the user has banned from appearing in
-	 * search results.
-	 */
+     * An array of words that the user has banned from appearing in
+     * search results.
+     */
     public static final StringArraySetting BANNED_WORDS =
-        FACTORY.createStringArraySetting("BANNED_WORDS", new String[0]);
+            FACTORY.createStringArraySetting("BANNED_WORDS", new String[0]);
+
+    private FilterSettings() {
+    }
 }

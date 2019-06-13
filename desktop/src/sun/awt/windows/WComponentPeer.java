@@ -5,9 +5,7 @@ package sun.awt.windows;
  */
 @SuppressWarnings("unused")
 public class WComponentPeer {
-
-	public long getHWnd() {
-		return 0;
-	}
-
+    public long getHWnd() {
+        return 0;
+    }
 }

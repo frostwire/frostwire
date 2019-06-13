@@ -23,13 +23,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthScrollBarUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinScrollBarUI extends SynthScrollBarUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinScrollBarUI();

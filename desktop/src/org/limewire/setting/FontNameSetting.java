@@ -19,7 +19,6 @@ package org.limewire.setting;
 
 import java.util.Properties;
 
-
 /**
  * Provides a font name setting value. As a subclass of
  * <code>Setting</code>, the setting has a key.
@@ -28,7 +27,6 @@ import java.util.Properties;
  * {@link SettingsFactory#createFontNameSetting(String, String)}.
  */
 final class FontNameSetting extends AbstractSetting {
-
     FontNameSetting(Properties defaultProps, Properties props, String key,
                     String defaultStr) {
         super(defaultProps, props, key, defaultStr);
@@ -36,6 +34,5 @@ final class FontNameSetting extends AbstractSetting {
 
     @Override
     protected void loadValue(String sValue) {
-
     }
 }

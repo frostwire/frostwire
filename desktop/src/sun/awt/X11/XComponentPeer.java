@@ -5,8 +5,7 @@ package sun.awt.X11;
  */
 @SuppressWarnings("unused")
 public class XComponentPeer {
-
-	public long getWindow() {
-		return 0;
-	}
+    public long getWindow() {
+        return 0;
+    }
 }

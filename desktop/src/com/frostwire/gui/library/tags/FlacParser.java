@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,12 +29,9 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 
  * @author aldenml
- *
  */
 class FlacParser extends JaudiotaggerParser {
-
     private static final Logger LOG = Logger.getLogger(FlacParser.class);
 
     public FlacParser(File file) {
@@ -44,7 +41,6 @@ class FlacParser extends JaudiotaggerParser {
     @Override
     public BufferedImage getArtwork() {
         BufferedImage image = super.getArtwork();
-
         if (image == null) {
             try {
                 AudioFile audioFile = AudioFileIO.read(file);
@@ -61,7 +57,6 @@ class FlacParser extends JaudiotaggerParser {
                 LOG.error("Unable to read cover art from flac");
             }
         }
-
         return image;
     }
 }

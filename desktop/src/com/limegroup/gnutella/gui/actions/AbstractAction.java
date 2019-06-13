@@ -15,24 +15,20 @@
 
 package com.limegroup.gnutella.gui.actions;
 
-import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 
 import javax.swing.*;
 
 /**
- * Abstract class that allows the name of the action to have an ampersand to 
+ * Abstract class that allows the name of the action to have an ampersand to
  * mark the mnemonic of the action in its name.
- * 
+ * <p>
  * A call to {@link #putValue(String, Object) putValue(Action.Name, "Hello &World")}
  * will set the name of the action to "Hello World" and its menomonic to 'W'.
- * 
- * 
  */
 public abstract class AbstractAction extends javax.swing.AbstractAction {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 5133426772218480351L;
 
@@ -43,22 +39,21 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     public AbstractAction(String name) {
         super(name);
     }
-    
+
     public AbstractAction() {
     }
-    
+
     @Override
     public void putValue(String key, Object newValue) {
         // parse out mnemonic key for action name
         if (key.equals(NAME)) {
-            String name = (String)newValue;
+            String name = (String) newValue;
             newValue = GUIUtils.stripAmpersand(name);
             int mnemonicKeyCode = GUIUtils.getMnemonicKeyCode(name);
-            if (mnemonicKeyCode != -1) { 
-            	super.putValue(MNEMONIC_KEY, mnemonicKeyCode);
+            if (mnemonicKeyCode != -1) {
+                super.putValue(MNEMONIC_KEY, mnemonicKeyCode);
             }
         }
         super.putValue(key, newValue);
     }
-
 }

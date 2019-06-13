@@ -21,13 +21,10 @@ package com.frostwire.gui.library;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class PlayableIconCell {
-
     private Icon icon;
 
     PlayableIconCell(Icon icon) {
@@ -37,5 +34,4 @@ public class PlayableIconCell {
     public Icon getIcon() {
         return icon;
     }
-
 }

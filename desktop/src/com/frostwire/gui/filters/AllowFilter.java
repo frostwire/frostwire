@@ -19,9 +19,9 @@ package com.frostwire.gui.filters;
 
 import com.limegroup.gnutella.gui.search.UISearchResult;
 
-/** 
+/**
  * A filter that allows anything.  Use when you don't want to filter
- * traffic. 
+ * traffic.
  */
 public class AllowFilter implements SearchFilter {
     public boolean allow(UISearchResult m) {

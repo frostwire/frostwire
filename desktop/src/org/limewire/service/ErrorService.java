@@ -7,7 +7,6 @@ import java.io.PrintStream;
  * includes static methods to set and get the <code>ErrorCallback</code> class.
  */
 public final class ErrorService {
-
     /**
      * The <tt>ErrorCallback</tt> instance that callbacks are sent to.
      * As a default the <tt>PrintStreamErrorCallback</tt> is set,
@@ -29,7 +28,6 @@ public final class ErrorService {
         _errorCallback = callback;
     }
 
-
     /**
      * Displays the error to the user.
      */
@@ -44,14 +42,12 @@ public final class ErrorService {
         _errorCallback.error(problem, detail);
     }
 
-
     /**
      * Helper class that outputs the stack trace and the exception message to
      * a {@link PrintStream} and rethrows the exception as a {@link
      * RuntimeException}.
      */
     private static class PrintStreamErrorCallback implements ErrorCallback {
-
         private final PrintStream out;
 
         /**

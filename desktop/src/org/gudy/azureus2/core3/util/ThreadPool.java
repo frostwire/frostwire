@@ -29,45 +29,21 @@ public class ThreadPool {
     private static final boolean NAME_THREADS = false;
     private static final boolean LOG_WARNINGS = false;
     private static final int WARN_TIME = 10000;
-
     private static final List busy_pools = new ArrayList();
-    private static boolean busy_pool_timer_set = false;
-
     private static final ThreadLocal tls =
             ThreadLocal.withInitial(() -> (null));
-
-    private static void
-    checkAllTimeouts() {
-        List pools;
-        // copy the busy pools to avoid potential deadlock due to synchronization
-        // nestings
-
-        synchronized (busy_pools) {
-            pools = new ArrayList(busy_pools);
-        }
-
-        for (Object pool : pools) {
-            ((ThreadPool) pool).checkTimeouts();
-        }
-    }
-
-
+    private static boolean busy_pool_timer_set = false;
     private final String name;
-    private int thread_name_index = 1;
-
     private final List busy;
     private final boolean queue_when_full;
     private final List task_queue = new ArrayList();
-
     private final AESemaphore thread_sem;
+    private final Average task_average = Average.getInstance(WARN_TIME, 120);
+    private int thread_name_index = 1;
     private int reserved_actual;
-
     private boolean warn_when_full;
-
     private long task_total;
     private long task_total_last;
-    private final Average task_average = Average.getInstance(WARN_TIME, 120);
-
     public ThreadPool(
             String _name,
             int _max_size) {
@@ -80,10 +56,21 @@ public class ThreadPool {
             boolean _queue_when_full) {
         name = _name;
         queue_when_full = _queue_when_full;
-
         thread_sem = new AESemaphore(_max_size);
-
         busy = new ArrayList(_max_size);
+    }
+
+    private static void
+    checkAllTimeouts() {
+        List pools;
+        // copy the busy pools to avoid potential deadlock due to synchronization
+        // nestings
+        synchronized (busy_pools) {
+            pools = new ArrayList(busy_pools);
+        }
+        for (Object pool : pools) {
+            ((ThreadPool) pool).checkTimeouts();
+        }
     }
 
     void
@@ -95,67 +82,44 @@ public class ThreadPool {
         run(runnable, false);
     }
 
-
     private void run(AERunnable runnable, boolean manualRelease) {
-
         if (manualRelease && !(runnable instanceof ThreadPoolTask))
             throw new IllegalArgumentException("manual release only allowed for ThreadPoolTasks");
         else if (manualRelease)
             ((ThreadPoolTask) runnable).setManualRelease();
-
         // System.out.println( "Thread pool:" + name + " - sem = " + thread_sem.getValue() + ", queue = " + task_queue.size());
-
         // not queueing, grab synchronous sem here
-
         if (!queue_when_full) {
-
             if (!thread_sem.reserveIfAvailable()) {
-
                 // defend against recursive entry when in queuing mode (yes, it happens)
-
                 threadPoolWorker recursive_worker = (threadPoolWorker) tls.get();
-
                 if (recursive_worker == null || recursive_worker.getOwner() != this) {
-
                     // do a blocking reserve here, not recursive
-
                     checkWarning();
-
                     thread_sem.reserve();
-
                 } else {
                     // run immediately
-
                     if (runnable instanceof ThreadPoolTask) {
-
                         ThreadPoolTask task = (ThreadPoolTask) runnable;
-
                         runIt(runnable);
                         task.join();
                     } else {
-
                         runIt(runnable);
                     }
-
                     return;
                 }
             }
         }
-
         synchronized (this) {
-
             if (false)
                 task_queue.add(0, runnable);
             else
                 task_queue.add(runnable);
-
             // reserve if available is non-blocking
-
             if (queue_when_full && !thread_sem.reserveIfAvailable()) {
                 checkWarning();
             }
         }
-
     }
 
     private void runIt(AERunnable runnable) {
@@ -187,29 +151,18 @@ public class ThreadPool {
         }
     }
 
-
     private void
     checkTimeouts() {
         synchronized (this) {
-
             long diff = task_total - task_total_last;
-
             task_average.addValue(diff);
-
             task_total_last = task_total;
-
-
             long now = SystemTime.getMonotonousTime();
-
             for (Object o : busy) {
-
                 threadPoolWorker x = (threadPoolWorker) o;
-
                 long elapsed = now - x.run_start_time;
-
                 if (elapsed > ((long) WARN_TIME * (x.warn_count + 1))) {
                     x.warn_count++;
-
                 }
             }
         }
@@ -237,9 +190,7 @@ public class ThreadPool {
 
         public void run() {
             tls.set(threadPoolWorker.this);
-
             boolean autoRelease = true;
-
             try {
                 do {
                     try {
@@ -249,7 +200,6 @@ public class ThreadPool {
                             else
                                 break;
                         }
-
                         synchronized (ThreadPool.this) {
                             run_start_time = SystemTime.getMonotonousTime();
                             warn_count = 0;
@@ -267,19 +217,16 @@ public class ThreadPool {
                                 }
                             }
                         }
-
                         if (runnable instanceof ThreadPoolTask) {
                             ThreadPoolTask tpt = (ThreadPoolTask) runnable;
                             String task_name = NAME_THREADS ? tpt.getName() : null;
                             try {
                                 if (task_name != null)
                                     setName(worker_name + "{" + task_name + "}");
-
                                 runIt(runnable);
                             } finally {
                                 if (task_name != null)
                                     setName(worker_name);
-
                                 if (!tpt.isAutoReleaseAndAllowManual()) {
                                     autoRelease = false;
                                     break;
@@ -287,7 +234,6 @@ public class ThreadPool {
                             }
                         } else
                             runIt(runnable);
-
                     } catch (Throwable e) {
                         e.printStackTrace();
                     } finally {
@@ -296,9 +242,7 @@ public class ThreadPool {
                                 long elapsed = SystemTime.getMonotonousTime() - run_start_time;
                                 if (elapsed > WARN_TIME && LOG_WARNINGS)
                                     System.out.println(getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + state);
-
                                 busy.remove(threadPoolWorker.this);
-
                                 // if debug is on we leave the pool registered so that we
                                 // can trace on the timeout events
                                 if (busy.size() == 0)
@@ -313,21 +257,15 @@ public class ThreadPool {
                 e.printStackTrace();
             } finally {
                 if (autoRelease) {
-
                     synchronized (ThreadPool.this) {
-
                         int reserved_target = 0;
                         if (reserved_target > reserved_actual) {
-
                             reserved_actual++;
-
                         } else {
-
                             thread_sem.release();
                         }
                     }
                 }
-
                 tls.set(null);
             }
         }

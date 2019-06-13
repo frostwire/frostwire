@@ -19,18 +19,27 @@
 package com.frostwire.gui.player;
 
 public interface MPlayerUIEventListener {
+    void onUIVolumeChanged(float volume);
 
-	void onUIVolumeChanged(float volume);
-	void onUIVolumeIncremented();
-	void onUIVolumeDecremented();
+    void onUIVolumeIncremented();
+
+    void onUIVolumeDecremented();
+
     void onUISeekToTime(float seconds);
+
     void onUIPlayPressed();
+
     void onUIPausePressed();
+
     void onUITogglePlayPausePressed();
+
     void onUIFastForwardPressed();
+
     void onUIRewindPressed();
+
     void onUIToggleFullscreenPressed();
-	void onUIProgressSlideStart();
-	void onUIProgressSlideEnd();
-	
+
+    void onUIProgressSlideStart();
+
+    void onUIProgressSlideEnd();
 }

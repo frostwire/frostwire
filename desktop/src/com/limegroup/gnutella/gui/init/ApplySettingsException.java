@@ -20,9 +20,8 @@ package com.limegroup.gnutella.gui.init;
  * setup.
  */
 class ApplySettingsException extends Exception {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6921739192150900295L;
 
@@ -32,7 +31,7 @@ class ApplySettingsException extends Exception {
      * retrieved by the <code>{@link java.lang.Throwable#getMessage}</code>
      * method of class <code>java.lang.Throwable</code>.
      *
-     * @param   s   the detail message.
+     * @param s the detail message.
      */
     ApplySettingsException(String s) {
         super(s);

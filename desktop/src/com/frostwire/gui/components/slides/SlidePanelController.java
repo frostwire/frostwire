@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.gui.player.StreamMediaSource;
@@ -23,13 +22,10 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.StringUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 class SlidePanelController {
-
     private Slide slide;
 
     SlidePanelController(Slide slide) {
@@ -41,25 +37,22 @@ class SlidePanelController {
     }
 
     void downloadSlide() {
-
         switch (slide.method) {
-        case Slide.SLIDE_DOWNLOAD_METHOD_HTTP:
-            if (slide.httpDownloadURL != null) {
-                GUIMediator.instance().openSlide(slide);
-            }
-            break;
-
-        case Slide.SLIDE_DOWNLOAD_METHOD_TORRENT:
-            if (slide.torrent != null) {
-                if (slide.torrent.toLowerCase().startsWith("http")) {
-                    GUIMediator.instance().openTorrentURI(slide.torrent, false);
-                } else if (slide.torrent.toLowerCase().startsWith("magnet:?")) {
-                    GUIMediator.instance().openTorrentURI(slide.torrent, false);
+            case Slide.SLIDE_DOWNLOAD_METHOD_HTTP:
+                if (slide.httpDownloadURL != null) {
+                    GUIMediator.instance().openSlide(slide);
                 }
-            }
-            break;
+                break;
+            case Slide.SLIDE_DOWNLOAD_METHOD_TORRENT:
+                if (slide.torrent != null) {
+                    if (slide.torrent.toLowerCase().startsWith("http")) {
+                        GUIMediator.instance().openTorrentURI(slide.torrent, false);
+                    } else if (slide.torrent.toLowerCase().startsWith("magnet:?")) {
+                        GUIMediator.instance().openTorrentURI(slide.torrent, false);
+                    }
+                }
+                break;
         }
-
         if (slide.hasFlag(Slide.OPEN_CLICK_URL_ON_DOWNLOAD) && slide.clickURL != null) {
             GUIMediator.openURL(slide.clickURL);
         }

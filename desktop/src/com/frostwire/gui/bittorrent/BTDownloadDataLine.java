@@ -34,54 +34,14 @@ import java.util.*;
  * instance.
  */
 public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
-    
-    private static final String PARTIAL_DOWNLOAD_TEXT = I18n.tr(" (Handpicked)");
-
-    /**
-     * Variable for the status of the download.
-     */
-    private TransferState transferState;
-
-    /**
-     * Variable for the amount of the file that has been read.
-     */
-    private long download = 0;
-    private long upload;
-
-    /**
-     * Variable for the progress made in the progress bar.
-     */
-    private int progress;
-
-    /**
-     * Variable for the size of the download.
-     */
-    private double size = -1;
-
-    /**
-     * Variable for the speed of the download.
-     */
-    private double downloadSpeed;
-    private double uploadSpeed;
-
-    /**
-     * Variable for how much time is left.
-     */
-    private double timeLeft;
-    private String seeds;
-    private String peers;
-    private String shareRatio;
-    private String seedToPeerRatio;
-    private Date dateCreated;
-    private String license;
-    private boolean notificationShown;
-    private PaymentOptions paymentOptions;
-    private static final List<LimeTableColumn> columns;
-    private static final int COLUMN_COUNT;
     static final LimeTableColumn ACTIONS_COLUMN;
-    private static final LimeTableColumn FILE_COLUMN;
     static final LimeTableColumn SEEDING_COLUMN;
     static final LimeTableColumn PAYMENT_OPTIONS_COLUMN;
+    static final LimeTableColumn DATE_CREATED_COLUMN;
+    private static final String PARTIAL_DOWNLOAD_TEXT = I18n.tr(" (Handpicked)");
+    private static final List<LimeTableColumn> columns;
+    private static final int COLUMN_COUNT;
+    private static final LimeTableColumn FILE_COLUMN;
     private static final LimeTableColumn SIZE_COLUMN;
     private static final LimeTableColumn STATUS_COLUMN;
     private static final LimeTableColumn PROGRESS_COLUMN;
@@ -94,8 +54,8 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private static final LimeTableColumn PEERS_COLUMN;
     private static final LimeTableColumn SHARE_RATIO_COLUMN;
     private static final LimeTableColumn SEED_TO_PEER_RATIO_COLUMN;
-    static final LimeTableColumn DATE_CREATED_COLUMN;
     private static final LimeTableColumn LICENSE_COLUMN;
+    public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     static {
         columns = new ArrayList<>();
@@ -105,7 +65,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         columns.add(FILE_COLUMN);
         SEEDING_COLUMN = new LimeTableColumn(columns.size(), "SEEDING_COLUMN", I18n.tr("Seeding"), 67, true, SeedingHolder.class);
         columns.add(SEEDING_COLUMN);
-        PAYMENT_OPTIONS_COLUMN = new LimeTableColumn(columns.size(), "PAYMENT_OPTIONS_COLUMN", I18n.tr("Tips/Donations"), 126, true, PaymentOptions.class );
+        PAYMENT_OPTIONS_COLUMN = new LimeTableColumn(columns.size(), "PAYMENT_OPTIONS_COLUMN", I18n.tr("Tips/Donations"), 126, true, PaymentOptions.class);
         columns.add(PAYMENT_OPTIONS_COLUMN);
         SIZE_COLUMN = new LimeTableColumn(columns.size(), "DOWNLOAD_SIZE_COLUMN", I18n.tr("Size"), 79, true, SizeHolder.class);
         columns.add(SIZE_COLUMN);
@@ -138,16 +98,6 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         COLUMN_COUNT = columns.size();
     }
 
-    private TransferHolder transferHolder;
-    private SeedingHolder seedingHolder;
-
-    // Implements DataLine interface
-    public int getColumnCount() {
-        return COLUMN_COUNT;
-    }
-
-    public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
-
     static {
         TRANSFER_STATE_STRING_MAP.put(TransferState.CHECKING, I18n.tr("Checking..."));
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING_METADATA, I18n.tr("Downloading metadata"));
@@ -176,11 +126,62 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     }
 
     /**
+     * Variable for the status of the download.
+     */
+    private TransferState transferState;
+    /**
+     * Variable for the amount of the file that has been read.
+     */
+    private long download = 0;
+    private long upload;
+    /**
+     * Variable for the progress made in the progress bar.
+     */
+    private int progress;
+    /**
+     * Variable for the size of the download.
+     */
+    private double size = -1;
+    /**
+     * Variable for the speed of the download.
+     */
+    private double downloadSpeed;
+    private double uploadSpeed;
+    /**
+     * Variable for how much time is left.
+     */
+    private double timeLeft;
+    private String seeds;
+    private String peers;
+    private String shareRatio;
+    private String seedToPeerRatio;
+    private Date dateCreated;
+    private String license;
+    private boolean notificationShown;
+    private PaymentOptions paymentOptions;
+    private TransferHolder transferHolder;
+    private SeedingHolder seedingHolder;
+
+    static LimeTableColumn staticGetColumn(int idx) {
+        try {
+            return columns.get(idx);
+        } catch (Throwable t) {
+            System.out.println("BTDownloadDataLine::staticGetColumn(" + idx + ") - Index out of bound.");
+            return null;
+        }
+    }
+
+    // Implements DataLine interface
+    public int getColumnCount() {
+        return COLUMN_COUNT;
+    }
+
+    /**
      * Must initialize data.
      *
      * @param downloader the <tt>Downloader</tt>
-     *  that provides access to
-     *  information about the download
+     *                   that provides access to
+     *                   information about the download
      */
     public void initialize(BTDownload downloader) {
         super.initialize(downloader);
@@ -199,12 +200,12 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         final TransferState state = initializer.getState();
         // almost like TorrentUtils.isActive() but doesn't consider uploading or seeding.
         final boolean downloading = state == TransferState.ALLOCATING ||
-                                    state == TransferState.CHECKING ||
-                                    state == TransferState.DOWNLOADING ||
-                                    state == TransferState.DOWNLOADING_METADATA ||
-                                    state == TransferState.DOWNLOADING_TORRENT;
+                state == TransferState.CHECKING ||
+                state == TransferState.DOWNLOADING ||
+                state == TransferState.DOWNLOADING_METADATA ||
+                state == TransferState.DOWNLOADING_TORRENT;
         final boolean pausedButUnfinished = !initializer.isCompleted() && state == TransferState.PAUSED;
-        return initializer != null  && (downloading || pausedButUnfinished);
+        return initializer != null && (downloading || pausedButUnfinished);
     }
 
     public boolean isFinished() {
@@ -221,11 +222,11 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Returns the <tt>Object</tt> stored at the specified column in this
      * line of data.
+     *
      * @return the <tt>Object</tt> stored at that index
      */
     public Object getValueAt(int index) {
         final LimeTableColumn column = columns.get(index);
-
         if (column == ACTIONS_COLUMN) {
             return transferHolder;
         } else if (column == SEEDING_COLUMN) {
@@ -257,13 +258,13 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         } else if (column == UPLOAD_SPEED_COLUMN) {
             return uploadSpeed;
         } else if (column == TIME_COLUMN) {
-                if (initializer.isCompleted()) {
-                    return new TimeRemainingHolder(0);
-                } else if (downloadSpeed < 0.001) {
-                    return new TimeRemainingHolder(-1);
-                } else {
-                    return new TimeRemainingHolder(timeLeft);
-                }
+            if (initializer.isCompleted()) {
+                return new TimeRemainingHolder(0);
+            } else if (downloadSpeed < 0.001) {
+                return new TimeRemainingHolder(-1);
+            } else {
+                return new TimeRemainingHolder(timeLeft);
+            }
         } else if (column == SEEDS_COLUMN) {
             return new SeedsHolder(seeds);
         } else if (column == PEERS_COLUMN) {
@@ -284,15 +285,6 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         return staticGetColumn(idx);
     }
 
-    static LimeTableColumn staticGetColumn(int idx) {
-        try {
-            return columns.get(idx);
-        } catch (Throwable t) {
-            System.out.println("BTDownloadDataLine::staticGetColumn("+idx+") - Index out of bound.");
-            return null;
-        }
-    }
-
     public int getTypeAheadColumn() {
         return FILE_COLUMN.getModelIndex();
     }
@@ -310,7 +302,6 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         String seeds = I18n.tr("Seeds") + ": " + getInitializeObject().getSeedsString();
         String size = I18n.tr("Size") + ": " + new SizeHolder(getInitializeObject().getSize());
         String time = I18n.tr("ETA") + ": " + (getInitializeObject().isCompleted() ? new TimeRemainingHolder(0) : (getInitializeObject().getDownloadSpeed() < 0.001 ? new TimeRemainingHolder(-1) : new TimeRemainingHolder(getInitializeObject().getETA())));
-
         info[0] = name;
         info[1] = status;
         info[2] = progress;
@@ -322,7 +313,6 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         info[8] = seeds;
         info[9] = size;
         info[10] = time;
-
         return info;
     }
 
@@ -360,18 +350,15 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         seedToPeerRatio = initializer.getSeedToPeerRatio();
         size = initializer.getSize();
         dateCreated = initializer.getDateCreated();
-        
-        if (initializer.getCopyrightLicenseBroker() != null && 
-            initializer.getCopyrightLicenseBroker().license != null) {
+        if (initializer.getCopyrightLicenseBroker() != null &&
+                initializer.getCopyrightLicenseBroker().license != null) {
             license = initializer.getCopyrightLicenseBroker().license.getName();
         } else {
             license = "";
         }
-        
         if (initializer.getPaymentOptions() != null) {
             paymentOptions = initializer.getPaymentOptions();
         }
-
         if (getInitializeObject().isCompleted()) {
             showNotification();
         }

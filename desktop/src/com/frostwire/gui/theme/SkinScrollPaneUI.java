@@ -24,13 +24,10 @@ import javax.swing.plaf.synth.SynthScrollPaneUI;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinScrollPaneUI extends SynthScrollPaneUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinScrollPaneUI();
@@ -39,7 +36,6 @@ public final class SkinScrollPaneUI extends SynthScrollPaneUI {
     @Override
     protected void installDefaults(JScrollPane scrollpane) {
         super.installDefaults(scrollpane);
-
         JScrollBar scrollBar = scrollpane.getVerticalScrollBar();
         if (scrollBar != null) {
             scrollBar.setPreferredSize(new Dimension(18, 100));

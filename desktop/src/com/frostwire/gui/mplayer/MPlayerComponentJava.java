@@ -21,23 +21,20 @@ package com.frostwire.gui.mplayer;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class MPlayerComponentJava extends Canvas implements MPlayerComponent {
-
-	public MPlayerComponentJava() {
+    public MPlayerComponentJava() {
     }
-	
-	@Override
-	public Component getComponent() {
-		return this;
-	}
 
-	@Override
-	public boolean toggleFullScreen() {
-		return false;
-	}
+    @Override
+    public Component getComponent() {
+        return this;
+    }
+
+    @Override
+    public boolean toggleFullScreen() {
+        return false;
+    }
 }

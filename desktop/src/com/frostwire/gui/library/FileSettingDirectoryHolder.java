@@ -21,13 +21,11 @@ import org.limewire.setting.FileSetting;
 
 import java.io.File;
 
-
 /**
  * Implementation of the {@link DirectoryHolder} interface backed by a file
  * setting.
  */
 public class FileSettingDirectoryHolder extends AbstractDirectoryHolder {
-
     private String name;
     private String desc;
     private FileSetting fs;

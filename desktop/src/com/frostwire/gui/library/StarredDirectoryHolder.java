@@ -25,13 +25,10 @@ import javax.swing.*;
 import java.io.File;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class StarredDirectoryHolder implements DirectoryHolder {
-
     private final Icon icon;
 
     public StarredDirectoryHolder() {
@@ -65,5 +62,4 @@ public class StarredDirectoryHolder implements DirectoryHolder {
     public Icon getIcon() {
         return icon;
     }
-
 }

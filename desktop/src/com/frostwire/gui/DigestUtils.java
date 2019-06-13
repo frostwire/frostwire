@@ -22,7 +22,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public class DigestUtils {
-
     /**
      * Returns true if the MD5 of the file corresponds to the given MD5 string.
      * It works with lowercase or uppercase, you don't need to worry about that.
@@ -31,7 +30,6 @@ public class DigestUtils {
         if (isInvalidMD5(expectedMD5)) {
             return false;
         }
-
         String md5 = getMD5(f, listener);
         return compareMD5(md5, expectedMD5);
     }
@@ -40,7 +38,6 @@ public class DigestUtils {
         if ((isInvalidMD5(md5a)) || (isInvalidMD5(md5b))) {
             return false;
         }
-
         return md5a.equalsIgnoreCase(md5b);
     }
 
@@ -48,7 +45,6 @@ public class DigestUtils {
         if (md5 == null) {
             return true;
         }
-
         // Check length AND characters
         return !md5.matches("^[0-9A-Fa-f]{32}+$");
     }
@@ -68,19 +64,14 @@ public class DigestUtils {
     private static String getMD5(InputStream is, long streamLength, DigestProgressListener listener) {
         try {
             MessageDigest m = MessageDigest.getInstance("MD5");
-
             byte[] buf = new byte[1024 * 4];
             int num_read;
-
             InputStream in = new BufferedInputStream(is);
-
             long total_read = 0;
-
             boolean stopped = false;
             while (!stopped && (num_read = in.read(buf)) != -1) {
                 total_read += num_read;
                 m.update(buf, 0, num_read);
-
                 if (listener != null) {
                     if (streamLength > 0) {
                         int progressPercentage = (int) (total_read * 100 / streamLength);
@@ -89,19 +80,14 @@ public class DigestUtils {
                         } catch (Exception ignored) {
                         }
                     }
-
                     if (listener.stopDigesting()) {
                         stopped = true;
                     }
                 }
             }
-
-
             in.close();
-
             if (!stopped) {
                 StringBuilder result = new StringBuilder(new BigInteger(1, m.digest()).toString(16));
-
                 // pad with zeros if until it's 32 chars long.
                 if (result.length() < 32) {
                     int paddingSize = 32 - result.length();
@@ -113,8 +99,6 @@ public class DigestUtils {
             } else {
                 return null;
             }
-
-
         } catch (Exception e) {
             return null;
         }

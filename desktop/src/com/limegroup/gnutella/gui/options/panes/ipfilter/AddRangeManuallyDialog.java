@@ -30,14 +30,12 @@ import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
 public class AddRangeManuallyDialog extends JDialog {
     private final static Logger LOG = Logger.getLogger(AddRangeManuallyDialog.class);
+    private final static Pattern IPV4_PATTERN = Pattern.compile("(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])", java.util.regex.Pattern.CASE_INSENSITIVE);
+    private final static Pattern IPV6_PATTERN = Pattern.compile("([0-9a-f]{1,4}\\:{1,2}){4,7}([0-9a-f]){1,4}", java.util.regex.Pattern.CASE_INSENSITIVE);
     private final IPFilterPaneItem dialogListener;
     private final JTextField descriptionTextField;
     private final JTextField rangeStartTextField;
     private final JTextField rangeEndTextField;
-
-    private final static Pattern IPV4_PATTERN = Pattern.compile("(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])", java.util.regex.Pattern.CASE_INSENSITIVE);
-    private final static Pattern IPV6_PATTERN = Pattern.compile("([0-9a-f]{1,4}\\:{1,2}){4,7}([0-9a-f]){1,4}", java.util.regex.Pattern.CASE_INSENSITIVE);
-
 
     public AddRangeManuallyDialog(IPFilterPaneItem dialogListener) {
         super(getParentDialog(dialogListener), true);
@@ -48,24 +46,19 @@ public class AddRangeManuallyDialog extends JDialog {
         panel.add(new JLabel(I18n.tr("Description")), "wrap");
         descriptionTextField = new JTextField();
         panel.add(descriptionTextField, "growx, wrap");
-
         panel.add(new JLabel("<html><strong>" + I18n.tr("Starting IP address") + "</strong></html>"), "wrap");
         rangeStartTextField = new JTextField();
         panel.add(rangeStartTextField, "w 250px, wrap");
-
         panel.add(new JLabel("<html><strong>" +
                 I18n.tr("Ending IP address") +
                 "</strong><br/><i>" +
                 I18n.tr("Leave blank or repeat 'Starting IP address' to block a single one") +
                 "</i></html>"), "growx ,wrap");
-
         rangeEndTextField = new JTextField();
         panel.add(rangeEndTextField, "w 250px, gapbottom 10px, wrap");
-
         fixKeyStrokes(descriptionTextField);
         fixKeyStrokes(rangeStartTextField);
         fixKeyStrokes(rangeEndTextField);
-
         JButton addRangeButton = new JButton(addIPRangeManuallyString);
         panel.add(addRangeButton, "growx");
         addRangeButton.addActionListener((e) -> onAddRangeButtonClicked());
@@ -76,6 +69,15 @@ public class AddRangeManuallyDialog extends JDialog {
         setResizable(false);
         setLocationRelativeTo(getParent());
         pack();
+    }
+
+    private static JDialog getParentDialog(IPFilterPaneItem paneItem) {
+        Component result = paneItem.getContainer();
+        do {
+            result = result.getParent();
+            LOG.info("getParentDialog: getContainer -> " + result.getClass().getName());
+        } while (!(result instanceof JDialog));
+        return (JDialog) result;
     }
 
     private void onAddRangeButtonClicked() {
@@ -93,14 +95,12 @@ public class AddRangeManuallyDialog extends JDialog {
     private boolean validateInput() {
         String rangeStart = rangeStartTextField.getText().trim();
         String rangeEnd = rangeEndTextField.getText().trim();
-
         if (isInvalidIPAddress(rangeStart, IPAddressFormat.IPV4) &&
                 isInvalidIPAddress(rangeStart, IPAddressFormat.IPV6)) {
             rangeStartTextField.selectAll();
             rangeStartTextField.requestFocus();
             return false;
         }
-
         if (!rangeEnd.isEmpty() &&
                 isInvalidIPAddress(rangeEnd, IPAddressFormat.IPV4) &&
                 isInvalidIPAddress(rangeEnd, IPAddressFormat.IPV6)) {
@@ -108,12 +108,10 @@ public class AddRangeManuallyDialog extends JDialog {
             rangeEndTextField.requestFocus();
             return false;
         }
-
         String description = descriptionTextField.getText().trim();
         if (description.isEmpty()) {
             description = I18n.tr("Not available");
         }
-
         try {
             new IPRange(
                     description,
@@ -125,25 +123,16 @@ public class AddRangeManuallyDialog extends JDialog {
         return true;
     }
 
-    private static JDialog getParentDialog(IPFilterPaneItem paneItem) {
-        Component result = paneItem.getContainer();
-        do {
-            result = result.getParent();
-            LOG.info("getParentDialog: getContainer -> " + result.getClass().getName());
-        } while (!(result instanceof JDialog));
-        return (JDialog) result;
-    }
-
-    private enum IPAddressFormat {
-        IPV4,
-        IPV6
-    }
-
     private boolean isInvalidIPAddress(String potentialIPAddress, IPAddressFormat format) {
         if (potentialIPAddress == null || potentialIPAddress.isEmpty()) {
             return true;
         }
         Pattern pattern = format == IPAddressFormat.IPV4 ? IPV4_PATTERN : IPV6_PATTERN;
         return !pattern.matcher(potentialIPAddress).find();
+    }
+
+    private enum IPAddressFormat {
+        IPV4,
+        IPV6
     }
 }

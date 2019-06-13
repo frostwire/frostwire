@@ -33,22 +33,19 @@ import java.net.URL;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ImageCache {
-
     private static final Logger LOG = Logger.getLogger(ImageCache.class);
-
     private static ImageCache instance;
+
+    private ImageCache() {
+    }
 
     public synchronized static ImageCache instance() {
         if (instance == null) {
             instance = new ImageCache();
         }
         return instance;
-    }
-
-    private ImageCache() {
     }
 
     public BufferedImage getImage(URL url, OnLoadedListener listener) {
@@ -69,7 +66,6 @@ public class ImageCache {
             host = "localhost";
             path = new File(path).getName();
         }
-
         return new File(SharingSettings.getImageCacheDirectory(), File.separator + host + File.separator + path);
     }
 
@@ -113,17 +109,13 @@ public class ImageCache {
                 BufferedImage image = null;
                 HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
                 byte[] data = newInstance.getBytes(url.toString());
-
                 if (data == null) {
                     throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
-
                 }
-
                 if (data != null) {
                     image = ImageIO.read(new ByteArrayInputStream(data));
                     saveToCache(url, image, System.currentTimeMillis());
                 }
-
                 if (listener != null && image != null) {
                     listener.onLoaded(url, image, false, false);
                 }
@@ -131,23 +123,19 @@ public class ImageCache {
                 LOG.error("Failed to load image from: " + url, e);
                 listener.onLoaded(url, null, false, true);
             }
-        }),"ImageCache.loadFromUrl");
+        }), "ImageCache.loadFromUrl");
     }
 
     private void saveToCache(URL url, BufferedImage image, long date) {
         try {
             File file = getCacheFile(url);
-
             if (file.exists()) {
                 file.delete();
             }
-
             String filename = file.getName();
             int dotIndex = filename.lastIndexOf('.');
             String ext = filename.substring(dotIndex + 1);
-
             String formatName = ImageIO.getImageReadersBySuffix(ext).next().getFormatName();
-
             if (!file.getParentFile().exists()) {
                 file.mkdirs();
             }
@@ -159,7 +147,6 @@ public class ImageCache {
     }
 
     public interface OnLoadedListener {
-
         /**
          * This is called in the event that the image was downloaded and cached
          */

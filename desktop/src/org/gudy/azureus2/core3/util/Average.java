@@ -30,19 +30,14 @@ public class Average {
      * and the other one is the one currently filled,
      * which value is not taken into account for the average.
      */
-
     //The refresh rate of the average (ms)
     private final int refreshRate;
-
     //the period (in ms)
     private final int period;
-
     //The number of elements in the average
     private final int nbElements;
-
     //The time the average was last updated (divided by the refreshRate).
     private long lastUpdate;
-
     //The values
     private long[] values;
 
@@ -55,7 +50,6 @@ public class Average {
     private Average(int _refreshRate, int _period) {
         this.refreshRate = _refreshRate;
         this.period = _period;
-
         this.nbElements = (_period * 1000) / _refreshRate + 2;
         this.lastUpdate = getEffectiveTime() / _refreshRate;
         //this.values = new long[this.nbElements];
@@ -89,10 +83,8 @@ public class Average {
         //If we have a really OLD lastUpdate, we could erase the buffer a
         //huge number of time, so if it's really old, we change it so we'll only
         //erase the buffer once.
-
         if (lastUpdate < timeFactor - nbElements)
             lastUpdate = timeFactor - nbElements - 1;
-
         if (values != null) {
             //For all values between lastUpdate + 1 (next value than last updated)
             //and timeFactor (which is the new value insertion position)
@@ -103,7 +95,6 @@ public class Average {
             //We also clear the next value to be inserted (so on next time change...)
             values[(int) ((timeFactor + 1) % nbElements)] = 0;
         }
-
         //And we update lastUpdate.
         lastUpdate = timeFactor;
     }
@@ -125,7 +116,6 @@ public class Average {
             //And then we add our value to current element
             values[(int) (timeFactor % nbElements)] += value;
         }
-
     }
 
     /**
@@ -140,7 +130,6 @@ public class Average {
     private synchronized long getSum() {
         //The sum of all elements used for the average.
         long sum = 0;
-
         if (values != null) {
             //We get the current timeFactor
             long timeFactor = getEffectiveTime() / refreshRate;
@@ -153,8 +142,6 @@ public class Average {
                 sum += values[(int) (i % nbElements)];
             }
         }
-
-
         //We return the sum divided by the period
         return (sum);
     }

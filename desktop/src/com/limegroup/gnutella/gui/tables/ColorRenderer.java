@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Draws a cell with it's default renderer, but the foreground
  * colored differently.
- *
+ * <p>
  * Due to the nature of renderer components being shared
  * between cells, this can not act directly on the renderer
  * that's returned.  Otherwise, this has the side effect of altering
@@ -34,16 +34,16 @@ import java.util.Map;
  * ColorRenderer to work regardless of the cell's specific renderer,
  * this will instantiate a copy of that renderer and cache it for future
  * use.
- *
- *******************************************************************
+ * <p>
+ * ******************************************************************
  * This requires that any cell that is being colored have a default
  * TableCellRenderer that has a parameterless constructor.
- *******************************************************************
- *
+ * ******************************************************************
+ * <p>
  * New renderers are created flyweight-style.
- *
+ * <p>
  * All useful calls are wrapped and redirected to the underlying renderer.
- *
+ * <p>
  * This class takes advantage of the potential of the 'renderer' component
  * to not be the TableCellRenderer itself.  It is merely by convention
  * that all getTableCellRendererComponent calls return 'this'.
@@ -55,21 +55,20 @@ import java.util.Map;
  * poor name for being in an interface titled TableCellRenderer.
  * The delegate functionality is useful, but so is the rubber-stamping.
  * It would probably have been better to name getTableCel.. 'stamp'.
- *
+ * <p>
  * This class does *NOT* instantiate new copies of the component returned
  * from getTableCellRendererComponent.  It needs new copies of the
  * TableCellRenderer, in order to call further getTableCellRendererComponents.
  * Since the two are generally the same, it works out nicely.
- *
+ * <p>
  * UI Updates are propagated to all contained TableCellRenderers.
- *
+ * <p>
  * For clarity, this class just extends JComponent (needed to recieve
  * an updateUI call).  It is not really a component -- it just delegates.
- *
+ * <p>
  * NOTE: This does not color selected or focused cells.
  */
 class ColorRenderer extends DefaultTableBevelledCellRenderer {
-
     /**
      * Map is from TableCellRenderer to TableCellRenderer.
      * Every instance of a renderer will have a mirrored instance as its value.
@@ -93,15 +92,11 @@ class ColorRenderer extends DefaultTableBevelledCellRenderer {
             val = "";
             clazz = String.class;
         }
-
         TableCellRenderer tcr = table.getDefaultRenderer(clazz);
         tcr = getCachedOrNewRenderer(tcr);
-
         Component renderer = tcr.getTableCellRendererComponent(table, val, isSel, hasFocus, row, column);
-
         if ((!isSel && !hasFocus)) // || isReadable(clr, renderer.getBackground()))
             renderer.setForeground(clr);
-
         return renderer;
     }
 
@@ -115,7 +110,6 @@ class ColorRenderer extends DefaultTableBevelledCellRenderer {
 
     private TableCellRenderer getCachedOrNewRenderer(TableCellRenderer tcr) {
         TableCellRenderer renderer = otherRenderers.get(tcr);
-
         // if it doesn't exist, put a copy of the renderer in there
         // so that the setForeground doesn't effect the real renderer.
         if (renderer == null) {

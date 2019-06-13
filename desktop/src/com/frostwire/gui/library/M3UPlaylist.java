@@ -25,22 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class M3UPlaylist {
-
     private static final String M3U_HEADER = "#EXTM3U";
     private static final String SONG_DELIM = "#EXTINF";
     private static final String SEC_DELIM = ":";
 
     /**
-     * @exception IOException Thrown if load failed.<p>
-     *
-     * Format of playlist (.m3u) files is:<br>
-     * ----------------------<br>
-     * #EXTM3U<br>
-     * #EXTINF:numSeconds<br>
-     * /path/of/file/1<br>
-     * #EXTINF:numSeconds<br>
-     * /path/of/file/2<br>
-     * ----------------------<br>
+     * @throws IOException Thrown if load failed.<p>
+     *                     <p>
+     *                     Format of playlist (.m3u) files is:<br>
+     *                     ----------------------<br>
+     *                     #EXTM3U<br>
+     *                     #EXTINF:numSeconds<br>
+     *                     /path/of/file/1<br>
+     *                     #EXTINF:numSeconds<br>
+     *                     /path/of/file/2<br>
+     *                     ----------------------<br>
      */
     public static List<File> load(String fileName) throws IOException {
         List<File> files = new ArrayList<>();
@@ -54,7 +53,6 @@ public final class M3UPlaylist {
                 throw new IOException();
             if (currLine.startsWith(M3U_HEADER))
                 currLine = m3uFile.readLine();
-
             for (; currLine != null; currLine = m3uFile.readLine()) {
                 if (currLine.startsWith(SONG_DELIM)) {
                     currLine = m3uFile.readLine();
@@ -79,10 +77,11 @@ public final class M3UPlaylist {
 
     /**
      * Call this when you want to save the contents of the playlist.
-     * NOTE: only local files can be saved in M3U format, filters out URLs 
+     * NOTE: only local files can be saved in M3U format, filters out URLs
      * that are not part of the local filesystem
-     * @exception IOException Throw when save failed.
-     * @exception IOException Throw when save failed.
+     *
+     * @throws IOException Throw when save failed.
+     * @throws IOException Throw when save failed.
      */
     public static void save(String fileName, List<File> files) throws IOException {
         File playListFile = new File(fileName);
@@ -94,20 +93,16 @@ public final class M3UPlaylist {
             //            }
             return;
         }
-
         PrintWriter m3uFile = null;
         try {
             m3uFile = new PrintWriter(new FileWriter(playListFile.getCanonicalPath(), false));
-
             m3uFile.write(M3U_HEADER);
             m3uFile.println();
-
             for (File currFile : files) {
                 // only save files that are local to the file system
                 if (currFile.isFile()) {
                     File locFile;
                     locFile = new File(currFile.toURI());
-
                     // first line of song description...
                     m3uFile.write(SONG_DELIM);
                     m3uFile.write(SEC_DELIM);

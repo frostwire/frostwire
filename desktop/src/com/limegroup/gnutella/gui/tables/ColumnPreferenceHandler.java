@@ -3,14 +3,13 @@ package com.limegroup.gnutella.gui.tables;
 /**
  * Encapsulates access to preferences for a table's column.
  */
- public interface ColumnPreferenceHandler {
-
+public interface ColumnPreferenceHandler {
     /**
      * Reverts this table's header preferences to their default
      * values.
      */
     void revertToDefault();
-    
+
     /**
      * Determines whether or not the columns are already their default values.
      */
@@ -33,10 +32,9 @@ package com.limegroup.gnutella.gui.tables;
      * on the user's preferences for this table.
      */
     void setVisibility();
-    
+
     /**
      * Sets the single SimpleColumnListener callback.
      */
     void setSimpleColumnListener(SimpleColumnListener scl);
-    
 }

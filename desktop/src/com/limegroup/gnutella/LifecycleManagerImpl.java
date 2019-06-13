@@ -17,9 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LifecycleManagerImpl implements LifecycleManager {
-
     private static final Logger LOG = Logger.getLogger(LifecycleManagerImpl.class);
-
     private final AtomicBoolean preinitializeBegin = new AtomicBoolean(false);
     private final AtomicBoolean preinitializeDone = new AtomicBoolean(false);
     private final AtomicBoolean backgroundBegin = new AtomicBoolean(false);
@@ -28,22 +26,32 @@ public class LifecycleManagerImpl implements LifecycleManager {
     private final AtomicBoolean startDone = new AtomicBoolean(false);
     private final AtomicBoolean shutdownBegin = new AtomicBoolean(false);
     private final AtomicBoolean shutdownDone = new AtomicBoolean(false);
-
     private final CountDownLatch startLatch = new CountDownLatch(1);
-
-    private enum State {NONE, STARTING, STARTED, STOPPED}
-
     private final LimeCoreGlue limeCoreGlue;
-
     /**
      * A list of items that require running prior to shutting down LW.
      */
     private final List<Thread> SHUTDOWN_ITEMS = Collections.synchronizedList(new LinkedList<>());
-
     /**/
     LifecycleManagerImpl(
             LimeCoreGlue limeCoreGlue) {
         this.limeCoreGlue = limeCoreGlue;
+    }
+
+    private static String parseCommand(String toCall) {
+        if (toCall.startsWith("\"")) {
+            int end;
+            if ((end = toCall.indexOf("\"", 1)) > -1) {
+                return toCall.substring(0, end + 1);
+            } else {
+                return toCall + "\"";
+            }
+        }
+        int space;
+        if ((space = toCall.indexOf(" ")) > -1) {
+            return toCall.substring(0, space);
+        }
+        return toCall;
     }
     /**/
 
@@ -69,9 +77,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
     public void installListeners() {
         if (preinitializeBegin.getAndSet(true))
             return;
-
         LimeCoreGlue.preinstall();
-
         preinitializeDone.set(true);
     }
 
@@ -81,18 +87,14 @@ public class LifecycleManagerImpl implements LifecycleManager {
     public void loadBackgroundTasks() {
         if (backgroundBegin.getAndSet(true))
             return;
-
         installListeners();
-
         ThreadExecutor.startThread(this::doBackgroundTasks, "BackgroundTasks");
     }
 
     private void loadBackgroundTasksBlocking() {
         if (backgroundBegin.getAndSet(true))
             return;
-
         installListeners();
-
         doBackgroundTasks();
     }
 
@@ -102,7 +104,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
     public void start() {
         if (startBegin.getAndSet(true))
             return;
-
         try {
             doStart();
         } finally {
@@ -112,10 +113,8 @@ public class LifecycleManagerImpl implements LifecycleManager {
 
     private void doStart() {
         loadBackgroundTasksBlocking();
-
         if (ApplicationSettings.AUTOMATIC_MANUAL_GC.getValue())
             startManualGCThread();
-
         startDone.set(true);
     }
 
@@ -133,7 +132,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
     private void doShutdown() {
         if (!startBegin.get() || shutdownBegin.getAndSet(true))
             return;
-
         try {
             // TODO: should we have a time limit on how long we wait?
             startLatch.await(); // wait for starting to finish...
@@ -141,35 +139,13 @@ public class LifecycleManagerImpl implements LifecycleManager {
             LOG.error("Interrupted while waiting to finish starting", ie);
             return;
         }
-
         // save frostwire.props & other settings
         SettingsGroupManager.instance().save();
-
         LOG.info("Stopping BTEngine...");
         BTEngine.getInstance().stop();
         LOG.info("BTEngine stopped");
-
         shutdownDone.set(true);
     }
-
-
-    private static String parseCommand(String toCall) {
-        if (toCall.startsWith("\"")) {
-            int end;
-            if ((end = toCall.indexOf("\"", 1)) > -1) {
-                return toCall.substring(0, end + 1);
-            } else {
-                return toCall + "\"";
-            }
-        }
-        int space;
-        if ((space = toCall.indexOf(" ")) > -1) {
-            return toCall.substring(0, space);
-        }
-
-        return toCall;
-    }
-
 
     /* (non-Javadoc)
      * @see com.limegroup.gnutella.LifecycleManager#shutdown(java.lang.String)
@@ -196,7 +172,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
     public void addShutdownItem(Thread t) {
         if (shutdownBegin.get())
             return;
-
         SHUTDOWN_ITEMS.add(t);
     }
 
@@ -205,7 +180,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
      */
     private void doBackgroundTasks() {
         limeCoreGlue.install(); // ensure glue is set before running tasks.
-
         backgroundDone.set(true);
     }
 
@@ -245,4 +219,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
         t.start();
         //LOG.info("Started manual GC thread.");
     }
+
+    private enum State {NONE, STARTING, STARTED, STOPPED}
 }

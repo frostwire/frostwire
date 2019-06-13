@@ -7,9 +7,8 @@ import org.limewire.service.ErrorService;
  * forward uncaught exceptions to {@link ErrorService}.
  */
 class ManagedThread extends Thread {
-    
     private static UncaughtExceptionHandler HANDLER =
-        new ErrorServiceHandler();
+            new ErrorServiceHandler();
 
     /**
      * Constructs a ManagedThread with the specified target and name.
@@ -19,7 +18,7 @@ class ManagedThread extends Thread {
         setPriority(Thread.NORM_PRIORITY);
         setUncaughtExceptionHandler(HANDLER);
     }
-    
+
     private static class ErrorServiceHandler implements UncaughtExceptionHandler {
         public void uncaughtException(Thread t, Throwable e) {
             ErrorService.error(e, "Uncaught thread error: " + t.getName());

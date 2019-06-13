@@ -22,15 +22,11 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinEtchedBorder implements Border {
-
     private final Color color;
-
     private final Color bottomShadeColor;
 
     public SkinEtchedBorder(Color color) {
@@ -39,17 +35,14 @@ public final class SkinEtchedBorder implements Border {
     }
 
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-
         Graphics2D g2d = (Graphics2D) g.create();
         //float strokeWidth = SubstanceSizeUtils.getBorderStrokeWidth(SubstanceSizeUtils.getComponentFontSize(c));
         //g2d.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         g2d.setColor(color);
         //g2d.drawRect(x, y, w - 1, h - 1);
         g2d.drawRoundRect(x, y, width - 1, height - 2, 16, 16);
         g2d.setColor(bottomShadeColor);
-
         g2d.drawLine(x + 7, height - 1, width - 7, height - 1);
         /*
         g2d.translate(x, y);
@@ -74,7 +67,6 @@ public final class SkinEtchedBorder implements Border {
         // g2d.drawLine(w - 1, h - 1, w - 1, 0);
         */
         g2d.dispose();
-
         // this is a fix for defect 248 - in order to paint the TitledBorder
         // text respecting the AA settings of the display, we have to
         // set rendering hints on the passed Graphics object.

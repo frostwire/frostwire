@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.limegroup.gnutella.gui.tables;
 
 import javax.swing.table.AbstractTableModel;
@@ -24,54 +23,46 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 /**
  * Handles common tasks associated with storing the DataLine's of a table.
  * Previously, this class used to be split between a DataLineList and a
  * AbstractTableModel.  However, because the function of the DataLineList was
  * really to handle all interactions with the data, it essentially was a model.
  * Now, because the two classes are combined, the model can fire its own events.
+ *
  * @author Sam Berlin
  */
 public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableModel
-    implements DataLineModel<T, E> {
-
+        implements DataLineModel<T, E> {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -974830504558996194L;
-
-    /**
-     * Internally used list object storing the DataLines.
-     */
-    protected List<T> _list = new ArrayList<>();
-
     private static final int ASCENDING = 1;
     private static final int DESCENDING = -1;
-
-    /**
-     * Variable for whether or not the current sorting scheme
-     * is ascending (value 1) or descending (value -1).
-     */
-    protected int _ascending = ASCENDING;
-
-    /**
-     * Variable for which column is currently being sorted.
-     */
-    protected int _activeColumn = -1;
-
     /**
      * Variable to determine which DataLine class
      * to create instances of
      */
     private final Class<? extends T> _dataLineClass;
-
     /**
      * Variable for the instance of the DataLine that'll be used
      * to determine column length/names/classes.
      */
     private final T _internalDataLine;
-
+    /**
+     * Internally used list object storing the DataLines.
+     */
+    protected List<T> _list = new ArrayList<>();
+    /**
+     * Variable for whether or not the current sorting scheme
+     * is ascending (value 1) or descending (value -1).
+     */
+    protected int _ascending = ASCENDING;
+    /**
+     * Variable for which column is currently being sorted.
+     */
+    protected int _activeColumn = -1;
     /**
      * Variable for whether or not this list has been sorted
      * at least once.
@@ -91,7 +82,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     public String[] getToolTipArray(int row, int col) {
         return _list.get(row).getToolTipArray(col);
     }
-    
+
     public boolean isTooltipRequired(int row, int col) {
         return _list.get(row).isTooltipRequired(col);
     }
@@ -114,7 +105,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     //Implements DataLineModel interface.
     public void sort(int col) {
         if (col == _activeColumn) {
-            if(_ascending == DESCENDING) {
+            if (_ascending == DESCENDING) {
                 unsort();
                 return;
             } else {
@@ -127,15 +118,15 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         _isSorted = true;
         resort();
     }
-    
+
     // Re-sort the list to provide real-time sorting
     public void resort() {
         if (_isSorted) {
             doResort();
             fireTableDataChanged();
-         }
+        }
     }
-    
+
     /**
      * Stops sorting.
      */
@@ -143,8 +134,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         _isSorted = false;
         _activeColumn = -1;
     }
-    
-    
+
     /**
      * Implementation of resorting.
      */
@@ -158,7 +148,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public boolean needsResort() {
         return _isSorted &&
-               _internalDataLine.isDynamic(_activeColumn);
+                _internalDataLine.isDynamic(_activeColumn);
     }
 
     //Implements DataLineModel interface
@@ -167,7 +157,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         _list.clear();
         fireTableDataChanged();
     }
-    
+
     //Cleans up all the datalines.
     protected void cleanup() {
         int end = _list.size();
@@ -176,12 +166,13 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         }
     }
 
-   /**
+    /**
      * Basic linear update.
      * Extending classes may wish to override this function to provide
      * a fine-tuned refresh, possibly recieving feedback from each
      * row after it is updated.  The return value can be used to notify
      * the Mediator of information related to the refresh.
+     *
      * @return null
      */
     public Object refresh() {
@@ -204,12 +195,12 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Instantiates a DataLine.
-     *
+     * <p>
      * This uses reflection to create an instance of the DataLine class.
      * The dataLineClass Class is used to determine which class should
      * be created.
      * Failure to create results in AssertFailures.
-     *
+     * <p>
      * Extending classes should override this to change the way
      * DataLine's are instantiated.
      */
@@ -220,7 +211,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
      * Returns an initialized new dataline.
      */
@@ -233,10 +224,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * Determines where the DataLine should be inserted.
      * Runs in log(n) time ArrayLists and linear time for LinkedLists.
-     *
+     * <p>
      * Extending classes should override this to change the method
      * used to determine where to insert a new DataLine.
-     *
+     * <p>
      * The current methodology is to use Collections.binarySearch
      * with _list as the list, the DataLine as the key, and this
      * as the Comparator.
@@ -262,14 +253,14 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Helper function.
-     *
+     * <p>
      * Adds a DataLine initialized by the object to row 0.
-     *
+     * <p>
      * This should be overriden only if you want the default,
      * non-sorting add to go someplace other than row 0.
-     *
+     * <p>
      * Delegates to add(Object, int).
-     *
+     * <p>
      * Extending classes should maintain the delegation to add(Object, int).
      */
     public int add(E o) {
@@ -278,9 +269,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Helper function.
-     *
+     * <p>
      * Uses getNewDataLine(Object) and add(DataLine, int).
-     *
+     * <p>
      * Extending classes can override this, but it is recommended
      * that they override the two above methods instead.
      */
@@ -299,9 +290,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Adds a DataLine to the list at a row.
-     *
+     * <p>
      * All forms of add(..) eventually end up here.
-     *
+     * <p>
      * Extending classes should override this if they want
      * to maintain a HashMap of any type for speedier access.
      */
@@ -313,10 +304,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Helper function.
-     *
+     * <p>
      * Uses getNewDataLine(Object), getSortedPosition(DataLine),
      * and add(DataLine, int)
-     *
+     * <p>
      * Extending classes can override this, but it is recommended
      * they override the above mentioned methods instead.
      */
@@ -327,9 +318,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * Helper function.
-     *
+     * <p>
      * Uses getSortedPosition(DataLine) and add(DataLine, int).
-     *
+     * <p>
      * Extending classes can override this, but it is recommended
      * they override the above mentioned methods instead.
      */
@@ -339,7 +330,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     //Implements the DataLineModel interface.
     public T get(int row) {
-        if(row == -1)
+        if (row == -1)
             return null;
         else
             return _list.get(row);
@@ -419,7 +410,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     //Implements the TableModel method
     // Ignores the update if the row doesn't exist.
     public void setValueAt(Object o, int row, int col) {
-        if(row >= 0 && row < _list.size()) {
+        if (row >= 0 && row < _list.size()) {
             _list.get(row).setValueAt(o, col);
             fireTableRowsUpdated(row, row);
         }
@@ -428,9 +419,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * @return true if List contains the Object o in column col.
      * @notes Extending classes may wish to override this function
-     *  if a particular column is searched frequently, using a HashMap.
-     *  The add(Object, int) & sort function should be overriden to initialize
-     *  the HashMap.
+     * if a particular column is searched frequently, using a HashMap.
+     * The add(Object, int) & sort function should be overriden to initialize
+     * the HashMap.
      */
     public boolean contains(Object o, int col) {
         int end = _list.size();
@@ -443,9 +434,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * @return true if the List contains a DataLine that was initialized
-     *  by Object o.
+     * by Object o.
      * @notes Extending classes may wish to override this function
-     *  if searching is done frequently, using a HashMap.
+     * if searching is done frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to intialize
      * the HashMap.
      */
@@ -467,9 +458,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * @return the index of the first DataLine that contains Object o
-     *  in column col.
+     * in column col.
      * @notes Extending classes may wish to override this function
-     *  if a particular column is searched frequently, using a HashMap.
+     * if a particular column is searched frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
      */
@@ -482,10 +473,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         return -1;
     }
 
-   /**
+    /**
      * @return the index of the first DataLine that was initialized by Object o.
      * @notes Extending classes may wish to override this function
-     *  if searching is done frequently, using a HashMap.
+     * if searching is done frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
      */
@@ -511,7 +502,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Returns the LimeTableColumn at the specific column this data line.
      */
     public LimeTableColumn getTableColumn(int col) {
-        if( _internalDataLine == null)
+        if (_internalDataLine == null)
             return null;
         else
             return _internalDataLine.getColumn(col);
@@ -533,7 +524,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         else
             return _internalDataLine.getColumnCount();
     }
-    
+
     /**
      * Returns whether or not the specified column is clippable.
      */
@@ -543,13 +534,13 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         else
             return _internalDataLine.isClippable(col);
     }
-    
+
     public int getTypeAheadColumn() {
         if (_internalDataLine == null)
             return -1;
         else
             return _internalDataLine.getTypeAheadColumn();
-    }        
+    }
 
     /**
      * Returns the name of the TableColumn as specified by the data line.
