@@ -78,10 +78,6 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
         return 0;
     }
 
-    public boolean isEmpty() {
-        return true;
-    }
-
     public Set<File> getCache() {
         return cache;
     }

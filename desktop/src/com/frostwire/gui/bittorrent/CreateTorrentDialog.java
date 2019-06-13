@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 @SuppressWarnings("serial")
 public class CreateTorrentDialog extends JDialog {
@@ -76,7 +75,9 @@ public class CreateTorrentDialog extends JDialog {
     private LimeTextField textSelectedContent;
     private JButton buttonSelectFile;
 
-    /** Only used on MacOSX, as FileChooser does not support both File and Directory selection. */
+    /**
+     * Only used on MacOSX, as FileChooser does not support both File and Directory selection.
+     */
     private JButton buttonSelectFolder;
     private JLabel labelTrackers;
     private JTextArea textTrackers;
@@ -96,8 +97,9 @@ public class CreateTorrentDialog extends JDialog {
     private JComboBox<PieceSize> pieceSizeComboBox;
     private int pieceSize;
     private static final PieceSize[] values = PieceSize.values();
+
     private enum PieceSize {
-        AUTO_DETECT(0,"(" + I18n.tr("Auto Detect") + ")"),
+        AUTO_DETECT(0, "(" + I18n.tr("Auto Detect") + ")"),
         _16KB(16),
         _32KB(32),
         _64KB(64),
@@ -160,7 +162,7 @@ public class CreateTorrentDialog extends JDialog {
         container.add(tabbedPane, "grow, pushy, wrap");
         licensesPane.add(licenseSelectorPanel, "grow");
         paymentsPane.add(paymentOptionsPanel, "grow");
-        
+
         tabbedPane.addTab("1. " + I18n.tr("Contents and Tracking"), basicTorrentPane);
         tabbedPane.addTab("2. " + I18n.tr("Copyright License"), licensesPane);
         tabbedPane.addTab("3. " + I18n.tr("Payments/Tips"), paymentsPane);
@@ -168,14 +170,14 @@ public class CreateTorrentDialog extends JDialog {
 
     private void initComponents() {
         initDialogSettings();
-        
-        initTabbedPane();        
+
+        initTabbedPane();
         initProgressBar();
         initSaveCloseButtons();
 
         initTorrentContents();
         initTorrentTracking();
-        
+
         buildListeners();
     }
 
@@ -198,7 +200,7 @@ public class CreateTorrentDialog extends JDialog {
         textSelectedContent.setToolTipText(I18n.tr("These box shows the contents you've selected for your new .torrent.\nEither a file, or the contents of a folder."));
         torrentContentsPanel.add(textSelectedContent, "north, growx, gap 5 5 0 0, wrap");
 
-        JPanel contentSelectionButtonsPanel = new JPanel(new MigLayout("ins 0, nogrid, fillx, wrap 1",""));
+        JPanel contentSelectionButtonsPanel = new JPanel(new MigLayout("ins 0, nogrid, fillx, wrap 1", ""));
         buttonSelectFile = new JButton(I18n.tr("Select File"));
         buttonSelectFile.setToolTipText(I18n.tr("Click here to select a single file as the content indexed by your new .torrent"));
         buttonSelectFolder = new JButton(I18n.tr("Select Folder"));
@@ -206,7 +208,7 @@ public class CreateTorrentDialog extends JDialog {
 
         contentSelectionButtonsPanel.add(buttonSelectFile, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
         contentSelectionButtonsPanel.add(buttonSelectFolder, "align right, width 175px, gaptop 5, gapright 5, gapbottom 5");
-        torrentContentsPanel.add(contentSelectionButtonsPanel,"width 380px, align right, gaptop 5, gapright 5, gapbottom 5");
+        torrentContentsPanel.add(contentSelectionButtonsPanel, "width 380px, align right, gaptop 5, gapright 5, gapbottom 5");
 
         basicTorrentPane.add(torrentContentsPanel, "growx, wrap");
     }
@@ -418,7 +420,7 @@ public class CreateTorrentDialog extends JDialog {
     }
 
     private void onButtonSelectFile() {
-            onContentSelectionButton(JFileChooser.FILES_ONLY);
+        onContentSelectionButton(JFileChooser.FILES_ONLY);
     }
 
     private void onButtonSelectFolder() {
@@ -436,8 +438,8 @@ public class CreateTorrentDialog extends JDialog {
         //if user chose a folder that's empty
         File[] fileArray;
         if (directoryPath != null &&
-            ((fileArray = new File(directoryPath).listFiles()) != null) &&
-            fileArray.length == 0) {
+                ((fileArray = new File(directoryPath).listFiles()) != null) &&
+                fileArray.length == 0) {
             JOptionPane.showMessageDialog(this, I18n.tr("The folder you selected is empty."), I18n.tr("Invalid Folder"), JOptionPane.ERROR_MESSAGE);
             tabbedPane.setSelectedIndex(0);
             return;
@@ -496,7 +498,7 @@ public class CreateTorrentDialog extends JDialog {
         File torrContents = (create_from_dir) ? new File(directoryPath) : new File(singlePath);
         File suggestedFile = new File(SharingSettings.DEFAULT_TORRENTS_DIR, torrContents.getName() + ".torrent");
 
-        File chosenFile = FileChooserHandler.getSaveAsFile(GUIMediator.getAppFrame(),
+        File chosenFile = FileChooserHandler.getSaveAsFile(
                 I18n.tr("Save .torrent"),
                 suggestedFile,
                 saveAsFilter);
@@ -535,8 +537,8 @@ public class CreateTorrentDialog extends JDialog {
 
             // assume http if the user does not specify it
             if (!tracker_url.startsWith("http://") &&
-                !tracker_url.startsWith("https://") &&
-                !tracker_url.startsWith("udp://")) {
+                    !tracker_url.startsWith("https://") &&
+                    !tracker_url.startsWith("udp://")) {
                 tracker_url = "http://" + tracker_url.trim();
             }
 
@@ -660,35 +662,35 @@ public class CreateTorrentDialog extends JDialog {
 
     private boolean addAvailableWebSeeds(create_torrent torrent, boolean isMultiFile) {
         boolean result = true;
-	    if (textWebSeeds.getText().length() > 0) {
-	       List<String> mirrors = Arrays.asList(textWebSeeds.getText().split("\n"));
-	       
-	       if (!mirrors.isEmpty()) {
-	           //check just the first file on all mirrors.
-	           reportCurrentTask(I18n.tr("Checking Web seed mirror URLs..."));
-               for (String mirror : mirrors) {
+        if (textWebSeeds.getText().length() > 0) {
+            List<String> mirrors = Arrays.asList(textWebSeeds.getText().split("\n"));
 
-                   if (isMultiFile && !mirror.endsWith("/")) {
-                       fixWebSeedMirrorUrl(mirror);
-                   }
-                   
-                   if (!checkWebSeedMirror(mirror, torrent, isMultiFile)) {
-                       result = false;
-                       showWebseedsErrorMessage(new Exception(getWebSeedTestPath(mirror, torrent, isMultiFile) + " " + I18n.tr("Web seed not reachable.")));
-                       break;
-                   }
-               }
-	           
-               if (result) {
-                       for (String mirror : mirrors) {
-                           torrent.add_url_seed(mirror);
-                       }
-        	           result = true;
-               }
-	       }
-	    }
-	    
-	    return result;
+            if (!mirrors.isEmpty()) {
+                //check just the first file on all mirrors.
+                reportCurrentTask(I18n.tr("Checking Web seed mirror URLs..."));
+                for (String mirror : mirrors) {
+
+                    if (isMultiFile && !mirror.endsWith("/")) {
+                        fixWebSeedMirrorUrl(mirror);
+                    }
+
+                    if (!checkWebSeedMirror(mirror, torrent, isMultiFile)) {
+                        result = false;
+                        showWebseedsErrorMessage(new Exception(getWebSeedTestPath(mirror, torrent, isMultiFile) + " " + I18n.tr("Web seed not reachable.")));
+                        break;
+                    }
+                }
+
+                if (result) {
+                    for (String mirror : mirrors) {
+                        torrent.add_url_seed(mirror);
+                    }
+                    result = true;
+                }
+            }
+        }
+
+        return result;
     }
 
     private void fixWebSeedMirrorUrl(final String mirror) {
@@ -708,7 +710,7 @@ public class CreateTorrentDialog extends JDialog {
 
         int responseCode = 500;
         try {
-            responseCode = browser.head(urlPath, 2000 , null);
+            responseCode = browser.head(urlPath, 2000, null);
             System.out.println(responseCode + ": " + urlPath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -718,7 +720,7 @@ public class CreateTorrentDialog extends JDialog {
 
     private String getWebSeedTestPath(String mirror, create_torrent torrent, boolean isMultiFile) {
         String urlPath;
-        
+
         //fix mirror
         if (isMultiFile && !mirror.endsWith("/")) {
             mirror = mirror + "/";
@@ -774,7 +776,7 @@ public class CreateTorrentDialog extends JDialog {
             buttonClose.setEnabled(false);
         });
     }
-    
+
     private void showWebseedsErrorMessage(Exception webSeedsException) {
         final Exception e = webSeedsException;
         reportCurrentTask(e.getMessage());

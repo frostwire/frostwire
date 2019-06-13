@@ -4,8 +4,6 @@ import org.limewire.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -40,6 +38,7 @@ public class FileArraySetting extends AbstractSetting {
 	 * 
 	 * @return the value of this setting
 	 */
+	@SuppressWarnings("unused")
 	public File[] getValue() {
         return value;
 	}
@@ -58,6 +57,7 @@ public class FileArraySetting extends AbstractSetting {
 	 *
 	 * @param file file to the array.
 	 */
+	@SuppressWarnings("unused")
 	public synchronized void add(File file) {
 	    if (file == null)
 	        return;
@@ -75,6 +75,7 @@ public class FileArraySetting extends AbstractSetting {
 	 * @return false when the array does not contain the file or when the
 	 * file is <code>null</code> 
 	 */
+	@SuppressWarnings("unused")
 	public synchronized boolean remove(File file) {
 	    if (file == null)
 	        return false;
@@ -96,6 +97,7 @@ public class FileArraySetting extends AbstractSetting {
 	}
     
 	/** Returns true if the given file is contained in this array. */
+	@SuppressWarnings("unused")
 	public synchronized boolean contains(File file) {
 	    return indexOf(file) >= 0;
 	}
@@ -109,15 +111,15 @@ public class FileArraySetting extends AbstractSetting {
             try {
                 if ((FileUtils.getCanonicalFile(value[i])).equals(FileUtils.getCanonicalFile(file)))
                     return i;
-            } catch(IOException ioe) {
-                continue;
-            }
+            } catch(IOException ignored) {
+			}
         }
 
 	    return -1;
 	}
 	
-	/** Returns the length of the array.	 */
+	/** Returns the length of the array.*/
+	@SuppressWarnings("unused")
 	public synchronized int length() {
 	    return value.length;
 	}
@@ -126,6 +128,7 @@ public class FileArraySetting extends AbstractSetting {
      * @param sValue property string value
      *
      */
+	@SuppressWarnings("unused")
     protected synchronized void loadValue(String sValue) {
 		value = encode(sValue);
     }
@@ -164,18 +167,4 @@ public class FileArraySetting extends AbstractSetting {
         return buffer.toString();
     }
 
-	/** Removes non-existent members from this.	 */
-	public synchronized void clean() {
-		List<File> list = new ArrayList<>(value.length);
-		File file = null;
-        for (File item : value) {
-            file = item;
-            if (file == null)
-                continue;
-            if (!file.exists())
-                continue;
-            list.add(file);
-        }
-		setValue(list.toArray(new File[0]));
-	}
 }

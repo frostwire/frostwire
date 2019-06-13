@@ -483,7 +483,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             suggestedDirectory = new File(CommonUtils.getUserHomeDir(), "Desktop");
         }
         suggested = new File(suggestedDirectory, suggestedName + ".m3u");
-        File selFile = FileChooserHandler.getSaveAsFile(GUIMediator.getAppFrame(), I18n.tr("Save Playlist As"), suggested, new PlaylistListFileFilter());
+        File selFile = FileChooserHandler.getSaveAsFile(I18n.tr("Save Playlist As"), suggested, new PlaylistListFileFilter());
         // didn't select a file?  nothing we can do.
         if (selFile == null) {
             return;

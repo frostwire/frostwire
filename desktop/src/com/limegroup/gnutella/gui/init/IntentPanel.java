@@ -56,7 +56,7 @@ public class IntentPanel extends JPanel {
         URLLabel findMore = new URLLabel("http://www.frostwire.com/?id=terms", I18n.tr("Find out more..."));
 
         Ditherer ditherer = new Ditherer(GUIUtils.hexToColor("E2E2E2"), GUIUtils.hexToColor("ECECEC"), Ditherer.Y_AXIS, new Ditherer.PolygonShader(2f));
-        DitherPanel willNot = new DitherPanel(ditherer, null);
+        DitherPanel willNot = new DitherPanel(ditherer);
         willNot.setLayout(new GridBagLayout());
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -66,7 +66,7 @@ public class IntentPanel extends JPanel {
         willNot.add(willNotButton, gbc);
         willNot.setBorder(BorderFactory.createEtchedBorder(GUIUtils.hexToColor("C8C8C8"), GUIUtils.hexToColor("FBFBFB")));
 
-        DitherPanel mightUse = new DitherPanel(ditherer, null);
+        DitherPanel mightUse = new DitherPanel(ditherer);
         mightUse.setLayout(new GridBagLayout());
         mightUseButton.setText("<html><div display=\"block\" color=\"#515151\" size=\"13\">"+I18n.tr("I <b>might use</b> FrostWire {0} for copyright infringement.", FrostWireUtils.getFrostWireVersion())+"</div></html>");
         mightUseButton.setOpaque(false);

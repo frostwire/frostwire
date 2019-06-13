@@ -47,7 +47,6 @@ public class ExternalControl {
     private static final String LOCALHOST_NAME = "localhost";
     private static final int SERVER_PORT = 45099;
 
-    private boolean initialized = false;
     private volatile String enqueuedRequest = null;
 
     private final ActivityCallback activityCallback;
@@ -105,6 +104,7 @@ public class ExternalControl {
         }).start();
     }
 
+    @SuppressWarnings("RedundantThrows")
     private boolean process(String get, OutputStream os) throws IOException {
         Map<String, String> original_params = new HashMap<>();
         Map<String, String> lc_params = new HashMap<>();
@@ -173,7 +173,7 @@ public class ExternalControl {
                         // local torrent files
                         handleTorrentRequest(url);
                     }
-                } 
+                }
                 writeHTTPReply(os);
                 return true;
             }
@@ -186,7 +186,7 @@ public class ExternalControl {
         writeNotFound(os);
         return true;
     }
-    
+
     private void writeNotFound(OutputStream os) {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(os));
         pw.print("HTTP/1.0 404 Not Found" + NL + NL);
@@ -203,7 +203,7 @@ public class ExternalControl {
         pw.write(string);
         pw.flush();
     }
-    
+
     private void writeHTTPReply(OutputStream os) {
         PrintWriter pw = new PrintWriter(new OutputStreamWriter(os));
         pw.print("HTTP/1.1 200 OK" + NL);
@@ -244,16 +244,11 @@ public class ExternalControl {
         }
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
     public void enqueueControlRequest(String arg) {
         enqueuedRequest = arg;
     }
 
     public void runQueuedControlRequest() {
-        initialized = true;
         if (enqueuedRequest != null) {
             String request = enqueuedRequest;
             enqueuedRequest = null;
@@ -282,7 +277,7 @@ public class ExternalControl {
     }
 
     /**
-     * @return true if this is a torrent request.  
+     * @return true if this is a torrent request.
      */
     private boolean isTorrentRequest(String arg) {
         if (arg == null)
@@ -323,18 +318,20 @@ public class ExternalControl {
         callback.handleTorrent(torrentFile);
     }
 
-    /**  Check if the client is already running, and if so, pop it up.
-     *   Sends the MAGNET message along the given socket. 
-     *   @return true if a local FrostWire responded with a true.
+    /**
+     * Check if the client is already running, and if so, pop it up.
+     * Sends the MAGNET message along the given socket.
+     *
+     * @return true if a local FrostWire responded with a true.
      */
     private boolean testForFrostWire(String arg) {
         try {
             //LOG.info("testForFrostWire(arg = ["+arg+"])");
-            
+
             String urlParameter;
             if (arg != null && (arg.startsWith("http://") || arg.startsWith("https://") || arg.startsWith("magnet:?") || arg.endsWith(".torrent"))) {
                 urlParameter = "/download?url=" + UrlUtils.encode(arg);
-            }  else {
+            } else {
                 urlParameter = "/show";
             }
 
@@ -344,7 +341,7 @@ public class ExternalControl {
             if (response != null) {
                 return true;
             }
-            
+
         } catch (Exception ignored) {
         }
 

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.frostwire.gui.library;
 
 import com.frostwire.gui.bittorrent.TorrentUtil;
@@ -30,25 +31,25 @@ import java.util.Set;
 public abstract class AbstractDirectoryHolder implements DirectoryHolder {
 
     Set<File> _hideFiles;
-    
+
     /**
      * Uses the file filter for listing the files in the directory provided by
-     * {@link #getDirectory}.  
+     * {@link #getDirectory}.
      */
     public File[] getFiles() {
-        
+
         _hideFiles = TorrentUtil.getIgnorableFiles();
-        
+
         File[] files = getDirectory().listFiles(this);
         return (files != null) ? files : new File[0];
     }
 
     public boolean accept(File file) {
-		if (_hideFiles!=null && (_hideFiles.contains(file) || !isFileVisible(file)
-				|| file.getName().toLowerCase().equals(".ds_store")
+        if (_hideFiles != null && (_hideFiles.contains(file) || !isFileVisible(file)
+                || file.getName().toLowerCase().equals(".ds_store")
                 || isPartsFile(file))) {
-			return false;
-		}
+            return false;
+        }
 
         File parent = file.getParentFile();
         return parent != null && parent.equals(getDirectory());
@@ -61,7 +62,7 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
     /**
      * Returns true if the given file is visible
      */
-    protected boolean isFileVisible(File file) {
+    private boolean isFileVisible(File file) {
         return file != null && file.exists() && file.canRead() && !file.isHidden();
     }
 
@@ -87,7 +88,4 @@ public abstract class AbstractDirectoryHolder implements DirectoryHolder {
         return null;
     }
 
-    public boolean isEmpty() {
-        return size() == 0;
-    }
 }

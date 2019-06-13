@@ -1,26 +1,35 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.frostwire.gui;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class DigestUtils {
-    public static boolean checkMD5(File f, String expectedMD5) {
-        return checkMD5(f, expectedMD5, null);
-    }
 
     /**
      * Returns true if the MD5 of the file corresponds to the given MD5 string.
      * It works with lowercase or uppercase, you don't need to worry about that.
-     * 
-     * @param f
-     * @param expectedMD5
-     * @return
-     * @throws Exception
      */
     public static boolean checkMD5(File f, String expectedMD5, DigestProgressListener listener) {
-        if (!isValidMD5(expectedMD5)) {
+        if (isInvalidMD5(expectedMD5)) {
             return false;
         }
 
@@ -29,27 +38,27 @@ public class DigestUtils {
     }
 
     public static boolean compareMD5(String md5a, String md5b) {
-        if ((!isValidMD5(md5a)) || (!isValidMD5(md5b))) {
+        if ((isInvalidMD5(md5a)) || (isInvalidMD5(md5b))) {
             return false;
         }
 
         return md5a.equalsIgnoreCase(md5b);
     }
 
-    private static boolean isValidMD5(String md5) {
+    private static boolean isInvalidMD5(String md5) {
         if (md5 == null) {
-            return false;
+            return true;
         }
-        
+
         // Check length AND characters
-        return md5.matches("^[0-9A-Fa-f]{32}+$");
+        return !md5.matches("^[0-9A-Fa-f]{32}+$");
     }
 
     public static String getMD5(File f) {
         return getMD5(f, null);
     }
-    
-    public static String getMD5(File f, DigestProgressListener listener) {
+
+    private static String getMD5(File f, DigestProgressListener listener) {
         try {
             return getMD5(new FileInputStream(f), f.length(), listener);
         } catch (FileNotFoundException e) {
@@ -57,17 +66,17 @@ public class DigestUtils {
         }
     }
 
-    public static String getMD5(InputStream is, long streamLength, DigestProgressListener listener) {
+    private static String getMD5(InputStream is, long streamLength, DigestProgressListener listener) {
         try {
             MessageDigest m = MessageDigest.getInstance("MD5");
 
-            byte[] buf = new byte[1024*4];
+            byte[] buf = new byte[1024 * 4];
             int num_read;
 
             InputStream in = new BufferedInputStream(is);
 
             long total_read = 0;
-            
+
             boolean stopped = false;
             while (!stopped && (num_read = in.read(buf)) != -1) {
                 total_read += num_read;
@@ -78,22 +87,22 @@ public class DigestUtils {
                         int progressPercentage = (int) (total_read * 100 / streamLength);
                         try {
                             listener.onProgress(progressPercentage);
-                        } catch (Exception e) {
+                        } catch (Exception ignored) {
                         }
                     }
-                    
+
                     if (listener.stopDigesting()) {
                         stopped = true;
                     }
                 }
             }
 
-            
+
             in.close();
 
             if (!stopped) {
                 StringBuilder result = new StringBuilder(new BigInteger(1, m.digest()).toString(16));
-    
+
                 // pad with zeros if until it's 32 chars long.
                 if (result.length() < 32) {
                     int paddingSize = 32 - result.length();
@@ -111,16 +120,10 @@ public class DigestUtils {
             return null;
         }
     }
-    
-    public static String getMD5(String s) {
-        byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-        return getMD5(bais,bytes.length,null);
-
-    }
 
     public interface DigestProgressListener {
         void onProgress(int progressPercentage);
+
         boolean stopDigesting();
     }
 }

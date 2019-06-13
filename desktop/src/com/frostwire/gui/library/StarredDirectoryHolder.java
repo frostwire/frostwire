@@ -66,7 +66,4 @@ public class StarredDirectoryHolder implements DirectoryHolder {
         return icon;
     }
 
-    public boolean isEmpty() {
-        return false;
-    }
 }
