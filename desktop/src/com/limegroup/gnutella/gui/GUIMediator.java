@@ -56,8 +56,6 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -112,32 +110,15 @@ public final class GUIMediator {
 
         private Action navAction;
 
-        private String name;
-
         public boolean navigatedTo;
 
-        private final PropertyChangeSupport propertyChangeSupport;
-
         Tabs(String nameWithAmpersand) {
-            this.name = GUIUtils.stripAmpersand(nameWithAmpersand);
-            navAction = new NavigationAction(nameWithAmpersand, I18n.tr("Display the {0} Screen", name));
-            this.propertyChangeSupport = new PropertyChangeSupport(this);
-        }
-
-        void setName(String newName) {
-            String oldName = name;
-            this.name = GUIUtils.stripAmpersand(newName);
-            navAction.putValue(Action.NAME, newName);
-            navAction.putValue(Action.LONG_DESCRIPTION, I18n.tr("Display the {0} Screen", name));
-            propertyChangeSupport.firePropertyChange("name", oldName, name);
+            navAction = new NavigationAction(nameWithAmpersand, I18n.tr("Display the {0} Screen",
+                    GUIUtils.stripAmpersand(nameWithAmpersand)));
         }
 
         void setEnabled(boolean enabled) {
             navAction.setEnabled(enabled);
-        }
-
-        public String getName() {
-            return name;
         }
 
         public boolean isEnabled() {
@@ -155,9 +136,6 @@ public final class GUIMediator {
             }
         }
 
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
-            propertyChangeSupport.addPropertyChangeListener(listener);
-        }
     }
 
     /**
@@ -561,7 +539,7 @@ public final class GUIMediator {
         getMainFrame().setSelectedTab(tabEnum);
 
         // If we've never selected a directory holder in the library, then we have it select "Default Save Folder"
-        if (LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue()==-1) {
+        if (LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue() == -1) {
             selectDefaultSaveFolderOnLibraryFirstTime(tabEnum);
         } else {
             LibraryMediator.instance().getLibraryExplorer().selectDirectoryHolderAt(LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue());
@@ -809,7 +787,8 @@ public final class GUIMediator {
                     //we tried
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     public void showTransfers(TransfersTab.FilterMode mode) {
@@ -886,7 +865,7 @@ public final class GUIMediator {
      * Serves as a single point of access for any icons used in the program.
      *
      * @param name the name of the icon to return without path information, as in
-     *                  "plug"
+     *             "plug"
      * @return the <tt>ImageIcon</tt> object specified in the param string
      */
     public static ImageIcon getThemeImage(final String name) {
@@ -924,19 +903,19 @@ public final class GUIMediator {
      * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
      * locale-specific message to the user in the form of a yes or no question.
      *
-     * @param message      the locale-specific message to display
-     * @param title        the locale-specific title dialog to display
-     * @param msgType      type messages example JOptionPane.QUESTION_MESSAGE
+     * @param message the locale-specific message to display
+     * @param title   the locale-specific title dialog to display
+     * @param msgType type messages example JOptionPane.QUESTION_MESSAGE
      * @return an integer indicating a yes or a no response from the user
      */
     public static DialogOption showYesNoMessage(final String message, final String title, final int msgType) {
-      return MessageService.instance().showYesNoMessage(message, title, msgType);
+        return MessageService.instance().showYesNoMessage(message, title, msgType);
     }
 
     /**
      * Acts as a proxy for the <tt>MessageService</tt> class. Displays a
      * locale-specific message to the user in the form of a yes or no question.
-     *
+     * <p>
      * The <tt>messageKey</tt> parameter must be the key for a locale- specific
      * message <tt>String</tt> and not a hard-coded value.
      *

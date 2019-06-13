@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
@@ -22,10 +21,8 @@ import com.frostwire.gui.filters.TableLineFilter;
 import com.limegroup.gnutella.gui.GUIUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class GeneralResultFilter implements TableLineFilter<SearchResultDataLine> {
 
@@ -45,7 +42,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
 
     private String _keywords;
 
-    public GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
+    GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
         _rp = rp;
         _rangeSliderSeeds = rangeSliderSeeds;
         _rangeSliderSize = rangeSliderSize;
@@ -65,7 +62,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         boolean seedsNeedUpdate = false;
         int seeds = node.getSeeds();
         if (seeds < _minResultsSeeds) {
-            _minResultsSeeds = seeds >= 0 ? seeds : 0;
+            _minResultsSeeds = Math.max(seeds, 0);
             seedsNeedUpdate = true;
         }
         if (seeds > _maxResultsSeeds) {
@@ -92,7 +89,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _rangeSliderSize.getMaximumValueLabel().setText(GUIUtils.getBytesInHuman(_maxResultsSize));
         }
 
-        boolean inSeedRange = false;
+        boolean inSeedRange;
 
         if (_maxResultsSeeds > _minResultsSeeds) {
             int seedNorm = ((seeds - _minResultsSeeds) * 1000) / (_maxResultsSeeds - _minResultsSeeds);
@@ -112,7 +109,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             inSeedRange = seeds == _maxResultsSeeds;
         }
 
-        boolean inSizeRange = false;
+        boolean inSizeRange;
 
         if (_maxResultsSize > _minResultsSize) {
             double sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
@@ -170,38 +167,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         return true;
     }
 
-    public int getMinResultsSeeds() {
-        return _minResultsSeeds;
-    }
-
-    public int getMaxResultsSeeds() {
-        return _maxResultsSeeds;
-    }
-
-    public double getMinResultsSize() {
-        return _minResultsSize;
-    }
-
-    public double getMaxResultsSize() {
-        return _maxResultsSize;
-    }
-
-    public int getMinSeeds() {
-        return _minSeeds;
-    }
-
-    public int getMaxSeeds() {
-        return _maxSeeds;
-    }
-
-    public int getMinSize() {
-        return _minSize;
-    }
-
-    public int getMaxSize() {
-        return _maxSize;
-    }
-
     void setRangeSeeds(int min, int max) {
         _minSeeds = min;
         _maxSeeds = max;
@@ -217,9 +182,5 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
     void updateKeywordFiltering(String text) {
         _keywords = text;
         _rp.filterChanged(this, 1);
-    }
-
-    public String getKeywordFilterText() {
-        return _keywords;
     }
 }

@@ -18,6 +18,7 @@
 package com.limegroup.gnutella.gui.tables;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 /** 
  * This class extends the BasicDataLineModel
@@ -36,7 +37,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
     /** 
      * HashMap for quick access to indexes.
      */
-    protected HashMap<E, Integer> _indexes = new HashMap<>();
+    private HashMap<E, Integer> _indexes = new HashMap<>();
     
     /**
      * Constructor -- this HashBasedDataLineModel supports the
@@ -100,10 +101,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      */
     public int getRow(E o) {
         Integer idx = _indexes.get(o);
-        if (idx == null) 
-            return -1;
-        else
-            return idx;
+        return Objects.requireNonNullElse(idx, -1);
     }
     
     /** 
@@ -147,14 +145,5 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
             _indexes.put(get(i).getInitializeObject(), i);
         }
     }
-    
-    /**
-     * Notifies the model that the initialize object of a line
-     * has changed.
-     */
-    public void initializeObjectChanged(E old, E now) {
-        Integer val = _indexes.remove(old);
-        _indexes.put(now, val);
-    }
-            
-}  
+
+}

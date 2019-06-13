@@ -40,7 +40,7 @@ import java.util.*;
  */
 public final class Grid
 {
-	public static final boolean TEST_GAPS = true;
+	static final boolean TEST_GAPS = true;
 
 	private static final Float[] GROW_100 = new Float[] {ResizeConstraint.WEIGHT_100};
 
@@ -1134,8 +1134,8 @@ public final class Grid
 			ArrayList<LinkedDimGroup> groups = groupsLists[r];
 
 			int[] groupSizes = new int[] {
-					getTotalGroupsSizeParallel(groups, LayoutUtil.MIN, false),
-					getTotalGroupsSizeParallel(groups, LayoutUtil.PREF, false),
+					getTotalGroupsSizeParallel(groups, LayoutUtil.MIN),
+					getTotalGroupsSizeParallel(groups, LayoutUtil.PREF),
 					LayoutUtil.INF};
 
 			correctMinMax(groupSizes);
@@ -1286,10 +1286,6 @@ public final class Grid
 	}
 
 	/** Returns the row gaps in pixel sizes. One more than there are <code>specs</code> sent in.
-	 * @param specs
-	 * @param refSize
-	 * @param isHor
-	 * @param fillInPushGaps If the gaps are pushing. <b>NOTE!</b> this argument will be filled in and thus changed!
 	 * @return The row gaps in pixel sizes. One more than there are <code>specs</code> sent in.
 	 */
 	private int[][] getRowGaps(DimConstraint[] specs, int refSize, boolean isHor, boolean[] fillInPushGaps)
@@ -1376,8 +1372,6 @@ public final class Grid
 	/** Adjust min/pref size for columns(or rows) that has components that spans multiple columns (or rows).
 	 * @param specs The specs for the columns or rows. Last index will be used if <code>count</code> is greater than this array's length.
 	 * @param defPush The default grow weight if the specs does not have anyone that will grow. Comes from "push" in the CC.
-	 * @param fss
-	 * @param groupsLists
 	 */
 	private void adjustMinPrefForSpanningComps(DimConstraint[] specs, Float[] defPush, FlowSizeSpec fss, ArrayList<LinkedDimGroup>[] groupsLists)
 	{
@@ -1424,6 +1418,7 @@ public final class Grid
 		TreeSet<Integer> secIndexes = isRows ? colIndexes : rowIndexes;
 		DimConstraint[] primDCs = (isRows ? rowConstr : colConstr).getConstaints();
 
+		//noinspection unchecked
 		ArrayList<LinkedDimGroup>[] groupLists = new ArrayList[primIndexes.size()];
 
 		int gIx = 0;
@@ -1514,6 +1509,7 @@ public final class Grid
 		return retSpan;
 	}
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	private boolean isCellFree(int r, int c, ArrayList<int[]> occupiedRects)
 	{
 		if (getCell(r, c) != null)
@@ -1663,9 +1659,9 @@ public final class Grid
 			if (linkType == TYPE_PARALLEL) {
 				layoutParallel(parent, _compWraps, dc, start, size, isHor, fromEnd);
 			} else if (linkType == TYPE_BASELINE) {
-				layoutBaseline(parent, _compWraps, dc, start, size, LayoutUtil.PREF, spanCount);
+				layoutBaseline(parent, _compWraps, dc, start, size, spanCount);
 			} else {
-				layoutSerial(parent, _compWraps, dc, start, size, isHor, spanCount, fromEnd);
+				layoutSerial(parent, _compWraps, dc, start, size, isHor, fromEnd);
 			}
 		}
 
@@ -1803,8 +1799,7 @@ public final class Grid
 			if (checkPrefChange && w != horSizes[LayoutUtil.PREF]) {
 				BoundSize vSz = cc.getVertical().getSize();
 				if (vSz.getPreferred() == null) {
-					if (comp.getPreferredHeight(-1) != verSizes[LayoutUtil.PREF])
-						return true;
+					return comp.getPreferredHeight(-1) != verSizes[LayoutUtil.PREF];
 				}
 			}
 			return false;
@@ -1908,9 +1903,9 @@ public final class Grid
 	//* Helper Methods
 	//***************************************************************************************
 
-	private static void layoutBaseline(ContainerWrapper parent, ArrayList<CompWrap> compWraps, DimConstraint dc, int start, int size, int sizeType, int spanCount)
+	private static void layoutBaseline(ContainerWrapper parent, ArrayList<CompWrap> compWraps, DimConstraint dc, int start, int size, int spanCount)
 	{
-		int[] aboveBelow = getBaselineAboveBelow(compWraps, sizeType, true);
+		int[] aboveBelow = getBaselineAboveBelow(compWraps, LayoutUtil.PREF, true);
 		int blRowSize = aboveBelow[0] + aboveBelow[1];
 
 		CC cc = compWraps.get(0).cc;
@@ -1930,7 +1925,7 @@ public final class Grid
         }
 	}
 
-	private static void layoutSerial(ContainerWrapper parent, ArrayList<CompWrap> compWraps, DimConstraint dc, int start, int size, boolean isHor, int spanCount, boolean fromEnd)
+	private static void layoutSerial(ContainerWrapper parent, ArrayList<CompWrap> compWraps, DimConstraint dc, int start, int size, boolean isHor, boolean fromEnd)
 	{
 		FlowSizeSpec fss = mergeSizesGapsAndResConstrs(
 				getComponentResizeConstraints(compWraps, isHor),
@@ -2091,11 +2086,11 @@ public final class Grid
 		return constrainSize(totSize);
 	}
 
-	private static int getTotalGroupsSizeParallel(ArrayList<LinkedDimGroup> groups, int sType, boolean countSpanning)
+	private static int getTotalGroupsSizeParallel(ArrayList<LinkedDimGroup> groups, int sType)
 	{
 		int size = sType == LayoutUtil.MAX ? LayoutUtil.INF : 0;
         for (LinkedDimGroup group : groups) {
-            if (countSpanning || group.span == 1) {
+            if (1 == group.span) {
                 int grpSize = group.getMinPrefMax()[sType];
                 if (grpSize >= LayoutUtil.INF)
                     return LayoutUtil.INF;
@@ -2108,8 +2103,6 @@ public final class Grid
 	}
 
 	/**
-	 * @param compWraps
-	 * @param isHor
 	 * @return Might contain LayoutUtil.NOT_SET
 	 */
 	private static int[][] getComponentSizes(ArrayList<CompWrap> compWraps, boolean isHor)
@@ -2169,12 +2162,12 @@ public final class Grid
 
 		int[] ret = new int[oldValues.length];
 		for (int i = 0; i < ret.length; i++)
-			ret[i] = mergeSizes(oldValues[i], newValues[i], true);
+			ret[i] = mergeSizes(oldValues[i], newValues[i]);
 
 		return ret;
 	}
 
-	private static int mergeSizes(int oldValue, int newValue, boolean toMax)
+	private static int mergeSizes(int oldValue, int newValue)
 	{
 		if (oldValue == LayoutUtil.NOT_SET || oldValue == newValue)
 			return newValue;
@@ -2182,12 +2175,12 @@ public final class Grid
 		if (newValue == LayoutUtil.NOT_SET)
 			return oldValue;
 
-		return toMax != oldValue > newValue ? newValue : oldValue;
+		return oldValue <= newValue ? newValue : oldValue;
 	}
 
 	private static int constrainSize(int s)
 	{
-		return s > 0 ? (s < LayoutUtil.INF ? s : LayoutUtil.INF) : 0;
+		return s > 0 ? (Math.min(s, LayoutUtil.INF)) : 0;
 	}
 
 	private static void correctMinMax(int[] s)
@@ -2217,9 +2210,6 @@ public final class Grid
 		 * @param specs The specs for the columns or rows. Last index will be used of <code>fromIx + len</code> is greater than this array's length.
 		 * @param targetSize The size to try to meet.
 		 * @param defGrow The default grow weight if the specs does not have anyone that will grow. Comes from "push" in the CC.
-		 * @param fromIx
-		 * @param len
-		 * @param sizeType
 		 * @param eagerness How eager the algorithm should be to try to expand the sizes.
 		 * <ul>
 		 * <li>0 - Grow only rows/columns which have the <code>sizeType</code> set to be the containing components AND which has a grow weight &gt; 0.
@@ -2280,7 +2270,7 @@ public final class Grid
 		}
 
 		Float[] newArr = new Float[len];
-		System.arraycopy(arr, ix + 0, newArr, 0, len);
+		System.arraycopy(arr, ix, newArr, 0, len);
 		return newArr;
 	}
 
@@ -2291,14 +2281,6 @@ public final class Grid
 			PARENT_ROWCOL_SIZES_MAP = new WeakHashMap[] {new WeakHashMap(4), new WeakHashMap(4)};
 
 		PARENT_ROWCOL_SIZES_MAP[isRows ? 0 : 1].put(parComp, new int[][] {ixArr, sizes});
-	}
-
-	static synchronized int[][] getSizesAndIndexes(Object parComp, boolean isRows)
-	{
-		if (PARENT_ROWCOL_SIZES_MAP == null)
-			return null;
-
-		return (int[][]) PARENT_ROWCOL_SIZES_MAP[isRows ? 0 : 1].get(parComp);
 	}
 
 	private static WeakHashMap<Object, LinkedHashMap<Integer, Cell>> PARENT_GRIDPOS_MAP = null;
