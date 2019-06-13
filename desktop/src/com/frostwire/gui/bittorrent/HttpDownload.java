@@ -22,6 +22,7 @@ import com.frostwire.gui.DigestUtils;
 import com.frostwire.gui.DigestUtils.DigestProgressListener;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
+import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
 import com.frostwire.util.http.HttpClient.RangeNotSupportedException;
@@ -35,7 +36,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author gubatron
@@ -43,8 +44,7 @@ import java.util.concurrent.Executors;
  *
  */
 public class HttpDownload extends HttpBTDownload {
-    /** TODO: Make this configurable */
-    private static final Executor HTTP_THREAD_POOL = Executors.newFixedThreadPool(6);
+    private static final Executor HTTP_THREAD_POOL = new ThreadPool("HttpDownloaders", 1, 6, 5000, new LinkedBlockingQueue<>(), true); // daemon=true, doesn't hold VM from shutting down.
     private static final Logger LOG = Logger.getLogger(HttpDownload.class);
 
     private final String url;
@@ -160,7 +160,6 @@ public class HttpDownload extends HttpBTDownload {
                     onComplete();
                     return;
                 }
-
                 if (resume) {
                     if (incompleteFile.exists()) {
                         bytesReceived = incompleteFile.length();
