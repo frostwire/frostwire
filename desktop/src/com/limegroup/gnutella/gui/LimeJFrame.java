@@ -29,7 +29,6 @@ import java.util.List;
  * A JFrame that uses LimeWire's icon.
  */
 public class LimeJFrame extends JFrame {
-
     public LimeJFrame() throws HeadlessException {
         super();
         initialize();
@@ -50,6 +49,18 @@ public class LimeJFrame extends JFrame {
         initialize();
     }
 
+    private static List<JPopupMenu> getPopups() {
+        MenuSelectionManager msm = MenuSelectionManager.defaultManager();
+        MenuElement[] p = msm.getSelectedPath();
+        List<JPopupMenu> list = new ArrayList<>(p.length);
+        for (MenuElement element : p) {
+            if (element instanceof JPopupMenu) {
+                list.add((JPopupMenu) element);
+            }
+        }
+        return list;
+    }
+
     private void initialize() {
         ImageIcon limeIcon = GUIMediator.getThemeImage(GUIConstants.FROSTWIRE_64x64_ICON);
         setIconImage(limeIcon.getImage());
@@ -62,7 +73,6 @@ public class LimeJFrame extends JFrame {
     @Override
     public void addNotify() {
         super.addNotify();
-
         // Replace the Swing icon with a prettier platform-specific one
         SystemUtils.setWindowIcon(this, GUIConstants.FROSTWIRE_EXE_FILE);
     }
@@ -75,18 +85,5 @@ public class LimeJFrame extends JFrame {
                 }
             }
         });
-    }
-
-    private static List<JPopupMenu> getPopups() {
-        MenuSelectionManager msm = MenuSelectionManager.defaultManager();
-        MenuElement[] p = msm.getSelectedPath();
-
-        List<JPopupMenu> list = new ArrayList<>(p.length);
-        for (MenuElement element : p) {
-            if (element instanceof JPopupMenu) {
-                list.add((JPopupMenu) element);
-            }
-        }
-        return list;
     }
 }

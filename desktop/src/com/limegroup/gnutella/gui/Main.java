@@ -34,23 +34,19 @@ import java.net.URL;
  * all of the necessary classes for the application.
  */
 public class Main {
-
     private static URL CHOSEN_SPLASH_URL = null;
 
-    /** 
-     * Creates an <tt>Initializer</tt> instance that constructs the 
+    /**
+     * Creates an <tt>Initializer</tt> instance that constructs the
      * necessary classes for the application.
      *
      * @param args the array of command line arguments
      */
     public static void main(String[] args) {
         ThemeMediator.changeTheme();
-
         System.setProperty("sun.awt.noerasebackground", "true");
-
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-
         if (OSUtils.isWindows() && !OSUtils.isMachineX64()) {
             String jlibtorrentPath = getWindows32JLibtorrentPath();
             System.setProperty("jlibtorrent.jni.path", jlibtorrentPath);
@@ -64,25 +60,21 @@ public class Main {
             System.setProperty("jlibtorrent.jni.path", jlibtorrentPath);
         }
         //System.out.println("1: Main.main("+args+")");
-
         // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
         libtorrent_jni.version();
-
         Frame splash = null;
         try {
             // show initial splash screen only if there are no arguments
             if (args == null || args.length == 0)
                 splash = showInitialSplash();
-
             // load the GUI through reflection so that we don't reference classes here,
             // which would slow the speed of class-loading, causing the splash to be
             // displayed later.
             try {
-                Class.forName("com.limegroup.gnutella.gui.GUILoader").getMethod("load", new Class[] { String[].class, Frame.class }).invoke(null, args, splash);
+                Class.forName("com.limegroup.gnutella.gui.GUILoader").getMethod("load", new Class[]{String[].class, Frame.class}).invoke(null, args, splash);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
             System.exit(1);
@@ -106,20 +98,17 @@ public class Main {
                 splashFrame = AWTSplashWindow.splash(image);
             }
         }
-
         return splashFrame;
     }
 
     /**
-     * Tries to get a random splash every time. It keeps track of the 
+     * Tries to get a random splash every time. It keeps track of the
      * last 2 shown splashes to avoid recent collisions.
      */
     public static URL getChosenSplashURL() {
         if (CHOSEN_SPLASH_URL != null)
             return CHOSEN_SPLASH_URL;
-
         final String splashPath = "org/limewire/gui/images/app_splash.jpg";
-
         CHOSEN_SPLASH_URL = ClassLoader.getSystemResource(splashPath);
         return CHOSEN_SPLASH_URL;
     }
@@ -127,33 +116,23 @@ public class Main {
     private static String getWindows32JLibtorrentPath() {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
         jarPath = jarPath.replaceAll("%20", " ");
-
         boolean isRelease = !jarPath.contains("frostwire-desktop");
-
         String libPath = jarPath + File.separator + ((isRelease) ? "jlibtorrentX86.dll" : "lib/native/jlibtorrentX86.dll");
-
         if (!new File(libPath).exists()) {
             libPath = new File(jarPath + File.separator + "../../lib/native/jlibtorrentx86.dll").getAbsolutePath();
         }
-
         System.out.println("Using jlibtorrent 32 bits: " + libPath);
-
         return libPath;
     }
 
     private static String getLinux32JLibtorrentPath() {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-
         boolean isRelease = !jarPath.contains("frostwire-desktop");
-
         String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrentX86.so" : "lib/native/libjlibtorrentX86.so");
-
         if (!new File(libPath).exists()) {
             libPath = new File(jarPath + File.separator + "../../lib/native/libjlibtorrentx86.so").getAbsolutePath();
         }
-
         System.out.println("Using jlibtorrent 32 bits: " + libPath);
-
         return libPath;
     }
 }

@@ -17,12 +17,10 @@
 
 package com.limegroup.gnutella.gui;
 
-
 import javax.swing.*;
 import java.awt.*;
 
 public class FramedDialog extends LimeJFrame {
-
     private final JDialog dialog = new JDialog(this);
 
     public FramedDialog() throws HeadlessException {
@@ -46,5 +44,4 @@ public class FramedDialog extends LimeJFrame {
     public JDialog getDialog() {
         return dialog;
     }
-
 }

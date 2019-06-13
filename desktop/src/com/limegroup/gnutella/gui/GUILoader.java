@@ -25,13 +25,11 @@ import java.awt.*;
 import java.io.*;
 import java.util.Properties;
 
-
 /**
  * This class constructs an <tt>Initializer</tt> instance that constructs
  * all of the necessary classes for the application.
  */
 public class GUILoader {
-
     /**
      * Creates an <tt>Initializer</tt> instance that constructs the
      * necessary classes for the application.
@@ -79,8 +77,9 @@ public class GUILoader {
     /**
      * Display a standardly formatted internal error message
      * coming from the backend.
-     * @param err     the <tt>Throwable</tt> object containing information
-     *                about the error
+     *
+     * @param err the <tt>Throwable</tt> object containing information
+     *            about the error
      */
     private static void showCorruptionError(Throwable err) {
         err.printStackTrace();
@@ -100,14 +99,10 @@ public class GUILoader {
         pw.println("Free/total memory: "
                 + runtime.freeMemory() + "/" + runtime.totalMemory());
         pw.println();
-
         err.printStackTrace(pw);
-
         pw.println();
-
         pw.println("STARTUP ERROR!");
         pw.println();
-
         File propsFile = new File(getUserSettingsDir(), "frostwire.props");
         Properties props = new Properties();
         try {
@@ -118,9 +113,7 @@ public class GUILoader {
             props.list(pw);
         } catch (IOException ignored) {
         }
-
         pw.flush();
-
         displayError(sw.toString());
     }
 
@@ -146,33 +139,27 @@ public class GUILoader {
         final Dimension DIALOG_DIMENSION = new Dimension(350, 200);
         final Dimension INNER_SIZE = new Dimension(300, 150);
         DIALOG.setSize(DIALOG_DIMENSION);
-
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setLayout(new BorderLayout());
-
-
         String instr0;
         String instr1;
         String instr2;
         String instr3;
         String instr4;
         String instr5;
-
         instr0 = "One or more necessary files appear to be invalid.";
         instr1 = "This is generally caused by a corrupted installation.";
         instr2 = "Please try downloading and installing FrostWire again.";
         instr3 = "If the problem persists, please visit www.frostwire.com ";
         instr4 = "and click the 'Support' link.  ";
         instr5 = "Thank you.";
-
         JLabel label0 = new JLabel(instr0);
         JLabel label1 = new JLabel(instr1);
         JLabel label2 = new JLabel(instr2);
         JLabel label3 = new JLabel(instr3);
         JLabel label4 = new JLabel(instr4);
         JLabel label5 = new JLabel(instr5);
-
         JPanel labelPanel = new JPanel();
         JPanel innerLabelPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
@@ -186,8 +173,6 @@ public class GUILoader {
         innerLabelPanel.add(Box.createVerticalStrut(6));
         labelPanel.add(innerLabelPanel);
         labelPanel.add(Box.createHorizontalGlue());
-
-
         final JTextArea textArea = new JTextArea(error);
         textArea.selectAll();
         textArea.copy();
@@ -196,8 +181,6 @@ public class GUILoader {
         JScrollPane scroller = new JScrollPane(textArea);
         scroller.setBorder(BorderFactory.createEtchedBorder());
         scroller.setPreferredSize(INNER_SIZE);
-
-
         JPanel buttonPanel = new JPanel();
         JButton copyButton = new JButton("Copy Report");
         copyButton.addActionListener(e -> {
@@ -208,14 +191,11 @@ public class GUILoader {
         quitButton.addActionListener(e -> DIALOG.dispose());
         buttonPanel.add(copyButton);
         buttonPanel.add(quitButton);
-
         mainPanel.add(labelPanel, BorderLayout.NORTH);
         mainPanel.add(scroller, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
         DIALOG.getContentPane().add(mainPanel);
         DIALOG.pack();
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension dialogSize = DIALOG.getSize();
         DIALOG.setLocation((screenSize.width - dialogSize.width) / 2,

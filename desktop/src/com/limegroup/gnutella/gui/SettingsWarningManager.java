@@ -21,7 +21,6 @@ import com.limegroup.gnutella.util.FrostWireUtils;
  * Provides methods to display notifications for common settings problems
  */
 public class SettingsWarningManager {
-
     /**
      * Warn about load/save problems
      */

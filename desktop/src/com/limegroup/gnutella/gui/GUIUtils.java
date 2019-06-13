@@ -44,30 +44,20 @@ import java.util.Locale;
  * methods.
  */
 public final class GUIUtils {
-
     public static final String DEFAULT_ENCODING = "UTF8";
     public static final Locale LOCALE_ENGLISH = new Locale("en", "");
-
     private static final Logger LOG = Logger.getLogger(GUIUtils.class);
-
-    /**
-     * Make sure the constructor is never called.
-     */
-    private GUIUtils() {
-    }
-
+    private static final HyperlinkListener HYPER_LISTENER;
     /**
      * Localizable Number Format constant for the current default locale
      * set at init time.
      */
     private static NumberFormat NUMBER_FORMAT0; // localized "#,##0"
     private static NumberFormat NUMBER_FORMAT1; // localized "#,##0.0"
-
     /**
      * A full datetime format.
      */
     private static DateFormat FULL_DATETIME_FORMAT;
-
     /**
      * Localizable constants
      */
@@ -77,9 +67,6 @@ public final class GUIUtils {
     private static String GENERAL_UNIT_TERABYTES;
     /* ambiguous name: means kilobytes/second, not kilobits/second! */
     private static String GENERAL_UNIT_KBPSEC;
-
-    private static final HyperlinkListener HYPER_LISTENER;
-
     /**
      * An action that disposes the parent window.
      * Constructed lazily.
@@ -97,20 +84,23 @@ public final class GUIUtils {
         resetLocale();
     }
 
+    /**
+     * Make sure the constructor is never called.
+     */
+    private GUIUtils() {
+    }
+
     static void resetLocale() {
         NUMBER_FORMAT0 = NumberFormat.getNumberInstance(GUIMediator.getLocale());
         NUMBER_FORMAT0.setMaximumFractionDigits(0);
         NUMBER_FORMAT0.setMinimumFractionDigits(0);
         NUMBER_FORMAT0.setGroupingUsed(true);
-
         NUMBER_FORMAT1 = NumberFormat.getNumberInstance(GUIMediator.getLocale());
         NUMBER_FORMAT1.setMaximumFractionDigits(1);
         NUMBER_FORMAT1.setMinimumFractionDigits(1);
         NUMBER_FORMAT1.setGroupingUsed(true);
-
         FULL_DATETIME_FORMAT =
                 new SimpleDateFormat("EEE, MMM. d, yyyy h:mm a", GUIMediator.getLocale());
-
         GENERAL_UNIT_KILOBYTES =
                 I18n.tr("KB");
         GENERAL_UNIT_MEGABYTES =
@@ -267,14 +257,12 @@ public final class GUIUtils {
         bindKeyToAction(c, key, a, JComponent.WHEN_FOCUSED);
     }
 
-
     /**
      * Returns (possibly constructing) the ESC action.
      */
     public static Action getDisposeAction() {
         if (ACTION_DISPOSE == null) {
             ACTION_DISPOSE = new AbstractAction() {
-
                 /**
                  *
                  */
@@ -286,7 +274,6 @@ public final class GUIUtils {
                         parent = (Window) ae.getSource();
                     else
                         parent = SwingUtilities.getWindowAncestor((Component) ae.getSource());
-
                     if (parent != null)
                         parent.dispatchEvent(new WindowEvent(parent, WindowEvent.WINDOW_CLOSING));
                 }
@@ -305,7 +292,6 @@ public final class GUIUtils {
     public static void fixInputMap(JComponent jc) {
         InputMap map =
                 jc.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
         if (OSUtils.isMacOSX()) {
             replaceAction(map, 'A'); // select all
             replaceAction(map, 'C'); // copy
@@ -382,7 +368,6 @@ public final class GUIUtils {
         int r = colorCode.getRed();
         int g = colorCode.getGreen();
         int b = colorCode.getBlue();
-
         return toHex(r) + toHex(g) + toHex(b);
     }
 
@@ -405,7 +390,6 @@ public final class GUIUtils {
         decimalColor = Integer.parseInt(hexString, 16);
         return new Color(decimalColor);
     }
-
 
     /**
      * Launches file or enqueues it.
@@ -430,7 +414,6 @@ public final class GUIUtils {
             GUIMediator.instance().openTorrentFile(file, true);
             return false;
         }
-
         if (GUIMediator.isPlaylistVisible()) {
             if (MediaPlayer.isPlayableFile(file)) {
                 if (false) {
@@ -441,7 +424,6 @@ public final class GUIUtils {
                 return true;
             }
         }
-
         GUIMediator.launchFile(file);
         return false;
     }
@@ -485,35 +467,6 @@ public final class GUIUtils {
             component.putClientProperty(SizePolicy.class, sizePolicy);
         }
     }
-
-    public static class EmptyIcon implements Icon {
-        private final String name;
-        private final int width;
-        private final int height;
-
-        public EmptyIcon(String name, int width, int height) {
-            this.name = name;
-            this.width = width;
-            this.height = height;
-        }
-
-        public void paintIcon(Component c, Graphics g, int x, int y) {
-        }
-
-        public int getIconWidth() {
-            return width;
-        }
-
-        public int getIconHeight() {
-            return height;
-        }
-
-        public String toString() {
-            return name;
-        }
-    }
-
-    public enum SizePolicy {RESTRICT_NONE, RESTRICT_HEIGHT, RESTRICT_BOTH}
 
     /**
      * Using a little reflection here for a lack of any better way
@@ -576,11 +529,9 @@ public final class GUIUtils {
             //invalid column index
             return;
         }
-
         if (!model.getColumnClass(columnIndex).equals(String.class)) {
             return;
         }
-
         String longestValue = "";
         for (int row = 0; row < model.getRowCount(); row++) {
             String strValue = (String) model.getValueAt(row, columnIndex);
@@ -588,9 +539,7 @@ public final class GUIUtils {
                 longestValue = strValue;
             }
         }
-
         Graphics g = table.getGraphics();
-
         try {
             int suggestedWidth = (int) g.getFontMetrics(table.getFont()).getStringBounds(longestValue, g).getWidth();
             table.getColumnModel().getColumn(columnIndex).setPreferredWidth((Math.min(suggestedWidth, maxWidth)) + rightPadding);
@@ -606,5 +555,34 @@ public final class GUIUtils {
         Border border = BorderFactory.createCompoundBorder(lineBorder, titleBorder);
         panel.setBorder(border);
         panel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
+    }
+
+    public enum SizePolicy {RESTRICT_NONE, RESTRICT_HEIGHT, RESTRICT_BOTH}
+
+    public static class EmptyIcon implements Icon {
+        private final String name;
+        private final int width;
+        private final int height;
+
+        public EmptyIcon(String name, int width, int height) {
+            this.name = name;
+            this.width = width;
+            this.height = height;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+        }
+
+        public int getIconWidth() {
+            return width;
+        }
+
+        public int getIconHeight() {
+            return height;
+        }
+
+        public String toString() {
+            return name;
+        }
     }
 }

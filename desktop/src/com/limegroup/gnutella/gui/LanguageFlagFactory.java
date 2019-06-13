@@ -26,7 +26,6 @@ import java.util.MissingResourceException;
  * Simple factory for retrieving a flag for a given country and/or language.
  */
 public class LanguageFlagFactory {
-
     private final static Map<String, String> lc2cc;
 
     static {
@@ -119,7 +118,6 @@ public class LanguageFlagFactory {
         lc2cc.put("uz", "UZ"); //Uzbekistan
         lc2cc.put("vi", "VN"); //Vietnamese, Vietnam
         lc2cc.put("zh", "CN"); //Chinese, China
-
         //The country codes on this map correspond to the names
         //of the flag .gifs on gui/images/flags
     }
@@ -128,9 +126,9 @@ public class LanguageFlagFactory {
      * Returns a flag representing the given country, or if the country
      * doesn't have a flag, the most prominent country that the language
      * is spoken in.
-     * 
+     * <p>
      * If no flag exists, defaults to a large (24x24) globe icon.
-     * 
+     *
      * @param countryCode
      * @param languageCode
      * @return
@@ -143,10 +141,10 @@ public class LanguageFlagFactory {
      * Returns a flag representing the given country, or if the country
      * doesn't have a flag, the most prominent country that the language
      * is spoken in.
-     * 
+     * <p>
      * If no flag exists and little is true, this will return a 16x16 globe icon.
      * If no flag exists and little is false, this will return a 24x24 globe icon.
-     * 
+     *
      * @param countryCode
      * @param languageCode
      * @return
@@ -159,7 +157,6 @@ public class LanguageFlagFactory {
             } catch (MissingResourceException mse) {
             }
         }
-
         if (flag == null) {
             //no country code available -> use language code to country code map
             String cc = lc2cc.get(languageCode);
@@ -170,11 +167,9 @@ public class LanguageFlagFactory {
                 }
             }
         }
-
         // fallback to a globe.
         if (flag == null)
             flag = GUIMediator.getThemeImage("globe" + (little ? "_small" : "_large"));
-
         return flag;
     }
 
@@ -187,10 +182,8 @@ public class LanguageFlagFactory {
     }
 
     private static class LocaleRenderer extends DefaultListCellRenderer {
-
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean hasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, hasFocus);
-
             if (value instanceof Locale) {
                 Locale locale = (Locale) value;
                 setIcon(LanguageFlagFactory.getFlag(locale.getCountry(), locale.getLanguage()));
@@ -199,12 +192,9 @@ public class LanguageFlagFactory {
             } else {
                 setIcon(null);
             }
-
             setIconTextGap(10);
             setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-
             return this;
         }
     }
-
 }

@@ -5,28 +5,27 @@ import org.limewire.service.Switch;
 
 import javax.swing.*;
 
-
 /**
  * Displays messages to the user using the standard LimeWire messaging service
  * classes.
  */
 public class MessageHandler implements MessageCallback {
-
     /**
      * Creats a new <tt>MessageHandler</tt> for displaying messages to the user.
      */
-    public MessageHandler() {}
+    public MessageHandler() {
+    }
 
     // Inherit doc comment.
     public void showError(final String messageKey) {
         SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(messageKey)));
     }
-    
+
     // Inherit doc comment.
     public void showError(final String messageKey,
                           final Switch ignore) {
         SwingUtilities.invokeLater(() -> GUIMediator.showError(I18n.tr(messageKey), ignore));
-    }  
+    }
 
     // Inherit doc comment.
     public void showMessage(final String messageKey) {
@@ -60,5 +59,4 @@ public class MessageHandler implements MessageCallback {
                                      final Object... args) {
         SwingUtilities.invokeLater(() -> GUIMediator.showMessage(I18n.tr(messageKey, args), ignore));
     }
-
 }

@@ -21,16 +21,11 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.gui.mplayer.MPlayerWindow;
 
 public class MPlayerMediator {
-
     private static MPlayerMediator instance;
     private final MPlayerWindow mplayerWindow;
 
     private MPlayerMediator() {
         mplayerWindow = MPlayerWindow.createMPlayerWindow();
-    }
-
-    public MPlayerWindow getMPlayerWindow() {
-        return mplayerWindow;
     }
 
     public static MPlayerMediator instance() {
@@ -42,6 +37,10 @@ public class MPlayerMediator {
             }
         }
         return instance;
+    }
+
+    public MPlayerWindow getMPlayerWindow() {
+        return mplayerWindow;
     }
 
     public long getCanvasComponentHwnd() {

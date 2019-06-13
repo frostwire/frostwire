@@ -30,21 +30,23 @@ import org.limewire.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashMap;
 
-
 public class SendFeedbackDialog {
+    private static Pattern VALID_EMAIL_ADDRESS_REGEX = null;
     private final JDialog DIALOG;
     private final JTextField emailTextField;
     private final JButton sendButton;
     private final JButton cancelButton;
     private final JTextField userNameTextField;
-    private JTextArea feedbackTextArea;
     private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "\n(" +
             I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
-    private static Pattern VALID_EMAIL_ADDRESS_REGEX = null;
+    private JTextArea feedbackTextArea;
 
     SendFeedbackDialog() {
         DIALOG = new JDialog(GUIMediator.getAppFrame());
@@ -54,16 +56,13 @@ public class SendFeedbackDialog {
         DIALOG.setResizable(false);
         DIALOG.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         DIALOG.pack();
-
         JComponent baseContentPane = (JComponent) DIALOG.getContentPane();
         GUIUtils.addHideAction(baseContentPane);
         baseContentPane.setLayout(new MigLayout("fill, insets 10 10"));
         baseContentPane.setBorder(
                 BorderFactory.createEmptyBorder(GUIConstants.SEPARATOR, GUIConstants.SEPARATOR, GUIConstants.SEPARATOR,
                         GUIConstants.SEPARATOR));
-
         JPanel feedbackPanel = new JPanel(new MigLayout("fill, insets 10 10"));
-
         // Message
         feedbackTextArea = new JTextArea(FEEDBACK_HINT);
         feedbackTextArea.selectAll();
@@ -79,7 +78,6 @@ public class SendFeedbackDialog {
                 onMessageTextAreaFirstClick();
             }
         });
-
         feedbackTextArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -90,7 +88,6 @@ public class SendFeedbackDialog {
         JScrollPane feedbackTextAreaScrollPane = new JScrollPane(feedbackTextArea);
         feedbackTextAreaScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         feedbackPanel.add(feedbackTextAreaScrollPane, "spanx 2, growx, wrap");
-
         // Optional email
         JPanel contactInfoPanel = new JPanel(new MigLayout("fill, insets 0 0"));
         JLabel emailLabel = new JLabel(I18n.tr("Email (Optional)"));
@@ -107,7 +104,6 @@ public class SendFeedbackDialog {
             }
         });
         contactInfoPanel.add(emailTextField, "align left, pushx 1.0, growx");
-
         // Optional name
         JLabel nameLabel = new JLabel(I18n.tr("Your Name (Optional)"));
         nameLabel.setEnabled(false);
@@ -123,23 +119,32 @@ public class SendFeedbackDialog {
         });
         contactInfoPanel.add(userNameTextField, "align left, pushx 2.0, growx");
         feedbackPanel.add(contactInfoPanel, "spanx 2, growx, wrap");
-
         // System Information
         JLabel systemInformationTextArea = new JLabel(getSystemInformation(true));
         systemInformationTextArea.setEnabled(false);
         feedbackPanel.add(systemInformationTextArea, "spanx 2, grow, wrap");
-
         // Buttons
         sendButton = new JButton(I18n.tr("Send"));
         sendButton.addActionListener(e -> onSendClicked());
         sendButton.setEnabled(false);
         feedbackPanel.add(sendButton, "pushx 1.0, alignx right");
-
         cancelButton = new JButton(I18n.tr("Cancel"));
         cancelButton.addActionListener(GUIUtils.getDisposeAction());
         feedbackPanel.add(cancelButton, "alignx right");
-
         baseContentPane.add(feedbackPanel, "grow, wrap");
+    }
+
+    private static String getSystemInformation(boolean useHTML) {
+        LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
+        String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
+        return (useHTML) ?
+                "<html>" + basicSystemInfo.replace("\n", "<br/>") + "</html>" :
+                basicSystemInfo;
+    }
+
+    public static void main(String[] args) {
+        SendFeedbackDialog sendFeedbackDialog = new SendFeedbackDialog();
+        sendFeedbackDialog.showDialog();
     }
 
     private void sendButtonRefresh() {
@@ -156,7 +161,6 @@ public class SendFeedbackDialog {
                     java.util.regex.Pattern.CASE_INSENSITIVE
             );
         }
-
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailString);
         return matcher.matches();
     }
@@ -170,14 +174,6 @@ public class SendFeedbackDialog {
     void showDialog() {
         GUIUtils.centerOnScreen(DIALOG);
         DIALOG.setVisible(true);
-    }
-
-    private static String getSystemInformation(boolean useHTML) {
-        LocalClientInfo mock = new LocalClientInfo(new Throwable("mock"), "", "", false);
-        String basicSystemInfo = mock.getBasicSystemInfo().sw.toString();
-        return (useHTML) ?
-                "<html>" + basicSystemInfo.replace("\n", "<br/>") + "</html>" :
-                basicSystemInfo;
     }
 
     private void onSendClicked() {
@@ -208,10 +204,5 @@ public class SendFeedbackDialog {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        SendFeedbackDialog sendFeedbackDialog = new SendFeedbackDialog();
-        sendFeedbackDialog.showDialog();
     }
 }

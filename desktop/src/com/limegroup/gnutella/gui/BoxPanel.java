@@ -19,32 +19,27 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class is simply a JPanel that uses a BoxLayout with the orientation 
- * specified in the constructor.  The default constructor creates a panel 
+ * This class is simply a JPanel that uses a BoxLayout with the orientation
+ * specified in the constructor.  The default constructor creates a panel
  * oriented along the y axis.
  */
 public class BoxPanel extends JPanel {
-
     /**
      * Constant for specifying that the underlying <tt>BoxLayout</tt> should
      * be oriented along the x axis.
      */
     public static final int X_AXIS = BoxLayout.X_AXIS;
-
     /**
      * Constant for specifying that the underlying <tt>BoxLayout</tt> should
      * be oriented along the y axis.
      */
     public static final int Y_AXIS = BoxLayout.Y_AXIS;
-
     public static final Dimension HORIZONTAL_COMPONENT_GAP = new Dimension(6, 0);
-
     public static final Dimension VERTICAL_COMPONENT_GAP = new Dimension(0, 6);
-
     public static final Dimension LINE_GAP = new Dimension(0, 10);
 
     /**
-     * Creates a default <tt>BoxPanel</tt> with a <tt>BoxLayout</tt> oriented 
+     * Creates a default <tt>BoxPanel</tt> with a <tt>BoxLayout</tt> oriented
      * along the y axis.
      */
     public BoxPanel() {
@@ -52,14 +47,13 @@ public class BoxPanel extends JPanel {
     }
 
     /**
-     * Creates a <tt>BoxPanel</tt> with a <tt>BoxLayout</tt> that uses the 
+     * Creates a <tt>BoxPanel</tt> with a <tt>BoxLayout</tt> that uses the
      * specified orientation.
      *
      * @param orientation the orientation to use for the layout, which should
      *                    be either BoxPanel.X_AXIS or BoxPanel.Y_AXIS
-     *
-     * @throws IllegalArgumentException if the <tt>orientation</tt> is not 
-     *         a valid <tt>BoxPanel</tt> orientation
+     * @throws IllegalArgumentException if the <tt>orientation</tt> is not
+     *                                  a valid <tt>BoxPanel</tt> orientation
      */
     public BoxPanel(int orientation) {
         if (orientation != X_AXIS && orientation != Y_AXIS)
@@ -72,9 +66,8 @@ public class BoxPanel extends JPanel {
      *
      * @param orientation the orientation to use for the layout, which should
      *                    be either BoxPanel.X_AXIS or BoxPanel.Y_AXIS
-     *
-     * @throws IllegalArgumentException if the <tt>orientation</tt> is not 
-     *         a valid <tt>BoxPanel</tt> orientation
+     * @throws IllegalArgumentException if the <tt>orientation</tt> is not
+     *                                  a valid <tt>BoxPanel</tt> orientation
      */
     public void setOrientation(int orientation) {
         if (orientation != X_AXIS && orientation != Y_AXIS)

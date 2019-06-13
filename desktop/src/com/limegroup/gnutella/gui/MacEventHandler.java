@@ -32,28 +32,14 @@ import java.util.List;
  * expected to handle in some way.
  */
 public class MacEventHandler {
-
     private static final Logger LOG = Logger.getLogger(MacEventHandler.class);
-
     private static MacEventHandler INSTANCE;
 
-    public static synchronized MacEventHandler instance() {
-        if (INSTANCE == null)
-            INSTANCE = new MacEventHandler();
-
-        return INSTANCE;
-    }
-
     private MacEventHandler() {
-
         MacOSHandler.setAboutHandler(args -> handleAbout());
-
         MacOSHandler.setQuitHandler(args -> handleQuit());
-
         MacOSHandler.setAppReopenedListener(args -> handleReopen());
-
         MacOSHandler.setPreferencesHandler(args -> handlePreferences());
-
         MacOSHandler.setOpenFileHandler(args -> {
             List<File> files = MacOSHandler.getFiles(args[0]);
             if (files != null && files.size() > 0) {
@@ -64,7 +50,6 @@ public class MacEventHandler {
                 }
             }
         });
-
         MacOSHandler.setOpenURIHandler(args -> {
             String uri = MacOSHandler.getURI(args[0]).toString();
             LOG.debug("URI: " + uri);
@@ -72,6 +57,12 @@ public class MacEventHandler {
                 GUIMediator.instance().openTorrentURI(uri, false);
             }
         });
+    }
+
+    public static synchronized MacEventHandler instance() {
+        if (INSTANCE == null)
+            INSTANCE = new MacEventHandler();
+        return INSTANCE;
     }
 
     /**
@@ -105,29 +96,15 @@ public class MacEventHandler {
     }
 
     private static final class MacOSHandler implements InvocationHandler {
-
         private static final int javaVersion = javaVersion();
         private static final Class<?> applicationClass = applicationClass();
         private static final Object application = applicationObject();
-
         private final String handlerMethod;
         private final EventHandler handler;
 
         private MacOSHandler(String handlerMethod, EventHandler handler) {
             this.handlerMethod = handlerMethod;
             this.handler = handler;
-        }
-
-        @Override
-        public final Object invoke(Object proxy, Method method, Object[] args) {
-            try {
-                if (handlerMethod.equals(method.getName()) && args.length > 0) {
-                    handler.handle(args);
-                }
-            } catch (Throwable e) {
-                LOG.error("Error invoking handler", e);
-            }
-            return null;
         }
 
         private static int javaVersion() {
@@ -158,26 +135,22 @@ public class MacEventHandler {
             } catch (Throwable e) {
                 LOG.error("Error getting application class", e);
             }
-
             return null;
         }
 
         private static Object applicationObject() {
             try {
                 Method m = null;
-
                 if (javaVersion == 8) {
                     m = applicationClass.getDeclaredMethod("getApplication");
                 }
                 if (javaVersion >= 9) {
                     m = applicationClass.getDeclaredMethod("getDesktop");
                 }
-
                 return m.invoke(null);
             } catch (Throwable e) {
                 LOG.error("Error creating application instance", e);
             }
-
             return null;
         }
 
@@ -186,7 +159,6 @@ public class MacEventHandler {
             try {
                 Class<?> handlerClass = Class.forName(handlerName);
                 Method setMethod = null;
-
                 try {
                     setMethod = applicationClass.getDeclaredMethod(methodName,
                             handlerClass);
@@ -195,7 +167,6 @@ public class MacEventHandler {
                     setMethod = applicationClass.getDeclaredMethod(methodName,
                             handlerClass.getInterfaces()[0]);
                 }
-
                 MacOSHandler adapter = new MacOSHandler(handlerMethod, handler);
                 Object proxy = Proxy.newProxyInstance(MacOSHandler.class.getClassLoader(),
                         new Class<?>[]{handlerClass}, adapter);
@@ -292,8 +263,19 @@ public class MacEventHandler {
             return null;
         }
 
-        public interface EventHandler {
+        @Override
+        public final Object invoke(Object proxy, Method method, Object[] args) {
+            try {
+                if (handlerMethod.equals(method.getName()) && args.length > 0) {
+                    handler.handle(args);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error invoking handler", e);
+            }
+            return null;
+        }
 
+        public interface EventHandler {
             void handle(Object[] args);
         }
     }

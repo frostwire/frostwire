@@ -38,44 +38,35 @@ import java.util.MissingResourceException;
  * instances needed by the application.
  */
 public final class ResourceManager {
-
-    /**
-     * Instance of this <tt>ResourceManager</tt>, following singleton.
-     */
-    private static ResourceManager _instance;
-
     /**
      * Constant for the relative path of the gui directory.
      */
     private static final String GUI_PATH = "org/limewire/gui/";
-
     /**
      * Constant for the relative path of the resources directory.
      */
     private static final String RESOURCES_PATH = GUI_PATH + "resources/";
-
     /**
      * Constant for the relative path of the images directory.
      */
     private static final String IMAGES_PATH = GUI_PATH + "images/";
-
+    /**
+     * Cache of theme images (name as String -> image as ImageIcon)
+     */
+    private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
+    /**
+     * Instance of this <tt>ResourceManager</tt>, following singleton.
+     */
+    private static ResourceManager _instance;
     /**
      * Boolean status that controls whever the shared <tt>Locale</tt> instance
      * needs to be loaded, and locale-specific options need to be setup.
      */
     private static boolean _localeOptionsSet;
-
     /**
      * Static variable for the loaded <tt>Locale</tt> instance.
      */
     private static Locale _locale;
-
-    /**
-     * Cache of theme images (name as String -> image as ImageIcon)
-     */
-    private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
-
-
     /**
      * Marked true in the event of an error in the load/save of any settings file
      */
@@ -83,6 +74,13 @@ public final class ResourceManager {
 
     static {
         resetLocaleOptions();
+    }
+
+    /**
+     * Private constructor to ensure that a <tt>ResourceManager</tt> cannot be
+     * constructed from outside this class.
+     */
+    private ResourceManager() {
     }
 
     static void resetLocaleOptions() {
@@ -94,7 +92,6 @@ public final class ResourceManager {
         if (!_localeOptionsSet) {
             if (ApplicationSettings.LANGUAGE.getValue().equals(""))
                 ApplicationSettings.LANGUAGE.setValue("en");
-
             _locale = new Locale(ApplicationSettings.LANGUAGE.getValue(),
                     ApplicationSettings.COUNTRY.getValue(),
                     ApplicationSettings.LOCALE_VARIANT.getValue());
@@ -112,7 +109,6 @@ public final class ResourceManager {
     static Locale getLocale() {
         return _locale;
     }
-
 
     /**
      * Indicated if a failure has occurred for delayed reporting
@@ -139,25 +135,20 @@ public final class ResourceManager {
     static ImageIcon getThemeImage(final String name) {
         if (name == null)
             throw new NullPointerException("null image name");
-
         ImageIcon icon;
-
         // First try to get theme image from cache
         icon = THEME_IMAGES.get(name);
         if (icon != null)
             return icon;
-
         // Then try to get from org/limewire/gui/images resources
         icon = getImageFromURL(IMAGES_PATH + name, false);
         if (icon != null && icon.getImage() != null) {
             THEME_IMAGES.put(name, icon);
             return icon;
         }
-
         // no resource? error.
         throw new MissingResourceException(
                 "image: " + name + " doesn't exist.", null, null);
-
     }
 
     /**
@@ -181,17 +172,14 @@ public final class ResourceManager {
         URL img = toURL(location, file);
         if (img != null)
             return new ImageIcon(img);
-
         // try with png second
         img = toURL(location + ".png", file);
         if (img != null)
             return new ImageIcon(img);
-
         // try with gif third
         img = toURL(location + ".gif", file);
         if (img != null)
             return new ImageIcon(img);
-
         return null;
     }
 
@@ -262,13 +250,6 @@ public final class ResourceManager {
     }
 
     /**
-     * Private constructor to ensure that a <tt>ResourceManager</tt> cannot be
-     * constructed from outside this class.
-     */
-    private ResourceManager() {
-    }
-
-    /**
      * Alters all Fonts in UIManager to use Dialog, to correctly display foreign
      * strings.
      */
@@ -288,10 +269,8 @@ public final class ResourceManager {
                 "RadioButtonMenuItem.acceleratorFont", "Spinner.font",
                 "Tree.font", "ToolBar.font", "OptionPane.messageFont",
                 "OptionPane.buttonFont", "ToolTip.font",};
-
         boolean displayable = false;
         for (String comp : comps) displayable |= checkFont(comp, newFont, testString, false);
-
         // Then do it the automagic way.
         // note that this could work all the time (without requiring the above)
         // if Java 1.4 didn't introduce Locales, and it could even still work
@@ -310,7 +289,6 @@ public final class ResourceManager {
                 }
             }
         }
-
         return displayable;
     }
 
@@ -338,13 +316,6 @@ public final class ResourceManager {
     }
 
     /**
-     * Determines if a system tray icon is available.
-     */
-    public boolean isTrayIconAvailable() {
-        return (OSUtils.isWindows() || OSUtils.isLinux()) && NotifyUserProxy.instance().supportsSystemTray();
-    }
-
-    /**
      * Updates the component to use the native UI resource.
      */
     static ComponentUI getNativeUI(JComponent c) {
@@ -361,11 +332,16 @@ public final class ResourceManager {
                 e.printStackTrace();
             }
         }
-
         // if any of those failed, default to the current UI.
         if (ret == null)
             ret = UIManager.getUI(c);
-
         return ret;
+    }
+
+    /**
+     * Determines if a system tray icon is available.
+     */
+    public boolean isTrayIconAvailable() {
+        return (OSUtils.isWindows() || OSUtils.isLinux()) && NotifyUserProxy.instance().supportsSystemTray();
     }
 }

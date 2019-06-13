@@ -31,8 +31,10 @@ import java.io.File;
  * to make it easy to swap UIs.
  */
 public final class VisualConnectionCallback implements ActivityCallback {
-
     private static VisualConnectionCallback INSTANCE;
+
+    private VisualConnectionCallback() {
+    }
 
     public static VisualConnectionCallback instance() {
         if (INSTANCE == null) {
@@ -41,26 +43,11 @@ public final class VisualConnectionCallback implements ActivityCallback {
         return INSTANCE;
     }
 
-    private VisualConnectionCallback() {
-    }
-
     /**
      * Show active downloads
      */
     public void showDownloads() {
         SwingUtilities.invokeLater(() -> GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL));
-    }
-
-    private class AddDownload implements Runnable {
-        private BTDownload mgr;
-
-        AddDownload(BTDownload mgr) {
-            this.mgr = mgr;
-        }
-
-        public void run() {
-            mf().getBTDownloadMediator().addDownload(mgr);
-        }
     }
 
     /**
@@ -76,7 +63,6 @@ public final class VisualConnectionCallback implements ActivityCallback {
     private MainFrame mf() {
         return GUIMediator.instance().getMainFrame();
     }
-
 
     public void handleTorrent(final File torrentFile) {
         SwingUtilities.invokeLater(() -> GUIMediator.instance().openTorrentFile(torrentFile, false));
@@ -110,7 +96,18 @@ public final class VisualConnectionCallback implements ActivityCallback {
             System.out.println("Failed to create GUIMediator");
             e.printStackTrace();
         }
-
         return GUIMediator.instance().isRemoteDownloadsAllowed();
+    }
+
+    private class AddDownload implements Runnable {
+        private BTDownload mgr;
+
+        AddDownload(BTDownload mgr) {
+            this.mgr = mgr;
+        }
+
+        public void run() {
+            mf().getBTDownloadMediator().addDownload(mgr);
+        }
     }
 }

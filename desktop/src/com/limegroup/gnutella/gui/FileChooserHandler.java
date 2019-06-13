@@ -41,7 +41,6 @@ import java.util.List;
  * file chooser, as that is the only one that will appear with themes.
  */
 public final class FileChooserHandler {
-
     private FileChooserHandler() {
     }
 
@@ -69,7 +68,6 @@ public final class FileChooserHandler {
             }
         }
     }
-
 
     /**
      * Same as <tt>getInputDirectory</tt> that takes no arguments, except this
@@ -146,14 +144,11 @@ public final class FileChooserHandler {
      */
     public static File getInputDirectory(Component parent, String titleKey,
                                          String approveKey, File directory, FileFilter filter) {
-
         List<File> dirs = getInput(parent, titleKey, approveKey, directory,
                 JFileChooser.DIRECTORIES_ONLY, JFileChooser.APPROVE_OPTION,
                 false, filter);
-
         assert (dirs == null || dirs.size() <= 1)
                 : "selected more than one folder: " + dirs;
-
         if (dirs != null && dirs.size() == 1) {
             return dirs.get(0);
         } else {
@@ -218,14 +213,11 @@ public final class FileChooserHandler {
      */
     private static File getInputFile(Component parent, String titleKey,
                                      String approveKey, File directory, FileFilter filter) {
-
         List<File> files = getInput(parent, titleKey, approveKey, directory,
                 JFileChooser.FILES_ONLY, JFileChooser.APPROVE_OPTION, false,
                 filter);
-
         assert (files == null || files.size() <= 1)
                 : "selected more than one folder: " + files;
-
         if (files != null && files.size() == 1) {
             return files.get(0);
         } else {
@@ -255,23 +247,18 @@ public final class FileChooserHandler {
             FilenameFilter f = (dir, name) -> filter.accept(new File(dir, name));
             dialog.setFilenameFilter(f);
         }
-
         dialog.setVisible(true);
         String dir = dialog.getDirectory();
         String file = dialog.getFile();
         if (dir != null && file != null) {
-
             if (suggestedFile != null) {
                 String suggestedFileExtension = FilenameUtils
                         .getExtension(suggestedFile.getName());
-
                 String newFileExtension = FilenameUtils.getExtension(file);
-
                 if (newFileExtension == null && suggestedFileExtension != null) {
                     file = file + "." + suggestedFileExtension;
                 }
             }
-
             File f = new File(dir, file);
             if (filter != null && !filter.accept(f)) {
                 return null;
@@ -295,16 +282,13 @@ public final class FileChooserHandler {
                     .tr(titleKey), FileDialog.SAVE);
             dialog.setDirectory(suggestedFile.getParent());
             dialog.setFile(suggestedFile.getName());
-
             if (filter != null) {
                 FilenameFilter f = (dir, name) -> filter.accept(new File(dir, name));
                 dialog.setFilenameFilter(f);
             }
-
             dialog.setVisible(true);
             String dir = dialog.getDirectory();
             setLastInputDirectory(new File(dir));
-
             System.setProperty("apple.awt.fileDialogForDirectories", "false");
             if (dir != null) {
                 File f = new File(dir);
@@ -369,7 +353,6 @@ public final class FileChooserHandler {
                 // ignore NPE.  can't do anything with it ...
                 return null;
             }
-
             if (allowMultiSelect) {
                 File[] chosen = fileChooser.getSelectedFiles();
                 if (chosen.length > 0)
@@ -380,15 +363,12 @@ public final class FileChooserHandler {
                 setLastInputDirectory(chosen);
                 return Collections.singletonList(chosen);
             }
-
         } else {
             if (mode == JFileChooser.DIRECTORIES_ONLY) {
                 System.setProperty("apple.awt.fileDialogForDirectories", "true");
             }
-
             FileDialog dialog = new FileDialog(GUIMediator.getAppFrame(), "");
             dialog.setTitle(I18n.tr(titleKey));
-
             if (filter != null) {
                 FilenameFilter f = (dir, name) -> {
                     if (mode == JFileChooser.DIRECTORIES_ONLY) {
@@ -398,20 +378,16 @@ public final class FileChooserHandler {
                 };
                 dialog.setFilenameFilter(f);
             }
-
             if (directory != null) {
                 dialog.setDirectory(directory.getAbsolutePath());
             }
-
             dialog.setVisible(true);
             String dirStr = dialog.getDirectory();
             String fileStr = dialog.getFile();
-
             if (mode == JFileChooser.DIRECTORIES_ONLY) {
                 //revert
                 System.setProperty("apple.awt.fileDialogForDirectories", "false");
             }
-
             if ((dirStr == null) || (fileStr == null))
                 return null;
             setLastInputDirectory(new File(dirStr));
@@ -420,7 +396,6 @@ public final class FileChooserHandler {
             File f = new File(dirStr, fileStr);
             if (filter != null && !filter.accept(f))
                 return null;
-
             return Collections.singletonList(f);
         }
     }
@@ -440,8 +415,6 @@ public final class FileChooserHandler {
         JFileChooser chooser;
         if (directory == null)
             directory = getLastInputDirectory();
-
-
         if (directory == null) {
             chooser = new JFileChooser();
         } else {
@@ -465,9 +438,7 @@ public final class FileChooserHandler {
                 chooser = new JFileChooser(directory);
             }
         }
-
         prepareForWindowEvents(chooser);
-
         if (filter != null) {
             chooser.setFileFilter(filter);
         } else {
@@ -486,7 +457,6 @@ public final class FileChooserHandler {
         chooser.setFileSelectionMode(mode);
         String title = I18n.tr(titleKey);
         chooser.setDialogTitle(title);
-
         if (approveKey != null) {
             String approveButtonText = I18n.tr(approveKey);
             chooser.setApproveButtonText(approveButtonText);
@@ -507,20 +477,16 @@ public final class FileChooserHandler {
                 onFileChooserMoved(e.getComponent().getX(), e.getComponent().getY());
             }
         });
-
         if (ApplicationSettings.FILECHOOSER_X_POS.getValue() == -1) {
             //first time ever. calculate centered x,y offset. (Big-Small)/2.
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             ApplicationSettings.FILECHOOSER_X_POS.setValue((screenSize.width - ApplicationSettings.FILECHOOSER_WIDTH.getValue()) >> 1);
             ApplicationSettings.FILECHOOSER_Y_POS.setValue((screenSize.height - ApplicationSettings.FILECHOOSER_HEIGHT.getValue()) >> 1);
         }
-
         fileChooser.setLocation(ApplicationSettings.FILECHOOSER_X_POS.getValue(),
                 ApplicationSettings.FILECHOOSER_Y_POS.getValue());
-
         fileChooser.setPreferredSize(new Dimension(ApplicationSettings.FILECHOOSER_WIDTH.getValue(),
                 ApplicationSettings.FILECHOOSER_HEIGHT.getValue()));
-
     }
 
     private static void onFileChooserResized(int width, int height) {

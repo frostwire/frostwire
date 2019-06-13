@@ -24,7 +24,6 @@ import java.awt.event.MouseEvent;
  * This class contains the logo and the searching icon for the application.
  */
 final class LogoPanel extends BoxPanel {
-
     /**
      * Constructs a new panel containing the logo and the search icon.
      */
@@ -38,13 +37,10 @@ final class LogoPanel extends BoxPanel {
         ImageIcon logoIcon = GUIMediator.getThemeImage("logo_header");
         labelLogo.setIcon(logoIcon);
         labelLogo.setSize(logoIcon.getIconWidth(), logoIcon.getIconHeight());
-
         GUIUtils.setOpaque(false, this);
-
         add(Box.createHorizontalGlue());
         add(labelLogo);
         add(Box.createHorizontalGlue());
-
         this.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent me) {
                 GUIMediator.openURL("http://www.frostwire.com/?from=header");

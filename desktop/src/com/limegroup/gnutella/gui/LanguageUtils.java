@@ -23,8 +23,8 @@ import org.limewire.util.OSUtils;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -33,14 +33,10 @@ import java.util.zip.ZipFile;
  * changing language settings.
  */
 public class LanguageUtils {
-
-    private static Logger LOG = Logger.getLogger(LanguageUtils.class);
-
     private static final String BUNDLE_PREFIX = "org/limewire/i18n/Messages_";
-
     private static final String BUNDLE_POSTFIX = ".class";
-
     private static final String BUNDLE_MARKER = "org/limewire/i18n/Messages.class";
+    private static Logger LOG = Logger.getLogger(LanguageUtils.class);
 
     /**
      * Applies this language code to be the new language of the program.
@@ -49,38 +45,32 @@ public class LanguageUtils {
         ApplicationSettings.LANGUAGE.setValue(locale.getLanguage());
         ApplicationSettings.COUNTRY.setValue(locale.getCountry());
         ApplicationSettings.LOCALE_VARIANT.setValue(locale.getVariant());
-
         GUIMediator.resetLocale();
     }
 
     /**
      * Returns an array of supported language as a LanguageInfo[], always having
      * the English language as the first element.
-     * 
+     * <p>
      * This will only include languages that can be displayed using the given
      * font. If the font is null, all languages are returned.
      */
     public static Locale[] getLocales(Font font) {
         final List<Locale> locales = new LinkedList<>();
-        
         File jar = FileUtils.getJarFromClasspath(LanguageUtils.class.getClassLoader(), BUNDLE_MARKER);
         if (jar != null) {
             addLocalesFromJar(locales, jar);
         } else {
             LOG.warn("Could not find bundle jar to determine locales");
         }
-        
         locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(
                 o2.getDisplayName(o2)));
-        
         locales.remove(Locale.ENGLISH);
         locales.add(0, Locale.ENGLISH);
-
         // remove languages that cannot be displayed using this font
         if (font != null && !OSUtils.isMacOSX()) {
             locales.removeIf(locale -> !GUIUtils.canDisplay(font, locale.getDisplayName(locale)));
         }
-
         return locales.toArray(new Locale[0]);
     }
 
@@ -96,7 +86,6 @@ public class LanguageUtils {
                         || name.contains("$")) {
                     continue;
                 }
-
                 String iso = name.substring(BUNDLE_PREFIX.length(), name.length()
                         - BUNDLE_POSTFIX.length());
                 List<String> tokens = new ArrayList<>(Arrays.asList(iso.split("_", 3)));
@@ -106,7 +95,6 @@ public class LanguageUtils {
                 while (tokens.size() < 3) {
                     tokens.add("");
                 }
-
                 Locale locale = new Locale(tokens.get(0), tokens.get(1), tokens.get(2));
                 locales.add(locale);
             }
@@ -125,7 +113,7 @@ public class LanguageUtils {
     /**
      * Returns a score between -1 and 3 how well <code>specificLocale</code>
      * matches <code>genericLocale</code>.
-     * 
+     *
      * @return -1, if locales do not match, 3 if locales are equal
      */
     static int getMatchScore(Locale specificLocale, Locale genericLocale) {
@@ -145,14 +133,13 @@ public class LanguageUtils {
         } else if (genericLocale.getVariant().length() > 0) {
             return -1;
         }
-        
         return i;
     }
 
     /**
      * Returns true, if <code>locale</code> is less specific than the system
      * default locale.
-     * 
+     *
      * @see Locale#getDefault()
      */
     static boolean matchesDefaultLocale(Locale locale) {
@@ -161,7 +148,7 @@ public class LanguageUtils {
                 && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry())
                 && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
     }
-    
+
     private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
         return generic.length() == 0 || detailed.equals(generic);
     }

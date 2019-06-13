@@ -24,11 +24,8 @@ import org.limewire.service.ErrorService;
  * JNI based GetURL AppleEvent handler for Mac OS X
  */
 public final class GURLHandler {
-
     private static final Logger LOG = Logger.getLogger(GURLHandler.class);
-
     private static GURLHandler instance;
-    private volatile boolean registered = false;
 
     static {
         try {
@@ -37,6 +34,8 @@ public final class GURLHandler {
             ErrorService.error(err);
         }
     }
+
+    private volatile boolean registered = false;
 
     public static synchronized GURLHandler getInstance() {
         if (instance == null)

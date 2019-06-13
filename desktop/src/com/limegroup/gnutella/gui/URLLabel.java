@@ -26,34 +26,28 @@ import java.beans.PropertyChangeListener;
  * A label that has a clickable text. The text is rendered as an HTML link and
  * the mouse cursor is changed when the mouse hovers over the label.
  */
-public class URLLabel extends JLabel  {
-    
+public class URLLabel extends JLabel {
     private MouseListener urlListener;
-    
     private PropertyChangeListener listener = null;
-
     private Action currentAction;
-    
     private String url = "";
-      
     private String text;
-    
     private Color linkColor = UIManager.getColor("Label.foreground");
 
     /**
      * Constructs a new clickable label with <code>url</code> as the
      * text.
-     * 
+     *
      * @param url the URL to open when the label is clicked
      */
     public URLLabel(final String url) {
         this(url, url);
     }
-    
+
     /**
      * Constructs a new clickable label.
-     * 
-     * @param url the URL to open when the label is clicked
+     *
+     * @param url  the URL to open when the label is clicked
      * @param text the label's text
      */
     public URLLabel(final String url, final String text) {
@@ -63,56 +57,50 @@ public class URLLabel extends JLabel  {
         installListener(GUIUtils.getURLInputListener(url));
     }
 
-
     @Override
     public void setText(String text) {
         this.text = text;
         String htmlString = null;
-        if(text != null) {
-            htmlString = ("<html><a href=\"" + url + "\"" + 
-                (linkColor != null ? "color=\"#" + GUIUtils.colorToHex(linkColor) + "\"" : "") +
-                ">" + text + "</a></html>");
+        if (text != null) {
+            htmlString = ("<html><a href=\"" + url + "\"" +
+                    (linkColor != null ? "color=\"#" + GUIUtils.colorToHex(linkColor) + "\"" : "") +
+                    ">" + text + "</a></html>");
         }
-
         super.setText(htmlString);
     }
-   
-    
+
+    public void setColor(Color fg) {
+        linkColor = fg;
+        setText(text);
+    }
+
+    public Action getAction() {
+        return currentAction;
+    }
+
     public void setAction(Action action) {
         // remove old listener
         Action oldAction = getAction();
         if (oldAction != null) {
             oldAction.removePropertyChangeListener(getListener());
         }
-
         // add listener
         currentAction = action;
         currentAction.addPropertyChangeListener(getListener());
         installListener(GUIUtils.getURLInputListener(action));
         updateLabel();
     }
-    
-    
-    public void setColor(Color fg) {
-        linkColor = fg;
-        setText(text);
-    }
-    
-    public Action getAction(){
-        return currentAction;
-    }
-       
+
     private PropertyChangeListener getListener() {
         if (listener == null) {
             listener = evt -> {
                 //update label properties
                 updateLabel();
-
             };
         }
         return listener;
     }
-    
+
     /*
      * Update label text based on action event
      */
@@ -122,10 +110,8 @@ public class URLLabel extends JLabel  {
             Color color = (Color) currentAction.getValue(LimeAction.COLOR);
             if (color != null)
                 setColor(color);
-
             setIcon((Icon) currentAction.getValue(Action.SMALL_ICON));
             setToolTipText((String) currentAction.getValue(Action.SHORT_DESCRIPTION));
-
             // display
             setText(display);
         } else {
@@ -133,7 +119,7 @@ public class URLLabel extends JLabel  {
             setToolTipText(url);
         }
     }
-   
+
     private void installListener(MouseListener listener) {
         if (urlListener != null) {
             removeMouseListener(urlListener);

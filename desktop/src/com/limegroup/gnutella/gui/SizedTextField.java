@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.gui.GUIUtils.SizePolicy;
@@ -24,39 +23,37 @@ import java.awt.*;
 
 /**
  * This class creates a <tt>JTextField</tt> with a standardized size.<p>
- *
+ * <p>
  * It sets the preffered and maximum size of the field to the standard
  * <tt>Dimension</tt> or sets the preferred and maximum sizes to the
  * <tt>Dimension</tt> argument.
  */
 public final class SizedTextField extends LimeTextField {
-	
-	/**
-	 * Constant for the standard height for <tt>JTextField</tt>.
-	 */
-	private static final int STANDARD_HEIGHT = 28;
-	
-	/**
-	 * Constant for the standard <tt>Dimension</tt> for <tt>JTextField</tt>.
-	 */
-	private static final Dimension STANDARD_DIMENSION = new Dimension(500, STANDARD_HEIGHT);
+    /**
+     * Constant for the standard height for <tt>JTextField</tt>.
+     */
+    private static final int STANDARD_HEIGHT = 28;
+    /**
+     * Constant for the standard <tt>Dimension</tt> for <tt>JTextField</tt>.
+     */
+    private static final Dimension STANDARD_DIMENSION = new Dimension(500, STANDARD_HEIGHT);
 
-	/**
-	 * Creates a <tt>JTextField</tt> with a standard size.
-	 */
-	SizedTextField() {
-		setPreferredSize(STANDARD_DIMENSION);
-		setMaximumSize(STANDARD_DIMENSION);
-	}
+    /**
+     * Creates a <tt>JTextField</tt> with a standard size.
+     */
+    SizedTextField() {
+        setPreferredSize(STANDARD_DIMENSION);
+        setMaximumSize(STANDARD_DIMENSION);
+    }
 
-	/**
-	 * Creates a <tt>JTextField</tt> with a standard size and with the 
-	 * specified number of columns.
-	 *
-	 * @param columns the number of columns to use in the field
-	 */
-	public SizedTextField(final int columns, final SizePolicy sizePolicy) {
-		super(columns);
-		GUIUtils.restrictSize(this, sizePolicy);
-	}
+    /**
+     * Creates a <tt>JTextField</tt> with a standard size and with the
+     * specified number of columns.
+     *
+     * @param columns the number of columns to use in the field
+     */
+    public SizedTextField(final int columns, final SizePolicy sizePolicy) {
+        super(columns);
+        GUIUtils.restrictSize(this, sizePolicy);
+    }
 }

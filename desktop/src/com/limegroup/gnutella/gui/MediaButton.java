@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,27 +23,25 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This class is really just a hack to make it easier to get the media player 
+ * This class is really just a hack to make it easier to get the media player
  * buttons to display correctly.
- * 
+ *
  * @author gubatron
  * @author aldenml
  */
 public final class MediaButton extends JButton {
-
     private String tipText;
     private String upName;
     private String downName;
 
     public MediaButton(String tipText, String upName, String downName) {
-        init(tipText,upName,downName);
+        init(tipText, upName, downName);
     }
-    
+
     public void init(String tipText, String upName, String downName) {
         this.tipText = tipText;
         this.upName = upName;
         this.downName = downName;
-
         setupUI();
     }
 
@@ -57,7 +55,6 @@ public final class MediaButton extends JButton {
         } else {
             setIcon(null);
         }
-
         setHorizontalAlignment(SwingConstants.CENTER);
         if (!StringUtils.isNullOrEmpty(downName)) {
             ImageIcon downIcon = GUIMediator.getThemeImage(downName);

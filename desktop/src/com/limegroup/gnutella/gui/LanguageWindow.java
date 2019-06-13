@@ -10,55 +10,36 @@ import java.awt.event.ItemEvent;
 import java.util.Locale;
 
 public class LanguageWindow extends JDialog {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1794098818746665242L;
-
     private static final int MIN_DIALOG_WIDTH = 350;
-
     private static final String TRANSLATE_URL = "https://github.com/frostwire/frostwire";
-
     private JCheckBox showLanguageCheckbox;
-
     private JComboBox<Object> localeComboBox;
-
     private JPanel mainPanel;
-
     private OkayAction okayAction;
-
     private CancelAction cancelAction;
-
     private Locale currentLocale;
-
     private URLLabel helpTranslateLabel;
-
     private boolean defaultLocaleSelectable;
-    
     private Font dialogFont;
-    
+
     public LanguageWindow() {
         super(GUIMediator.getAppFrame());
-
         this.currentLocale = GUIMediator.getLocale();
-
         initializeWindow();
-
         dialogFont = new Font("Dialog", Font.PLAIN, 11);
         Locale[] locales = LanguageUtils.getLocales(dialogFont);
-
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         getContentPane().add(mainPanel, BorderLayout.CENTER);
-
         initializeContent(locales);
         initializeButtons();
         initializeWindow();
-        
         updateLabels(currentLocale);
         pack();
-        
         if (getWidth() < MIN_DIALOG_WIDTH) {
             setSize(350, getHeight());
             setResizable(false);
@@ -73,10 +54,9 @@ public class LanguageWindow extends JDialog {
     }
 
     private void initializeContent(Locale[] locales) {
-    	JPanel container = new JPanel(new GridBagLayout());
-    	GridBagConstraints c = new GridBagConstraints();
-
-        // add locales to model and select the best match 
+        JPanel container = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        // add locales to model and select the best match
         DefaultComboBoxModel<Object> localeModel = new DefaultComboBoxModel<>();
         int selectedScore = -1;
         int selectedIndex = -1;
@@ -92,7 +72,6 @@ public class LanguageWindow extends JDialog {
                 defaultLocaleSelectable = true;
             }
         }
-
         localeComboBox = new JComboBox<>(localeModel);
         localeComboBox.setFont(dialogFont);
         localeComboBox.setRenderer(LanguageFlagFactory.getListRenderer());
@@ -100,12 +79,10 @@ public class LanguageWindow extends JDialog {
         if (selectedIndex != -1) {
             localeComboBox.setSelectedIndex(selectedIndex);
         }
-        
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1.0;
-        container.add(localeComboBox,c);
-
+        container.add(localeComboBox, c);
         // reflect the changed language right away so someone who doesn't speak
         // English or whatever language it the default can understand what the
         // buttons say
@@ -121,30 +98,23 @@ public class LanguageWindow extends JDialog {
                 }
             }
         });
-
-        container.add(Box.createVerticalStrut(5),c);
-        
+        container.add(Box.createVerticalStrut(5), c);
         helpTranslateLabel = new URLLabel(TRANSLATE_URL, "");
         helpTranslateLabel.setFont(dialogFont);
-        container.add(helpTranslateLabel,c);
-
-        container.add(Box.createVerticalStrut(15),c);
-
+        container.add(helpTranslateLabel, c);
+        container.add(Box.createVerticalStrut(15), c);
         showLanguageCheckbox = new JCheckBox();
         showLanguageCheckbox.setFont(dialogFont);
         showLanguageCheckbox.setSelected(StatusBarSettings.LANGUAGE_DISPLAY_ENABLED.getValue());
         c.anchor = GridBagConstraints.LINE_START;
-        container.add(showLanguageCheckbox,c);
-
-        container.add(Box.createVerticalStrut(15),c);
-
+        container.add(showLanguageCheckbox, c);
+        container.add(Box.createVerticalStrut(15), c);
         mainPanel.add(container, BorderLayout.CENTER);
     }
 
     private void initializeButtons() {
         okayAction = new OkayAction();
         cancelAction = new CancelAction();
-
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         JButton buttonOK = new JButton(okayAction);
         buttonOK.setFont(dialogFont);
@@ -165,19 +135,16 @@ public class LanguageWindow extends JDialog {
         if (!defaultLocaleSelectable && LanguageUtils.matchesDefaultLocale(locale)) {
             locale = Locale.getDefault();
         }
-
         if (!locale.equals(GUIMediator.getLocale())) {
             LanguageUtils.setLocale(locale);
             GUIMediator.instance().getStatusLine().updateLanguage();
-
             String message = I18n.trl(
                     "FrostWire must be restarted for the new language to take effect.", locale);
-	    //com.frostwire.gui.updates.UpdateManager.getInstance().checkForUpdates(); // check if it's possible to load the new overlay ad for next frostwire load. In the future should be loaded automatically from this function checkforupdates.
+            //com.frostwire.gui.updates.UpdateManager.getInstance().checkForUpdates(); // check if it's possible to load the new overlay ad for next frostwire load. In the future should be loaded automatically from this function checkforupdates.
             JLabel labelMessage = new JLabel(message);
             labelMessage.setFont(dialogFont);
             JOptionPane.showMessageDialog(this, labelMessage, I18n.tr("Message"), JOptionPane.INFORMATION_MESSAGE);
         }
-
         StatusBarSettings.LANGUAGE_DISPLAY_ENABLED.setValue(showLanguageInStatusBar);
         if (LanguageUtils.isEnglishLocale(locale)) {
             StatusBarSettings.LANGUAGE_DISPLAY_ENGLISH_ENABLED.setValue(showLanguageInStatusBar);
@@ -202,7 +169,6 @@ public class LanguageWindow extends JDialog {
             Locale locale = (Locale) localeComboBox.getSelectedItem();
             switchLanguage(locale, showLanguageCheckbox.isSelected());
         }
-
     }
 
     private class CancelAction extends AbstractAction {
@@ -212,7 +178,6 @@ public class LanguageWindow extends JDialog {
         public void actionPerformed(ActionEvent event) {
             GUIUtils.getDisposeAction().actionPerformed(event);
         }
-
     }
 
     private class UseEnglishAction extends AbstractAction {
@@ -224,7 +189,5 @@ public class LanguageWindow extends JDialog {
         public void actionPerformed(ActionEvent event) {
             switchLanguage(Locale.ENGLISH, showLanguageCheckbox.isSelected());
         }
-
     }
-
 }

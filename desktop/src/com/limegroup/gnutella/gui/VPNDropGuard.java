@@ -25,13 +25,10 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import static com.limegroup.gnutella.gui.I18n.tr;
 
 public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
-
     public static boolean canUseBitTorrent(boolean showExplanationDialog) {
         return canUseBitTorrent(showExplanationDialog, null);
     }
@@ -53,19 +50,15 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
             dialog.setLayout(new FlowLayout()); // gets rid of that default border layout
             dialog.setModal(true);
             dialog.setResizable(false);
-
             // Icon and labels
             JLabel icon = new JLabel(GUIMediator.getThemeImage("vpn_drop_guard_dialog_icon"));
-            icon.setPreferredSize(new Dimension(115,96));
-
+            icon.setPreferredSize(new Dimension(115, 96));
             JPanel labelPanel = new JPanel(new MigLayout());
             labelPanel.add(new JLabel("<html><p><strong>" + tr("BitTorrent is off because your VPN is disconnected") + "</strong></p></html>"), "wrap");
             labelPanel.add(new JLabel("<html><p>" + tr("Check the status of your VPN connection or disable the VPN-Drop Protection") + ".</p></html>"), "wrap");
-
             JPanel upperPanel = new JPanel(new MigLayout());
             upperPanel.add(icon);
             upperPanel.add(labelPanel);
-
             // Buttons
             JButton whatIsAVPN = new JButton(tr("What is a VPN?"));
             whatIsAVPN.addActionListener(e -> {
@@ -91,16 +84,14 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
             });
             JButton ok = new JButton(tr("Ok"));
             ok.addActionListener(e -> dialog.dispose());
-            JPanel buttonsPanel = new JPanel(new MigLayout("insets 10px 0 0 0, align right",""));
+            JPanel buttonsPanel = new JPanel(new MigLayout("insets 10px 0 0 0, align right", ""));
             buttonsPanel.add(whatIsAVPN);
             buttonsPanel.add(disableVPNDrop);
-            buttonsPanel.add(ok,"growx, shrink 0");
-
+            buttonsPanel.add(ok, "growx, shrink 0");
             // Put it all together
             JPanel panel = new JPanel(new MigLayout());
             panel.add(upperPanel, "wrap");
             panel.add(buttonsPanel, "growx");
-
             // Add it to the dialog
             dialog.add(panel);
             dialog.setPreferredSize(new Dimension(700, 225));
@@ -108,7 +99,6 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
             dialog.setLocationRelativeTo(GUIMediator.getAppFrame()); // centers dialog with respect to parent frame
             dialog.setVisible(true);
         });
-
     }
 
     public static boolean canUseBitTorrent() {
@@ -119,7 +109,6 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
     public void onStatusUpdated(boolean vpnIsOn) {
         boolean vpnDropProtectionOn = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
         BTEngine instance = BTEngine.getInstance();
-
         if (vpnDropProtectionOn) {
             if (vpnIsOn && instance.isPaused()) {
                 instance.resume();

@@ -5,10 +5,9 @@ package com.limegroup.gnutella.gui;
  * notified of UI refresh events.
  */
 public interface RefreshListener {
-	
-	/**
-	 * Called when a UI refresh event has occurred.  Refresh any elements
-	 * of this component that need refreshing.
-	 */
-	void refresh();
+    /**
+     * Called when a UI refresh event has occurred.  Refresh any elements
+     * of this component that need refreshing.
+     */
+    void refresh();
 }

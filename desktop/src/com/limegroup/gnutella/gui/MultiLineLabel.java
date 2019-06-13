@@ -23,38 +23,34 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.StringTokenizer;
 
-/** 
- * This class uses a <tt>JTextArea</tt> to simulate a <tt>JLabel</tt> that 
- * allows multiple-line labels.  It does this by using JLabel's values for 
+/**
+ * This class uses a <tt>JTextArea</tt> to simulate a <tt>JLabel</tt> that
+ * allows multiple-line labels.  It does this by using JLabel's values for
  * border, font, etc.
  */
 public class MultiLineLabel extends JTextArea {
-
     /**
      * The default pixel width for labels when the width is not
      * specified in the constructor.
      */
     private final static int DEFAULT_LABEL_WIDTH = 200;
-
     /**
      * The actual text, prior to \n being inserted.
      */
     private String _theText;
-
     /**
      * Resize handler to update the text layout when the parent is resized.
-     * 
+     * <p>
      * Is constructed lazily when the component obtains a parent.
      */
     private ResizeHandler resizeHandler = null;
-
     /**
      * Whether or not a resize handler should be installed.
      */
     private boolean resizable = false;
 
     /**
-     * Creates a label that can have multiple lines and that has the 
+     * Creates a label that can have multiple lines and that has the
      * default width.
      *
      * @param s the <tt>String</tt> to display in the label
@@ -75,8 +71,8 @@ public class MultiLineLabel extends JTextArea {
     /**
      * Creates a label with new lines inserted after the specified number
      * of pixels have been filled on each line.
-     * 
-     * @param s the <tt>String</tt> to display in the label
+     *
+     * @param s      the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line
      */
     public MultiLineLabel(String s, int pixels) {
@@ -95,11 +91,11 @@ public class MultiLineLabel extends JTextArea {
     /**
      * New constructor that takes an array of strings.  This creates a
      * new <tt>MultiLineLabel</tt> with the string at each index in
-     * the array placed on its own line.  The array cannot contain 
+     * the array placed on its own line.  The array cannot contain
      * any null strings.
      *
      * @param strs the array of strings that should each be placed on
-     *  its own line in the label
+     *             its own line in the label
      */
     public MultiLineLabel(String[] strs) {
         this.setOpaque(false);
@@ -108,13 +104,13 @@ public class MultiLineLabel extends JTextArea {
     }
 
     /**
-     * Creates a label that can have multiple lines and that sets the 
+     * Creates a label that can have multiple lines and that sets the
      * number of rows and columns for the JTextArea.
      *
-     * @param s the <tt>String</tt> to display in the label
+     * @param s      the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line.
-     * @param rows the number of rows to include in the label
-     * @param cols the number of columns to include in the label
+     * @param rows   the number of rows to include in the label
+     * @param cols   the number of columns to include in the label
      */
     public MultiLineLabel(String s, int pixels, int rows, int cols) {
         super(rows, cols);
@@ -128,12 +124,19 @@ public class MultiLineLabel extends JTextArea {
     /**
      * Change the text before passing it up to the super setText.
      *
-     * @param s the <tt>String</tt> to display in the label
+     * @param s      the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line
      */
     public void setText(String s, int pixels) {
         _theText = s;
         super.setText(createSizedString(s, pixels));
+    }
+
+    /**
+     * Gets the current text.
+     */
+    public String getText() {
+        return _theText;
     }
 
     /**
@@ -147,21 +150,13 @@ public class MultiLineLabel extends JTextArea {
     }
 
     /**
-     * Gets the current text.
-     */
-    public String getText() {
-        return _theText;
-    }
-
-    /**
-     * Tells the look and feel to reset some of the  values for this  
+     * Tells the look and feel to reset some of the  values for this
      * component so that it doesn't use JTextArea's default values.
-     *
-     *  DO NOT CALL THIS METHOD YOURSELF!
+     * <p>
+     * DO NOT CALL THIS METHOD YOURSELF!
      */
     public void updateUI() {
         super.updateUI();
-        
         // refactor this method to allow the use of a skin UI, not critical now
         setBackground(new Color(255, 255, 255, 0));
         //setLineWrap(true);
@@ -173,7 +168,6 @@ public class MultiLineLabel extends JTextArea {
         if (resizeHandler != null) {
             resizeHandler.componentResized(null);
         }
-
         // update restricted size
         SizePolicy policy = (SizePolicy) getClientProperty(SizePolicy.class);
         if (policy != null) {
@@ -187,13 +181,12 @@ public class MultiLineLabel extends JTextArea {
      * parameter.
      *
      * @param message the <tt>String</tt> to display in the label
-     * @param pixels the pixel width on each line before
-     *  inserting a new line character
+     * @param pixels  the pixel width on each line before
+     *                inserting a new line character
      */
     private String createSizedString(final String message, final int pixels) {
         FontMetrics fm = getFontMetrics(getFont());
         String word;
-
         //  Find if a single line is longer than the pixel limit.  If so, use
         //  that limit instead of pixels
         StringTokenizer st = new StringTokenizer(message);
@@ -202,7 +195,6 @@ public class MultiLineLabel extends JTextArea {
             word = st.nextToken();
             newWidth = Math.max(newWidth, fm.stringWidth(word));
         }
-
         //  layout multiple lines
         StringBuilder sb = new StringBuilder();
         StringBuilder cursb = new StringBuilder();
@@ -213,7 +205,6 @@ public class MultiLineLabel extends JTextArea {
             if (word.equals(" "))
                 continue;
             isNewLine = word.equals("\n");
-
             if (isNewLine || fm.stringWidth(cursb.toString() + word) > newWidth) {
                 sb.append(cursb.toString());
                 sb.append("\n");
@@ -225,7 +216,6 @@ public class MultiLineLabel extends JTextArea {
             }
         }
         sb.append(cursb.toString());
-
         return sb.toString();
     }
 
@@ -262,7 +252,7 @@ public class MultiLineLabel extends JTextArea {
      *
      * @param strs the array of strings to put in the multiline label
      * @return a new string with newlines inserted at the appropriate
-     *  places
+     * places
      */
     private String createSizedString(final String[] strs) {
         StringBuilder sb = new StringBuilder();
@@ -274,7 +264,6 @@ public class MultiLineLabel extends JTextArea {
     }
 
     private class ResizeHandler extends ComponentAdapter {
-
         private int lastWidth = -1;
 
         @Override

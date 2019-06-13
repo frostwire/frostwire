@@ -15,7 +15,6 @@ import com.limegroup.gnutella.gui.search.SearchMediator;
  * is about to be exited.
  */
 final class Finalizer {
-
     private static final Logger LOG = Logger.getLogger(Finalizer.class);
 
     /**
@@ -36,10 +35,8 @@ final class Finalizer {
         ShutdownWindow window = new ShutdownWindow();
         GUIUtils.centerOnScreen(window);
         window.setVisible(true);
-
         // remove any user notification icons
         NotifyUserProxy.instance().hideTrayIcon();
-
         // Do shutdown stuff in another thread.
         // We don't want to lockup the event thread
         // (which this was called on).

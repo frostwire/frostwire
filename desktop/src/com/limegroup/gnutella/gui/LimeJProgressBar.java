@@ -11,12 +11,10 @@ import java.awt.*;
  * Note: Since Java 1.6 the above bug is reported as fixed.
  */
 public class LimeJProgressBar extends JProgressBar {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -391739746034247225L;
-    
     private final static Dimension PREFERRED_HORIZONTAL_SIZE = new Dimension(146, 17);
 
     LimeJProgressBar() {

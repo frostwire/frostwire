@@ -23,13 +23,10 @@ import com.frostwire.gui.theme.SkinMultilineToolTipUI;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class MultilineToolTip extends JToolTip {
-
     public MultilineToolTip() {
     }
 
@@ -49,16 +46,14 @@ public final class MultilineToolTip extends JToolTip {
 
     private String join(String[] arr) {
         StringBuilder sb = new StringBuilder();
-
         int size = arr.length;
-            if (size - 1 > -1) {
+        if (size - 1 > -1) {
             for (int i = 0; i < size - 1; i++) {
                 sb.append(arr[i]);
                 sb.append(System.lineSeparator());
             }
             sb.append(arr[size - 1]);
         }
-
         return sb.toString();
     }
 }

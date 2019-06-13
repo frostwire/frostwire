@@ -28,21 +28,17 @@ import java.util.List;
  * @author aldenml
  */
 public final class VPNs {
-
     public static boolean isVPNActive() {
         boolean result = false;
-
         if (BTEngine.getInstance().swig() == null) {
             // still not started or already stopped
             return false;
         }
-
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
             result = isPosixVPNActive();
         } else if (OSUtils.isWindows()) {
             result = isWindowsVPNActive();
         }
-
         return result;
     }
 
@@ -73,7 +69,6 @@ public final class VPNs {
             }
         } catch (Throwable ignored) {
         }
-
         return result;
     }
 
@@ -107,15 +102,12 @@ public final class VPNs {
                 break;
             }
         }
-
         if (adapter == null) {
             return false;
         }
-
         if (routes == null) { // don't lookup at routes
             return true;
         }
-
         for (EnumNet.IpRoute route : routes) {
             if (route.name().contains(adapter.name())) {
                 return true;

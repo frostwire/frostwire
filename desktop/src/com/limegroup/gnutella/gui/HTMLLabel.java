@@ -4,9 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class HTMLLabel extends JEditorPane {
-    
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -3000702789974804495L;
 
@@ -16,13 +15,11 @@ public class HTMLLabel extends JEditorPane {
         setEditable(false);
         setCaretPosition(0);
         addHyperlinkListener(GUIUtils.getHyperlinkListener());
-        
         // make it mimic a JLabel
         JLabel label = new JLabel();
         setBackground(label.getBackground());
-        setFont(new Font(label.getFont().getName(), 
-                         label.getFont().getStyle(),
-                         label.getFont().getSize()));
+        setFont(new Font(label.getFont().getName(),
+                label.getFont().getStyle(),
+                label.getFont().getSize()));
     }
-
 }

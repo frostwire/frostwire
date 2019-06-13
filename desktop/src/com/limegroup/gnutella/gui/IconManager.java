@@ -14,16 +14,34 @@ public class IconManager {
      * The sole instance of this IconManager class.
      */
     private static volatile IconManager INSTANCE;
-
     /**
      * The current FileIconController.
      */
     private FileIconController fileController;
-
     /**
      * The current ButtonIconController.
      */
     private ButtonIconController buttonController;
+
+    /**
+     * Constructs a new IconManager.
+     */
+    private IconManager() {
+        buttonController = new ButtonIconController();
+        // Always begin with the basic controller, whose
+        // construction can never block.
+        fileController = new BasicFileIconController();
+        // Then, in a new thread, try to change it to a controller
+        // that can block.
+        if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
+            SwingUtilities.invokeLater(() -> {
+                FileIconController newController = new NativeFileIconController();
+                if (newController.isValid()) {
+                    fileController = newController;
+                }
+            });
+        }
+    }
 
     /**
      * Returns the sole instance of this IconManager class.
@@ -39,41 +57,16 @@ public class IconManager {
     }
 
     /**
-     * Constructs a new IconManager.
-     */
-    private IconManager() {
-        buttonController = new ButtonIconController();
-
-        // Always begin with the basic controller, whose
-        // construction can never block.
-        fileController = new BasicFileIconController();
-
-        // Then, in a new thread, try to change it to a controller
-        // that can block.
-        if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
-            SwingUtilities.invokeLater(() -> {
-                FileIconController newController = new NativeFileIconController();
-                if (newController.isValid()) {
-                    fileController = newController;
-                }
-            });
-        }
-    }
-
-    /**
      * Returns the icon associated with this file.
      * If the file does not exist, or no icon can be found, returns
      * the icon associated with the extension.
      */
     public Icon getIconForFile(File f) {
         validate();
-
         String ext = f != null ? FilenameUtils.getExtension(f.getName()) : null;
-
         if (f != null && ext != null && ext.toLowerCase().endsWith("torrent")) {
             return GUIMediator.getThemeImage("frosthires");
         }
-
         return fileController.getIconForFile(f);
     }
 
@@ -83,7 +76,6 @@ public class IconManager {
      */
     public Icon getIconForExtension(String ext) {
         validate();
-
         if (ext != null && ext.toLowerCase().endsWith("torrent")) {
             return GUIMediator.getThemeImage("frosthires");
         }
@@ -129,5 +121,4 @@ public class IconManager {
         if (!fileController.isValid())
             fileController = new BasicFileIconController();
     }
-
 }

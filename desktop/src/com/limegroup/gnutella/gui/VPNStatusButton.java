@@ -18,8 +18,6 @@
 package com.limegroup.gnutella.gui;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -28,12 +26,10 @@ import java.awt.event.MouseEvent;
  * @author aldenml
  */
 public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.VPNStatusListener {
-
+    static final String VPN_URL = "http://www.frostwire.com/vpn";
     private final IconButton iconButton;
     private final VPNBitTorrentDisabledWarningLabel vpnDropGuardLabel;
     private boolean lastVPNStatus;
-
-    static final String VPN_URL = "http://www.frostwire.com/vpn";
 
     VPNStatusButton() {
         iconButton = new IconButton("vpn_off");
@@ -92,10 +88,8 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
                     I18n.tr("FrostWire can't detect an encrypted VPN connection, your privacy is at risk. Click icon to set up an encrypted VPN connection.") +
                     "</p></html>");
         }
-
         removeAll();
         add(iconButton);
-
         if (!vpnIsOn && vpnDropGuardLabel.shouldBeShown()) {
             add(vpnDropGuardLabel);
         }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,91 +43,71 @@ import java.awt.event.*;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class ApplicationHeader extends JPanel implements RefreshListener {
-
     /*
-    * The property to store the selected icon in.
-    */
+     * The property to store the selected icon in.
+     */
     private static final String SELECTED_ICON = "SELECTED_ICON";
-
     /**
      * The property to store the unselected icon in.
      */
     private static final String DESELECTED_ICON = "DESELECTED_ICON";
-
     private static final String CLOUD_SEARCH_FIELD = "cloud_search_field";
-
     private static final String LIBRARY_SEARCH_FIELD = "library_search_field";
-
     private static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter a cloud sourced URL");
-
     /**
      * The clicker forwarder.
      */
     private final MouseListener CLICK_FORWARDER = new Clicker();
-
-    /** Button background for selected button */
+    /**
+     * Button background for selected button
+     */
     private final Image headerButtonBackgroundSelected;
-
-    /** Button background for unselected button */
+    /**
+     * Button background for unselected button
+     */
     private final Image headerButtonBackgroundUnselected;
-
+    private final GoogleSearchField cloudSearchField;
+    private final JPanel searchPanels;
     private LogoPanel logoPanel;
-
     private JLabel updateButton;
     private ImageIcon updateImageButtonOn;
     private ImageIcon updateImageButtonOff;
     private long updateButtonAnimationStartedTimestamp;
-
-    private final GoogleSearchField cloudSearchField;
     private SearchField librarySearchField;
-    private final JPanel searchPanels;
 
     ApplicationHeader(Map<Tabs, Tab> tabs) {
         setMinimumSize(new Dimension(1000, 54));
         setLayout(new MigLayout("ins 0, ay 50%, filly,", "[][][grow][][]"));
-
         headerButtonBackgroundSelected = GUIMediator.getThemeImage("selected_header_button_background").getImage();
         headerButtonBackgroundUnselected = GUIMediator.getThemeImage("unselected_header_button_background").getImage();
-
         cloudSearchField = new GoogleSearchField();
         searchPanels = createSearchPanel();
         add(searchPanels, "wmin 240px, wmax 370px, growprio 50, growx, gapright 10px, gapleft 5px");
-
         addTabButtons(tabs);
-
         createUpdateButton();
         JPanel logoUpdateButtonsPanel = new JPanel();
         logoPanel = new LogoPanel();
         //only one will be shown at the time.
         logoUpdateButtonsPanel.add(logoPanel);
         logoUpdateButtonsPanel.add(updateButton);
-
         add(logoUpdateButtonsPanel, "growx, alignx center");
-
         JComponent player = new MediaPlayerComponent().getMediaPanel();
         add(player, "dock east, growy, gapafter 10px!");
-
         GUIMediator.addRefreshListener(this);
-
         final ActionListener schemaListener = new SchemaListener();
         schemaListener.actionPerformed(null);
     }
-
 
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new CardLayout());
         initCloudSearchField();
         createLibrarySearchField();
-
         panel.add(cloudSearchField, CLOUD_SEARCH_FIELD);
         panel.add(librarySearchField, LIBRARY_SEARCH_FIELD);
-
         return panel;
     }
 
@@ -145,7 +125,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
         cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
-
         cloudSearchField.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -159,11 +138,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private void createUpdateButton() {
         updateImageButtonOn = GUIMediator.getThemeImage("update_button_on");
         updateImageButtonOff = GUIMediator.getThemeImage("update_button_off");
-
         updateButton = new JLabel(updateImageButtonOn);
         updateButton.setToolTipText(I18n.tr("A new update has been downloaded."));
         Dimension d = new Dimension(32, 32);
-
         updateButton.setVisible(false);
         updateButton.setSize(d);
         updateButton.setPreferredSize(d);
@@ -171,9 +148,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         updateButton.setMaximumSize(d);
         updateButton.setBorder(null);
         updateButton.setOpaque(false);
-
         updateButtonAnimationStartedTimestamp = -1;
-
         updateButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -185,10 +160,8 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private void addTabButtons(final Map<Tabs, Tab> tabs) {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
         ButtonGroup group = new ButtonGroup();
-
         Font buttonFont = new Font("Helvetica", Font.BOLD, 10);
         buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");
-
         for (Tabs t : GUIMediator.Tabs.values()) {
             final Tabs finalTab = t; //java...
             if (tabs.get(t) == null || !t.isEnabled()) {
@@ -196,7 +169,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             }
             AbstractButton button = createTabButton(tabs.get(t));
             button.setFont(buttonFont);
-
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -208,16 +180,14 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                     showSearchField(tabs.get(tab));
                     GUIMediator.instance().setWindow(tab);
                 }
-                
+
                 void prepareSearchTabAsSearchTrigger(final Tabs tab) {
                     String query = null;
                     if (tab == Tabs.SEARCH || tab == Tabs.SEARCH_TRANSFERS) {
                         if (!cloudSearchField.getText().isEmpty()) {
-
                             if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
                                 cloudSearchField.setText("");
                             }
-
                             query = cloudSearchField.getText();
                         } else if (cloudSearchField.getText().isEmpty() && !librarySearchField.getText().isEmpty()) {
                             //they want internet search while on the library
@@ -225,31 +195,27 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                             librarySearchField.setText("");
                             cloudSearchField.setText(query);
                         }
-
                         if (query != null) {
                             cloudSearchField.getActionListeners()[0].actionPerformed(null);
                         }
                     }
                 }
             });
-
             group.add(button);
             buttonContainer.add(button);
             buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy, w 0px");
-
             button.setSelected(t.equals(GUIMediator.Tabs.SEARCH));
         }
-        
         add(buttonContainer, "");
     }
-    
-    
- 
-    /** Given a Tab mark that button as selected 
-     * 
+
+    /**
+     * Given a Tab mark that button as selected
+     * <p>
      * Since we don't keep explicit references to the buttons this method
      * walks over the components in the ApplicationHeader until it finds
-     * the AbstractButton that has the Tab object as a client property named "tab" 
+     * the AbstractButton that has the Tab object as a client property named "tab"
+     *
      * @see MainFrame#setSelectedTab(Tabs)
      */
     void selectTab(Tab t) {
@@ -271,7 +237,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         Icon icon = t.getIcon();
         Icon disabledIcon = null;
         Icon rolloverIcon = null;
-
         final JRadioButton button = new JRadioButton(I18n.tr(t.getTitle())) {
             protected void paintComponent(Graphics g) {
                 if (isSelected()) {
@@ -282,9 +247,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 super.paintComponent(g);
             }
         };
-
         button.putClientProperty("tab", t);
-
         button.putClientProperty(SELECTED_ICON, icon);
         if (icon != null) {
             disabledIcon = icon;//ImageManipulator.darken(icon);
@@ -306,13 +269,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         button.setVerticalTextPosition(SwingConstants.BOTTOM);
         button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setForeground(ThemeMediator.TAB_BUTTON_FOREGROUND_COLOR);
-
         Dimension buttonDim = new Dimension(65, 55);
         button.setPreferredSize(buttonDim);
         button.setMinimumSize(buttonDim);
         button.setMaximumSize(buttonDim);
         button.setSelected(false);
-
         return button;
     }
 
@@ -327,19 +288,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         }
     }
 
-    /**
-     * Forwards click events from a panel to the panel's component.
-     */
-    private static class Clicker extends MouseAdapter {
-        public void mouseClicked(MouseEvent e) {
-            JComponent c = (JComponent) e.getSource();
-            if (!(c instanceof AbstractButton)) {
-                AbstractButton b = (AbstractButton) c.getComponent(0);
-                b.doClick();
-            }
-        }
-    }
-
     @Override
     public void refresh() {
         showUpdateButton(!UpdateMediator.instance().isUpdated() && UpdateMediator.instance().isUpdateDownloaded());
@@ -349,10 +297,8 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         if (updateButton.isVisible() == show) {
             return;
         }
-
         logoPanel.setVisible(!show);
         updateButton.setVisible(show);
-
         if (show) {
             //Start animating the button for 30 seconds.
             if (updateButtonAnimationStartedTimestamp == -1) {
@@ -363,7 +309,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private void startUpdateButtonIntermittentAnimation() {
         updateButtonAnimationStartedTimestamp = System.currentTimeMillis();
-
         //start animation thread.
         Thread t = new Thread("update-button-animation") {
             private long updateButtonAnimationLastChange;
@@ -371,7 +316,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             public void run() {
                 long now = System.currentTimeMillis();
                 updateButtonAnimationLastChange = now;
-
                 boolean buttonState = true;
                 long ANIMATION_DURATION = 30000;
                 while (now - updateButtonAnimationStartedTimestamp < ANIMATION_DURATION) {
@@ -431,10 +375,23 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         // for related problems.
         SwingUtilities.invokeLater(() -> requestSearchFocusImmediately());
     }
-    
+
     void startSearch(String query) {
         cloudSearchField.setText(query);
         cloudSearchField.getActionListeners()[0].actionPerformed(null);
+    }
+
+    /**
+     * Forwards click events from a panel to the panel's component.
+     */
+    private static class Clicker extends MouseAdapter {
+        public void mouseClicked(MouseEvent e) {
+            JComponent c = (JComponent) e.getSource();
+            if (!(c instanceof AbstractButton)) {
+                AbstractButton b = (AbstractButton) c.getComponent(0);
+                b.doClick();
+            }
+        }
     }
 
     private class SearchListener implements ActionListener {
@@ -442,17 +399,15 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             // Keep the query if there was one before switching to the search tab.
             String query = cloudSearchField.getText();
             String queryTitle = query;
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);                
-
+            GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
             // Start a download from the search box by entering a URL.
             if (FileMenuActions.openMagnetOrTorrent(query)) {
                 cloudSearchField.setText("");
                 cloudSearchField.hidePopup();
                 return;
             }
-
             if (query.contains("www.frostclick.com/cloudplayer/?type=yt") ||
-                query.contains("frostwire-preview.com/?type=yt")) {
+                    query.contains("frostwire-preview.com/?type=yt")) {
                 try {
                     query = query.split("detailsUrl=")[1];
                     query = URLDecoder.decode(query);
@@ -460,15 +415,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                     e1.printStackTrace();
                 }
             }
-            
             final SearchInformation info = SearchInformation.createTitledKeywordSearch(query, null, MediaType.getTorrentMediaType(), queryTitle);
-
             // If the search worked, store & clear it.
             if (SearchMediator.instance().triggerSearch(info) != 0) {
                 if (info.isKeywordSearch()) {
-
                     cloudSearchField.addToDictionary();
-
                     // Clear the existing search.
                     cloudSearchField.setText("");
                     cloudSearchField.hidePopup();
@@ -480,7 +431,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private class SchemaListener implements ActionListener {
         public void actionPerformed(ActionEvent event) {
             SearchSettings.MAX_QUERY_LENGTH.revertToDefault();
-
             //Truncate if you have too much text for a Gnutella search
             if (cloudSearchField.getText().length() > SearchSettings.MAX_QUERY_LENGTH.getValue()) {
                 try {
@@ -488,7 +438,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 } catch (BadLocationException ignored) {
                 }
             }
-
             requestSearchFocus();
         }
     }

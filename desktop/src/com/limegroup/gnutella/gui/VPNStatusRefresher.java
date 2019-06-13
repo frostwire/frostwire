@@ -25,19 +25,14 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class VPNStatusRefresher {
-
-    private long lastRefresh = 0;
-
-    private Set<VPNStatusListener> clients = new HashSet<>();
-
     private static final ThreadPool pool = new ThreadPool("VPNStatusRefresher", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
-
+    private static VPNStatusRefresher instance;
+    private long lastRefresh = 0;
+    private Set<VPNStatusListener> clients = new HashSet<>();
     private boolean active = true;
 
     private VPNStatusRefresher() {
     }
-
-    private static VPNStatusRefresher instance;
 
     public static VPNStatusRefresher getInstance() {
         if (instance == null) {
@@ -46,7 +41,7 @@ public class VPNStatusRefresher {
         return instance;
     }
 
-    public void addRefreshListener(VPNStatusListener listener){
+    public void addRefreshListener(VPNStatusListener listener) {
         clients.add(listener);
     }
 
@@ -95,5 +90,4 @@ public class VPNStatusRefresher {
     interface VPNStatusListener {
         void onStatusUpdated(boolean vpnIsOn);
     }
-
 }

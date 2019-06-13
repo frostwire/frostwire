@@ -49,7 +49,6 @@ import java.util.Random;
  * Initializes (creates, starts, & displays) the LimeWire Core & UI.
  */
 public final class Initializer {
-
     /**
      * True if is running from a system startup.
      */
@@ -67,73 +66,58 @@ public final class Initializer {
     void initialize(String[] args, Frame awtSplash) {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
         preinit();
-
         // Various startup tasks...
         //System.out.println("Initializer.initialize() setup callbacks and listeners");
         setupCallbacksAndListeners();
         validateStartup(args);
-
         // Creates LimeWire itself.
         //System.out.println("Initializer.initialize() create Limewire");
         LimeWireGUI limewireGUI = createLimeWire();
         LimeWireCore limeWireCore = limewireGUI.getLimeWireCore();
-
         // Various tasks that can be done after core is glued & started.
         //System.out.println("Initializer.initialize() glue core");
         glueCore(limeWireCore);
-
         // Validate any arguments or properties outside of the LW environment.
         //System.out.println("Initializer.initialize() run external checks");
         runExternalChecks(limeWireCore, args);
         limeWireCore.getExternalControl().startServer();
-
         // Starts some system monitoring for deadlocks.
         //System.out.println("Initializer.initialize() monitor deadlocks");
         DeadlockSupport.startDeadlockMonitoring();
         //stopwatch.resetAndLog("Start deadlock monitor");
-
         // Installs properties & resources.
         //System.out.println("Initializer.initialize() install properties");
         installProperties();
         installResources();
-
         // Construct the SetupManager, which may or may not be shown.
         final SetupManager setupManager = new SetupManager();
         //stopwatch.resetAndLog("construct SetupManager");
-
         // Move from the AWT splash to the Swing splash & start early core.
         //System.out.println("Initializer.initialize() switch splashes");
         switchSplashes(awtSplash);
         startEarlyCore(limeWireCore);
-
         // Initialize early UI components, display the setup manager (if necessary),
         // and ensure the save directory is valid.
         //System.out.println("Initializer.initialize() init early UI");
         initializeEarlyUI();
         startSetupManager(setupManager);
-
         startBittorrentCore();
-
         // Load the UI, system tray & notification handlers,
         // and hide the splash screen & display the UI.
         //System.out.println("Initializer.initialize() load UI");
         loadUI();
         loadTrayAndNotifications();
         hideSplashAndShowUI();
-
         // Initialize late tasks, like Icon initialization & install listeners.
         loadLateTasksForUI();
-
         // Start the core & run any queued control requests, and load DAAP.
         //System.out.println("Initializer.initialize() start core");
         startCore(limeWireCore);
         runQueuedRequests(limeWireCore);
-
         if (OSUtils.isMacOSX()) {
             GURLHandler.getInstance().register();
             MacEventHandler.instance();
         }
-
         // Run any after-init tasks.
         postinit();
     }
@@ -161,10 +145,8 @@ public final class Initializer {
     private void setupCallbacksAndListeners() {
         // Set the error handler so we can receive core errors.
         ErrorService.setErrorCallback(new ErrorHandler());
-
         // Set the messaging handler so we can receive core messages
         org.limewire.service.MessageService.setCallback(new MessageHandler());
-
         // Set the default event error handler so we can receive uncaught
         // AWT errors.
         DefaultErrorCatcher.install();
@@ -175,21 +157,17 @@ public final class Initializer {
      * for expiration failures or startup settings.
      */
     private void validateStartup(String[] args) {
-
         // Yield so any other events can be run to determine
         // startup status, but only if we're going to possibly
         // be starting...
         if (StartupSettings.RUN_ON_STARTUP.getValue()) {
             Thread.yield();
         }
-
         if (OSUtils.isMacOSX()) {
             MacOSXUtils.setLoginStatus(StartupSettings.RUN_ON_STARTUP.getValue());
         }
-
         if (args.length >= 1 && "-startup".equals(args[0]))
             isStartup = true;
-
         if (isStartup) {
             // if the user doesn't want to start on system startup, exit the
             // JVM immediately
@@ -220,7 +198,6 @@ public final class Initializer {
      */
     private void runExternalChecks(LimeWireCore limeWireCore, String[] args) {
         ExternalControl externalControl = limeWireCore.getExternalControl();
-
         // Test for preexisting FrostWire and pass it a magnet URL if one
         // has been passed in.
         if (args.length > 0 && !args[0].equals("-startup")) {
@@ -239,7 +216,6 @@ public final class Initializer {
      */
     private void installProperties() {
         System.setProperty("http.agent", UserAgentGenerator.getUserAgent());
-
         if (OSUtils.isMacOSX()) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -259,7 +235,6 @@ public final class Initializer {
         // Add this running program to the Windows Firewall Exceptions list
         boolean inFirewallException = FirewallUtils.addToFirewall();
         //stopwatch.resetAndLog("add firewall exception");
-
         if (!inFirewallException) {
             limeWireCore.getLifecycleManager().loadBackgroundTasks();
             //stopwatch.resetAndLog("load background tasks");
@@ -278,7 +253,6 @@ public final class Initializer {
                 //stopwatch.resetAndLog("begin splash window");
             }
         });
-
         if (awtSplash != null) {
             awtSplash.dispose();
             //stopwatch.resetAndLog("dispose AWT splash");
@@ -292,10 +266,8 @@ public final class Initializer {
         // Load up the HTML engine.
         GUIMediator.setSplashScreenString(I18n.tr("Loading HTML Engine..."));
         //stopwatch.resetAndLog("update splash for HTML engine");
-
         GUIMediator.safeInvokeAndWait(() -> {
             //stopwatch.resetAndLog("enter evt queue");
-
             JLabel label = new JLabel();
             // setting font and color to null to minimize generated css
             // script
@@ -306,7 +278,6 @@ public final class Initializer {
             //stopwatch.resetAndLog("create HTML view");
         });
         //stopwatch.resetAndLog("return from evt queue");
-
         // Initialize the bug manager
         BugManager.instance();
         //stopwatch.resetAndLog("BugManager instance");
@@ -344,11 +315,9 @@ public final class Initializer {
         // tray icon.
         GUIMediator.safeInvokeAndWait(() -> {
             //stopwatch.resetAndLog("enter evt queue");
-
             NotifyUserProxy.instance();
             if (!ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
                 NotifyUserProxy.instance().hideTrayIcon();
-
             SettingsWarningManager.checkSettingsLoadSaveFailure();
         });
     }
@@ -361,9 +330,7 @@ public final class Initializer {
         if (!isStartup) {
             SplashWindow.instance().dispose();
         }
-
         GUIMediator.allowVisibility();
-
         // Make the GUI visible.
         if (!isStartup) {
             GUIMediator.setAppVisible(true);
@@ -382,7 +349,6 @@ public final class Initializer {
             GUIMediator.setSplashScreenString(I18n.tr("Loading Icons..."));
             IconManager.instance();
         });
-
         // Touch the I18N stuff to ensure it loads properly.
         GUIMediator.setSplashScreenString(I18n.tr("Loading Internationalization Support..."));
         I18NConvert.instance();
@@ -395,7 +361,6 @@ public final class Initializer {
         // Start the backend threads.  Note that the GUI is not yet visible,
         // but it needs to be constructed at this point  
         limeWireCore.getLifecycleManager().start();
-
         // Instruct the gui to perform tasks that can only be performed
         // after the backend has been constructed.
         GUIMediator.instance().coreInitialized();
@@ -406,27 +371,21 @@ public final class Initializer {
     private void startBittorrentCore() {
         SharingSettings.initTorrentDataDirSetting();
         SharingSettings.initTorrentsDirSetting();
-
         File homeDir = new File(CommonUtils.getUserSettingsDir() + File.separator + "libtorrent" + File.separator);
         if (!homeDir.exists()) {
             homeDir.mkdirs();
         }
-
         // port range [37000, 57000]
         int port0 = 37000 + new Random().nextInt(20000);
         int port1 = port0 + 10; // 10 retries
-
         if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
             port0 = ConnectionSettings.PORT_RANGE_0.getValue();
             port1 = ConnectionSettings.PORT_RANGE_1.getValue();
         }
-
         String iface = "0.0.0.0";
-
         if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue()) {
             iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
         }
-
         if (iface.equals("0.0.0.0")) {
             iface = "0.0.0.0:%1$d,[::]:%1$d";
         } else {
@@ -437,24 +396,18 @@ public final class Initializer {
             iface = iface + ":%1$d";
         }
         String if_string = String.format(iface, port0);
-
         BTContext ctx = new BTContext();
         ctx.homeDir = homeDir;
         ctx.torrentsDir = SharingSettings.TORRENTS_DIR_SETTING.getValue();
         ctx.dataDir = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
-
         ctx.interfaces = if_string;
         ctx.retries = port1 - port0;
-
         ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
-
         FrostWireUtils.getFrostWireVersionBuild(ctx.version);
-
         BTEngine.ctx = ctx;
         BTEngine.onCtxSetupComplete();
         BTEngine btEngine = BTEngine.getInstance();
         btEngine.start();
-
         VPNStatusRefresher.getInstance().addRefreshListener(new VPNDropGuard());
     }
 

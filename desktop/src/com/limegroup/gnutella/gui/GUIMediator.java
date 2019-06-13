@@ -83,127 +83,74 @@ import java.util.concurrent.LinkedBlockingQueue;
  * (Swing) thread.
  */
 public final class GUIMediator {
-
-    /**
-     * Flag for whether or not a message has been displayed to the user --
-     * useful in deciding whether or not to display other dialogues.
-     */
-    private static boolean _displayedMessage;
-
     /**
      * Message key for the disconnected message
      */
     private final static String DISCONNECTED_MESSAGE = I18n.tr("Your machine does not appear to have an active Internet connection or a firewall is blocking FrostWire from accessing the internet. FrostWire will automatically keep trying to connect you to the network unless you select \"Disconnect\" from the File menu.");
-
-    /**
-     * Singleton for easy access to the mediator.
-     */
-    private static GUIMediator _instance;
-
-    private boolean _remoteDownloadsAllowed;
-
-    public enum Tabs {
-        SEARCH(I18n.tr("&Search")),
-        TRANSFERS(I18n.tr("&Transfers")),
-        SEARCH_TRANSFERS(I18n.tr("&Search")),
-        LIBRARY(I18n.tr("&Library"));
-
-        private Action navAction;
-
-        public boolean navigatedTo;
-
-        Tabs(String nameWithAmpersand) {
-            navAction = new NavigationAction(nameWithAmpersand, I18n.tr("Display the {0} Screen",
-                    GUIUtils.stripAmpersand(nameWithAmpersand)));
-        }
-
-        void setEnabled(boolean enabled) {
-            navAction.setEnabled(enabled);
-        }
-
-        public boolean isEnabled() {
-            return navAction.isEnabled();
-        }
-
-        private class NavigationAction extends AbstractAction {
-            NavigationAction(String name, String description) {
-                super(name);
-                putValue(Action.LONG_DESCRIPTION, description);
-            }
-
-            public void actionPerformed(ActionEvent e) {
-                instance().setWindow(Tabs.this);
-            }
-        }
-
-    }
-
-    /**
-     * The main <tt>JFrame</tt> for the application.
-     */
-    private static JFrame FRAME;
-
-    /**
-     * The popup menu on the icon in the system tray.
-     */
-    private static PopupMenu TRAY_MENU;
-
     /**
      * <tt>List</tt> of <tt>RefreshListener</tt> classes to notify of UI refresh
      * events.
      */
     private static final List<RefreshListener> REFRESH_LIST = new ArrayList<>();
-
     /**
      * String to be displayed in title bar of LW client.
      */
     private static final String APP_TITLE = I18n.tr("FrostWire: Share Big Files");
-
+    /**
+     * Flag for whether or not a message has been displayed to the user --
+     * useful in deciding whether or not to display other dialogues.
+     */
+    private static boolean _displayedMessage;
+    /**
+     * Singleton for easy access to the mediator.
+     */
+    private static GUIMediator _instance;
+    /**
+     * The main <tt>JFrame</tt> for the application.
+     */
+    private static JFrame FRAME;
+    /**
+     * The popup menu on the icon in the system tray.
+     */
+    private static PopupMenu TRAY_MENU;
     /**
      * Handle to the <tt>OptionsMediator</tt> class that is responsible for
      * displaying customizable options to the user.
      */
     private static OptionsMediator OPTIONS_MEDIATOR;
-
     /**
      * The shell association manager.
      */
     private static ShellAssociationManager ASSOCIATION_MANAGER;
-
-    /**
-     * Constant handle to the <tt>MainFrame</tt> instance that handles
-     * constructing all of the primary gui components.
-     */
-    private MainFrame MAIN_FRAME;
-
-    /**
-     * Constant handle to the <tt>DownloadMediator</tt> class that is
-     * responsible for displaying active downloads to the user.
-     */
-    private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
-
-    /**
-     * Constant handle to the <tt>DownloadView</tt> class that is responsible
-     * for displaying the status of the network and connectivity to the user.
-     */
-    private StatusLine STATUS_LINE;
-
-    private long _lastConnectivityCheckTimestamp;
-
-    private boolean _wasInternetReachable;
-
     /**
      * Flag for whether or not the app has ever been made visible during this
      * session.
      */
     private static boolean _visibleOnce = false;
-
     /**
      * Flag for whether or not the app is allowed to become visible.
      */
     private static boolean _allowVisible = false;
-
+    private static ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
     private final RefreshTimer timer;
+    private boolean _remoteDownloadsAllowed;
+    /**
+     * Constant handle to the <tt>MainFrame</tt> instance that handles
+     * constructing all of the primary gui components.
+     */
+    private MainFrame MAIN_FRAME;
+    /**
+     * Constant handle to the <tt>DownloadMediator</tt> class that is
+     * responsible for displaying active downloads to the user.
+     */
+    private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
+    /**
+     * Constant handle to the <tt>DownloadView</tt> class that is responsible
+     * for displaying the status of the network and connectivity to the user.
+     */
+    private StatusLine STATUS_LINE;
+    private long _lastConnectivityCheckTimestamp;
+    private boolean _wasInternetReachable;
 
     /**
      * Private constructor to ensure that this class cannot be constructed from
@@ -212,9 +159,7 @@ public final class GUIMediator {
     private GUIMediator() {
         MAIN_FRAME = new MainFrame(getAppFrame());
         OPTIONS_MEDIATOR = MAIN_FRAME.getOptionsMediator();
-
         _remoteDownloadsAllowed = true;
-
         this.timer = new RefreshTimer();
     }
 
@@ -234,13 +179,6 @@ public final class GUIMediator {
      */
     public static boolean isConstructed() {
         return _instance != null;
-    }
-
-    /**
-     * Notification that the core has been initialized.
-     */
-    void coreInitialized() {
-        timer.startTimer();
     }
 
     /**
@@ -269,7 +207,6 @@ public final class GUIMediator {
                 getAppFrame().setVisible(visible);
             } catch (NullPointerException npe) {
                 System.out.println("GUIMediator - NULL POINTER EXCEPTION HAPPENED");
-
                 if (OSUtils.isNativeThemeWindows()) {
                     try {
                         GUIMediator
@@ -324,13 +261,10 @@ public final class GUIMediator {
         if (_displayedMessage)
             return;
         _displayedMessage = true;
-
         getAssociationManager().checkAndGrab(true);
-
         if (TipOfTheDayMessages.hasLocalizedMessages() && StartupSettings.SHOW_TOTD.getValue()) {
             // Construct it first...
             TipOfTheDayMediator.instance();
-
             ThreadExecutor.startThread(() -> {
                 try {
                     Thread.sleep(500);
@@ -375,16 +309,6 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the <tt>MainFrame</tt> instance. <tt>MainFrame</tt> maintains
-     * handles to all of the major gui classes.
-     *
-     * @return the <tt>MainFrame</tt> instance
-     */
-    public final MainFrame getMainFrame() {
-        return MAIN_FRAME;
-    }
-
-    /**
      * Returns the main application <tt>JFrame</tt> instance.
      *
      * @return the main application <tt>JFrame</tt> instance
@@ -410,56 +334,13 @@ public final class GUIMediator {
     }
 
     /**
-     * Returns the status line instance for other classes to access
+     * Returns whether or not the options window is visible
+     *
+     * @return <tt>true</tt> if the options window is visible, <tt>false</tt>
+     * otherwise
      */
-    public StatusLine getStatusLine() {
-        if (STATUS_LINE == null) {
-            STATUS_LINE = getMainFrame().getStatusLine();
-        }
-        return STATUS_LINE;
-    }
-
-    /**
-     * Refreshes the various gui components that require refreshing.
-     */
-    final void refreshGUI() {
-        for (RefreshListener listener : REFRESH_LIST) {
-            try {
-                listener.refresh();
-            } catch (Throwable t) {
-                // Show the error for each RefreshListener individually
-                // so that we continue refreshing the other items.
-                ErrorService.error(t);
-            }
-        }
-
-        updateConnectionQualityAsync();
-    }
-
-    private static ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
-
-    private void updateConnectionQualityAsync() {
-        pool.execute(() -> {
-            final int quality = getConnectionQuality();
-            safeInvokeLater(() -> {
-                if (quality != StatusLine.STATUS_DISCONNECTED) {
-                    hideDisposableMessage(DISCONNECTED_MESSAGE);
-                }
-
-                updateConnectionUI(quality);
-            });
-        });
-    }
-
-    /**
-     * Returns the connection quality.
-     */
-    private int getConnectionQuality() {
-        if (isInternetReachable()) {
-            return StatusLine.STATUS_TURBOCHARGED;
-        } else {
-            return StatusLine.STATUS_DISCONNECTED;
-        }
+    static boolean isOptionsVisible() {
+        return OPTIONS_MEDIATOR != null && OPTIONS_MEDIATOR.isOptionsVisible();
     }
 
     /**
@@ -471,29 +352,6 @@ public final class GUIMediator {
         if (OPTIONS_MEDIATOR == null)
             return;
         OPTIONS_MEDIATOR.setOptionsVisible(visible);
-    }
-
-    /**
-     * Sets the visibility state of the options window, and sets the selection
-     * to a option pane associated with a given key.
-     *
-     * @param visible the visibility state to set the window to
-     * @param key     the unique identifying key of the panel to show
-     */
-    public void setOptionsVisible(boolean visible, final String key) {
-        if (OPTIONS_MEDIATOR == null)
-            return;
-        OPTIONS_MEDIATOR.setOptionsVisible(visible, key);
-    }
-
-    /**
-     * Returns whether or not the options window is visible
-     *
-     * @return <tt>true</tt> if the options window is visible, <tt>false</tt>
-     * otherwise
-     */
-    static boolean isOptionsVisible() {
-        return OPTIONS_MEDIATOR != null && OPTIONS_MEDIATOR.isOptionsVisible();
     }
 
     /**
@@ -516,109 +374,7 @@ public final class GUIMediator {
         if (ASSOCIATION_MANAGER == null) {
             ASSOCIATION_MANAGER = new ShellAssociationManager(FrostAssociations.getSupportedAssociations());
         }
-
         return ASSOCIATION_MANAGER;
-    }
-
-    /**
-     * Sets the tab pane to display the given tab.
-     * Tip: Try to leave this method call last on your actions.
-     *
-     * @param tabEnum index of the tab to display
-     */
-    public void setWindow(GUIMediator.Tabs tabEnum) {
-        if (tabEnum == Tabs.TRANSFERS || tabEnum == Tabs.SEARCH_TRANSFERS) {
-            if (Tabs.TRANSFERS.isEnabled()) {
-                tabEnum = Tabs.TRANSFERS;
-            } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
-                tabEnum = Tabs.SEARCH_TRANSFERS;
-            }
-        }
-
-        getMainFrame().getApplicationHeader().showSearchField(getMainFrame().getTab(tabEnum));
-        getMainFrame().setSelectedTab(tabEnum);
-
-        // If we've never selected a directory holder in the library, then we have it select "Default Save Folder"
-        if (LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue() == -1) {
-            selectDefaultSaveFolderOnLibraryFirstTime(tabEnum);
-        } else {
-            LibraryMediator.instance().getLibraryExplorer().selectDirectoryHolderAt(LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue());
-        }
-    }
-
-    /**
-     * If the window to be shown is the Library tab, we automatically select "Finished Downloads"
-     * so the users have a clue of what they can do with the Library, and so that they see their
-     * finished downloads in case they came here the first time to see what they downloaded.
-     */
-    private void selectDefaultSaveFolderOnLibraryFirstTime(GUIMediator.Tabs tab) {
-        if (!tab.navigatedTo && tab.equals(GUIMediator.Tabs.LIBRARY)) {
-            LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
-            tab.navigatedTo = true;
-        }
-    }
-
-    public GUIMediator.Tabs getSelectedTab() {
-        return getMainFrame().getSelectedTab();
-    }
-
-    /**
-     * Sets the connected/disconnected visual status of the client.
-     *
-     * @param quality the connected/disconnected status of the client
-     */
-    private void updateConnectionUI(int quality) {
-        getStatusLine().setConnectionQuality(quality);
-    }
-
-    /**
-     * Returns the total number of currently active uploads.
-     *
-     * @return the total number of currently active uploads
-     */
-    int getCurrentUploads() {
-        return getBTDownloadMediator().getActiveUploads();
-    }
-
-    /**
-     * Returns the total number of downloads for this session.
-     *
-     * @return the total number of downloads for this session
-     */
-    @SuppressWarnings("unused")
-    public final int getTotalDownloads() {
-        return getBTDownloadMediator().getTotalDownloads();
-    }
-
-    final int getCurrentDownloads() {
-        return getBTDownloadMediator().getActiveDownloads();
-    }
-
-    public final void openTorrentFile(File torrentFile, boolean partialSelection) {
-        BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
-        List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
-
-        Runnable onOpenRunnable = () -> {
-            showTransfers(TransfersTab.FilterMode.ALL);
-            TorrentInfo ti = new TorrentInfo(torrentFile);
-            for (BTDownload btDownload : downloads) {
-                if (btDownload.getHash().equals(ti.infoHash().toHex())) {
-                    btDownloadMediator.selectBTDownload(btDownload);
-                }
-            }
-        };
-        btDownloadMediator.openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
-
-    }
-
-    public void openTorrentForSeed(File torrentFile, File saveDir) {
-        getBTDownloadMediator().openTorrentFileForSeed(torrentFile, saveDir);
-        showTransfers(TransfersTab.FilterMode.ALL);
-    }
-
-    public final void openTorrentURI(String uri, boolean partialDownload) {
-        showTransfers(TransfersTab.FilterMode.ALL);
-        getBTDownloadMediator().openTorrentURI(uri, partialDownload);
     }
 
     /**
@@ -645,18 +401,6 @@ public final class GUIMediator {
      */
     static void allowVisibility() {
         _allowVisible = true;
-    }
-
-    /**
-     * Notification that loading is finished. Updates the status line and bumps
-     * the AWT thread priority.
-     */
-    void loadFinished() {
-        SwingUtilities.invokeLater(() -> {
-            Thread awt = Thread.currentThread();
-            awt.setPriority(awt.getPriority() + 1);
-            getStatusLine().loadFinished();
-        });
     }
 
     /**
@@ -687,7 +431,6 @@ public final class GUIMediator {
      */
     private static void hideView() {
         getAppFrame().setState(Frame.ICONIFIED);
-
         if (OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable()) {
             GUIMediator.setAppVisible(false);
         }
@@ -702,14 +445,12 @@ public final class GUIMediator {
     public static void restoreView() {
         // Frame must be visible for setState to work. Make visible
         // before restoring.
-
         if (OSUtils.supportsTray() && ResourceManager.instance().isTrayIconAvailable()) {
             // below is a little hack to get around odd windowing
             // behavior with the system tray on windows. This enables
             // us to get LimeWire to the foreground after it's run from
             // the startup folder with all the nice little animations
             // that we want
-
             // cache whether or not to use our little hack, since setAppVisible
             // changes the value of _visibleOnce
             boolean doHack = false;
@@ -723,7 +464,6 @@ public final class GUIMediator {
             if (doHack)
                 restoreView();
         }
-
         getAppFrame().setState(Frame.NORMAL);
     }
 
@@ -733,9 +473,7 @@ public final class GUIMediator {
      * exiting after all file transfers in progress are complete.
      */
     public static void close(boolean fromFrame) {
-
         boolean minimizeToTray = ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
-
         if (!OSUtils.isMacOSX() && ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue()) {
             HideExitDialog dlg = new HideExitDialog(getAppFrame());
             dlg.setVisible(true);
@@ -746,7 +484,6 @@ public final class GUIMediator {
                 minimizeToTray = result == HideExitDialog.HIDE;
             }
         }
-
         if (minimizeToTray) {
             if (OSUtils.supportsTray()) {
                 if (ResourceManager.instance().isTrayIconAvailable()) {
@@ -789,17 +526,6 @@ public final class GUIMediator {
             }
         } catch (Throwable ignored) {
         }
-    }
-
-    public void showTransfers(TransfersTab.FilterMode mode) {
-        Tabs tabEnum = Tabs.TRANSFERS;
-        if (Tabs.TRANSFERS.isEnabled()) {
-            tabEnum = Tabs.TRANSFERS;
-        } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
-            tabEnum = Tabs.SEARCH_TRANSFERS;
-        }
-        setWindow(tabEnum);
-        ((TransfersTab) getMainFrame().getTab(Tabs.TRANSFERS)).showTransfers(mode);
     }
 
     /**
@@ -855,10 +581,6 @@ public final class GUIMediator {
                 }
             }
         }
-    }
-
-    public Tab getTab(Tabs tabs) {
-        return MAIN_FRAME.getTab(tabs);
     }
 
     /**
@@ -1225,55 +947,6 @@ public final class GUIMediator {
     }
 
     /**
-     * Launches the specified audio/video in the player.
-     *
-     * @param song - song to play now
-     */
-    public void launchMedia(MediaSource song, boolean isPreview) {
-
-        if (MediaPlayer.instance().getCurrentMedia() != null)
-            try {
-                MediaPlayer.instance().stop();
-                // it needs to pause for a bit, otherwise it'll play the same song.
-                // must be a sync bug somewhere, but this fixes it
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        //MediaPlayer.instance().loadSong(song);
-        boolean playNextSong = true;
-        if (song.getFile() != null && MediaType.getVideoMediaType().matches(song.getFile().getAbsolutePath())) {
-            playNextSong = false;
-        }
-
-        MediaPlayer.instance().asyncLoadMedia(song, isPreview, playNextSong);
-    }
-
-    /**
-     * Notification that the button state has changed.
-     */
-    public void buttonViewChanged() {
-        IconManager.instance().wipeButtonIconCache();
-        updateButtonView(getAppFrame());
-    }
-
-    private void updateButtonView(Component c) {
-        if (c instanceof IconButton) {
-            ((IconButton) c).updateUI();
-        }
-        Component[] children = null;
-        if (c instanceof Container) {
-            children = ((Container) c).getComponents();
-        }
-        if (children != null) {
-            for (Component aChildren : children) {
-                updateButtonView(aChildren);
-            }
-        }
-    }
-
-    /**
      * safely run code synchronously in the event dispatching thread.
      */
     public static void safeInvokeAndWait(Runnable runnable) {
@@ -1305,16 +978,6 @@ public final class GUIMediator {
             SwingUtilities.invokeLater(runnable);
     }
 
-    /**
-     * Sets the cursor on FrostWire's frame.
-     *
-     * @param cursor the cursor that should be shown on the frame and all its child
-     *               components that don't have their own cursor set
-     */
-    public void setFrameCursor(Cursor cursor) {
-        getAppFrame().setCursor(cursor);
-    }
-
     public static void openURL(final String link, final long delay) {
         if (delay > 0) {
             new Thread(() -> {
@@ -1330,13 +993,6 @@ public final class GUIMediator {
         }
     }
 
-    public BTDownloadMediator getBTDownloadMediator() {
-        if (BT_DOWNLOAD_MEDIATOR == null) {
-            BT_DOWNLOAD_MEDIATOR = getMainFrame().getBTDownloadMediator();
-        }
-        return BT_DOWNLOAD_MEDIATOR;
-    }
-
     public static void setClipboardContent(String str) {
         try {
             StringSelection data = new StringSelection(str);
@@ -1347,24 +1003,285 @@ public final class GUIMediator {
         }
     }
 
+    /**
+     * Notification that the core has been initialized.
+     */
+    void coreInitialized() {
+        timer.startTimer();
+    }
+
+    /**
+     * Returns the <tt>MainFrame</tt> instance. <tt>MainFrame</tt> maintains
+     * handles to all of the major gui classes.
+     *
+     * @return the <tt>MainFrame</tt> instance
+     */
+    public final MainFrame getMainFrame() {
+        return MAIN_FRAME;
+    }
+
+    /**
+     * Returns the status line instance for other classes to access
+     */
+    public StatusLine getStatusLine() {
+        if (STATUS_LINE == null) {
+            STATUS_LINE = getMainFrame().getStatusLine();
+        }
+        return STATUS_LINE;
+    }
+
+    /**
+     * Refreshes the various gui components that require refreshing.
+     */
+    final void refreshGUI() {
+        for (RefreshListener listener : REFRESH_LIST) {
+            try {
+                listener.refresh();
+            } catch (Throwable t) {
+                // Show the error for each RefreshListener individually
+                // so that we continue refreshing the other items.
+                ErrorService.error(t);
+            }
+        }
+        updateConnectionQualityAsync();
+    }
+
+    private void updateConnectionQualityAsync() {
+        pool.execute(() -> {
+            final int quality = getConnectionQuality();
+            safeInvokeLater(() -> {
+                if (quality != StatusLine.STATUS_DISCONNECTED) {
+                    hideDisposableMessage(DISCONNECTED_MESSAGE);
+                }
+                updateConnectionUI(quality);
+            });
+        });
+    }
+
+    /**
+     * Returns the connection quality.
+     */
+    private int getConnectionQuality() {
+        if (isInternetReachable()) {
+            return StatusLine.STATUS_TURBOCHARGED;
+        } else {
+            return StatusLine.STATUS_DISCONNECTED;
+        }
+    }
+
+    /**
+     * Sets the visibility state of the options window, and sets the selection
+     * to a option pane associated with a given key.
+     *
+     * @param visible the visibility state to set the window to
+     * @param key     the unique identifying key of the panel to show
+     */
+    public void setOptionsVisible(boolean visible, final String key) {
+        if (OPTIONS_MEDIATOR == null)
+            return;
+        OPTIONS_MEDIATOR.setOptionsVisible(visible, key);
+    }
+
+    /**
+     * Sets the tab pane to display the given tab.
+     * Tip: Try to leave this method call last on your actions.
+     *
+     * @param tabEnum index of the tab to display
+     */
+    public void setWindow(GUIMediator.Tabs tabEnum) {
+        if (tabEnum == Tabs.TRANSFERS || tabEnum == Tabs.SEARCH_TRANSFERS) {
+            if (Tabs.TRANSFERS.isEnabled()) {
+                tabEnum = Tabs.TRANSFERS;
+            } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
+                tabEnum = Tabs.SEARCH_TRANSFERS;
+            }
+        }
+        getMainFrame().getApplicationHeader().showSearchField(getMainFrame().getTab(tabEnum));
+        getMainFrame().setSelectedTab(tabEnum);
+        // If we've never selected a directory holder in the library, then we have it select "Default Save Folder"
+        if (LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue() == -1) {
+            selectDefaultSaveFolderOnLibraryFirstTime(tabEnum);
+        } else {
+            LibraryMediator.instance().getLibraryExplorer().selectDirectoryHolderAt(LibrarySettings.LAST_SELECTED_LIBRARY_DIRECTORY_HOLDER_OFFSET.getValue());
+        }
+    }
+
+    /**
+     * If the window to be shown is the Library tab, we automatically select "Finished Downloads"
+     * so the users have a clue of what they can do with the Library, and so that they see their
+     * finished downloads in case they came here the first time to see what they downloaded.
+     */
+    private void selectDefaultSaveFolderOnLibraryFirstTime(GUIMediator.Tabs tab) {
+        if (!tab.navigatedTo && tab.equals(GUIMediator.Tabs.LIBRARY)) {
+            LibraryMediator.instance().getLibraryExplorer().selectFinishedDownloads();
+            tab.navigatedTo = true;
+        }
+    }
+
+    public GUIMediator.Tabs getSelectedTab() {
+        return getMainFrame().getSelectedTab();
+    }
+
+    /**
+     * Sets the connected/disconnected visual status of the client.
+     *
+     * @param quality the connected/disconnected status of the client
+     */
+    private void updateConnectionUI(int quality) {
+        getStatusLine().setConnectionQuality(quality);
+    }
+
+    /**
+     * Returns the total number of currently active uploads.
+     *
+     * @return the total number of currently active uploads
+     */
+    int getCurrentUploads() {
+        return getBTDownloadMediator().getActiveUploads();
+    }
+
+    /**
+     * Returns the total number of downloads for this session.
+     *
+     * @return the total number of downloads for this session
+     */
+    @SuppressWarnings("unused")
+    public final int getTotalDownloads() {
+        return getBTDownloadMediator().getTotalDownloads();
+    }
+
+    final int getCurrentDownloads() {
+        return getBTDownloadMediator().getActiveDownloads();
+    }
+
+    public final void openTorrentFile(File torrentFile, boolean partialSelection) {
+        BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
+        List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
+        Runnable onOpenRunnable = () -> {
+            showTransfers(TransfersTab.FilterMode.ALL);
+            TorrentInfo ti = new TorrentInfo(torrentFile);
+            for (BTDownload btDownload : downloads) {
+                if (btDownload.getHash().equals(ti.infoHash().toHex())) {
+                    btDownloadMediator.selectBTDownload(btDownload);
+                }
+            }
+        };
+        btDownloadMediator.openTorrentFile(torrentFile, partialSelection, onOpenRunnable);
+    }
+
+    public void openTorrentForSeed(File torrentFile, File saveDir) {
+        getBTDownloadMediator().openTorrentFileForSeed(torrentFile, saveDir);
+        showTransfers(TransfersTab.FilterMode.ALL);
+    }
+
+    public final void openTorrentURI(String uri, boolean partialDownload) {
+        showTransfers(TransfersTab.FilterMode.ALL);
+        getBTDownloadMediator().openTorrentURI(uri, partialDownload);
+    }
+
+    /**
+     * Notification that loading is finished. Updates the status line and bumps
+     * the AWT thread priority.
+     */
+    void loadFinished() {
+        SwingUtilities.invokeLater(() -> {
+            Thread awt = Thread.currentThread();
+            awt.setPriority(awt.getPriority() + 1);
+            getStatusLine().loadFinished();
+        });
+    }
+
+    public void showTransfers(TransfersTab.FilterMode mode) {
+        Tabs tabEnum = Tabs.TRANSFERS;
+        if (Tabs.TRANSFERS.isEnabled()) {
+            tabEnum = Tabs.TRANSFERS;
+        } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
+            tabEnum = Tabs.SEARCH_TRANSFERS;
+        }
+        setWindow(tabEnum);
+        ((TransfersTab) getMainFrame().getTab(Tabs.TRANSFERS)).showTransfers(mode);
+    }
+
+    public Tab getTab(Tabs tabs) {
+        return MAIN_FRAME.getTab(tabs);
+    }
+
+    /**
+     * Launches the specified audio/video in the player.
+     *
+     * @param song - song to play now
+     */
+    public void launchMedia(MediaSource song, boolean isPreview) {
+        if (MediaPlayer.instance().getCurrentMedia() != null)
+            try {
+                MediaPlayer.instance().stop();
+                // it needs to pause for a bit, otherwise it'll play the same song.
+                // must be a sync bug somewhere, but this fixes it
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        //MediaPlayer.instance().loadSong(song);
+        boolean playNextSong = true;
+        if (song.getFile() != null && MediaType.getVideoMediaType().matches(song.getFile().getAbsolutePath())) {
+            playNextSong = false;
+        }
+        MediaPlayer.instance().asyncLoadMedia(song, isPreview, playNextSong);
+    }
+
+    /**
+     * Notification that the button state has changed.
+     */
+    public void buttonViewChanged() {
+        IconManager.instance().wipeButtonIconCache();
+        updateButtonView(getAppFrame());
+    }
+
+    private void updateButtonView(Component c) {
+        if (c instanceof IconButton) {
+            ((IconButton) c).updateUI();
+        }
+        Component[] children = null;
+        if (c instanceof Container) {
+            children = ((Container) c).getComponents();
+        }
+        if (children != null) {
+            for (Component aChildren : children) {
+                updateButtonView(aChildren);
+            }
+        }
+    }
+
+    /**
+     * Sets the cursor on FrostWire's frame.
+     *
+     * @param cursor the cursor that should be shown on the frame and all its child
+     *               components that don't have their own cursor set
+     */
+    public void setFrameCursor(Cursor cursor) {
+        getAppFrame().setCursor(cursor);
+    }
+
+    public BTDownloadMediator getBTDownloadMediator() {
+        if (BT_DOWNLOAD_MEDIATOR == null) {
+            BT_DOWNLOAD_MEDIATOR = getMainFrame().getBTDownloadMediator();
+        }
+        return BT_DOWNLOAD_MEDIATOR;
+    }
+
     private boolean isInternetReachable() {
         long _internetConnectivityInterval = 5000;
         long now = System.currentTimeMillis();
-
         if (now - _lastConnectivityCheckTimestamp < _internetConnectivityInterval) {
             return _wasInternetReachable;
         }
-
         _lastConnectivityCheckTimestamp = now;
-
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-
             if (interfaces == null) {
                 _wasInternetReachable = false;
                 return false;
             }
-
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
                 if (iface.isUp() && !iface.isLoopback()) {
@@ -1376,7 +1293,6 @@ public final class GUIMediator {
             _wasInternetReachable = false;
             return false;
         }
-
         _wasInternetReachable = false;
         return false;
     }
@@ -1400,7 +1316,6 @@ public final class GUIMediator {
 
     public void openSlide(Slide slide) {
         getBTDownloadMediator().openSlide(slide);
-
         // we might already have it, let's show all instead of downloading.
         showTransfers(TransfersTab.FilterMode.ALL);
     }
@@ -1418,7 +1333,6 @@ public final class GUIMediator {
         if (source == null) {
             return;
         }
-
         if (source.getFile() != null) {
             GUIMediator.launchFile(source.getFile());
         } else if (source.getPlaylistItem() != null) {
@@ -1428,4 +1342,36 @@ public final class GUIMediator {
         }
     }
 
+    public enum Tabs {
+        SEARCH(I18n.tr("&Search")),
+        TRANSFERS(I18n.tr("&Transfers")),
+        SEARCH_TRANSFERS(I18n.tr("&Search")),
+        LIBRARY(I18n.tr("&Library"));
+        public boolean navigatedTo;
+        private Action navAction;
+
+        Tabs(String nameWithAmpersand) {
+            navAction = new NavigationAction(nameWithAmpersand, I18n.tr("Display the {0} Screen",
+                    GUIUtils.stripAmpersand(nameWithAmpersand)));
+        }
+
+        public boolean isEnabled() {
+            return navAction.isEnabled();
+        }
+
+        void setEnabled(boolean enabled) {
+            navAction.setEnabled(enabled);
+        }
+
+        private class NavigationAction extends AbstractAction {
+            NavigationAction(String name, String description) {
+                super(name);
+                putValue(Action.LONG_DESCRIPTION, description);
+            }
+
+            public void actionPerformed(ActionEvent e) {
+                instance().setWindow(Tabs.this);
+            }
+        }
+    }
 }

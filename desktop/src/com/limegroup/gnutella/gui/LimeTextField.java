@@ -34,12 +34,10 @@ import java.awt.event.ActionEvent;
  * A better JTextField.
  */
 public class LimeTextField extends JTextField {
-
     /**
      *
      */
     private static final long serialVersionUID = -1994520183255049424L;
-
     /**
      * The undo action.
      */
@@ -53,7 +51,6 @@ public class LimeTextField extends JTextField {
             getField(e).undo();
         }
     };
-
     /**
      * The cut action
      */
@@ -67,7 +64,6 @@ public class LimeTextField extends JTextField {
             getField(e).cut();
         }
     };
-
     /**
      * The copy action.
      */
@@ -81,7 +77,6 @@ public class LimeTextField extends JTextField {
             getField(e).copy();
         }
     };
-
     /**
      * The paste action.
      */
@@ -95,7 +90,6 @@ public class LimeTextField extends JTextField {
             getField(e).paste();
         }
     };
-
     /**
      * The delete action.
      */
@@ -109,7 +103,6 @@ public class LimeTextField extends JTextField {
             getField(e).replaceSelection("");
         }
     };
-
     /**
      * The select all action.
      */
@@ -123,12 +116,10 @@ public class LimeTextField extends JTextField {
             getField(e).selectAll();
         }
     };
-
     /**
      * The sole JPopupMenu that's shared among all the text fields.
      */
     private static final JPopupMenu POPUP = createPopup();
-
     /**
      * Our UndoManager.
      */
@@ -175,6 +166,34 @@ public class LimeTextField extends JTextField {
     }
 
     /**
+     * Creates the JPopupMenu that all LimeTextFields will share.
+     */
+    private static JPopupMenu createPopup() {
+        JPopupMenu popup;
+        // initialize the JPopupMenu with necessary stuff.
+        popup = new SkinPopupMenu() {
+            /**
+             *
+             */
+            private static final long serialVersionUID = -6004124495511263059L;
+
+            public void show(Component invoker, int x, int y) {
+                ((LimeTextField) invoker).updateActions();
+                super.show(invoker, x, y);
+            }
+        };
+        popup.add(new SkinMenuItem(UNDO_ACTION));
+        popup.addSeparator();
+        popup.add(new SkinMenuItem(CUT_ACTION));
+        popup.add(new SkinMenuItem(COPY_ACTION));
+        popup.add(new SkinMenuItem(PASTE_ACTION));
+        popup.add(new SkinMenuItem(DELETE_ACTION));
+        popup.addSeparator();
+        popup.add(new SkinMenuItem(SELECT_ALL_ACTION));
+        return popup;
+    }
+
+    /**
      * The light text that's on the textfield as a hint before you type
      */
     public void setPrompt(String promptText) {
@@ -209,48 +228,15 @@ public class LimeTextField extends JTextField {
         super.setDocument(doc);
     }
 
-
     /**
      * Initialize the necessary events.
      */
     private void init() {
         setComponentPopupMenu(POPUP);
-
         undoManager = new UndoManager();
         undoManager.setLimit(1);
         getDocument().addUndoableEditListener(undoManager);
-
         ThemeMediator.fixKeyStrokes(this);
-    }
-
-    /**
-     * Creates the JPopupMenu that all LimeTextFields will share.
-     */
-    private static JPopupMenu createPopup() {
-        JPopupMenu popup;
-
-        // initialize the JPopupMenu with necessary stuff.
-        popup = new SkinPopupMenu() {
-            /**
-             *
-             */
-            private static final long serialVersionUID = -6004124495511263059L;
-
-            public void show(Component invoker, int x, int y) {
-                ((LimeTextField) invoker).updateActions();
-                super.show(invoker, x, y);
-            }
-        };
-
-        popup.add(new SkinMenuItem(UNDO_ACTION));
-        popup.addSeparator();
-        popup.add(new SkinMenuItem(CUT_ACTION));
-        popup.add(new SkinMenuItem(COPY_ACTION));
-        popup.add(new SkinMenuItem(PASTE_ACTION));
-        popup.add(new SkinMenuItem(DELETE_ACTION));
-        popup.addSeparator();
-        popup.add(new SkinMenuItem(SELECT_ALL_ACTION));
-        return popup;
     }
 
     /**
@@ -260,10 +246,8 @@ public class LimeTextField extends JTextField {
         String selectedText = getSelectedText();
         if (selectedText == null)
             selectedText = "";
-
         boolean stuffSelected = !selectedText.equals("");
         boolean allSelected = selectedText.equals(getText());
-
         UNDO_ACTION.setEnabled(isEnabled() && isEditable() && isUndoAvailable());
         CUT_ACTION.setEnabled(isEnabled() && isEditable() && stuffSelected);
         COPY_ACTION.setEnabled(isEnabled() && stuffSelected);
@@ -295,7 +279,6 @@ public class LimeTextField extends JTextField {
      * Base Action that all LimeTextField actions extend.
      */
     private static abstract class FieldAction extends AbstractAction {
-
         /**
          *
          */
@@ -316,6 +299,5 @@ public class LimeTextField extends JTextField {
             JPopupMenu menu = (JPopupMenu) source.getParent();
             return (LimeTextField) menu.getInvoker();
         }
-
     }
 }
