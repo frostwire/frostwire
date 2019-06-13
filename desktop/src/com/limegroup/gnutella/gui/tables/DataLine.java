@@ -3,11 +3,10 @@ package com.limegroup.gnutella.gui.tables;
 
 /**
  * The basic interface through which datalines should be accessed
+ *
  * @author Sam Berlin
  */
-
 public interface DataLine<E> {
-
     /**
      * Return the number of columns this dataline controls.
      */
@@ -22,8 +21,8 @@ public interface DataLine<E> {
      * Returns whether or not this column can change on subsequent
      * updates to the DataLine
      */
-    boolean isDynamic(int col);
-    
+    boolean isDynamic(@SuppressWarnings("unused") int col);
+
     /**
      * Returns whether or not this column can be clipped (and should
      * display a tooltip of the full data if it is).
@@ -43,6 +42,7 @@ public interface DataLine<E> {
     /**
      * Reset the object that initialized the DataLine
      */
+    @SuppressWarnings("unused")
     void setInitializeObject(E o);
 
     /**
@@ -54,7 +54,7 @@ public interface DataLine<E> {
      * Set a value in a column of the DataLine
      */
     void setValueAt(Object o, int col);
-    
+
     /**
      * Gets the 'type ahead' column.
      */
@@ -73,9 +73,10 @@ public interface DataLine<E> {
     /**
      * Gets the tooltip for this line
      */
-    String[] getToolTipArray(int col);
-    
-    /** Determines if a tooltip is required. */
-    boolean isTooltipRequired(int col);
+    String[] getToolTipArray(@SuppressWarnings("unused") int col);
 
+    /**
+     * Determines if a tooltip is required.
+     */
+    boolean isTooltipRequired(@SuppressWarnings("unused") int col);
 }

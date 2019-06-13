@@ -1,3 +1,19 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.limegroup.gnutella.gui.tables;
 
@@ -6,7 +22,8 @@ import java.util.Comparator;
 
 /**
  * Interface for the model of a DataLineTable
- * @author Sam Berlin
+ *
+ * @author Sam Berlin, gubatron
  */
 public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, TableModel {
 
@@ -56,11 +73,6 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Should return the row of the DataLine updated.
      */
     int update(E o);
-    
-    /**
-     * Fires an update event for the table.
-     */
-    void fireTableDataChanged();
 
     /**
      * Add a new DataLine to the info, initialized by o.
@@ -79,14 +91,15 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Adds a new DataLine to the info.
      * Return the row it was added at.
      */
+    @SuppressWarnings("unused")
     int add(T dl);
 
     /**
      * Adds a new DataLine to the model in whatever row will keep
      * the DataLine sorted.
-     * Return the row it was added at.
      */
-    int addSorted(T dl);
+    @SuppressWarnings("unused")
+    void addSorted(T dl);
 
     /**
      * Add a new DataLine to the info, at a specific row initialized by o.
@@ -98,6 +111,7 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Adds a new DataLine to the info at a specific row.
      * Return the row it was added at.
      */
+    @SuppressWarnings("unused")
     int add(T dl, int row);
 
     /**
@@ -108,11 +122,13 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
     /**
      * Gets the DataLine that was initialized by Object o.
      */
+    @SuppressWarnings("unused")
     T get(E o);
 
     /**
      * Gets the first DataLine that has Object o in column col.
      */
+    @SuppressWarnings("unused")
     T get(Object o, int col);
 
     /**
@@ -123,26 +139,31 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
     /**
      * Remove the row associated with the DataLine 'line'.
      */
+    @SuppressWarnings("unused")
     void remove(T line);
 
     /**
      * Remove the row that was initialized by Object 'o'.
      */
+    @SuppressWarnings("unused")
     void remove(Object o);
 
     /**
      * Determine if the list contains Object o in column col.
      */
+    @SuppressWarnings("unused")
     boolean contains(Object o, int col);
 
     /**
      * Determine if the list contains a row that was initialized by Object o.
      */
+    @SuppressWarnings("unused")
     boolean contains(Object o);
 
     /**
      * Get the row of the row that contains Object o in column col.
      */
+    @SuppressWarnings("unused")
     int getRow(Object o, int col);
 
     /**
@@ -159,10 +180,12 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Gets the tooltip for a specific row.
      */
     String[] getToolTipArray(int row, int col);
-    
-    /** Determines if a tooltip must show, regardless of the table settings. */
+
+    /**
+     * Determines if a tooltip must show, regardless of the table settings.
+     */
     boolean isTooltipRequired(int row, int col);
-    
+
     /**
      * Determines if the specified column can be clipped.
      * This is generally true for all text columns.
@@ -180,7 +203,7 @@ public interface DataLineModel<T extends DataLine<E>, E> extends Comparator<T>, 
      * Gets the id of the specified column.
      */
     Object getColumnId(int col);
-    
+
     /**
      * Gets the 'type ahead' column.
      */

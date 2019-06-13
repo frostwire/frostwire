@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.limewire.util;
 
 import com.frostwire.util.Logger;
@@ -7,18 +24,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Converts older package and class names to the new equivalent name and is useful 
- * in code refactoring. For example, if packages or classes are renamed, 
- * <code>ObjectInputStream</code> fails to find 
- * the older name. <code>ConverterObjectInputStream</code> looks up the old name 
+ * Converts older package and class names to the new equivalent name and is useful
+ * in code refactoring. For example, if packages or classes are renamed,
+ * <code>ObjectInputStream</code> fails to find
+ * the older name. <code>ConverterObjectInputStream</code> looks up the old name
  * and if a new name exists, <code>ConverterObjectInputStream</code> internally
  * updates any references to the new name without the old name needing to be in the
  * classpath (and as long as serialVersionUID is the same; see {@link Serializable}
  * for more information).
  * <p>
- * <code>ConverterObjectInputStream</code> comes with a pre-set package and class 
- * mapping between the old and new name, and you can add more lookups with 
- * {@link #addLookup(String, String)}.
+ * <code>ConverterObjectInputStream</code> comes with a pre-set package and class
+ * mapping between the old and new name, and you can add more lookups with
  * <p>
  * Pre-set package and class mapping:
  * <table cellpadding="5">
@@ -51,31 +67,27 @@ import java.util.Map;
  * </table>
  * None of the earlier forms of the class need to exist in the classpath.
  */
-
 public class ConverterObjectInputStream extends ObjectInputStream {
-
     private static final Logger LOG = Logger.getLogger(ConverterObjectInputStream.class);
-
     private Map<String, String> lookups = new HashMap<>(8);
 
     /**
-     * Constructs a new <code>ConverterObjectInputStream</code> wrapping the 
+     * Constructs a new <code>ConverterObjectInputStream</code> wrapping the
      * specified <code>InputStream</code>.
      */
-    public ConverterObjectInputStream(InputStream in) throws IOException {
+    ConverterObjectInputStream(InputStream in) throws IOException {
         super(in);
         createLookups();
     }
 
-    /**
-     * Erases any lookups that were added using {@link #addLookup(String, String)}.
-     */
     public void revertToDefault() {
         lookups.clear();
         createLookups();
     }
 
-    /** Adds all internal lookups. */
+    /**
+     * Adds all internal lookups.
+     */
     private void createLookups() {
         lookups.put("com.limegroup.gnutella.util.FileComparator", "org.limewire.collection.FileComparator");
         lookups.put("com.limegroup.gnutella.util.Comparators$CaseInsensitiveStringComparator", "org.limewire.collection.Comparators$CaseInsensitiveStringComparator");
@@ -84,16 +96,7 @@ public class ConverterObjectInputStream extends ObjectInputStream {
     }
 
     /**
-     * Adds a mapping between an old package or class name to a new name.
-     * @param oldName the name of the old package or class
-     * @param newName the name of the new package or class
-     */
-    public void addLookup(String oldName, String newName) {
-        lookups.put(oldName, newName);
-    }
-
-    /** 
-     * Overridden to manually alter the class descriptors. 
+     * Overridden to manually alter the class descriptors.
      * Note this does NOT require the original class to be loadable.
      * <p>
      * Lookup works as follows:
@@ -103,21 +106,18 @@ public class ConverterObjectInputStream extends ObjectInputStream {
      * <li>The package name of the serialized class name is extracted and
      * looked up if a new package name exists, it is prepended to the name of
      * the class the corresponding class is loaded.</li>
-     * <li>Otherwise the original ObjectStreamClass is returned.</li> 
+     * <li>Otherwise the original ObjectStreamClass is returned.</li>
      * <ul>
      */
     protected ObjectStreamClass readClassDescriptor() throws IOException, ClassNotFoundException {
         ObjectStreamClass read = super.readClassDescriptor();
         String className = read.getName();
-
         //LOG.debug("Looking up class: " + className);
-
         boolean array = className.startsWith("[L") && className.endsWith(";");
         if (array) {
             className = className.substring(2, className.length() - 1);
             LOG.debug("Stripping array form off, resulting in: " + className);
         }
-
         ObjectStreamClass clazzToReturn;
         String newName = lookups.get(className);
         if (newName != null) {
@@ -139,16 +139,13 @@ public class ConverterObjectInputStream extends ObjectInputStream {
                 clazzToReturn = read;
             }
         }
-
         //LOG.debug("Located substitute class: " + clazzToReturn.getName());
-
         // If it's an array, and we modified what we read off disk, convert
         // to array form.
         if (array && read != clazzToReturn) {
             clazzToReturn = ObjectStreamClass.lookup(Class.forName("[L" + clazzToReturn.getName() + ";"));
             LOG.debug("Re-added array wrapper, for class: " + clazzToReturn.getName());
         }
-
         return clazzToReturn;
     }
 }

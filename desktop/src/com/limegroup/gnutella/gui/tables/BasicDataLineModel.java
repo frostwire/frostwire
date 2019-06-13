@@ -333,8 +333,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Extending classes can override this, but it is recommended
      * they override the above mentioned methods instead.
      */
-    public int addSorted(T dl) {
-        return add(dl, getSortedPosition(dl));
+    public void addSorted(T dl) {
+        add(dl, getSortedPosition(dl));
     }
 
     //Implements the DataLineModel interface.
