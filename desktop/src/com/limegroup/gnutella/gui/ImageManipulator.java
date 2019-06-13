@@ -20,7 +20,7 @@ public class ImageManipulator extends RGBImageFilter {
     private int percent;
 
     /**
-     * Constucts a new manipulator.
+     * Constructs a new manipulator.
      */
     private ImageManipulator(boolean b, int p) {
         brighter = b;
@@ -39,7 +39,7 @@ public class ImageManipulator extends RGBImageFilter {
     }
     
     /**
-     * Brighens or darkens a single r/g/b value.
+     * Brightens or darkens a single r/g/b value.
      */
     private int filter(int color) {
         color = color & 0xff;
@@ -75,54 +75,32 @@ public class ImageManipulator extends RGBImageFilter {
         img = darken(img);
         return new IconUIResource(new ImageIcon(img));
     }
-    
-    /**
-     * Returns a grayed version of the icon.
-     */
-    public static Icon gray(Icon icon) {
-        Image img = getImage(icon);
-        if(img == null)
-            return icon;
-        img = gray(img);
-        return new IconUIResource(new ImageIcon(img));
-    }
-    
-    /**
-     * Manipulates an icon.
-     */
-    public static Icon manipulate(Icon icon, boolean brighten, int percent) {
-        Image img = getImage(icon);
-        if(img == null)
-            return icon;
-        img = manipulate(img, brighten, percent);
-        return new IconUIResource(new ImageIcon(img));
-    }
-    
+
     /**
      * Brightens an image.
      */
-    public static Image brighten(Image img) {
+    private static Image brighten(Image img) {
         return manipulate(img, true, 20);
     }
     
     /**
      * Darkens an image.
      */
-    public static Image darken(Image img) {
+    private static Image darken(Image img) {
         return manipulate(img, false, 10);
     }
     
-    /**
-     * Grays an image.
-     */
-    public static Image gray(Image img) {
-        return GrayFilter.createDisabledImage(img);
-    }
+//    /**
+//     * Grays an image.
+//     */
+//    public static Image gray(Image img) {
+//        return GrayFilter.createDisabledImage(img);
+//    }
     
     /**
      * Manipulates an image.
      */
-    public static Image manipulate(Image img, boolean brighten, int percent) {
+    private static Image manipulate(Image img, boolean brighten, int percent) {
     	ImageFilter filter = new ImageManipulator(brighten, percent);
     	ImageProducer prod = new FilteredImageSource(img.getSource(), filter);
     	return Toolkit.getDefaultToolkit().createImage(prod);

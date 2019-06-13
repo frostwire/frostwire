@@ -436,7 +436,7 @@ public final class DimConstraint implements Externalizable
 
 		boolean hasGap = gap != null && gap.getGapPush();
 		if ((gap == null || gap.isUnset()) && (adjGap == null || adjGap.isUnset()) && comp != null)
-			gap = PlatformDefaults.getDefaultComponentGap(comp, adjacentComp, adjacentSide + 1, tag, isLTR);
+			gap = PlatformDefaults.getDefaultComponentGap(adjacentComp, adjacentSide + 1, tag, isLTR);
 
 		if (gap == null)
 			return hasGap ? new int[] {0, 0, LayoutUtil.NOT_SET} : null;

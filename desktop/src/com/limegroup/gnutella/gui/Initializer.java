@@ -64,7 +64,6 @@ public final class Initializer {
      */
     void initialize(String[] args, Frame awtSplash) {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
-        //System.out.println("Initializer.initialize() preinit()");
         preinit();
 
         // Various startup tasks...
@@ -103,7 +102,7 @@ public final class Initializer {
         // Move from the AWT splash to the Swing splash & start early core.
         //System.out.println("Initializer.initialize() switch splashes");
         switchSplashes(awtSplash);
-        startEarlyCore(setupManager, limeWireCore);
+        startEarlyCore(limeWireCore);
 
         // Initialize early UI components, display the setup manager (if necessary),
         // and ensure the save directory is valid.
@@ -248,18 +247,13 @@ public final class Initializer {
      * Sets up ResourceManager.
      */
     private void installResources() {
-        GUIMediator.safeInvokeAndWait(() -> {
-            //stopwatch.resetAndLog("wait for event queue");
-            ResourceManager.instance();
-            //stopwatch.resetAndLog("ResourceManager instance");
-        });
-        //stopwatch.resetAndLog("come back from evt queue");
+        GUIMediator.safeInvokeAndWait(ResourceManager::instance);
     }
 
     /**
      * Starts any early core-related functionality.
      */
-    private void startEarlyCore(SetupManager setupManager, LimeWireCore limeWireCore) {
+    private void startEarlyCore(LimeWireCore limeWireCore) {
         // Add this running program to the Windows Firewall Exceptions list
         boolean inFirewallException = FirewallUtils.addToFirewall();
         //stopwatch.resetAndLog("add firewall exception");
@@ -322,12 +316,10 @@ public final class Initializer {
     private void startSetupManager(final SetupManager setupManager) {
         // Run through the initialization sequence -- this must always be
         // called before GUIMediator constructs the LibraryTree!
-        GUIMediator.safeInvokeAndWait(() -> {
-            //stopwatch.resetAndLog("event evt queue");
-            // Then create the setup manager if needed.
-            setupManager.createIfNeeded();
-            //stopwatch.resetAndLog("create setupManager if needed");
-        });
+        //stopwatch.resetAndLog("event evt queue");
+        // Then create the setup manager if needed.
+        //stopwatch.resetAndLog("create setupManager if needed");
+        GUIMediator.safeInvokeAndWait(setupManager::createIfNeeded);
         //stopwatch.resetAndLog("return from evt queue");
     }
 
@@ -336,15 +328,8 @@ public final class Initializer {
      */
     private void loadUI() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading User Interface..."));
-
-        GUIMediator.safeInvokeAndWait(() -> {
-            // stopwatch.resetAndLog("enter evt queue");
-            GUIMediator.instance();
-            // stopwatch.resetAndLog("GUImediator instance");
-        });
-
+        GUIMediator.safeInvokeAndWait(GUIMediator::instance);
         GUIMediator.setSplashScreenString(I18n.tr("Loading Core Components..."));
-        //stopwatch.resetAndLog("update splash for core");
     }
 
     /**
@@ -359,16 +344,11 @@ public final class Initializer {
             //stopwatch.resetAndLog("enter evt queue");
 
             NotifyUserProxy.instance();
-            //stopwatch.resetAndLog("NotifYUserProxy instance");
-
             if (!ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
                 NotifyUserProxy.instance().hideTrayIcon();
 
             SettingsWarningManager.checkSettingsLoadSaveFailure();
-
-            //stopwatch.resetAndLog("end notify runner");
         });
-        //stopwatch.resetAndLog("return from evt queue");
     }
 
     /**
@@ -490,13 +470,6 @@ public final class Initializer {
     private void postinit() {
         // Tell the GUI that loading is all done.
         GUIMediator.instance().loadFinished();
-    }
-
-    /**
-     * Sets the startup property to be true.
-     */
-    void setStartup() {
-        isStartup = true;
     }
 
     /**
