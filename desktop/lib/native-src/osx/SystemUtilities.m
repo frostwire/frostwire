@@ -10,7 +10,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+// June 13th 2019
+// cc -dynamiclib -o ../../native/libSystemUtilities.jnilib -I/System/Library/Frameworks/JavaVM.framework/Headers SystemUtilities.m -arch x86_64
+// removed the '-c' flag, otherwise it won't build the shared library and ignores the '-dynamiclib'
 
+// Feb 1st, 2018
 // compile with:
 // cc -c -dynamiclib -o libSystemUtilities.ppc -I/System/Library/Frameworks/JavaVM.framework/Headers SystemUtilities.m -arch ppc
 // cc -c -dynamiclib -o libSystemUtilities.i386 -I/System/Library/Frameworks/JavaVM.framework/Headers SystemUtilities.m -arch i386
