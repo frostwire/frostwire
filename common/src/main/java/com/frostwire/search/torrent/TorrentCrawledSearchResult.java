@@ -27,7 +27,6 @@ import org.apache.commons.io.FilenameUtils;
  * @author aldenml
  */
 public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResult<TorrentCrawlableSearchResult> implements TorrentItemSearchResult {
-
     private final TorrentInfo ti;
     private final int fileIndex;
     private final String filePath;

@@ -17,11 +17,9 @@
 
 package com.frostwire.mp4;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 final class Utf8 {
-
     private Utf8() {
     }
 

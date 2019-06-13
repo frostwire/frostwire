@@ -39,7 +39,6 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?" +
                 "&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span>" +
                 "<span>(?<seeds>\\d+)</span><span>.*?");
-
         usualTrackers = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
                 "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
                 "tr=udp://tracker.internetwarriors.net:1337/announce&" +
@@ -95,7 +94,6 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
                 matcherFound = false;
                 LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
             }
-
             if (matcherFound) {
                 Torrentz2SearchResult sr = fromMatcher(matcher);
                 if (sr != null) {

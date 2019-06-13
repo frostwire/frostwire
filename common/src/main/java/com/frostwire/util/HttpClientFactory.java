@@ -27,18 +27,10 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class HttpClientFactory {
-    public enum HttpContext {
-        SEARCH,
-        DOWNLOAD,
-        MISC
-    }
-
     private static Map<HttpContext, ThreadPool> okHttpClientPools = null;
 
     private HttpClientFactory() {
@@ -52,7 +44,6 @@ public class HttpClientFactory {
         if (isWindowsXP()) {
             return new JdkHttpClient();
         }
-
         if (okHttpClientPools == null) {
             okHttpClientPools = buildThreadPools();
         }
@@ -71,5 +62,11 @@ public class HttpClientFactory {
         String os = System.getProperty("os.name");
         os = os.toLowerCase(Locale.US);
         return os.contains("windows xp");
+    }
+
+    public enum HttpContext {
+        SEARCH,
+        DOWNLOAD,
+        MISC
     }
 }

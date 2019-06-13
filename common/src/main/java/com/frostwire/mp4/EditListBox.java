@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class EditListBox extends FullBox {
-
     protected int entry_count;
     protected Entry[] entries;
 
@@ -36,7 +35,6 @@ public final class EditListBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         entry_count = buf.getInt();
         entries = new Entry[entry_count];
@@ -59,7 +57,6 @@ public final class EditListBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {

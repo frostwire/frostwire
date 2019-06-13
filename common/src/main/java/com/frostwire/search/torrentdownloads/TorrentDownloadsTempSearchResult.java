@@ -25,7 +25,6 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author alejandroarturom
  */
 public final class TorrentDownloadsTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String itemId;
     private final String detailsUrl;
 

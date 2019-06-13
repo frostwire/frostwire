@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public interface SystemPaths {
-
     File data();
 
     File torrents();

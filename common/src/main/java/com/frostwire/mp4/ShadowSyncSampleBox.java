@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class ShadowSyncSampleBox extends FullBox {
-
     protected int entry_count;
     protected Entry[] entries;
 
@@ -36,7 +35,6 @@ public final class ShadowSyncSampleBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         entry_count = buf.getInt();
         entries = new Entry[entry_count];
@@ -51,7 +49,6 @@ public final class ShadowSyncSampleBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
         IsoMedia.write(ch, entry_count, 8, entries, buf);
@@ -67,7 +64,6 @@ public final class ShadowSyncSampleBox extends FullBox {
     }
 
     public static final class Entry extends BoxEntry {
-
         public int shadowed_sample_number;
         public int sync_sample_number;
 

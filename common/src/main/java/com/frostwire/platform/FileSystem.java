@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public interface FileSystem {
-
     boolean isDirectory(File file);
 
     boolean isFile(File file);

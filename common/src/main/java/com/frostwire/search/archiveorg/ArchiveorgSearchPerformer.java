@@ -35,7 +35,6 @@ import java.util.Map;
  * @author aldenml
  */
 public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<ArchiveorgSearchResult> {
-
     private static final int MAX_RESULTS = 12;
 
     public ArchiveorgSearchPerformer(String domainName, long token, String keywords, int timeout) {
@@ -56,16 +55,13 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-
         ArchiveorgResponse response = JsonUtils.toObject(page, ArchiveorgResponse.class);
-
         for (ArchiveorgItem item : response.response.docs) {
             if (!isStopped() && filter(item)) {
                 ArchiveorgSearchResult sr = new ArchiveorgSearchResult(getDomainName(), item);
                 result.add(sr);
             }
         }
-
         return result;
     }
 
@@ -77,13 +73,9 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     @Override
     protected List<? extends SearchResult> crawlResult(ArchiveorgSearchResult sr, byte[] data) throws Exception {
         List<ArchiveorgCrawledSearchResult> list = new LinkedList<>();
-
         String json = new String(data, StandardCharsets.UTF_8);
-
         List<ArchiveorgFile> files = readFiles(json);
-
         long totalSize = calcTotalSize(files);
-
         for (ArchiveorgFile file : files) {
             if (isStreamable(file.filename)) {
                 list.add(new ArchiveorgCrawledStreamableSearchResult(sr, file));
@@ -93,19 +85,15 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
                 list.add(new ArchiveorgCrawledSearchResult(sr, file));
             }
         }
-
         return list;
     }
 
     private List<ArchiveorgFile> readFiles(String json) {
         List<ArchiveorgFile> result = new LinkedList<>();
-
         JsonElement element = new JsonParser().parse(json);
         JsonObject obj = element.getAsJsonObject();
         JsonObject files = obj.getAsJsonObject("files");
-
         Iterator<Map.Entry<String, JsonElement>> it = files.entrySet().iterator();
-
         while (it.hasNext() && !isStopped()) {
             Map.Entry<String, JsonElement> e = it.next();
             String name = e.getKey();
@@ -116,7 +104,6 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
                 result.add(file);
             }
         }
-
         return result;
     }
 
@@ -124,13 +111,11 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
         if (name.startsWith("/")) {
             name = name.substring(1);
         }
-
         return name;
     }
 
     private long calcTotalSize(List<ArchiveorgFile> files) {
         long size = 0;
-
         for (ArchiveorgFile f : files) {
             try {
                 size += Long.parseLong(f.size);
@@ -138,7 +123,6 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
                 // ignore
             }
         }
-
         return size;
     }
 

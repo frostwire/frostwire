@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public class FullBox extends Box {
-
     protected byte version;
     protected int flags;
 

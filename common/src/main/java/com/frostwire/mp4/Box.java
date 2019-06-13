@@ -27,7 +27,6 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public class Box {
-
     public static final int uuid = Bits.make4cc("uuid");
     public static final int soun = Bits.make4cc("soun");
     public static final int vide = Bits.make4cc("vide");
@@ -42,7 +41,6 @@ public class Box {
     public static final int iso6 = Bits.make4cc("iso6");
     public static final int avc1 = Bits.make4cc("avc1");
     public static final int zero = Bits.make4cc("\0\0\0\0");
-
     public static final int mdat = Bits.make4cc("mdat");
     public static final int ftyp = Bits.make4cc("ftyp");
     public static final int moov = Bits.make4cc("moov");
@@ -125,14 +123,11 @@ public class Box {
     public static final int imif = Bits.make4cc("imif");
     public static final int schm = Bits.make4cc("schm");
     public static final int schi = Bits.make4cc("schi");
-
     private static final HashMap<Integer, BoxLambda> mapping = buildMapping();
-
-    protected int size;
     protected final int type;
+    protected int size;
     protected Long largesize;
     protected byte[] usertype;
-
     protected Box parent;
     protected LinkedList<Box> boxes;
 
@@ -140,76 +135,14 @@ public class Box {
         this.type = type;
     }
 
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-        throw new UnsupportedOperationException(Bits.make4cc(type));
-    }
-
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-        throw new UnsupportedOperationException(Bits.make4cc(type));
-    }
-
-    void update() {
-        throw new UnsupportedOperationException(Bits.make4cc(type));
-    }
-
-    final long length() {
-        long n = size - 8;
-        if (size == 1) {
-            n = largesize - 16;
-        } else if (size == 0) {
-            return -1;
-        }
-        if (type == uuid) {
-            n = n - 16;
-        }
-
-        if (n < 0) {
-            throw new UnsupportedOperationException("negative long value: " + n);
-        }
-
-        return n;
-    }
-
-    final void length(long value) {
-        if (value < 0) {
-            throw new IllegalArgumentException("negative long value: " + value);
-        }
-        long s = value;
-        if (type == uuid) {
-            s = s + 16;
-        }
-        if (s <= Integer.MAX_VALUE - 8) {
-            size = (int) (s + 8);
-            largesize = null;
-        } else {
-            size = 1;
-            largesize = s + 16;
-        }
-    }
-
-    public final <T extends Box> LinkedList<T> find(int type) {
-        return boxes != null ? Box.find(boxes, type) : new LinkedList<T>();
-    }
-
-    public final <T extends Box> T findFirst(int type) {
-        return boxes != null ? Box.findFirst(boxes, type) : null;
-    }
-
-    @Override
-    public String toString() {
-        return Bits.make4cc(type);
-    }
-
     @SuppressWarnings("unchecked")
     public static <T extends Box> LinkedList<T> find(LinkedList<Box> boxes, int type) {
         LinkedList<T> l = new LinkedList<>();
-
         for (Box b : boxes) {
             if (b.type == type) {
                 l.add((T) b);
             }
         }
-
         if (l.isEmpty()) {
             for (Box b : boxes) {
                 if (b.boxes != null) {
@@ -220,7 +153,6 @@ public class Box {
                 }
             }
         }
-
         return l;
     }
 
@@ -231,7 +163,6 @@ public class Box {
                 return (T) b;
             }
         }
-
         for (Box b : boxes) {
             if (b.boxes != null) {
                 T t = findFirst(b.boxes, type);
@@ -240,7 +171,6 @@ public class Box {
                 }
             }
         }
-
         return null;
     }
 
@@ -255,7 +185,6 @@ public class Box {
 
     private static HashMap<Integer, BoxLambda> buildMapping() {
         HashMap<Integer, BoxLambda> map = new HashMap<>();
-
         map.put(mdat, new BoxLambda() {
             @Override
             public Box empty() {
@@ -604,8 +533,65 @@ public class Box {
                 return new TrackRunBox();
             }
         });
-
         return map;
+    }
+
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException(Bits.make4cc(type));
+    }
+
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+        throw new UnsupportedOperationException(Bits.make4cc(type));
+    }
+
+    void update() {
+        throw new UnsupportedOperationException(Bits.make4cc(type));
+    }
+
+    final long length() {
+        long n = size - 8;
+        if (size == 1) {
+            n = largesize - 16;
+        } else if (size == 0) {
+            return -1;
+        }
+        if (type == uuid) {
+            n = n - 16;
+        }
+        if (n < 0) {
+            throw new UnsupportedOperationException("negative long value: " + n);
+        }
+        return n;
+    }
+
+    final void length(long value) {
+        if (value < 0) {
+            throw new IllegalArgumentException("negative long value: " + value);
+        }
+        long s = value;
+        if (type == uuid) {
+            s = s + 16;
+        }
+        if (s <= Integer.MAX_VALUE - 8) {
+            size = (int) (s + 8);
+            largesize = null;
+        } else {
+            size = 1;
+            largesize = s + 16;
+        }
+    }
+
+    public final <T extends Box> LinkedList<T> find(int type) {
+        return boxes != null ? Box.find(boxes, type) : new LinkedList<T>();
+    }
+
+    public final <T extends Box> T findFirst(int type) {
+        return boxes != null ? Box.findFirst(boxes, type) : null;
+    }
+
+    @Override
+    public String toString() {
+        return Bits.make4cc(type);
     }
 
     private interface BoxLambda {

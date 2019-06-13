@@ -24,7 +24,6 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public final class MetaBox extends FullBox {
-
     MetaBox() {
         super(meta);
         boxes = new LinkedList<>();

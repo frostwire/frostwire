@@ -26,7 +26,6 @@ import java.nio.channels.WritableByteChannel;
  * @author aldenml
  */
 final class OutputChannel implements WritableByteChannel {
-
     private final WritableByteChannel ch;
     private long count;
 

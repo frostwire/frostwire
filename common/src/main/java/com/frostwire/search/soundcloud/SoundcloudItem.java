@@ -23,7 +23,6 @@ package com.frostwire.search.soundcloud;
  * @author aldenml
  */
 final class SoundcloudItem {
-
     public int id;
     public SoundcloundUser user;
     public String uri;

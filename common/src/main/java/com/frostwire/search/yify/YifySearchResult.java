@@ -33,7 +33,6 @@ import java.util.regex.Pattern;
  * @author aldenml
  */
 public final class YifySearchResult extends AbstractTorrentSearchResult {
-
     private static final long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2L << 39, 2L << 49};
     private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
     private static final Pattern SIZE_PATTERN;
@@ -61,7 +60,6 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
 
     public YifySearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-
         this.displayName = buildDisplayName(matcher);
         this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
         this.size = buildSize(matcher.group("size"));
@@ -70,6 +68,64 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.magnetUrl = matcher.group("magnet").replaceAll("&amp;", "&");
         this.filename = buildFileName(detailsUrl);
         this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
+    }
+
+    private static String buildDisplayName(SearchMatcher matcher) {
+        String displayName = matcher.group("displayName");
+        String lang = matcher.group("language");
+        if (lang != null) {
+            displayName += " (" + lang + ")";
+        }
+        return displayName;
+    }
+
+    private static String buildThumbnailUrl(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.startsWith("//") ? "https:" + str : "https://www.yify-torrent.org" + str;
+    }
+
+    private static long buildCreationTime(String str) {
+        try {
+            return new SimpleDateFormat("M/d/y").parse(str).getTime();
+        } catch (Throwable e) {
+            // not that important
+            return System.currentTimeMillis();
+        }
+    }
+
+    private static String buildFileName(String detailsUrl) {
+        return FilenameUtils.getBaseName(detailsUrl) + ".torrent";
+    }
+
+    private static long buildSize(String str) {
+        long result = 0;
+        Matcher matcher = SIZE_PATTERN.matcher(str);
+        if (matcher.find()) {
+            String amount = matcher.group(1);
+            String unit = matcher.group(2);
+            long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
+            //fractional size
+            if (amount.indexOf(".") > 0) {
+                float floatAmount = Float.parseFloat(amount);
+                result = (long) (floatAmount * multiplier);
+            }
+            //integer based size
+            else {
+                int intAmount = Integer.parseInt(amount);
+                result = intAmount * multiplier;
+            }
+        }
+        return result;
+    }
+
+    private static int parseSeeds(String group) {
+        try {
+            return Integer.parseInt(group);
+        } catch (Throwable e) {
+            return 0;
+        }
     }
 
     @Override
@@ -120,64 +176,5 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     @Override
     public String getThumbnailUrl() {
         return thumbnailUrl;
-    }
-
-    private static String buildDisplayName(SearchMatcher matcher) {
-        String displayName = matcher.group("displayName");
-        String lang = matcher.group("language");
-        if (lang != null) {
-            displayName += " (" + lang + ")";
-        }
-        return displayName;
-    }
-
-    private static String buildThumbnailUrl(String str) {
-        if (str == null) {
-            return null;
-        }
-        return str.startsWith("//") ? "https:" + str : "https://www.yify-torrent.org" + str;
-    }
-
-    private static long buildCreationTime(String str) {
-        try {
-            return new SimpleDateFormat("M/d/y").parse(str).getTime();
-        } catch (Throwable e) {
-            // not that important
-            return System.currentTimeMillis();
-        }
-    }
-
-    private static String buildFileName(String detailsUrl) {
-        return FilenameUtils.getBaseName(detailsUrl) + ".torrent";
-    }
-
-    private static long buildSize(String str) {
-        long result = 0;
-        Matcher matcher = SIZE_PATTERN.matcher(str);
-        if (matcher.find()) {
-            String amount = matcher.group(1);
-            String unit = matcher.group(2);
-
-            long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
-            //fractional size
-            if (amount.indexOf(".") > 0) {
-                float floatAmount = Float.parseFloat(amount);
-                result = (long) (floatAmount * multiplier);
-            }
-            //integer based size
-            else {
-                int intAmount = Integer.parseInt(amount);
-                result = intAmount * multiplier;
-            }
-        }
-        return result;
-    }
-
-    private static int parseSeeds(String group) {
-        try {
-            return Integer.parseInt(group);
-        } catch (Throwable e) {
-            return 0;
-        }
     }
 }

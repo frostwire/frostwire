@@ -18,26 +18,20 @@
 
 package com.frostwire.search.archiveorg;
 
-import java.util.Locale;
-
+import com.frostwire.search.AbstractCrawledSearchResult;
+import com.frostwire.search.HttpSearchResult;
 import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import com.frostwire.search.AbstractCrawledSearchResult;
-import com.frostwire.search.HttpSearchResult;
+import java.util.Locale;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult implements HttpSearchResult {
-
     private static final String DOWNLOAD_URL = "http://%s/download/%s/%s";
-
     private final String filename;
-
     private final String displayName;
     private final String downloadUrl;
     private final double size;

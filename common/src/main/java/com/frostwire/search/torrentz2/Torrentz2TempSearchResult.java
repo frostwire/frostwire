@@ -21,7 +21,6 @@ import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.util.UrlUtils;
 
 final class Torrentz2TempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String detailsUrl;
 
     Torrentz2TempSearchResult(String domainName, String itemId) {

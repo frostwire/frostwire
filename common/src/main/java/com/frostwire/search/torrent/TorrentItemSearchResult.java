@@ -25,6 +25,5 @@ import com.frostwire.search.CrawledSearchResult;
  * @author aldenml
  */
 public interface TorrentItemSearchResult extends TorrentSearchResult, CrawledSearchResult {
-
     String getFilePath();
 }

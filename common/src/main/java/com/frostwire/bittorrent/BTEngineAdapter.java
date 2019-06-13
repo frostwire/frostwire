@@ -23,7 +23,6 @@ package com.frostwire.bittorrent;
  * @author aldenml
  */
 public class BTEngineAdapter implements BTEngineListener {
-
     @Override
     public void started(BTEngine engine) {
     }

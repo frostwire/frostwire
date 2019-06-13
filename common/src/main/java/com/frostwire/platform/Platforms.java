@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public final class Platforms {
-
     private static Platform platform;
 
     private Platforms() {

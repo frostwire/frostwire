@@ -18,44 +18,21 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.licenses.License;
+import com.frostwire.licenses.Licenses;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.licenses.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public class CopyrightLicenseBroker implements Mappable<String, Map<String, String>> {
-
-    public enum LicenseCategory {
-        CreativeCommons("creative-commons"), OpenSource("open-source"), PublicDomain("public-domain"), NoLicense("no-license");
-
-        private String name;
-
-        LicenseCategory(String stringName) {
-            name = stringName;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
-    public final LicenseCategory licenseCategory;
-
-    public final License license;
-    public final String attributionTitle;
-    public final String attributionAuthor;
-    public final String attributionUrl;
-
     public static final List<String> validLicenseUrls;
-
     public static final Map<String, License> urlToLicense;
 
     static {
@@ -66,7 +43,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         validLicenseUrls.add(Licenses.CC_BY_NC_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_NC_SA_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_NC_ND_4.getUrl());
-
         urlToLicense = new HashMap<String, License>();
         urlToLicense.put(Licenses.CC_BY_4.getUrl(), Licenses.CC_BY_4);
         urlToLicense.put(Licenses.CC_BY_SA_4.getUrl(), Licenses.CC_BY_SA_4);
@@ -74,7 +50,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         urlToLicense.put(Licenses.CC_BY_NC_4.getUrl(), Licenses.CC_BY_NC_4);
         urlToLicense.put(Licenses.CC_BY_NC_SA_4.getUrl(), Licenses.CC_BY_NC_SA_4);
         urlToLicense.put(Licenses.CC_BY_NC_ND_4.getUrl(), Licenses.CC_BY_NC_ND_4);
-
         urlToLicense.put(Licenses.APACHE.getUrl(), Licenses.APACHE);
         urlToLicense.put(Licenses.BSD_2_CLAUSE.getUrl(), Licenses.BSD_2_CLAUSE);
         urlToLicense.put(Licenses.BSD_3_CLAUSE.getUrl(), Licenses.BSD_3_CLAUSE);
@@ -84,10 +59,15 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         urlToLicense.put(Licenses.MOZILLA.getUrl(), Licenses.MOZILLA);
         urlToLicense.put(Licenses.CDDL.getUrl(), Licenses.CDDL);
         urlToLicense.put(Licenses.ECLIPSE.getUrl(), Licenses.ECLIPSE);
-
         urlToLicense.put(Licenses.PUBLIC_DOMAIN_MARK.getUrl(), Licenses.PUBLIC_DOMAIN_MARK);
         urlToLicense.put(Licenses.PUBLIC_DOMAIN_CC0.getUrl(), Licenses.PUBLIC_DOMAIN_CC0);
     }
+
+    public final LicenseCategory licenseCategory;
+    public final License license;
+    public final String attributionTitle;
+    public final String attributionAuthor;
+    public final String attributionUrl;
 
     public CopyrightLicenseBroker(boolean shareAlike, boolean nonCommercial, boolean noDerivatives, String attributionTitle, String attributionAuthor, String attributionURL) {
         licenseCategory = LicenseCategory.CreativeCommons;
@@ -117,7 +97,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         } else {
             licenseCategory = LicenseCategory.NoLicense;
         }
-
         if (licenseCategory != LicenseCategory.NoLicense) {
             Map<String, Entry> innerMap = map.get(licenseCategory.toString()).dictionary();
             String licenseUrl = innerMap.get("licenseUrl").string();
@@ -141,22 +120,6 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         this.attributionUrl = attributionUrl;
     }
 
-    public Map<String, Map<String, String>> asMap() {
-        Map<String, Map<String, String>> container = new HashMap<String, Map<String, String>>();
-        Map<String, String> innerMap = new HashMap<String, String>();
-        innerMap.put("licenseUrl", this.license.getUrl());
-        innerMap.put("attributionTitle", this.attributionTitle);
-        innerMap.put("attributionAuthor", this.attributionAuthor);
-        innerMap.put("attributionUrl", this.attributionUrl);
-
-        container.put(licenseCategory.toString(), innerMap);
-        return container;
-    }
-
-    public String getLicenseName() {
-        return license != null ? license.getName() : null;
-    }
-
     private static boolean isInvalidLicense(String licenseStr) {
         return licenseStr == null || licenseStr.isEmpty() || !validLicenseUrls.contains(licenseStr);
     }
@@ -172,12 +135,40 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         } else if (shareAlike) {
             noDerivatives = false;
         }
-
         String licenseShortCode = "by-" + (nonCommercial ? "nc-" : "") + (shareAlike ? "sa" : "") + (noDerivatives ? "-nd" : "");
         licenseShortCode = licenseShortCode.replace("--", "-");
         if (licenseShortCode.endsWith("-")) {
             licenseShortCode = licenseShortCode.substring(0, licenseShortCode.length() - 1);
         }
         return "http://creativecommons.org/licenses/" + licenseShortCode + "/" + "4.0" + "/";
+    }
+
+    public Map<String, Map<String, String>> asMap() {
+        Map<String, Map<String, String>> container = new HashMap<String, Map<String, String>>();
+        Map<String, String> innerMap = new HashMap<String, String>();
+        innerMap.put("licenseUrl", this.license.getUrl());
+        innerMap.put("attributionTitle", this.attributionTitle);
+        innerMap.put("attributionAuthor", this.attributionAuthor);
+        innerMap.put("attributionUrl", this.attributionUrl);
+        container.put(licenseCategory.toString(), innerMap);
+        return container;
+    }
+
+    public String getLicenseName() {
+        return license != null ? license.getName() : null;
+    }
+
+    public enum LicenseCategory {
+        CreativeCommons("creative-commons"), OpenSource("open-source"), PublicDomain("public-domain"), NoLicense("no-license");
+        private String name;
+
+        LicenseCategory(String stringName) {
+            name = stringName;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

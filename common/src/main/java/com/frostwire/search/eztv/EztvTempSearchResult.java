@@ -26,7 +26,6 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author aldenml
  */
 final class EztvTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String detailsUrl;
 
     public EztvTempSearchResult(String domainName, String itemId) {

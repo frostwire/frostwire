@@ -38,32 +38,34 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author aldenml
  */
 public final class KeywordDetector {
-
-    public enum Feature {
-        SEARCH_SOURCE(0.015f, 4, 20),
-        FILE_EXTENSION(0f, 3, 8),
-        FILE_NAME(0.01f, 3, 20),
-        MANUAL_ENTRY(0, 2, 20);
-
-        public final float filterThreshold;
-        public final int minimumTokenLength;
-        public final int maximumTokenLength;
-
-        Feature(float filterThreshold, int minimumTokenLength, int maximumTokenLength) {
-            this.filterThreshold = filterThreshold;
-            this.minimumTokenLength = minimumTokenLength;
-            this.maximumTokenLength = maximumTokenLength;
-        }
-    }
-
     private static final Logger LOG = Logger.getLogger(KeywordDetector.class);
     private static final Set<String> stopWords = new HashSet<>();
-
     private static final Pattern REPLACE_ALL_PATTERN = Pattern.compile("[^\\p{L}0-9 .]|\\.{2,}");
 
+    static {
+        // english
+        feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
+        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why", "your");
+        feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me", "null");
+        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "youre");
+        // spanish
+        feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
+        feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
+        feedStopWords("eso", "el", "esa", "esto", "yo", "usted", "tu", "los", "para");
+        // portuguese
+        feedStopWords("filho", "como", "em", "quando", "nos");
+        feedStopWords("tem", "ele", "seu", "nós", "quem");
+        feedStopWords("isto", "voce", "você", "seu");
+        // french
+        feedStopWords("fils", "sous", "par", "où", "ou", "quand");
+        feedStopWords("leur", "dans", "nous", "par", "ce", "qui");
+        feedStopWords("il", "le", "vous", "votre");
+        // TODO: Add more here as we start testing and getting noise
+    }
+
     private final Map<Feature, HistoHashMap<String>> histoHashMaps;
-    private KeywordDetectorListener keywordDetectorListener;
     private final HistogramUpdateRequestDispatcher histogramUpdateRequestsDispatcher;
+    private KeywordDetectorListener keywordDetectorListener;
     private ExecutorService threadPool;
     private int totalHistogramKeysCount = -1;
 
@@ -73,6 +75,30 @@ public final class KeywordDetector {
         histoHashMaps.put(Feature.SEARCH_SOURCE, new HistoHashMap<>());
         histoHashMaps.put(Feature.FILE_EXTENSION, new HistoHashMap<>());
         histoHashMaps.put(Feature.FILE_NAME, new HistoHashMap<>());
+    }
+
+    public static List<Map.Entry<String, Integer>> highPassFilter(List<Map.Entry<String, Integer>> histogram, float threshold) {
+        int high = 0;
+        int totalCount = 0;
+        for (Map.Entry<String, Integer> entry : histogram) {
+            int count = entry.getValue();
+            totalCount += count;
+            if (count > high) {
+                high = count;
+            }
+        }
+        List<Map.Entry<String, Integer>> filteredValues = new LinkedList<>();
+        for (Map.Entry<String, Integer> entry : histogram) {
+            float rate = (float) entry.getValue() / (high + totalCount);
+            if (entry.getValue() > 1 && rate >= threshold) {
+                filteredValues.add(entry);
+            }
+        }
+        return filteredValues;
+    }
+
+    private static void feedStopWords(String... words) {
+        Collections.addAll(stopWords, words);
     }
 
     public int totalHistogramKeys() {
@@ -115,9 +141,7 @@ public final class KeywordDetector {
                 if (fileName == null || fileName.isEmpty()) {
                     continue;
                 }
-
                 addSearchTerms(KeywordDetector.Feature.FILE_NAME, fileName);
-
                 // Check file extensions for YouTubeSearch results.
                 // If we find files with extensions other than ".youtube", we make their mt = null and don't include them
                 // in the keyword detector. IDEA: Make FileSearchResults have a .getMediaType() method and put this logic there.
@@ -165,28 +189,50 @@ public final class KeywordDetector {
                 }
             }
         }
-
         return filteredHistograms;
     }
 
-    public static List<Map.Entry<String, Integer>> highPassFilter(List<Map.Entry<String, Integer>> histogram, float threshold) {
-        int high = 0;
-        int totalCount = 0;
-        for (Map.Entry<String, Integer> entry : histogram) {
-            int count = entry.getValue();
-            totalCount += count;
-            if (count > high) {
-                high = count;
+    /**
+     * Expensive
+     */
+    public void requestHistogramsUpdateAsync(List<SearchResult> filtered) {
+        if (!histogramUpdateRequestsDispatcher.running.get()) {
+            histogramUpdateRequestsDispatcher.start();
+        }
+        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, filtered);
+        histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
+    }
+
+    public void reset() {
+        histogramUpdateRequestsDispatcher.clear();
+        if (histoHashMaps != null && !histoHashMaps.isEmpty()) {
+            for (HistoHashMap<String> stringHistoHashMap : histoHashMaps.values()) {
+                stringHistoHashMap.reset();
             }
         }
-        List<Map.Entry<String, Integer>> filteredValues = new LinkedList<>();
-        for (Map.Entry<String, Integer> entry : histogram) {
-            float rate = (float) entry.getValue() / (high + totalCount);
-            if (entry.getValue() > 1 && rate >= threshold) {
-                filteredValues.add(entry);
-            }
+        notifyKeywordDetectorListener();
+    }
+
+    public enum Feature {
+        SEARCH_SOURCE(0.015f, 4, 20),
+        FILE_EXTENSION(0f, 3, 8),
+        FILE_NAME(0.01f, 3, 20),
+        MANUAL_ENTRY(0, 2, 20);
+        public final float filterThreshold;
+        public final int minimumTokenLength;
+        public final int maximumTokenLength;
+
+        Feature(float filterThreshold, int minimumTokenLength, int maximumTokenLength) {
+            this.filterThreshold = filterThreshold;
+            this.minimumTokenLength = minimumTokenLength;
+            this.maximumTokenLength = maximumTokenLength;
         }
-        return filteredValues;
+    }
+
+    public interface KeywordDetectorListener {
+        void notifyHistogramsUpdate(Map<Feature, List<Map.Entry<String, Integer>>> filteredHistograms);
+
+        void onKeywordDetectorFinished();
     }
 
     private static class HistogramUpdateRequestTask implements Runnable {
@@ -199,7 +245,6 @@ public final class KeywordDetector {
             // good for memory, need to refactor this
             this.filtered = filtered != null ? new ArrayList<>(filtered) : null;
         }
-
 
         @Override
         public void run() {
@@ -235,11 +280,9 @@ public final class KeywordDetector {
          * one FILE_NAME request
          */
         private final List<HistogramUpdateRequestTask> histogramUpdateRequests;
-
         private final AtomicBoolean running = new AtomicBoolean(false);
         private final ReentrantLock lock = new ReentrantLock();
         private final Condition loopLock = lock.newCondition();
-
 
         public HistogramUpdateRequestDispatcher() {
             histogramUpdateRequests = new LinkedList<>();
@@ -250,7 +293,6 @@ public final class KeywordDetector {
             if (!running.get() || updateRequestTask == null) {
                 return;
             }
-
             synchronized (histogramUpdateRequests) {
                 histogramUpdateRequests.add(0, updateRequestTask);
                 if (histogramUpdateRequests.size() > 4) {
@@ -266,7 +308,6 @@ public final class KeywordDetector {
                     histogramUpdateRequests.addAll(head);
                 }
             }
-
             signalLoopLock();
         }
 
@@ -310,7 +351,6 @@ public final class KeywordDetector {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
             }
             clear();
             shutdownThreadPool();
@@ -340,7 +380,8 @@ public final class KeywordDetector {
             if (threadPool != null) {
                 try {
                     threadPool.shutdown();
-                } catch (Throwable ignored) {}
+                } catch (Throwable ignored) {
+                }
             }
         }
 
@@ -361,56 +402,5 @@ public final class KeywordDetector {
                 lock.unlock();
             }
         }
-    }
-
-    /**
-     * Expensive
-     */
-    public void requestHistogramsUpdateAsync(List<SearchResult> filtered) {
-        if (!histogramUpdateRequestsDispatcher.running.get()) {
-            histogramUpdateRequestsDispatcher.start();
-        }
-        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, filtered);
-        histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
-    }
-
-    public void reset() {
-        histogramUpdateRequestsDispatcher.clear();
-        if (histoHashMaps != null && !histoHashMaps.isEmpty()) {
-            for (HistoHashMap<String> stringHistoHashMap : histoHashMaps.values()) {
-                stringHistoHashMap.reset();
-            }
-        }
-        notifyKeywordDetectorListener();
-    }
-
-    private static void feedStopWords(String... words) {
-        Collections.addAll(stopWords, words);
-    }
-
-    static {
-        // english
-        feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
-        feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why", "your");
-        feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me", "null");
-        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "youre");
-        // spanish
-        feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
-        feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
-        feedStopWords("eso", "el", "esa", "esto", "yo", "usted", "tu", "los", "para");
-        // portuguese
-        feedStopWords("filho", "como", "em", "quando", "nos");
-        feedStopWords("tem", "ele", "seu", "nós", "quem");
-        feedStopWords("isto", "voce", "você", "seu");
-        // french
-        feedStopWords("fils", "sous", "par", "où", "ou", "quand");
-        feedStopWords("leur", "dans", "nous", "par", "ce", "qui");
-        feedStopWords("il", "le", "vous", "votre");
-        // TODO: Add more here as we start testing and getting noise
-    }
-
-    public interface KeywordDetectorListener {
-        void notifyHistogramsUpdate(Map<Feature, List<Map.Entry<String, Integer>>> filteredHistograms);
-        void onKeywordDetectorFinished();
     }
 }

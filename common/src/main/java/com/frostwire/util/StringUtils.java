@@ -16,24 +16,18 @@
 package com.frostwire.util;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Provides static methods to split, check for substrings, change case and
  * compare strings, along with additional string utility methods.
  */
 public class StringUtils {
-
-    /** Returns true if input contains the given pattern, which may contain the
-     *  wildcard character '*'.  TODO: need more formal definition.  Examples:
+    /**
+     * Returns true if input contains the given pattern, which may contain the
+     * wildcard character '*'.  TODO: need more formal definition.  Examples:
      *
-     *  <pre>
+     * <pre>
      *  StringUtils.contains("", "") ==> true
      *  StringUtils.contains("abc", "") ==> true
      *  StringUtils.contains("abc", "b") ==> true
@@ -41,14 +35,16 @@ public class StringUtils {
      *  StringUtils.contains("abcd", "a*d") ==> true
      *  StringUtils.contains("abcd", "*a**d*") ==> true
      *  StringUtils.contains("abcd", "d*a") ==> false
-     *  </pre> 
+     *  </pre>
      */
     public static boolean contains(String input, String pattern) {
         return contains(input, pattern, false);
     }
 
-    /** Exactly like contains(input, pattern), but case is ignored if
-     *  ignoreCase==true. */
+    /**
+     * Exactly like contains(input, pattern), but case is ignored if
+     * ignoreCase==true.
+     */
     public static boolean contains(String input, String pattern, boolean ignoreCase) {
         //More efficient algorithms are possible, e.g. a modified version of the
         //Rabin-Karp algorithm, but they are unlikely to be faster with such
@@ -56,13 +52,12 @@ public class StringUtils {
         //combining the second FOR loop below with the subset(..) call, but that
         //just isn't important.  The important thing is to avoid needless
         //allocations.
-
         final int n = pattern.length();
         //Where to resume searching after last wildcard, e.g., just past
         //the last match in input.
         int last = 0;
         //For each token in pattern starting at i...
-        for (int i = 0; i < n;) {
+        for (int i = 0; i < n; ) {
             //1. Find the smallest j>i s.t. pattern[j] is space, *, or +.
             char c = ' ';
             int j = i;
@@ -73,12 +68,10 @@ public class StringUtils {
                     break;
                 }
             }
-
             //2. Match pattern[i..j-1] against input[last...].
             int k = subset(pattern, i, j, input, last, ignoreCase);
             if (k < 0)
                 return false;
-
             //3. Reset the starting search index if got ' ' or '+'.
             //Otherwise increment past the match in input.
             if (c == ' ' || c == '+')
@@ -93,19 +86,19 @@ public class StringUtils {
     /**
      * @requires TODO3: fill this in
      * @effects returns the the smallest i>=bigStart
-     *  s.t. little[littleStart...littleStop-1] is a prefix of big[i...] 
-     *  or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
-     *  when comparing characters.
+     * s.t. little[littleStart...littleStop-1] is a prefix of big[i...]
+     * or -1 if no such i exists.  If ignoreCase==false, case doesn't matter
+     * when comparing characters.
      */
     private static int subset(String little, int littleStart, int littleStop, String big, int bigStart, boolean ignoreCase) {
         //Equivalent to
         // return big.indexOf(little.substring(littleStart, littleStop), bigStart);
         //but without an allocation.
         //Note special case for ignoreCase below.
-
         if (ignoreCase) {
             final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop: for (int i = bigStart; i < n; i++) {
+            outerLoop:
+            for (int i = bigStart; i < n; i++) {
                 //Check if little[littleStart...littleStop-1] matches with shift i
                 final int n2 = littleStop - littleStart;
                 for (int j = 0; j < n2; j++) {
@@ -119,7 +112,8 @@ public class StringUtils {
             return -1;
         } else {
             final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop: for (int i = bigStart; i < n; i++) {
+            outerLoop:
+            for (int i = bigStart; i < n; i++) {
                 final int n2 = littleStop - littleStart;
                 for (int j = 0; j < n2; j++) {
                     char c1 = big.charAt(i + j);
@@ -133,10 +127,11 @@ public class StringUtils {
         }
     }
 
-    /** If c is a lower case ASCII character, returns Character.toUpperCase(c).
-     *  Else if c is an upper case ASCII character, returns Character.toLowerCase(c),
-     *  Else returns c.
-     *  Note that this is <b>not internationalized</b>; but it is fast.
+    /**
+     * If c is a lower case ASCII character, returns Character.toUpperCase(c).
+     * Else if c is an upper case ASCII character, returns Character.toLowerCase(c),
+     * Else returns c.
+     * Note that this is <b>not internationalized</b>; but it is fast.
      */
     public static char toOtherCase(char c) {
         int i = c;
@@ -145,7 +140,6 @@ public class StringUtils {
         final int a = 'a'; //97
         final int z = 'z'; //122
         final int SHIFT = a - A;
-
         if (i < A) //non alphabetic
             return c;
         else if (i <= Z) //upper-case
@@ -166,18 +160,18 @@ public class StringUtils {
         return split(s, Character.toString(delimiter));
     }
 
-    /** 
-     *  Returns the tokens of s delimited by the given delimiter, without
-     *  returning the delimiter.  Repeated sequences of delimiters are treated
-     *  as one. Examples:
-     *  <pre>
+    /**
+     * Returns the tokens of s delimited by the given delimiter, without
+     * returning the delimiter.  Repeated sequences of delimiters are treated
+     * as one. Examples:
+     * <pre>
      *    split("a//b/ c /","/")=={"a","b"," c "}
      *    split("a b", "/")=={"a b"}.
      *    split("///", "/")=={}.
      *  </pre>
      *
      * <b>Note that whitespace is preserved if it is not part of the delimiter.</b>
-     * An older version of this trim()'ed each token of whitespace.  
+     * An older version of this trim()'ed each token of whitespace.
      */
     public static String[] split(String s, String delimiters) {
         //Tokenize s based on delimiters, adding to buffer.
@@ -185,7 +179,6 @@ public class StringUtils {
         List<String> tokens = new ArrayList<String>();
         while (tokenizer.hasMoreTokens())
             tokens.add(tokenizer.nextToken());
-
         return tokens.toArray(new String[0]);
     }
 
@@ -203,15 +196,15 @@ public class StringUtils {
      * strings.  If s contains N delimiters, N+1 strings are always returned.
      * Examples:
      *
-    *  <pre>
+     * <pre>
      *    split("a//b/ c /","/")=={"a","","b"," c ", ""}
      *    split("a b", "/")=={"a b"}.
      *    split("///", "/")=={"","","",""}.
      *  </pre>
      *
-     * @return an array A s.t. s.equals(A[0]+d0+A[1]+d1+...+A[N]), where 
-     *  for all dI, dI.size()==1 && delimiters.indexOf(dI)>=0; and for
-     *  all c in A[i], delimiters.indexOf(c)<0
+     * @return an array A s.t. s.equals(A[0]+d0+A[1]+d1+...+A[N]), where
+     * for all dI, dI.size()==1 && delimiters.indexOf(dI)>=0; and for
+     * all c in A[i], delimiters.indexOf(c)<0
      */
     public static String[] splitNoCoalesce(String s, String delimiters) {
         //Tokenize s based on delimiters, adding to buffer.
@@ -237,12 +230,12 @@ public class StringUtils {
         //Add trailing empty string UNLESS s is the empty string.
         if (gotDelimiter && !tokens.isEmpty())
             tokens.add("");
-
         return tokens.toArray(new String[0]);
     }
 
-    /** 
+    /**
      * Returns true iff s starts with prefix, ignoring case.
+     *
      * @return true iff s.toUpperCase().startsWith(prefix.toUpperCase())
      */
     public static boolean startsWithIgnoreCase(String s, String prefix) {
@@ -269,10 +262,9 @@ public class StringUtils {
     /**
      * Replaces all occurrences of old_str in str with new_str
      *
-     * @param str the String to modify
+     * @param str     the String to modify
      * @param old_str the String to be replaced
      * @param new_str the String to replace old_str with
-     *
      * @return the modified str.
      */
     public static String replace(String str, String old_str, String new_str) {
@@ -305,13 +297,13 @@ public class StringUtils {
      * to set each character of each string to lower case before doing the
      * comparison.  Uses the default <code>Locale</code> for case conversion.
      *
-     * @param str the string in which to search for the <tt>substring</tt>
-     *  argument
+     * @param str       the string in which to search for the <tt>substring</tt>
+     *                  argument
      * @param substring the substring to search for in <tt>str</tt>
      * @return if the <tt>substring</tt> argument occurs as a substring within
-     *  <tt>str</tt>, then the index of the first character of the first such
-     *  substring is returned; if it does not occur as a substring, -1 is
-     *  returned
+     * <tt>str</tt>, then the index of the first character of the first such
+     * substring is returned; if it does not occur as a substring, -1 is
+     * returned
      */
     public static int indexOfIgnoreCase(String str, String substring) {
         return indexOfIgnoreCase(str, substring, Locale.getDefault());
@@ -319,20 +311,20 @@ public class StringUtils {
 
     /**
      * Helper method to obtain the starting index of a substring within another
-     * string, ignoring their case.  This method is expensive because it has  
-     * to set each character of each string to lower case before doing the 
+     * string, ignoring their case.  This method is expensive because it has
+     * to set each character of each string to lower case before doing the
      * comparison.
-     * 
-     * @param str the string in which to search for the <tt>substring</tt>
-     *  argument
+     *
+     * @param str       the string in which to search for the <tt>substring</tt>
+     *                  argument
      * @param substring the substring to search for in <tt>str</tt>
-     * @param locale the <code>Locale</code> to use when converting the
-     *  case of <code>str</code> and <code>substring</code>.  This is necessary because
-     *  case conversion is <code>Locale</code> specific.
-     * @return if the <tt>substring</tt> argument occurs as a substring within  
-     *  <tt>str</tt>, then the index of the first character of the first such  
-     *  substring is returned; if it does not occur as a substring, -1 is 
-     *  returned
+     * @param locale    the <code>Locale</code> to use when converting the
+     *                  case of <code>str</code> and <code>substring</code>.  This is necessary because
+     *                  case conversion is <code>Locale</code> specific.
+     * @return if the <tt>substring</tt> argument occurs as a substring within
+     * <tt>str</tt>, then the index of the first character of the first such
+     * substring is returned; if it does not occur as a substring, -1 is
+     * returned
      */
     public static int indexOfIgnoreCase(String str, String substring, Locale locale) {
         // Look for the index after the expensive conversion to lower case.
@@ -369,7 +361,7 @@ public class StringUtils {
     /**
      * Returns the tokens of array concanated to a delimited by the given
      * delimiter, without Examples:
-     * 
+     *
      * <pre>
      *     explode({ "a", "b" }, " ") == "a b"
      *     explode({ "a", "b" }, "") == "ab"
@@ -427,19 +419,16 @@ public class StringUtils {
         if (StringUtils.isNullOrEmpty(localeLanguageCode, true)) {
             localeLanguageCode = "en";
         }
-        
-        
         String str = strMap.get(localeLanguageCode);
         if (StringUtils.isNullOrEmpty(str, true)) {
             str = defaultStr;
         }
-
         return str;
     }
 
     public static int quickHash(String s) {
         int hash = 1;
-        for (int i=0; i < s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             int cInt = s.charAt(i);
             hash = (hash * cInt) % 0x7fffffff; // modded to int max val
         }

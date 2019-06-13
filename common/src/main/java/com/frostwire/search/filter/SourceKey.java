@@ -22,16 +22,13 @@ package com.frostwire.search.filter;
  * @author aldenml
  */
 public final class SourceKey implements FilterKey {
-
     private final String source;
     private final int ordinal;
-
     private String display;
 
     public SourceKey(String source, int ordinal) {
         this.source = source;
         this.ordinal = ordinal;
-
         this.display = source;
     }
 
@@ -53,7 +50,6 @@ public final class SourceKey implements FilterKey {
         if (!(o instanceof SourceKey)) {
             return -1;
         }
-
         int x = ordinal;
         int y = ((SourceKey) o).ordinal;
         return (x < y) ? -1 : ((x == y) ? 0 : 1);

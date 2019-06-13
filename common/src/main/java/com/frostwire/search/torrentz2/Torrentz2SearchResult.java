@@ -99,17 +99,13 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
         long result = System.currentTimeMillis();
         try {
             String[] ds = dateString.split(" ");
-
-
             if (ds[1].contains("hours")) {
-
                 try {
                     int hours = Integer.parseInt(ds[0]);
                     return result - (hours * 60 * 60 * 1000L);
                 } catch (Exception ignored) {
                 }
             }
-
             if (ds[1].contains("years")) {
                 try {
                     int years = Integer.parseInt(ds[0]);
@@ -117,14 +113,12 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
                 } catch (Exception ignored) {
                 }
             }
-
             if (ds[1].contains("year")) {
                 try {
                     return result - (365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
                 } catch (Exception ignored) {
                 }
             }
-
             if (ds[1].contains("months")) {
                 try {
                     int months = Integer.parseInt(ds[0]);
@@ -132,11 +126,9 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
                 } catch (Exception ignored) {
                 }
             }
-
             if (dateString.contains("1 month")) {
                 return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
             }
-
             return result;
         } catch (Throwable t) {
             t.printStackTrace();

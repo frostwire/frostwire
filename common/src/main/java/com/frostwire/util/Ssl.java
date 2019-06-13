@@ -31,10 +31,8 @@ import java.security.cert.X509Certificate;
  * @author aldenml
  */
 public final class Ssl {
-
     private static final HostnameVerifier NULL_HOSTNAME_VERIFIER = new NullHostnameVerifier();
     private static final X509TrustManager NULL_TRUST_MANAGER = new NullTrustManager();
-
     private static final SSLSocketFactory NULL_SOCKET_FACTORY = buildNullSSLSocketFactory();
 
     private Ssl() {
@@ -88,7 +86,6 @@ public final class Ssl {
     }
 
     private static final class NullHostnameVerifier implements HostnameVerifier {
-
         @Override
         public boolean verify(String s, SSLSession sslSession) {
             return true;
@@ -96,7 +93,6 @@ public final class Ssl {
     }
 
     private static final class NullTrustManager implements X509TrustManager {
-
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
@@ -113,7 +109,6 @@ public final class Ssl {
      * workaround to a bug in android
      */
     private static final class WrapSSLSocketFactory extends SSLSocketFactory {
-
         private final SSLSocketFactory d;
 
         WrapSSLSocketFactory(SSLSocketFactory d) {

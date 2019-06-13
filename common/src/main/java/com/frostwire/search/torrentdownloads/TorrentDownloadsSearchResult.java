@@ -34,7 +34,6 @@ import java.util.Locale;
  * @author alejandroarturom
  */
 public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;

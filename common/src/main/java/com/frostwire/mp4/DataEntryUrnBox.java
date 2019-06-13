@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class DataEntryUrnBox extends FullBox {
-
     protected byte[] name;
     protected byte[] location;
 
@@ -52,7 +51,6 @@ public final class DataEntryUrnBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 4);
         if (len != 0) {
             IO.read(ch, len, buf);
@@ -68,7 +66,6 @@ public final class DataEntryUrnBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (name != null) {
             buf.put(name);
             buf.put((byte) 0);

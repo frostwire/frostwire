@@ -27,8 +27,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class NyaaSearchPerformer extends TorrentSearchPerformer {
-    private final Pattern pattern;
     private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
+    private final Pattern pattern;
 
     public NyaaSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 1);
@@ -58,7 +58,6 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
         if (offset == -1) {
             offset = 0;
         }
-
         ArrayList<NyaaSearchResult> results = new ArrayList<>(0);
         SearchMatcher matcher = new SearchMatcher((pattern.matcher(page.substring(offset))));
         boolean matcherFound;
@@ -70,7 +69,6 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
                 matcherFound = false;
                 LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
             }
-
             if (matcherFound) {
                 NyaaSearchResult sr = new NyaaSearchResult("https://" + getDomainName(), matcher);
                 if (sr != null) {

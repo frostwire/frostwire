@@ -21,13 +21,10 @@ package com.frostwire.search;
 import com.frostwire.regex.Pattern;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 interface RegexSearchPerformer<T extends SearchResult> extends SearchPerformer {
-
     Pattern getPattern();
 
     T fromMatcher(SearchMatcher matcher);

@@ -26,7 +26,6 @@ import java.util.Comparator;
  * @author aldenml
  */
 public final class SearchFilters {
-
     private SearchFilters() {
     }
 
@@ -35,7 +34,6 @@ public final class SearchFilters {
     }
 
     private static final class AddFilter implements SearchFilter {
-
         private final SearchFilter f1;
         private final SearchFilter f2;
 
@@ -61,7 +59,6 @@ public final class SearchFilters {
     }
 
     private static final class AddKey implements FilterKey {
-
         private final FilterKey k1;
         private final FilterKey k2;
 
@@ -80,15 +77,12 @@ public final class SearchFilters {
             if (!(o instanceof AddKey)) {
                 return -1;
             }
-
             int n = k1.compareTo(((AddKey) o).k1);
-
             return n != 0 ? n : k2.compareTo(((AddKey) o).k2);
         }
     }
 
     private static final class AddComparator implements Comparator<SearchResult> {
-
         private final Comparator<SearchResult> c1;
         private final Comparator<SearchResult> c2;
 
@@ -100,7 +94,6 @@ public final class SearchFilters {
         @Override
         public int compare(SearchResult o1, SearchResult o2) {
             int n = c1.compare(o1, o2);
-
             return n != 0 ? n : c2.compare(o1, o2);
         }
     }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * A pure java based HTTP client with resume capabilities.
  *
@@ -30,9 +29,9 @@ import java.util.Map;
  * @author aldenml
  */
 public interface HttpClient {
-    void setListener(HttpClientListener listener);
-
     HttpClientListener getListener();
+
+    void setListener(HttpClientListener listener);
 
     void onCancel();
 
@@ -86,7 +85,6 @@ public interface HttpClient {
     boolean isCanceled();
 
     interface HttpClientListener {
-
         void onError(HttpClient client, Throwable e);
 
         void onData(HttpClient client, byte[] buffer, int offset, int length);
@@ -99,7 +97,6 @@ public interface HttpClient {
     }
 
     abstract class HttpClientListenerAdapter implements HttpClientListener {
-
         public void onError(HttpClient client, Throwable e) {
         }
 
@@ -117,7 +114,6 @@ public interface HttpClient {
     }
 
     class HttpRangeException extends IOException {
-
         private static final long serialVersionUID = 1891038288667531894L;
 
         HttpRangeException(String message) {
@@ -126,7 +122,6 @@ public interface HttpClient {
     }
 
     final class RangeNotSupportedException extends HttpRangeException {
-
         private static final long serialVersionUID = -3356618211960630147L;
 
         RangeNotSupportedException(String message) {
@@ -135,13 +130,11 @@ public interface HttpClient {
     }
 
     final class HttpRangeOutOfBoundsException extends HttpRangeException {
-
         private static final long serialVersionUID = -335661829606230147L;
 
         HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
             super("HttpRange Out of Bounds error: start=" + rangeStart + " expected file size=" + expectedFileSize);
         }
-
     }
 
     final class ResponseCodeNotSupportedException extends IOException {

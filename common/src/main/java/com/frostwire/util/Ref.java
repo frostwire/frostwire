@@ -18,20 +18,13 @@
 
 package com.frostwire.util;
 
-import java.lang.ref.PhantomReference;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
+import java.lang.ref.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class Ref {
-
     private Ref() {
     }
 

@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public class BoxEntry {
-
     void get(ByteBuffer buf) throws IOException {
         throw new UnsupportedOperationException();
     }

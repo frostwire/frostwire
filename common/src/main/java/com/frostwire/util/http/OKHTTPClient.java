@@ -21,6 +21,11 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
+import okhttp3.*;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,22 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.ConnectionPool;
-import okhttp3.ConnectionSpec;
-import okhttp3.Dispatcher;
-import okhttp3.Headers;
-import okhttp3.Interceptor;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.GzipSink;
-import okio.Okio;
-
 /**
  * An OkHttpClient based HTTP Client.
  *
@@ -56,14 +45,44 @@ import okio.Okio;
  * @author aldenml
  */
 public class OKHTTPClient extends AbstractHttpClient {
-
+    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 10, TimeUnit.SECONDS);
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private final ThreadPool pool;
 
-    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 10, TimeUnit.SECONDS);
-
     public OKHTTPClient(final ThreadPool pool) {
         this.pool = pool;
+    }
+
+    public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
+        OkHttpClient.Builder searchClient = new OkHttpClient.Builder();
+        searchClient.dispatcher(new Dispatcher(pool));
+        searchClient.connectionPool(CONNECTION_POOL);
+        searchClient.followRedirects(true);
+        searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        searchClient = configNullSsl(searchClient);
+        // Maybe we should use a custom connection pool here. Using default.
+        //searchClient.setConnectionPool(?);
+        return searchClient;
+    }
+
+    public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
+        b.followSslRedirects(true);
+        b.hostnameVerifier(Ssl.nullHostnameVerifier());
+        b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
+        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
+        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
+        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
+        b.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
+        return b;
+    }
+
+    private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
+        ConnectionSpec.Builder b = new ConnectionSpec.Builder(spec);
+        if (spec.isTls()) {
+            b = b.allEnabledCipherSuites();
+            b = b.allEnabledTlsVersions();
+        }
+        return b.build();
     }
 
     @Override
@@ -139,7 +158,6 @@ public class OKHTTPClient extends AbstractHttpClient {
             fos = new FileOutputStream(file, false);
             rangeStart = -1;
         }
-
         final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, null);
         addRangeHeader(rangeStart, -1, builder);
@@ -147,7 +165,6 @@ public class OKHTTPClient extends AbstractHttpClient {
         final Headers headers = response.headers();
         onHeaders(headers);
         final InputStream in = response.body().byteStream();
-
         byte[] b = new byte[4096];
         int n;
         while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
@@ -201,11 +218,9 @@ public class OKHTTPClient extends AbstractHttpClient {
         final Response response = this.getSyncResponse(okHttpClient, builder);
         try {
             int httpResponseCode = response.code();
-
             if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
-
             if (canceled) {
                 onCancel();
             } else {
@@ -215,7 +230,6 @@ public class OKHTTPClient extends AbstractHttpClient {
         } finally {
             closeQuietly(response.body());
         }
-
         return result;
     }
 
@@ -288,42 +302,6 @@ public class OKHTTPClient extends AbstractHttpClient {
         return newOkHttpClient(pool);
     }
 
-    public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
-        OkHttpClient.Builder searchClient = new OkHttpClient.Builder();
-        searchClient.dispatcher(new Dispatcher(pool));
-        searchClient.connectionPool(CONNECTION_POOL);
-        searchClient.followRedirects(true);
-        searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
-
-        searchClient = configNullSsl(searchClient);
-
-        // Maybe we should use a custom connection pool here. Using default.
-        //searchClient.setConnectionPool(?);
-        return searchClient;
-    }
-
-    public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
-        b.followSslRedirects(true);
-        b.hostnameVerifier(Ssl.nullHostnameVerifier());
-        b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
-
-        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
-        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
-        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
-        b.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
-
-        return b;
-    }
-
-    private static ConnectionSpec cipherSpec(ConnectionSpec spec) {
-        ConnectionSpec.Builder b = new ConnectionSpec.Builder(spec);
-        if (spec.isTls()) {
-            b = b.allEnabledCipherSuites();
-            b = b.allEnabledTlsVersions();
-        }
-        return b.build();
-    }
-
     /**
      * This interceptor compresses the HTTP request body. Many web servers can't handle this!
      */
@@ -334,7 +312,6 @@ public class OKHTTPClient extends AbstractHttpClient {
             if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
                 return chain.proceed(originalRequest);
             }
-
             Request compressedRequest = originalRequest.newBuilder()
                     .header("Content-Encoding", "gzip")
                     .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))

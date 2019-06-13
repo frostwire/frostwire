@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class SampleDescriptionBox extends FullBox {
-
     protected int entry_count;
     protected SampleEntry[] entries;
 
@@ -36,7 +35,6 @@ public final class SampleDescriptionBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         entry_count = buf.getInt();
         entries = new SampleEntry[entry_count];
@@ -45,13 +43,11 @@ public final class SampleDescriptionBox extends FullBox {
             IO.read(ch, 8, buf);
             int size = buf.getInt();
             int type = buf.getInt();
-
             Long largesize = null;
             if (size == 1) {
                 IO.read(ch, 8, buf);
                 largesize = buf.getLong();
             }
-
             SampleEntry e;
             if (handler_type == soun) {
                 e = new AudioSampleEntry(type);
@@ -64,16 +60,13 @@ public final class SampleDescriptionBox extends FullBox {
             }
             e.size = size;
             e.largesize = largesize;
-
             long r = ch.count();
             e.read(ch, buf);
             r = ch.count() - r;
-
             long length = e.length();
             if (r < length) {
                 IsoMedia.read(ch, length - r, e, buf, IsoMedia.OnBoxListener.ALL);
             }
-
             entries[i] = e;
         }
     }
@@ -81,23 +74,18 @@ public final class SampleDescriptionBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {
             Box b = entries[i];
-
             buf.putInt(b.size);
             buf.putInt(b.type);
             IO.write(ch, 8, buf);
-
             if (b.largesize != null) {
                 buf.putLong(b.largesize);
                 IO.write(ch, 8, buf);
             }
-
             b.write(ch, buf);
-
             IsoMedia.write(ch, b.boxes, buf, IsoMedia.OnBoxListener.ALL);
         }
     }

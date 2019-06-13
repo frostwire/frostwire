@@ -18,18 +18,11 @@
 
 package com.frostwire.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.ConcurrentModificationException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 public final class HistoHashMap<K> {
-
     private final HashMap<K, Integer> map = new HashMap<>();
-
     // creates the comparator as a field to avoid GC pressure every
     // time histogram is called, but still not static (no need)
     private final Comparator<Entry<K, Integer>> cmp = (o1, o2) -> o2.getValue().compareTo(o1.getValue());

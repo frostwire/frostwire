@@ -23,7 +23,6 @@ package com.frostwire.transfers;
  * @author aldenml
  */
 public class HttpDownload extends BaseHttpDownload {
-
     public HttpDownload(Info info) {
         super(info);
     }

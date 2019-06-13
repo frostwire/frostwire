@@ -26,7 +26,6 @@ import com.frostwire.util.UrlUtils;
  * @author gubatron
  */
 final class ZooqleTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String detailUrl;
 
     ZooqleTempSearchResult(String domainName, String detailPath) {

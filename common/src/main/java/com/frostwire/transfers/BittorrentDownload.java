@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public interface BittorrentDownload extends Transfer {
-
     String getInfoHash();
 
     /**
@@ -68,8 +67,9 @@ public interface BittorrentDownload extends Transfer {
     /**
      * Adds up the number of bytes per file extension and returns
      * the winning file extension for the torrent.
-     *
+     * <p>
      * If the files are not known, then it returns "torrent"
+     *
      * @return
      */
     String getPredominantFileExtension();

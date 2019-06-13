@@ -35,23 +35,16 @@ import java.util.concurrent.PriorityBlockingQueue;
  * @author aldenml
  */
 public final class SearchManager {
-
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
-
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;
-
     private SearchListener listener;
 
     private SearchManager(int nThreads) {
         this.executor = new ThreadPool("SearchManager", 2, nThreads, 5000L, new PriorityBlockingQueue<>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<>());
         this.tables = Collections.synchronizedList(new LinkedList<>());
-    }
-
-    private static class Loader {
-        static final SearchManager INSTANCE = new SearchManager(8);
     }
 
     public static SearchManager getInstance() {
@@ -63,7 +56,6 @@ public final class SearchManager {
             if (performer.getToken() < 0) {
                 throw new IllegalArgumentException("Search token id must be >= 0");
             }
-
             performer.setListener(new SearchListener() {
                 @Override
                 public void onResults(long token, List<? extends SearchResult> results) {
@@ -84,7 +76,6 @@ public final class SearchManager {
                     // nothing since this is calculated in aggregation
                 }
             });
-
             SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
             submit(task);
         } else {
@@ -115,21 +106,17 @@ public final class SearchManager {
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<>();
-
         for (SearchResult sr : results) {
             if (sr instanceof CrawlableSearchResult) {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
-
                 if (csr.isComplete()) {
                     list.add(sr);
                 }
-
                 crawl(performer, csr);
             } else {
                 list.add(sr);
             }
         }
-
         if (!list.isEmpty()) {
             onResults(performer.getToken(), list);
         }
@@ -140,7 +127,6 @@ public final class SearchManager {
             if (results != null && listener != null) {
                 listener.onResults(token, results);
             }
-
             synchronized (tables) {
                 Iterator<WeakReference<SearchTable>> it = tables.iterator();
                 while (it.hasNext()) {
@@ -203,7 +189,6 @@ public final class SearchManager {
 
     private void checkIfFinished(long token) {
         SearchTask pendingTask = null;
-
         synchronized (tasks) {
             Iterator<SearchTask> it = tasks.iterator();
             while (it.hasNext() && pendingTask == null) {
@@ -211,13 +196,11 @@ public final class SearchManager {
                 if (task.token() == token && !task.stopped()) {
                     pendingTask = task;
                 }
-
                 if (task.stopped()) {
                     it.remove();
                 }
             }
         }
-
         if (pendingTask == null) {
             onStopped(token);
         }
@@ -235,8 +218,11 @@ public final class SearchManager {
         return ordinal;
     }
 
-    private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
+    private static class Loader {
+        static final SearchManager INSTANCE = new SearchManager(8);
+    }
 
+    private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
         protected final SearchManager manager;
         final SearchPerformer performer;
         private final int ordinal;
@@ -267,7 +253,6 @@ public final class SearchManager {
     }
 
     private static final class PerformTask extends SearchTask {
-
         PerformTask(SearchManager manager, SearchPerformer performer, int order) {
             super(manager, performer, order);
         }
@@ -289,7 +274,6 @@ public final class SearchManager {
     }
 
     private static final class CrawlTask extends SearchTask {
-
         private final CrawlableSearchResult sr;
 
         CrawlTask(SearchManager manager, SearchPerformer performer, CrawlableSearchResult sr, int order) {

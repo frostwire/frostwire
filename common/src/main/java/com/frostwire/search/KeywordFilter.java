@@ -26,7 +26,6 @@ import java.util.List;
  * @author aldenml
  */
 public final class KeywordFilter {
-
     private final boolean inclusive;
     private final String keyword;
     private KeywordDetector.Feature feature;
@@ -35,42 +34,6 @@ public final class KeywordFilter {
         this.inclusive = inclusive;
         this.keyword = keyword.toLowerCase();
         this.feature = feature;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof KeywordFilter)) {
-            return false;
-        }
-
-        KeywordFilter other = (KeywordFilter) obj;
-        return inclusive == other.inclusive && keyword.equals(other.keyword);
-    }
-
-    @Override
-    public int hashCode() {
-        return keyword.hashCode() * (inclusive ? 1 : -1);
-    }
-
-    public boolean isInclusive() {
-        return inclusive;
-    }
-
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public KeywordDetector.Feature getFeature() {
-        return feature;
-    }
-
-    public KeywordFilter negate() {
-        return new KeywordFilter(!inclusive, keyword, feature);
-    }
-
-    public boolean accept(final String lowercaseHaystack) {
-        boolean found = lowercaseHaystack.contains(keyword);
-        return ((inclusive && found) || (!inclusive && !found));
     }
 
     static String getSearchResultHaystack(SearchResult sr) {
@@ -106,5 +69,40 @@ public final class KeywordFilter {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof KeywordFilter)) {
+            return false;
+        }
+        KeywordFilter other = (KeywordFilter) obj;
+        return inclusive == other.inclusive && keyword.equals(other.keyword);
+    }
+
+    @Override
+    public int hashCode() {
+        return keyword.hashCode() * (inclusive ? 1 : -1);
+    }
+
+    public boolean isInclusive() {
+        return inclusive;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public KeywordDetector.Feature getFeature() {
+        return feature;
+    }
+
+    public KeywordFilter negate() {
+        return new KeywordFilter(!inclusive, keyword, feature);
+    }
+
+    public boolean accept(final String lowercaseHaystack) {
+        boolean found = lowercaseHaystack.contains(keyword);
+        return ((inclusive && found) || (!inclusive && !found));
     }
 }

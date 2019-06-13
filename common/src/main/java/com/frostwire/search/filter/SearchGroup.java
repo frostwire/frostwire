@@ -28,7 +28,6 @@ import java.util.TreeSet;
  * @author aldenml
  */
 public final class SearchGroup {
-
     private final SortedSet<SearchResult> data;
 
     SearchGroup(SearchFilter filter) {

@@ -29,9 +29,7 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
-
     private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
-
     private final String displayName;
     private final String username;
     private final String trackUrl;
@@ -49,13 +47,11 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         this.filename = item.permalink + "-soundcloud.mp3";
         this.size = buildSize(item);
         this.source = buildSource(item);
-
         String userAvatarUrl = null;
         if (item.user != null) {
             userAvatarUrl = item.user.avatar_url;
         }
         this.thumbnailUrl = buildThumbnailUrl(item.artwork_url != null ? item.artwork_url : userAvatarUrl);
-
         this.date = buildDate(item.created_at);
         this.downloadUrl = buildDownloadUrl(item, clientId, appVersion);
     }
@@ -156,17 +152,14 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private String buildDownloadUrl(SoundcloudItem item, String clientId, String appVersion) {
         final String clientAppenderChar = (item.download_url != null && item.download_url.contains("?")) ? "&" : "?";
         String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url);
-
         //http://api.soundcloud.com/tracks/#########/download no longer works, has to be /stream now.
         if (downloadUrl.endsWith("/download")) {
             downloadUrl = downloadUrl.replace("/download", "/stream");
         }
-
         // direct download urls don't seem to need client_id & app_version, if passed to the url returns HTTP 404.
         if (clientId != null && appVersion != null) {
             downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
         }
-
         return downloadUrl;
     }
 

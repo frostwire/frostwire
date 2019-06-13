@@ -25,35 +25,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class PaymentOptions implements Mappable<String, Map<String, String>> {
-    /** BitCoin URI, see BIP-0021 - https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki 
+    /**
+     * BitCoin URI, see BIP-0021 - https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
      * bitcoinurn     = "bitcoin:" bitcoinaddress [ "?" bitcoinparams ]
      * bitcoinaddress = base58 *base58
      * Example: bitcoin:175tWpb8K1S7NmH4Zx6rewF9WQrcZv245W
-     * 
+     * <p>
      * To be serialized as dictionary in the .torrent as follows
-     *     paymentOptions: {
-     *        bitcoin: "bitcoin:13hbpRfDT1HKmK4jejHgh7MM9W1NCPFT8v",
-     *        paypalUrl: "http://frostwire.com/donate"
-     *     }
-     * 
+     * paymentOptions: {
+     * bitcoin: "bitcoin:13hbpRfDT1HKmK4jejHgh7MM9W1NCPFT8v",
+     * paypalUrl: "http://frostwire.com/donate"
+     * }
      */
     public final String bitcoin;
-
-    public enum PaymentMethod {
-        BITCOIN, PAYPAL
-    }
-
-    /** Simply a valid email address for creating a paypal payment form */
+    /**
+     * Simply a valid email address for creating a paypal payment form
+     */
     public final String paypalUrl;
-    
     private String itemName;
-
     public PaymentOptions() {
         bitcoin = null;
         paypalUrl = null;
@@ -73,7 +66,6 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
             } else {
                 this.bitcoin = null;
             }
-
             if (dictionary.containsKey("paypalUrl")) {
                 this.paypalUrl = dictionary.get("paypalUrl").string();
             } else {
@@ -93,24 +85,26 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
         if (!StringUtils.isNullOrEmpty(paypalUrl)) {
             innerMap.put("paypalUrl", paypalUrl);
         }
-
         Map<String, Map<String, String>> paymentOptions = new HashMap<>();
-
         if (!innerMap.isEmpty()) {
             paymentOptions.put("paymentOptions", innerMap);
         }
         return paymentOptions;
     }
-    
-    public void setItemName(String name) {
-        itemName = name;
-    }
-    
+
     public String getItemName() {
         return itemName;
     }
 
+    public void setItemName(String name) {
+        itemName = name;
+    }
+
     public boolean isEmpty() {
         return bitcoin == null && paypalUrl == null;
+    }
+
+    public enum PaymentMethod {
+        BITCOIN, PAYPAL
     }
 }

@@ -28,7 +28,6 @@ import java.util.List;
  * @author aldenml
  */
 public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearchResult<TorrentCrawlableSearchResult> implements TorrentSearchResult {
-
     private final String artist;
     private final String album;
     private final List<TorrentItemSearchResult> items;
@@ -111,17 +110,14 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
         if (StringUtils.isNotBlank(artist)) {
             result = artist + " - " + album;
         }
-
         return result;
     }
 
     private long buildSize(List<TorrentItemSearchResult> items) {
         long r = 0;
-
         for (TorrentItemSearchResult sr : items) {
             r += sr.getSize();
         }
-
         return r;
     }
 }

@@ -26,7 +26,6 @@ import java.nio.channels.ReadableByteChannel;
  * @author aldenml
  */
 final class InputChannel implements ReadableByteChannel {
-
     private final ReadableByteChannel ch;
     private long count;
 

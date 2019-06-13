@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,13 +18,10 @@
 package com.frostwire.search;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface CrawlCache {
-
     byte[] get(String key);
 
     void put(String key, byte[] data);

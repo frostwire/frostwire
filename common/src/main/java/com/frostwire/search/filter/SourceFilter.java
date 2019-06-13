@@ -28,7 +28,6 @@ import java.util.HashMap;
  * @author aldenml
  */
 public final class SourceFilter implements SearchFilter {
-
     private static final Comparator<SearchResult> CMP = new Comparator<SearchResult>() {
         @Override
         public int compare(SearchResult o1, SearchResult o2) {
@@ -37,7 +36,6 @@ public final class SourceFilter implements SearchFilter {
             return (x < y) ? -1 : ((x == y) ? 0 : 1);
         }
     };
-
     private final HashMap<String, SourceKey> keys;
 
     public SourceFilter(SourceKey... keys) {

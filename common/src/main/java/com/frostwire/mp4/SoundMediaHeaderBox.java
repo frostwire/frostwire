@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class SoundMediaHeaderBox extends FullBox {
-
     protected short balance;
     protected short reserved;
 
@@ -36,7 +35,6 @@ public final class SoundMediaHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         balance = buf.getShort();
         reserved = buf.getShort();
@@ -45,7 +43,6 @@ public final class SoundMediaHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putShort(balance);
         buf.putShort(reserved);
         IO.write(ch, 4, buf);

@@ -26,7 +26,6 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public class SampleEntry extends Box {
-
     protected final byte[] reserved;
     protected short data_reference_index;
 

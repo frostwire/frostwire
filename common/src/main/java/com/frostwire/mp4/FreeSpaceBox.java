@@ -25,9 +25,7 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class FreeSpaceBox extends Box {
-
     private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
-
     protected byte[] data;
 
     FreeSpaceBox(int type) {
@@ -38,6 +36,14 @@ public final class FreeSpaceBox extends Box {
         super(type);
         data = new byte[(int) length];
         update();
+    }
+
+    public static FreeSpaceBox free(long length) {
+        return new FreeSpaceBox(free, length);
+    }
+
+    public static FreeSpaceBox skip(long length) {
+        return new FreeSpaceBox(skip, length);
     }
 
     @Override
@@ -71,13 +77,5 @@ public final class FreeSpaceBox extends Box {
             s += data.length;
         }
         length(s);
-    }
-
-    public static FreeSpaceBox free(long length) {
-        return new FreeSpaceBox(free, length);
-    }
-
-    public static FreeSpaceBox skip(long length) {
-        return new FreeSpaceBox(skip, length);
     }
 }

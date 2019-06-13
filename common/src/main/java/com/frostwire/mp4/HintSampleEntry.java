@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class HintSampleEntry extends SampleEntry {
-
     protected byte[] data;
 
     HintSampleEntry(int protocol) {
@@ -35,7 +34,6 @@ public final class HintSampleEntry extends SampleEntry {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 8);
         if (len != 0) {
             IO.read(ch, len, buf);
@@ -47,7 +45,6 @@ public final class HintSampleEntry extends SampleEntry {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (data != null) {
             buf.put(data);
             IO.write(ch, data.length, buf);

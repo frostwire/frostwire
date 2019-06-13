@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
-
     protected long base_media_decode_time;
 
     TrackFragmentBaseMediaDecodeTimeBox() {
@@ -35,7 +34,6 @@ public final class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         if (version == 1) {
             IO.read(ch, 8, buf);
             base_media_decode_time = buf.getLong();
@@ -48,7 +46,6 @@ public final class TrackFragmentBaseMediaDecodeTimeBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (version == 1) {
             buf.putLong(base_media_decode_time);
             IO.write(ch, 8, buf);

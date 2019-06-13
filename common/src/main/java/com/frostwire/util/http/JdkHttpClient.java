@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,33 +54,26 @@ public final class JdkHttpClient extends AbstractHttpClient {
     @Override
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
         byte[] result = null;
-
         ByteArrayOutputStream baos = null;
-
         try {
             baos = new ByteArrayOutputStream();
             get(url, baos, timeout, userAgent, referrer, cookies, -1);
-
             result = baos.toByteArray();
         } catch (Throwable e) {
             LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
         } finally {
             closeQuietly(baos);
         }
-
         return result;
     }
 
     @Override
     public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
         String result = null;
-
         ByteArrayOutputStream baos = null;
-
         try {
             baos = new ByteArrayOutputStream();
             get(url, baos, timeout, userAgent, referrer, cookie, -1, -1, customHeaders);
-
             result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         } catch (java.net.SocketTimeoutException timeoutException) {
             throw timeoutException;
@@ -89,7 +82,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
         } finally {
             closeQuietly(baos);
         }
-
         return result;
     }
 
@@ -97,7 +89,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
         FileOutputStream fos = null;
         long rangeStart;
-
         try {
             if (resume && file.exists()) {
                 fos = new FileOutputStream(file, true);
@@ -106,7 +97,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
                 fos = new FileOutputStream(file, false);
                 rangeStart = -1;
             }
-
             get(url, fos, timeout, userAgent, null, referrer, rangeStart);
         } finally {
             closeQuietly(fos);
@@ -119,9 +109,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
     @Override
     public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
         String result = null;
-
         ByteArrayOutputStream baos = null;
-
         try {
             baos = new ByteArrayOutputStream();
             post(url, baos, timeout, userAgent, formData);
@@ -131,7 +119,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
         } finally {
             closeQuietly(baos);
         }
-
         return result;
     }
 
@@ -142,25 +129,19 @@ public final class JdkHttpClient extends AbstractHttpClient {
         final URL u = new URL(url);
         final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
         conn.setDoOutput(true);
-
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
         conn.setRequestProperty("User-Agent", userAgent);
         conn.setInstanceFollowRedirects(false);
-
         if (conn instanceof HttpsURLConnection) {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
-
         byte[] data = content.getBytes(StandardCharsets.UTF_8);
-
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", postContentType);
         conn.setRequestProperty("charset", "utf-8");
         conn.setUseCaches(false);
-
         ByteArrayInputStream in = new ByteArrayInputStream(data);
-
         try {
             OutputStream out;
             if (gzip) {
@@ -168,7 +149,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
             } else {
                 out = conn.getOutputStream();
             }
-
             byte[] b = new byte[4096];
             int n;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
@@ -178,16 +158,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
                     onData(b, 0, n);
                 }
             }
-
             closeQuietly(out);
-
             conn.connect();
             int httpResponseCode = getResponseCode(conn);
-
             if (httpResponseCode != HttpURLConnection.HTTP_OK && httpResponseCode != HttpURLConnection.HTTP_PARTIAL) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
-
             if (canceled) {
                 onCancel();
             } else {
@@ -220,10 +196,8 @@ public final class JdkHttpClient extends AbstractHttpClient {
     }
 
     private void checkRangeSupport(long rangeStart, URLConnection conn) throws RangeNotSupportedException {
-
         boolean hasContentRange = conn.getHeaderField("Content-Range") != null;
         boolean hasAcceptRanges = conn.getHeaderField("Accept-Ranges") != null && conn.getHeaderField("Accept-Ranges").equals("bytes");
-
         if (rangeStart > 0 && !hasContentRange && !hasAcceptRanges) {
             RangeNotSupportedException rangeNotSupportedException = new RangeNotSupportedException("Server does not support bytes range request");
             onError(rangeNotSupportedException);
@@ -239,48 +213,37 @@ public final class JdkHttpClient extends AbstractHttpClient {
         canceled = false;
         final URL u = new URL(url);
         final URLConnection conn = u.openConnection();
-
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
-
         if (userAgent != null) {
             conn.setRequestProperty("User-Agent", userAgent);
         } else {
             conn.setRequestProperty("User-Agent", DEFAULT_USER_AGENT);
         }
-
         if (referrer != null) {
             conn.setRequestProperty("Referer", referrer);
         }
-
         if (cookie != null) {
             conn.setRequestProperty("Cookie", cookie);
         }
-
         if (conn instanceof HttpURLConnection) {
             ((HttpURLConnection) conn).setInstanceFollowRedirects(true);
         }
-
         if (conn instanceof HttpsURLConnection) {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
-
         if (rangeStart > 0) {
             conn.setRequestProperty("Range", buildRange(rangeStart, rangeLength));
         }
-
         if (customHeaders != null && customHeaders.size() > 0) {
             //put down here so it can overwrite any of the previous headers.
             setCustomHeaders(conn, customHeaders);
         }
-
         InputStream in = conn.getInputStream();
         if ("gzip".equals(conn.getContentEncoding())) {
             in = new GZIPInputStream(in);
         }
-
         int httpResponseCode = getResponseCode(conn);
-
         if (httpResponseCode != HttpURLConnection.HTTP_OK &&
                 httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
                 httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
@@ -289,7 +252,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
         }
         onHeaders(conn.getHeaderFields());
         checkRangeSupport(rangeStart, conn);
-
         try {
             byte[] b = new byte[4096];
             int n;
@@ -299,9 +261,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
                     onData(b, 0, n);
                 }
             }
-
             closeQuietly(out);
-
             if (canceled) {
                 onCancel();
             } else {
@@ -320,28 +280,21 @@ public final class JdkHttpClient extends AbstractHttpClient {
         final URL u = new URL(url);
         final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
         conn.setDoOutput(true);
-
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
         conn.setRequestProperty("User-Agent", userAgent);
         conn.setInstanceFollowRedirects(false);
-
         if (conn instanceof HttpsURLConnection) {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
-
         byte[] data = getFormDataBytes(formData);
-
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.setRequestProperty("charset", "utf-8");
         conn.setUseCaches(false);
-
         InputStream in = new ByteArrayInputStream(data);
-
         try {
             OutputStream postOut = conn.getOutputStream();
-
             byte[] b = new byte[4096];
             int n;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
@@ -351,22 +304,17 @@ public final class JdkHttpClient extends AbstractHttpClient {
                     onData(b, 0, n);
                 }
             }
-
             closeQuietly(postOut);
             closeQuietly(in);
-
             conn.connect();
-
             in = conn.getInputStream();
             int httpResponseCode = getResponseCode(conn);
-
             if (httpResponseCode != HttpURLConnection.HTTP_OK &&
                     httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
                     httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
                     httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
-
             b = new byte[4096];
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
                 if (!canceled) {
@@ -374,9 +322,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
                     onData(b, 0, n);
                 }
             }
-
             closeQuietly(out);
-
             if (canceled) {
                 onCancel();
             } else {

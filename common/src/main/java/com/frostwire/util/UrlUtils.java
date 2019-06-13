@@ -28,7 +28,6 @@ import java.nio.charset.StandardCharsets;
  * @author aldenml
  */
 public final class UrlUtils {
-
     private UrlUtils() {
     }
 

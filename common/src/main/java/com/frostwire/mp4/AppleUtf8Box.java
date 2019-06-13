@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public class AppleUtf8Box extends AppleDataBox {
-
     private byte[] value;
 
     AppleUtf8Box(int type) {
@@ -47,7 +46,6 @@ public class AppleUtf8Box extends AppleDataBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 16);
         if (len != 0) {
             IO.read(ch, len, buf);
@@ -59,7 +57,6 @@ public class AppleUtf8Box extends AppleDataBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (value != null) {
             buf.put(value);
             IO.write(ch, buf.position(), buf);

@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 public final class MovieBox extends ContainerBox {
-
     MovieBox() {
         super(moov);
     }

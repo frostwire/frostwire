@@ -24,15 +24,13 @@ import java.io.File;
  * @author aldenml
  */
 public final class BTContext {
-
+    public final int[] version = {0, 0, 0, 0};
     public File homeDir;
     public File torrentsDir;
     public File dataDir;
     public String interfaces;
     public int retries;
     public boolean optimizeMemory;
-    public final int[] version = {0,0,0,0};
-
     /**
      * Indicates if the engine starts with the DHT enable.
      */

@@ -12,7 +12,6 @@ import java.util.Map;
  * @since 0.1.9
  */
 public class Matcher {
-
     private com.google.re2j.Matcher matcher;
     private Pattern parentPattern;
 
@@ -105,12 +104,12 @@ public class Matcher {
      * <p>If the match succeeds then more information can be obtained via the
      * start, end, and group methods, and subsequent invocations of the find()
      * method will start at the first character not matched by this match.</p>
-
+     *
      * @param start the starting index
      * @return <code>true</code> if, and only if, a subsequence of the input
      * sequence starting at the given index matches this matcher's pattern
      * @throws IndexOutOfBoundsException If start is less than zero or if start
-     * is greater than the length of the input sequence.
+     *                                   is greater than the length of the input sequence.
      */
     public boolean find(int start) {
         return matcher.find(start);
@@ -161,7 +160,7 @@ public class Matcher {
      * @param group The index of a capturing group in this matcher's pattern
      * @return the subsequence
      * @throws IllegalStateException If no match has yet been attempted, or
-     * if the previous match operation failed
+     *                               if the previous match operation failed
      */
     public String group(int group) {
         return matcher.group(group);
@@ -202,7 +201,7 @@ public class Matcher {
     public String group(String groupName) {
         int idx = groupIndex(groupName);
         if (idx < 0) {
-          throw new IndexOutOfBoundsException("No group \"" + groupName + "\"");
+            throw new IndexOutOfBoundsException("No group \"" + groupName + "\"");
         }
         return group(idx);
     }
@@ -217,7 +216,6 @@ public class Matcher {
      */
     public Map<String, String> namedGroups() {
         Map<String, String> result = new LinkedHashMap<String, String>();
-
         if (matcher.find(0)) {
             for (String groupName : parentPattern.groupNames()) {
                 String groupValue = matcher.group(groupIndex(groupName));
@@ -346,7 +344,7 @@ public class Matcher {
         if (!(obj instanceof Matcher)) {
             return false;
         }
-        Matcher other = (Matcher)obj;
+        Matcher other = (Matcher) obj;
         if (!parentPattern.equals(other.parentPattern)) {
             return false;
         }

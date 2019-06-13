@@ -26,18 +26,15 @@ import java.util.*;
  * @author aldenml
  */
 public final class SearchView {
-
     private final SearchTable table;
     private final SearchFilter filter;
     private final SortedMap<FilterKey, SearchGroup> groups;
-
     private SearchViewListener listener;
 
     public SearchView(SearchTable table, SearchFilter filter) {
         this.table = table;
         this.filter = filter;
         this.groups = new TreeMap<>();
-
         add(table.data());
     }
 
@@ -51,22 +48,18 @@ public final class SearchView {
 
     public void add(List<? extends SearchResult> results) {
         LinkedList<SearchResult> added = new LinkedList<>();
-
         for (SearchResult sr : results) {
             if (filter.accept(sr)) {
                 FilterKey key = filter.key(sr);
                 SearchGroup group = groups.get(key);
-
                 if (group == null) {
                     group = new SearchGroup(filter);
                     groups.put(key, group);
                 }
-
                 group.add(sr);
                 added.add(sr);
             }
         }
-
         if (listener != null && added.size() > 0) {
             listener.viewAdded(this, added);
         }
@@ -90,7 +83,6 @@ public final class SearchView {
             g.clear();
         }
         groups.clear();
-
         if (listener != null) {
             listener.viewChanged(this);
         }

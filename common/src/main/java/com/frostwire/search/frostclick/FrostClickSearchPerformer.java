@@ -31,18 +31,14 @@ import java.util.Map;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
-
     private static final Logger LOG = Logger.getLogger(FrostClickSearchPerformer.class);
-
     private static final int MAX_RESULTS = 1;
-
     private final Map<String, String> customHeaders;
 
     public FrostClickSearchPerformer(String domainName, long token, String keywords, int timeout, UserAgent userAgent) {
-        super(domainName ,token, keywords, timeout, MAX_RESULTS);
+        super(domainName, token, keywords, timeout, MAX_RESULTS);
         this.customHeaders = buildCustomHeaders(userAgent);
     }
 
@@ -60,7 +56,6 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
         } catch (IOException e) {
             return Collections.emptyList();
         }
-        
         if (text != null) {
             return searchPage(text);
         } else {
@@ -79,7 +74,6 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
         Map<String, String> map = new HashMap<>(userAgent.getHeadersMap());
         map.put("User-Agent", userAgent.toString());
         map.put("sessionId", userAgent.getUUID());
-
         return map;
     }
 }

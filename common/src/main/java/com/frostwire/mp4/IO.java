@@ -28,7 +28,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 final class IO {
-
     private IO() {
     }
 
@@ -36,9 +35,7 @@ final class IO {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
-
         buf.clear().limit(len);
-
         int n = 0;
         int r;
         do {
@@ -47,7 +44,6 @@ final class IO {
             }
             n += r;
         } while (n < len);
-
         buf.flip();
     }
 
@@ -55,15 +51,12 @@ final class IO {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
-
         int size = buf.clear().capacity();
         long a = len / size;
         int b = (int) (len % size);
-
         for (long i = 0; i < a; i++) {
             read(ch, size, buf);
         }
-
         if (b > 0) {
             read(ch, b, buf);
         }
@@ -85,14 +78,11 @@ final class IO {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
-
         buf.flip().limit(len);
-
         int n = 0;
         do {
             n += ch.write(buf);
         } while (n < len);
-
         buf.clear();
     }
 
@@ -100,15 +90,12 @@ final class IO {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
-
         int size = buf.clear().capacity();
         long a = len / size;
         int b = (int) (len % size);
-
         for (long i = 0; i < a; i++) {
             write(ch, size, buf);
         }
-
         if (b > 0) {
             write(ch, b, buf);
         }
@@ -118,16 +105,13 @@ final class IO {
         if (len <= 0) {
             throw new IllegalArgumentException("len argument must be > 0");
         }
-
         int size = buf.clear().capacity();
         long a = len / size;
         int b = (int) (len % size);
-
         for (long i = 0; i < a; i++) {
             read(src, size, buf);
             write(dst, size, buf);
         }
-
         if (b > 0) {
             read(src, b, buf);
             write(dst, b, buf);

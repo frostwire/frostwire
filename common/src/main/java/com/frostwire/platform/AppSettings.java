@@ -23,7 +23,6 @@ package com.frostwire.platform;
  * @author aldenml
  */
 public interface AppSettings {
-
     String string(String key);
 
     void string(String key, String value);

@@ -23,16 +23,28 @@ package com.frostwire.transfers;
  * @author aldenml
  */
 final class SpeedStat {
-
     private static final int INTERVAL_MILLISECONDS = 1000;
-
     private long totalBytes;
     private long averageSpeed; // in bytes
-
     private long speedMarkTimestamp;
     private long lastTotalBytes;
 
     SpeedStat() {
+    }
+
+    private static long eta(double size, double total, double speed) {
+        double left = size - total;
+        if (left <= 0) {
+            return 0;
+        }
+        if (speed <= 0) {
+            return -1;
+        }
+        return (long) (left / speed);
+    }
+
+    private static int progress(double size, double total) {
+        return size > 0 ? (int) ((total * 100) / size) : 0;
     }
 
     long totalBytes() {
@@ -45,9 +57,7 @@ final class SpeedStat {
 
     public void update(long numBytes) {
         long now = System.currentTimeMillis();
-
         totalBytes += numBytes;
-
         if (now - speedMarkTimestamp > INTERVAL_MILLISECONDS) {
             averageSpeed = ((totalBytes - lastTotalBytes) * 1000) / (now - speedMarkTimestamp);
             speedMarkTimestamp = now;
@@ -61,23 +71,5 @@ final class SpeedStat {
 
     public int progress(double size) {
         return progress(size, totalBytes);
-    }
-
-    private static long eta(double size, double total, double speed) {
-        double left = size - total;
-
-        if (left <= 0) {
-            return 0;
-        }
-
-        if (speed <= 0) {
-            return -1;
-        }
-
-        return (long) (left / speed);
-    }
-
-    private static int progress(double size, double total) {
-        return size > 0 ? (int) ((total * 100) / size) : 0;
     }
 }

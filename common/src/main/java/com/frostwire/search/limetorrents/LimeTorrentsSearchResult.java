@@ -30,7 +30,6 @@ import java.util.Locale;
  * Created by alejandroarturom on 26-08-16.
  */
 public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult {
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -39,7 +38,6 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
     private final double size;
     private final long creationTime;
     private final int seeds;
-
 
     LimeTorrentsSearchResult(String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
@@ -115,15 +113,12 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
             if (dateString.contains("1 Year+")) {
                 return result - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
             }
-
             if (dateString.contains("Last Month")) {
                 return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
             }
-
             if (dateString.contains("Yesterday")) {
                 return result - 1L * 24L * 60L * 60L * 1000L; // one day in milliseconds
             }
-
             // this format seems to be not used anymore
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             result = myFormat.parse(dateString.trim()).getTime();

@@ -20,11 +20,9 @@ package com.frostwire.search.torrent;
 
 import com.frostwire.search.CrawlableSearchResult;
 
-
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public interface TorrentCrawlableSearchResult extends TorrentSearchResult, CrawlableSearchResult {
 }

@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class TrackFragmentHeaderBox extends FullBox {
-
     protected int track_ID;
     protected long base_data_offset;
     protected int sample_description_index;
@@ -64,10 +63,8 @@ public final class TrackFragmentHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         track_ID = buf.getInt();
-
         if ((flags & 0x1) == 0x1) { // base-data-offset-present
             IO.read(ch, 8, buf);
             base_data_offset = buf.getLong();
@@ -93,10 +90,8 @@ public final class TrackFragmentHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(track_ID);
         IO.write(ch, 4, buf);
-
         if ((flags & 0x1) == 0x1) { // base-data-offset-present
             buf.putLong(base_data_offset);
             IO.write(ch, 8, buf);

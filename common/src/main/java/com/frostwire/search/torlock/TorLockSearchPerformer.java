@@ -26,7 +26,6 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  * @author aldenml
  */
 public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockSearchResult> {
-
     private static final int MAX_RESULTS = 15;
     private static final String REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
     private static final String HTML_REGEX = "(?is)<a href=\"/tor/(?<torrentid>.*?).torrent\".*?" +

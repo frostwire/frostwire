@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class SampleSizeBox extends FullBox {
-
     protected int sample_size;
     protected int sample_count;
     protected Entry[] entries;
@@ -37,7 +36,6 @@ public final class SampleSizeBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 8, buf);
         sample_size = buf.getInt();
         sample_count = buf.getInt();
@@ -53,7 +51,6 @@ public final class SampleSizeBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(sample_size);
         buf.putInt(sample_count);
         IO.write(ch, 8, buf);
@@ -70,7 +67,6 @@ public final class SampleSizeBox extends FullBox {
     }
 
     public static final class Entry extends BoxEntry {
-
         public int entry_size;
 
         @Override

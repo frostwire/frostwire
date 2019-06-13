@@ -22,11 +22,7 @@ package com.frostwire.search.filter;
  * @author aldenml
  */
 public interface FilterKey extends Comparable<FilterKey> {
-
-    String display();
-
     FilterKey NULL = new FilterKey() {
-
         @Override
         public String display() {
             return "";
@@ -37,8 +33,9 @@ public interface FilterKey extends Comparable<FilterKey> {
             if (this.equals(o)) {
                 return 0;
             }
-
             return 1;
         }
     };
+
+    String display();
 }

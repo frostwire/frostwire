@@ -17,30 +17,9 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionManager;
-import com.frostwire.jlibtorrent.SessionParams;
-import com.frostwire.jlibtorrent.SettingsPack;
-import com.frostwire.jlibtorrent.TcpEndpoint;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
-import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.swig.bdecode_node;
-import com.frostwire.jlibtorrent.swig.byte_vector;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.libtorrent;
-import com.frostwire.jlibtorrent.swig.session_params;
-import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -49,31 +28,17 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
-import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
-import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class BTEngine extends SessionManager {
-
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
-
     private static final int[] INNER_LISTENER_TYPES = new int[]{
             ADD_TORRENT.swig(),
             LISTEN_SUCCEEDED.swig(),
@@ -85,29 +50,22 @@ public final class BTEngine extends SessionManager {
             PEER_LOG.swig(),
             AlertType.LOG.swig()
     };
-
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
     private static final String STATE_VERSION_KEY = "state_version";
     // this constant only changes when the libtorrent settings_pack ABI is
     // incompatible with the previous version, it should only happen from
     // time to time, not in every version
     private static final String STATE_VERSION_VALUE = "1.2.0.6";
+    private final static CountDownLatch ctxSetupLatch = new CountDownLatch(1);
     public static BTContext ctx;
-
     private final InnerListener innerListener;
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
-
     private BTEngineListener listener;
-    private final static CountDownLatch ctxSetupLatch = new CountDownLatch(1);
 
     private BTEngine() {
         super(false);
         this.innerListener = new InnerListener();
         this.restoreDownloadsQueue = new LinkedList<>();
-    }
-
-    private static class Loader {
-        static final BTEngine INSTANCE = new BTEngine();
     }
 
     public static BTEngine getInstance() {
@@ -128,6 +86,45 @@ public final class BTEngine extends SessionManager {
         ctxSetupLatch.countDown();
     }
 
+    // this is here until we have a properly done OS utils.
+    private static String escapeFilename(String s) {
+        return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
+    }
+
+    private static String dhtBootstrapNodes() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("dht.libtorrent.org:25401").append(",");
+        sb.append("router.bittorrent.com:6881").append(",");
+        sb.append("dht.transmissionbt.com:6881").append(",");
+        // for DHT IPv6
+        sb.append("router.silotis.us:6881");
+        return sb.toString();
+    }
+
+    private static SettingsPack defaultSettings() {
+        SettingsPack sp = new SettingsPack();
+        sp.broadcastLSD(true);
+        if (ctx.optimizeMemory) {
+            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
+            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            int sendBufferWatermark = sp.sendBufferWatermark();
+            sp.sendBufferWatermark(sendBufferWatermark / 2);
+            sp.cacheSize(256);
+            sp.activeDownloads(4);
+            sp.activeSeeds(4);
+            sp.maxPeerlistSize(200);
+            //sp.setGuidedReadCache(true);
+            sp.tickInterval(1000);
+            sp.inactivityTimeout(60);
+            sp.seedingOutgoingConnections(false);
+            sp.connectionsLimit(200);
+        } else {
+            sp.activeDownloads(10);
+            sp.activeSeeds(10);
+        }
+        return sp;
+    }
+
     public BTEngineListener getListener() {
         return listener;
     }
@@ -139,7 +136,6 @@ public final class BTEngine extends SessionManager {
     @Override
     public void start() {
         SessionParams params = loadSettings();
-
         settings_pack sp = params.settings().swig();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
@@ -149,17 +145,13 @@ public final class BTEngine extends SessionManager {
         sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
         sp.set_bool(settings_pack.bool_types.enable_dht.swigValue(), ctx.enableDht);
         sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true);
-
-
         if (ctx.optimizeMemory) {
             sp.set_bool(settings_pack.bool_types.enable_ip_notifier.swigValue(), false);
         }
-
         // NOTE: generate_fingerprint needs a tag number between 0 and 19, otherwise it returns an
         // invalid character that makes the app crash on android
         String fwFingerPrint = libtorrent.generate_fingerprint("FW", ctx.version[0], ctx.version[1], ctx.version[2], ctx.version[3] % 10);
         sp.set_str(settings_pack.string_types.peer_fingerprint.swigValue(), fwFingerPrint);
-
         String userAgent = String.format(Locale.ENGLISH,
                 "FrostWire/%d.%d.%d libtorrent/%s",
                 ctx.version[0],
@@ -167,10 +159,8 @@ public final class BTEngine extends SessionManager {
                 ctx.version[2],
                 libtorrent.version());
         sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
-
         System.out.println("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
         System.out.println("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
-
         super.start(params);
     }
 
@@ -208,9 +198,7 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         ctx.dataDir = dataDir; // this will be removed when we start using platform
-
         super.moveStorage(dataDir);
     }
 
@@ -223,13 +211,11 @@ public final class BTEngine extends SessionManager {
                 bdecode_node n = new bdecode_node();
                 error_code ec = new error_code();
                 int ret = bdecode_node.bdecode(buffer, n, ec);
-
                 if (ret == 0) {
                     String stateVersion = n.dict_find_string_value_s(STATE_VERSION_KEY);
                     if (!STATE_VERSION_VALUE.equals(stateVersion)) {
                         return defaultParams();
                     }
-
                     session_params params = libtorrent.read_session_params(n);
                     buffer.clear(); // prevents GC
                     return new SessionParams(params);
@@ -261,7 +247,6 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return null;
         }
-
         entry e = new entry();
         swig().save_state(e);
         e.set(STATE_VERSION_KEY, STATE_VERSION_VALUE);
@@ -272,7 +257,6 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         try {
             byte[] data = saveState();
             FileUtils.writeByteArrayToFile(settingsFile(), data);
@@ -285,9 +269,7 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         SettingsPack sp = defaultSettings();
-
         applySettings(sp);
     }
 
@@ -295,31 +277,24 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
             return;
         }
-
         TorrentInfo ti = new TorrentInfo(torrent);
-
         if (selection == null) {
             selection = new boolean[ti.numFiles()];
             Arrays.fill(selection, true);
         }
-
         Priority[] priorities = null;
-
         TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
-
         if (selection != null) {
             if (th != null) {
                 priorities = th.filePriorities();
             } else {
                 priorities = Priority.array(Priority.IGNORE, ti.numFiles());
             }
-
             boolean changed = false;
             for (int i = 0; i < selection.length; i++) {
                 if (selection[i] && priorities[i] == Priority.IGNORE) {
@@ -327,14 +302,11 @@ public final class BTEngine extends SessionManager {
                     changed = true;
                 }
             }
-
             if (!changed) { // nothing to do
                 return;
             }
         }
-
         download(ti, saveDir, priorities, null, null);
-
         if (!exists) {
             saveResumeTorrent(ti);
         }
@@ -348,19 +320,15 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
             return;
         }
-
         if (selection == null) {
             selection = new boolean[ti.numFiles()];
             Arrays.fill(selection, true);
         }
-
         Priority[] priorities = null;
-
         TorrentHandle th = find(ti.infoHash());
         boolean torrentHandleExists = th != null;
         if (torrentHandleExists) {
@@ -380,13 +348,11 @@ public final class BTEngine extends SessionManager {
                     changed = true;
                 }
             }
-
             if (!changed) { // nothing to do
                 return;
             }
         }
         download(ti, saveDir, priorities, null, peers);
-
         if (!torrentHandleExists) {
             saveResumeTorrent(ti);
             if (!dontSaveTorrentFile) {
@@ -403,18 +369,14 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
             return;
         }
-
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
-
         TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
-
         if (th != null) {
             Priority[] priorities = th.filePriorities();
             if (priorities[fileIndex] == Priority.IGNORE) {
@@ -426,7 +388,6 @@ public final class BTEngine extends SessionManager {
             priorities[fileIndex] = Priority.NORMAL;
             download(ti, saveDir, priorities, null, null);
         }
-
         if (!exists) {
             saveResumeTorrent(ti);
             if (!dontSaveTorrentFile) {
@@ -439,27 +400,22 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return;
         }
-
         if (ctx.homeDir == null || !ctx.homeDir.exists()) {
             LOG.warn("Wrong setup with BTEngine home dir");
             return;
         }
-
         File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent"));
-
         if (torrents != null) {
             for (File t : torrents) {
                 try {
                     String infoHash = FilenameUtils.getBaseName(t.getName());
                     if (infoHash != null) {
                         File resumeFile = resumeDataFile(infoHash);
-
                         File savePath = readSavePath(infoHash);
                         if (setupSaveDir(savePath) == null) {
                             LOG.warn("Can't create data dir or mount point is not accessible");
                             return;
                         }
-
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
                     }
                 } catch (Throwable e) {
@@ -467,9 +423,7 @@ public final class BTEngine extends SessionManager {
                 }
             }
         }
-
         migrateVuzeDownloads();
-
         runNextRestoreDownloadTask();
     }
 
@@ -491,7 +445,6 @@ public final class BTEngine extends SessionManager {
 
     File readTorrentPath(String infoHash) {
         File torrent = null;
-
         try {
             byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
             entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
@@ -499,13 +452,11 @@ public final class BTEngine extends SessionManager {
         } catch (Throwable e) {
             // can't recover original torrent path
         }
-
         return torrent;
     }
 
     File readSavePath(String infoHash) {
         File savePath = null;
-
         try {
             byte[] arr = FileUtils.readFileToByteArray(resumeDataFile(infoHash));
             entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
@@ -513,37 +464,29 @@ public final class BTEngine extends SessionManager {
         } catch (Throwable e) {
             // can't recover original torrent path
         }
-
         return savePath;
     }
 
     private void saveTorrent(TorrentInfo ti) {
         File torrentFile;
-
         try {
             String name = getEscapedFilename(ti);
-
             torrentFile = torrentFile(name);
             byte[] arr = ti.toEntry().bencode();
-
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
             fs.scan(torrentFile);
         } catch (Throwable e) {
             LOG.warn("Error saving torrent info to file", e);
         }
-
     }
 
     private void saveResumeTorrent(TorrentInfo ti) {
-
         try {
             String name = getEscapedFilename(ti);
-
             entry e = ti.toEntry().swig();
             e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
@@ -618,18 +561,15 @@ public final class BTEngine extends SessionManager {
         try {
             File dir = new File(ctx.homeDir.getParent(), "azureus");
             File file = new File(dir, "downloads.config");
-
             if (file.exists()) {
                 Entry configEntry = Entry.bdecode(file);
                 List<Entry> downloads = configEntry.dictionary().get("downloads").list();
-
                 for (Entry d : downloads) {
                     try {
                         Map<String, Entry> map = d.dictionary();
                         File saveDir = new File(map.get("save_dir").string());
                         File torrent = new File(map.get("torrent").string());
                         List<Entry> filePriorities = map.get("file_priorities").list();
-
                         Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
                         for (int i = 0; i < filePriorities.size(); i++) {
                             long p = filePriorities.get(i).integer();
@@ -637,7 +577,6 @@ public final class BTEngine extends SessionManager {
                                 priorities[i] = Priority.NORMAL;
                             }
                         }
-
                         if (torrent.exists() && saveDir.exists()) {
                             LOG.info("Restored old vuze download: " + torrent);
                             restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
@@ -647,7 +586,6 @@ public final class BTEngine extends SessionManager {
                         LOG.error("Error restoring vuze torrent download", e);
                     }
                 }
-
                 file.delete();
             }
         } catch (Throwable e) {
@@ -657,7 +595,6 @@ public final class BTEngine extends SessionManager {
 
     private File setupSaveDir(File saveDir) {
         File result = null;
-
         if (saveDir == null) {
             if (ctx.dataDir != null) {
                 result = ctx.dataDir;
@@ -667,19 +604,15 @@ public final class BTEngine extends SessionManager {
         } else {
             result = saveDir;
         }
-
         FileSystem fs = Platforms.get().fileSystem();
-
         if (result != null && !fs.isDirectory(result) && !fs.mkdirs(result)) {
             result = null;
             LOG.warn("Failed to create save dir to download");
         }
-
         if (result != null && !fs.canWrite(result)) {
             result = null;
             LOG.warn("Failed to setup save dir with write access");
         }
-
         return result;
     }
 
@@ -698,16 +631,13 @@ public final class BTEngine extends SessionManager {
     }
 
     private void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, List<TcpEndpoint> peers) {
-
         TorrentHandle th = find(ti.infoHash());
-
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
             if (priorities != null) {
                 if (ti.numFiles() != priorities.length) {
                     throw new IllegalArgumentException("The priorities length should be equals to the number of files");
                 }
-
                 th.prioritizeFiles(priorities);
                 fireDownloadUpdate(th);
                 th.resume();
@@ -723,52 +653,6 @@ public final class BTEngine extends SessionManager {
             th = find(ti.infoHash());
             if (th != null) {
                 fireDownloadUpdate(th);
-            }
-        }
-    }
-
-    // this is here until we have a properly done OS utils.
-    private static String escapeFilename(String s) {
-        return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
-    }
-
-    private final class InnerListener implements AlertListener {
-        @Override
-        public int[] types() {
-            return INNER_LISTENER_TYPES;
-        }
-
-        @Override
-        public void alert(Alert<?> alert) {
-
-            AlertType type = alert.type();
-
-            switch (type) {
-                case ADD_TORRENT:
-                    TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
-                    fireDownloadAdded(torrentAlert);
-                    runNextRestoreDownloadTask();
-                    break;
-                case LISTEN_SUCCEEDED:
-                    onListenSucceeded((ListenSucceededAlert) alert);
-                    break;
-                case LISTEN_FAILED:
-                    onListenFailed((ListenFailedAlert) alert);
-                    break;
-                case EXTERNAL_IP:
-                    onExternalIpAlert((ExternalIpAlert) alert);
-                    break;
-                case FASTRESUME_REJECTED:
-                    onFastresumeRejected((FastresumeRejectedAlert) alert);
-                    break;
-                case DHT_BOOTSTRAP:
-                    onDhtBootstrap();
-                    break;
-                case TORRENT_LOG:
-                case PEER_LOG:
-                case LOG:
-                    printAlert(alert);
-                    break;
             }
         }
     }
@@ -802,8 +686,50 @@ public final class BTEngine extends SessionManager {
         System.out.println("Log: " + alert);
     }
 
-    private final class RestoreDownloadTask implements Runnable {
+    private static class Loader {
+        static final BTEngine INSTANCE = new BTEngine();
+    }
 
+    private final class InnerListener implements AlertListener {
+        @Override
+        public int[] types() {
+            return INNER_LISTENER_TYPES;
+        }
+
+        @Override
+        public void alert(Alert<?> alert) {
+            AlertType type = alert.type();
+            switch (type) {
+                case ADD_TORRENT:
+                    TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
+                    fireDownloadAdded(torrentAlert);
+                    runNextRestoreDownloadTask();
+                    break;
+                case LISTEN_SUCCEEDED:
+                    onListenSucceeded((ListenSucceededAlert) alert);
+                    break;
+                case LISTEN_FAILED:
+                    onListenFailed((ListenFailedAlert) alert);
+                    break;
+                case EXTERNAL_IP:
+                    onExternalIpAlert((ExternalIpAlert) alert);
+                    break;
+                case FASTRESUME_REJECTED:
+                    onFastresumeRejected((FastresumeRejectedAlert) alert);
+                    break;
+                case DHT_BOOTSTRAP:
+                    onDhtBootstrap();
+                    break;
+                case TORRENT_LOG:
+                case PEER_LOG:
+                case LOG:
+                    printAlert(alert);
+                    break;
+            }
+        }
+    }
+
+    private final class RestoreDownloadTask implements Runnable {
         private final File torrent;
         private final File saveDir;
         private final Priority[] priorities;
@@ -824,44 +750,5 @@ public final class BTEngine extends SessionManager {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
         }
-    }
-
-    private static String dhtBootstrapNodes() {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("dht.libtorrent.org:25401").append(",");
-        sb.append("router.bittorrent.com:6881").append(",");
-        sb.append("dht.transmissionbt.com:6881").append(",");
-        // for DHT IPv6
-        sb.append("router.silotis.us:6881");
-
-        return sb.toString();
-    }
-
-    private static SettingsPack defaultSettings() {
-        SettingsPack sp = new SettingsPack();
-
-        sp.broadcastLSD(true);
-
-        if (ctx.optimizeMemory) {
-            int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
-            sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
-            int sendBufferWatermark = sp.sendBufferWatermark();
-            sp.sendBufferWatermark(sendBufferWatermark / 2);
-            sp.cacheSize(256);
-            sp.activeDownloads(4);
-            sp.activeSeeds(4);
-            sp.maxPeerlistSize(200);
-            //sp.setGuidedReadCache(true);
-            sp.tickInterval(1000);
-            sp.inactivityTimeout(60);
-            sp.seedingOutgoingConnections(false);
-            sp.connectionsLimit(200);
-        } else {
-            sp.activeDownloads(10);
-            sp.activeSeeds(10);
-        }
-
-        return sp;
     }
 }

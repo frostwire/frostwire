@@ -27,17 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NyaaSearchResult implements TorrentCrawlableSearchResult {
-
-    private final String detailsUrl;
-    private final String thumbnailUrl;
-    private final String displayName;
-    private final String hash;
-    private final long creationTime;
-    private final String torrentUrl;
-    private final String fileName;
-    private final int seeds;
-    private final double fileSize;
-
     private static final Map<String, Double> UNIT_TO_BYTES;
 
     static {
@@ -50,6 +39,16 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024L));
         UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024L * 1024L));
     }
+
+    private final String detailsUrl;
+    private final String thumbnailUrl;
+    private final String displayName;
+    private final String hash;
+    private final long creationTime;
+    private final String torrentUrl;
+    private final String fileName;
+    private final int seeds;
+    private final double fileSize;
 
     NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {
         detailsUrl = urlPrefix + matcher.group("detailsurl");
@@ -147,12 +146,10 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         if (amount == null || unit == null) {
             return -1;
         }
-
         Double unitMultiplier = UNIT_TO_BYTES.get(unit);
         if (unitMultiplier == null) {
             unitMultiplier = UNIT_TO_BYTES.get("bytes");
         }
-
         //fractional size
         if (amount.indexOf(".") > 0) {
             float floatAmount = Float.parseFloat(amount);

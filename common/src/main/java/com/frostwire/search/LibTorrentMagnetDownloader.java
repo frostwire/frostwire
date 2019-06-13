@@ -24,7 +24,6 @@ import com.frostwire.bittorrent.BTEngine;
  * @author aldenml
  */
 public class LibTorrentMagnetDownloader implements MagnetDownloader {
-
     public LibTorrentMagnetDownloader() {
     }
 

@@ -36,11 +36,8 @@ import java.util.*;
  * @author aldenml
  */
 public final class BTDownload implements BittorrentDownload {
-
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
-
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
-
     private static final int[] ALERT_TYPES = {
             AlertType.TORRENT_FINISHED.swig(),
             AlertType.TORRENT_REMOVED.swig(),
@@ -48,28 +45,20 @@ public final class BTDownload implements BittorrentDownload {
             AlertType.SAVE_RESUME_DATA.swig(),
             AlertType.PIECE_FINISHED.swig(),
             AlertType.STORAGE_MOVED.swig()};
-
     private static final String EXTRA_DATA_KEY = "extra_data";
     private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
-
     private final BTEngine engine;
     private final TorrentHandle th;
     private final File savePath;
     private final Date created;
     private final PiecesTracker piecesTracker;
     private final File parts;
-
     private final Map<String, String> extra;
-
-    private BTDownloadListener listener;
-
-    private Set<File> incompleteFilesToRemove;
-
-    private long lastSaveResumeTime;
     private final PaymentOptions paymentOptions;
-
     private final InnerListener innerListener;
-
+    private BTDownloadListener listener;
+    private Set<File> incompleteFilesToRemove;
+    private long lastSaveResumeTime;
     private String predominantFileExtension;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
@@ -84,6 +73,10 @@ public final class BTDownload implements BittorrentDownload {
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();
         engine.addListener(innerListener);
+    }
+
+    private static boolean isPaused(TorrentStatus s) {
+        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
     }
 
     public Map<String, String> getExtra() {
@@ -101,7 +94,6 @@ public final class BTDownload implements BittorrentDownload {
     @Override
     public String getDisplayName() {
         Priority[] priorities = th.filePriorities();
-
         int count = 0;
         int index = 0;
         for (int i = 0; i < priorities.length; i++) {
@@ -110,7 +102,6 @@ public final class BTDownload implements BittorrentDownload {
                 index = i;
             }
         }
-
         return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
@@ -144,32 +135,24 @@ public final class BTDownload implements BittorrentDownload {
         if (!engine.isRunning()) {
             return TransferState.STOPPED;
         }
-
         if (engine.isPaused()) {
             return TransferState.PAUSED;
         }
-
         if (!th.isValid()) {
             return TransferState.ERROR;
         }
-
         final TorrentStatus status = th.status();
         final boolean isPaused = isPaused(status);
-
         if (isPaused && status.isFinished()) {
             return TransferState.FINISHED;
         }
-
         if (isPaused && !status.isFinished()) {
             return TransferState.PAUSED;
         }
-
         if (!isPaused && status.isFinished()) { // see the docs of isFinished
             return TransferState.SEEDING;
         }
-
         final TorrentStatus.State state = status.state();
-
         switch (state) {
             case CHECKING_FILES:
                 return TransferState.CHECKING;
@@ -214,25 +197,19 @@ public final class BTDownload implements BittorrentDownload {
         if (th == null || !th.isValid()) {
             return 0;
         }
-
         TorrentStatus ts = th.status();
-
         if (ts == null) { // this can't never happens
             return 0;
         }
-
         float fp = ts.progress();
         TorrentStatus.State state = ts.state();
-
         if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return 100;
         }
-
         int p = (int) (fp * 100);
         if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return Math.min(p, 100);
         }
-
         return 0;
     }
 
@@ -296,7 +273,6 @@ public final class BTDownload implements BittorrentDownload {
             if (!th.isValid()) {
                 return null;
             }
-
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.swig() != null) {
                 return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.name() : ti.files().filePath(0));
@@ -304,7 +280,6 @@ public final class BTDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.warn("Could not retrieve download content save path", e);
         }
-
         return null;
     }
 
@@ -342,12 +317,9 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return;
         }
-
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
-
         th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
-
         doResumeData(true);
     }
 
@@ -355,12 +327,9 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return;
         }
-
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
-
         th.setFlags(TorrentFlags.AUTO_MANAGED);
         th.resume();
-
         doResumeData(true);
     }
 
@@ -375,9 +344,7 @@ public final class BTDownload implements BittorrentDownload {
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
-
         incompleteFilesToRemove = getIncompleteFiles();
-
         if (th.isValid()) {
             if (deleteData) {
                 engine.remove(th, SessionHandle.DELETE_FILES);
@@ -385,14 +352,12 @@ public final class BTDownload implements BittorrentDownload {
                 engine.remove(th);
             }
         }
-
         if (deleteTorrent) {
             File torrent = engine.readTorrentPath(infoHash);
             if (torrent != null) {
                 Platforms.get().fileSystem().delete(torrent);
             }
         }
-
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
     }
@@ -459,11 +424,9 @@ public final class BTDownload implements BittorrentDownload {
 
     private void torrentRemoved() {
         engine.removeListener(innerListener);
-
         if (parts != null) {
             parts.delete();
         }
-
         if (listener != null) {
             try {
                 listener.removed(this, incompleteFilesToRemove);
@@ -626,7 +589,6 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return false;
         }
-
         torrent_flags_t flags = th.status().flags();
         return flags.and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).nonZero();
     }
@@ -635,7 +597,6 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return;
         }
-
         if (sequential) {
             th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         } else {
@@ -700,7 +661,6 @@ public final class BTDownload implements BittorrentDownload {
                     readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
                 }
             }
-
         } catch (Throwable e) {
             LOG.error("Error reading extra data from resume file", e);
         }
@@ -731,12 +691,7 @@ public final class BTDownload implements BittorrentDownload {
         return flag;
     }
 
-    private static boolean isPaused(TorrentStatus s) {
-        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
-    }
-
     private final class InnerListener implements AlertListener {
-
         @Override
         public int[] types() {
             return ALERT_TYPES;

@@ -32,7 +32,6 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class ArchiveorgSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String identifier;
     private final String title;
     private final String detailsUrl;
@@ -47,6 +46,18 @@ public final class ArchiveorgSearchResult extends AbstractSearchResult implement
         this.title = buildTitle(item.title);
         this.licence = Licenses.creativeCommonsByUrl(item.licenseurl);
         this.creationTime = parsePublicDate(item.publicdate);
+    }
+
+    private static String buildTitle(Object obj) {
+        if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof ArrayList<?>) {
+            ArrayList<?> l = (ArrayList<?>) obj;
+            if (l.size() > 0) {
+                return l.get(0).toString();
+            }
+        }
+        return "<unknown>";
     }
 
     public String getIdentifier() {
@@ -81,19 +92,6 @@ public final class ArchiveorgSearchResult extends AbstractSearchResult implement
     @Override
     public boolean isComplete() {
         return false;
-    }
-
-    private static String buildTitle(Object obj) {
-        if (obj instanceof String) {
-            return (String) obj;
-        } else if (obj instanceof ArrayList<?>) {
-            ArrayList<?> l = (ArrayList<?>) obj;
-            if (l.size() > 0) {
-                return l.get(0).toString();
-            }
-        }
-
-        return "<unknown>";
     }
 
     private long parsePublicDate(String publicdate) {

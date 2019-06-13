@@ -26,9 +26,7 @@ import java.util.Map;
  * @author aldenml
  */
 public final class MimeDetector {
-
     public static final String UNKNOWN = "application/octet-stream";
-
     private static Map<String, String> map = null;
 
     private MimeDetector() {
@@ -47,7 +45,7 @@ public final class MimeDetector {
 
     private static Map<String, String> buildMimeTypeMap() {
         Map<String, String> map = new HashMap<String, String>();
-        map.put("apk","application/vnd.android.package-archive");
+        map.put("apk", "application/vnd.android.package-archive");
         map.put("fx", "text/plain");
         map.put("bctpuri", "application/x-bctp-uri");
         map.put("deepv", "application/x-deepv");
@@ -785,7 +783,6 @@ public final class MimeDetector {
         map.put("tgz", "application/gnutar");
         map.put("user", "text/plain");
         map.put("mme", "application/base64");
-
         map.put("ogx", "application/ogg");
         map.put("ogv", "video/ogg");
         map.put("oga", "audio/ogg");
@@ -797,19 +794,15 @@ public final class MimeDetector {
         map.put("axv", "video/annodex");
         map.put("xspf", "application/xspf+xml");
         map.put("kate", "application/kate");
-
         map.put("flv", "video/x-flv");
         map.put("f4v", "video/mp4");
         map.put("f4p", "video/mp4");
         map.put("f4a", "audio/mp4");
         map.put("f4b", "audio/mp4");
-
         map.put("mka", "audio/x-matroska");
         map.put("mkv", "video/x-matroska");
         map.put("mk3d", "video/x-matroska-3d");
-
         map.put("webm", "video/webm");
-
         return map;
     }
 }

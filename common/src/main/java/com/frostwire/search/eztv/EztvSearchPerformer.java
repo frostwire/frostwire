@@ -32,10 +32,7 @@ import java.util.Map;
  * @author aldenml
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-
-    private static final int MAX_RESULTS = 20;
     public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     public static final String TORRENT_DETAILS_PAGE_REGEX =
             "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
@@ -48,6 +45,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
                     "<b>Filesize:</b>\\s+(?<filesize>.*?)<br.*?" +
                     "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
+    private static final int MAX_RESULTS = 20;
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
@@ -66,7 +64,6 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         formData.put("SearchString", "");
         formData.put("search", "Search");
         String page = post(url, formData);
-
         return page != null && isValidHtml(page) ? page : null;
     }
 
@@ -104,9 +101,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         if (k == null) {
             k = keywords[0];
         }
-
         int count = StringUtils.countMatches(html.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
-
         return count > 9;
     }
 }

@@ -34,7 +34,6 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class TorLockSearchResult extends AbstractTorrentSearchResult {
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -47,7 +46,7 @@ public final class TorLockSearchResult extends AbstractTorrentSearchResult {
     public TorLockSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.infoHash = matcher.group("infohash");
-        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl)).replaceAll("<font color=\".*?\">|</font>","");
+        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl)).replaceAll("<font color=\".*?\">|</font>", "");
         this.size = parseSize(matcher.group("filesize"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));

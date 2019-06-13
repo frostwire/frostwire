@@ -19,13 +19,10 @@
 package com.frostwire.search.archiveorg;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgFile {
-
     public String filename;
     public String source;
     public String size;

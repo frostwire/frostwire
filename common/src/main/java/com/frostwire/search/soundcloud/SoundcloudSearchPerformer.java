@@ -30,35 +30,11 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-
     private static final String SOUNDCLOUD_CLIENTID = "FweeGBOOEOYJWLJN3oEyToGLKhmSz0I7";
     private static final String SOUNDCLOUD_APP_VERSION = "1516627364";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
-    }
-
-    @Override
-    protected String getUrl(int page, String encodedKeywords) {
-        return "https://api-v2.soundcloud.com/search/tracks?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + SOUNDCLOUD_CLIENTID;
-    }
-
-    @Override
-    protected List<? extends SearchResult> searchPage(String page) {
-        List<SearchResult> result = new LinkedList<>();
-        SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
-
-        // can't use fromJson here due to the isStopped call
-        if (obj != null && obj.collection != null) {
-            for (SoundcloudItem item : obj.collection) {
-                if (!isStopped() && item != null && item.downloadable) {
-                    SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                    result.add(sr);
-                }
-            }
-        }
-
-        return result;
     }
 
     public static String resolveUrl(String url) {
@@ -69,7 +45,6 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
         if (json.contains("\"collection\":")) {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
-
             if (obj != null && obj.collection != null) {
                 for (SoundcloudItem item : obj.collection) {
                     if (item != null && item.downloadable) {
@@ -80,7 +55,6 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             }
         } else if (json.contains("\"tracks\":")) {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
-
             if (obj != null && obj.tracks != null) {
                 for (SoundcloudItem item : obj.tracks) {
                     if (item != null && item.downloadable) {
@@ -96,7 +70,27 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
                 r.add(sr);
             }
         }
-
         return r;
+    }
+
+    @Override
+    protected String getUrl(int page, String encodedKeywords) {
+        return "https://api-v2.soundcloud.com/search/tracks?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + SOUNDCLOUD_CLIENTID;
+    }
+
+    @Override
+    protected List<? extends SearchResult> searchPage(String page) {
+        List<SearchResult> result = new LinkedList<>();
+        SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
+        // can't use fromJson here due to the isStopped call
+        if (obj != null && obj.collection != null) {
+            for (SoundcloudItem item : obj.collection) {
+                if (!isStopped() && item != null && item.downloadable) {
+                    SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                    result.add(sr);
+                }
+            }
+        }
+        return result;
     }
 }

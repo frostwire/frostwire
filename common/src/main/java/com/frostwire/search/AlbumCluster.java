@@ -23,7 +23,10 @@ import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.util.MimeDetector;
 import org.apache.commons.io.FilenameUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * To be used only inside PerformersHelper and only for torrents search related functions.
@@ -33,7 +36,6 @@ import java.util.*;
  * @author aldenml
  */
 public class AlbumCluster {
-
     private static final int ALBUM_SIZE_THRESHOLD = 4;
 
     /**
@@ -81,34 +83,26 @@ public class AlbumCluster {
 
         return ImmutablePair.of(album, artist);
     }*/
-
     public LinkedList<TorrentCrawledAlbumSearchResult> detect(TorrentCrawlableSearchResult parent, List<? extends TorrentItemSearchResult> results) {
         LinkedList<TorrentCrawledAlbumSearchResult> albums = new LinkedList<TorrentCrawledAlbumSearchResult>();
-
         Map<String, LinkedList<TorrentItemSearchResult>> dirs = new HashMap<String, LinkedList<TorrentItemSearchResult>>();
-
         for (TorrentItemSearchResult sr : results) {
             String path = sr.getFilePath();
             String dir = FilenameUtils.getPathNoEndSeparator(path);
-
             if (!dirs.containsKey(dir)) {
                 dirs.put(dir, new LinkedList<TorrentItemSearchResult>());
             }
-
             LinkedList<TorrentItemSearchResult> items = dirs.get(dir);
             items.add(sr);
         }
-
         for (Map.Entry<String, LinkedList<TorrentItemSearchResult>> kv : dirs.entrySet()) {
             int numAudio = 0;
-
             for (TorrentItemSearchResult sr : kv.getValue()) {
                 String mime = MimeDetector.getMimeType(sr.getFilePath());
                 if (mime.startsWith("audio")) {
                     numAudio++;
                 }
             }
-
 //            if (numAudio >= ALBUM_SIZE_THRESHOLD) {
 //                Pair<String, String> p = albumArtistFromPath(kv.getKey(), "", "");
 //                TorrentCrawledAlbumSearchResult sr = new TorrentCrawledAlbumSearchResult(parent, p.getRight(), p.getLeft(), kv.getValue());
@@ -116,7 +110,6 @@ public class AlbumCluster {
 //                albums.add(sr);
 //            }
         }
-
         return albums;
     }
 }

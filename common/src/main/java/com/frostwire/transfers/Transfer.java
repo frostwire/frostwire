@@ -27,7 +27,6 @@ import java.util.List;
  * @author aldenml
  */
 public interface Transfer {
-
     String getName();
 
     String getDisplayName();
@@ -51,7 +50,7 @@ public interface Transfer {
     long getUploadSpeed();
 
     boolean isDownloading();
-    
+
     long getETA();
 
     /**

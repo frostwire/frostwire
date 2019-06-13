@@ -26,7 +26,6 @@ import static java.util.logging.Level.INFO;
  * @author aldenml
  */
 public final class Logger {
-
     private final java.util.logging.Logger jul;
     private final String name;
 
@@ -37,6 +36,21 @@ public final class Logger {
 
     public static Logger getLogger(Class<?> clazz) {
         return new Logger(java.util.logging.Logger.getLogger(clazz.getSimpleName()));
+    }
+
+    private static String getCallingMethodInfo() {
+        Thread currentThread = Thread.currentThread();
+        StackTraceElement[] stackTrace = currentThread.getStackTrace();
+        String caller = " - <Thread not scheduled yet>";
+        if (stackTrace.length >= 5) {
+            StackTraceElement stackElement = stackTrace[5];
+            caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
+        }
+        return caller;
+    }
+
+    private static String appendCallingMethodInfo(String msg) {
+        return msg + getCallingMethodInfo();
     }
 
     public String getName() {
@@ -105,20 +119,5 @@ public final class Logger {
 
     public void debug(String msg, Throwable e) {
         debug(msg, e, false);
-    }
-
-    private static String getCallingMethodInfo() {
-        Thread currentThread = Thread.currentThread();
-        StackTraceElement[] stackTrace = currentThread.getStackTrace();
-        String caller = " - <Thread not scheduled yet>";
-        if (stackTrace.length >= 5) {
-            StackTraceElement stackElement = stackTrace[5];
-            caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:"+currentThread.getName()+"(tid="+currentThread.getId()+")>";
-        }
-        return caller;
-    }
-
-    private static String appendCallingMethodInfo(String msg) {
-        return msg + getCallingMethodInfo();
     }
 }

@@ -26,11 +26,7 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  * @author aldenml
  */
 public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
-
-    private static final int MAX_RESULTS = 21;
-
     public static final String SEARCH_RESULTS_REGEX = "(?is)<figcaption><h3><a class=\"movielink\" href=\"/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">";
-
     public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<section id=\"movie\".*?" +
             "<h1 itemprop=\"name\">(?<displayName>.*?)</h1>.*?" +
             "<img itemprop=\"image\" src=\"(?<cover>.*?)\".*?" +
@@ -39,6 +35,7 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
             "<dt>Add Date:</dt> <dd><span.*?>(?<creationDate>.*?)</span></dd>.*?" +
             "<dt>Seeds:</dt> <dd>(?<seeds>[0-9]+)</dd>.*?" +
             "<a href=\"(?<magnet>.*?)\" id=\"dm\" class=\"button button-default\".*?>Download Magnet</a>.*?";
+    private static final int MAX_RESULTS = 21;
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
@@ -53,7 +50,6 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group("itemId");
         String htmlFileName = matcher.group("htmlFileName");
-
         return new YifyTempSearchResult(getDomainName(), itemId, htmlFileName);
     }
 
@@ -78,6 +74,5 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
         int offset = html.indexOf("<section id=\"movie_bottom\">");
         return offset > 0 ? offset : html.length();
     }
-
     // Tests? See YifiSearchPerformerTest in tests folder for non-ui search test
 }

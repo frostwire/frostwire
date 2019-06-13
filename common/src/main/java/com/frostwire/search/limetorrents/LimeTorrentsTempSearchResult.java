@@ -26,7 +26,6 @@ import com.frostwire.util.UrlUtils;
  * Created by alejandroarturom on 26-08-16.
  */
 final class LimeTorrentsTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String detailsUrl;
 
     LimeTorrentsTempSearchResult(String domainName, String itemId) {

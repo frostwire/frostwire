@@ -27,7 +27,6 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  */
 // TODO: this performer does not need to download a torrent to get the details
 public class LimeTorrentsSearchPerformer extends TorrentRegexSearchPerformer<LimeTorrentsSearchResult> {
-
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"http://itorrents.org/torrent/(.*?).torrent?(.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a><a href=\"(?<itemid>.*?).html?(.*?)\">.*?</a></div>.*?";
     private static final String HTML_REGEX =

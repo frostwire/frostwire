@@ -20,6 +20,6 @@ package com.frostwire.bittorrent;
 
 import java.util.Map;
 
-public interface Mappable<K,V> {
-    Map<K,V> asMap();
+public interface Mappable<K, V> {
+    Map<K, V> asMap();
 }

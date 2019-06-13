@@ -20,12 +20,11 @@ package org.apache.commons.lang3;
  * <p>Operations on {@link CharSequence} that are
  * {@code null} safe.</p>
  *
+ * @version $Id: CharSequenceUtils.java 1606051 2014-06-27 12:22:17Z ggregory $
  * @see CharSequence
  * @since 3.0
- * @version $Id: CharSequenceUtils.java 1606051 2014-06-27 12:22:17Z ggregory $
  */
 public class CharSequenceUtils {
-
     private static final int NOT_FOUND = -1;
 
     /**
@@ -38,8 +37,8 @@ public class CharSequenceUtils {
     public CharSequenceUtils() {
         super();
     }
-
     //-----------------------------------------------------------------------
+
     /**
      * <p>Returns a new {@code CharSequence} that is a subsequence of this
      * sequence starting with the {@code char} value at the specified index.</p>
@@ -48,24 +47,24 @@ public class CharSequenceUtils {
      * The length (in {@code char}) of the returned sequence is {@code length() - start},
      * so if {@code start == end} then an empty sequence is returned.</p>
      *
-     * @param cs  the specified subsequence, null returns null
-     * @param start  the start index, inclusive, valid
+     * @param cs    the specified subsequence, null returns null
+     * @param start the start index, inclusive, valid
      * @return a new subsequence, may be null
-     * @throws IndexOutOfBoundsException if {@code start} is negative or if 
-     *  {@code start} is greater than {@code length()}
+     * @throws IndexOutOfBoundsException if {@code start} is negative or if
+     *                                   {@code start} is greater than {@code length()}
      */
     public static CharSequence subSequence(final CharSequence cs, final int start) {
         return cs == null ? null : cs.subSequence(start, cs.length());
     }
-
     //-----------------------------------------------------------------------
+
     /**
      * <p>Finds the first index in the {@code CharSequence} that matches the
      * specified character.</p>
      *
-     * @param cs  the {@code CharSequence} to be processed, not null
-     * @param searchChar  the char to be searched for
-     * @param start  the start index, negative starts at the string start
+     * @param cs         the {@code CharSequence} to be processed, not null
+     * @param searchChar the char to be searched for
+     * @param start      the start index, negative starts at the string start
      * @return the index where the search char was found, -1 if not found
      */
     static int indexOf(final CharSequence cs, final int searchChar, int start) {
@@ -87,9 +86,9 @@ public class CharSequenceUtils {
     /**
      * Used by the indexOf(CharSequence methods) as a green implementation of indexOf.
      *
-     * @param cs the {@code CharSequence} to be processed
+     * @param cs         the {@code CharSequence} to be processed
      * @param searchChar the {@code CharSequence} to be searched for
-     * @param start the start index
+     * @param start      the start index
      * @return the index where the search sequence was found
      */
     static int indexOf(final CharSequence cs, final CharSequence searchChar, final int start) {
@@ -109,9 +108,9 @@ public class CharSequenceUtils {
      * <p>Finds the last index in the {@code CharSequence} that matches the
      * specified character.</p>
      *
-     * @param cs  the {@code CharSequence} to be processed
-     * @param searchChar  the char to be searched for
-     * @param start  the start index, negative returns -1, beyond length starts at end
+     * @param cs         the {@code CharSequence} to be processed
+     * @param searchChar the char to be searched for
+     * @param start      the start index, negative returns -1, beyond length starts at end
      * @return the index where the search char was found, -1 if not found
      */
     static int lastIndexOf(final CharSequence cs, final int searchChar, int start) {
@@ -136,9 +135,9 @@ public class CharSequenceUtils {
     /**
      * Used by the lastIndexOf(CharSequence methods) as a green implementation of lastIndexOf
      *
-     * @param cs the {@code CharSequence} to be processed
+     * @param cs         the {@code CharSequence} to be processed
      * @param searchChar the {@code CharSequence} to be searched for
-     * @param start the start index
+     * @param start      the start index
      * @return the index where the search sequence was found
      */
     static int lastIndexOf(final CharSequence cs, final CharSequence searchChar, final int start) {
@@ -175,42 +174,37 @@ public class CharSequenceUtils {
     /**
      * Green implementation of regionMatches.
      *
-     * @param cs the {@code CharSequence} to be processed
+     * @param cs         the {@code CharSequence} to be processed
      * @param ignoreCase whether or not to be case insensitive
-     * @param thisStart the index to start on the {@code cs} CharSequence
-     * @param substring the {@code CharSequence} to be looked for
-     * @param start the index to start on the {@code substring} CharSequence
-     * @param length character length of the region
+     * @param thisStart  the index to start on the {@code cs} CharSequence
+     * @param substring  the {@code CharSequence} to be looked for
+     * @param start      the index to start on the {@code substring} CharSequence
+     * @param length     character length of the region
      * @return whether the region matched
      */
     static boolean regionMatches(final CharSequence cs, final boolean ignoreCase, final int thisStart,
-            final CharSequence substring, final int start, final int length)    {
+                                 final CharSequence substring, final int start, final int length) {
         if (cs instanceof String && substring instanceof String) {
             return ((String) cs).regionMatches(ignoreCase, thisStart, (String) substring, start, length);
         }
         int index1 = thisStart;
         int index2 = start;
         int tmpLen = length;
-
         while (tmpLen-- > 0) {
             final char c1 = cs.charAt(index1++);
             final char c2 = substring.charAt(index2++);
-
             if (c1 == c2) {
                 continue;
             }
-
             if (!ignoreCase) {
                 return false;
             }
-
             // The same check as in String.regionMatches():
             if (Character.toUpperCase(c1) != Character.toUpperCase(c2)
                     && Character.toLowerCase(c1) != Character.toLowerCase(c2)) {
                 return false;
             }
         }
-
         return true;
     }
 }

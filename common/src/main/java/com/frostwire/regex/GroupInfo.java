@@ -13,7 +13,7 @@ public class GroupInfo {
      * position
      *
      * @param groupIndex the group index
-     * @param pos the position
+     * @param pos        the position
      */
     public GroupInfo(int groupIndex, int pos) {
         this.groupIndex = groupIndex;

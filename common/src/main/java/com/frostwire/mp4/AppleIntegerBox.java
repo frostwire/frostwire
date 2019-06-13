@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public class AppleIntegerBox extends AppleDataBox {
-
     private byte[] value;
 
     AppleIntegerBox(int type) {
@@ -54,14 +53,12 @@ public class AppleIntegerBox extends AppleDataBox {
         } else {
             this.value = new byte[]{Bits.int3(value), Bits.int2(value), Bits.int1(value), Bits.int0(value)};
         }
-
         dataLength = this.value.length + 16;
     }
 
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 16);
         if (len != 0) {
             IO.read(ch, len, buf);
@@ -73,7 +70,6 @@ public class AppleIntegerBox extends AppleDataBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (value != null) {
             buf.put(value);
             IO.write(ch, value.length, buf);

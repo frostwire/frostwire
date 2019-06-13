@@ -32,10 +32,8 @@ import static com.frostwire.search.PerformersHelper.parseInfoHash;
  * @author gubatron
  */
 public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
-
     private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)";
     private static final Pattern FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -50,12 +48,11 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         this.filename = matcher.group("filename") + ".torrent";
         this.displayName = matcher.group("filename");
         this.seeds = Integer.valueOf(matcher.group("seeds").trim());
-
         String magnetUrl = "magnet:?xt=urn:btih:" + matcher.group("magnet");
         //if (matcher.group("torrent") != null) {
         //    this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
         //} else {
-            this.torrentUrl = magnetUrl;
+        this.torrentUrl = magnetUrl;
         //}
         this.infoHash = parseInfoHash(magnetUrl);
         this.size = calculateSize(matcher.group("sizedata"));

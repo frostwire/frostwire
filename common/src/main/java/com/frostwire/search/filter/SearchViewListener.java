@@ -26,7 +26,6 @@ import java.util.List;
  * @author aldenml
  */
 public interface SearchViewListener {
-
     void viewChanged(SearchView view);
 
     void viewAdded(SearchView view, List<SearchResult> results);

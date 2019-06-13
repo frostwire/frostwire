@@ -18,8 +18,8 @@
 
 package com.frostwire.search;
 
-import com.frostwire.util.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.Logger;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,19 +31,13 @@ import java.util.Map;
  * @author aldenml
  */
 public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResult> extends PagedWebSearchPerformer {
-
+    protected static final Map<String, Integer> UNIT_TO_BYTES;
     private static final Logger LOG = Logger.getLogger(CrawlPagedWebSearchPerformer.class);
-
     private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
     private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 600000; // 10 minutes.
     private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT_SECS = 20; // 20 seconds.
-
     private static CrawlCache cache = null;
     private static MagnetDownloader magnetDownloader = null;
-
-    private int numCrawls;
-
-    protected static final Map<String, Integer> UNIT_TO_BYTES;
 
     static {
         UNIT_TO_BYTES = new HashMap<>();
@@ -53,6 +47,8 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
         UNIT_TO_BYTES.put("MB", 1024 * 1024);
         UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
     }
+
+    private int numCrawls;
 
     public CrawlPagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages);
@@ -71,18 +67,87 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
         CrawlPagedWebSearchPerformer.magnetDownloader = magnetDownloader;
     }
 
+    private static byte[] long2array(long l) {
+        byte[] arr = new byte[Long.SIZE / Byte.SIZE];
+        longToByteArray(l, 0, arr, 0, arr.length);
+        return arr;
+    }
+
+    private static long array2long(byte[] arr) {
+        return byteArrayToLong(arr, 0, 0, 0, Long.SIZE / Byte.SIZE);
+    }
+
+    public static void clearCache() {
+        if (cache != null) {
+            synchronized (cache) {
+                cache.clear();
+            }
+        }
+    }
+
+    public static long getCacheNumEntries() {
+        long result = 0;
+        if (cache != null) {
+            synchronized (cache) {
+                result = cache.numEntries();
+            }
+        }
+        return result;
+    }
+
+    public static long getCacheSize() {
+        long result = 0;
+        if (cache != null) {
+            synchronized (cache) {
+                result = cache.sizeInBytes();
+            }
+        }
+        return result;
+    }
+
+    private static long byteArrayToLong(final byte[] src, final int srcPos, final long dstInit, final int dstPos,
+                                        final int nBytes) {
+        if ((src.length == 0 && srcPos == 0) || 0 == nBytes) {
+            return dstInit;
+        }
+        if ((nBytes - 1) * 8 + dstPos >= 64) {
+            throw new IllegalArgumentException("(nBytes-1)*8+dstPos is greater or equal to than 64");
+        }
+        long out = dstInit;
+        int shift;
+        for (int i = 0; i < nBytes; i++) {
+            shift = i * 8 + dstPos;
+            final long bits = (0xffL & src[i + srcPos]) << shift;
+            final long mask = 0xffL << shift;
+            out = (out & ~mask) | bits;
+        }
+        return out;
+    }
+
+    private static byte[] longToByteArray(final long src, final int srcPos, final byte[] dst, final int dstPos,
+                                          final int nBytes) {
+        if (0 == nBytes) {
+            return dst;
+        }
+        if ((nBytes - 1) * 8 + srcPos >= 64) {
+            throw new IllegalArgumentException("(nBytes-1)*8+srcPos is greater or equal to than 64");
+        }
+        int shift;
+        for (int i = 0; i < nBytes; i++) {
+            shift = i * 8 + srcPos;
+            dst[dstPos + i] = (byte) (0xff & (src >> shift));
+        }
+        return dst;
+    }
+
     @Override
     public void crawl(CrawlableSearchResult sr) {
         if (numCrawls > 0) {
             numCrawls--;
-
             T obj = cast(sr);
             if (obj != null) {
-
                 String url = getCrawlUrl(obj);
-
                 if (url != null) {
-
                     // this block is an early check for failed in cache, quick return
                     byte[] failed = cacheGet("failed:" + url);
                     if (failed != null) {
@@ -96,10 +161,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             cacheRemove("failed:" + url);
                         }
                     }
-
-
                     byte[] data = cacheGet(url);
-
                     if (sr instanceof TorrentSearchResult) {
                         String infohash = ((TorrentSearchResult) sr).getHash();
                         if (data == null) {
@@ -109,16 +171,13 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             cachePut(infohash, data);
                         }
                     }
-
                     if (data == null) { // not a big deal about synchronization here
                         //LOG.debug("Downloading data for: " + url);
-
                         if (url.startsWith("magnet")) {
                             data = fetchMagnet(url);
                         } else {
                             data = fetchBytes(url, sr.getDetailsUrl(), DEFAULT_CRAWL_TIMEOUT);
                         }
-
                         //we put this here optimistically hoping this is actually
                         //valid data. if no data can be crawled from this we remove it
                         //from the cache. we do this because this same data may come
@@ -126,7 +185,6 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         //expense of performing another download.
                         if (data != null) {
                             cachePut(url, data);
-
                             if (sr instanceof TorrentSearchResult) {
                                 // if the search result has an infohash we can use...
                                 String infohash = ((TorrentSearchResult) sr).getHash();
@@ -137,7 +195,6 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             cachePut("failed:" + url, long2array(System.currentTimeMillis()));
                         }
                     }
-
                     try {
                         if (data != null) {
                             List<? extends SearchResult> results = crawlResult(obj, data);
@@ -217,82 +274,6 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
         } catch (ClassCastException e) {
             LOG.warn("Something wrong with the logic, need to pass a crawlable search result with the correct type");
         }
-
         return null;
-    }
-
-    private static byte[] long2array(long l) {
-        byte[] arr = new byte[Long.SIZE / Byte.SIZE];
-        longToByteArray(l, 0, arr, 0, arr.length);
-        return arr;
-    }
-
-    private static long array2long(byte[] arr) {
-        return byteArrayToLong(arr, 0, 0, 0, Long.SIZE / Byte.SIZE);
-    }
-
-
-    public static void clearCache() {
-        if (cache != null) {
-            synchronized (cache) {
-                cache.clear();
-            }
-        }
-    }
-
-    public static long getCacheNumEntries() {
-        long result = 0;
-        if (cache != null) {
-            synchronized (cache) {
-                result = cache.numEntries();
-            }
-        }
-        return result;
-    }
-
-    public static long getCacheSize() {
-        long result = 0;
-        if (cache != null) {
-            synchronized (cache) {
-                result = cache.sizeInBytes();
-            }
-        }
-        return result;
-    }
-
-
-    private static long byteArrayToLong(final byte[] src, final int srcPos, final long dstInit, final int dstPos,
-                                        final int nBytes) {
-        if ((src.length == 0 && srcPos == 0) || 0 == nBytes) {
-            return dstInit;
-        }
-        if ((nBytes - 1) * 8 + dstPos >= 64) {
-            throw new IllegalArgumentException("(nBytes-1)*8+dstPos is greater or equal to than 64");
-        }
-        long out = dstInit;
-        int shift;
-        for (int i = 0; i < nBytes; i++) {
-            shift = i * 8 + dstPos;
-            final long bits = (0xffL & src[i + srcPos]) << shift;
-            final long mask = 0xffL << shift;
-            out = (out & ~mask) | bits;
-        }
-        return out;
-    }
-
-    private static byte[] longToByteArray(final long src, final int srcPos, final byte[] dst, final int dstPos,
-                                          final int nBytes) {
-        if (0 == nBytes) {
-            return dst;
-        }
-        if ((nBytes - 1) * 8 + srcPos >= 64) {
-            throw new IllegalArgumentException("(nBytes-1)*8+srcPos is greater or equal to than 64");
-        }
-        int shift;
-        for (int i = 0; i < nBytes; i++) {
-            shift = i * 8 + srcPos;
-            dst[dstPos + i] = (byte) (0xff & (src >> shift));
-        }
-        return dst;
     }
 }

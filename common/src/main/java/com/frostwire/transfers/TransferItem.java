@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public interface TransferItem {
-
     String getName();
 
     String getDisplayName();

@@ -30,7 +30,6 @@ import com.google.gson.GsonBuilder;
  * @author aldenml
  */
 public final class JsonUtils {
-
     private static final Gson gson = new GsonBuilder().create();
     private static final Gson gsonPretty = new GsonBuilder().setPrettyPrinting().create();
 

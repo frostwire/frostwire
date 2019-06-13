@@ -25,7 +25,9 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class MovieHeaderBox extends FullBox {
-
+    protected final int[] reserved2;
+    protected final int[] matrix;
+    protected final int[] pre_defined;
     protected long creation_time;
     protected long modification_time;
     protected int timescale;
@@ -33,9 +35,6 @@ public final class MovieHeaderBox extends FullBox {
     protected int rate;
     protected short volume;
     protected short reserved1;
-    protected final int[] reserved2;
-    protected final int[] matrix;
-    protected final int[] pre_defined;
     protected int next_track_ID;
 
     MovieHeaderBox() {
@@ -66,7 +65,6 @@ public final class MovieHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, (version == 1 ? 28 : 16) + 80, buf);
         if (version == 1) {
             creation_time = buf.getLong();
@@ -79,7 +77,6 @@ public final class MovieHeaderBox extends FullBox {
             timescale = buf.getInt();
             duration = buf.getInt();
         }
-
         rate = buf.getInt();
         volume = buf.getShort();
         reserved1 = buf.getShort();
@@ -92,7 +89,6 @@ public final class MovieHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (version == 1) {
             buf.putLong(creation_time);
             buf.putLong(modification_time);
@@ -104,7 +100,6 @@ public final class MovieHeaderBox extends FullBox {
             buf.putInt(timescale);
             buf.putInt((int) duration);
         }
-
         buf.putInt(rate);
         buf.putShort(volume);
         buf.putShort(reserved1);

@@ -27,7 +27,6 @@ import java.util.Map;
  * @author aldenml
  */
 public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResult implements TorrentCrawlableSearchResult {
-
     private final static double[] BYTE_MULTIPLIERS = new double[]{
             1,
             2 << 9,
@@ -36,7 +35,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
             2L << 39,
             2L << 49,  // PB = 1024^5 == 2 << 49
             2L << 59}; // EB = 1024^6 == 2 << 59
-
     private final static Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
 
     static {
@@ -74,16 +72,12 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         if (amount == null || unit == null) {
             return -1;
         }
-
-        amount = amount.replaceAll(",","");
-
+        amount = amount.replaceAll(",", "");
         final Integer unitMultiplier = UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit);
         double multiplier = 1;
-
         if (unitMultiplier != null) {
             multiplier = BYTE_MULTIPLIERS[unitMultiplier];
         }
-
         //fractional size
         if (amount.indexOf(".") > 0) {
             float floatAmount = Float.parseFloat(amount);
@@ -95,7 +89,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
             return intAmount * multiplier;
         }
     }
-
 //    public static void main(String[] args) {
 //        AbstractTorrentSearchResult sr = new AbstractTorrentSearchResult() {
 //            @Override
