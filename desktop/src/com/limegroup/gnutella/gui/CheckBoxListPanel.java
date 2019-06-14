@@ -18,7 +18,6 @@ package com.limegroup.gnutella.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,41 +26,15 @@ import java.util.List;
  * row underneath.
  */
 public class CheckBoxListPanel<E> extends BoxPanel {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1989311176988471587L;
     private CheckBoxList<E> list;
 
     /**
      * Constructs a checkbox list panel for an array of objects.
      * <p>
-     * See {@link CheckBoxList#CheckBoxList(Collection<E>, TextProvider, boolean)}.
      */
     public CheckBoxListPanel(Collection<E> elements, CheckBoxList.TextProvider<E> provider,
                              boolean selected) {
         list = new CheckBoxList<>(elements, provider, selected, CheckBoxList.SELECT_FIRST_OFF);
-        initialize();
-    }
-
-    /**
-     * Constructs a checkbox list panel for an array of objects.
-     * <p>
-     * See {@link CheckBoxList#CheckBoxList(Collection<E>)}.
-     */
-    public CheckBoxListPanel(Collection<E> elements) {
-        list = new CheckBoxList<>(elements);
-        initialize();
-    }
-
-    /**
-     * Constructs an empty checkbox list panel.
-     * <p>
-     * See {@link CheckBoxList#CheckBoxList()}.
-     */
-    @SuppressWarnings("unchecked")
-    public CheckBoxListPanel() {
-        list = new CheckBoxList<>(Collections.emptyList());
         initialize();
     }
 
@@ -75,7 +48,6 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 
     /**
      * Returns a typed array of the selected objects.
-     * See {@link CheckBoxList#getSelectedElements(Object[])}.
      */
     public List<E> getSelectedElements() {
         return list.getCheckedElements();
@@ -83,8 +55,6 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 
     /**
      * Returns the checkbox list used internally.
-     *
-     * @return
      */
     public CheckBoxList<E> getList() {
         return list;
@@ -99,7 +69,7 @@ public class CheckBoxListPanel<E> extends BoxPanel {
          */
         private static final long serialVersionUID = 5346177338334373472L;
 
-        public InternalJScrollPane(Component comp) {
+        InternalJScrollPane(Component comp) {
             super(comp);
             getViewport().setBackground(UIManager.getColor("List.background"));
         }

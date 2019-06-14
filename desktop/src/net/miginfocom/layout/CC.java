@@ -40,7 +40,6 @@ import java.util.ArrayList;
  * A simple value holder for one component's constraint.
  */
 public final class CC implements Externalizable {
-    static final String[] DOCK_SIDES = {"north", "west", "south", "east"};
     private static final BoundSize DEF_GAP = BoundSize.NULL_SIZE;    // Only used to denote default wrap/newline gap.
     // ***** Tmp cache field
     private static final String[] EMPTY_ARR = new String[0];
@@ -64,12 +63,6 @@ public final class CC implements Externalizable {
     private boolean external = false;
     private Float pushX = null, pushY = null;
     private transient String[] linkTargets = null;
-
-    /**
-     * Empty constructor.
-     */
-    public CC() {
-    }
 
     String[] getLinkTargets() {
         if (linkTargets == null) {
@@ -97,1187 +90,6 @@ public final class CC implements Externalizable {
         }
     }
     // **********************************************************
-    // Chaining constraint setters
-    // **********************************************************
-
-    /**
-     * Specifies that the component should be put in the end group <code>s</code> and will thus share the same ending
-     * coordinate as them within the group.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s A name to associate on the group that should be the same for other rows/columns in the same group.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC endGroupX(String s) {
-        hor.setEndGroup(s);
-        return this;
-    }
-
-    /**
-     * Specifies that the component should be put in the size group <code>s</code> and will thus share the same size
-     * as them within the group.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s A name to associate on the group that should be the same for other rows/columns in the same group.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC sizeGroupX(String s) {
-        hor.setSizeGroup(s);
-        return this;
-    }
-
-    /**
-     * The minimum size for the component. The value will override any value that is set on the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>UnitValue</code>. E.g. "100px" or "200mm".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC minWidth(String size) {
-        hor.setSize(LayoutUtil.derive(hor.getSize(), ConstraintParser.parseUnitValue(size, true), null, null));
-        return this;
-    }
-
-    /**
-     * The size for the component as a min and/or preferred and/or maximum size. The value will override any value that is set on
-     * the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC width(String size) {
-        hor.setSize(ConstraintParser.parseBoundSize(size, false, true));
-        return this;
-    }
-
-    /**
-     * The maximum size for the component. The value will override any value that is set on the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>UnitValue</code>. E.g. "100px" or "200mm".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC maxWidth(String size) {
-        hor.setSize(LayoutUtil.derive(hor.getSize(), null, null, ConstraintParser.parseUnitValue(size, true)));
-        return this;
-    }
-
-    /**
-     * The horizontal gap before and/or after the component. The gap is towards cell bounds and/or other component bounds.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param before The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @param after  The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC gapX(String before, String after) {
-        if (before != null)
-            hor.setGapBefore(ConstraintParser.parseBoundSize(before, true, true));
-        if (after != null)
-            hor.setGapAfter(ConstraintParser.parseBoundSize(after, true, true));
-        return this;
-    }
-
-    /**
-     * Same functionality as <code>getHorizontal().setAlign(ConstraintParser.parseUnitValue(unitValue, true))</code> only this method
-     * returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param align The align keyword or for instance "100px". E.g "left", "right", "leading" or "trailing".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC alignX(String align) {
-        hor.setAlign(ConstraintParser.parseUnitValueOrAlign(align, true, null));
-        return this;
-    }
-
-    /**
-     * The grow priority compared to other components in the same cell.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p The grow priority.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC growPrioX(int p) {
-        hor.setGrowPriority(p);
-        return this;
-    }
-
-    /**
-     * Grow priority for the component horizontally and optionally vertically.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param widthHeight The new shrink weight and height. 1-2 arguments, never null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC growPrio(int... widthHeight) {
-        switch (widthHeight.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + widthHeight.length);
-            case 2:
-                growPrioY(widthHeight[1]);
-            case 1:
-                growPrioX(widthHeight[0]);
-        }
-        return this;
-    }
-
-    /**
-     * Grow weight for the component horizontally. It default to weight <code>100</code>.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #growX(float)
-     */
-    public final CC growX() {
-        hor.setGrow(ResizeConstraint.WEIGHT_100);
-        return this;
-    }
-
-    /**
-     * Grow weight for the component horizontally.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param w The new grow weight.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC growX(float w) {
-        hor.setGrow(w);
-        return this;
-    }
-
-    /**
-     * grow weight for the component horizontally and optionally vertically.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param widthHeight The new shrink weight and height. 1-2 arguments, never null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC grow(float... widthHeight) {
-        switch (widthHeight.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + widthHeight.length);
-            case 2:
-                growY(widthHeight[1]);
-            case 1:
-                growX(widthHeight[0]);
-        }
-        return this;
-    }
-
-    /**
-     * The shrink priority compared to other components in the same cell.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p The shrink priority.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC shrinkPrioX(int p) {
-        hor.setShrinkPriority(p);
-        return this;
-    }
-
-    /**
-     * Shrink priority for the component horizontally and optionally vertically.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param widthHeight The new shrink weight and height. 1-2 arguments, never null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC shrinkPrio(int... widthHeight) {
-        switch (widthHeight.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + widthHeight.length);
-            case 2:
-                shrinkPrioY(widthHeight[1]);
-            case 1:
-                shrinkPrioX(widthHeight[0]);
-        }
-        return this;
-    }
-
-    /**
-     * Shrink weight for the component horizontally.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param w The new shrink weight.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC shrinkX(float w) {
-        hor.setShrink(w);
-        return this;
-    }
-
-    /**
-     * Shrink weight for the component horizontally and optionally vertically.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param widthHeight The new shrink weight and height. 1-2 arguments, never null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC shrink(float... widthHeight) {
-        switch (widthHeight.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + widthHeight.length);
-            case 2:
-                shrinkY(widthHeight[1]);
-            case 1:
-                shrinkX(widthHeight[0]);
-        }
-        return this;
-    }
-
-    /**
-     * The end group that this component should be placed in.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s The name of the group. If <code>null</code> that means no group (default)
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC endGroupY(String s) {
-        ver.setEndGroup(s);
-        return this;
-    }
-
-    /**
-     * The end group(s) that this component should be placed in.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param xy The end group for x and y respectively. 1-2 arguments, not null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC endGroup(String... xy) {
-        switch (xy.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + xy.length);
-            case 2:
-                endGroupY(xy[1]);
-            case 1:
-                endGroupX(xy[0]);
-        }
-        return this;
-    }
-
-    /**
-     * The size group that this component should be placed in.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s The name of the group. If <code>null</code> that means no group (default)
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC sizeGroupY(String s) {
-        ver.setSizeGroup(s);
-        return this;
-    }
-
-    /**
-     * The size group(s) that this component should be placed in.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param xy The size group for x and y respectively. 1-2 arguments, not null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC sizeGroup(String... xy) {
-        switch (xy.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + xy.length);
-            case 2:
-                sizeGroupY(xy[1]);
-            case 1:
-                sizeGroupX(xy[0]);
-        }
-        return this;
-    }
-
-    /**
-     * The minimum size for the component. The value will override any value that is set on the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>UnitValue</code>. E.g. "100px" or "200mm".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC minHeight(String size) {
-        ver.setSize(LayoutUtil.derive(ver.getSize(), ConstraintParser.parseUnitValue(size, false), null, null));
-        return this;
-    }
-
-    /**
-     * The size for the component as a min and/or preferred and/or maximum size. The value will override any value that is set on
-     * the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC height(String size) {
-        ver.setSize(ConstraintParser.parseBoundSize(size, false, false));
-        return this;
-    }
-
-    /**
-     * The maximum size for the component. The value will override any value that is set on the component itself.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param size The size expressed as a <code>UnitValue</code>. E.g. "100px" or "200mm".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC maxHeight(String size) {
-        ver.setSize(LayoutUtil.derive(ver.getSize(), null, null, ConstraintParser.parseUnitValue(size, false)));
-        return this;
-    }
-
-    /**
-     * The vertical gap before (normally above) and/or after (normally below) the component. The gap is towards cell bounds and/or other component bounds.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param before The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @param after  The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC gapY(String before, String after) {
-        if (before != null)
-            ver.setGapBefore(ConstraintParser.parseBoundSize(before, true, false));
-        if (after != null)
-            ver.setGapAfter(ConstraintParser.parseBoundSize(after, true, false));
-        return this;
-    }
-
-    /**
-     * Same functionality as <code>getVertical().setAlign(ConstraintParser.parseUnitValue(unitValue, true))</code> only this method
-     * returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param align The align keyword or for instance "100px". E.g "top" or "bottom".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC alignY(String align) {
-        ver.setAlign(ConstraintParser.parseUnitValueOrAlign(align, false, null));
-        return this;
-    }
-
-    /**
-     * The grow priority compared to other components in the same cell.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p The grow priority.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC growPrioY(int p) {
-        ver.setGrowPriority(p);
-        return this;
-    }
-
-    /**
-     * Grow weight for the component vertically. Defaults to <code>100</code>.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #growY(Float)
-     */
-    public final CC growY() {
-        ver.setGrow(ResizeConstraint.WEIGHT_100);
-        return this;
-    }
-
-    /**
-     * Grow weight for the component vertically.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param w The new grow weight.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC growY(Float w) {
-        ver.setGrow(w);
-        return this;
-    }
-
-    /**
-     * The shrink priority compared to other components in the same cell.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p The shrink priority.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC shrinkPrioY(int p) {
-        ver.setShrinkPriority(p);
-        return this;
-    }
-
-    /**
-     * Shrink weight for the component horizontally.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param w The new shrink weight.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC shrinkY(float w) {
-        ver.setShrink(w);
-        return this;
-    }
-
-    /**
-     * How this component, if hidden (not visible), should be treated.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param mode The mode. Default to the mode in the {@link net.miginfocom.layout.LC}.
-     *             0 == Normal. Bounds will be calculated as if the component was visible.<br>
-     *             1 == If hidden the size will be 0, 0 but the gaps remain.<br>
-     *             2 == If hidden the size will be 0, 0 and gaps set to zero.<br>
-     *             3 == If hidden the component will be disregarded completely and not take up a cell in the grid..
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC hideMode(int mode) {
-        setHideMode(mode);
-        return this;
-    }
-
-    /**
-     * The id used to reference this component in some constraints.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s The id or <code>null</code>. May consist of a groupID and an componentID which are separated by a dot: ".". E.g. "grp1.id1".
-     *          The dot should never be first or last if present.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     */
-    public final CC id(String s) {
-        setId(s);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setTag(String tag)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param tag The new tag. May be <code>null</code>.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setTag(String)
-     */
-    public final CC tag(String tag) {
-        setTag(tag);
-        return this;
-    }
-
-    /**
-     * Set the cell(s) that the component should occupy in the grid. Same functionality as {@link #setCellX(int col)} and
-     * {@link #setCellY(int row)} together with {@link #setSpanX(int width)} and {@link #setSpanY(int height)}. This method
-     * returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param colRowWidthHeight cellX, cellY, spanX, spanY repectively. 1-4 arguments, not null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setCellX(int)
-     * @see #setCellY(int)
-     * @see #setSpanX(int)
-     * @see #setSpanY(int)
-     * @since 3.7.2. Replacing cell(int, int) and cell(int, int, int, int)
-     */
-    public final CC cell(int... colRowWidthHeight) {
-        switch (colRowWidthHeight.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + colRowWidthHeight.length);
-            case 4:
-                setSpanY(colRowWidthHeight[3]);
-            case 3:
-                setSpanX(colRowWidthHeight[2]);
-            case 2:
-                setCellY(colRowWidthHeight[1]);
-            case 1:
-                setCellX(colRowWidthHeight[0]);
-        }
-        return this;
-    }
-
-    /**
-     * Same functionality as <code>spanX(cellsX).spanY(cellsY)</code> which means this cell will span cells in both x and y.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     * Since 3.7.2 this takes an array/vararg whereas it previously only took two specific values, xSpan and ySpan.
-     *
-     * @param cells spanX and spanY, when present, and in that order.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setSpanY(int)
-     * @see #setSpanX(int)
-     * @see #spanY()
-     * @see #spanX()
-     * @since 3.7.2 Replaces span(int, int).
-     */
-    public final CC span(int... cells) {
-        if (cells == null || cells.length == 0) {
-            setSpanX(LayoutUtil.INF);
-            setSpanY(1);
-        } else if (cells.length == 1) {
-            setSpanX(cells[0]);
-            setSpanY(1);
-        } else {
-            setSpanX(cells[0]);
-            setSpanY(cells[1]);
-        }
-        return this;
-    }
-
-    /**
-     * Corresponds exactly to the "gap left right top bottom" keyword.
-     *
-     * @param args Same as for the "gap" keyword. Length 1-4, never null buf elements can be null.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gap(String... args) {
-        switch (args.length) {
-            default:
-                throw new IllegalArgumentException("Illegal argument count: " + args.length);
-            case 4:
-                gapBottom(args[3]);
-            case 3:
-                gapTop(args[2]);
-            case 2:
-                gapRight(args[1]);
-            case 1:
-                gapLeft(args[0]);
-        }
-        return this;
-    }
-
-    /**
-     * Sets the horizontal gap before the component.
-     * <p>
-     * Note! This is currently same as gapLeft(). This might change in 4.x.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapBefore(String boundsSize) {
-        hor.setGapBefore(ConstraintParser.parseBoundSize(boundsSize, true, true));
-        return this;
-    }
-
-    /**
-     * Sets the horizontal gap after the component.
-     * <p>
-     * Note! This is currently same as gapLeft(). This might change in 4.x.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapAfter(String boundsSize) {
-        hor.setGapAfter(ConstraintParser.parseBoundSize(boundsSize, true, true));
-        return this;
-    }
-
-    /**
-     * Sets the gap above the component.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapTop(String boundsSize) {
-        ver.setGapBefore(ConstraintParser.parseBoundSize(boundsSize, true, false));
-        return this;
-    }
-
-    /**
-     * Sets the gap to the left the component.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapLeft(String boundsSize) {
-        hor.setGapBefore(ConstraintParser.parseBoundSize(boundsSize, true, true));
-        return this;
-    }
-
-    /**
-     * Sets the gap below the component.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapBottom(String boundsSize) {
-        ver.setGapAfter(ConstraintParser.parseBoundSize(boundsSize, true, false));
-        return this;
-    }
-
-    /**
-     * Sets the gap to the right of the component.
-     *
-     * @param boundsSize The size of the gap expressed as a <code>BoundSize</code>. E.g. "50:100px:200mm" or "100px!".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @since 3.7.2
-     */
-    public final CC gapRight(String boundsSize) {
-        hor.setGapAfter(ConstraintParser.parseBoundSize(boundsSize, true, true));
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setSpanY(int LayoutUtil.INF)} which means this cell will span the rest of the column.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setSpanY(int)
-     * @see #spanY()
-     */
-    public final CC spanY() {
-        return spanY(LayoutUtil.INF);
-    }
-
-    /**
-     * Same functionality as {@link #setSpanY(int)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param cells The number of cells to span (i.e. merge).
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setSpanY(int)
-     */
-    public final CC spanY(int cells) {
-        setSpanY(cells);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setSpanX(int)} which means this cell will span the rest of the row.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setSpanX(int)
-     * @see #spanX()
-     */
-    public final CC spanX() {
-        return spanX(LayoutUtil.INF);
-    }
-
-    /**
-     * Same functionality as {@link #setSpanX(int)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param cells The number of cells to span (i.e. merge).
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setSpanY(int)
-     */
-    public final CC spanX(int cells) {
-        setSpanX(cells);
-        return this;
-    }
-
-    /**
-     * Same functionality as <code>pushX().pushY()</code> which means this cell will push in both x and y dimensions.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushX(Float)
-     * @see #setPushX(Float)
-     * @see #pushY()
-     * @see #pushX()
-     */
-    public final CC push() {
-        return pushX().pushY();
-    }
-
-    /**
-     * Same functionality as <code>pushX(weightX).pushY(weightY)</code> which means this cell will push in both x and y dimensions.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param weightX The weight used in the push.
-     * @param weightY The weight used in the push.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushY(Float)
-     * @see #setPushX(Float)
-     * @see #pushY()
-     * @see #pushX()
-     */
-    public final CC push(Float weightX, Float weightY) {
-        return pushX(weightX).pushY(weightY);
-    }
-
-    /**
-     * Same functionality as {@link #setPushY(Float))} which means this cell will push the rest of the column.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushY(Float)
-     */
-    public final CC pushY() {
-        return pushY(ResizeConstraint.WEIGHT_100);
-    }
-
-    /**
-     * Same functionality as {@link #setPushY(Float weight)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param weight The weight used in the push.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushY(Float)
-     */
-    public final CC pushY(Float weight) {
-        setPushY(weight);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setPushX(Float)} which means this cell will push the rest of the row.
-     * This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushX(Float)
-     */
-    public final CC pushX() {
-        return pushX(ResizeConstraint.WEIGHT_100);
-    }
-
-    /**
-     * Same functionality as {@link #setPushX(Float weight)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param weight The weight used in the push.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
-     * @see #setPushY(Float)
-     */
-    public final CC pushX(Float weight) {
-        setPushX(weight);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setSplit(int parts)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param parts The number of parts (i.e. component slots) the cell should be divided into.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setSplit(int)
-     */
-    public final CC split(int parts) {
-        setSplit(parts);
-        return this;
-    }
-
-    /**
-     * Same functionality as split(LayoutUtil.INF), which means split until one of the keywords that breaks the split is found for
-     * a component after this one (e.g. wrap, newline and skip).
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setSplit(int)
-     * @since 3.7.2
-     */
-    public final CC split() {
-        setSplit(LayoutUtil.INF);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setSkip(int)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param cells How many cells in the grid that should be skipped <b>before</b> the component that this constraint belongs to
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setSkip(int)
-     */
-    public final CC skip(int cells) {
-        setSkip(cells);
-        return this;
-    }
-
-    /**
-     * Same functionality as skip(1).
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setSkip(int)
-     * @since 3.7.2
-     */
-    public final CC skip() {
-        setSkip(1);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setExternal(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setExternal(boolean)
-     */
-    public final CC external() {
-        setExternal(true);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setFlowX(Boolean .TRUE)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setFlowX(Boolean)
-     */
-    public final CC flowX() {
-        setFlowX(Boolean.TRUE);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setFlowX(Boolean .FALSE)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setFlowX(Boolean)
-     */
-    public final CC flowY() {
-        setFlowX(Boolean.FALSE);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #growX()} and {@link #growY()}.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #growX()
-     * @see #growY()
-     */
-    public final CC grow() {
-        growX();
-        growY();
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setNewline(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setNewline(boolean)
-     */
-    public final CC newline() {
-        setNewline(true);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setNewlineGapSize(BoundSize)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param gapSize The gap size that will override the gap size in the row/colum constraints if <code>!= null</code>. E.g. "5px" or "unrel".
-     *                If <code>null</code> or <code>""</code> the newline size will be set to the default size and turned on. This is different compared to
-     *                {@link #setNewlineGapSize(BoundSize)}.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setNewlineGapSize(BoundSize)
-     */
-    public final CC newline(String gapSize) {
-        BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && !flowX));
-        if (bs != null) {
-            setNewlineGapSize(bs);
-        } else {
-            setNewline(true);
-        }
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setWrap(boolean true)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setWrap(boolean)
-     */
-    public final CC wrap() {
-        setWrap(true);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setWrapGapSize(BoundSize)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param gapSize The gap size that will override the gap size in the row/colum constraints if <code>!= null</code>. E.g. "5px" or "unrel".
-     *                If <code>null</code> or <code>""</code> the wrap size will be set to the default size and turned on. This is different compared to
-     *                {@link #setWrapGapSize(BoundSize)}.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setWrapGapSize(BoundSize)
-     */
-    public final CC wrap(String gapSize) {
-        BoundSize bs = ConstraintParser.parseBoundSize(gapSize, true, (flowX != null && !flowX));
-        if (bs != null) {
-            setWrapGapSize(bs);
-        } else {
-            setWrap(true);
-        }
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setDockSide(int 0)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setDockSide(int)
-     */
-    public final CC dockNorth() {
-        setDockSide(0);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setDockSide(int 1)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setDockSide(int)
-     */
-    public final CC dockWest() {
-        setDockSide(1);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setDockSide(int 2)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setDockSide(int)
-     */
-    public final CC dockSouth() {
-        setDockSide(2);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setDockSide(int 3)} only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setDockSide(int)
-     */
-    public final CC dockEast() {
-        setDockSide(3);
-        return this;
-    }
-
-    /**
-     * Sets the x-coordinate for the component. This is used to set the x coordinate position to a specific value. The component
-     * bounds is still precalculated to the grid cell and this method should be seen as a way to correct the x position.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param x The x position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     * @see #setBoundsInGrid(boolean)
-     */
-    public final CC x(String x) {
-        return corrPos(x, 0);
-    }
-
-    /**
-     * Sets the y-coordinate for the component. This is used to set the y coordinate position to a specific value. The component
-     * bounds is still precalculated to the grid cell and this method should be seen as a way to correct the y position.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param y The y position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     * @see #setBoundsInGrid(boolean)
-     */
-    public final CC y(String y) {
-        return corrPos(y, 1);
-    }
-
-    /**
-     * Sets the x2-coordinate for the component (right side). This is used to set the x2 coordinate position to a specific value. The component
-     * bounds is still precalculated to the grid cell and this method should be seen as a way to correct the x position.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param x2 The x2 side's position as a UnitValue. E.g. "10" or "40mm" or "container.x2 - 10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     * @see #setBoundsInGrid(boolean)
-     */
-    public final CC x2(String x2) {
-        return corrPos(x2, 2);
-    }
-
-    /**
-     * Sets the y2-coordinate for the component (bottom side). This is used to set the y2 coordinate position to a specific value. The component
-     * bounds is still precalculated to the grid cell and this method should be seen as a way to correct the y position.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param y2 The y2 side's position as a UnitValue. E.g. "10" or "40mm" or "container.x2 - 10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     * @see #setBoundsInGrid(boolean)
-     */
-    public final CC y2(String y2) {
-        return corrPos(y2, 3);
-    }
-
-    private CC corrPos(String uv, int ix) {
-        UnitValue[] b = getPos();
-        if (b == null)
-            b = new UnitValue[4];
-        b[ix] = ConstraintParser.parseUnitValue(uv, (ix % 2 == 0));
-        setPos(b);
-        setBoundsInGrid(true);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #x(String x)} and {@link #y(String y)} toghether.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param x The x position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @param y The y position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     */
-    public final CC pos(String x, String y) {
-        UnitValue[] b = getPos();
-        if (b == null)
-            b = new UnitValue[4];
-        b[0] = ConstraintParser.parseUnitValue(x, true);
-        b[1] = ConstraintParser.parseUnitValue(y, false);
-        setPos(b);
-        setBoundsInGrid(false);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #x(String x)}, {@link #y(String y)}, {@link #y2(String y)} and {@link #y2(String y)} toghether.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param x  The x position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @param y  The y position as a UnitValue. E.g. "10" or "40mm" or "container.x+10".
-     * @param x2 The x2 side's position as a UnitValue. E.g. "10" or "40mm" or "container.x2 - 10".
-     * @param y2 The y2 side's position as a UnitValue. E.g. "10" or "40mm" or "container.x2 - 10".
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setPos(UnitValue[])
-     */
-    public final CC pos(String x, String y, String x2, String y2) {
-        setPos(new UnitValue[]{
-                ConstraintParser.parseUnitValue(x, true),
-                ConstraintParser.parseUnitValue(y, false),
-                ConstraintParser.parseUnitValue(x2, true),
-                ConstraintParser.parseUnitValue(y2, false),
-        });
-        setBoundsInGrid(false);
-        return this;
-    }
-
-    /**
-     * Same functionality as {@link #setPadding(UnitValue[])} but the unit values as absolute pixels. This method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param top    The top padding that will be added to the y coordinate at the last stage in the layout.
-     * @param left   The top padding that will be added to the x coordinate at the last stage in the layout.
-     * @param bottom The top padding that will be added to the y2 coordinate at the last stage in the layout.
-     * @param right  The top padding that will be added to the x2 coordinate at the last stage in the layout.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setTag(String)
-     */
-    public final CC pad(int top, int left, int bottom, int right) {
-        setPadding(new UnitValue[]{
-                new UnitValue(top), new UnitValue(left), new UnitValue(bottom), new UnitValue(right)
-        });
-        return this;
-    }
-
-    /**
-     * Same functionality as <code>setPadding(ConstraintParser.parseInsets(pad, false))}</code> only this method returns <code>this</code> for chaining multiple calls.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param pad The string to parse. E.g. "10 10 10 10" or "20". If less than 4 groups the last will be used for the missing.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new ComponentConstraint().noGrid().gap().fill()</code>.
-     * @see #setTag(String)
-     */
-    public final CC pad(String pad) {
-        setPadding(pad != null ? ConstraintParser.parseInsets(pad, false) : null);
-        return this;
-    }
-    // **********************************************************
     // Bean properties
     // **********************************************************
 
@@ -1295,16 +107,6 @@ public final class CC implements Externalizable {
     }
 
     /**
-     * Sets the horizontal dimension constraint for this component constraint. It has constraints for the horizontal size
-     * and grow/shrink priorities and weights.
-     *
-     * @param h The new dimension constraint. If <code>null</code> it will be reset to <code>new DimConstraint();</code>
-     */
-    public void setHorizontal(DimConstraint h) {
-        hor = h != null ? h : new DimConstraint();
-    }
-
-    /**
      * Returns the vertical dimension constraint for this component constraint. It has constraints for the vertical size
      * and grow/shrink priorities and weights.
      * <p>
@@ -1318,16 +120,6 @@ public final class CC implements Externalizable {
     }
 
     /**
-     * Sets the vertical dimension constraint for this component constraint. It has constraints for the vertical size
-     * and grow/shrink priorities and weights.
-     *
-     * @param v The new dimension constraint. If <code>null</code> it will be reset to <code>new DimConstraint();</code>
-     */
-    public void setVertical(DimConstraint v) {
-        ver = v != null ? v : new DimConstraint();
-    }
-
-    /**
      * Returns the vertical or horizontal dim constraint.
      * <p>
      * Note! If any changes is to be made it must be made direct when the object is returned. It is not allowed to save the
@@ -1336,7 +128,7 @@ public final class CC implements Externalizable {
      * @param isHor If the horizontal constraint should be returned.
      * @return The dim constraint. Never <code>null</code>.
      */
-    public DimConstraint getDimConstraint(boolean isHor) {
+    DimConstraint getDimConstraint(boolean isHor) {
         return isHor ? hor : ver;
     }
 
@@ -1384,7 +176,7 @@ public final class CC implements Externalizable {
      * @return The current value.
      * @see #getPos()
      */
-    public boolean isBoundsInGrid() {
+    boolean isBoundsInGrid() {
         return boundsInGrid;
     }
 
@@ -1408,7 +200,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public int getCellX() {
+    int getCellX() {
         return cellX;
     }
 
@@ -1420,7 +212,7 @@ public final class CC implements Externalizable {
      *
      * @param x The x-position or <code>-1</code> to disable cell positioning.
      */
-    public void setCellX(int x) {
+    void setCellX(int x) {
         cellX = x;
     }
 
@@ -1431,7 +223,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public int getCellY() {
+    int getCellY() {
         return cellX < 0 ? -1 : cellY;
     }
 
@@ -1443,10 +235,10 @@ public final class CC implements Externalizable {
      *
      * @param y The y-position or <code>-1</code> to disable cell positioning.
      */
-    public void setCellY(int y) {
+    void setCellY(int y) {
         if (y < 0)
             cellX = -1;
-        cellY = y < 0 ? 0 : y;
+        cellY = Math.max(y, 0);
     }
 
     /**
@@ -1457,7 +249,7 @@ public final class CC implements Externalizable {
      *
      * @return The current side.
      */
-    public int getDockSide() {
+    int getDockSide() {
         return dock;
     }
 
@@ -1469,7 +261,7 @@ public final class CC implements Externalizable {
      *
      * @param side -1 or 0-3.
      */
-    public void setDockSide(int side) {
+    void setDockSide(int side) {
         if (side < -1 || side > 3)
             throw new IllegalArgumentException("Illegal dock side: " + side);
         dock = side;
@@ -1510,7 +302,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public Boolean getFlowX() {
+    Boolean getFlowX() {
         return flowX;
     }
 
@@ -1524,7 +316,7 @@ public final class CC implements Externalizable {
      *
      * @param b <code>Boolean.TRUE</code> means horizontal flow in the cell.
      */
-    public void setFlowX(Boolean b) {
+    void setFlowX(Boolean b) {
         this.flowX = b;
     }
 
@@ -1538,7 +330,7 @@ public final class CC implements Externalizable {
      * 2 == If hidden the size will be 0, 0 and gaps set to zero.<br>
      * 3 == If hidden the component will be disregarded completely and not take up a cell in the grid..
      */
-    public int getHideMode() {
+    int getHideMode() {
         return hideMode;
     }
 
@@ -1551,7 +343,7 @@ public final class CC implements Externalizable {
      *             2 == If hidden the size will be 0, 0 and gaps set to zero.<br>
      *             3 == If hidden the component will be disregarded completely and not take up a cell in the grid..
      */
-    public void setHideMode(int mode) {
+    void setHideMode(int mode) {
         if (mode < -1 || mode > 3)
             throw new IllegalArgumentException("Wrong hideMode: " + mode);
         hideMode = mode;
@@ -1641,7 +433,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public int getSpanX() {
+    int getSpanX() {
         return spanX;
     }
 
@@ -1655,7 +447,7 @@ public final class CC implements Externalizable {
      *
      * @param cells The number of cells to span (i.e. merge).
      */
-    public void setSpanX(int cells) {
+    void setSpanX(int cells) {
         this.spanX = cells;
     }
 
@@ -1669,7 +461,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public int getSpanY() {
+    int getSpanY() {
         return spanY;
     }
 
@@ -1683,7 +475,7 @@ public final class CC implements Externalizable {
      *
      * @param cells The number of cells to span (i.e. merge).
      */
-    public void setSpanY(int cells) {
+    void setSpanY(int cells) {
         this.spanY = cells;
     }
 
@@ -1696,7 +488,7 @@ public final class CC implements Externalizable {
      *
      * @return The current push value. Default is <code>null</code>.
      */
-    public Float getPushX() {
+    Float getPushX() {
         return pushX;
     }
 
@@ -1709,7 +501,7 @@ public final class CC implements Externalizable {
      *
      * @param weight The new push value. Default is <code>null</code>.
      */
-    public void setPushX(Float weight) {
+    void setPushX(Float weight) {
         this.pushX = weight;
     }
 
@@ -1722,7 +514,7 @@ public final class CC implements Externalizable {
      *
      * @return The current push value. Default is <code>null</code>.
      */
-    public Float getPushY() {
+    Float getPushY() {
         return pushY;
     }
 
@@ -1735,7 +527,7 @@ public final class CC implements Externalizable {
      *
      * @param weight The new push value. Default is <code>null</code>.
      */
-    public void setPushY(Float weight) {
+    void setPushY(Float weight) {
         this.pushY = weight;
     }
 
@@ -1826,7 +618,7 @@ public final class CC implements Externalizable {
      * @see #setWrap(boolean)
      * @since 2.4.2
      */
-    public BoundSize getWrapGapSize() {
+    BoundSize getWrapGapSize() {
         return wrap == DEF_GAP ? null : wrap;
     }
 
@@ -1839,7 +631,7 @@ public final class CC implements Externalizable {
      * @see #setWrap(boolean)
      * @since 2.4.2
      */
-    public void setWrapGapSize(BoundSize s) {
+    void setWrapGapSize(BoundSize s) {
         wrap = s == null ? (wrap != null ? DEF_GAP : null) : s;
     }
 
@@ -1850,7 +642,7 @@ public final class CC implements Externalizable {
      *
      * @return The current value.
      */
-    public boolean isNewline() {
+    boolean isNewline() {
         return newline != null;
     }
 
@@ -1861,7 +653,7 @@ public final class CC implements Externalizable {
      *
      * @param b <code>true</code> means wrap before.
      */
-    public void setNewline(boolean b) {
+    void setNewline(boolean b) {
         newline = b ? (newline == null ? DEF_GAP : newline) : null;
     }
 
@@ -1874,7 +666,7 @@ public final class CC implements Externalizable {
      * @see #setNewline(boolean)
      * @since 2.4.2
      */
-    public BoundSize getNewlineGapSize() {
+    BoundSize getNewlineGapSize() {
         return newline == DEF_GAP ? null : newline;
     }
 
@@ -1887,7 +679,7 @@ public final class CC implements Externalizable {
      * @see #setNewline(boolean)
      * @since 2.4.2
      */
-    public void setNewlineGapSize(BoundSize s) {
+    void setNewlineGapSize(BoundSize s) {
         newline = s == null ? (newline != null ? DEF_GAP : null) : s;
     }
     // ************************************************
@@ -1898,7 +690,7 @@ public final class CC implements Externalizable {
         return LayoutUtil.getSerializedObject(this);
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         LayoutUtil.setSerializedObject(this, LayoutUtil.readAsXML(in));
     }
 

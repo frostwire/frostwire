@@ -82,7 +82,7 @@ public class SwingComponentWrapper implements ComponentWrapper {
     private final Component c;
     private int compType = TYPE_UNSET;
     private Boolean bl = null;
-//	/** Cache.
+    //	/** Cache.
 //	 */
 //	private final static IdentityHashMap<FontMetrics, Point.Float> FM_MAP2 = new IdentityHashMap<FontMetrics, Point.Float>(4);
 //	private final static Font SUBST_FONT2 = new Font("sansserif", Font.PLAIN, 11);
@@ -308,12 +308,6 @@ public class SwingComponentWrapper implements ComponentWrapper {
         g.setPaint(DB_COMP_OUTLINE);
         g.setStroke(new BasicStroke(1f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10f, new float[]{2f, 4f}, 0));
         g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-    }
-
-    public int getComponetType(boolean disregardScrollPane) {
-        if (compType == TYPE_UNSET)
-            compType = checkType(disregardScrollPane);
-        return compType;
     }
 
     public int getLayoutHashCode() {

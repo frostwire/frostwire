@@ -24,35 +24,30 @@ public class ColumnSelectionMenu {
     /**
      * More Options menu item.
      */
-    public static final String MORE_OPTIONS =
+    private static final String MORE_OPTIONS =
             I18n.tr("More Options");
-    /**
-     * Setting for row stripes.
-     */
-    public static final String ROWSTRIPE =
-            I18n.tr("Stripe Rows");
     /**
      * Setting for real-time sorting.
      */
-    public static final String SORTING =
+    private static final String SORTING =
             I18n.tr("Sort Automatically");
     /**
      * Setting for displaying tooltips.
      */
-    public static final String TOOLTIPS =
+    private static final String TOOLTIPS =
             I18n.tr("Extended Tooltips");
     /**
      * The string used to signify the columnId property
      */
-    protected static final String COLUMN_ID = "columnId";
+    private static final String COLUMN_ID = "columnId";
     /**
      * The string used to signify the Setting property
      */
-    protected static final String SETTING = "setting";
+    private static final String SETTING = "setting";
     /**
      * The SettingListener to use for all menus.
      */
-    protected static final ActionListener SETTING_LISTENER =
+    private static final ActionListener SETTING_LISTENER =
             new SettingListener();
     /**
      * Revert to default string
@@ -62,7 +57,7 @@ public class ColumnSelectionMenu {
     /**
      * The actual popup menu.
      */
-    protected final JPopupMenu _menu = new SkinPopupMenu();
+    private final JPopupMenu _menu = new SkinPopupMenu();
     /**
      * The LimeJTable this menu is associated with
      */
@@ -72,7 +67,7 @@ public class ColumnSelectionMenu {
      * Constructs the popupmenu & actionlistener associated with the
      * table & model.
      */
-    public ColumnSelectionMenu(LimeJTable table) {
+    ColumnSelectionMenu(LimeJTable table) {
         _table = table;
         DataLineModel<?, ?> model = (DataLineModel<?, ?>) _table.getModel();
         // add the 'revert to default' option.
@@ -100,7 +95,7 @@ public class ColumnSelectionMenu {
     /**
      * Returns a JMenu with the 'More Options' options tied to settings.
      */
-    public static JMenu createMoreOptions(TableSettings settings) {
+    private static JMenu createMoreOptions(TableSettings settings) {
         JMenu options = new SkinMenu(MORE_OPTIONS);
         addSetting(options, SORTING, settings.REAL_TIME_SORT);
         addSetting(options, TOOLTIPS, settings.DISPLAY_TOOLTIPS);
@@ -110,22 +105,21 @@ public class ColumnSelectionMenu {
     /**
      * Creates & adds a checkbox-setting with a listener.
      */
-    public static JMenuItem addSetting(JMenu parent,
-                                       final String name,
-                                       BooleanSetting setting) {
+    private static void addSetting(JMenu parent,
+                                   final String name,
+                                   BooleanSetting setting) {
         JMenuItem item = new SkinCheckBoxMenuItem(name, setting.getValue());
         item.putClientProperty(SETTING, setting);
         item.addActionListener(SETTING_LISTENER);
         parent.add(item);
-        return item;
     }
 
     /**
      * Adds the table choices.
      */
-    protected void addTableColumnChoices(ActionListener listener,
-                                         DataLineModel<?, ?> model,
-                                         LimeJTable table) {
+    private void addTableColumnChoices(ActionListener listener,
+                                       DataLineModel<?, ?> model,
+                                       LimeJTable table) {
         for (int i = 0; i < model.getColumnCount(); i++) {
             JMenuItem item = createColumnMenuItem(listener, model, table, i);
             _menu.add(item);
@@ -135,10 +129,10 @@ public class ColumnSelectionMenu {
     /**
      * Creates a single menu item for a column.
      */
-    protected JMenuItem createColumnMenuItem(ActionListener listener,
-                                             DataLineModel<?, ?> model,
-                                             LimeJTable table,
-                                             int i) {
+    private JMenuItem createColumnMenuItem(ActionListener listener,
+                                           DataLineModel<?, ?> model,
+                                           LimeJTable table,
+                                           int i) {
         Object id = model.getColumnId(i);
         String name = model.getColumnName(i);
         JCheckBoxMenuItem item =

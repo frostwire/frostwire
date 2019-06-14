@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.settings;
@@ -30,12 +32,6 @@ public final class ConnectionSettings extends LimeProps {
     public static final int C_SOCKS4_PROXY = 4;
     public static final int C_SOCKS5_PROXY = 5;
     public static final int C_HTTP_PROXY = 1;
-    /**
-     * Sets whether or not the users ip address should be forced to
-     * the value they have entered.
-     */
-    public static final BooleanSetting FORCE_IP_ADDRESS =
-            FACTORY.createBooleanSetting("FORCE_IP_ADDRESS", false);
     public static final IntSetting PORT_RANGE_0 =
             FACTORY.createIntSetting("PORT_RANGE_0", 40256);
     public static final IntSetting PORT_RANGE_1 =
@@ -82,11 +78,6 @@ public final class ConnectionSettings extends LimeProps {
      */
     public static final StringSetting PROXY_PASS =
             FACTORY.createStringSetting("PROXY_PASS", "");
-    /**
-     * setting for locale preferencing
-     */
-    public static final BooleanSetting USE_LOCALE_PREF =
-            FACTORY.createBooleanSetting("USE_LOCALE_PREF", true);
     /**
      * setting that governs if BitTorrent engine can start if there is no VPN (if true it can only start with VPN active)
      */

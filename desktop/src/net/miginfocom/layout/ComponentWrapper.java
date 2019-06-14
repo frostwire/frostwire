@@ -63,13 +63,10 @@ public interface ComponentWrapper {
     int TYPE_LIST = 6;
     int TYPE_TABLE = 7;
     int TYPE_SCROLL_PANE = 8;
-    int TYPE_IMAGE = 9;
     int TYPE_PANEL = 10;
-    int TYPE_COMBO_BOX = 11;
     int TYPE_SLIDER = 12;
     int TYPE_SPINNER = 13;
     int TYPE_PROGRESS_BAR = 14;
-    int TYPE_TREE = 15;
     int TYPE_CHECK_BOX = 16;
     int TYPE_SCROLL_BAR = 17;
     int TYPE_SEPARATOR = 18;
@@ -335,18 +332,4 @@ public interface ComponentWrapper {
      * Paints component outline to indicate where it is.
      */
     void paintDebugOutline();
-
-    /**
-     * Returns the type of component that this wrapper is wrapping.
-     * <p>
-     * This method can be invoked often so the result should be cached.
-     * <p>
-     * <b>NOTE!</b> This is misspelled. Keeping it that way though since this is only used by developers who
-     * port MigLayout.
-     *
-     * @param disregardScrollPane Is <code>true</code> any wrapping scroll pane should be disregarded and the type
-     *                            of the scrolled component should be returned.
-     * @return The type of component that this wrapper is wrapping. E.g. {@link #TYPE_LABEL}.
-     */
-    int getComponetType(boolean disregardScrollPane);
 }

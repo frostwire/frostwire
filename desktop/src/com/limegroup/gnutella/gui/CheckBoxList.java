@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
@@ -18,22 +35,14 @@ import java.util.*;
 
 /**
  * Provides a list of checkboxes in the look and feel of a {@link JList}.
- * <p>
- * The seleted items can be retrieved easily using {@link #getSelectedObjects()}
- * or {@link #getSelectedElements(Object[])}.
  */
 public class CheckBoxList<E> extends BoxPanel {
-    public static final int SELECT_FIRST_ON = 0;
-    public static final int SELECT_FIRST_OFF = 1;
+    static final int SELECT_FIRST_OFF = 1;
     /**
      * The key for the text provider property, when the text provider changes
      * for this component a property change event is fired with this key.
      */
-    public static final String TEXT_PROVIDER_PROPERTY = "textProvider";
-    /**
-     *
-     */
-    private static final long serialVersionUID = 680881365220840255L;
+    private static final String TEXT_PROVIDER_PROPERTY = "textProvider";
     private static final int DEFAULT_ROW_HEIGHT = 22;
     /**
      * The set of elements included on the panel.
@@ -88,10 +97,9 @@ public class CheckBoxList<E> extends BoxPanel {
      * @param elements the collection of objects to be displayed in the checkbox list
      * @param provider the provider that retrieves the textual display information
      *                 from the objects
-     * @param selected whether or not the checkboxes should be selected initially
      * @throws NullPointerException if the text provider is <code>null</code>
      */
-    public CheckBoxList(Collection<E> elements, Collection<E> notCheckedElements, TextProvider<E> provider, ExtrasProvider<E> separatorProvider, int mode) {
+    private CheckBoxList(Collection<E> elements, Collection<E> notCheckedElements, TextProvider<E> provider, ExtrasProvider<E> separatorProvider, int mode) {
         this.provider = provider;
         this.extrasProvider = separatorProvider;
         if (provider == null) {
@@ -104,28 +112,12 @@ public class CheckBoxList<E> extends BoxPanel {
         this.setElements(elements, notCheckedElements);
     }
 
-    public CheckBoxList(Collection<E> elements, Collection<E> notCheckedElements, TextProvider<E> provider, int mode) {
-        this(elements, notCheckedElements, provider, null, mode);
-    }
-
-    public CheckBoxList(Collection<E> elements, TextProvider<E> provider, boolean checkAll, int mode) {
+    CheckBoxList(Collection<E> elements, TextProvider<E> provider, boolean checkAll, int mode) {
         this(elements, checkAll ? new HashSet<>() : elements, provider, null, mode);
     }
 
-    public CheckBoxList(Collection<E> totalElements, Collection<E> notCheckedElements, int mode) {
-        this(totalElements, notCheckedElements, new DefaultTextProvider<>(), null, mode);
-    }
-
-    public CheckBoxList(Collection<E> elements, TextProvider<E> provider, int mode) {
+    private CheckBoxList(Collection<E> elements, TextProvider<E> provider, int mode) {
         this(elements, new HashSet<>(), provider, null, mode);
-    }
-
-    public CheckBoxList(Collection<E> elements) {
-        this(elements, new DefaultTextProvider<>(), SELECT_FIRST_ON);
-    }
-
-    public CheckBoxList(Collection<E> elements, TextProvider<E> provider) {
-        this(elements, provider, SELECT_FIRST_ON);
     }
 
     private static void ensureRowVisible(JTable table, int row) {
@@ -140,7 +132,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Wrapper for setElements.
      */
-    public void setElements(Collection<E> elements, boolean checked) {
+    private void setElements(Collection<E> elements, @SuppressWarnings("SameParameterValue") boolean checked) {
         if (checked) {
             this.setElements(elements, new HashSet<>());
         } else {
@@ -151,7 +143,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Sets the element list.
      */
-    public void setElements(Collection<E> elements, Collection<E> notCheckedElements) {
+    private void setElements(Collection<E> elements, Collection<E> notCheckedElements) {
         this.items = new ArrayList<>(elements);
         Object[][] rowData = new Object[elements.size()][1];
         for (int i = 0; i < elements.size(); i++)
@@ -180,7 +172,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Deletes an item from the list with key "key"
      */
-    public void removeItem(Object key) {
+    private void removeItem(Object key) {
         Set<E> newElements = new HashSet<>(this.elements);
         Set<E> newUnchecked = new HashSet<>(this.unchecked);
         newElements.remove(key);
@@ -189,31 +181,9 @@ public class CheckBoxList<E> extends BoxPanel {
     }
 
     /**
-     * Enables or disables the delete buttons on each row
-     */
-    public void setRemovable(boolean state) {
-        this.removeable = state;
-        this.update();
-    }
-
-    /**
-     * Gets the custom tooltip for disabled items
-     */
-    public String getDisabledTooltip() {
-        return this.disabledTooltip;
-    }
-
-    /**
-     * Sets the custom tooltip for disabled items
-     */
-    public void setDisabledTooltip(String tooltip) {
-        this.disabledTooltip = tooltip;
-    }
-
-    /**
      * Ensures the row with the key is visible.
      */
-    public void ensureRowVisible(E key) {
+    private void ensureRowVisible(E key) {
         if (key == null) {
             throw new IllegalArgumentException();
         }
@@ -233,6 +203,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Selects an item in the list.
      */
+    @SuppressWarnings("unused")
     public void setItemSelected(E key) {
         if (key == null) {
             throw new IllegalArgumentException();
@@ -247,6 +218,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Checks an item, returns true if the item has changed state
      * otherwise false.
      */
+    @SuppressWarnings("unused")
     public boolean setItemChecked(E key) {
         if (key == null) {
             throw new IllegalArgumentException();
@@ -265,6 +237,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Disable or enable a set of items
      */
+    @SuppressWarnings("unused")
     public void setItemsEnabled(Set<E> keys, boolean state) {
         if (state) {
             Set<E> toUncheck = new HashSet<>(this.checked);
@@ -282,6 +255,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Check or uncheck a set of items
      */
+    @SuppressWarnings("unused")
     public void setItemsChecked(Set<E> keys, boolean state) {
         if (state) {
             this.unchecked.removeAll(keys);
@@ -313,26 +287,16 @@ public class CheckBoxList<E> extends BoxPanel {
 
     /**
      * Sets the preferred number of visible rows.
-     *
-     * @param rows
      */
     public void setVisibleRowCount(int rows) {
         this.visibleRowCount = rows;
         this.setPreferredSize(this.getPreferredScrollableViewportSize());
     }
 
-    public Dimension getPreferredScrollableViewportSize() {
+    private Dimension getPreferredScrollableViewportSize() {
         return (visibleRowCount > 0 && items.size() > 0) ?
                 new Dimension(getPreferredSize().width, visibleRowCount * this.checkBoxList.getRowHeight())
                 : getPreferredSize();
-    }
-
-    public void setSelectionListener(CheckBoxListSelectionListener listener) {
-        this.selectionListener = listener;
-    }
-
-    public void setCheckChangeListener(CheckBoxListCheckChangeListener<?> listener) {
-        this.checkListener = listener;
     }
 
     /**
@@ -341,6 +305,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * @param provider the new text provider
      * @throws NullPointerException if the new provider is <code>null</code>
      */
+    @SuppressWarnings("unused")
     public void setTextProvider(TextProvider<E> provider) {
         if (provider == null) {
             throw new NullPointerException("provider must not be null");
@@ -354,7 +319,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Returns the typed array of selected objects taking
      * enable/disable into account
      */
-    public List<E> getCheckedElements() {
+    List<E> getCheckedElements() {
         if (this.checkBoxList.isEnabled() && this.checked.size() > 0) {
             Set<E> totalChecked = new HashSet<>(checked);
             totalChecked.removeAll(this.disabled);
@@ -368,6 +333,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Returns the typed array of unselected objects taking
      * enable/disable into account
      */
+    @SuppressWarnings("unused")
     public List<E> getUncheckedElements() {
         if (!this.checkBoxList.isEnabled()) {
             return new LinkedList<>(this.elements);
@@ -390,21 +356,8 @@ public class CheckBoxList<E> extends BoxPanel {
         return new HashSet<>(this.elements);
     }
 
-    /**
-     * Convenience wrapper for {@link #setElements(Object[], boolean)
-     * setObjects(Object[], true)}.
-     */
     public void setElements(Collection<E> elements) {
         setElements(elements, true);
-    }
-
-    /**
-     * Returns a new list of the unchecked elements
-     * without regards to the enabled/disabled status
-     * of the component or elements
-     */
-    public Set<E> getRawUncheckedElementsAsSet() {
-        return new HashSet<>(this.unchecked);
     }
 
     /**
@@ -481,7 +434,6 @@ public class CheckBoxList<E> extends BoxPanel {
          * Returns the label text displayed next to the checkbox.
          *
          * @param obj the underlying data object
-         * @return
          */
         String getText(E obj);
 
@@ -489,7 +441,6 @@ public class CheckBoxList<E> extends BoxPanel {
          * Returns the tooltip text for the checkbox item.
          *
          * @param obj the underlying data object
-         * @return
          */
         String getToolTipText(E obj);
 
@@ -497,32 +448,6 @@ public class CheckBoxList<E> extends BoxPanel {
          * Returns an icon that is displayed to the left of the checkbox.
          */
         Icon getIcon(E obj);
-    }
-
-    /**
-     * Provides a default implementation of the {@link TextProvider} interface.
-     */
-    public static class DefaultTextProvider<E> implements TextProvider<E> {
-        /**
-         * Returns {@link Object#toString() obj.toString()}.
-         */
-        public String getText(E obj) {
-            return obj.toString();
-        }
-
-        /**
-         * Returns <code>null</code>.
-         */
-        public String getToolTipText(E obj) {
-            return null;
-        }
-
-        /**
-         * Returns <code>null</code>.
-         */
-        public Icon getIcon(E obj) {
-            return null;
-        }
     }
 
     /**
@@ -535,7 +460,7 @@ public class CheckBoxList<E> extends BoxPanel {
         private static final long serialVersionUID = 6985964072155472329L;
         private Object selected;
 
-        public CheckBoxListSelectionEvent(Object source, Object selected) {
+        CheckBoxListSelectionEvent(Object source, Object selected) {
             super(source);
             this.selected = selected;
         }
@@ -561,7 +486,7 @@ public class CheckBoxList<E> extends BoxPanel {
         private E selected;
         private boolean checked;
 
-        public CheckBoxListCheckChangeEvent(Object source, E selected, boolean checked) {
+        CheckBoxListCheckChangeEvent(Object source, E selected, boolean checked) {
             super(source);
             this.selected = selected;
             this.checked = checked;
@@ -589,7 +514,7 @@ public class CheckBoxList<E> extends BoxPanel {
     private class BoldRemoveListener implements ActionListener {
         private E key;
 
-        public BoldRemoveListener(E key) {
+        BoldRemoveListener(E key) {
             this.key = key;
         }
 
@@ -605,7 +530,7 @@ public class CheckBoxList<E> extends BoxPanel {
          */
         private static final long serialVersionUID = -8173830762677196193L;
 
-        public SelectAllAction() {
+        SelectAllAction() {
             putValue(Action.NAME, I18n.tr
                     ("Select All"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr
@@ -621,12 +546,7 @@ public class CheckBoxList<E> extends BoxPanel {
     }
 
     private class DeselectAllAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -7666969710559350155L;
-
-        public DeselectAllAction() {
+        DeselectAllAction() {
             putValue(Action.NAME, I18n.tr
                     ("Deselect All"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr
@@ -681,7 +601,6 @@ public class CheckBoxList<E> extends BoxPanel {
      * Check box tree cell renderer.
      */
     private class CheckBoxCellRenderer extends DefaultTableBevelledCellRenderer {
-        private static final long serialVersionUID = -8209871264709364379L;
         private IconDataCheckBox checkBox = new IconDataCheckBox();
 
         @Override
@@ -731,7 +650,7 @@ public class CheckBoxList<E> extends BoxPanel {
         private static final long serialVersionUID = 8487646158995389360L;
         private CustomEditorDelegate customDelegate;
 
-        public CheckBoxCellEditor() {
+        CheckBoxCellEditor() {
             super(new JCheckBox());
             IconDataCheckBox checkBox = new IconDataCheckBox();
             editorComponent = checkBox;
@@ -747,7 +666,7 @@ public class CheckBoxList<E> extends BoxPanel {
          * table editor classes so selection changes can be handled
          * correctly.
          */
-        public void notifyChange() {
+        void notifyChange() {
             this.customDelegate.notifyChange();
         }
 
@@ -875,7 +794,7 @@ public class CheckBoxList<E> extends BoxPanel {
         private Font originalFont;
         private Font boldFont;
 
-        public IconDataCheckBox() {
+        IconDataCheckBox() {
             super(BoxPanel.X_AXIS);
             sepBorder = new SeperatorBorder();
             blankBorder = BorderFactory.createMatteBorder(4, 4, 4, 4, (Icon) null);
@@ -894,7 +813,7 @@ public class CheckBoxList<E> extends BoxPanel {
             boldFont = originalFont.deriveFont(originalFont.getStyle() | Font.BOLD | Font.ITALIC);
         }
 
-        public void setRemovable(boolean state) {
+        void setRemovable(boolean state) {
             this.button.setVisible(state);
         }
 
@@ -915,7 +834,7 @@ public class CheckBoxList<E> extends BoxPanel {
             this.setToolTipText(provider.getToolTipText(obj));
         }
 
-        public void setHighlight(boolean b) {
+        void setHighlight(boolean b) {
             button.setHighlight(b);
             if (b) {
                 this.setToolTipText("Remove...");
@@ -970,7 +889,7 @@ public class CheckBoxList<E> extends BoxPanel {
             this.checkBox.addActionListener(l);
         }
 
-        public void addTopMouseListener(MouseListener l) {
+        void addTopMouseListener(MouseListener l) {
             this.addMouseListener(l);
             this.label.addMouseListener(l);
         }
@@ -983,7 +902,7 @@ public class CheckBoxList<E> extends BoxPanel {
             private Icon iconReg;
             private Icon iconHi;
 
-            public DeleteButton() {
+            DeleteButton() {
                 iconReg = GUIMediator.getThemeImage("delete_small");
                 iconHi = GUIMediator.getThemeImage("delete_small_hi");
                 this.setIcon(iconReg);
@@ -1010,7 +929,7 @@ public class CheckBoxList<E> extends BoxPanel {
                 });
             }
 
-            public void setHighlight(boolean b) {
+            void setHighlight(boolean b) {
                 if (b) {
                     this.setIcon(iconHi);
                 } else {

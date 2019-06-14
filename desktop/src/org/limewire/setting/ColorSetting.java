@@ -63,6 +63,7 @@ public final class ColorSetting extends AbstractSetting {
      *
      * @return the value of this setting
      */
+    @SuppressWarnings("unused")
     public Color getValue() {
         return value;
     }
@@ -72,6 +73,7 @@ public final class ColorSetting extends AbstractSetting {
      *
      * @param value the value to store
      */
+    @SuppressWarnings("unused")
     public void setValue(Color value) {
         setValueInternal(formatColor(value));
         this.value = value;
@@ -80,6 +82,7 @@ public final class ColorSetting extends AbstractSetting {
     /**
      * Returns the value of this setting.
      */
+    @SuppressWarnings("unused")
     protected void loadValue(String sValue) {
         sValue = sValue.trim();
         try {

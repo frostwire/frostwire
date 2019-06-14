@@ -119,8 +119,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         fileList = new JList<>(fileNames.toArray(new String[0]));
         fileList.setVisibleRowCount(5);
         fileList.setCellRenderer(new FileNameListCellRenderer());
-        //fileList.setSelectionForeground(fileList.getForeground());
-        //fileList.setSelectionBackground(fileList.getBackground());
         fileList.setFocusable(false);
         return fileList;
     }

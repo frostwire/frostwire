@@ -29,15 +29,8 @@ public final class CharArraySetting extends AbstractSetting {
         super(defaultProps, props, key, new String(defaultValue));
     }
 
-    CharArraySetting(Properties defaultProps, Properties props, String key,
-                     String defaultValue) {
-        super(defaultProps, props, key, defaultValue);
-    }
-
     /**
      * Returns the value of this setting.
-     *
-     * @return the value of this setting
      */
     public char[] getValue() {
         return value;
