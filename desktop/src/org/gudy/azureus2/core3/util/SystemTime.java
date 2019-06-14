@@ -32,22 +32,8 @@ public class SystemTime {
     private static final boolean SOD_IT_LETS_USE_HPC = false;//	= Constants.isCVSVersion();
     private static final List<TickConsumer> systemTimeConsumers = new ArrayList<>();
     private static final List<TickConsumer> monotoneTimeConsumers = new ArrayList<>();
-    private static SystemTimeProvider instance;
+    private static final SystemTimeProvider instance = new SteppedProvider();
     private static volatile List<ChangeListener> clock_change_list = new ArrayList<>();
-
-    static {
-        try {
-            if (System.getProperty("azureus.time.use.raw.provider", "0").equals("1")) {
-                System.out.println("Warning: Using Raw Provider");
-                instance = new RawProvider();
-            } else {
-                instance = new SteppedProvider();
-            }
-        } catch (Throwable e) {
-            // might be in applet...
-            instance = new SteppedProvider();
-        }
-    }
 
     /**
      * Note that this can this time can jump into the future or past due to
@@ -87,13 +73,13 @@ public class SystemTime {
 
     static void registerClockChangeListener(ChangeListener c) {
         synchronized (instance) {
-            List new_list = new ArrayList(clock_change_list);
+            ArrayList<ChangeListener> new_list = new ArrayList<>(clock_change_list);
             new_list.add(c);
             clock_change_list = new_list;
         }
     }
 
-    public static long
+    private static long
     getHighPrecisionCounter() {
         return (System.nanoTime());
     }
@@ -147,7 +133,7 @@ public class SystemTime {
                     mLastRound = mnow;
                     try {
                         Thread.sleep(15);
-                    } catch (Throwable e) {
+                    } catch (Throwable ignored) {
                     }
                 }
             }).start();
@@ -170,17 +156,11 @@ public class SystemTime {
     public interface ChangeListener {
         /**
          * Called before the change becomes visible to getCurrentTime callers
-         *
-         * @param current_time
-         * @param change_millis
          */
         void clockChangeDetected(long current_time, long change_millis);
 
         /**
          * Called after the change is visible to getCurrentTime callers
-         *
-         * @param current_time
-         * @param change_millis
          */
         void clockChangeCompleted(long current_time, long change_millis);
     }
@@ -188,18 +168,20 @@ public class SystemTime {
     private static class SteppedProvider implements SystemTimeProvider {
         private static final long HPC_START = getHighPrecisionCounter() / 1000000L;
         private final AtomicLong last_approximate_time = new AtomicLong();
-        private volatile long stepped_time;
+        // System.out.println("SystemTime: using stepped time provider");
+        private volatile long stepped_time = 0;
+        private final Object stepped_time_lock = new Object();
         private volatile long currentTimeOffset = System.currentTimeMillis();
         //private volatile long		last_approximate_time;
         private volatile int access_count;
+        private final Object access_count_lock = new Object();
         private volatile int slice_access_count;
+        private final Object slice_access_count_lock = new Object();
         private volatile int access_average_per_slice;
         private volatile int drift_adjusted_granularity;
         private volatile long stepped_mono_time;
 
         private SteppedProvider() {
-            // System.out.println("SystemTime: using stepped time provider");
-            stepped_time = 0;
             // these averages rely on monotone time, thus won't be affected by system time changes
             /*
              * keep the monotone time in sync with the raw system
@@ -236,6 +218,7 @@ public class SystemTime {
                     long lastOffset = adjustedTimeOffset;
                     long lastSecond = -1000;
                     int tick_count = 0;
+                    //noinspection InfiniteLoopStatement
                     while (true) {
                         final long rawTime = System.currentTimeMillis();
                         /*
@@ -257,10 +240,14 @@ public class SystemTime {
                              * not the current time one, that only happens every
                              * second
                              */
-                            stepped_time += TIME_GRANULARITY_MILLIS;
+                            synchronized (stepped_time_lock) {
+                                stepped_time += TIME_GRANULARITY_MILLIS;
+                            }
                             adjustedTimeOffset = rawTime - stepped_time;
                         } else { // time is good, keep it
-                            stepped_time = newMonotoneTime;
+                            synchronized (stepped_time_lock) {
+                                stepped_time = newMonotoneTime;
+                            }
                         }
                         tick_count++;
                         long change;
@@ -358,8 +345,12 @@ public class SystemTime {
                     adjusted_time = sliceStep + stepped_time;
                 } else
                     adjusted_time = stepped_time;
-                access_count++;
-                slice_access_count++;
+                synchronized (access_count_lock) {
+                    access_count++;
+                }
+                synchronized (slice_access_count_lock) {
+                    slice_access_count++;
+                }
                 // make sure we don't go backwards and our reference value for going backwards doesn't go backwards either
                 long approxBuffered = last_approximate_time.get();
                 if (adjusted_time < approxBuffered)
@@ -376,97 +367,6 @@ public class SystemTime {
             } else {
                 return (stepped_mono_time);
             }
-        }
-    }
-
-    private static class RawProvider implements SystemTimeProvider {
-        private RawProvider() {
-            System.out.println("SystemTime: using raw time provider");
-            // clock's changed
-            //private static final int	STEPS_PER_SECOND	= (int) (1000 / TIME_GRANULARITY_MILLIS);
-            Thread updater = new Thread("SystemTime") {
-                long last_time;
-
-                public void run() {
-                    while (true) {
-                        long current_time = getTime();
-                        long change;
-                        if (last_time != 0) {
-                            long offset = current_time - last_time;
-                            if (offset < 0 || offset > 5000) {
-                                change = offset;
-                                // clock's changed
-                                for (ChangeListener changeListener : clock_change_list) {
-                                    try {
-                                        changeListener.clockChangeDetected(current_time, change);
-                                    } catch (Throwable e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            } else {
-                                change = 0;
-                            }
-                        } else {
-                            change = 0;
-                        }
-                        last_time = current_time;
-                        if (change != 0) {
-                            for (ChangeListener changeListener : clock_change_list) {
-                                try {
-                                    changeListener.clockChangeCompleted(current_time, change);
-                                } catch (Throwable e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                        List consumer_list_ref = systemTimeConsumers;
-                        for (Object value : consumer_list_ref) {
-                            TickConsumer cons = (TickConsumer) value;
-                            try {
-                                cons.consume(current_time);
-                            } catch (Throwable e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        consumer_list_ref = monotoneTimeConsumers;
-                        long mono_time = getMonoTime();
-                        for (Object o : consumer_list_ref) {
-                            TickConsumer cons = (TickConsumer) o;
-                            try {
-                                cons.consume(mono_time);
-                            } catch (Throwable e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        try {
-                            Thread.sleep(TIME_GRANULARITY_MILLIS);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            };
-            updater.setDaemon(true);
-            // we don't want this thread to lag much as it'll stuff up the upload/download rate mechanisms (for example)
-            updater.setPriority(Thread.MAX_PRIORITY);
-            updater.start();
-        }
-
-        public long getTime() {
-            return System.currentTimeMillis();
-        }
-
-        /**
-         * This implementation does not guarantee monotonous time increases with
-         * 100% accuracy as the adjustedTimeOffset is only adjusted every
-         * TIME_GRANULARITY_MILLIS
-         */
-        public long getMonoTime() {
-            return getHighPrecisionCounter() / 1000000;
-        }
-
-        public long getSteppedMonoTime() {
-            return getMonoTime();
         }
     }
 }
