@@ -31,16 +31,14 @@ public class VideoPlayerPaneItem extends AbstractPaneItem {
     /**
      * Creates new VideoPlayerOptionsPaneItem
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public VideoPlayerPaneItem() {
         super(TITLE, LABEL);
         _playerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-        /**
-         * Constant for the key of the locale-specific <code>String</code> for the
-         * label on the component that allows to user to change the setting for
-         * this <tt>PaneItem</tt>.
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          label on the component that allows to user to change the setting for
+          this <tt>PaneItem</tt>.
          */
         String OPTION_LABEL = I18n.tr("Video Player");
         LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _playerField);

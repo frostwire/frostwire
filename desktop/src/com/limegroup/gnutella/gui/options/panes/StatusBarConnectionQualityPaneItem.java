@@ -22,14 +22,12 @@ public final class StatusBarConnectionQualityPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public StatusBarConnectionQualityPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for whether
-         * the connection quality status should be displayed in the status bar.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for whether
+          the connection quality status should be displayed in the status bar.
          */
         String CHECK_BOX_LABEL = I18n.tr("Show Connection Quality Indicator:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,

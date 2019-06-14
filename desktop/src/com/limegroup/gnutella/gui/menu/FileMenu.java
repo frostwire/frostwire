@@ -30,8 +30,6 @@ final class FileMenu extends AbstractMenu {
      * argument for setting the locale-specific title and
      * accessibility text.
      *
-     * @param key the key for locale-specific string resources unique
-     *            to the menu
      */
     FileMenu() {
         super(I18n.tr("&File"));

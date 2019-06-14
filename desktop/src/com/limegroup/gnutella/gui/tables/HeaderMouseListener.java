@@ -20,7 +20,6 @@ public final class HeaderMouseListener implements MouseInputListener {
     /**
      * Invoked when the mouse has been clicked on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mouseClicked(MouseEvent ev) {
         if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
@@ -35,7 +34,6 @@ public final class HeaderMouseListener implements MouseInputListener {
     /**
      * Invoked when a mouse button has been pressed on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mousePressed(MouseEvent ev) {
         if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {
@@ -49,7 +47,6 @@ public final class HeaderMouseListener implements MouseInputListener {
     /**
      * Invoked when a mouse button has been released on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
      */
     public void mouseReleased(MouseEvent ev) {
         if (!tryPopup(ev) && SwingUtilities.isLeftMouseButton(ev)) {

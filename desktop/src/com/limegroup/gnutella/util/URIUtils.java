@@ -65,8 +65,8 @@ public class URIUtils {
                 encodedURL.append(s);
             } else {
                 try {
-                    /**
-                     * Identifier for ISO-Latin-1 encoding
+                    /*
+                      Identifier for ISO-Latin-1 encoding
                      */
                     String ASCII_ENCODING = "ISO-8859-1";
                     encodedURL.append(URLEncoder.encode(s, ASCII_ENCODING));

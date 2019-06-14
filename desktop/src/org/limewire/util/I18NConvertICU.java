@@ -88,7 +88,6 @@ final class I18NConvertICU extends AbstractI18NConverter {
      * finally composes to NFC and adds spaces '\u0020' between
      * different unicode blocks
      *
-     * @param String to convert
      * @return converted String
      */
     private String convert(String s) {

@@ -25,14 +25,12 @@ public final class PopupsPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public PopupsPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * chat enabled check box label in the options window.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          chat enabled check box label in the options window.
          */
         String CHECK_BOX_LABEL = I18n.tr("Revert to Default:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,

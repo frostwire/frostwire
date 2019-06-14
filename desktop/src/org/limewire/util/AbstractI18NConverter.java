@@ -139,7 +139,6 @@ abstract class AbstractI18NConverter {
      * The index to the blockStarts array will be used to compare
      * when splitting the string.
      *
-     * @param String s
      * @return string split into blocks with '\u0020' as the delim
      */
     String blockSplit(String s) {
@@ -170,7 +169,6 @@ abstract class AbstractI18NConverter {
      * belongs to. The returned int is the index to the blockStarts
      * array.
      *
-     * @param char c
      * @return index to array
      */
     int of(char c) {

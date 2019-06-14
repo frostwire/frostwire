@@ -105,9 +105,9 @@ public final class OptionsConstructor {
      */
     public OptionsConstructor(final OptionsTreeManager treeManager, final OptionsPaneManager paneManager) {
         TREE_MANAGER = treeManager;
-        /**
-         * Stored for convenience to allow using this in helper methods
-         * during construction.
+        /*
+          Stored for convenience to allow using this in helper methods
+          during construction.
          */
         keysToNodes = new LinkedHashMap<>();
         final String title = I18n.tr("Options");

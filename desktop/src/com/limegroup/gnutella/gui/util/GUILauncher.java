@@ -13,7 +13,7 @@ import java.io.File;
 public class GUILauncher {
     /**
      * Launches an array of <code>providers</code> delegating the time
-     * consuming construction of {@link Downloader#getDownloadFragment()}
+     * consuming construction of
      * into a background threads.
      */
     public static void launch(LaunchableProvider[] providers) {

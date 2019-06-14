@@ -42,9 +42,9 @@ public class KeyTypedMover implements KeyListener {
         char c = e.getKeyChar();
         long time = e.getWhen();
         int startIndex = src.getSelectionModel().getLeadSelectionIndex();
-        /**
-         * The time factor to treate the series of typed alphanumeric key
-         * as prefix for first letter navigation.
+        /*
+          The time factor to treate the series of typed alphanumeric key
+          as prefix for first letter navigation.
          */
         long timeFactor = 500L;
         if (time - lastTime < timeFactor) {

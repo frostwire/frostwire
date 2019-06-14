@@ -317,7 +317,6 @@ public final class MessageService {
      * @param messageType  either {@link JOptionPane#YES_NO_OPTION},
      *                     {@link JOptionPane#YES_NO_CANCEL_OPTION} or {@link JOptionPane#OK_CANCEL_OPTION}.
      * @param listRenderer an optional list cell renderer, can be <code>null</code>
-     * @param the          title shown in the dialog window bar
      */
     final int showConfirmListMessage(String message, Object[] listModel,
                                      int messageType, ListCellRenderer<Object> listRenderer, String title) {

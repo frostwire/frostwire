@@ -54,9 +54,9 @@ public final class LibraryTab extends AbstractTab {
 
     private static JPanel createPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        /**
-         * Constant for the <tt>Component</tt> instance containing the
-         * elements of this tab.
+        /*
+          Constant for the <tt>Component</tt> instance containing the
+          elements of this tab.
          */
         JComponent COMPONENT = LIBRARY_MEDIATOR.getComponent();
         panel.add(COMPONENT, BorderLayout.CENTER);

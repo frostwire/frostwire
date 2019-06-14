@@ -57,8 +57,8 @@ public final class ProxyPaneItem extends AbstractPaneItem {
      */
     public ProxyPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant handle to the check box that enables or disables this feature.
+        /*
+          Constant handle to the check box that enables or disables this feature.
          */
         ButtonGroup BUTTONS = new ButtonGroup();
         BUTTONS.add(NO_PROXY_BUTTON);
@@ -72,9 +72,9 @@ public final class ProxyPaneItem extends AbstractPaneItem {
         add(HTTP_PROXY_BUTTON);
         add(getHorizontalSeparator());
         BoxPanel panel = new BoxPanel(BoxPanel.X_AXIS);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * label on the proxy host field.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the proxy host field.
          */
         String PROXY_HOST_LABEL_KEY = I18n.tr("Proxy:");
         LabeledComponent comp = new LabeledComponent(PROXY_HOST_LABEL_KEY,
@@ -82,9 +82,9 @@ public final class ProxyPaneItem extends AbstractPaneItem {
                 LabeledComponent.LEFT);
         panel.add(comp.getComponent());
         panel.addHorizontalComponentGap();
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * label on the port text field.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the port text field.
          */
         String PROXY_PORT_LABEL_KEY = I18n.tr("Port:");
         comp = new LabeledComponent(PROXY_PORT_LABEL_KEY, PROXY_PORT_FIELD,

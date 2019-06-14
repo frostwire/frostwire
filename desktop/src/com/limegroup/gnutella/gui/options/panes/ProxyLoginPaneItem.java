@@ -59,26 +59,26 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
     public ProxyLoginPaneItem() {
         super(TITLE, LABEL);
         CHECK_BOX.addItemListener(new LocalAuthenticateListener());
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * check box that enables / disables password authentification at the
-         * proxy.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          check box that enables / disables password authentification at the
+          proxy.
          */
         String PROXY_AUTHENTICATE_CHECK_BOX_LABEL = I18n.tr("Enable Authentication:");
         LabeledComponent checkBox = new LabeledComponent(
                 PROXY_AUTHENTICATE_CHECK_BOX_LABEL, CHECK_BOX,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * label on the username field.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the username field.
          */
         String PROXY_USERNAME_LABEL_KEY = I18n.tr("Username:");
         LabeledComponent username = new LabeledComponent(
                 PROXY_USERNAME_LABEL_KEY, PROXY_USERNAME_FIELD,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * label on the password field.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the password field.
          */
         String PROXY_PASSWORD_LABEL_KEY = I18n.tr("Password:");
         LabeledComponent password = new LabeledComponent(

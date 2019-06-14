@@ -1,6 +1,6 @@
 package com.frostwire.gui;
-/**
- * @(#)AlphaIcon.java 1.0 08/16/10
+/*
+  @(#)AlphaIcon.java 1.0 08/16/10
  */
 
 import javax.swing.*;

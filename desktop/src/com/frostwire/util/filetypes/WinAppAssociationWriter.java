@@ -354,8 +354,8 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
         private String backupMimeType;
         private String backupClassID;
         private String backupFileExt;
-        /**
-         * Suppresses default constructor for noninstantiability.
+        /*
+          Suppresses default constructor for noninstantiability.
          */
         //private BackupAssociation() {}
 

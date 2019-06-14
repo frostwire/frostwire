@@ -720,15 +720,15 @@ final class TrieNode<E> {
     public Iterator<String> labelsForward() {
         return new LabelForwardIterator();
     }
-    /**
-     * Returns the children of this in forward order,
-     * as an iterator of TrieNode.
+    /*
+      Returns the children of this in forward order,
+      as an iterator of TrieNode.
      */ /*
     public Iterator childrenBackward() {
         return new ChildrenBackwardIterator();
     } */
-    /**
-     * Maps (lambda(edge) edge.getChild) on children.iteratorBackward().
+    /*
+      Maps (lambda(edge) edge.getChild) on children.iteratorBackward().
      */ /*
     private class ChildrenBackwardIterator extends UnmodifiableIterator {
         int i = children.size() - 1;
@@ -784,9 +784,9 @@ final class TrieNode<E> {
             throw new NoSuchElementException();
         }
     }
-    /**
-     * Returns the labels of the children of this in backward order,
-     * as an iterator of Strings.
+    /*
+      Returns the labels of the children of this in backward order,
+      as an iterator of Strings.
      */ /*
     public Iterator labelsBackward() {
         return new LabelBackwardIterator();
@@ -808,9 +808,9 @@ final class TrieNode<E> {
             throw new NoSuchElementException();
         }
     }
-    /**
-     * Unit test.
-     * @see TrieNodeTest
+    /*
+      Unit test.
+      @see TrieNodeTest
      */
 }
 

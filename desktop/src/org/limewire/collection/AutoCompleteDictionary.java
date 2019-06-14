@@ -1,6 +1,6 @@
-/**
- * Code taken freely from
- * http://www.java-engineer.com/java/auto-complete.html
+/*
+  Code taken freely from
+  http://www.java-engineer.com/java/auto-complete.html
  */
 //------------------------------------------------------------------------------
 // Copyright (c) 1999-2001 Matt Welsh.  All Rights Reserved.

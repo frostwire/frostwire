@@ -50,8 +50,8 @@ public final class BugsPaneItem extends AbstractPaneItem {
                 I18n
                         .tr("You can choose how bug reports should be sent. To view an example bug report, click \'View Example\'. Choosing \'Always Send Immediately\' will immediately contact the bug server when FrostWire encounters an internal error. Choosing \'Always Ask for Review\' will tell FrostWire to ask for your approval before sending a bug to the bug server. Choosing \'Always Discard All Errors\' will cause FrostWire to ignore all bugs (this is not recommended)."));
         localClientInfoFactory = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
-        /**
-         * The 'View Example Bug' string
+        /*
+          The 'View Example Bug' string
          */
         String VIEW_EXAMPLE = I18n.tr("View Example");
         JButton example = new JButton(VIEW_EXAMPLE);

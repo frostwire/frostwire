@@ -186,7 +186,6 @@ final class SchemaBox extends JPanel {
     /**
      * Use this if you want to programmatically change the current file type being displayed for a search.
      *
-     * @see SearchResultMediator#selectSchemaBoxByMediaType(NamedMediaType)
      */
     void selectMediaType(NamedMediaType type) {
         JToggleButton mediaTypeButton = buttonsMap.get(type);

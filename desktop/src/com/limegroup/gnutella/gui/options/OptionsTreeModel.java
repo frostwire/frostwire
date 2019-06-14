@@ -41,7 +41,6 @@ final class OptionsTreeModel extends DefaultTreeModel {
      *                    appears to the user
      * @param displayName the name of the node as it is displayed to the
      *                    user
-     * @param keywords    search keywords associated with this node
      * @return the created node
      * @throws IllegalArgumentException if the parentKey does not
      *                                  correspond to any top-level node

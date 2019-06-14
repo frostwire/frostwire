@@ -24,14 +24,12 @@ public final class AutoCompletePaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public AutoCompletePaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * autocompletion enabled check box label..
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          autocompletion enabled check box label..
          */
         String AUTOCOMPLETE_LABEL = I18n.tr("Enable Autocompletion of Text Fields:");
         LabeledComponent c = new LabeledComponent(AUTOCOMPLETE_LABEL,

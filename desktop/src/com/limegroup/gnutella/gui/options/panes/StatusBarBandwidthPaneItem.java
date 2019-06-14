@@ -35,14 +35,12 @@ public final class StatusBarBandwidthPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public StatusBarBandwidthPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for whether
-         * the firewall status should be displayed in the status bar.
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for whether
+          the firewall status should be displayed in the status bar.
          */
         String CHECK_BOX_LABEL = I18n.tr("Show Bandwidth Indicator:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,

@@ -49,7 +49,6 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
     /**
      * Does nothing.
      *
-     * @see BuddySupport#add(javax.swing.JComponent, Position, JTextField)
      */
     public void addLayoutComponent(String name, Component comp) {
     }
@@ -81,7 +80,6 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
     /**
      * Does nothing.
      *
-     * @see BuddySupport#remove(javax.swing.JComponent, JTextField)
      */
     public void removeLayoutComponent(Component comp) {
     }

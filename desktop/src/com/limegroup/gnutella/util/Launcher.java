@@ -128,7 +128,6 @@ public final class Launcher {
      * .bat, .sys, or .com extensions, diplaying an error if one of the file is
      * of one of these types.
      *
-     * @param path The path of the file to launch
      * @return an object for accessing the launch process; null, if the process
      * can be represented (e.g. the file was launched through a native
      * call)

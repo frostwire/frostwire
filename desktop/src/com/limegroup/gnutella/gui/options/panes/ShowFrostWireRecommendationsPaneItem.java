@@ -41,14 +41,12 @@ public final class ShowFrostWireRecommendationsPaneItem extends AbstractPaneItem
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public ShowFrostWireRecommendationsPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <tt>String</tt> for the
-         * frostclick promotions enabled check box label..
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          frostclick promotions enabled check box label..
          */
         String SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL = I18n.tr("Enable FrostWire Recommendations (highly recommended):");
         LabeledComponent c = new LabeledComponent(SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL,

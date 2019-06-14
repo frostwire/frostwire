@@ -31,16 +31,14 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public MaximumSearchesPaneItem() {
         super(TITLE, LABEL);
         _maxSearchesField = new SizedWholeNumberField();
-        /**
-         * Constant for the key of the locale-specific <code>String</code> for the
-         * label on the component that allows to user to change the setting for
-         * this <tt>PaneItem</tt>.
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          label on the component that allows to user to change the setting for
+          this <tt>PaneItem</tt>.
          */
         String OPTION_LABEL = I18n.tr("Maximum Searches:");
         LabeledComponent comp = new LabeledComponent(OPTION_LABEL,

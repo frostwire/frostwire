@@ -28,14 +28,12 @@ public final class StartupPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public StartupPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant for the key of the locale-specific <code>String</code> for the
-         * upload pane check box label in the options window.
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          upload pane check box label in the options window.
          */
         String CHECK_BOX_LABEL = I18n.tr("Run on System Startup:");
         LabeledComponent comp =

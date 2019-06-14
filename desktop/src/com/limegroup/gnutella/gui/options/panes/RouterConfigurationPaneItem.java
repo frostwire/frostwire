@@ -52,8 +52,8 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
      */
     public RouterConfigurationPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Constant handle to the check box that enables or disables this feature.
+        /*
+          Constant handle to the check box that enables or disables this feature.
          */
         ButtonGroup BUTTONS = new ButtonGroup();
         BUTTONS.add(RANDOM_PORT);

@@ -32,14 +32,12 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate strings
      */
     public IgnoreResultsPaneItem() {
         super(TITLE, LABEL);
-        /**
-         * Key for the locale-specifis string for the adult content check box
-         * label.
+        /*
+          Key for the locale-specifis string for the adult content check box
+          label.
          */
         String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
         IGNORE_ADULT_CHECK_BOX.setText(I18n.tr(ADULT_BOX_LABEL));

@@ -166,11 +166,10 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * corresponding "SearchField.*" properties from defaults table. The
      * {@link JXSearchField}s layout is set to the value returned by
      * <code>createLayout</code>. Also calls
-     * {@link #replaceBorderIfNecessary()} and {@link #updateButtons()}. This
+     *  and {@link #updateButtons()}. This
      * method is called by {@link #installUI(JComponent)}.
      *
      * @see #installUI
-     * @see #createLayout
      * @see JXSearchField#customSetUIProperty(String, Object)
      */
     protected void installDefaults() {

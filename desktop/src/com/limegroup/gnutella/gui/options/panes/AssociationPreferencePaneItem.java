@@ -33,8 +33,6 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
      * The constructor constructs all of the elements of this
      * <tt>AbstractPaneItem</tt>.
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that the
-     *            superclass uses to generate locale-specific keys
      */
     public AssociationPreferencePaneItem() {
         super(TITLE, LABEL);

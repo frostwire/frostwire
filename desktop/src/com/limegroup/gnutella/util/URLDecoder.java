@@ -1,5 +1,5 @@
-/**
- * Decodes a string from x-www-urlencoded format
+/*
+  Decodes a string from x-www-urlencoded format
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 package com.limegroup.gnutella.util;

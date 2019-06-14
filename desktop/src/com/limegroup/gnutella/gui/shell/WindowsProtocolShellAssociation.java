@@ -15,7 +15,6 @@ public class WindowsProtocolShellAssociation extends WindowsAssociation {
     /**
      * Make a new WindowsProtocolShellAssociation, specifying the program and protocol it will check for and set.
      *
-     * @param running  The path to the native executable that is us running right now
      * @param protocol The protocol without punctuation
      * @param name     The common name of the protocol
      */

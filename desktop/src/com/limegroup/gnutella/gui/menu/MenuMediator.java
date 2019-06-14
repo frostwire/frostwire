@@ -31,8 +31,8 @@ public final class MenuMediator {
      */
     private static MenuMediator INSTANCE;
 
-    /**
-     * We call this so that the menu won't be covered by the SWT Browser.
+    /*
+      We call this so that the menu won't be covered by the SWT Browser.
      */
     static {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -51,27 +51,27 @@ public final class MenuMediator {
      */
     private MenuMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
-        /**
-         * Constant handle to the single <tt>FileMenu</tt> instance for
-         * the application.
+        /*
+          Constant handle to the single <tt>FileMenu</tt> instance for
+          the application.
          */
         FileMenu FILE_MENU = new FileMenu();
         addMenu(FILE_MENU);
-        /**
-         * Constant handle to the single <tt>ViewMenu</tt> instance for
-         * the application.
+        /*
+          Constant handle to the single <tt>ViewMenu</tt> instance for
+          the application.
          */
         Menu VIEW_MENU = new ViewMenu();
         addMenu(VIEW_MENU);
-        /**
-         * Constant handle to the single <tt>ToolsMenu</tt> instance for
-         * the application.
+        /*
+          Constant handle to the single <tt>ToolsMenu</tt> instance for
+          the application.
          */
         Menu TOOLS_MENU = new ToolsMenu();
         addMenu(TOOLS_MENU);
-        /**
-         * Constant handle to the single <tt>HelpMenu</tt> instance for
-         * the application.
+        /*
+          Constant handle to the single <tt>HelpMenu</tt> instance for
+          the application.
          */
         Menu HELP_MENU = new HelpMenu();
         addMenu(HELP_MENU);
