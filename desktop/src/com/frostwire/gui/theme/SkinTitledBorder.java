@@ -49,10 +49,7 @@ public final class SkinTitledBorder extends TitledBorder {
         dest.y = y1;
         dest.width = x2 - x1;
         dest.height = y2 - y1;
-        if (dest.width <= 0 || dest.height <= 0) {
-            return false;
-        }
-        return true;
+        return dest.width > 0 && dest.height > 0;
     }
 
     @Override

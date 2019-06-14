@@ -153,10 +153,7 @@ public class MagnetOptions implements Serializable {
         for (String xt : topics)
             if (xt.startsWith("urn:btih"))
                 return true;
-        if (getDefaultURLs().length > 0) {
-            return true;
-        }
-        return false;
+        return getDefaultURLs().length > 0;
     }
 
     /**

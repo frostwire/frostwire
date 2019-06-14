@@ -168,12 +168,8 @@ public class WinRegistryUtil {
      */
     private static boolean isSubKeyExist(String subKey, int regLevel) {
         int hKey = getHKeyByLevel(regLevel);
-        if (WinRegistryWrapper.WinRegSubKeyExist(hKey, subKey)
-                == ERROR_ITEM_EXISTED) {
-            return true;
-        } else {
-            return false;
-        }
+        return WinRegistryWrapper.WinRegSubKeyExist(hKey, subKey)
+                == ERROR_ITEM_EXISTED;
     }
 
     /**
@@ -187,10 +183,8 @@ public class WinRegistryUtil {
     private static boolean isValueExist(String subKey, String valueName, int regLevel) {
         if (isSubKeyExist(subKey, regLevel)) {
             int hKey = getHKeyByLevel(regLevel);
-            if (WinRegistryWrapper.WinRegValueExist(hKey, subKey, valueName)
-                    == ERROR_ITEM_EXISTED) {
-                return true;
-            }
+            return WinRegistryWrapper.WinRegValueExist(hKey, subKey, valueName)
+                    == ERROR_ITEM_EXISTED;
         }
         return false;
     }

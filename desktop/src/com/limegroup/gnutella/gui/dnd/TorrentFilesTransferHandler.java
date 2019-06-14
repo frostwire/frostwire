@@ -41,11 +41,8 @@ public class TorrentFilesTransferHandler extends LimeTransferHandler {
 
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-        if (DNDUtils.contains(transferFlavors, DataFlavor.javaFileListFlavor)
-                || DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor)) {
-            return true;
-        }
-        return false;
+        return DNDUtils.contains(transferFlavors, DataFlavor.javaFileListFlavor)
+                || DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor);
     }
 
     @Override

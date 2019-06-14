@@ -674,11 +674,9 @@ final class TrieNode<E> {
         // precondition requires it to be lower, so we add the edge *after*
         // it. If there's no match, there are two cases: the Trie is empty,
         // or the closest match returned is the last edge in the list.
-        if ((i = search(labelStart = label.charAt(0), // find closest match
-                false)) >= 0) {
-            assert get(i).getLabelStart() != labelStart :
-                    "Precondition of TrieNode.put violated.";
-        }
+        assert (i = search(labelStart = label.charAt(0), // find closest match
+                false)) < 0 || get(i).getLabelStart() != labelStart :
+                "Precondition of TrieNode.put violated.";
         children.add(i + 1, new TrieEdge<>(label, child));
     }
 

@@ -129,11 +129,9 @@ public class Action {
             String otherDescription = otherAction.getDescription();
             String otherVerb = otherAction.getVerb();
             String otherCommand = otherAction.getCommand();
-            if ((Objects.equals(description, otherDescription))
+            return (Objects.equals(description, otherDescription))
                     && (Objects.equals(verb, otherVerb))
-                    && (Objects.equals(command, otherCommand))) {
-                return true;
-            }
+                    && (Objects.equals(command, otherCommand));
         }
         return false;
     }

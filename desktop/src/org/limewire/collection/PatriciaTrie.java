@@ -1465,8 +1465,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
                 if (Objects.equals(k1, k2)) {
                     Object v1 = getValue();
                     Object v2 = e.getValue();
-                    if (Objects.equals(v1, v2))
-                        return true;
+                    return Objects.equals(v1, v2);
                 }
                 return false;
             } else {
