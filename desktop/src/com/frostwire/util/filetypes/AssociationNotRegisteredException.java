@@ -28,23 +28,13 @@ package com.frostwire.util.filetypes;
  * @see AssociationService
  */
 public class AssociationNotRegisteredException extends AssociationException {
-    private static final long serialVersionUID = -3091626806993470802L;
-
-    /**
-     * Constructs an <code>AssociationNotRegisteredException</code> object with no
-     * detail message.
-     */
-    public AssociationNotRegisteredException() {
-        super();
-    }
-
     /**
      * Constructs an <code>AssociationNotRegisteredException</code> object with the
      * specified detail message.
      *
      * @param msg the detail message pertaining to this exception.
      */
-    public AssociationNotRegisteredException(String msg) {
+    AssociationNotRegisteredException(String msg) {
         super(msg);
     }
 }

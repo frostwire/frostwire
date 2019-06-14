@@ -106,7 +106,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         BTEngine engine = BTEngine.getInstance();
         long maxDownload = engine.downloadRateLimit();
         long maxUpload = engine.uploadRateLimit();
-        addSpeedMenu(menuAdvanced, true, true, downSpeedDisabled, downSpeedUnlimited, totalDownSpeed, downSpeedSetMax, maxDownload, upSpeedDisabled, upSpeedUnlimited, totalUpSpeed, upSpeedSetMax,
+        addSpeedMenu(menuAdvanced, downSpeedDisabled, downSpeedUnlimited, totalDownSpeed, downSpeedSetMax, maxDownload, upSpeedDisabled, upSpeedUnlimited, totalUpSpeed, upSpeedSetMax,
                 maxUpload, dms.length, new SpeedAdapter() {
                     public void setDownSpeed(final int speed) {
                         for (com.frostwire.bittorrent.BTDownload dm : dms) {
@@ -191,7 +191,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         return list.toArray(new com.frostwire.bittorrent.BTDownload[0]);
     }
 
-    private static void addSpeedMenu(SkinMenu menuAdvanced, boolean isTorrentContext, boolean hasSelection, boolean downSpeedDisabled, boolean downSpeedUnlimited, long totalDownSpeed,
+    private static void addSpeedMenu(SkinMenu menuAdvanced, boolean downSpeedDisabled, boolean downSpeedUnlimited, long totalDownSpeed,
                                      long downSpeedSetMax, long maxDownload, boolean upSpeedDisabled, boolean upSpeedUnlimited, long totalUpSpeed, long upSpeedSetMax, long maxUpload, final int num_entries,
                                      final SpeedAdapter adapter) {
         // advanced > Download Speed Menu //
@@ -231,7 +231,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemsDownSpeed[1].putClientProperty("maxdl", 0);
         itemsDownSpeed[1].addActionListener(itemsDownSpeedListener);
         menuDownSpeed.add(itemsDownSpeed[1]);
-        if (hasSelection) {
+        if (true) {
             //using 200KiB/s as the default limit when no limit set.
             if (maxDownload == 0) {
                 if (downSpeedSetMax == 0) {
@@ -310,7 +310,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemsUpSpeed[1].putClientProperty("maxul", 0);
         itemsUpSpeed[1].addActionListener(itemsUpSpeedListener);
         menuUpSpeed.add(itemsUpSpeed[1]);
-        if (hasSelection) {
+        if (true) {
             //using 75KiB/s as the default limit when no limit set.
             if (maxUpload == 0) {
                 maxUpload = 75 * 1024;

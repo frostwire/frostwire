@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.theme.SkinTableUI;
 import com.frostwire.gui.theme.ThemeMediator;
-import com.limegroup.gnutella.gui.AbstractCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
 

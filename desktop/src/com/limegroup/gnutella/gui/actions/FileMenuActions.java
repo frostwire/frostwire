@@ -179,11 +179,6 @@ public final class FileMenuActions {
         }
 
         private class PasteAction extends AbstractAction {
-            /**
-             *
-             */
-            private static final long serialVersionUID = -3351075105994389491L;
-
             PasteAction() {
                 super(I18n.tr("Paste"));
             }
@@ -194,11 +189,6 @@ public final class FileMenuActions {
         }
 
         private class BrowseAction extends AbstractAction {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 3000234847843826596L;
-
             BrowseAction() {
                 super(I18n.tr("Browse..."));
             }
@@ -226,11 +216,6 @@ public final class FileMenuActions {
         }
 
         private class CancelAction extends AbstractAction {
-            /**
-             *
-             */
-            private static final long serialVersionUID = 3350673081539434959L;
-
             CancelAction() {
                 super(I18n.tr("Cancel"));
             }
@@ -245,11 +230,6 @@ public final class FileMenuActions {
      * Exits the application.
      */
     public static class CloseAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -456007457702576349L;
-
         public CloseAction() {
             super(I18n.tr("&Close"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Close the program's main window"));
@@ -272,8 +252,6 @@ public final class FileMenuActions {
     }
 
     public static class CreateTorrentAction extends AbstractAction {
-        private static final long serialVersionUID = 1494672346951877693L;
-
         public CreateTorrentAction() {
             super(I18n.tr("Create New Torrent"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create a new .torrent file"));

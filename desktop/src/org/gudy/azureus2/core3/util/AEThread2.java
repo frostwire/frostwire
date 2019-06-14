@@ -114,6 +114,7 @@ abstract class AEThread2 {
         private JoinLock currentLock;
         private long last_active_time;
 
+        @SuppressWarnings("unused")
         threadWrapper(
                 String name,
                 boolean daemon) {

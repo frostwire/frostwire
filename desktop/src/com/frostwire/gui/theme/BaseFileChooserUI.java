@@ -49,6 +49,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -57,7 +58,7 @@ import java.util.Vector;
  * @author Jeff Dinkins
  */
 public class BaseFileChooserUI extends BasicFileChooserUI {
-    final static int space = 10;
+    private final static int space = 10;
     private static final Dimension hstrut5 = new Dimension(5, 1);
     //private static final Dimension hstrut11 = new Dimension(11, 1);
     private static final Dimension vstrut5 = new Dimension(1, 5);
@@ -112,7 +113,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     private String detailsViewButtonAccessibleName = null;
     private AlignedLabel fileNameLabel;
 
-    public BaseFileChooserUI(JFileChooser filechooser) {
+    BaseFileChooserUI(JFileChooser filechooser) {
         super(filechooser);
     }
 
@@ -360,11 +361,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         JFileChooser fc = getFileChooser();
         Boolean prop =
                 (Boolean) fc.getClientProperty("FileChooser.useShellFolder");
-        if (prop != null) {
-            useShellFolder = prop;
-        } else {
-            useShellFolder = fc.getFileSystemView().equals(FileSystemView.getFileSystemView());
-        }
+        useShellFolder = Objects.requireNonNullElseGet(prop, () -> fc.getFileSystemView().equals(FileSystemView.getFileSystemView()));
     }
 
     protected JPanel getButtonPanel() {
@@ -374,7 +371,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         return buttonPanel;
     }
 
-    protected JPanel getBottomPanel() {
+    private JPanel getBottomPanel() {
         if (bottomPanel == null) {
             bottomPanel = new JPanel();
         }
@@ -411,17 +408,17 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         SwingUtilities.replaceUIActionMap(fc, actionMap);
     }
 
-    protected ActionMap getActionMap2() {
+    private ActionMap getActionMap2() {
         return createActionMap2();
     }
 
-    protected ActionMap createActionMap2() {
+    private ActionMap createActionMap2() {
         ActionMap map = new ActionMapUIResource();
         FilePane.addActionsToMap(map, filePane.getActions());
         return map;
     }
 
-    protected JPanel createList(JFileChooser fc) {
+    private JPanel createList() {
         return filePane.createList();
     }
 
@@ -858,7 +855,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         }
 
         public JPanel createList() {
-            return BaseFileChooserUI.this.createList(getFileChooser());
+            return BaseFileChooserUI.this.createList();
         }
 
         public JPanel createDetailsView() {
@@ -1186,12 +1183,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      * Acts when DirectoryComboBox has changed the selected item.
      */
     protected class DirectoryComboBoxAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -372782296185641300L;
-
-        protected DirectoryComboBoxAction() {
+        DirectoryComboBoxAction() {
             super("DirectoryComboBoxAction");
         }
 
@@ -1205,10 +1197,6 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     }
 
     private class AlignedLabel extends JLabel {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 5729395346234189975L;
         private AlignedLabel[] group;
         private int maxWidth = 0;
 

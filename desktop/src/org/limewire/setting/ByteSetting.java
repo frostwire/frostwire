@@ -42,17 +42,12 @@ public final class ByteSetting extends AbstractNumberSetting<Byte> {
                 false, null, null);
     }
 
-    ByteSetting(Properties defaultProps, Properties props, String key,
-                byte defaultByte, byte min, byte max) {
-        super(defaultProps, props, key, String.valueOf(defaultByte),
-                true, min, max);
-    }
-
     /**
      * Returns the value of this setting.
      *
      * @return the value of this setting
      */
+    @SuppressWarnings("unused")
     public byte getValue() {
         return value;
     }
@@ -62,6 +57,7 @@ public final class ByteSetting extends AbstractNumberSetting<Byte> {
      *
      * @param value the value to store
      */
+    @SuppressWarnings("unused")
     public void setValue(byte value) {
         setValueInternal(String.valueOf(value));
     }
@@ -71,6 +67,7 @@ public final class ByteSetting extends AbstractNumberSetting<Byte> {
      *
      * @param sValue property string value
      */
+    @SuppressWarnings("unused")
     protected void loadValue(String sValue) {
         try {
             value = Byte.parseByte(sValue.trim());
@@ -79,6 +76,7 @@ public final class ByteSetting extends AbstractNumberSetting<Byte> {
         }
     }
 
+    @SuppressWarnings("unused")
     protected Comparable<Byte> convertToComparable(String value) {
         return Byte.valueOf(value);
     }

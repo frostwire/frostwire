@@ -1,20 +1,36 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.frostwire.gui.searchfield;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicTextUI;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class BuddySupport {
-    public static final String OUTER_MARGIN = "outerMargin";
+    private static final String OUTER_MARGIN = "outerMargin";
 
-    public static void addLeft(Component c, JTextField textField) {
+    static void addLeft(Component c, JTextField textField) {
         add(c, Position.LEFT, textField);
     }
 
-    public static void addRight(Component c, JTextField textField) {
+    static void addRight(Component c, JTextField textField) {
         add(c, Position.RIGHT, textField);
     }
 
@@ -37,15 +53,11 @@ public class BuddySupport {
         addToComponentHierarchy(c, pos, textField);
     }
 
-    public static void addGap(int width, Position pos, JTextField textField) {
-        add(createGap(width), pos, textField);
-    }
-
-    public static void setRight(JTextField textField, List<Component> rightBuddies) {
+    private static void setRight(JTextField textField, List<Component> rightBuddies) {
         set(rightBuddies, Position.RIGHT, textField);
     }
 
-    public static void setLeft(JTextField textField, List<Component> leftBuddies) {
+    private static void setLeft(JTextField textField, List<Component> leftBuddies) {
         set(leftBuddies, Position.LEFT, textField);
     }
 
@@ -61,15 +73,15 @@ public class BuddySupport {
         }
     }
 
-    public static List<Component> getLeft(JTextField textField) {
+    static List<Component> getLeft(JTextField textField) {
         return getBuddies(Position.LEFT, textField);
     }
 
-    public static List<Component> getRight(JTextField textField) {
+    static List<Component> getRight(JTextField textField) {
         return getBuddies(Position.RIGHT, textField);
     }
 
-    public static List<Component> getBuddies(Position pos, JTextField textField) {
+    private static List<Component> getBuddies(Position pos, JTextField textField) {
         return Collections.unmodifiableList(buddies(pos, textField));
     }
 
@@ -80,23 +92,6 @@ public class BuddySupport {
             return buddies;
         }
         return new ArrayList<>();
-    }
-
-    public static boolean isBuddy(Component c, JTextField textField) {
-        return buddies(Position.LEFT, textField).contains(c) || buddies(Position.RIGHT, textField).contains(c);
-    }
-
-    /**
-     * Because {@link BasicTextUI} removes all components when uninstalled and
-     * therefore all buddies are removed when the LnF changes.
-     *
-     * @param c
-     * @param textField
-     */
-    public static void remove(JComponent c, JTextField textField) {
-        buddies(Position.LEFT, textField).remove(c);
-        buddies(Position.RIGHT, textField).remove(c);
-        textField.remove(c);
     }
 
     public static void removeAll(JTextField textField) {
@@ -112,15 +107,15 @@ public class BuddySupport {
         right.clear();
     }
 
-    public static void setOuterMargin(JTextField buddyField, Insets margin) {
+    static void setOuterMargin(JTextField buddyField, Insets margin) {
         buddyField.putClientProperty(OUTER_MARGIN, margin);
     }
 
-    public static Insets getOuterMargin(JTextField buddyField) {
+    static Insets getOuterMargin(JTextField buddyField) {
         return (Insets) buddyField.getClientProperty(OUTER_MARGIN);
     }
 
-    public static void ensureBuddiesAreInComponentHierarchy(JTextField textField) {
+    static void ensureBuddiesAreInComponentHierarchy(JTextField textField) {
         for (Component c : BuddySupport.getLeft(textField)) {
             addToComponentHierarchy(c, Position.LEFT, textField);
         }
@@ -131,11 +126,8 @@ public class BuddySupport {
 
     /**
      * Create a gap to insert between to buddies.
-     *
-     * @param width
-     * @return
      */
-    public static Component createGap(int width) {
+    static Component createGap(int width) {
         return Box.createHorizontalStrut(width);
     }
 

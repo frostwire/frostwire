@@ -50,13 +50,12 @@ import java.util.Arrays;
  */
 public final class AC implements Externalizable {
     private final ArrayList<DimConstraint> cList = new ArrayList<>(8);
-    private transient int curIx = 0;
 
     /**
      * Constructor. Creates an instance that can be configured manually. Will be initialized with a default
      * {@link net.miginfocom.layout.DimConstraint}.
      */
-    public AC() {
+    AC() {
         cList.add(new DimConstraint());
     }
 
@@ -69,7 +68,7 @@ public final class AC implements Externalizable {
      * @return The different {@link net.miginfocom.layout.DimConstraint}s that this object consists of. A new list and
      * never <code>null</code>.
      */
-    public final DimConstraint[] getConstaints() {
+    final DimConstraint[] getConstaints() {
         return cList.toArray(new DimConstraint[0]);
     }
 
@@ -82,7 +81,7 @@ public final class AC implements Externalizable {
      *               will be copied for storage. <code>null</code> or and emty array will reset the constraints to one <code>DimConstraint</code>
      *               with default values.
      */
-    public final void setConstaints(DimConstraint[] constr) {
+    final void setConstaints(DimConstraint[] constr) {
         if (constr == null || constr.length < 1)
             constr = new DimConstraint[]{new DimConstraint()};
         cList.clear();
@@ -100,24 +99,6 @@ public final class AC implements Externalizable {
     }
 
     /**
-     * Specifies that the indicated rows/columns should not be grid-like. The while row/colum will have its components layed out
-     * in one single cell. It is the same as to say that the cells in this column/row will all be merged (a.k.a spanned).
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param indexes The index(es) (0-based) of the columns/rows that should be affected by this constraint.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-     */
-    public final AC noGrid(int... indexes) {
-        for (int i = indexes.length - 1; i >= 0; i--) {
-            int ix = indexes[i];
-            makeSize(ix);
-            cList.get(ix).setNoGrid(true);
-        }
-        return this;
-    }
-
-    /**
      * Specifies that the indicated rows'/columns' component should grow by default. It does not affect the size of the row/column.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
@@ -130,54 +111,6 @@ public final class AC implements Externalizable {
             int ix = indexes[i];
             makeSize(ix);
             cList.get(ix).setFill(true);
-        }
-        return this;
-    }
-//	/** Specifies that the current row/column should be put in the end group <code>s</code> and will thus share the same ending
-//	 * coordinate within the group.
-//	 * <p>
-//	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-//	 * @param s A name to associate on the group that should be the same for other rows/columns in the same group.
-//	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-//	 */
-//	public final AxisConstraint endGroup(String s)
-//	{
-//		return endGroup(s, curIx);
-//	}
-//
-//	/** Specifies that the indicated rows/columns should be put in the end group <code>s</code> and will thus share the same ending
-//	 * coordinate within the group.
-//	 * <p>
-//	 * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-//	 * @param s A name to associate on the group that should be the same for other rows/columns in the same group.
-//	 * @param indexes The index(es) (0-based) of the columns/rows that should be affected by this constraint.
-//	 * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-//	 */
-//	public final AxisConstraint endGroup(String s, int... indexes)
-//	{
-//		for (int i = indexes.length - 1; i >= 0; i--) {
-//			int ix = indexes[i];
-//			makeSize(ix);
-//			cList.get(ix).setEndGroup(s);
-//		}
-//		return this;
-//	}
-
-    /**
-     * Specifies that the indicated rows/columns should be put in the size group <code>s</code> and will thus share the same size
-     * constraints as the other components in the group.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param s       A name to associate on the group that should be the same for other rows/columns in the same group.
-     * @param indexes The index(es) (0-based) of the columns/rows that should be affected by this constraint.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-     */
-    public final AC sizeGroup(String s, int... indexes) {
-        for (int i = indexes.length - 1; i >= 0; i--) {
-            int ix = indexes[i];
-            makeSize(ix);
-            cList.get(ix).setSizeGroup(s);
         }
         return this;
     }
@@ -247,24 +180,6 @@ public final class AC implements Externalizable {
     }
 
     /**
-     * Specifies the indicated rows'/columns' grow priority.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p       The new grow priority.
-     * @param indexes The index(es) (0-based) of the columns/rows that should be affected by this constraint.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-     */
-    public final AC growPrio(int p, int... indexes) {
-        for (int i = indexes.length - 1; i >= 0; i--) {
-            int ix = indexes[i];
-            makeSize(ix);
-            cList.get(ix).setGrowPriority(p);
-        }
-        return this;
-    }
-
-    /**
      * Specifies the indicated rows'/columns' grow weight within columns/rows with the same <code>grow priority</code>.
      * <p>
      * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
@@ -284,24 +199,6 @@ public final class AC implements Externalizable {
     }
 
     /**
-     * Specifies the indicated rows'/columns' shrink priority.
-     * <p>
-     * For a more thorough explanation of what this constraint does see the white paper or cheat Sheet at www.migcomponents.com.
-     *
-     * @param p       The new shrink priority.
-     * @param indexes The index(es) (0-based) of the columns/rows that should be affected by this constraint.
-     * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
-     */
-    public final AC shrinkPrio(int p, int... indexes) {
-        for (int i = indexes.length - 1; i >= 0; i--) {
-            int ix = indexes[i];
-            makeSize(ix);
-            cList.get(ix).setShrinkPriority(p);
-        }
-        return this;
-    }
-
-    /**
      * Specifies that the current row/column's shrink weight withing the columns/rows with the same <code>shrink priority</code>.
      * <p>
      * For a more thorough explanation of what this constraint does see the White Paper or Cheat Sheet at www.migcomponents.com.
@@ -311,6 +208,7 @@ public final class AC implements Externalizable {
      * @since 3.7.2
      */
     public final AC shrink(float w) {
+        int curIx = 0;
         return shrink(w, curIx);
     }
 
@@ -378,7 +276,7 @@ public final class AC implements Externalizable {
         return LayoutUtil.getSerializedObject(this);
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         LayoutUtil.setSerializedObject(this, LayoutUtil.readAsXML(in));
     }
 

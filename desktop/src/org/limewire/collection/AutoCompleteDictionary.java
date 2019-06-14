@@ -37,6 +37,7 @@ public interface AutoCompleteDictionary extends Iterable<String> {
      * @return True if successful, false if the string is not contained or cannot
      * be removed.
      */
+    @SuppressWarnings("UnusedReturnValue")
     boolean removeEntry(String s);
 
     /**

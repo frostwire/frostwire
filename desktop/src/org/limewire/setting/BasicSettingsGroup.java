@@ -46,6 +46,7 @@ public class BasicSettingsGroup extends AbstractSettingsGroup {
      *
      * @return the <tt>Properties</tt> instance for storing settings
      */
+    @SuppressWarnings("unused")
     public Properties getProperties() {
         return FACTORY.getProperties();
     }

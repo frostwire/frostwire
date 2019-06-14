@@ -67,7 +67,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Variable for whether or not this list has been sorted
      * at least once.
      */
-    protected boolean _isSorted = false;
+    private boolean _isSorted = false;
 
     /*
      * Constructor -- creates the model, tying it to
@@ -158,9 +158,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         fireTableDataChanged();
     }
 
-    //Cleans up all the datalines.
+    //Cleans up all the data lines.
     protected void cleanup() {
-        int end = _list.size();
         for (T t : _list) {
             t.cleanup();
         }
@@ -169,7 +168,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * Basic linear update.
      * Extending classes may wish to override this function to provide
-     * a fine-tuned refresh, possibly recieving feedback from each
+     * a fine-tuned refresh, possibly receiving feedback from each
      * row after it is updated.  The return value can be used to notify
      * the Mediator of information related to the refresh.
      *
@@ -215,7 +214,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * Returns an initialized new dataline.
      */
-    public T getNewDataLine(E o) {
+    private T getNewDataLine(E o) {
         T dl = createDataLine();
         dl.initialize(o);
         return dl;
@@ -232,7 +231,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * with _list as the list, the DataLine as the key, and this
      * as the Comparator.
      */
-    public int getSortedPosition(T dl) {
+    private int getSortedPosition(T dl) {
         // Collections.binarySearch return notes:
         // index of the search key, if it is contained in the list;
         // otherwise, (-(insertion point) - 1). The insertion point
@@ -418,13 +417,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * @return true if List contains the Object o in column col.
-     * @notes Extending classes may wish to override this function
      * if a particular column is searched frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
      */
     public boolean contains(Object o, int col) {
-        int end = _list.size();
         for (T t : _list) {
             if (t.getValueAt(col).equals(o))
                 return true;
@@ -435,13 +432,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * @return true if the List contains a DataLine that was initialized
      * by Object o.
-     * @notes Extending classes may wish to override this function
      * if searching is done frequently, using a HashMap.
-     * The add(Object, int) & sort function should be overriden to intialize
+     * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
      */
     public boolean contains(Object o) {
-        int end = _list.size();
         for (T t : _list) {
             if (t.getInitializeObject().equals(o))
                 return true;
@@ -459,7 +454,6 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * @return the index of the first DataLine that contains Object o
      * in column col.
-     * @notes Extending classes may wish to override this function
      * if a particular column is searched frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
@@ -475,7 +469,6 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     /**
      * @return the index of the first DataLine that was initialized by Object o.
-     * @notes Extending classes may wish to override this function
      * if searching is done frequently, using a HashMap.
      * The add(Object, int) & sort function should be overriden to initialize
      * the HashMap.
@@ -516,7 +509,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     }
 
     /**
-     * Returns the number of columns as speicifed by the data line.
+     * Returns the number of columns as specified by the data line.
      */
     public int getColumnCount() {
         if (_internalDataLine == null)

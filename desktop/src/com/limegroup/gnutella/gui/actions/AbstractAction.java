@@ -27,11 +27,7 @@ import javax.swing.*;
  * will set the name of the action to "Hello World" and its menomonic to 'W'.
  */
 public abstract class AbstractAction extends javax.swing.AbstractAction {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 5133426772218480351L;
-
+    @SuppressWarnings("unused")
     public AbstractAction(String name, Icon icon) {
         super(name, icon);
     }

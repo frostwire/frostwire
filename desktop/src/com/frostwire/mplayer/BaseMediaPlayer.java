@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.mplayer;
@@ -25,29 +27,14 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     private final List<PositionListener> positionListeners;
     private final List<TaskListener> taskListeners;
     private final List<IcyInfoListener> icyInfoListeners;
-    //private float				reopeningPos;
-    //private MediaPlaybackState  reopeningPriorState;
-    //private SubtitleMonitor		subtitleMonitor;
     protected PlayerPreferences preferences;
     private MediaPlaybackState currentState;
     private int currentVolume;
-    private int videoWidth;
-    private int videoHeight;
-    private int displayWidth;
-    private int displayHeight;
     private float currentPositionInSecs;
     private float durationInSecs;
-    private boolean durationInSecsSet;
     private List<Language> audioTracks;
     private List<Language> subtitles;
-    private String activeAudioTrackId = "0";
-    private LanguageSource activeSubtitleSource = null;
-    private String activeSubtitleId = null;
     private String openedFile;
-
-    public BaseMediaPlayer() {
-        this(null);
-    }
 
     public BaseMediaPlayer(PlayerPreferences preferences) {
         this.preferences = preferences;
@@ -69,30 +56,14 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         openedFile = null;
         audioTracks = new ArrayList<>();
         subtitles = new ArrayList<>();
-        activeAudioTrackId = "0";
-        activeSubtitleId = null;
-        activeSubtitleSource = null;
         durationInSecs = 0;
-        durationInSecsSet = false;
         currentPositionInSecs = 0;
         currentState = MediaPlaybackState.Uninitialized;
-    }
-
-    public void addMetaDataListener(MetaDataListener listener) {
-        synchronized (metaDataListeners) {
-            metaDataListeners.add(listener);
-        }
     }
 
     public void addStateListener(StateListener listener) {
         synchronized (stateListeners) {
             stateListeners.add(listener);
-        }
-    }
-
-    public void addVolumeListener(VolumeListener listener) {
-        synchronized (volumeListeners) {
-            volumeListeners.add(listener);
         }
     }
 
@@ -130,37 +101,23 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
 
     public abstract void doSetVolume(int volume);
 
+    @SuppressWarnings("unused")
     public abstract void doLoadSubtitlesFile(String file, boolean autoPlay);
-
-    private void doLoadSubtitlesFile(String file) {
-        doLoadSubtitlesFile(file, true);
-    }
 
     public void open(String fileOrUrl, int initialVolume) {
         if (currentState == MediaPlaybackState.Uninitialized || currentState == MediaPlaybackState.Stopped) {
             openedFile = fileOrUrl;
-            //subtitleMonitor = new SubtitleMonitor(fileOrUrl);
             doOpen(fileOrUrl, initialVolume);
         } else {
             doStop();
             initialize();
             openedFile = fileOrUrl;
-            //subtitleMonitor = new SubtitleMonitor(fileOrUrl);
             doOpen(fileOrUrl, initialVolume);
         }
-        //Finds subtitles
-//		String[] subtitles = OpenSubtitlesAPI.getLocalSubtitlesForFile(fileOrUrl);
-//		for(String subtitle:subtitles) {
-//			doLoadSubtitlesFile(subtitle,false);
-//		}
     }
 
     public String getOpenedFile() {
         return openedFile;
-    }
-
-    public void loadSubtitlesFile(String file) {
-        doLoadSubtitlesFile(file);
     }
 
     public void fastForward() {
@@ -197,46 +154,6 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         }
     }
 
-    public void removeMetaDataListener(MetaDataListener listener) {
-        synchronized (metaDataListeners) {
-            while (metaDataListeners.contains(listener)) {
-                metaDataListeners.remove(listener);
-            }
-        }
-    }
-
-    public void removeStateListener(StateListener listener) {
-        synchronized (stateListeners) {
-            while (stateListeners.contains(listener)) {
-                stateListeners.remove(listener);
-            }
-        }
-    }
-
-    public void removeVolumeListener(VolumeListener listener) {
-        synchronized (volumeListeners) {
-            while (volumeListeners.contains(listener)) {
-                volumeListeners.remove(listener);
-            }
-        }
-    }
-
-    public void removePositionListener(PositionListener listener) {
-        synchronized (positionListeners) {
-            while (positionListeners.contains(listener)) {
-                positionListeners.remove(listener);
-            }
-        }
-    }
-
-    public void removeIcyInfoListener(IcyInfoListener listener) {
-        synchronized (icyInfoListeners) {
-            while (icyInfoListeners.contains(listener)) {
-                icyInfoListeners.remove(listener);
-            }
-        }
-    }
-
     public synchronized void seek(float timeInSecs) {
         if (timeInSecs < 0) timeInSecs = 0;
         if (timeInSecs > durationInSecs) timeInSecs = durationInSecs;
@@ -245,17 +162,17 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         }
     }
 
+    @SuppressWarnings("unused")
     public void incrementVolume() {
         setVolume(getVolume() + 10);
     }
 
+    @SuppressWarnings("unused")
     public void decrementVolume() {
         setVolume(getVolume() - 10);
     }
 
     public void receivedDisplayResolution(int width, int height) {
-        displayWidth = width;
-        displayHeight = height;
         synchronized (metaDataListeners) {
             for (MetaDataListener listener : metaDataListeners) {
                 listener.receivedDisplayResolution(width, height);
@@ -264,11 +181,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void receivedDuration(float durationInSecs) {
-        durationInSecsSet = true;
         this.durationInSecs = durationInSecs;
-//		if(subtitleMonitor != null) {
-//			subtitleMonitor.setVideoDuration(durationInSecs);
-//		}
         synchronized (metaDataListeners) {
             for (MetaDataListener listener : metaDataListeners) {
                 listener.receivedDuration(durationInSecs);
@@ -277,8 +190,6 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void receivedVideoResolution(int width, int height) {
-        videoWidth = width;
-        videoHeight = height;
         synchronized (metaDataListeners) {
             for (MetaDataListener listener : metaDataListeners) {
                 listener.receivedVideoResolution(width, height);
@@ -309,7 +220,6 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void activeAudioTrackChanged(String audioTrackId) {
-        activeAudioTrackId = audioTrackId;
         synchronized (metaDataListeners) {
             for (MetaDataListener listener : metaDataListeners) {
                 listener.activeAudioTrackChanged(audioTrackId);
@@ -318,33 +228,10 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void activeSubtitleChanged(String subtitleId, LanguageSource source) {
-        //System.out.println(subtitleId + " " + source);
-        activeSubtitleId = subtitleId;
-        activeSubtitleSource = source;
-//		if(subtitleMonitor != null) {
-//			Language subtitle = getSubtitleByIdAndSource(subtitleId,source);
-//			if(subtitle != null && subtitle.source == LanguageSource.FILE) {
-//				subtitleMonitor.subtitleSet(subtitle.getSourceInfo());
-//			} else {
-//				subtitleMonitor.subtitleSet(null);
-//			}
-//		}
         synchronized (metaDataListeners) {
             for (MetaDataListener listener : metaDataListeners) {
                 listener.activeSubtitleChanged(subtitleId, source);
             }
-        }
-    }
-
-    private Language getSubtitleByIdAndSource(String subtitleId, LanguageSource source) {
-        if (subtitleId == null) return null;
-        synchronized (subtitles) {
-            for (Language l : subtitles) {
-                if (l.id != null && l.id.equals(subtitleId) && l.source == source) {
-                    return l;
-                }
-            }
-            return null;
         }
     }
 
@@ -381,20 +268,6 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         synchronized (icyInfoListeners) {
             for (IcyInfoListener listener : icyInfoListeners) {
                 listener.newIcyInfoData(data);
-            }
-        }
-    }
-
-    public void addTaskListener(TaskListener listener) {
-        synchronized (taskListeners) {
-            taskListeners.add(listener);
-        }
-    }
-
-    public void removeTaskListener(TaskListener listener) {
-        synchronized (taskListeners) {
-            while (taskListeners.contains(listener)) {
-                taskListeners.remove(listener);
             }
         }
     }
@@ -443,70 +316,11 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         }
     }
 
-    public int getVideoWidth() {
-        return videoWidth;
-    }
-
-    public int getVideoHeight() {
-        return videoHeight;
-    }
-
-    public int getDisplayWidth() {
-        return displayWidth;
-    }
-
-    public int getDisplayHeight() {
-        return displayHeight;
-    }
-
     public float getPositionInSecs() {
         return currentPositionInSecs;
     }
 
-    public void
-    clearDurationInSecs() {
-        durationInSecs = 0;
-        durationInSecsSet = false;
-    }
-
     public float getDurationInSecs() {
         return durationInSecs;
-    }
-
-    public void
-    setDurationInSecs(
-            float secs) {
-        // this is a hint in case we don't receive a real value, which sometimes happens during streaming :(
-        if (!durationInSecsSet) {
-            durationInSecs = secs;
-        }
-    }
-
-    public Language[] getAudioTracks() {
-        List<Language> result = new ArrayList<>();
-        synchronized (audioTracks) {
-            result.addAll(audioTracks);
-        }
-        return result.toArray(new Language[0]);
-    }
-
-    public Language[] getSubtitles() {
-        List<Language> result = new ArrayList<>();
-        synchronized (subtitles) {
-            result.addAll(subtitles);
-        }
-        return result.toArray(new Language[0]);
-    }
-
-    public String getActiveAudioTrackId() {
-        return activeAudioTrackId;
-    }
-
-    public String getActiveSubtitleId() {
-        return activeSubtitleId;
-    }
-
-    public Language getActiveSubtitle() {
-        return getSubtitleByIdAndSource(activeSubtitleId, activeSubtitleSource);
     }
 }

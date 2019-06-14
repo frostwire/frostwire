@@ -34,9 +34,8 @@ public class BoxPanel extends JPanel {
      * be oriented along the y axis.
      */
     public static final int Y_AXIS = BoxLayout.Y_AXIS;
-    public static final Dimension HORIZONTAL_COMPONENT_GAP = new Dimension(6, 0);
-    public static final Dimension VERTICAL_COMPONENT_GAP = new Dimension(0, 6);
-    public static final Dimension LINE_GAP = new Dimension(0, 10);
+    private static final Dimension HORIZONTAL_COMPONENT_GAP = new Dimension(6, 0);
+    private static final Dimension VERTICAL_COMPONENT_GAP = new Dimension(0, 6);
 
     /**
      * Creates a default <tt>BoxPanel</tt> with a <tt>BoxLayout</tt> oriented
@@ -69,14 +68,10 @@ public class BoxPanel extends JPanel {
      * @throws IllegalArgumentException if the <tt>orientation</tt> is not
      *                                  a valid <tt>BoxPanel</tt> orientation
      */
-    public void setOrientation(int orientation) {
+    void setOrientation(@SuppressWarnings("SameParameterValue") int orientation) {
         if (orientation != X_AXIS && orientation != Y_AXIS)
             throw new IllegalArgumentException("Illegal BoxPanel orientation");
         setLayout(new BoxLayout(this, orientation));
-    }
-
-    public void addLineGap() {
-        add(Box.createRigidArea(BoxPanel.LINE_GAP));
     }
 
     public void addHorizontalComponentGap() {
@@ -87,17 +82,7 @@ public class BoxPanel extends JPanel {
         add(Box.createRigidArea(BoxPanel.VERTICAL_COMPONENT_GAP));
     }
 
-    public void addLeft(JComponent component) {
-        component.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        super.add(component);
-    }
-
-    public void addCenter(JComponent component) {
-        component.setAlignmentX(Component.CENTER_ALIGNMENT);
-        super.add(component);
-    }
-
-    public void addRight(JComponent component) {
+    void addRight(JComponent component) {
         component.setAlignmentX(Component.LEFT_ALIGNMENT);
         super.add(component);
     }

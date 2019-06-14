@@ -85,11 +85,11 @@ final class BTDownloadActions {
 
     private static abstract class RefreshingAction extends AbstractAction {
         public final void actionPerformed(ActionEvent e) {
-            performAction(e);
+            performAction();
             BTDownloadMediator.instance().doRefresh();
         }
 
-        protected abstract void performAction(ActionEvent e);
+        protected abstract void performAction();
     }
 
     private static class ExploreAction extends RefreshingAction {
@@ -105,7 +105,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length > 0) {
                 // when the downloader is a single file, this is appending a folder to the actual file path
@@ -137,7 +137,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_SHOW_IN_LIBRARY");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length > 0) {
                 final String toExplore = downloaders[0].getDisplayName();
@@ -157,7 +157,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_FILE_MORE_SOURCES");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             BTDownload lastSelectedDownload = null;
             if (downloaders.length == 1) {
@@ -179,7 +179,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_PAUSE");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             BTDownload lastSelectedDownload = null;
             if (downloaders.length == 1) {
@@ -222,7 +222,7 @@ final class BTDownloadActions {
             _deleteData = deleteData;
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             if (_deleteData) {
                 DialogOption result = GUIMediator.showYesNoMessage(I18n.tr("Are you sure you want to remove the data files from your computer?\n\nYou won't be able to recover the files."), I18n.tr("Are you sure?"), JOptionPane.QUESTION_MESSAGE);
                 if (result != DialogOption.YES)
@@ -258,7 +258,7 @@ final class BTDownloadActions {
         }
 
         @Override
-        protected void performAction(ActionEvent e) {
+        protected void performAction() {
             BTDownloadMediator.instance().removeCompleted();
         }
     }
@@ -271,7 +271,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "COPY_MAGNET");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < downloaders.length; i++) {
@@ -303,7 +303,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "COPY_HASH");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < downloaders.length; i++) {
@@ -325,7 +325,7 @@ final class BTDownloadActions {
             //putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("share"));
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length != 1) {
                 return;

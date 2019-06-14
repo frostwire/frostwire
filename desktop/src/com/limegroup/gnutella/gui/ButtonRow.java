@@ -30,12 +30,12 @@ public final class ButtonRow extends JPanel {
      * This will create a "glue" at the top of the button panel, pushing
      * the buttons to the bottom.
      */
-    public static final int TOP_GLUE = 10;
+    private static final int TOP_GLUE = 10;
     /**
      * This will create a "glue" at the bottom of the button panel, pushing
      * the buttons to the top.
      */
-    public static final int BOTTOM_GLUE = 11;
+    private static final int BOTTOM_GLUE = 11;
     /**
      * This will create a "glue" at the left of the button panel, pushing
      * the buttons to the left.
@@ -60,27 +60,6 @@ public final class ButtonRow extends JPanel {
      */
     private JButton[] _buttons;
 
-    /**
-     * Creates a row of buttons with standard separation between
-     * each button and with the specified tooltips and listeners.
-     * This constructor uses the default <tt>X_AXIS</tt> orientation
-     * and the default <tt>NO_GLUE</tt>.
-     *
-     * @param labelKeys   the array of keys for looking up the
-     *                    locale-specific labels to use for the buttons
-     * @param tooltipKeys the array of keys for looking up the
-     *                    locale-specific tooltips to use for the buttons
-     * @param listeners   the array of <tt>ActionListeners</tt> to use
-     *                    for the buttons
-     * @throws <tt>IllegalArgumentException</tt> if the lengths of the
-     *                                           arrays in the constructor are not all equal
-     */
-    public ButtonRow(String[] labelKeys,
-                     String[] toolTipKeys,
-                     EventListener[] listeners) {
-        this(labelKeys, toolTipKeys, listeners, null, X_AXIS, NO_GLUE);
-    }
-
     public ButtonRow(String[] labelKeys,
                      String[] toolTipKeys,
                      EventListener[] listeners,
@@ -96,8 +75,6 @@ public final class ButtonRow extends JPanel {
      *
      * @param labelKeys   the array of keys for looking up the locale-specific
      *                    labels to use for the buttons
-     * @param tooltipKeys the array of keys for looking up the locale-specific
-     *                    tooltips to use for the buttons
      * @param listeners   the array of <tt>ActionListeners</tt> to use
      *                    for the buttons
      * @param orientation the orientation to use for the row of buttons,
@@ -105,8 +82,6 @@ public final class ButtonRow extends JPanel {
      * @param glue        the glue determining the placement of the buttons,
      *                    either TOP_GLUE, BOTTOM_GLUE, LEFT_GLUE, RIGHT_GLUE,
      *                    or NO_GLUE
-     * @throws <tt>IllegalArgumentException</tt> if the lengths of the
-     *                                           arrays in the constructor are not all equal
      */
     public ButtonRow(String[] labelKeys,
                      String[] toolTipKeys,
@@ -311,22 +286,6 @@ public final class ButtonRow extends JPanel {
     public void setButtonsEnabled(final boolean enabled) {
         for (JButton button : _buttons) {
             button.setEnabled(enabled);
-        }
-    }
-
-    /**
-     * Tranforms the text and the tooltip of the button.
-     *
-     * @param index The index of the button to change.
-     * @param label The new label for the button.
-     * @param tip   The new tip for the button.
-     */
-    public void transformButton(int index, final String label,
-                                final String tip) {
-        final JButton button = getButtonAtIndex(index);
-        if (button != null) {
-            button.setText(label);
-            button.setToolTipText(tip);
         }
     }
 }

@@ -22,6 +22,7 @@ package org.gudy.azureus2.core3.util;
 
 import java.util.concurrent.Semaphore;
 
+@SuppressWarnings("unused")
 class AESemaphore2 {
     private final Semaphore sem = new Semaphore(0);
 

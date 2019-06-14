@@ -55,7 +55,7 @@ public class LimeTransferHandler extends TransferHandler {
      */
     @Override
     protected Transferable createTransferable(JComponent c) {
-        return new BasicTransferableCreator(c).getTransferable();
+        return new BasicTransferableCreator().getTransferable();
     }
 
     /**

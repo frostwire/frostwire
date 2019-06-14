@@ -20,7 +20,6 @@
 
 package com.frostwire.util.filetypes;
 
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 //import org.jdesktop.jdic.filetypes.internal.AppAssociationWriter;
@@ -53,18 +52,6 @@ import java.util.List;
  * @see Action
  */
 public class AssociationService {
-    // Add the initialization code from package org.jdesktop.jdic.init.
-    // To set the environment variables or initialize the set up for
-    // native libraries and executable files.
-    static {
-//        try {
-//            JdicManager jm = JdicManager.getManager();
-//            jm.initShareNative();
-//        } catch (JdicInitException e){
-//            e.printStackTrace();
-//        }
-    }
-
     // A platform-dependent instance of AppAssociationReader.
     private AppAssociationReader appAssocReader;
     // A platform-dependent instance of AppAssociationWriter.
@@ -176,35 +163,6 @@ public class AssociationService {
     }
 
     /**
-     * Returns the association representing the file type of the file the given
-     * URL points to.
-     *
-     * @param url a given URL.
-     * @return the appropriate <code>Association</code> object; <code>null</code>
-     * if the file type of the file the given URL points to is not
-     * found in the system.
-     */
-    public Association getAssociationByContent(URL url) {
-        if (url == null) {
-            throw new IllegalArgumentException("The specified URL is null");
-        }
-        Association assoc = null;
-        String mimeType = appAssocReader.getMimeTypeByURL(url);
-        if (mimeType != null) {
-            // Get association by mime type.
-            assoc = getMimeTypeAssociation(mimeType);
-        }
-        if (assoc == null) {
-            // Get association by file extension.
-            String fileExt = AppUtility.getFileExtensionByURL(url);
-            if (fileExt != null) {
-                assoc = getFileExtensionAssociation(fileExt);
-            }
-        }
-        return assoc;
-    }
-
-    /**
      * Registers the given association in the user specific level.
      * <p>
      * <ul>
@@ -236,11 +194,7 @@ public class AssociationService {
             throw new IllegalArgumentException("The specified association is null");
         }
         // Check whether the specified association is valid for registration.
-        try {
-            appAssocWriter.checkAssociationValidForRegistration(assoc);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
+        appAssocWriter.checkAssociationValidForRegistration(assoc);
         // Check whether the specified association already exists.
         if (appAssocWriter.isAssociationExist(assoc, AppAssociationWriter.USER_LEVEL)) {
             throw new AssociationAlreadyRegisteredException("Assocation already exists!");
@@ -292,88 +246,5 @@ public class AssociationService {
         }
         // Perform unregistration.
         appAssocWriter.unregisterAssociation(assoc, AppAssociationWriter.USER_LEVEL);
-    }
-
-    /**
-     * Registers the given association in the system level.
-     * <p>
-     * <ul>
-     *   <li> For Microsoft Windows platforms: the file extension list and MIME
-     *        type can't all be null. If any of the description, icon file name, action
-     *        list fields is not null, the file extension list couldn't be empty.
-     * <p>
-     *        For Windows XP: the user needs the administrator permission to
-     *        access the system association information in the registry.
-     *
-     *  <li>  For Gnome/Unix platforms: both the name and MIME type fields need to
-     *        be specified to perform this operation.
-     * </ul>
-     *
-     * @param assoc a given <code>Association</code> object.
-     * @throws IllegalArgumentException              if the given association is not valid for
-     *                                               this operation.
-     * @throws AssociationAlreadyRegisteredException if the given association
-     *                                               already exists in the system.
-     * @throws RegisterFailedException               if the given association fails to be
-     *                                               registered in the system.
-     */
-    public void registerSystemAssociation(Association assoc)
-            throws AssociationAlreadyRegisteredException, RegisterFailedException {
-        if (assoc == null) {
-            throw new IllegalArgumentException("The specified association is null");
-        }
-        // Check whether the specified association is valid for registration.
-        try {
-            appAssocWriter.checkAssociationValidForRegistration(assoc);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
-        // Check whether the specified association already exists.
-        if (appAssocWriter.isAssociationExist(assoc, AppAssociationWriter.SYSTEM_LEVEL)) {
-            throw new AssociationAlreadyRegisteredException("Assocation already exists!");
-        }
-        // Perform registration.
-        appAssocWriter.registerAssociation(assoc, AppAssociationWriter.SYSTEM_LEVEL);
-    }
-
-    /**
-     * Unregisters the given association in the system level.
-     * <p>
-     * <ul>
-     *   <li> For Microsoft Windows platforms: either the MIME type or the file extension
-     *        list field needs to be specified to perform this operation.
-     * <p>
-     *        For Windows XP: the user needs the administrator permission to access the
-     *        system association information in the registry.
-     *
-     *   <li> For Gnome/Unix platforms: only the name field needs to be specified to
-     *        perform this operation.
-     * </ul>
-     * <p>
-     *
-     * @param assoc a given Association object.
-     * @throws IllegalArgumentException          if the given association is not valid for
-     *                                           this operation.
-     * @throws AssociationNotRegisteredException if the given association doesn't
-     *                                           exist in the system.
-     * @throws RegisterFailedException           if the given association fails to be
-     *                                           unregistered in the system.
-     */
-    public void unregisterSystemAssociation(Association assoc)
-            throws AssociationNotRegisteredException, RegisterFailedException {
-        if (assoc == null) {
-            throw new IllegalArgumentException("The specified association is null");
-        }
-        // Check whether the specified association is valid for unregistration.
-        try {
-            appAssocWriter.checkAssociationValidForUnregistration(assoc);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
-        // Check whether the specified association not exists.
-        if (!appAssocWriter.isAssociationExist(assoc, AppAssociationWriter.SYSTEM_LEVEL)) {
-            throw new AssociationNotRegisteredException("Assocation not existed!");
-        }
-        appAssocWriter.unregisterAssociation(assoc, AppAssociationWriter.SYSTEM_LEVEL);
     }
 }
