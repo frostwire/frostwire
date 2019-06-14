@@ -408,9 +408,9 @@ public final class UnitValue implements Serializable {
                 case DIV:
                     return r1 / r2;
                 case MIN:
-                    return r1 < r2 ? r1 : r2;
+                    return Math.min(r1, r2);
                 case MAX:
-                    return r1 > r2 ? r1 : r2;
+                    return Math.max(r1, r2);
                 case MID:
                     return (r1 + r2) * 0.5f;
             }

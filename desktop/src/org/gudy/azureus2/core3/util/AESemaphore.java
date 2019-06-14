@@ -97,7 +97,7 @@ public class AESemaphore {
                     throw (new RuntimeException("Semaphore: operation interrupted", e));
                 }
             } else {
-                int num_to_get = 1 > dont_wait ? dont_wait : 1;
+                int num_to_get = Math.min(1, dont_wait);
                 dont_wait -= num_to_get;
                 total_reserve += num_to_get;
             }

@@ -809,7 +809,7 @@ public final class Grid {
             return newValue;
         if (newValue == LayoutUtil.NOT_SET)
             return oldValue;
-        return oldValue <= newValue ? newValue : oldValue;
+        return Math.max(oldValue, newValue);
     }
 
     private static int constrainSize(int s) {

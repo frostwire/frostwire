@@ -471,9 +471,9 @@ public class CMYKJPEGImageReader extends ImageReader {
                             >> SCALEBITS));
             cmykY = MAXJSAMPLE - (y + Cb_b_tab[cb]);    // blue
             /* K passes through unchanged */
-            cmyk[i] = (cmykC < 0 ? 0 : (cmykC > 255) ? 255 : cmykC) << 24
-                    | (cmykM < 0 ? 0 : (cmykM > 255) ? 255 : cmykM) << 16
-                    | (cmykY < 0 ? 0 : (cmykY > 255) ? 255 : cmykY) << 8
+            cmyk[i] = (cmykC < 0 ? 0 : Math.min(cmykC, 255)) << 24
+                    | (cmykM < 0 ? 0 : Math.min(cmykM, 255)) << 16
+                    | (cmykY < 0 ? 0 : Math.min(cmykY, 255)) << 8
                     | 255 - ycckK[i];
         }
         return Raster.createPackedRaster(
@@ -501,9 +501,9 @@ public class CMYKJPEGImageReader extends ImageReader {
                             >> SCALEBITS));
             cmykY = MAXJSAMPLE - (y + Cb_b_tab[cb]);    // blue
             /* K passes through unchanged */
-            cmyk[i] = (cmykC < 0 ? 0 : (cmykC > 255) ? 255 : cmykC) << 24
-                    | (cmykM < 0 ? 0 : (cmykM > 255) ? 255 : cmykM) << 16
-                    | (cmykY < 0 ? 0 : (cmykY > 255) ? 255 : cmykY) << 8
+            cmyk[i] = (cmykC < 0 ? 0 : Math.min(cmykC, 255)) << 24
+                    | (cmykM < 0 ? 0 : Math.min(cmykM, 255)) << 16
+                    | (cmykY < 0 ? 0 : Math.min(cmykY, 255)) << 8
                     | ycckK[i];
         }
         return Raster.createPackedRaster(
