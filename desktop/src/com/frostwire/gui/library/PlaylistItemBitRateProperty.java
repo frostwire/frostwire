@@ -22,8 +22,8 @@ package com.frostwire.gui.library;
  * @author aldenml
  */
 final class PlaylistItemBitRateProperty extends PlaylistItemIntProperty {
-    public PlaylistItemBitRateProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean playing, boolean exists) {
-        super(line, getStringValue(stringValue), getIntValue(stringValue), playing, exists);
+    PlaylistItemBitRateProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean exists) {
+        super(line, getStringValue(stringValue), getIntValue(stringValue), exists);
     }
 
     private static String getStringValue(String stringValue) {

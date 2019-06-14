@@ -235,11 +235,7 @@ public class AssociationService {
             throw new IllegalArgumentException("The specified association is null");
         }
         // Check whether the specified association is valid for unregistration.
-        try {
-            appAssocWriter.checkAssociationValidForUnregistration(assoc);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
+        appAssocWriter.checkAssociationValidForUnregistration(assoc);
         // Check whether the specified association not exists.
         if (!appAssocWriter.isAssociationExist(assoc, AppAssociationWriter.USER_LEVEL)) {
             throw new AssociationNotRegisteredException("Assocation not exists!");

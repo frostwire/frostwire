@@ -28,7 +28,7 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public class LibraryActionsHolder extends AbstractActionsHolder {
+public final class LibraryActionsHolder extends AbstractActionsHolder {
     LibraryActionsHolder(DataLine<?> dataLine, boolean playing) {
         super(dataLine, playing);
     }

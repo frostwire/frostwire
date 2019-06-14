@@ -18,12 +18,10 @@
 package com.frostwire.gui.library;
 
 abstract class PlaylistItemProperty<T> implements Comparable<T> {
-    private final boolean playing;
     private final boolean exists;
     final LibraryPlaylistsTableDataLine line;
 
-    PlaylistItemProperty(LibraryPlaylistsTableDataLine line, boolean playing, boolean exists) {
-        this.playing = playing;
+    PlaylistItemProperty(LibraryPlaylistsTableDataLine line, boolean exists) {
         this.exists = exists;
         this.line = line;
     }

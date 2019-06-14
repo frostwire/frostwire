@@ -24,8 +24,8 @@ package com.frostwire.gui.library;
  * @author aldenml
  */
 class PlaylistItemStarProperty extends PlaylistItemProperty<PlaylistItemStarProperty> {
-    PlaylistItemStarProperty(LibraryPlaylistsTableDataLine line, boolean isPlaying, boolean exists) {
-        super(line, isPlaying, exists);
+    PlaylistItemStarProperty(LibraryPlaylistsTableDataLine line, boolean exists) {
+        super(line, exists);
     }
 
     @Override
@@ -35,7 +35,6 @@ class PlaylistItemStarProperty extends PlaylistItemProperty<PlaylistItemStarProp
 
     @Override
     public String getStringValue() {
-        // nothing to do
         return "";
     }
 }

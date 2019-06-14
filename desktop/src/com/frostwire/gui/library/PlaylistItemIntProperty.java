@@ -25,14 +25,14 @@ class PlaylistItemIntProperty extends PlaylistItemProperty<PlaylistItemIntProper
     private final String stringValue;
     private final int intValue;
 
-    public PlaylistItemIntProperty(LibraryPlaylistsTableDataLine line, int value, boolean playing, boolean exists) {
-        super(line, playing, exists);
+    public PlaylistItemIntProperty(LibraryPlaylistsTableDataLine line, int value, boolean exists) {
+        super(line, exists);
         intValue = value;
         stringValue = value > 0 ? String.valueOf(value) : "";
     }
 
-    PlaylistItemIntProperty(LibraryPlaylistsTableDataLine line, String stringValue, int intValue, boolean playing, boolean exists) {
-        super(line, playing, exists);
+    PlaylistItemIntProperty(LibraryPlaylistsTableDataLine line, String stringValue, int intValue, boolean exists) {
+        super(line, exists);
         this.intValue = intValue;
         this.stringValue = stringValue;
     }
