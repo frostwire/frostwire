@@ -138,7 +138,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
         return comp;
     }
 
-    public abstract List<MediaSource> getFilesView();
+    protected abstract List<MediaSource> getFilesView();
 
     public MediaType getMediaType() {
         return mediaType;
@@ -293,7 +293,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
             LibraryUtils.asyncAddToPlaylist(playlist, getSelectedLines());
         }
 
-        public void setName(String name) {
+        void setName(String name) {
             putValue(Action.NAME, name);
         }
     }

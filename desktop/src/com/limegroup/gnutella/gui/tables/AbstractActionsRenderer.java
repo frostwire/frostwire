@@ -54,7 +54,7 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private JLabel labelDownload;
     private boolean showSolid;
 
-    public AbstractActionsRenderer() {
+    protected AbstractActionsRenderer() {
         setupUI();
     }
 

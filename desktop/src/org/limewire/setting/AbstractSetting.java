@@ -89,8 +89,8 @@ public abstract class AbstractSetting implements Setting {
      * @param defaultValue the defaultValue for the setting
      *                     setting is already contained in the map of default settings
      */
-    protected AbstractSetting(Properties defaultProps, Properties props, String key,
-                              String defaultValue) {
+    AbstractSetting(Properties defaultProps, Properties props, String key,
+                    String defaultValue) {
         DEFAULT_PROPS = defaultProps;
         PROPS = props;
         KEY = key;
@@ -215,7 +215,7 @@ public abstract class AbstractSetting implements Setting {
      *              can update all kinds of settings using a String value.
      *              StringSetting updates the access to public.
      */
-    protected void setValueInternal(String value) {
+    void setValueInternal(String value) {
         String old = PROPS.getProperty(KEY);
         if (old == null || !old.equals(value)) {
             PROPS.setProperty(KEY, value);
@@ -263,7 +263,7 @@ public abstract class AbstractSetting implements Setting {
     /**
      * Returns the default value
      */
-    public Object getDefaultValue() {
+    Object getDefaultValue() {
         return DEFAULT_PROPS.getProperty(KEY);
     }
 }

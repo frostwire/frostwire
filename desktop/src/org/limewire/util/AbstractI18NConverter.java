@@ -24,7 +24,7 @@ abstract class AbstractI18NConverter {
      * copy from Character.java
      * the boundaries for each of the unicode blocks
      */
-    static final char[] blockStarts = {
+    private static final char[] blockStarts = {
             '\u0000',
             '\u0080',
             '\u0100',
@@ -171,7 +171,7 @@ abstract class AbstractI18NConverter {
      *
      * @return index to array
      */
-    int of(char c) {
+    private int of(char c) {
         int top, bottom, current;
         bottom = 0;
         top = blockStarts.length;

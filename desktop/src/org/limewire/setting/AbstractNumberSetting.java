@@ -35,7 +35,7 @@ public abstract class AbstractNumberSetting<T extends Number & Comparable<T>> ex
      * Adds a safeguard against remote making a setting take a value beyond the
      * reasonable max
      */
-    protected final T MAX_VALUE;
+    private final T MAX_VALUE;
     /**
      * Adds a safeguard against remote making a setting take a value below the
      * reasonable min

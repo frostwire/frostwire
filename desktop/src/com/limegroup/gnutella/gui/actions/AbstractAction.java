@@ -32,11 +32,11 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
         super(name, icon);
     }
 
-    public AbstractAction(String name) {
+    protected AbstractAction(String name) {
         super(name);
     }
 
-    public AbstractAction() {
+    protected AbstractAction() {
     }
 
     @Override

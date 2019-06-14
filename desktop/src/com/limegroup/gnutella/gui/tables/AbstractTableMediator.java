@@ -106,27 +106,27 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Variable for the RemoveListener for this component.
      */
-    public ActionListener REMOVE_LISTENER;
+    protected ActionListener REMOVE_LISTENER;
     /**
      * Variable for the DefaultMouseListener for this component.
      */
-    public MouseListener DEFAULT_LISTENER;
+    private MouseListener DEFAULT_LISTENER;
     /**
      * Variable for the HeaderMouseListener for this component.
      */
-    public MouseInputListener HEADER_LISTENER;
+    private MouseInputListener HEADER_LISTENER;
     /**
      * Variable for the ListSelectionListener for this component.
      */
-    public ListSelectionListener SELECTION_LISTENER;
+    private ListSelectionListener SELECTION_LISTENER;
     /**
      * KeyListener for moving based on typing.
      */
-    public KeyListener AUTO_NAVIGATION_KEY_LISTENER;
+    private KeyListener AUTO_NAVIGATION_KEY_LISTENER;
     /**
      * Variable for the TableSettings for this component.
      */
-    public TableSettings SETTINGS;
+    protected TableSettings SETTINGS;
     /**
      * Variable to the main component displaying this Table.
      * MUST be initialized in setupConstants()
@@ -149,7 +149,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Resorter -- for doing real-time resorts.
      */
-    protected Resorter RESORTER = new Resorter();
+    private Resorter RESORTER = new Resorter();
     /**
      * The <tt>Component</tt> containing the <tt>JScrollPane</tt> for the
      * table.
@@ -164,7 +164,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * package internal event listeners, which want to suppress events during
      * resorting.
      */
-    protected boolean isResorting = false;
+    boolean isResorting = false;
 
     /**
      * Basic constructor that uses a Template Pattern to delegate the
@@ -308,7 +308,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * Sets row heights a little larger than normal, turns off
      * the display of the grid and disallows column selections.
      */
-    protected void setupTable() {
+    void setupTable() {
         TABLE.setRowHeight(TABLE.getRowHeight() + 1);
         TABLE.setShowGrid(false);
         //TABLE.setIntercellSpacing(ZERO_DIMENSION);
@@ -322,7 +322,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * <p>
      * Currently sets the 'action' key to call 'handleActionKey'.
      */
-    protected void addActions() {
+    void addActions() {
         InputMap map = TABLE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         Action enter = new AbstractAction() {
             private static final long serialVersionUID = 5177362850526818763L;
@@ -501,7 +501,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Forces the object to be added unsorted.
      */
-    public void addUnsorted(I o) {
+    protected void addUnsorted(I o) {
         if (TABLE.isEditing()) {
             CellEditor editor = TABLE.getCellEditor();
             editor.cancelCellEditing();
@@ -822,35 +822,35 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      */
     protected abstract JPopupMenu createPopupMenu();
 
-    protected TableCellRenderer getProgressBarRenderer() {
+    private TableCellRenderer getProgressBarRenderer() {
         if (PROGRESS_BAR_RENDERER == null) {
             PROGRESS_BAR_RENDERER = new ProgressBarRenderer();
         }
         return PROGRESS_BAR_RENDERER;
     }
 
-    protected TableCellRenderer getSpeedRenderer() {
+    private TableCellRenderer getSpeedRenderer() {
         if (SPEED_RENDERER == null) {
             SPEED_RENDERER = new SpeedRenderer();
         }
         return SPEED_RENDERER;
     }
 
-    protected TableCellRenderer getColorRenderer() {
+    private TableCellRenderer getColorRenderer() {
         if (COLOR_RENDERER == null) {
             COLOR_RENDERER = new ColorRenderer();
         }
         return COLOR_RENDERER;
     }
 
-    protected TableCellRenderer getIconRenderer() {
+    private TableCellRenderer getIconRenderer() {
         if (ICON_RENDERER == null) {
             ICON_RENDERER = new IconRenderer();
         }
         return ICON_RENDERER;
     }
 
-    protected TableCellRenderer getIconAndNameRenderer() {
+    private TableCellRenderer getIconAndNameRenderer() {
         if (ICON_AND_NAME_RENDERER == null) {
             ICON_AND_NAME_RENDERER = new IconAndNameRenderer();
         }
@@ -864,7 +864,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         return SOURCE_RENDERER;
     }
 
-    protected TableCellRenderer getActionIconAndNameRenderer() {
+    private TableCellRenderer getActionIconAndNameRenderer() {
         if (ACTION_ICON_AND_NAME_RENDERER == null) {
             ACTION_ICON_AND_NAME_RENDERER = new ActionIconAndNameRenderer();
         }
@@ -878,21 +878,21 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         return SEARCH_RESULT_ACTIONS_RENDERER;
     }
 
-    protected TableCellRenderer getDefaultRenderer() {
+    private TableCellRenderer getDefaultRenderer() {
         if (DEFAULT_RENDERER == null) {
             DEFAULT_RENDERER = new DefaultTableBevelledCellRenderer();//new DefaultTableCellRenderer();
         }
         return DEFAULT_RENDERER;
     }
 
-    protected TableCellRenderer getCenterRenderer() {
+    private TableCellRenderer getCenterRenderer() {
         if (CENTER_RENDERER == null) {
             CENTER_RENDERER = new CenteredRenderer();
         }
         return CENTER_RENDERER;
     }
 
-    protected TableCellRenderer getDateRenderer() {
+    private TableCellRenderer getDateRenderer() {
         if (DATE_RENDERER == null) {
             DATE_RENDERER = new DateRenderer();
         }

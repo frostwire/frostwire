@@ -33,7 +33,7 @@ abstract class AbstractMenu implements Menu {
      * Constant handle to the <tt>JMenu</tt> instance for this
      * <tt>AbstractMenu</tt>.
      */
-    protected final JMenu MENU;
+    final JMenu MENU;
 
     /**
      * Creates a new <tt>AbstractMenu</tt>, using the <tt>key</tt>
@@ -41,7 +41,7 @@ abstract class AbstractMenu implements Menu {
      * accessibility text.
      *
      */
-    protected AbstractMenu(String name) {
+    AbstractMenu(String name) {
         // using an action here to get the mnemonic parsed
         MENU = new JMenu(new MenuAction(name));
         MENU.addMenuListener(new RefreshMenuListener());
@@ -56,11 +56,12 @@ abstract class AbstractMenu implements Menu {
         return MENU;
     }
 
-    protected JMenuItem addMenuItem(Action action) {
+    @SuppressWarnings("UnusedReturnValue")
+    JMenuItem addMenuItem(Action action) {
         return addMenuItem(action, null);
     }
 
-    protected JMenuItem addMenuItem(Action action, KeyStroke acceleratorKeyStroke) {
+    JMenuItem addMenuItem(Action action, KeyStroke acceleratorKeyStroke) {
         JMenuItem item = new JMenuItem(action);
         if (acceleratorKeyStroke != null) {
             item.setAccelerator(acceleratorKeyStroke);
@@ -69,7 +70,7 @@ abstract class AbstractMenu implements Menu {
         return item;
     }
 
-    protected JMenuItem addToggleMenuItem(Action action, boolean selected) {
+    private JMenuItem addToggleMenuItem(Action action, boolean selected) {
         JMenuItem item;
         if (OSUtils.isMacOSX()) {
             item = new JRadioButtonMenuItem(action);
@@ -81,24 +82,25 @@ abstract class AbstractMenu implements Menu {
         return item;
     }
 
-    protected JMenuItem addToggleMenuItem(ToggleSettingAction action) {
+    @SuppressWarnings("UnusedReturnValue")
+    JMenuItem addToggleMenuItem(ToggleSettingAction action) {
         return addToggleMenuItem(action, action.getSetting().getValue());
     }
 
     /**
      * Adds a separator to the <tt>JMenu</tt> instance.
      */
-    protected void addSeparator() {
+    void addSeparator() {
         MENU.addSeparator();
     }
 
-    protected void refresh() {
+    void refresh() {
     }
 
     private static class MenuAction extends AbstractAction {
         private static final long serialVersionUID = -4311768902578846258L;
 
-        public MenuAction(String name) {
+        MenuAction(String name) {
             super(name);
         }
 

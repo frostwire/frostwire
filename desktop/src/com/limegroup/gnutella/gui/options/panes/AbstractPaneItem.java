@@ -47,11 +47,11 @@ public abstract class AbstractPaneItem implements PaneItem {
      * This sole constructor overrides the the public accessibility of the
      * default constructor and is usually called implicitly.
      */
-    protected AbstractPaneItem(final String title, final String text) {
+    AbstractPaneItem(final String title, final String text) {
         this(title, text, null);
     }
 
-    protected AbstractPaneItem(final String title, final String text, String url) {
+    private AbstractPaneItem(final String title, final String text, String url) {
         CONTAINER.setTitle(title);
         // make sure the panel always expands to the full width of the dialog
         add(Box.createHorizontalGlue());
@@ -105,7 +105,7 @@ public abstract class AbstractPaneItem implements PaneItem {
      *
      * @param comp the <tt>Component</tt> to add
      */
-    protected final void add(Component comp) {
+    final void add(Component comp) {
         CONTAINER.add(comp);
     }
 
