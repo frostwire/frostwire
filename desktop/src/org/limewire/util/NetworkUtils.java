@@ -62,7 +62,7 @@ public final class NetworkUtils {
      * <p>
      * This method is IPv6 compliant
      */
-    public static byte[] getBytes(InetAddress addr, int port) {
+    private static byte[] getBytes(InetAddress addr, int port) {
         if (!isValidPort(port)) {
             throw new IllegalArgumentException("Port out of range: " + port);
         }

@@ -9,18 +9,18 @@ import java.beans.PropertyChangeEvent;
  *
  * @author Peter Weishapl <petw@gmx.net>
  */
-public class NativeSearchFieldSupport {
+class NativeSearchFieldSupport {
     public static final String FIND_POPUP_PROPERTY = "JTextField.Search.FindPopup";
     public static final String FIND_ACTION_PROPERTY = "JTextField.Search.FindAction";
-    public static final String MAC_SEARCH_VARIANT = "search";
-    public static final String MAC_TEXT_FIELD_VARIANT_PROPERTY = "JTextField.variant";
+    private static final String MAC_SEARCH_VARIANT = "search";
+    private static final String MAC_TEXT_FIELD_VARIANT_PROPERTY = "JTextField.variant";
     public static final String CANCEL_ACTION_PROPERTY = "JTextField.Search.CancelAction";
     private static final SearchFieldUIChangeHandler uiChangeHandler = new SearchFieldUIChangeHandler();
 
     /**
      * @return <code>true</code> if we run Leopard and the Mac Look And Feel.
      */
-    public static boolean isNativeSearchFieldSupported() {
+    private static boolean isNativeSearchFieldSupported() {
         return false;
     }
 

@@ -213,7 +213,7 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
         com.apple.concurrent.Dispatch.getInstance().getNonBlockingMainQueueExecutor().execute(() -> awtMessage(view, messageID, message));
     }
 
-    protected String getImagesPath() {
+    private String getImagesPath() {
         boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire-desktop");
         return (isRelease) ? getReleaseImagesPath() : "components/resources/src/main/resources/org/limewire/gui/images/";
     }

@@ -137,7 +137,7 @@ public class NativeFileIconController implements FileIconController {
      * Just to be safe, we do this on the Swing thread, since we've seen
      * deadlocks when constructing JFileChooser ones outside the Swing thread.
      */
-    public SmartFileView constructFSVView() {
+    private SmartFileView constructFSVView() {
         final AtomicReference<SmartFileView> ref = new AtomicReference<>();
         GUIMediator.safeInvokeAndWait(() -> ref.set(new FSVFileView()));
         return ref.get();
@@ -237,17 +237,17 @@ public class NativeFileIconController implements FileIconController {
         /**
          * Checks to see if the given icon is cached.
          */
-        public abstract boolean isIconCached(File f);
+        protected abstract boolean isIconCached(File f);
 
         /**
          * Removes a file from the cache, if possible.
          */
-        public abstract boolean removeFromCache(File f);
+        protected abstract boolean removeFromCache(File f);
 
         /**
          * Determines if this view is working.  By default, returns true.
          */
-        public boolean isViewAvailable() {
+        boolean isViewAvailable() {
             return true;
         }
     }
@@ -417,7 +417,7 @@ public class NativeFileIconController implements FileIconController {
          */
         private final Set<File> CACHE = new FixedsizeForgetfulHashSet<>(5000, 1000);
 
-        public SmartChooserView(FileView delegate) {
+        SmartChooserView(FileView delegate) {
             DELEGATE = delegate;
         }
 

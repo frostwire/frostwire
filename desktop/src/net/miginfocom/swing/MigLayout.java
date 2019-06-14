@@ -120,7 +120,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      *
      * @param layoutConstraints The constraints that concern the whole layout. <code>null</code> will be treated as an empty constraint.
      */
-    public MigLayout(LC layoutConstraints) {
+    private MigLayout(LC layoutConstraints) {
         this(layoutConstraints, null, null);
     }
 
@@ -130,7 +130,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      * @param layoutConstraints The constraints that concern the whole layout. <code>null</code> will be treated as an empty constraint.
      * @param colConstraints    The constraints for the columns in the grid. <code>null</code> will be treated as an empty constraint.
      */
-    public MigLayout(LC layoutConstraints, AC colConstraints) {
+    private MigLayout(LC layoutConstraints, AC colConstraints) {
         this(layoutConstraints, colConstraints, null);
     }
 
@@ -141,7 +141,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      * @param colConstraints    The constraints for the columns in the grid. <code>null</code> will be treated as an empty constraint.
      * @param rowConstraints    The constraints for the rows in the grid. <code>null</code> will be treated as an empty constraint.
      */
-    public MigLayout(LC layoutConstraints, AC colConstraints, AC rowConstraints) {
+    private MigLayout(LC layoutConstraints, AC colConstraints, AC rowConstraints) {
         setLayoutConstraints(layoutConstraints);
         setColumnConstraints(colConstraints);
         setRowConstraints(rowConstraints);
@@ -166,7 +166,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      * @param constr The layout constraints as a String representation. <code>null</code> is converted to <code>""</code> for storage.
      * @throws RuntimeException if the constraint was not valid.
      */
-    public void setLayoutConstraints(Object constr) {
+    private void setLayoutConstraints(Object constr) {
         if (constr == null || constr instanceof String) {
             constr = ConstraintParser.prepare((String) constr);
             lc = ConstraintParser.parseLayoutConstraint((String) constr);
@@ -197,7 +197,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      * @param constr The column layout constraints as a String representation. <code>null</code> is converted to <code>""</code> for storage.
      * @throws RuntimeException if the constraint was not valid.
      */
-    public void setColumnConstraints(Object constr) {
+    private void setColumnConstraints(Object constr) {
         if (constr == null || constr instanceof String) {
             constr = ConstraintParser.prepare((String) constr);
             colSpecs = ConstraintParser.parseColumnConstraints((String) constr);
@@ -230,7 +230,7 @@ public final class MigLayout implements LayoutManager2, Externalizable {
      * @param constr The row layout constraints as a String representation. <code>null</code> is converted to <code>""</code> for storage.
      * @throws RuntimeException if the constraint was not valid.
      */
-    public void setRowConstraints(Object constr) {
+    private void setRowConstraints(Object constr) {
         if (constr == null || constr instanceof String) {
             constr = ConstraintParser.prepare((String) constr);
             rowSpecs = ConstraintParser.parseRowConstraints((String) constr);

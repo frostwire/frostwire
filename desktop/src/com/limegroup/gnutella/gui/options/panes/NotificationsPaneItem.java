@@ -12,8 +12,8 @@ import javax.swing.*;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class NotificationsPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Notifications");
-    public final static String LABEL = I18n.tr("FrostWire can display popups to notify you when certain things happen, such as a download completing.");
+    private final static String TITLE = I18n.tr("Notifications");
+    private final static String LABEL = I18n.tr("FrostWire can display popups to notify you when certain things happen, such as a download completing.");
     private final JCheckBox SHOW_NOTIFICATIONS_CHECK_BOX = new JCheckBox();
 
     public NotificationsPaneItem() {

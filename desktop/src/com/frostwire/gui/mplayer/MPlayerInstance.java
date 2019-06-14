@@ -752,7 +752,7 @@ MPlayerInstance {
         KEEP_FORCE    // pass the pausing_keep_force prefix
     }
 
-    protected interface
+    interface
     OutputConsumer {
         void
         consume(

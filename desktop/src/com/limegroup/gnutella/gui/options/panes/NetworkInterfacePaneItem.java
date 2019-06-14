@@ -35,8 +35,8 @@ import java.util.Random;
  * Allows the user to pick a custom interface/address to bind to.
  */
 public class NetworkInterfacePaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Network Interface");
-    public final static String LABEL = I18n.tr("You can tell FrostWire to bind outgoing connections to an IP address from a specific network interface. Listening sockets will still listen on all available interfaces. This is useful on multi-homed hosts. If you later disable this interface, FrostWire will revert to binding to an arbitrary address.");
+    private final static String TITLE = I18n.tr("Network Interface");
+    private final static String LABEL = I18n.tr("You can tell FrostWire to bind outgoing connections to an IP address from a specific network interface. Listening sockets will still listen on all available interfaces. This is useful on multi-homed hosts. If you later disable this interface, FrostWire will revert to binding to an arbitrary address.");
     private static final String ADDRESS = "frostwire.networkinterfacepane.address";
     private final ButtonGroup GROUP = new ButtonGroup();
     private final JCheckBox CUSTOM;

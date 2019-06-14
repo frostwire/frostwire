@@ -127,7 +127,7 @@ public class MultiLineLabel extends JTextArea {
      * @param s      the <tt>String</tt> to display in the label
      * @param pixels the pixel limit for each line
      */
-    public void setText(String s, int pixels) {
+    private void setText(String s, int pixels) {
         _theText = s;
         super.setText(createSizedString(s, pixels));
     }

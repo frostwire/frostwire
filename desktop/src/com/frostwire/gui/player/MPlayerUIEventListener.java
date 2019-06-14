@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.player;
 
-public interface MPlayerUIEventListener {
+interface MPlayerUIEventListener {
     void onUIVolumeChanged(float volume);
 
     void onUIVolumeIncremented();
