@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class AbstractUIChangeHandler implements PropertyChangeListener {
+abstract class AbstractUIChangeHandler implements PropertyChangeListener {
     //prevent double installation.
     private final Set<JComponent> installed = new HashSet<>();
 
@@ -17,11 +17,11 @@ public abstract class AbstractUIChangeHandler implements PropertyChangeListener 
         installed.add(c);
     }
 
-    public boolean isInstalled(JComponent c) {
+    private boolean isInstalled(JComponent c) {
         return installed.contains(c);
     }
 
-    public void uninstall(JComponent c) {
+    void uninstall(JComponent c) {
         c.removePropertyChangeListener("UI", this);
         installed.remove(c);
     }

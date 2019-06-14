@@ -33,10 +33,10 @@ import javax.swing.tree.TreePath;
  * @author Steffen Pingel
  */
 public abstract class AbstractTreeModel implements TreeModel {
-    protected transient EventListenerList listenerList = new EventListenerList();
-    protected StringBuilder root;
+    private transient EventListenerList listenerList = new EventListenerList();
+    StringBuilder root;
 
-    public AbstractTreeModel(String root) {
+    AbstractTreeModel(String root) {
         this.root = new StringBuilder(root);
     }
 
@@ -49,7 +49,7 @@ public abstract class AbstractTreeModel implements TreeModel {
         listenerList.add(TreeModelListener.class, l);
     }
 
-    protected void fireTreeNodesInserted(TreeModelEvent e) {
+    void fireTreeNodesInserted(TreeModelEvent e) {
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
@@ -60,7 +60,7 @@ public abstract class AbstractTreeModel implements TreeModel {
         }
     }
 
-    protected void fireTreeNodesRemoved(TreeModelEvent e) {
+    void fireTreeNodesRemoved(TreeModelEvent e) {
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
@@ -71,7 +71,7 @@ public abstract class AbstractTreeModel implements TreeModel {
         }
     }
 
-    protected void fireTreeStructureChanged(TreeModelEvent e) {
+    void fireTreeStructureChanged(TreeModelEvent e) {
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying
@@ -82,7 +82,7 @@ public abstract class AbstractTreeModel implements TreeModel {
         }
     }
 
-    protected void fireTreeNodesChanged(TreeModelEvent e) {
+    void fireTreeNodesChanged(TreeModelEvent e) {
         // Guaranteed to return a non-null array
         Object[] listeners = listenerList.getListenerList();
         // Process the listeners last to first, notifying

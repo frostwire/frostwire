@@ -308,7 +308,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * Sets row heights a little larger than normal, turns off
      * the display of the grid and disallows column selections.
      */
-    void setupTable() {
+    private void setupTable() {
         TABLE.setRowHeight(TABLE.getRowHeight() + 1);
         TABLE.setShowGrid(false);
         //TABLE.setIntercellSpacing(ZERO_DIMENSION);
@@ -322,7 +322,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * <p>
      * Currently sets the 'action' key to call 'handleActionKey'.
      */
-    void addActions() {
+    private void addActions() {
         InputMap map = TABLE.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         Action enter = new AbstractAction() {
             private static final long serialVersionUID = 5177362850526818763L;
@@ -521,7 +521,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             // (if the previous row was selected,
             //  then the newly added one will be selected also)
             TABLE.removeRowSelectionInterval(addedAt, addedAt);
-            // (and must reselect an older row, 'cause unselecting moves
+            // (and must reselect an older row, 'cause un-selecting moves
             //  the traversing focus)
             int selected = TABLE.getSelectedRow();
             if (selected >= 0 && selected < DATA_MODEL.getRowCount()) {
@@ -631,7 +631,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      * and fires deletions through the dataModel
      * <p>
      * Cancels any editing that may be occurring prior to updating the model, we
-     * must do this since editing will be occuring on the row that will be removed.
+     * must do this since editing will be occurring on the row that will be removed.
      */
     public void removeSelection() {
         if (TABLE.isEditing()) {

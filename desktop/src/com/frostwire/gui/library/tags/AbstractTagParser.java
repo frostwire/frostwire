@@ -32,13 +32,13 @@ import java.io.File;
  */
 abstract class AbstractTagParser implements TagsParser {
     private static final Logger LOG = Logger.getLogger(AbstractTagParser.class);
-    protected final File file;
+    final File file;
 
-    public AbstractTagParser(File file) {
+    AbstractTagParser(File file) {
         this.file = file;
     }
 
-    protected static BufferedImage imageFromData(byte[] data) {
+    static BufferedImage imageFromData(byte[] data) {
         BufferedImage image = null;
         try {
             try {
@@ -52,7 +52,7 @@ abstract class AbstractTagParser implements TagsParser {
         return image;
     }
 
-    protected TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
+    TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
         if (title == null || title.length() == 0) {
             title = FilenameUtils.getBaseName(file.getAbsolutePath());
         }
@@ -79,8 +79,7 @@ abstract class AbstractTagParser implements TagsParser {
         if (track == null) {
             track = "";
         } else {
-            int index = -1;
-            index = track.indexOf('/');
+            int index = track.indexOf('/');
             if (index != -1) {
                 track = track.substring(0, index);
             }

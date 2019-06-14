@@ -31,7 +31,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
     private static final String IMAGES_PATH = "org/limewire/gui/images/skin_";
     protected final ShapeGenerator shapeGenerator;
 
-    public AbstractSkinPainter() {
+    protected AbstractSkinPainter() {
         this.shapeGenerator = new ShapeGenerator();
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
      * @param colors
      * @return a valid LinearGradientPaint. This method never returns null.
      */
-    protected final LinearGradientPaint createGradient(float x1, float y1, float x2, float y2, float[] midpoints, Color[] colors) {
+    private LinearGradientPaint createGradient(float x1, float y1, float x2, float y2, float[] midpoints, Color[] colors) {
         if (x1 == x2 && y1 == y2) {
             y2 += .00001f;
         }
@@ -82,7 +82,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
         return x >= 0 && y >= 0 && (w - x) > 0 && (h - y) > 0;
     }
 
-    protected final Image getImage(String name) {
+    final Image getImage(String name) {
         String imagePath = IMAGES_PATH + name + ".png";
         try {
             return ImageIO.read(ClassLoader.getSystemResource(imagePath));

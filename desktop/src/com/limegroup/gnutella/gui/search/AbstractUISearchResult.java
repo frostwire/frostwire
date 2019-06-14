@@ -37,7 +37,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     private final String query;
     private final String extension;
 
-    public AbstractUISearchResult(FileSearchResult sr, SearchEngine se, String query) {
+    AbstractUISearchResult(FileSearchResult sr, SearchEngine se, String query) {
         this.sr = sr;
         this.se = se;
         this.query = query;

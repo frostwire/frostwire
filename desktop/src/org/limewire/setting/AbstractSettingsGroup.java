@@ -9,20 +9,16 @@ import java.util.Collection;
 /**
  * An abstract implementation of SettingsGroup
  */
-public abstract class AbstractSettingsGroup implements SettingsGroup {
+abstract class AbstractSettingsGroup implements SettingsGroup {
     /**
      * List of {@link SettingsGroupListener}s
      */
     private Collection<SettingsGroupListener> listeners;
-    /**
-     * Value for whether or not settings should be saved to file.
-     */
-    private volatile boolean shouldSave = true;
 
     /**
      * Returns all {@link SettingsGroupListener}s or null if there are none
      */
-    public SettingsGroupListener[] getSettingsGroupListeners() {
+    private SettingsGroupListener[] getSettingsGroupListeners() {
         synchronized (this) {
             if (listeners == null) {
                 return null;
@@ -34,21 +30,21 @@ public abstract class AbstractSettingsGroup implements SettingsGroup {
     /* (non-Javadoc)
      * @see org.limewire.setting.SettingsGroup#getShouldSave()
      */
-    public boolean getShouldSave() {
-        return shouldSave;
+    boolean getShouldSave() {
+        return true;
     }
 
     /**
      * Fires a SettingsEvent
      */
-    protected void fireSettingsEvent(EventType type) {
+    void fireSettingsEvent(EventType type) {
         fireSettingsEvent(new SettingsGroupEvent(type, this));
     }
 
     /**
      * Fires a SettingsEvent
      */
-    protected void fireSettingsEvent(final SettingsGroupEvent evt) {
+    private void fireSettingsEvent(final SettingsGroupEvent evt) {
         if (evt == null) {
             throw new NullPointerException("SettingsEvent is null");
         }
