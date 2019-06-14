@@ -18,7 +18,6 @@ package com.limegroup.gnutella.gui.search;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 /**
  * A Search Result transferable.  Contains the ResultPanel & TableLines

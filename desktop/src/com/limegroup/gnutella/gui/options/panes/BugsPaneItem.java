@@ -11,7 +11,6 @@ import com.limegroup.gnutella.settings.BugSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows

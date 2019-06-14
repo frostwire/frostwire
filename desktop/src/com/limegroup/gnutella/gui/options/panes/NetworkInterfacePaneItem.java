@@ -22,7 +22,6 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;

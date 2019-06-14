@@ -6,7 +6,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.StatusBarSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user

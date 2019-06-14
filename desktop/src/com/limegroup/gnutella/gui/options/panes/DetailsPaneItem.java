@@ -24,7 +24,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.SearchSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * @author gubatron

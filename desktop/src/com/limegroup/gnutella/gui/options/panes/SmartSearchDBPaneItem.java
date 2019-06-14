@@ -10,7 +10,6 @@ import com.limegroup.gnutella.settings.SearchSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 
 public final class SmartSearchDBPaneItem extends AbstractPaneItem {
     public final static String TITLE = I18n.tr("Smart Search");

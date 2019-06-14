@@ -5,7 +5,6 @@ import com.limegroup.gnutella.gui.ListEditor;
 import com.limegroup.gnutella.settings.FilterSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;

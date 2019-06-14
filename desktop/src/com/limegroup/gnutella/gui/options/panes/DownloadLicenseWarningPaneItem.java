@@ -23,7 +23,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the pane in the options window that allows

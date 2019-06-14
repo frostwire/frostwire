@@ -24,8 +24,6 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 
-import java.io.IOException;
-
 /**
  * @author gubatron
  * @author aldenml

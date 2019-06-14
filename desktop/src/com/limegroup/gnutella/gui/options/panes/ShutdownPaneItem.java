@@ -22,7 +22,6 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options

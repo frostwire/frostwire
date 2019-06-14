@@ -1,7 +1,5 @@
 package com.frostwire.gui.searchfield;
 
-import com.frostwire.gui.searchfield.BuddySupport.Position;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;

@@ -13,7 +13,6 @@ import com.limegroup.gnutella.gui.SizedTextField;
 import com.limegroup.gnutella.settings.URLHandlerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options

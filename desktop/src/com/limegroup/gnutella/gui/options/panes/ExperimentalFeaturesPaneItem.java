@@ -23,7 +23,6 @@ import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * @author aldenml

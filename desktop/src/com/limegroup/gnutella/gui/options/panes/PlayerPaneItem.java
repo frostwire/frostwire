@@ -23,7 +23,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.PlayerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * @author gubatron

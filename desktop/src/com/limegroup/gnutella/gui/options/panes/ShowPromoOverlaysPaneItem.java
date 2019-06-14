@@ -23,7 +23,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.UpdateManagerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Pane to let the user decide wether or not to see the FrostClick promotions.

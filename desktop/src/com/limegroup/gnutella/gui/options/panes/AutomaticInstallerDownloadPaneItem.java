@@ -4,7 +4,6 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UpdateSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 public class AutomaticInstallerDownloadPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("Automatic Installer Download");

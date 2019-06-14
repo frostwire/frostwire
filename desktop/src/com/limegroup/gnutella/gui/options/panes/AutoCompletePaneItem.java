@@ -5,7 +5,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Class defineing the options panel that allows the user to enable

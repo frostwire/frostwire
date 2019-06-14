@@ -25,7 +25,6 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user to
