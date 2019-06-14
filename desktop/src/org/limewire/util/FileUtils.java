@@ -384,7 +384,7 @@ public class FileUtils {
         if (messagesURL != null) {
             String url = CommonUtils.decode(messagesURL.toExternalForm());
             if (url != null && url.startsWith("jar:file:")) {
-                url = url.substring("jar:file:".length(), url.length());
+                url = url.substring("jar:file:".length());
                 url = url.substring(0, url.length() - markerFile.length() - "!/".length());
                 return new File(url);
             }

@@ -230,12 +230,12 @@ public class StringUtils {
         StringBuilder buf = new StringBuilder();
         for (int i = str.indexOf(old_str); i > -1; i = str.indexOf(old_str, i + 1)) {
             if (i > o) {
-                buf.append(str.substring(o, i));
+                buf.append(str, o, i);
             }
             buf.append(new_str);
             o = i + old_str.length();
         }
-        buf.append(str.substring(o, str.length()));
+        buf.append(str.substring(o));
         return buf.toString();
     }
 

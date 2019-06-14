@@ -187,7 +187,7 @@ public class LanguageFlagFactory {
             if (value instanceof Locale) {
                 Locale locale = (Locale) value;
                 setIcon(LanguageFlagFactory.getFlag(locale.getCountry(), locale.getLanguage()));
-                setText(locale.getDisplayName(locale).substring(0, 1).toUpperCase() + locale.getDisplayName(locale).substring(1, locale.getDisplayName(locale).length()).toLowerCase()); // FTA: Languages list looks better. Each language starts with uppercase. In the past we had a mix of lowercase and uppercase letters.
+                setText(locale.getDisplayName(locale).substring(0, 1).toUpperCase() + locale.getDisplayName(locale).substring(1).toLowerCase()); // FTA: Languages list looks better. Each language starts with uppercase. In the past we had a mix of lowercase and uppercase letters.
                 //FTA DEBUG System.out.println("Idioma: " + locale.getDisplayName(locale) + " Country: " + locale.getCountry() + "Language code: " + locale.getLanguage());
             } else {
                 setIcon(null);

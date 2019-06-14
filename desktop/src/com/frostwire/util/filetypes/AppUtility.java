@@ -48,12 +48,12 @@ public class AppUtility {
             return null;
         }
         int strIndex = trimFile.lastIndexOf("/");
-        String filePart = trimFile.substring(strIndex + 1, trimFile.length());
+        String filePart = trimFile.substring(strIndex + 1);
         strIndex = filePart.lastIndexOf(".");
         if (strIndex == -1 || strIndex == filePart.length() - 1) {
             return null;
         } else {
-            return filePart.substring(strIndex, filePart.length());
+            return filePart.substring(strIndex);
         }
     }
 
