@@ -81,7 +81,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
                 new LimeTableColumn(START, "START", I18n.tr("Start"), 180, true, true, true, String.class),
                 new LimeTableColumn(END, "END", I18n.tr("End"), 180, true, true, true, String.class)};
 
-        public IPFilterDataLine() {
+        IPFilterDataLine() {
         }
 
         @Override

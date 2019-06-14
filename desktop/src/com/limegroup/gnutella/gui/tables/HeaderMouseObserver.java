@@ -8,7 +8,7 @@ import java.awt.*;
  *
  * @author Sam Berlin
  */
-public interface HeaderMouseObserver {
+interface HeaderMouseObserver {
     void handleHeaderColumnLeftClick(Point p);
 
     void handleHeaderColumnPressed(Point p);

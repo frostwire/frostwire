@@ -259,7 +259,7 @@ public final class iTunesMediator {
         return iTunesImportSettings.IMPORT_FILES.contains(file);
     }
 
-    void deleteFrostWirePlaylist() {
+    private void deleteFrostWirePlaylist() {
         String playlistName = iTunesSettings.ITUNES_PLAYLIST.getValue();
         try {
             if (OSUtils.isMacOSX()) {
@@ -303,7 +303,7 @@ public final class iTunesMediator {
         /**
          * Constructs a new ExecOSAScriptCommand for the specified file.
          */
-        public ExecOSAScriptCommand(String playlist, File[] files) {
+        ExecOSAScriptCommand(String playlist, File[] files) {
             this.playlist = playlist;
             this.files = files;
         }
@@ -338,7 +338,7 @@ public final class iTunesMediator {
         /**
          * Constructs a new ExecOSAScriptCommand for the specified file.
          */
-        public ExecWSHScriptCommand(String playlist, File[] files) {
+        ExecWSHScriptCommand(String playlist, File[] files) {
             this.playlist = playlist;
             this.files = files;
         }

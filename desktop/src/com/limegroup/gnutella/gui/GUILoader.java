@@ -29,7 +29,7 @@ import java.util.Properties;
  * This class constructs an <tt>Initializer</tt> instance that constructs
  * all of the necessary classes for the application.
  */
-public class GUILoader {
+class GUILoader {
     /**
      * Creates an <tt>Initializer</tt> instance that constructs the
      * necessary classes for the application.

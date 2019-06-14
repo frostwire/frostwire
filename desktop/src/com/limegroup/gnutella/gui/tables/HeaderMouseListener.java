@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
  * This class handles mouse input to the table.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
-public final class HeaderMouseListener implements MouseInputListener {
+final class HeaderMouseListener implements MouseInputListener {
     private final HeaderMouseObserver hmo;
     private boolean isResizing = false;
 

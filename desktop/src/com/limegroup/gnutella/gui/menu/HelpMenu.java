@@ -130,7 +130,7 @@ final class HelpMenu extends AbstractMenu {
             GUIMediator.showSendFeedbackDialog();
         }
 
-        public void refresh() {
+        void refresh() {
             long lastFeedbackSentTimestamp = UISettings.LAST_FEEDBACK_SENT_TIMESTAMP.getValue();
             if (lastFeedbackSentTimestamp == 0) {
                 return;

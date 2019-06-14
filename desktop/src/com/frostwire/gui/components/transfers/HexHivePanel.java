@@ -322,7 +322,7 @@ public class HexHivePanel extends JPanel {
             this.color = color;
         }
 
-        public Color getColor() {
+        Color getColor() {
             return color;
         }
     }
@@ -445,7 +445,7 @@ public class HexHivePanel extends JPanel {
             update(left, top, right, bottom);
         }
 
-        public void update(int left, int top, int right, int bottom) {
+        void update(int left, int top, int right, int bottom) {
             origin.x = left;
             origin.y = top;
             center.x = (left + right) >> 1;

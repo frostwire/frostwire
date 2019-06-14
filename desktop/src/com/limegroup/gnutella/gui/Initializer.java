@@ -48,7 +48,7 @@ import java.util.Random;
 /**
  * Initializes (creates, starts, & displays) the LimeWire Core & UI.
  */
-public final class Initializer {
+final class Initializer {
     /**
      * True if is running from a system startup.
      */

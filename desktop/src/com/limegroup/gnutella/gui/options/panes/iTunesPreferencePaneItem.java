@@ -30,8 +30,8 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class iTunesPreferencePaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Importing");
-    public final static String LABEL = I18n.tr("You can have FrostWire import newly downloaded songs into iTunes.");
+    private final static String TITLE = I18n.tr("Importing");
+    private final static String LABEL = I18n.tr("You can have FrostWire import newly downloaded songs into iTunes.");
     /**
      * Constant for the check box that specifies whether or not downloads
      * should be automatically cleared.

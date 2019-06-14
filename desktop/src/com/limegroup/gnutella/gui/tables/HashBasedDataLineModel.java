@@ -40,7 +40,7 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      * Constructor -- this HashBasedDataLineModel supports the
      * the single param constructor of BasicDataLineModel.
      */
-    public HashBasedDataLineModel(Class<? extends T> dataLineClass) {
+    protected HashBasedDataLineModel(Class<? extends T> dataLineClass) {
         super(dataLineClass);
     }
 

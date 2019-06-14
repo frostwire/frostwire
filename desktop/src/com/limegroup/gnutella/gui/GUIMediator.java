@@ -1347,7 +1347,7 @@ public final class GUIMediator {
         TRANSFERS(I18n.tr("&Transfers")),
         SEARCH_TRANSFERS(I18n.tr("&Search")),
         LIBRARY(I18n.tr("&Library"));
-        public boolean navigatedTo;
+        boolean navigatedTo;
         private final Action navAction;
 
         Tabs(String nameWithAmpersand) {

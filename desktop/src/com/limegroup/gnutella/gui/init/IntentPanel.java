@@ -25,7 +25,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class IntentPanel extends JPanel {
+class IntentPanel extends JPanel {
     private final JRadioButton mightUseButton;
     private final JRadioButton willNotButton;
 

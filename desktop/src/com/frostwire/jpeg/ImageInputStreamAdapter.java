@@ -21,7 +21,7 @@ import java.io.IOException;
  * @author Werner Randelshofer
  * @version 1.0 2009-12-17 Created.
  */
-public class ImageInputStreamAdapter extends FilterInputStream {
+class ImageInputStreamAdapter extends FilterInputStream {
     private final ImageInputStream iis;
 
     public ImageInputStreamAdapter(ImageInputStream iis) {

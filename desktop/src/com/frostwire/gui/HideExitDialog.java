@@ -33,7 +33,7 @@ import java.awt.event.ActionEvent;
 public class HideExitDialog extends JDialog {
     public static final int NONE = 0;
     public static final int HIDE = 1;
-    public static final int EXIT = 2;
+    private static final int EXIT = 2;
     private JCheckBox _checkBox;
     private int _result;
 
@@ -44,7 +44,7 @@ public class HideExitDialog extends JDialog {
         setLocationRelativeTo(frame);
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setResizable(false);
         getContentPane().setLayout(new GridBagLayout());
         GridBagConstraints c;
@@ -88,7 +88,7 @@ public class HideExitDialog extends JDialog {
         GUIUtils.addHideAction((JComponent) getContentPane());
     }
 
-    protected void buttonHide_actionPerformed(ActionEvent e) {
+    private void buttonHide_actionPerformed(ActionEvent e) {
         _result = HIDE;
         if (_checkBox.isSelected()) {
             ApplicationSettings.MINIMIZE_TO_TRAY.setValue(true);
@@ -97,7 +97,7 @@ public class HideExitDialog extends JDialog {
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
 
-    protected void buttonExit_actionPerformed(ActionEvent e) {
+    private void buttonExit_actionPerformed(ActionEvent e) {
         _result = EXIT;
         if (_checkBox.isSelected()) {
             ApplicationSettings.MINIMIZE_TO_TRAY.setValue(false);

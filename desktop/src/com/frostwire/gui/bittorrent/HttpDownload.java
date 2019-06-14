@@ -195,7 +195,7 @@ public class HttpDownload extends HttpBTDownload {
      * Meant to be overwritten by children classes that want to do something special
      * after the download is completed.
      */
-    protected void onComplete() {
+    void onComplete() {
     }
 
     @Override

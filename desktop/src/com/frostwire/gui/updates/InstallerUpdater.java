@@ -46,7 +46,7 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  * @author gubatron
  * @author aldenml
  */
-public class InstallerUpdater implements Runnable {
+class InstallerUpdater implements Runnable {
     private static final Logger LOG = Logger.getLogger(InstallerUpdater.class);
     private static String lastMD5;
     private static boolean isDownloadingUpdate = false;

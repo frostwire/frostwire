@@ -21,8 +21,8 @@ import java.io.IOException;
  * default image behavior.
  */
 public class ImageViewerPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Image Options");
-    public final static String LABEL = I18n.tr("You can choose which image viewer to use.");
+    private final static String TITLE = I18n.tr("Image Options");
+    private final static String LABEL = I18n.tr("You can choose which image viewer to use.");
     /**
      * Handle to the <tt>JTextField</tt> that displays the viewer name
      */

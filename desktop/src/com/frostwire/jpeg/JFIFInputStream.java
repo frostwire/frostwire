@@ -52,7 +52,7 @@ import java.util.HashSet;
  * <br>1.1 2009-12-26 Added method getSegment().
  * <br>1.0 2008-10-14 Created.
  */
-public class JFIFInputStream extends FilterInputStream {
+class JFIFInputStream extends FilterInputStream {
     /**
      * JUNK_MARKER Marker (for data which is not part of the JFIF stream.
      */
@@ -431,7 +431,7 @@ public class JFIFInputStream extends FilterInputStream {
          * Holds the offset of the first data byte to the beginning
          * of the stream.
          */
-        public final long offset;
+        final long offset;
         /**
          * If the marker starts a marker segment, holds the length
          * of the data in the data segment.

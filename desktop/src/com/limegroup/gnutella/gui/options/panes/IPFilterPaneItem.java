@@ -49,8 +49,8 @@ import java.util.zip.GZIPInputStream;
 import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
 public class IPFilterPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("IP Filter");
-    public final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
+    private final static String TITLE = I18n.tr("IP Filter");
+    private final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
     private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
     private final String decompressingString = I18n.tr("Decompressing");
@@ -65,7 +65,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private boolean initialized;
     private int lastPercentage = -1;
     private long lastPercentageUpdateTimestamp;
-    public IPFilterPaneItem() {
+    private IPFilterPaneItem() {
         super(TITLE, LABEL);
         ipFilterTable = null;
         httpExecutor = ExecutorsHelper.newProcessingQueue("IPFilterPanelItem-http");

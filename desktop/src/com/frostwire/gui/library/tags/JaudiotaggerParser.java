@@ -36,7 +36,7 @@ class JaudiotaggerParser extends AbstractTagParser {
     private static final Logger LOG = Logger.getLogger(JaudiotaggerParser.class);
     private final AudioFileReader fileReader;
 
-    public JaudiotaggerParser(File file, AudioFileReader fileReader) {
+    JaudiotaggerParser(File file, AudioFileReader fileReader) {
         super(file);
         this.fileReader = fileReader;
     }
@@ -87,35 +87,35 @@ class JaudiotaggerParser extends AbstractTagParser {
         return data;
     }
 
-    protected String getTitle(AudioFile audioFile) {
+    String getTitle(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.TITLE);
     }
 
-    protected String getArtist(AudioFile audioFile) {
+    String getArtist(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.ARTIST);
     }
 
-    protected String getAlbum(AudioFile audioFile) {
+    String getAlbum(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.ALBUM);
     }
 
-    protected String getComment(AudioFile audioFile) {
+    String getComment(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.COMMENT);
     }
 
-    protected String getGenre(AudioFile audioFile) {
+    String getGenre(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.GENRE);
     }
 
-    protected String getTrack(AudioFile audioFile) {
+    String getTrack(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.TRACK);
     }
 
-    protected String getYear(AudioFile audioFile) {
+    String getYear(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.YEAR);
     }
 
-    protected String getLyrics(AudioFile audioFile) {
+    String getLyrics(AudioFile audioFile) {
         return getValueSafe(audioFile.getTag(), FieldKey.LYRICS);
     }
 

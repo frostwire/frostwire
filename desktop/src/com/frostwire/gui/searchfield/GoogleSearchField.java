@@ -116,18 +116,18 @@ public class GoogleSearchField extends SearchField {
         private final GoogleSearchField input;
         private boolean cancelled;
 
-        public SuggestionsThread(String constraint, GoogleSearchField input) {
+        SuggestionsThread(String constraint, GoogleSearchField input) {
             this.constraint = constraint;
             this.input = input;
             this.setName("SuggestionsThread: " + constraint);
             this.setDaemon(true);
         }
 
-        public boolean isCancelled() {
+        boolean isCancelled() {
             return cancelled;
         }
 
-        public void cancel() {
+        void cancel() {
             cancelled = true;
         }
 

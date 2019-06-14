@@ -16,8 +16,8 @@ import java.util.Vector;
  * appear in search results.
  */
 public final class IgnoreResultsPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Filter Results");
-    public final static String LABEL = I18n.tr("You can filter out search results containing specific words.");
+    private final static String TITLE = I18n.tr("Filter Results");
+    private final static String LABEL = I18n.tr("You can filter out search results containing specific words.");
     /**
      * Constant handle to the <tt>ListEditor</tt> that adds and removes
      * word to ignore.
