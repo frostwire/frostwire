@@ -48,7 +48,7 @@ public class MediaSource {
         toolTipText = this.file.getAbsolutePath();
     }
 
-    public MediaSource(String url) {
+    MediaSource(String url) {
         if (url == null) {
             throw new NullPointerException("Url cannot be null");
         }

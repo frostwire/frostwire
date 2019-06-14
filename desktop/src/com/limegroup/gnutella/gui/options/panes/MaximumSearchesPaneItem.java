@@ -15,8 +15,8 @@ import java.io.IOException;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class MaximumSearchesPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Maximum Searches");
-    public final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");
+    private final static String TITLE = I18n.tr("Maximum Searches");
+    private final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");
     /**
      * Handle to the <tt>WholeNumberField</tt> where the user selects the
      * time to live for outgoing searches.

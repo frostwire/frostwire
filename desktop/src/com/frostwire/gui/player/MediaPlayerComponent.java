@@ -329,7 +329,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     /**
      * Begins playing the loaded song
      */
-    public void play() {
+    private void play() {
         if (mediaPlayer.getCurrentMedia() != null) {
             if (mediaPlayer.getState() == MediaPlaybackState.Paused || mediaPlayer.getState() == MediaPlaybackState.Playing) {
                 mediaPlayer.togglePause();
@@ -357,7 +357,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         mediaPlayer.stop();
     }
 
-    public void seek(float percent) {
+    private void seek(float percent) {
         if (currentPlayListItem != null && currentPlayListItem.getURL() == null && mediaPlayer.canSeek()) {
             float timeInSecs = mediaPlayer.getDurationInSecs() * percent;
             mediaPlayer.seek(timeInSecs);

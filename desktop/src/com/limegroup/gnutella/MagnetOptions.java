@@ -214,7 +214,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public String getDisplayName() {
+    private String getDisplayName() {
         List<String> list = optionsMap.get(Option.DN);
         if (list == null || list.isEmpty())
             return null;
@@ -258,7 +258,7 @@ public class MagnetOptions implements Serializable {
      *
      * @return
      */
-    public List<String> getAS() {
+    private List<String> getAS() {
         return getList(Option.AS);
     }
 
@@ -277,7 +277,7 @@ public class MagnetOptions implements Serializable {
     private enum Option {
         XS, XT, AS, DN, KT, TR;
 
-        public static Option valueFor(String str) {
+        static Option valueFor(String str) {
             for (Option option : values()) {
                 if (str.toUpperCase(Locale.US).startsWith(option.toString()))
                     return option;

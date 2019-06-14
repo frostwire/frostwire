@@ -176,7 +176,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setAboutHandler(EventHandler handler) {
+        static void setAboutHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setAboutHandler", "com.apple.eawt.AboutHandler",
                         "handleAbout", handler);
@@ -187,7 +187,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setQuitHandler(EventHandler handler) {
+        static void setQuitHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setQuitHandler", "com.apple.eawt.QuitHandler",
                         "handleQuitRequestWith", handler);
@@ -198,7 +198,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setAppReopenedListener(EventHandler handler) {
+        static void setAppReopenedListener(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("addAppEventListener", "com.apple.eawt.AppReOpenedListener",
                         "appReOpened", handler);
@@ -209,7 +209,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setPreferencesHandler(EventHandler handler) {
+        static void setPreferencesHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setPreferencesHandler", "com.apple.eawt.PreferencesHandler",
                         "handlePreferences", handler);
@@ -220,7 +220,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setOpenFileHandler(EventHandler handler) {
+        static void setOpenFileHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setOpenFileHandler", "com.apple.eawt.OpenFilesHandler",
                         "openFiles", handler);
@@ -231,7 +231,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setOpenURIHandler(EventHandler handler) {
+        static void setOpenURIHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setOpenURIHandler", "com.apple.eawt.OpenURIHandler",
                         "openURI", handler);
@@ -243,7 +243,7 @@ public class MacEventHandler {
         }
 
         @SuppressWarnings("unchecked")
-        public static List<File> getFiles(Object event) {
+        static List<File> getFiles(Object event) {
             try {
                 Method m = event.getClass().getMethod("getFiles");
                 return (List<File>) m.invoke(event);
@@ -253,7 +253,7 @@ public class MacEventHandler {
             return null;
         }
 
-        public static URI getURI(Object event) {
+        static URI getURI(Object event) {
             try {
                 Method m = event.getClass().getDeclaredMethod("getURI");
                 return (URI) m.invoke(event);
@@ -275,7 +275,7 @@ public class MacEventHandler {
             return null;
         }
 
-        public interface EventHandler {
+        interface EventHandler {
             void handle(Object[] args);
         }
     }

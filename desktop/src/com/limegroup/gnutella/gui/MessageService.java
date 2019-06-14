@@ -18,12 +18,12 @@ public final class MessageService {
      * Constant for when the 'Always use this answer' checkbox wants to
      * remember the answer.
      */
-    public static final int REMEMBER_ANSWER = 1;
+    private static final int REMEMBER_ANSWER = 1;
     /**
      * Constant for when the 'Always use this answer' checkbox does not
      * want to remember the answer.
      */
-    public static final int FORGET_ANSWER = 0;
+    private static final int FORGET_ANSWER = 0;
     /**
      * <tt>MessageService</tt> instance, following singleton.
      */
@@ -36,7 +36,7 @@ public final class MessageService {
     /**
      * Initializes all of the necessary messaging components.
      */
-    MessageService() {
+    private MessageService() {
         GUIMediator.setSplashScreenString(
                 I18n.tr("Loading Messages..."));
     }
@@ -318,8 +318,8 @@ public final class MessageService {
      *                     {@link JOptionPane#YES_NO_CANCEL_OPTION} or {@link JOptionPane#OK_CANCEL_OPTION}.
      * @param listRenderer an optional list cell renderer, can be <code>null</code>
      */
-    final int showConfirmListMessage(String message, Object[] listModel,
-                                     int messageType, ListCellRenderer<Object> listRenderer, String title) {
+    private int showConfirmListMessage(String message, Object[] listModel,
+                                       int messageType, ListCellRenderer<Object> listRenderer, String title) {
         JList<Object> list = new JList<>(listModel);
         list.setVisibleRowCount(5);
         list.setSelectionForeground(list.getForeground());
@@ -337,7 +337,7 @@ public final class MessageService {
                 content, title, messageType);
     }
 
-    final DialogOption showYesNoMessage(String message, String title) {
+    private DialogOption showYesNoMessage(String message, String title) {
         return showYesNoMessage(message, title, DialogOption.YES);
     }
 
@@ -367,7 +367,7 @@ public final class MessageService {
      * @param msgType       type message and icon
      * @param defaultOption
      */
-    final DialogOption showYesNoMessage(String message, String title, int msgType, DialogOption defaultOption) {
+    private DialogOption showYesNoMessage(String message, String title, int msgType, DialogOption defaultOption) {
         final String[] options = {DialogOption.YES.getText(),
                 DialogOption.NO.getText()
         };

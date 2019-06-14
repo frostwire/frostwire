@@ -21,7 +21,7 @@ import javax.swing.*;
  * Defines the minimal necessary methods for menus in the main application
  * menu bar.
  */
-public interface Menu {
+interface Menu {
     /**
      * Returns the <tt>JMenu</tt> instance for this <tt>Menu</tt>.
      *

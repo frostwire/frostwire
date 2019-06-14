@@ -78,7 +78,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     private boolean isPlayPausedForSliding = false;
     private boolean stateNotificationsEnabled = true;
 
-    protected MediaPlayer() {
+    MediaPlayer() {
         lastRandomFiles = new LinkedList<>();
         playExecutor = ExecutorsHelper.newProcessingQueue("AudioPlayer-PlayExecutor");
         String playerPath;
@@ -131,7 +131,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return file.exists() && !file.isDirectory() && isPlayableFile(file.getAbsolutePath());
     }
 
-    public static boolean isPlayableFile(String filename) {
+    private static boolean isPlayableFile(String filename) {
         return FileUtils.hasExtension(filename, getPlayableExtensions());
     }
 
@@ -151,7 +151,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     protected abstract String getPlayerPath();
 
-    protected float getVolumeGainFactor() {
+    float getVolumeGainFactor() {
         return 100.0f;
     }
 
@@ -391,7 +391,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return (int) (volume * getVolumeGainFactor());
     }
 
-    public double getVolume() {
+    private double getVolume() {
         return volume;
     }
 

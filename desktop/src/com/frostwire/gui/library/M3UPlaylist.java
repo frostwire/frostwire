@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class M3UPlaylist {
+final class M3UPlaylist {
     private static final String M3U_HEADER = "#EXTM3U";
     private static final String SONG_DELIM = "#EXTINF";
     private static final String SEC_DELIM = ":";

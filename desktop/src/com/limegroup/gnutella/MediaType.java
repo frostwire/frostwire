@@ -27,9 +27,9 @@ public class MediaType implements Serializable {
     public static final String SCHEMA_TORRENTS = "torrent"; //possibly magnet might be added in the future
     // These values should match standard MIME content-type
     // categories and/or XSD schema names.
-    static final String SCHEMA_ANY_TYPE = "*";
+    private static final String SCHEMA_ANY_TYPE = "*";
     // These are used as resource keys to retreive descriptions in the GUI
-    static final String ANY_TYPE = I18n.tr("All Types");
+    private static final String ANY_TYPE = I18n.tr("All Types");
     private static final long serialVersionUID = 3999062781289258389L;
     private static final String DOCUMENTS = I18n.tr("Books/Docs");
     private static final String PROGRAMS = I18n.tr("Programs");
@@ -187,8 +187,8 @@ public class MediaType implements Serializable {
      *                       type.  Must be all lowercase.  If null, this matches
      *                       any file.
      */
-    public MediaType(String schema, String descriptionKey,
-                     String[] extensions) {
+    private MediaType(String schema, String descriptionKey,
+                      String[] extensions) {
         if (schema == null) {
             throw new NullPointerException("schema must not be null");
         }
