@@ -36,7 +36,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
     /**
      * A list of all filtered results.
      */
-    protected final List<SearchResultDataLine> HIDDEN;
+    private final List<SearchResultDataLine> HIDDEN;
     /**
      * The filter to use in this row filter.
      */
@@ -174,7 +174,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         }
     }
 
-    public int getFilteredResults() {
+    private int getFilteredResults() {
         return super.getTotalResults();
     }
 

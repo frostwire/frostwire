@@ -12,7 +12,7 @@ public class TableSettings {
     /**
      * The SettingsFactory settings will be added/read to/from.
      */
-    protected static final SettingsFactory FACTORY = TablesHandlerSettings.instance().getFactory();
+    private static final SettingsFactory FACTORY = TablesHandlerSettings.instance().getFactory();
     public static final IntSetting DEFAULT_TABLE_ROW_HEIGHT = FACTORY.createIntSetting("TABLE_ROW_HEIGHT", 22);
     /**
      * Additions to the ID to identify the setting.

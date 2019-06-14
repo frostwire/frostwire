@@ -543,13 +543,13 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * @throws NullPointerException     if <tt>workQueue</tt>
      *                                  or <tt>threadFactory</tt> or <tt>handler</tt> are null.
      */
-    public ThreadPoolExecutor(int corePoolSize,
-                              int maximumPoolSize,
-                              long keepAliveTime,
-                              TimeUnit unit,
-                              BlockingQueue<Runnable> workQueue,
-                              ThreadFactory threadFactory,
-                              RejectedExecutionHandler handler) {
+    private ThreadPoolExecutor(int corePoolSize,
+                               int maximumPoolSize,
+                               long keepAliveTime,
+                               TimeUnit unit,
+                               BlockingQueue<Runnable> workQueue,
+                               ThreadFactory threadFactory,
+                               RejectedExecutionHandler handler) {
         // Unnecesary, but required to compile since TPE offers no empty
         // constructor.
         super(corePoolSize, maximumPoolSize, keepAliveTime,
@@ -616,7 +616,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * from the queue during shutdown. The method is non-private to
      * allow access from ScheduledThreadPoolExecutor.
      */
-    final void tryTerminate2() {
+    private void tryTerminate2() {
         for (; ; ) {
             int c = ctl.get();
             int rs = runStateOf(c);
@@ -775,7 +775,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * invocation of shutdown.  A no-op here, but used by
      * ScheduledThreadPoolExecutor to cancel delayed tasks.
      */
-    void onShutdown2() {
+    private void onShutdown2() {
     }
 
     /*
@@ -1004,7 +1004,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      *
      * @param w the worker
      */
-    final void runWorker(Worker w) {
+    private void runWorker(Worker w) {
         Runnable task = w.firstTask;
         w.firstTask = null;
         boolean completedAbruptly = true;
@@ -1678,7 +1678,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * unless the executor has been shut down, in which case the task
      * is discarded.
      */
-    public static class CallerRunsPolicy implements RejectedExecutionHandler {
+    private static class CallerRunsPolicy implements RejectedExecutionHandler {
         /**
          * Executes task r in the caller's thread, unless the executor
          * has been shut down, in which case the task is discarded.
@@ -1699,11 +1699,11 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * A handler for rejected tasks that throws a
      * <tt>RejectedExecutionException</tt>.
      */
-    public static class AbortPolicy implements RejectedExecutionHandler {
+    static class AbortPolicy implements RejectedExecutionHandler {
         /**
          * Creates an <tt>AbortPolicy</tt>.
          */
-        public AbortPolicy() {
+        AbortPolicy() {
         }
 
         /**
@@ -1722,7 +1722,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * A handler for rejected tasks that silently discards the
      * rejected task.
      */
-    public static class DiscardPolicy implements RejectedExecutionHandler {
+    private static class DiscardPolicy implements RejectedExecutionHandler {
         /**
          * Does nothing, which has the effect of discarding task r.
          *
@@ -1738,7 +1738,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * request and then retries <tt>execute</tt>, unless the executor
      * is shut down, in which case the task is discarded.
      */
-    public static class DiscardOldestPolicy implements RejectedExecutionHandler {
+    private static class DiscardOldestPolicy implements RejectedExecutionHandler {
         /**
          * Obtains and ignores the next task that the executor
          * would otherwise execute, if one is immediately available,

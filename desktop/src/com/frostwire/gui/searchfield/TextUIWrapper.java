@@ -20,7 +20,7 @@ public abstract class TextUIWrapper<UI extends TextUI> {
     private final TextUIChangeHandler uiChangeHandler = new TextUIChangeHandler();
     private final Class<UI> wrapperClass;
 
-    protected TextUIWrapper(Class<UI> wrapperClass) {
+    TextUIWrapper(Class<UI> wrapperClass) {
         this.wrapperClass = wrapperClass;
     }
 
@@ -54,7 +54,7 @@ public abstract class TextUIWrapper<UI extends TextUI> {
      * @param textComponent
      * @return <code>true</code> if the UI has been replaced
      */
-    protected boolean replaceUIIfNeeded(JTextComponent textComponent) {
+    boolean replaceUIIfNeeded(JTextComponent textComponent) {
         if (wrapperClass.isAssignableFrom(textComponent.getUI().getClass())) {
             return false;
         }
@@ -68,7 +68,7 @@ public abstract class TextUIWrapper<UI extends TextUI> {
      *
      * @return the wrapping UI
      */
-    public abstract UI wrapUI(JTextComponent textComponent);
+    protected abstract UI wrapUI(JTextComponent textComponent);
 
     /**
      * <p>

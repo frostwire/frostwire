@@ -168,7 +168,7 @@ public class ThreadPool {
         }
     }
 
-    public String getName() {
+    private String getName() {
         return (name);
     }
 
