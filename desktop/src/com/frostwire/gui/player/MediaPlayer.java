@@ -85,7 +85,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         playerPath = getPlayerPath();
         MPlayer.initialise(new File(playerPath));
         mplayer = new MPlayer();
-        mplayer.addPositionListener(currentTimeInSecs -> notifyProgress(currentTimeInSecs));
+        mplayer.addPositionListener(this::notifyProgress);
         mplayer.addStateListener(newState -> {
             if (newState == MediaPlaybackState.Closed) { // This is the case
                 // mplayer is
@@ -94,7 +94,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
                 playNextMedia();
             }
         });
-        mplayer.addIcyInfoListener(data -> notifyIcyInfo(data));
+        mplayer.addIcyInfoListener(this::notifyIcyInfo);
         repeatMode = RepeatMode.values()[PlayerSettings.LOOP_PLAYLIST.getValue()];
         shuffle = PlayerSettings.SHUFFLE_PLAYLIST.getValue();
         playNextMedia = true;

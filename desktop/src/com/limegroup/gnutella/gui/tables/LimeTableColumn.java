@@ -110,7 +110,8 @@ public class LimeTableColumn extends TableColumn {
             if (visName) {
                 if (icon != null) {
                     super.setHeaderValue(icon);
-                } else if (name != null) {
+                } else //noinspection ReplaceNullCheck
+                    if (name != null) {
                     super.setHeaderValue(name);
                 } else {
                     super.setHeaderValue("");

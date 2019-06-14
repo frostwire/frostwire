@@ -1477,6 +1477,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         final BlockingQueue<Runnable> q = workQueue;
         try {
             Iterator<Runnable> it = q.iterator();
+            //noinspection Java8CollectionRemoveIf
             while (it.hasNext()) {
                 Runnable r = it.next();
                 if (r instanceof Future<?> && ((Future<?>) r).isCancelled())

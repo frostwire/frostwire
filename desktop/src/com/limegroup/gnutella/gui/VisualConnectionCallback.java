@@ -54,7 +54,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
      * Tell the GUI to deiconify.
      */
     public void restoreApplication() {
-        SwingUtilities.invokeLater(() -> GUIMediator.restoreView());
+        SwingUtilities.invokeLater(GUIMediator::restoreView);
     }
 
     /**
@@ -91,7 +91,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
 
     public boolean isRemoteDownloadsAllowed() {
         try {
-            SwingUtilities.invokeAndWait(() -> GUIMediator.instance());
+            SwingUtilities.invokeAndWait(GUIMediator::instance);
         } catch (Exception e) {
             System.out.println("Failed to create GUIMediator");
             e.printStackTrace();

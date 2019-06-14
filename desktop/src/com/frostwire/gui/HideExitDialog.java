@@ -63,7 +63,7 @@ public class HideExitDialog extends JDialog {
         getContentPane().add(_checkBox, c);
         // hide button
         JButton _buttonHide = new JButton(I18n.tr("Hide"));
-        _buttonHide.addActionListener(e -> buttonHide_actionPerformed(e));
+        _buttonHide.addActionListener(this::buttonHide_actionPerformed);
         c = new GridBagConstraints();
         c.insets = new Insets(4, 430, 8, 4);
         c.fill = GridBagConstraints.NONE;
@@ -73,7 +73,7 @@ public class HideExitDialog extends JDialog {
         getContentPane().add(_buttonHide, c);
         // exit button
         JButton _buttonExit = new JButton(I18n.tr("Exit"));
-        _buttonExit.addActionListener(e -> buttonExit_actionPerformed(e));
+        _buttonExit.addActionListener(this::buttonExit_actionPerformed);
         c = new GridBagConstraints();
         c.insets = new Insets(4, 0, 8, 6);
         c.fill = GridBagConstraints.NONE;

@@ -41,7 +41,7 @@ MPlayerInstance {
     private static final boolean LOG = true;
     private static com.frostwire.util.Logger LOGGER = com.frostwire.util.Logger.getLogger(MPlayerInstance.class);
     private static File BINARY_PATH;
-    public volatile boolean activateNextSubtitleLoaded = false;
+    volatile boolean activateNextSubtitleLoaded = false;
     private volatile Process mPlayerProcess;
     private boolean starting;
     private boolean started;
@@ -65,10 +65,10 @@ MPlayerInstance {
     //private String fileOpened;
     private long redraw_last_frame;
 
-    public MPlayerInstance() {
+    MPlayerInstance() {
     }
 
-    public static void
+    static void
     initialise(
             File binary_path) {
         BINARY_PATH = binary_path;
@@ -81,7 +81,7 @@ MPlayerInstance {
             if (delay) {
                 try {
                     Thread.sleep(250);
-                } catch (Throwable e) {
+                } catch (Throwable ignored) {
                 }
             }
             runCommand(
@@ -102,7 +102,7 @@ MPlayerInstance {
             if (delay) {
                 try {
                     Thread.sleep(250);
-                } catch (Throwable e) {
+                } catch (Throwable ignored) {
                 }
             }
             runCommand(
@@ -141,7 +141,7 @@ MPlayerInstance {
         return (name);
     }
 
-    public void
+    void
     doOpen(
             String fileOrUrl,
             int initialVolume,
@@ -283,7 +283,7 @@ MPlayerInstance {
             System.out.println(String.format("starting mplayer: %s", cmdString));
             try {
                 System.out.println("File Path: [" + cmdList.get(cmdList.size() - 1) + "]");
-            } catch (Exception e9) {
+            } catch (Exception ignored) {
             }
             try {
                 ProcessBuilder pb = new ProcessBuilder(cmd);
@@ -348,7 +348,7 @@ MPlayerInstance {
                                     int millis = Integer.parseInt(toBeSent.substring(toBeSent.startsWith("p") ? 25 : 6));
                                     try {
                                         Thread.sleep(millis);
-                                    } catch (Throwable e) {
+                                    } catch (Throwable ignored) {
                                     }
                                     synchronized (MPlayerInstance.this) {
                                         pending_sleeps -= millis;
@@ -384,7 +384,7 @@ MPlayerInstance {
         }
     }
 
-    protected void
+    private void
     sendCommand(
             String cmd,
             CommandPauseMode pauseMode) {
@@ -403,13 +403,13 @@ MPlayerInstance {
         }
     }
 
-    protected void
+    private void
     sendCommand(
             String cmd) {
         sendCommand(cmd, CommandPauseMode.NONE);
     }
 
-    protected void
+    void
     initialised() {
         synchronized (this) {
             //sendCommand("pause");
@@ -422,7 +422,7 @@ MPlayerInstance {
         }
     }
 
-    protected void
+    private void
     updateObservedPaused(
             boolean r_paused) {
         synchronized (this) {
@@ -465,33 +465,31 @@ MPlayerInstance {
                 });
     }
 
-    protected boolean
+    void
     doPause() {
         synchronized (this) {
             if (paused) {
-                return (false);
+                return;
             }
             paused = true;
             pausedStateChanging();
             sendCommand("pause", CommandPauseMode.NONE);
-            return (true);
         }
     }
 
-    protected boolean
+    void
     doResume() {
         synchronized (this) {
             if (!paused) {
-                return (false);
+                return;
             }
             paused = false;
             pausedStateChanging();
             sendCommand("pause", CommandPauseMode.NONE);
-            return (true);
         }
     }
 
-    protected void
+    void
     doSeek(
             float timeInSecs) {
         synchronized (this) {
@@ -511,10 +509,8 @@ MPlayerInstance {
 
     /**
      * this is called for every poisition received, not just after a seek
-     *
-     * @param time
      */
-    protected void
+    void
     positioned(
             float time) {
         long now = SystemTime.getMonotonousTime();
@@ -536,7 +532,7 @@ MPlayerInstance {
     /**
      * called to a specific position report
      */
-    protected void
+    void
     positioned() {
         synchronized (this) {
             if (isSeeking) {
@@ -549,14 +545,14 @@ MPlayerInstance {
         }
     }
 
-    protected void doSetVolume(int volume) {
+    void doSetVolume(int volume) {
         synchronized (this) {
             CommandPauseMode pauseMode = paused ? CommandPauseMode.KEEP_FORCE : CommandPauseMode.NONE;
             sendCommand("volume " + volume + " 1", pauseMode);
         }
     }
 
-    protected void
+    void
     doMute(
             boolean on) {
         synchronized (this) {
@@ -581,6 +577,7 @@ MPlayerInstance {
         }
     }
 
+    @SuppressWarnings("unused")
     protected void
     setAudioTrack(
             Language language) {
@@ -591,6 +588,7 @@ MPlayerInstance {
         }
     }
 
+    @SuppressWarnings("unused")
     protected void
     doRedraw() {
         synchronized (this) {
@@ -633,7 +631,7 @@ MPlayerInstance {
         }
     }
 
-    protected String
+    String
     setSubtitles(
             Language language) {
         synchronized (this) {
@@ -654,14 +652,14 @@ MPlayerInstance {
         }
     }
 
-    protected void doLoadSubtitlesFile(String file, boolean autoPlay) {
+    void doLoadSubtitlesFile(String file, boolean autoPlay) {
         synchronized (this) {
             activateNextSubtitleLoaded = autoPlay;
             sendCommand("sub_load \"" + file + "\"");
         }
     }
 
-    public void
+    void
     doStop() {
         synchronized (this) {
             if (starting) {
@@ -683,10 +681,10 @@ MPlayerInstance {
         stop_sem.reserve();
     }
 
-    public void doGetProperties(String fileOrUrl, final OutputConsumer _outputConsumer) {
-        final OutputConsumer output_consumer = output -> _outputConsumer.consume(output);
+    void doGetProperties(String fileOrUrl, final OutputConsumer _outputConsumer) {
+        final OutputConsumer output_consumer = _outputConsumer::consume;
         final CountDownLatch signal = new CountDownLatch(1);
-        List<String> cmdList = new ArrayList<String>();
+        List<String> cmdList = new ArrayList<>();
         cmdList.add(BINARY_PATH.getAbsolutePath());
         cmdList.add("-slave");
         cmdList.add("-identify");

@@ -468,7 +468,7 @@ public final class LayoutUtil {
         if (writeOutputStream == null)
             writeOutputStream = new ByteArrayOutputStream(16384);
         writeOutputStream.reset();
-        writeXMLObject(writeOutputStream, o, e -> e.printStackTrace());
+        writeXMLObject(writeOutputStream, o, Throwable::printStackTrace);
         byte[] buf = writeOutputStream.toByteArray();
         out.writeInt(buf.length);
         out.write(buf);

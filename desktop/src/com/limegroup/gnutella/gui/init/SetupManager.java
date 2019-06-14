@@ -126,6 +126,7 @@ public final class SetupManager {
         SetupWindow prior = null;
         for (SetupWindow current : windows) {
             _setupWindowHolder.add(current);
+            //noinspection ReplaceNullCheck
             if (prior == null) {
                 current.setPrevious(current);
             } else {

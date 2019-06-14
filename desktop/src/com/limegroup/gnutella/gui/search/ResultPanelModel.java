@@ -219,6 +219,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      */
     private int fastMatch(String sha1) {
         Integer idx = _indexes.get(sha1);
+        //noinspection ReplaceNullCheck
         if (idx == null)
             return -1;
         else

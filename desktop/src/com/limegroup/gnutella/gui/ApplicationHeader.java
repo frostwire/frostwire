@@ -373,7 +373,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         // http://developer.java.sun.com/developer/bugParade/bugs/4379600.html
         // http://developer.java.sun.com/developer/bugParade/bugs/4128120.html
         // for related problems.
-        SwingUtilities.invokeLater(() -> requestSearchFocusImmediately());
+        SwingUtilities.invokeLater(this::requestSearchFocusImmediately);
     }
 
     void startSearch(String query) {

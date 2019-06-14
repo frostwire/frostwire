@@ -39,6 +39,7 @@ class ShellFolderManager {
     private static final String COLUMN_NAME = "FileChooser.fileNameHeaderText";
     private static final String COLUMN_SIZE = "FileChooser.fileSizeHeaderText";
     private static final String COLUMN_DATE = "FileChooser.fileDateHeaderText";
+    @SuppressWarnings("Convert2Diamond")
     private Comparator<Object> fileComparator = new Comparator<Object>() {
         public int compare(Object a, Object b) {
             return cmp((File) a, (File) b);

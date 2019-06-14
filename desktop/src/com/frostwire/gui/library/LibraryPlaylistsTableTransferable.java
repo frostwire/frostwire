@@ -71,8 +71,7 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        List<DataFlavor> list = new ArrayList<>();
-        list.addAll(Arrays.asList(fileTransferable.getTransferDataFlavors()));
+        List<DataFlavor> list = new ArrayList<>(Arrays.asList(fileTransferable.getTransferDataFlavors()));
         list.add(ITEM_ARRAY);
         if (selectedIndexes != null) {
             list.add(PLAYLIST_ITEM_ARRAY);

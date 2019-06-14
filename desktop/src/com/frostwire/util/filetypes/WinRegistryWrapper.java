@@ -585,7 +585,6 @@ public class WinRegistryWrapper {
             try (DataInputStream inStream = new DataInputStream(url.openStream())) {
                 // Read a buffer size of 256 bytes of data to sniff the mime type.
                 inStream.read(dataBytes, 0, 256);
-                inStream.close();
             } catch (IOException e) {
                 // Cannot open the connection to the URL, return.
                 return null;

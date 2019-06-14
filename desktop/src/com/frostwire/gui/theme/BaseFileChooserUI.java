@@ -634,42 +634,56 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     public PropertyChangeListener createPropertyChangeListener(JFileChooser fc) {
         return e -> {
             String s = e.getPropertyName();
-            if (s.equals(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY)) {
-                doSelectedFileChanged(e);
-            } else if (s.equals(JFileChooser.SELECTED_FILES_CHANGED_PROPERTY)) {
-                doSelectedFilesChanged(e);
-            } else if (s.equals(JFileChooser.DIRECTORY_CHANGED_PROPERTY)) {
-                doDirectoryChanged(e);
-            } else if (s.equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY)) {
-                doFilterChanged(e);
-            } else if (s.equals(JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY)) {
-                doFileSelectionModeChanged(e);
-            } else if (s.equals(JFileChooser.ACCESSORY_CHANGED_PROPERTY)) {
-                doAccessoryChanged(e);
-            } else if (s.equals(JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY) ||
-                    s.equals(JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY)) {
-                doApproveButtonTextChanged(e);
-            } else if (s.equals(JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY)) {
-                doDialogTypeChanged(e);
-            } else if (s.equals(JFileChooser.APPROVE_BUTTON_MNEMONIC_CHANGED_PROPERTY)) {
-                doApproveButtonMnemonicChanged(e);
-            } else if (s.equals(JFileChooser.CONTROL_BUTTONS_ARE_SHOWN_CHANGED_PROPERTY)) {
-                doControlButtonsChanged(e);
-            } else if (s.equals("componentOrientation")) {
-                ComponentOrientation o = (ComponentOrientation) e.getNewValue();
-                JFileChooser cc = (JFileChooser) e.getSource();
-                if (o != e.getOldValue()) {
-                    cc.applyComponentOrientation(o);
-                }
-            } else if (s == "FileChooser.useShellFolder") {
-                updateUseShellFolder();
-                doDirectoryChanged(e);
-            } else if (s.equals("ancestor")) {
-                if (e.getOldValue() == null && e.getNewValue() != null) {
-                    // Ancestor was added, set initial focus
-                    fileNameTextField.selectAll();
-                    fileNameTextField.requestFocus();
-                }
+            switch (s) {
+                case JFileChooser.SELECTED_FILE_CHANGED_PROPERTY:
+                    doSelectedFileChanged(e);
+                    break;
+                case JFileChooser.SELECTED_FILES_CHANGED_PROPERTY:
+                    doSelectedFilesChanged(e);
+                    break;
+                case JFileChooser.DIRECTORY_CHANGED_PROPERTY:
+                    doDirectoryChanged(e);
+                    break;
+                case JFileChooser.FILE_FILTER_CHANGED_PROPERTY:
+                    doFilterChanged(e);
+                    break;
+                case JFileChooser.FILE_SELECTION_MODE_CHANGED_PROPERTY:
+                    doFileSelectionModeChanged(e);
+                    break;
+                case JFileChooser.ACCESSORY_CHANGED_PROPERTY:
+                    doAccessoryChanged(e);
+                    break;
+                case JFileChooser.APPROVE_BUTTON_TEXT_CHANGED_PROPERTY:
+                case JFileChooser.APPROVE_BUTTON_TOOL_TIP_TEXT_CHANGED_PROPERTY:
+                    doApproveButtonTextChanged(e);
+                    break;
+                case JFileChooser.DIALOG_TYPE_CHANGED_PROPERTY:
+                    doDialogTypeChanged(e);
+                    break;
+                case JFileChooser.APPROVE_BUTTON_MNEMONIC_CHANGED_PROPERTY:
+                    doApproveButtonMnemonicChanged(e);
+                    break;
+                case JFileChooser.CONTROL_BUTTONS_ARE_SHOWN_CHANGED_PROPERTY:
+                    doControlButtonsChanged(e);
+                    break;
+                case "componentOrientation":
+                    ComponentOrientation o = (ComponentOrientation) e.getNewValue();
+                    JFileChooser cc = (JFileChooser) e.getSource();
+                    if (o != e.getOldValue()) {
+                        cc.applyComponentOrientation(o);
+                    }
+                    break;
+                case "FileChooser.useShellFolder":
+                    updateUseShellFolder();
+                    doDirectoryChanged(e);
+                    break;
+                case "ancestor":
+                    if (e.getOldValue() == null && e.getNewValue() != null) {
+                        // Ancestor was added, set initial focus
+                        fileNameTextField.selectAll();
+                        fileNameTextField.requestFocus();
+                    }
+                    break;
             }
         };
     }
