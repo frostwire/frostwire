@@ -118,7 +118,7 @@ public final class SettingsGroupManager {
     /**
      * Fires a event on the Executor Thread
      */
-    protected void execute(Runnable evt) {
+    void execute(Runnable evt) {
         executor.execute(evt);
     }
 }

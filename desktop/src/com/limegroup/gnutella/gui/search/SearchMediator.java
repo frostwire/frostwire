@@ -46,7 +46,7 @@ import java.util.*;
  */
 @SuppressWarnings("RegExpRedundantEscape")
 public final class SearchMediator {
-    public static final Logger LOG = Logger.getLogger(SearchMediator.class);
+    private static final Logger LOG = Logger.getLogger(SearchMediator.class);
     /**
      * Query text is valid.
      */

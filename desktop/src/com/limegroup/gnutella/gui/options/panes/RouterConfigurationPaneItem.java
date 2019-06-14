@@ -33,8 +33,8 @@ import java.io.IOException;
  * to force their ip address to the specified value.
  */
 public final class RouterConfigurationPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Router Configuration");
-    public final static String LABEL = I18n.tr("FrostWire can configure itself to work from behind a firewall or router. Using Universal Plug \'n Play (UPnP) and other NAT traversal techniques FrostWire can automatically configure your router or firewall for optimal performance. If your router does not support UPnP, FrostWire can be set to advertise an external port manually. (You may also have to configure your router if you choose manual configuration, but FrostWire will try its best so you don't have to.)");
+    private final static String TITLE = I18n.tr("Router Configuration");
+    private final static String LABEL = I18n.tr("FrostWire can configure itself to work from behind a firewall or router. Using Universal Plug \'n Play (UPnP) and other NAT traversal techniques FrostWire can automatically configure your router or firewall for optimal performance. If your router does not support UPnP, FrostWire can be set to advertise an external port manually. (You may also have to configure your router if you choose manual configuration, but FrostWire will try its best so you don't have to.)");
     /**
      * Constant <tt>WholeNumberField</tt> instance that holds the port
      * to force to.

@@ -86,7 +86,7 @@ final class SearchTabbedPane extends JTabbedPane {
             add(labelText);
         }
 
-        public void setTitle(String title) {
+        void setTitle(String title) {
             labelText.setText(title);
         }
 

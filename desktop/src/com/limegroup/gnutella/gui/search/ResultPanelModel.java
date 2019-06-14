@@ -37,7 +37,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     /**
      * The columns.
      */
-    protected final SearchTableColumns COLUMNS = new SearchTableColumns();
+    private final SearchTableColumns COLUMNS = new SearchTableColumns();
     /**
      * HashMap for quick access to indexes based on SHA1 info.
      */
@@ -169,7 +169,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * Simple clear -- clears the number of sources & cached SHA1 indexes.
      * Calls super.clear to erase the stored lines.
      */
-    protected void simpleClear() {
+    void simpleClear() {
         _numResults = 0;
         _indexes.clear();
         super.clear();
@@ -226,7 +226,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
             return idx;
     }
 
-    public int getTotalResults() {
+    int getTotalResults() {
         return _numResults;
     }
 

@@ -230,7 +230,7 @@ public final class SetupManager {
     /**
      * Displays the next window in the setup sequence.
      */
-    public void next() {
+    private void next() {
         SetupWindow newWindow = _currentWindow.getNext();
         try {
             _currentWindow.applySettings(true);
@@ -247,7 +247,7 @@ public final class SetupManager {
     /**
      * Displays the previous window in the setup sequence.
      */
-    public void previous() {
+    private void previous() {
         SetupWindow newWindow = _currentWindow.getPrevious();
         try {
             _currentWindow.applySettings(false);

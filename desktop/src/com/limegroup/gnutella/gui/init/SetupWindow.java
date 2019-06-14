@@ -91,7 +91,7 @@ abstract class SetupWindow extends JPanel {
         _moreInfoURL = moreInfoURL;
     }
 
-    protected void createWindow() {
+    void createWindow() {
         removeAll();
         setLayout(new BorderLayout());
         JPanel jpTop = new JPanel();
@@ -155,7 +155,7 @@ abstract class SetupWindow extends JPanel {
         return _key;
     }
 
-    public Icon getIcon() {
+    Icon getIcon() {
         return null;
     }
 
@@ -249,7 +249,7 @@ abstract class SetupWindow extends JPanel {
         return getLayout().preferredLayoutSize(this);
     }
 
-    protected static class MultiLineLabel extends JTextArea {
+    static class MultiLineLabel extends JTextArea {
         /**
          * Creates a label that can have multiple lines and that has the
          * default width.

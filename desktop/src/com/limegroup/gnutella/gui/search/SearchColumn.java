@@ -31,8 +31,8 @@ class SearchColumn extends LimeTableColumn {
     /**
      * Creates a new column.
      */
-    public SearchColumn(int model, final String id, final String name,
-                        Icon icon, int width, boolean vis, Class<?> clazz) {
+    private SearchColumn(int model, final String id, final String name,
+                         Icon icon, int width, boolean vis, Class<?> clazz) {
         super(model, id, name, icon, width, vis, clazz);
         _visible = TablesHandlerSettings.getVisibility(id, vis).getValue();
         _order = TablesHandlerSettings.getOrder(id, model).getValue();

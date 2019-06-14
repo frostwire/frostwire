@@ -64,7 +64,7 @@ public class QuotedStringTokenizer {
         throw new NoSuchElementException();
     }
 
-    protected Token nextToken(int index) {
+    private Token nextToken(int index) {
         if (index > maxIndex) {
             return null;
         }

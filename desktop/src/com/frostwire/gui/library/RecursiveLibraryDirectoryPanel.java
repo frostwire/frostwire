@@ -229,7 +229,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      * Adds <code>blackListSet</code> to the set of black folders to exclude
      * from sharing.
      */
-    public void addFoldersToExclude(Set<File> blackListSet) {
+    private void addFoldersToExclude(Set<File> blackListSet) {
         deselected.addAll(blackListSet);
     }
 

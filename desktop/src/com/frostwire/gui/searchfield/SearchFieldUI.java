@@ -29,7 +29,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @see #installUI
      * @see #uninstallUI
      */
-    protected JXSearchField searchField;
+    private JXSearchField searchField;
     private Handler handler;
 
     public SearchFieldUI(TextUI delegate) {
@@ -172,7 +172,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @see #installUI
      * @see JXSearchField#customSetUIProperty(String, Object)
      */
-    protected void installDefaults() {
+    private void installDefaults() {
         if (isNativeSearchField()) {
             return;
         }
@@ -224,7 +224,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @return true if <code>o</code> is <code>null</code> or of instance
      * {@link UIResource}
      */
-    protected boolean shouldReplaceResource(Object o) {
+    private boolean shouldReplaceResource(Object o) {
         return o == null || o instanceof UIResource;
     }
 
@@ -240,7 +240,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @param resKey the resource key identifying the default icon
      * @return the new icon
      */
-    protected Icon getNewIcon(Icon icon, String resKey) {
+    private Icon getNewIcon(Icon icon, String resKey) {
         Icon uiIcon = UIManager.getIcon(resKey);
         if (shouldReplaceResource(icon)) {
             return uiIcon;
@@ -254,7 +254,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @return the clear button
      * @see JXSearchField#getCancelButton()
      */
-    protected final JButton clearButton() {
+    private JButton clearButton() {
         return searchField.getCancelButton();
     }
 
@@ -264,7 +264,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @return the search button
      * @see JXSearchField#getFindButton()
      */
-    protected final JButton searchButton() {
+    private JButton searchButton() {
         return searchField.getFindButton();
     }
 
@@ -274,7 +274,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @return the popup button
      * @see JXSearchField#getPopupButton()
      */
-    protected final JButton popupButton() {
+    private JButton popupButton() {
         return searchField.getPopupButton();
     }
 
@@ -285,7 +285,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      *
      * @return the popup button is used in addition to the search button
      */
-    public boolean usingSeperatePopupButton() {
+    private boolean usingSeperatePopupButton() {
         return searchField.isUseSeperatePopupButton() && searchField.getFindPopupMenu() != null;
     }
 
@@ -298,7 +298,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * @return number of pixels between the popup button and the clear (or
      * search) button
      */
-    protected int getPopupOffset() {
+    private int getPopupOffset() {
         if (usingSeperatePopupButton()) {
             return UIManager.getInt("SearchField.popupOffset");
         }
@@ -312,7 +312,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * rollover icons if the search field is in regular search mode or clears
      * the icons when the search field is in instant search mode.
      */
-    protected void updateButtons() {
+    private void updateButtons() {
         clearButton().setVisible((!searchField.isRegularSearchMode() || searchField.isMacLayoutStyle()) && hasText());
         boolean clearNotHere = (searchField.isMacLayoutStyle() || !clearButton().isVisible());
         searchButton().setVisible(

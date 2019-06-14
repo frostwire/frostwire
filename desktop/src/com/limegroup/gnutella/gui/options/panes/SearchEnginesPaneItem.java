@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 public final class SearchEnginesPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Search Engines");
-    public final static String LABEL = I18n.tr("Select which search engines you want FrostWire to use.");
+    private final static String TITLE = I18n.tr("Search Engines");
+    private final static String LABEL = I18n.tr("Select which search engines you want FrostWire to use.");
     private final Map<JCheckBox, BooleanSetting> cBoxes;
     private final List<JCheckBox> searchEngineCheckboxes;
     private final SearchEngineCheckboxListener searchEnginesCheckboxListener;
@@ -143,12 +143,12 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         final Map<JCheckBox, BooleanSetting> cBoxes;
         private boolean enabled;
 
-        public SearchEngineCheckboxListener(final Map<JCheckBox, BooleanSetting> cBoxes) {
+        SearchEngineCheckboxListener(final Map<JCheckBox, BooleanSetting> cBoxes) {
             this.cBoxes = cBoxes;
             this.enabled = true;
         }
 
-        public void enable(boolean e) {
+        void enable(boolean e) {
             enabled = e;
         }
 

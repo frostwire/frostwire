@@ -270,7 +270,7 @@ public class ShareTorrentDialog extends JDialog {
      * <p/>
      * It looks like it disappears by changing the color into the background color.
      */
-    public void showFeedback(String title, double x, double y) {
+    private void showFeedback(String title, double x, double y) {
         int startY = (int) (y - getLocationOnScreen().getY() - 40);
         feedbackLabel.setLocation((int) (x - getLocationOnScreen().getX()), startY);
         feedbackLabel.setVisible(true);
@@ -281,7 +281,7 @@ public class ShareTorrentDialog extends JDialog {
             HttpClientListenerAdapter {
         private final String shortenerUri;
 
-        public URLShortenerHttpClientListener(String uri) {
+        URLShortenerHttpClientListener(String uri) {
             shortenerUri = uri;
         }
 
@@ -298,11 +298,11 @@ public class ShareTorrentDialog extends JDialog {
             }
         }
 
-        protected String getShortenerURL() {
+        String getShortenerURL() {
             return shortenerUri;
         }
 
-        protected Runnable getHttpRequestRunnable(final HttpClient browser) {
+        Runnable getHttpRequestRunnable(final HttpClient browser) {
             return () -> {
                 try {
                     System.out.println("Shortening with " + getShortenerURL());
@@ -319,7 +319,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class GoogleURLShortenerListener extends URLShortenerHttpClientListener {
-        public GoogleURLShortenerListener(String uri) {
+        GoogleURLShortenerListener(String uri) {
             super(uri);
         }
 
@@ -339,7 +339,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class TwitterAction extends AbstractAction {
-        public TwitterAction() {
+        TwitterAction() {
             putValue(Action.NAME, I18n.tr("Twitter it"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send the message above to Twitter"));
             putValue(LimeAction.ICON_NAME, "TWITTER");
@@ -354,7 +354,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class CopyToClipboardAction extends AbstractAction {
-        public CopyToClipboardAction() {
+        CopyToClipboardAction() {
             putValue(Action.NAME, I18n.tr("Copy Text"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy entire message to Clipboard"));
             putValue(LimeAction.ICON_NAME, "COPY_PASTE");
@@ -369,8 +369,8 @@ public class ShareTorrentDialog extends JDialog {
         }
     }
 
-    public class CopyLinkAction extends AbstractAction {
-        public CopyLinkAction() {
+    class CopyLinkAction extends AbstractAction {
+        CopyLinkAction() {
             putValue(Action.NAME, I18n.tr("Copy Link"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Link to Clipboard"));
             putValue(LimeAction.ICON_NAME, "LINK");
@@ -386,7 +386,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private class CopyMagnetAction extends AbstractAction {
-        public CopyMagnetAction() {
+        CopyMagnetAction() {
             putValue(Action.NAME, I18n.tr("Copy Magnet"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Copy Magnet URL to Clipboard"));
             putValue(LimeAction.ICON_NAME, "MAGNET");

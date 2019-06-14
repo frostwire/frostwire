@@ -26,8 +26,8 @@ import javax.swing.*;
  * @author aldenml
  */
 public class RangeSlider extends JSlider {
-    protected int thumbNum;
-    protected BoundedRangeModel[] sliderModels;
+    private int thumbNum;
+    private BoundedRangeModel[] sliderModels;
 
     public RangeSlider() {
         createThumbs(2);
@@ -116,7 +116,7 @@ public class RangeSlider extends JSlider {
         super.setUI(new SkinRangeSliderUI(this));
     }
 
-    protected void createThumbs(int n) {
+    private void createThumbs(int n) {
         thumbNum = n;
         sliderModels = new BoundedRangeModel[n];
         for (int i = 0; i < n; i++) {

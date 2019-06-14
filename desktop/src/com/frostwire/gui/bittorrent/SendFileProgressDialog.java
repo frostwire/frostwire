@@ -52,7 +52,7 @@ public class SendFileProgressDialog extends JDialog {
         torrentMakerListener = new TorrentMakerListener();
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setupWindow();
         initProgressBar();
         initCancelButton();
@@ -93,7 +93,7 @@ public class SendFileProgressDialog extends JDialog {
         _container.add(_cancelButton, c);
     }
 
-    protected void onCancelButton() {
+    private void onCancelButton() {
         dispose();
     }
 
@@ -110,7 +110,7 @@ public class SendFileProgressDialog extends JDialog {
         _container.add(_progressBar, c);
     }
 
-    protected void this_windowOpened() {
+    private void this_windowOpened() {
         if (_preselectedFile == null) {
             chooseFile();
         } else {
@@ -118,7 +118,7 @@ public class SendFileProgressDialog extends JDialog {
         }
     }
 
-    public void chooseFile() {
+    private void chooseFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);

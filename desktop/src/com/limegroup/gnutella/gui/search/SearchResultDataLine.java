@@ -97,7 +97,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
     /**
      * Returns the icon.
      */
-    Icon getIcon() {
+    private Icon getIcon() {
         //gubs: seems like this didn't fly
         //maybe the icon isn't refreshed.
         //see MetadataModel.addProperties()

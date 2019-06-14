@@ -92,7 +92,7 @@ public class SearchField extends JXSearchField {
     /**
      * The popup the scroll pane is in
      */
-    protected Popup popup;
+    private Popup popup;
     //----------------------------------------------------------------------------
     // Fields
     //----------------------------------------------------------------------------
@@ -366,7 +366,7 @@ public class SearchField extends JXSearchField {
     /**
      * Gets the component that is the popup listing other choices.
      */
-    protected JComponent getPopupComponent() {
+    JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;
         entryPanel = new JPanel(new GridBagLayout());
@@ -460,7 +460,7 @@ public class SearchField extends JXSearchField {
      * Displays the popup window with a list of auto-completable choices,
      * if any exist.
      */
-    public void autoCompleteInput() {
+    void autoCompleteInput() {
         String input = getText();
         if (input != null && input.length() > 0) {
             Iterator<String> it = dict.iterator(input);

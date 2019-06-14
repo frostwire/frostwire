@@ -25,7 +25,7 @@ public class QueryUtils {
      * @param allowNumbers whether number keywords are retained and returned
      *                     in the result set
      */
-    public static Set<String> keywords(String fileName, boolean allowNumbers) {
+    private static Set<String> keywords(String fileName, boolean allowNumbers) {
         //Remove extension
         fileName = QueryUtils.ripExtension(fileName);
         //Separate by whitespace and _, etc.

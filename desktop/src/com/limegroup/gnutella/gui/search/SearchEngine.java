@@ -136,7 +136,7 @@ public abstract class SearchEngine {
     private final BooleanSetting _setting;
     private String redirectUrl = null;
 
-    public SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
+    private SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
         _setting = setting;
@@ -189,7 +189,7 @@ public abstract class SearchEngine {
         return _name;
     }
 
-    public String getDomainName() {
+    private String getDomainName() {
         return _domainName;
     }
 

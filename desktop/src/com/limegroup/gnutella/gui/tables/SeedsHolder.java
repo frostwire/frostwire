@@ -7,8 +7,8 @@ package com.limegroup.gnutella.gui.tables;
  */
 public class SeedsHolder implements Comparable<SeedsHolder> {
     private final String stringForm;
-    public int connected;
-    public int seeds;
+    private int connected;
+    private int seeds;
 
     public SeedsHolder(String seedsString) {
         stringForm = seedsString;

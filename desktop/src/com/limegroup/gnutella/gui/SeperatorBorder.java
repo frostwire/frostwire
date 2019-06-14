@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * Defines the "border" line that is used to separate the "My Extensions" item in a CheckBoxList.
  */
-public class SeperatorBorder implements Border {
+class SeperatorBorder implements Border {
     public SeperatorBorder() {
     }
 

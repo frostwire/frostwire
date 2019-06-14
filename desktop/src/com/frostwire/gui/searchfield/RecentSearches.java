@@ -19,7 +19,7 @@ import java.util.prefs.Preferences;
  *
  * @author Peter Weishapl <petw@gmx.net>
  */
-public class RecentSearches implements ActionListener {
+class RecentSearches implements ActionListener {
     private Preferences prefsNode;
     private final List<String> recentSearches = new ArrayList<>();
     private final List<ChangeListener> listeners = new ArrayList<>();
@@ -100,7 +100,7 @@ public class RecentSearches implements ActionListener {
      * @param searchString the search string to add
      * @see #getMaxRecents()
      */
-    public void put(String searchString) {
+    private void put(String searchString) {
         if (searchString == null || searchString.trim().length() == 0) {
             return;
         }
@@ -130,14 +130,14 @@ public class RecentSearches implements ActionListener {
      *
      * @return number of recent searches
      */
-    public int getLength() {
+    private int getLength() {
         return recentSearches.size();
     }
 
     /**
      * Remove all recent searches.
      */
-    public void removeAll() {
+    private void removeAll() {
         recentSearches.clear();
         save();
         fireChangeEvent();
@@ -159,7 +159,7 @@ public class RecentSearches implements ActionListener {
      *
      * @param l the {@link ChangeListener}
      */
-    public void addChangeListener(ChangeListener l) {
+    private void addChangeListener(ChangeListener l) {
         listeners.add(l);
     }
 
@@ -188,7 +188,7 @@ public class RecentSearches implements ActionListener {
      * @param searchField the search field the returned popup menu will be installed on
      * @return the recent searches popup menu
      */
-    protected JPopupMenu createPopupMenu(JTextField searchField) {
+    private JPopupMenu createPopupMenu(JTextField searchField) {
         return new RecentSearchesPopup(this, searchField);
     }
 

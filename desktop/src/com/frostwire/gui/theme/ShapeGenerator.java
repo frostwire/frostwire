@@ -374,7 +374,7 @@ public final class ShapeGenerator {
          * @param h the height of the rectangle.
          * @return the radius (arc size) to use for rounding.
          */
-        public double getRadius(int w, int h) {
+        double getRadius(int w, int h) {
             switch (this) {
                 case ROUND_HEIGHT:
                     return h / 2.0;
