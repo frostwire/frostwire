@@ -18,16 +18,16 @@
 
 package com.frostwire.gui.mplayer;
 
-public class TimeUtils {
-    public static int getHours(int rawSeconds) {
+class TimeUtils {
+    private static int getHours(int rawSeconds) {
         return rawSeconds / 3600;
     }
 
-    public static int getMinutes(int rawSeconds) {
+    private static int getMinutes(int rawSeconds) {
         return (rawSeconds - (TimeUtils.getHours(rawSeconds) * 3600)) / 60;
     }
 
-    public static int getSeconds(int rawSeconds) {
+    private static int getSeconds(int rawSeconds) {
         return rawSeconds - (TimeUtils.getHours(rawSeconds) * 3600)
                 - (TimeUtils.getMinutes(rawSeconds) * 60);
     }

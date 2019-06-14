@@ -6,9 +6,9 @@ abstract class WindowsAssociation implements ShellAssociation {
     /**
      * Path to the native executable currently running
      */
-    protected final String executable;
+    final String executable;
 
-    protected WindowsAssociation(String executable) {
+    WindowsAssociation(String executable) {
         this.executable = executable;
     }
 
@@ -29,7 +29,7 @@ abstract class WindowsAssociation implements ShellAssociation {
      * @param value A text value from the Windows Registry that contains a path
      * @return The path
      */
-    protected static String parsePath(String value) {
+    static String parsePath(String value) {
         if ("".equals(value))
             return "";
         int begin, end;

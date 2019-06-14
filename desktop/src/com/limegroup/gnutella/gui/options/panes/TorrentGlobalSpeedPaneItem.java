@@ -25,8 +25,8 @@ import java.text.NumberFormat;
 import java.util.Hashtable;
 
 public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
-    public final static String TITLE_DOWNLOAD_SPEED = I18n.tr("BitTorrent Global Tranfer Speeds");
-    public final static String DESCRIPTION_DOWNLOAD_SPEED = I18n.tr("Set the Maximum BitTorrent transfer speeds in KB/s.\nTip: Use your keyboard arrows for more precision");
+    private final static String TITLE_DOWNLOAD_SPEED = I18n.tr("BitTorrent Global Tranfer Speeds");
+    private final static String DESCRIPTION_DOWNLOAD_SPEED = I18n.tr("Set the Maximum BitTorrent transfer speeds in KB/s.\nTip: Use your keyboard arrows for more precision");
     private static final int MAX_SLIDER_VALUE = (100 * 1024) + 1;
     private final static String DESCRIPTION_UPLOAD_SPEED = "<html>" + I18n.tr("Set the Maximum BitTorrent upload speed in KB/s.") + "<p>" + I18n.tr("Note: Too low upload speeds (leeching) could be penalized by some trackers, resulting in slower downloads.") + "</p></html>";
     private final JLabel DOWNLOAD_SLIDER_LABEL = new JLabel();

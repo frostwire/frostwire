@@ -105,7 +105,7 @@ final class ToolsMenu extends AbstractMenu {
             }
         }
 
-        public void refresh() {
+        void refresh() {
             String text;
             boolean enabled = true;
             if (UpdateMediator.instance().isUpdated()) {

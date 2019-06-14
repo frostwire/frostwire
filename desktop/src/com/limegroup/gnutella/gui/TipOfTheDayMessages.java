@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui;
 
-public class TipOfTheDayMessages {
+class TipOfTheDayMessages {
     private static final String FIRST_MESSAGE = I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher number in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!");
 
     /**

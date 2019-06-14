@@ -23,7 +23,7 @@ import com.limegroup.gnutella.settings.SharingSettings;
 import javax.swing.*;
 
 public final class TorrentConnectionPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("BitTorrent Connection Settings");
+    private final static String TITLE = I18n.tr("BitTorrent Connection Settings");
     private final static String TEXT = I18n.tr("Adjust connection settings to make better use of your internet connection");
     private final static String MAX_ACTIVE_DOWNLOADS = I18n.tr("Maximum active downloads");
     private final static String MAX_GLOBAL_NUM_CONNECTIONS = I18n.tr("Global maximum number of connections");

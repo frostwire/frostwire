@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Default Save Folder");
+    private final static String TITLE = I18n.tr("Default Save Folder");
     private final TorrentSaveFolderComponent COMPONENT;
 
     public TorrentSaveFolderPaneItem() {

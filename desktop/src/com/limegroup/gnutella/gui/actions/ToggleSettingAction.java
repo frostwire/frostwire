@@ -20,11 +20,11 @@ public class ToggleSettingAction extends AbstractAction {
     private static final long serialVersionUID = -7756628550520833921L;
     private final BooleanSetting setting;
 
-    public ToggleSettingAction(BooleanSetting setting, String name) {
+    protected ToggleSettingAction(BooleanSetting setting, String name) {
         this(setting, name, null);
     }
 
-    public ToggleSettingAction(BooleanSetting setting, String name, String description) {
+    protected ToggleSettingAction(BooleanSetting setting, String name, String description) {
         super(name);
         putValue(LONG_DESCRIPTION, description);
         this.setting = setting;

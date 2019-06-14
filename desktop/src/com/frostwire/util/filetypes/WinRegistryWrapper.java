@@ -29,7 +29,7 @@ import java.net.URL;
 /**
  * Bottom layer java wrapper for Windows registry relevant APIs
  */
-public class WinRegistryWrapper {
+class WinRegistryWrapper {
     /**
      * Windows handles to <tt>HKEY_CURRENT_USER</tt> and
      * <tt>HKEY_LOCAL_MACHINE</tt> hives.
@@ -44,18 +44,18 @@ public class WinRegistryWrapper {
     public static final int ERROR_FILE_NOT_FOUND = 2;
     public static final int ERROR_ACCESS_DENIED = 5;
     public static final int ERROR_ITEM_EXIST = 0;
-    public static final int ERROR_ITEM_NOTEXIST = 9;
+    private static final int ERROR_ITEM_NOTEXIST = 9;
     /* Constants for Windows registry element size limits */
     public static final int MAX_KEY_LENGTH = 255;
     public static final int MAX_VALUE_NAME_LENGTH = 255;
     /* Windows security masks */
     public static final int DELETE = 0x10000;
     public static final int KEY_QUERY_VALUE = 1;
-    public static final int KEY_SET_VALUE = 2;
+    private static final int KEY_SET_VALUE = 2;
     public static final int KEY_CREATE_SUB_KEY = 4;
     public static final int KEY_ENUMERATE_SUB_KEYS = 8;
-    public static final int KEY_READ = 0x20019;
-    public static final int KEY_WRITE = 0x20006;
+    private static final int KEY_READ = 0x20019;
+    private static final int KEY_WRITE = 0x20006;
     public static final int KEY_ALL_ACCESS = 0xf003f;
     /* Constants used to interpret returns of native functions  */
     private static final int OPENED_KEY_HANDLE = 0;

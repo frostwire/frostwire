@@ -21,8 +21,8 @@ import java.io.IOException;
  * default video behavior.
  */
 public class VideoPlayerPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Video Options");
-    public final static String LABEL = I18n.tr("You can choose which video player to use.");
+    private final static String TITLE = I18n.tr("Video Options");
+    private final static String LABEL = I18n.tr("You can choose which video player to use.");
     /**
      * Handle to the <tt>JTextField</tt> that displays the player name
      */

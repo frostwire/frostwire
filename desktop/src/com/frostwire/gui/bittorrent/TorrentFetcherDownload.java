@@ -59,7 +59,7 @@ public class TorrentFetcherDownload implements BTDownload {
     private final Date dateCreated;
     private TransferState state;
 
-    public TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath) {
+    private TorrentFetcherDownload(String uri, String referrer, String cookie, String displayName, boolean partial, String relativePath) {
         this.uri = uri;
         if (uri.startsWith("magnet")) {
             hash = PerformersHelper.parseInfoHash(uri);

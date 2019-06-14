@@ -31,8 +31,8 @@ import java.io.IOException;
  * @author aldenml
  */
 public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Seeding Settings");
-    public final static String LABEL = I18n.tr("Seeding is the process of connecting to a torrent when you have a complete file(s). Pieces of the seeded file(s) will be available to everybody. While downloading pieces are always available to other peers in the swarm.");
+    private final static String TITLE = I18n.tr("Seeding Settings");
+    private final static String LABEL = I18n.tr("Seeding is the process of connecting to a torrent when you have a complete file(s). Pieces of the seeded file(s) will be available to everybody. While downloading pieces are always available to other peers in the swarm.");
     private final TorrentSeedingSettingComponent COMPONENT;
 
     public TorrentSeedingSettingPaneItem() {

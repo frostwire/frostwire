@@ -20,7 +20,7 @@ package com.frostwire.gui.components.transfers;
 
 import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 
-public final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
+final class TransferDetailFilesModel extends BasicDataLineModel<TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
     TransferDetailFilesModel() {
         super(TransferDetailFilesDataLine.class);
     }

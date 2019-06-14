@@ -42,7 +42,7 @@ public class WindowsUtils {
         }
     }
 
-    public static File getUserStartMenu() {
+    private static File getUserStartMenu() {
         if (OSUtils.isModernWindows()) {
             return new File(System.getenv("appdata"), "Microsoft\\Windows\\Start Menu");
         } else {

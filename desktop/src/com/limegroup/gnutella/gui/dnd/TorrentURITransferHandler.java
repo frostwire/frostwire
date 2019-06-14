@@ -75,7 +75,7 @@ public class TorrentURITransferHandler extends LimeTransferHandler {
     }
 
     // made package private for tests
-    boolean areAllTorrentURLs(URI[] uris) {
+    private boolean areAllTorrentURLs(URI[] uris) {
         for (URI uri : uris) {
             String scheme = uri.getScheme();
             if (scheme == null || !scheme.equalsIgnoreCase("http")) {

@@ -29,7 +29,7 @@ import java.awt.*;
 import static com.limegroup.gnutella.gui.I18n.tr;
 
 public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
-    public static boolean canUseBitTorrent(boolean showExplanationDialog) {
+    private static boolean canUseBitTorrent(boolean showExplanationDialog) {
         return canUseBitTorrent(showExplanationDialog, null);
     }
 

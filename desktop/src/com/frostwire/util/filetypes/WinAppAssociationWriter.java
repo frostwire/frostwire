@@ -344,7 +344,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
     /**
      * Inline class for restoreing association registration/unregistration failure.
      */
-    protected class BackupAssociation {
+    class BackupAssociation {
         // Mime type retrieved from the specified association object.
         private final String curMimeType;
         // File extension retrieved from the specified association object.
@@ -365,7 +365,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          * @param assoc    the given Association (not null).
          * @param regLevel the given registeration level.
          */
-        protected BackupAssociation(Association assoc, int regLevel) {
+        BackupAssociation(Association assoc, int regLevel) {
             curMimeType = assoc.getMimeType();
             Iterator<String> iter = null;
             List<String> temFileExtList = assoc.getFileExtList();
@@ -401,7 +401,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return mime type
          */
-        protected String getCurMimeType() {
+        String getCurMimeType() {
             return curMimeType;
         }
 
@@ -410,7 +410,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return file extension
          */
-        protected String getCurFileExt() {
+        String getCurFileExt() {
             return curFileExt;
         }
 
@@ -419,7 +419,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return true if the mime type existed
          */
-        protected boolean getCurMimeTypeExisted() {
+        boolean getCurMimeTypeExisted() {
             return curMimeTypeExisted;
         }
 
@@ -428,7 +428,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return true if the file extension existed
          */
-        protected boolean getCurFileExtExisted() {
+        boolean getCurFileExtExisted() {
             return curFileExtExisted;
         }
 
@@ -437,7 +437,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return backup mime type information
          */
-        protected String getBackupMimeType() {
+        String getBackupMimeType() {
             return backupMimeType;
         }
 
@@ -446,7 +446,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return backup class ID information
          */
-        protected String getBackupClassID() {
+        String getBackupClassID() {
             return backupClassID;
         }
 
@@ -455,7 +455,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
          *
          * @return backup file extensio
          */
-        protected String getBackupFileExt() {
+        String getBackupFileExt() {
             return backupFileExt;
         }
     }

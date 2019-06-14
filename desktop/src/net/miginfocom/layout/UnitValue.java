@@ -88,31 +88,31 @@ public final class UnitValue implements Serializable {
     /**
      * A unit indicating millimeters.
      */
-    public static final int MM = 3;
+    private static final int MM = 3;
     /**
      * A unit indicating centimeters.
      */
-    public static final int CM = 4;
+    private static final int CM = 4;
     /**
      * A unit indicating inches.
      */
-    public static final int INCH = 5;
+    private static final int INCH = 5;
     /**
      * A unit indicating percent.
      */
-    public static final int PERCENT = 6;
+    private static final int PERCENT = 6;
     /**
      * A unit indicating points.
      */
-    public static final int PT = 7;
+    private static final int PT = 7;
     /**
      * A unit indicating screen percentage width.
      */
-    public static final int SPX = 8;
+    private static final int SPX = 8;
     /**
      * A unit indicating screen percentage height.
      */
-    public static final int SPY = 9;
+    private static final int SPY = 9;
     /**
      * A unit indicating alignment.
      */
@@ -132,43 +132,43 @@ public final class UnitValue implements Serializable {
     /**
      * A unit indicating botton size.
      */
-    public static final int BUTTON = 16;
+    private static final int BUTTON = 16;
     /**
      * A unit indicating linking to x.
      */
-    public static final int LINK_X = 18;   // First link
+    private static final int LINK_X = 18;   // First link
     /**
      * A unit indicating linking to y.
      */
-    public static final int LINK_Y = 19;
+    private static final int LINK_Y = 19;
     /**
      * A unit indicating linking to width.
      */
-    public static final int LINK_W = 20;
+    private static final int LINK_W = 20;
     /**
      * A unit indicating linking to height.
      */
-    public static final int LINK_H = 21;
+    private static final int LINK_H = 21;
     /**
      * A unit indicating linking to x2.
      */
-    public static final int LINK_X2 = 22;
+    private static final int LINK_X2 = 22;
     /**
      * A unit indicating linking to y2.
      */
-    public static final int LINK_Y2 = 23;
+    private static final int LINK_Y2 = 23;
     /**
      * A unit indicating linking to x position on screen.
      */
-    public static final int LINK_XPOS = 24;
+    private static final int LINK_XPOS = 24;
     /**
      * A unit indicating linking to y position on screen.
      */
-    public static final int LINK_YPOS = 25;    // Last link
+    private static final int LINK_YPOS = 25;    // Last link
     /**
      * A unit indicating a lookup.
      */
-    public static final int LOOKUP = 26;
+    private static final int LOOKUP = 26;
     /**
      * A unit indicating label alignment.
      */
@@ -240,7 +240,7 @@ public final class UnitValue implements Serializable {
     private transient String linkId = null; // Should be final, but initializes in a sub method.
 
     // Pixel
-    public UnitValue(float value)  // If hor/ver does not matter.
+    private UnitValue(float value)  // If hor/ver does not matter.
     {
         this(value, null, PIXEL, true, STATIC, null, null, value + "px");
     }
@@ -325,7 +325,7 @@ public final class UnitValue implements Serializable {
      *                 connected to any component.
      * @return The size in pixels.
      */
-    public final float getPixelsExact(float refValue, ContainerWrapper parent, ComponentWrapper comp) {
+    private float getPixelsExact(float refValue, ContainerWrapper parent, ComponentWrapper comp) {
         if (parent == null)
             return 1;
         if (oper == STATIC) {
@@ -492,7 +492,7 @@ public final class UnitValue implements Serializable {
         return unit;
     }
 
-    public final boolean isHorizontal() {
+    private boolean isHorizontal() {
         return isHor;
     }
 

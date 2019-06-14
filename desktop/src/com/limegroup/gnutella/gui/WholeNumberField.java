@@ -17,7 +17,7 @@ public class WholeNumberField extends LimeTextField {
     private final Toolkit toolkit;
     private final NumberFormat integerFormatter;
 
-    public WholeNumberField(int value, int columns) {
+    WholeNumberField(int value, int columns) {
         super(columns);
         toolkit = Toolkit.getDefaultToolkit();
         integerFormatter = NumberFormat.getNumberInstance(Locale.US);
@@ -25,7 +25,7 @@ public class WholeNumberField extends LimeTextField {
         setValue(value);
     }
 
-    public WholeNumberField(int columns) {
+    WholeNumberField(int columns) {
         super(columns);
         toolkit = Toolkit.getDefaultToolkit();
         integerFormatter = NumberFormat.getNumberInstance(Locale.US);

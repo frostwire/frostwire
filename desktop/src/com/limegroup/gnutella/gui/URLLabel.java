@@ -69,12 +69,12 @@ public class URLLabel extends JLabel {
         super.setText(htmlString);
     }
 
-    public void setColor(Color fg) {
+    private void setColor(Color fg) {
         linkColor = fg;
         setText(text);
     }
 
-    public Action getAction() {
+    private Action getAction() {
         return currentAction;
     }
 
@@ -104,7 +104,7 @@ public class URLLabel extends JLabel {
     /*
      * Update label text based on action event
      */
-    public void updateLabel() {
+    private void updateLabel() {
         if (currentAction != null) {
             String display = (String) currentAction.getValue(Action.NAME);
             Color color = (Color) currentAction.getValue(LimeAction.COLOR);

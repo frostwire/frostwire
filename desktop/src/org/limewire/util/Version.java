@@ -20,7 +20,7 @@ package org.limewire.util;
  * <p>
  * Unsupported versions include: <i>1a</i>, <i>1.2a</i>, <i>1.a</i>, <i>1.2.a</i>, etc.
  */
-public class Version implements Comparable<Version> {
+class Version implements Comparable<Version> {
     /**
      * The version string.
      */
@@ -61,7 +61,7 @@ public class Version implements Comparable<Version> {
     /**
      * Returns the version.
      */
-    public String getVersion() {
+    private String getVersion() {
         return v;
     }
 

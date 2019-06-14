@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
  * @author gubatron
  * @author aldenml
  */
-public final class UnameReader {
+final class UnameReader {
     public static String read() {
         String output = "";
         try {

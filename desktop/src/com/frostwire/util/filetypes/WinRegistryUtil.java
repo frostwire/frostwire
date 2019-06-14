@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Utility class for accessing the system registry and association info for Windows.
  */
-public class WinRegistryUtil {
+class WinRegistryUtil {
     
     /* Draft to illustrate the Registry items relationship
      HKEY_CLASSES_ROOT
@@ -516,7 +516,7 @@ public class WinRegistryUtil {
      * @param regLevel given regLevel
      * @return corresponding icon file, or null if none
      */
-    public static String getIconFileNameByFileExt(String fileExt, int regLevel) {
+    private static String getIconFileNameByFileExt(String fileExt, int regLevel) {
         // Retrieve the icon key
         String iconKey = getIconKey(fileExt, regLevel);
         if (iconKey == null) {
@@ -573,7 +573,7 @@ public class WinRegistryUtil {
      * @param regLevel given regLevel
      * @return corresponding description about the file extension, or null if none
      */
-    public static String getDescriptionByFileExt(String fileExt, int regLevel) {
+    private static String getDescriptionByFileExt(String fileExt, int regLevel) {
         // Retrievs the class ID
         String classID = getClassIDByFileExt(fileExt, regLevel);
         if (classID != null) {
@@ -648,7 +648,7 @@ public class WinRegistryUtil {
      * @param fileExt given file extension (not null)
      * @return the action list
      */
-    public static List<Action> getActionListByFileExt(String fileExt, int regLevel) {
+    private static List<Action> getActionListByFileExt(String fileExt, int regLevel) {
         List<Action> actionList = null;
         // Retrievs the relevant class ID
         String clsID = getClassIDByFileExt(fileExt, regLevel);
@@ -811,7 +811,7 @@ public class WinRegistryUtil {
      * @param cmdString given command string (not null)
      * @return String
      */
-    public static String ExpandEnvironmentStrings(String cmdString) {
+    private static String ExpandEnvironmentStrings(String cmdString) {
         return WinRegistryWrapper.WinExpandEnvironmentStrings(cmdString);
     }
 

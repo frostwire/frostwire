@@ -56,7 +56,7 @@ final class UpdateMessage implements Serializable {
         return _message;
     }
 
-    public void setMessage(String m) {
+    private void setMessage(String m) {
         _message = m;
     }
 

@@ -17,7 +17,7 @@ public class VersionUtils {
     /**
      * Determines if Java is above or equal to the given version.
      */
-    public static boolean isJavaVersionOrAbove(String version) {
+    private static boolean isJavaVersionOrAbove(String version) {
         try {
             Version java = new Version(getJavaVersion());
             Version given = new Version(version);

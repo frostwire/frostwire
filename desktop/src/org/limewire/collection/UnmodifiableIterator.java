@@ -5,7 +5,7 @@ import java.util.Iterator;
 /**
  * A convenience class to aid in developing iterators that cannot be modified.
  */
-public abstract class UnmodifiableIterator<E> implements Iterator<E> {
+abstract class UnmodifiableIterator<E> implements Iterator<E> {
     /**
      * Throws UnsupportedOperationException
      */

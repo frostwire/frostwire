@@ -72,7 +72,7 @@ public class TorrentFilesTransferHandler extends LimeTransferHandler {
     }
 
     // made package private for tests
-    boolean areAllTorrentFiles(File[] files) {
+    private boolean areAllTorrentFiles(File[] files) {
         for (File file : files) {
             if (!file.isFile() || !file.getName().toLowerCase().endsWith(".torrent")) {
                 return false;
