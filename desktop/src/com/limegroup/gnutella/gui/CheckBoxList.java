@@ -164,7 +164,7 @@ public class CheckBoxList<E> extends BoxPanel {
     /**
      * Force updates every item in the list
      */
-    public void update() {
+    void update() {
         ((DefaultTableModel) this.checkBoxList.getModel()).fireTableStructureChanged();
         //repaint();
     }
@@ -419,7 +419,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * check if an element requires is required to have a horizontal
      * separator drawn above it.
      */
-    public interface ExtrasProvider<E> {
+    interface ExtrasProvider<E> {
         boolean isSeparated(E obj);
 
         String getComment(E obj);
@@ -817,7 +817,7 @@ public class CheckBoxList<E> extends BoxPanel {
             this.button.setVisible(state);
         }
 
-        public void setData(E obj) {
+        void setData(E obj) {
             this.obj = obj;
             String text = provider.getText(obj);
             label.setIcon(provider.getIcon(obj));
@@ -843,7 +843,7 @@ public class CheckBoxList<E> extends BoxPanel {
             }
         }
 
-        public void setSelected(boolean selected) {
+        void setSelected(boolean selected) {
             checkBox.setSelected(selected);
         }
 
@@ -858,7 +858,7 @@ public class CheckBoxList<E> extends BoxPanel {
             }
         }
 
-        public void setBold(boolean b) {
+        void setBold(boolean b) {
             if (b) {
                 label.setFont(boldFont);
             } else {
@@ -885,7 +885,7 @@ public class CheckBoxList<E> extends BoxPanel {
          *
          * @param l the <code>ActionListener</code> to be added
          */
-        public void addActionListener(ActionListener l) {
+        void addActionListener(ActionListener l) {
             this.checkBox.addActionListener(l);
         }
 

@@ -61,7 +61,7 @@ final class CancelSearchIconProxy implements Icon {
      * the constructor loads the image icon and stores the location
      * and dimensions.
      */
-    CancelSearchIconProxy(int style) {
+    private CancelSearchIconProxy(int style) {
         this.style = style;
         setIcon();
     }

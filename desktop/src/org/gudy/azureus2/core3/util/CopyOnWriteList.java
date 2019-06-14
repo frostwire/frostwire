@@ -21,7 +21,7 @@ package org.gudy.azureus2.core3.util;
 
 import java.util.*;
 
-public class CopyOnWriteList<T> implements Iterable<T> {
+class CopyOnWriteList<T> implements Iterable<T> {
     private final boolean use_linked_list;
     private List<T> list = Collections.EMPTY_LIST;
     private boolean visible = false;
@@ -30,7 +30,7 @@ public class CopyOnWriteList<T> implements Iterable<T> {
         use_linked_list = _use_linked_list;
     }
 
-    public void
+    void
     remove(
             T obj) {
         synchronized (this) {

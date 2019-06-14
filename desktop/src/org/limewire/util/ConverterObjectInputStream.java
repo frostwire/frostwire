@@ -67,7 +67,7 @@ import java.util.Map;
  * </table>
  * None of the earlier forms of the class need to exist in the classpath.
  */
-public class ConverterObjectInputStream extends ObjectInputStream {
+class ConverterObjectInputStream extends ObjectInputStream {
     private static final Logger LOG = Logger.getLogger(ConverterObjectInputStream.class);
     private final Map<String, String> lookups = new HashMap<>(8);
 

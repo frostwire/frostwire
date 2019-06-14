@@ -36,7 +36,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class CopyrightLicenseSelectorPanel extends JPanel {
+class CopyrightLicenseSelectorPanel extends JPanel {
     private static final String CREATIVE_COMMONS_CARD_NAME = I18n.tr("Creative Commons");
     private static final String OPEN_SOURCE_CARD_NAME = I18n.tr("Open Source");
     private static final String PUBLIC_DOMAIN_CARD_NAME = I18n.tr("Public Domain");

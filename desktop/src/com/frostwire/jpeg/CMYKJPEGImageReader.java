@@ -58,7 +58,7 @@ public class CMYKJPEGImageReader extends ImageReader {
      */
     private BufferedImage image;
 
-    CMYKJPEGImageReader(ImageReaderSpi originatingProvider) {
+    private CMYKJPEGImageReader(ImageReaderSpi originatingProvider) {
         super(originatingProvider);
     }
 

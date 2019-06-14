@@ -535,7 +535,7 @@ public class CommonUtils {
         return false;//IS_PORTABLE;
     }
 
-    public static void closeQuietly(Closeable closeable) {
+    private static void closeQuietly(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();

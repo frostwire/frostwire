@@ -688,7 +688,7 @@ public class CreateTorrentDialog extends JDialog {
             this(k, k + " kB");
         }
 
-        public int bytes() {
+        int bytes() {
             return kb * 1024;
         }
 

@@ -20,7 +20,7 @@ import java.awt.event.ActionListener;
  * @author Sam Berlin
  * idea from the getColumnSelectionMenu in /search/TableColumnFilter
  */
-public class ColumnSelectionMenu {
+class ColumnSelectionMenu {
     /**
      * More Options menu item.
      */
@@ -152,7 +152,7 @@ public class ColumnSelectionMenu {
     /**
      * Simple class that deals with setting/unsetting settings.
      */
-    protected static class SettingListener implements ActionListener {
+    static class SettingListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
             BooleanSetting setting =
@@ -165,7 +165,7 @@ public class ColumnSelectionMenu {
      * Simple ActionListener class that will display/hide a column
      * based on the columnId property of the source.
      */
-    protected class SelectionActionListener implements ActionListener {
+    class SelectionActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
             try {
@@ -183,7 +183,7 @@ public class ColumnSelectionMenu {
      * Simple class that calls 'revertToDefault' on the ColumnPreferenceHandler
      * of the LimeJTable
      */
-    protected class ReverterListener implements ActionListener {
+    class ReverterListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             _table.getColumnPreferenceHandler().revertToDefault();
             _table.getTableSettings().revertToDefault();
