@@ -1028,7 +1028,9 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                     }
                 } finally {
                     task = null;
-                    w.completedTasks++;
+                    synchronized (w.completedTasksLock) {
+                        w.completedTasks++;
+                    }
                     w.unlock();
                 }
             }
@@ -1767,10 +1769,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      */
     private final class Worker extends ReentrantLock implements Runnable {
         /**
-         *
-         */
-        private static final long serialVersionUID = -1784809862406975944L;
-        /**
          * Thread this worker is running in.  Null if factory fails.
          */
         final Thread thread;
@@ -1782,6 +1780,8 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
          * Per-thread task counter
          */
         volatile long completedTasks;
+
+        private final Object completedTasksLock = new Object();
 
         /**
          * Creates with given first task and thread from ThreadFactory.

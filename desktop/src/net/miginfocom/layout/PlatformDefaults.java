@@ -98,6 +98,7 @@ public final class PlatformDefaults {
     private static int DEF_H_UNIT = UnitValue.LPX;
     private static int DEF_V_UNIT = UnitValue.LPY;
     private static volatile int MOD_COUNT;
+    private static final Object MOD_COUNT_LOCK = new Object();
     private static int CUR_PLAF = WINDOWS_XP;
     private static String BUTTON_FORMAT = null;
     private static BoundSize DEF_VGAP = null, DEF_HGAP = null;
@@ -115,6 +116,12 @@ public final class PlatformDefaults {
     }
 
     private PlatformDefaults() {
+    }
+
+    private static void incModCount() {
+        synchronized (MOD_COUNT_LOCK) {
+            MOD_COUNT++;
+        }
     }
 
     /**
@@ -248,7 +255,7 @@ public final class PlatformDefaults {
     private static void setHorizontalScaleFactor(Float f) {
         if (!LayoutUtil.equals(horScale, f)) {
             horScale = f;
-            MOD_COUNT++;
+            incModCount();
         }
     }
 
@@ -278,7 +285,7 @@ public final class PlatformDefaults {
     private static void setVerticalScaleFactor(Float f) {
         if (!LayoutUtil.equals(verScale, f)) {
             verScale = f;
-            MOD_COUNT++;
+            incModCount();
         }
     }
 
@@ -306,7 +313,7 @@ public final class PlatformDefaults {
             if (base < BASE_FONT_SIZE || base > BASE_SCALE_FACTOR)
                 throw new IllegalArgumentException("Unrecognized base: " + base);
             LP_BASE = base;
-            MOD_COUNT++;
+            incModCount();
         }
     }
 
@@ -364,7 +371,7 @@ public final class PlatformDefaults {
             DEF_HGAP = new BoundSize(x, x, null, null);
         if (y != null)
             DEF_VGAP = new BoundSize(y, y, null, null);
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -383,7 +390,7 @@ public final class PlatformDefaults {
      */
     private static void setMinimumButtonWidth(UnitValue width) {
         BUTT_WIDTH = width;
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -404,7 +411,7 @@ public final class PlatformDefaults {
             if (y != null)
                 VER_DEFS.put(s, y);
         }
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -466,7 +473,7 @@ public final class PlatformDefaults {
      */
     private static void setButtonOrder(String order) {
         BUTTON_FORMAT = order;
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -553,7 +560,7 @@ public final class PlatformDefaults {
             DIALOG_INS[2] = bottom;
         if (right != null)
             DIALOG_INS[3] = right;
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -583,7 +590,7 @@ public final class PlatformDefaults {
             PANEL_INS[2] = bottom;
         if (right != null)
             PANEL_INS[3] = right;
-        MOD_COUNT++;
+        incModCount();
     }
 
     /**
@@ -605,7 +612,7 @@ public final class PlatformDefaults {
      * @param isLTR        If it is left-to-right.
      * @return The default gap between two components or <code>null</code> if there should be no gap.
      */
-    static BoundSize getDefaultComponentGap(ComponentWrapper adjacentComp, int adjacentSide, String tag, boolean isLTR) {
+    static BoundSize getDefaultComponentGap(ComponentWrapper adjacentComp, int adjacentSide, @SuppressWarnings("unused") String tag, @SuppressWarnings("unused") boolean isLTR) {
         if (adjacentComp == null)
             return null;
         return (adjacentSide == SwingConstants.LEFT || adjacentSide == SwingConstants.RIGHT) ? RELATED_X : RELATED_Y;
@@ -644,7 +651,7 @@ public final class PlatformDefaults {
             throw new IllegalArgumentException("Illegal Unit: " + unit);
         if (DEF_H_UNIT != unit) {
             DEF_H_UNIT = unit;
-            MOD_COUNT++;
+            incModCount();
         }
     }
 
@@ -671,7 +678,7 @@ public final class PlatformDefaults {
             throw new IllegalArgumentException("Illegal Unit: " + unit);
         if (DEF_V_UNIT != unit) {
             DEF_V_UNIT = unit;
-            MOD_COUNT++;
+            incModCount();
         }
     }
 
@@ -683,8 +690,7 @@ public final class PlatformDefaults {
      * @since 3.5
      */
     static boolean getDefaultRowAlignmentBaseline() {
-        boolean dra = true;
-        return dra;
+        return true;
     }
 
     /**
@@ -692,6 +698,6 @@ public final class PlatformDefaults {
      */
     @SuppressWarnings("unused")
     public void invalidate() {
-        MOD_COUNT++;
+        incModCount();
     }
 }
