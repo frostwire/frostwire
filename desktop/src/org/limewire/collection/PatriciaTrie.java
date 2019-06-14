@@ -1478,7 +1478,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
          * Only the root can potentially be empty, all other
          * nodes must have a key.
          */
-        public boolean isEmpty() {
+        boolean isEmpty() {
             return key == null;
         }
 
@@ -1605,8 +1605,8 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * An iterator for the entries.
      */
     private abstract class NodeIterator<E> implements Iterator<E> {
-        protected TrieEntry<K, V> next; // the next node to return
-        protected TrieEntry<K, V> current; // the current entry we're on
+        TrieEntry<K, V> next; // the next node to return
+        TrieEntry<K, V> current; // the current entry we're on
         int expectedModCount = modCount;   // For fast-fail
 
         // Starts iteration from the beginning.
@@ -1634,7 +1634,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             return e;
         }
 
-        protected TrieEntry<K, V> findNext(TrieEntry<K, V> prior) {
+        TrieEntry<K, V> findNext(TrieEntry<K, V> prior) {
             return PatriciaTrie.this.nextEntry(prior);
         }
 
@@ -1673,9 +1673,9 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      */
     private class PrefixEntryIterator extends NodeIterator<Map.Entry<K, V>> {
         // values to reset the subtree if we remove it.
-        protected final K prefix;
-        protected final int offset;
-        protected final int length;
+        final K prefix;
+        final int offset;
+        final int length;
         boolean lastOne;
         TrieEntry<K, V> subtree; // the subtree to search within
 
@@ -1832,10 +1832,10 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
          *
          */
         private static final long serialVersionUID = -1736000794623484155L;
-        protected final K prefix;
-        protected final int offset;
-        protected final int length;
-        protected int size;
+        final K prefix;
+        final int offset;
+        final int length;
+        int size;
         private transient int keyModCount = 0;
 
         PrefixSubMap(K prefix, int offset, int length) {
@@ -2060,7 +2060,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             return entrySet;
         }
 
-        protected Set<Map.Entry<K, V>> newSubMapEntrySet() {
+        Set<Map.Entry<K, V>> newSubMapEntrySet() {
             return new EntrySetView();
         }
 
@@ -2084,18 +2084,18 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             return new SubMap(fromKey, toKey);
         }
 
-        protected boolean inRange(K key) {
+        boolean inRange(K key) {
             return (fromKey == null || inFromRange(key, false)) &&
                     (toKey == null || inToRange(key, false));
         }
 
         // This form allows the high endpoint (as well as all legit keys)
-        protected boolean inRange2(K key) {
+        boolean inRange2(K key) {
             return (fromKey == null || inFromRange(key, false)) &&
                     (toKey == null || inToRange(key, true));
         }
 
-        protected boolean inToRange(K key, boolean forceInclusive) {
+        boolean inToRange(K key, boolean forceInclusive) {
             int ret = keyAnalyzer.compare(key, toKey);
             if (toInclusive || forceInclusive)
                 return ret <= 0;
@@ -2103,7 +2103,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
                 return ret < 0;
         }
 
-        protected boolean inFromRange(K key, boolean forceInclusive) {
+        boolean inFromRange(K key, boolean forceInclusive) {
             int ret = keyAnalyzer.compare(key, fromKey);
             if (fromInclusive || forceInclusive)
                 return ret >= 0;

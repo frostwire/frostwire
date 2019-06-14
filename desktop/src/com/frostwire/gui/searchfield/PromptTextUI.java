@@ -33,7 +33,7 @@ public abstract class PromptTextUI extends TextUI {
     /**
      * Delegate the hard work to this object.
      */
-    protected final TextUI delegate;
+    private final TextUI delegate;
     private final SkinTextFieldBackgroundPainter backgroundPainter;
     private final Bias[] discardBias = new Bias[1];
     /**
@@ -84,7 +84,7 @@ public abstract class PromptTextUI extends TextUI {
      *
      * @return the adjusted prompt component
      */
-    public JTextComponent getPromptComponent(JTextComponent txt) {
+    JTextComponent getPromptComponent(JTextComponent txt) {
         if (promptComponent == null) {
             promptComponent = createPromptComponent();
             promptComponent.setUI(new SynthTextFieldUI());

@@ -165,7 +165,7 @@ public final class PlatformDefaults {
      *             <code>PlatformDefaults.MAC_OSX</code>, or
      *             <code>PlatformDefaults.GNOME</code>.
      */
-    public static void setPlatform(int plaf) {
+    private static void setPlatform(int plaf) {
         switch (plaf) {
             case WINDOWS_XP:
                 setRelatedGap(LPX4, LPY4);
@@ -464,7 +464,7 @@ public final class PlatformDefaults {
      *
      * @param order The new button order for the current platform.
      */
-    static void setButtonOrder(String order) {
+    private static void setButtonOrder(String order) {
         BUTTON_FORMAT = order;
         MOD_COUNT++;
     }
@@ -544,7 +544,7 @@ public final class PlatformDefaults {
      * @param bottom The bottom inset. May be <code>null</code>.
      * @param right  The right inset. May be <code>null</code>.
      */
-    static void setDialogInsets(UnitValue top, UnitValue left, UnitValue bottom, UnitValue right) {
+    private static void setDialogInsets(UnitValue top, UnitValue left, UnitValue bottom, UnitValue right) {
         if (top != null)
             DIALOG_INS[0] = top;
         if (left != null)

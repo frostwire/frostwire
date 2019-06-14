@@ -34,8 +34,8 @@ import java.io.IOException;
  * set the login data for the proxy.
  */
 public final class ProxyLoginPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Login Details");
-    public final static String LABEL = I18n.tr("Configure username and password to be used for the proxy.");
+    private final static String TITLE = I18n.tr("Login Details");
+    private final static String LABEL = I18n.tr("Configure username and password to be used for the proxy.");
     /**
      * Constant <tt>JTextField</tt> instance that holds the username.
      */

@@ -55,30 +55,30 @@ import java.util.Map;
 public final class OptionsConstructor {
     public static final String SHARED_KEY = "OPTIONS_SHARED_MAIN_TITLE";
     public static final String BITTORRENT_BASIC_KEY = "OPTIONS_BITTORRENT_BASIC_TITLE";
-    public static final String BITTORRENT_ADVANCED_KEY = "OPTIONS_BITTORRENT_ADVANCED_TITLE";
+    private static final String BITTORRENT_ADVANCED_KEY = "OPTIONS_BITTORRENT_ADVANCED_TITLE";
     public static final String LIBRARY_KEY = "OPTIONS_LIBRARY_MAIN_TITLE";
     static final String SAVE_BASIC_KEY = "OPTIONS_SAVE_BASIC_MAIN_TITLE";
     static final String SHARED_BASIC_KEY = "OPTIONS_SHARED_BASIC_TITLE";
-    static final String BITTORRENT_KEY = "OPTIONS_BITTORRENT_MAIN_TITLE";
-    static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
-    static final String PLAYER_KEY = "OPTIONS_PLAYER_MAIN_TITLE";
-    static final String STATUS_BAR_KEY = "OPTIONS_STATUS_BAR_MAIN_TITLE";
-    static final String ITUNES_KEY = "OPTIONS_ITUNES_MAIN_TITLE";
-    static final String ITUNES_IMPORT_KEY = "OPTIONS_ITUNES_PREFERENCE_MAIN_TITLE";
-    static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
-    static final String APPS_KEY = "OPTIONS_APPS_MAIN_TITLE";
-    static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
-    static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
-    static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
-    static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
-    static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
-    static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
-    static final String EXPERIMENTAL_KEY = "OPTIONS_EXPERIMENTAL_MAIN_TITLE";
-    static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
-    static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
-    static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
-    static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
-    static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
+    private static final String BITTORRENT_KEY = "OPTIONS_BITTORRENT_MAIN_TITLE";
+    private static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
+    private static final String PLAYER_KEY = "OPTIONS_PLAYER_MAIN_TITLE";
+    private static final String STATUS_BAR_KEY = "OPTIONS_STATUS_BAR_MAIN_TITLE";
+    private static final String ITUNES_KEY = "OPTIONS_ITUNES_MAIN_TITLE";
+    private static final String ITUNES_IMPORT_KEY = "OPTIONS_ITUNES_PREFERENCE_MAIN_TITLE";
+    private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
+    private static final String APPS_KEY = "OPTIONS_APPS_MAIN_TITLE";
+    private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
+    private static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
+    private static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
+    private static final String ADVANCED_KEY = "OPTIONS_ADVANCED_MAIN_TITLE";
+    private static final String PREFERENCING_KEY = "OPTIONS_PREFERENCING_MAIN_TITLE";
+    private static final String FIREWALL_KEY = "OPTIONS_FIREWALL_MAIN_TITLE";
+    private static final String EXPERIMENTAL_KEY = "OPTIONS_EXPERIMENTAL_MAIN_TITLE";
+    private static final String GUI_KEY = "OPTIONS_GUI_MAIN_TITLE";
+    private static final String STARTUP_KEY = "OPTIONS_STARTUP_MAIN_TITLE";
+    private static final String PROXY_KEY = "OPTIONS_PROXY_MAIN_TITLE";
+    private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
+    private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
     /**
      * Handle to the top-level <tt>JDialog</tt window that contains all
      * of the other GUI components.
@@ -339,8 +339,8 @@ public final class OptionsConstructor {
      * It also updates the width and height setting if the user changes the dialog
      * size manually.
      */
-    public static class DialogSizeSettingUpdater {
-        public static void install(JDialog dialog, IntSetting widthSetting, IntSetting heightSetting) {
+    static class DialogSizeSettingUpdater {
+        static void install(JDialog dialog, IntSetting widthSetting, IntSetting heightSetting) {
             int width = widthSetting.getValue();
             int height = heightSetting.getValue();
             dialog.setSize(width, height);
@@ -351,7 +351,7 @@ public final class OptionsConstructor {
             private final IntSetting widthSetting;
             private final IntSetting heightSetting;
 
-            public SizeChangeListener(IntSetting widthSetting, IntSetting heightSetting) {
+            SizeChangeListener(IntSetting widthSetting, IntSetting heightSetting) {
                 this.widthSetting = widthSetting;
                 this.heightSetting = heightSetting;
             }

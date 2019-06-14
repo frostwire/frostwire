@@ -24,7 +24,7 @@ import javax.swing.*;
  * @author gubatron
  * @author aldenml
  */
-public class PlayableIconCell {
+class PlayableIconCell {
     private final Icon icon;
 
     PlayableIconCell(Icon icon) {

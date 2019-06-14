@@ -13,8 +13,8 @@ public class PaddedPanel extends JPanel {
      * Constructor for a padded panel with the margins and the label text
      * specified as parameters.
      */
-    public PaddedPanel(String label, int top, int left,
-                       int bottom, int right) {
+    private PaddedPanel(String label, int top, int left,
+                        int bottom, int right) {
         BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
         Border border = BorderFactory.createEmptyBorder(top, left,
                 bottom, right);
@@ -38,7 +38,7 @@ public class PaddedPanel extends JPanel {
      * Constructor for a padded panel that allows you to specify the borders
      * on all sides with no label
      */
-    public PaddedPanel(int top, int left, int bottom, int right) {
+    private PaddedPanel(int top, int left, int bottom, int right) {
         this("", top, left, bottom, right);
     }
 
@@ -53,7 +53,7 @@ public class PaddedPanel extends JPanel {
      * Creates a panel with the specified label and the specified padding
      * on all sides.
      */
-    public PaddedPanel(String label, int padding) {
+    private PaddedPanel(String label, int padding) {
         this(label, padding, padding, padding, padding);
     }
 

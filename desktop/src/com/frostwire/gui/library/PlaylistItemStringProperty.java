@@ -19,7 +19,7 @@
 package com.frostwire.gui.library;
 
 class PlaylistItemStringProperty extends PlaylistItemProperty<PlaylistItemStringProperty> {
-    protected final String stringValue;
+    private final String stringValue;
 
     public PlaylistItemStringProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean playing, boolean exists) {
         super(line, playing, exists);

@@ -32,8 +32,8 @@ import java.io.IOException;
  * select a proxy to use.
  */
 public final class ProxyPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Proxy Options");
-    public final static String LABEL = I18n.tr("Configure Proxy Options for FrostWire.");
+    private final static String TITLE = I18n.tr("Proxy Options");
+    private final static String LABEL = I18n.tr("Configure Proxy Options for FrostWire.");
     private final JRadioButton NO_PROXY_BUTTON = new JRadioButton(I18n.tr("No Proxy"));
     private final JRadioButton SOCKS4_PROXY_BUTTON = new JRadioButton("Socks v4");
     private final JRadioButton SOCKS5_PROXY_BUTTON = new JRadioButton("Socks v5");

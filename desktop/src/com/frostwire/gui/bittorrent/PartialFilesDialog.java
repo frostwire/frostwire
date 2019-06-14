@@ -37,7 +37,7 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public class PartialFilesDialog extends JDialog {
+class PartialFilesDialog extends JDialog {
     private final TorrentInfo torrent;
     private final String name;
     private final TorrentTableModel model;

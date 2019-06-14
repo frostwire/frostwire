@@ -30,8 +30,8 @@ import java.io.IOException;
  * @author aldenml
  */
 public final class PlayerPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("FrostWire Media Player");
-    public final static String LABEL = I18n.tr("You can play your media with the native operating system player if the format is supported.");
+    private final static String TITLE = I18n.tr("FrostWire Media Player");
+    private final static String LABEL = I18n.tr("You can play your media with the native operating system player if the format is supported.");
     private final JCheckBox CHECK_BOX = new JCheckBox();
     private final JCheckBox VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX = new JCheckBox();
 

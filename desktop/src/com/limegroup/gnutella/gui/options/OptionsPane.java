@@ -13,7 +13,7 @@ import java.io.IOException;
  * to be displayed in the <tt>CardLayout</tt>.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
-public interface OptionsPane {
+interface OptionsPane {
     /**
      * Returns the name of this <tt>OptionsPane</tt>.
      *

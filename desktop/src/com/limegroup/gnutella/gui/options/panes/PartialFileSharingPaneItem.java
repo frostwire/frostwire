@@ -25,8 +25,8 @@ import javax.swing.*;
  * Allows the user to change whether or not partial files are shared.
  */
 public final class PartialFileSharingPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Partial Files");
-    public final static String LABEL = I18n.tr("You can choose whether or not to automatically share partially downloaded files.");
+    private final static String TITLE = I18n.tr("Partial Files");
+    private final static String LABEL = I18n.tr("You can choose whether or not to automatically share partially downloaded files.");
     /**
      * Constant for the check box that specifies whether or not partial
      * files should be shared.

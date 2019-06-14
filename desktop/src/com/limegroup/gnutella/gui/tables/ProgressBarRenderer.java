@@ -31,7 +31,7 @@ import java.awt.*;
  * @author gubatron
  * @author aldenml
  */
-public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
+class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
     private boolean isSelected;
 
     /**
@@ -54,7 +54,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      * @param value the same value that initializes the cell
      * @return the String that should be displayed
      */
-    protected String getDescription(Object value) {
+    private String getDescription(Object value) {
         return getBarStatus(value) + " %";
     }
 

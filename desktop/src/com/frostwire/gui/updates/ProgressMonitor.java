@@ -193,7 +193,7 @@ class ProgressMonitor implements Accessible {
      * when the value set by setProgress is >= max, but it may be called
      * earlier if the operation ends early.
      */
-    public void close() {
+    private void close() {
         if (dialog != null) {
             dialog.setVisible(false);
             dialog.dispose();
@@ -422,7 +422,7 @@ class ProgressMonitor implements Accessible {
      *
      * @since 1.5
      */
-    protected class AccessibleProgressMonitor extends AccessibleContext
+    class AccessibleProgressMonitor extends AccessibleContext
             implements AccessibleText, ChangeListener, PropertyChangeListener {
         /*
          * The accessibility hierarchy for ProgressMonitor is a flattened

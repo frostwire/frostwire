@@ -125,7 +125,7 @@ public class PromptSupport {
      * and repaints the component to reflect the changes. This color will be
      * used when no text is present.
      */
-    public static void setForeground(Color promptTextColor, JTextComponent textComponent) {
+    private static void setForeground(Color promptTextColor, JTextComponent textComponent) {
         textComponent.putClientProperty(FOREGROUND, promptTextColor);
         textComponent.repaint();
     }
@@ -149,7 +149,7 @@ public class PromptSupport {
      * only be used when no text is present.
      * </p>
      */
-    public static void setBackground(Color background, JTextComponent textComponent) {
+    private static void setBackground(Color background, JTextComponent textComponent) {
         TextUIWrapper.getDefaultWrapper().install(textComponent, true);
         textComponent.putClientProperty(BACKGROUND, background);
         textComponent.repaint();

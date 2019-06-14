@@ -12,7 +12,7 @@ public class PlaylistDB {
     private PlaylistDB() {
     } // don't allow explicit constructions
 
-    public static void fill(List<Object> row, Playlist p) {
+    private static void fill(List<Object> row, Playlist p) {
         int id = (Integer) row.get(0);
         String name = (String) row.get(1);
         String description = (String) row.get(2);

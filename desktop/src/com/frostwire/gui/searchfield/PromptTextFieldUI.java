@@ -36,7 +36,7 @@ public class PromptTextFieldUI extends PromptTextUI {
      *
      * @param delegate
      */
-    public PromptTextFieldUI(TextUI delegate) {
+    PromptTextFieldUI(TextUI delegate) {
         super(delegate);
     }
 

@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class PopupsPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("FrostWire Popups");
-    public final static String LABEL = I18n.tr("Redisplay messages for which you have chosen \'Do not display this message again\' or \'Always use this answer\'.");
+    private final static String TITLE = I18n.tr("FrostWire Popups");
+    private final static String LABEL = I18n.tr("Redisplay messages for which you have chosen \'Do not display this message again\' or \'Always use this answer\'.");
     /**
      * Constant for the check box that specifies whether or not downloads
      * should be automatically cleared.

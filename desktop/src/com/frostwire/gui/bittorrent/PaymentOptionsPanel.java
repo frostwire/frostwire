@@ -29,7 +29,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class PaymentOptionsPanel extends JPanel {
+class PaymentOptionsPanel extends JPanel {
     private final JCheckBox confirmationCheckbox;
     private final CryptoCurrencyTextField bitcoinAddress;
     private final LimeTextField paypalUrlAddress;
@@ -54,12 +54,12 @@ public class PaymentOptionsPanel extends JPanel {
         });
     }
 
-    protected void onConfirmationCheckbox() {
+    private void onConfirmationCheckbox() {
         bitcoinAddress.setEnabled(confirmationCheckbox.isSelected());
         paypalUrlAddress.setEnabled(confirmationCheckbox.isSelected());
     }
 
-    protected void onCryptoAddressPressed(CryptoCurrencyTextField textField) {
+    private void onCryptoAddressPressed(CryptoCurrencyTextField textField) {
         boolean hasValidPrefixOrNoPrefix = false;
         hasValidPrefixOrNoPrefix = textField.hasValidPrefixOrNoPrefix();
         if (!textField.hasValidAddress() || !hasValidPrefixOrNoPrefix) {

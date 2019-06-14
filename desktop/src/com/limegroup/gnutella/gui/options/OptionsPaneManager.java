@@ -35,7 +35,7 @@ import java.util.Map;
  * all of them regardless of how many there are or what their
  * specific type is.
  */
-public final class OptionsPaneManager {
+final class OptionsPaneManager {
     /**
      * Constant for the main panel of the options window.
      */

@@ -24,7 +24,7 @@ import com.frostwire.gui.LocaleLabel.LocaleString;
  * @author gubatron
  * @author aldenml
  */
-public class PlayableCell implements Comparable<PlayableCell> {
+class PlayableCell implements Comparable<PlayableCell> {
     private final Object dataLine;
     private final Object wrappedObject;
     private final String strValue;
