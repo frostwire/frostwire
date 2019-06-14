@@ -126,7 +126,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     /**
      * Split a collection in Lists of up to partitionSize elements.
      */
-    public static <T> List<List<T>> split(int partitionSize, List<T> collection) {
+    private static <T> List<List<T>> split(int partitionSize, List<T> collection) {
         List<List<T>> lists = new LinkedList<>();
         for (int i = 0; i < collection.size(); i += partitionSize) {
             //the compiler might not know if the collection has changed size
@@ -352,7 +352,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
      * @return a <tt>File</tt> instance associated with the specified row
      * in the table
      */
-    File getFile(int row) {
+    private File getFile(int row) {
         return DATA_MODEL.getFile(row);
     }
 

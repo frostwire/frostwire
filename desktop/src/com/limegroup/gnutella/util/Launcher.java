@@ -194,7 +194,7 @@ public final class Launcher {
      * @param path the path of the file to launch
      * @return an int for the exit code of the native method
      */
-    public static int launchFileWindows(String path) throws IOException {
+    private static int launchFileWindows(String path) throws IOException {
         try {
             return SystemUtils.openFile(path);
         } catch (IOException iox) {

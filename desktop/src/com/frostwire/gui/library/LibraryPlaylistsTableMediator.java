@@ -396,7 +396,7 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
      * @return a <tt>File</tt> instance associated with the specified row
      * in the table
      */
-    File getFile(int row) {
+    private File getFile(int row) {
         return DATA_MODEL.getFile(row);
     }
 

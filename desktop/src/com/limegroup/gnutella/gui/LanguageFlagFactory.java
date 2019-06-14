@@ -133,7 +133,7 @@ public class LanguageFlagFactory {
      * @param languageCode
      * @return
      */
-    public static ImageIcon getFlag(String countryCode, String languageCode) {
+    private static ImageIcon getFlag(String countryCode, String languageCode) {
         return getFlag(countryCode, languageCode, false);
     }
 

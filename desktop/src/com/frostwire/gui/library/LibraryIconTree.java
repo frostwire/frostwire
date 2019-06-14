@@ -37,11 +37,11 @@ import java.util.logging.Logger;
  * @author gubatron
  * @author aldenml
  */
-public class LibraryIconTree extends JTree {
+class LibraryIconTree extends JTree {
     private static final Logger LOG = Logger.getLogger(LibraryIconTree.class.getName());
     private Image speaker;
 
-    public LibraryIconTree() {
+    private LibraryIconTree() {
         loadIcons();
     }
 

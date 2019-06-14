@@ -22,7 +22,7 @@ public final class LabeledComponent {
      * Constant alignment key for aligning the label to the right of the
      * <tt>Component</tt>.
      */
-    public static final int RIGHT = 11;
+    private static final int RIGHT = 11;
     /**
      * This will create a "glue" at the left of the panel, pushing the
      * label/component pair to the right.

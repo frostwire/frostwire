@@ -33,10 +33,10 @@ public class ListEditor extends JPanel {
     /**
      * INVARIANT: model contains exactly the same elements as realModel.
      */
-    protected Vector<String> model;
-    protected final Vector<ListDataListener> listeners;
-    protected final JTextField editor;
-    protected final JList<Object> list;
+    private Vector<String> model;
+    private final Vector<ListDataListener> listeners;
+    private final JTextField editor;
+    private final JList<Object> list;
     private DefaultListModel<Object> /* of String */ realModel;
     private final JButton removeButton;
 

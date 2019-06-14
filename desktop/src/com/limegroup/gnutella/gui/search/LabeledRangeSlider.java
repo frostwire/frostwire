@@ -26,7 +26,7 @@ import java.awt.*;
 /**
  * @author gubatron
  */
-public class LabeledRangeSlider extends JPanel {
+class LabeledRangeSlider extends JPanel {
     private final RangeSlider slider;
     private final JLabel titleLabel;
     private final JLabel minLabel;

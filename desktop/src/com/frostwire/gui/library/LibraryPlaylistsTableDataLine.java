@@ -43,11 +43,11 @@ public final class LibraryPlaylistsTableDataLine extends AbstractLibraryTableDat
     /**
      * Size column (in bytes)
      */
-    static final int SIZE_IDX = 11;
+    private static final int SIZE_IDX = 11;
     /**
      * TYPE column
      */
-    static final int TYPE_IDX = 12;
+    private static final int TYPE_IDX = 12;
     private static final LimeTableColumn SORT_INDEX_COLUMN = new LimeTableColumn(SORT_INDEX_IDX, "PLAYLIST_TABLE_SORT_INDEX", I18n.tr("Index"), 30, true, false, false, PlaylistItemStringProperty.class);
     private static final LimeTableColumn ACTIONS_COLUMN = new LimeTableColumn(ACTIONS_IDX, "PLAYLIST_TABLE_ACTIONS", I18n.tr("Actions"), 36, true, false, false, LibraryActionsHolder.class);
     private static final LimeTableColumn STARRED_COLUMN = new LimeTableColumn(STARRED_IDX, "PLAYLIST_TABLE_STARRED", I18n.tr("Starred"), 20, true, false, false, PlaylistItemStarProperty.class);

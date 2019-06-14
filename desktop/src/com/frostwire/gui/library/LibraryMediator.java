@@ -62,7 +62,7 @@ public class LibraryMediator {
     private final Set<Integer> idScanned;
     private AbstractLibraryTableMediator<?, ?, ?> currentMediator;
 
-    public LibraryMediator() {
+    private LibraryMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Library Window..."));
         idScanned = new HashSet<>();
         getComponent(); // creates MAIN_PANEL

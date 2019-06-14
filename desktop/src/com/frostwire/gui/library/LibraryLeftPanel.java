@@ -30,7 +30,7 @@ import java.awt.event.ComponentEvent;
  * @author gubatron
  * @author aldenml
  */
-public class LibraryLeftPanel extends JPanel {
+class LibraryLeftPanel extends JPanel {
     static final int MIN_WIDTH = 155;
     static final int MAX_WIDTH = 300;
     private final LibraryExplorer libraryExplorer;
@@ -46,7 +46,7 @@ public class LibraryLeftPanel extends JPanel {
         setupUI();
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setLayout(new BorderLayout());
         //Prepare a split pane with explorers
         splitPane.setTopComponent(libraryExplorer);

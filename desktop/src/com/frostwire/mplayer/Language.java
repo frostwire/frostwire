@@ -20,8 +20,8 @@ package com.frostwire.mplayer;
 import java.util.Locale;
 
 public class Language {
-    final String id;
-    final LanguageSource source;
+    private final String id;
+    private final LanguageSource source;
     private String name;
     private Locale language;
 

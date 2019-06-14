@@ -107,7 +107,7 @@ public class LibrarySearch extends JPanel {
         statusLabel.setText(status);
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         setMinimumSize(new Dimension(200, 20));
@@ -174,7 +174,7 @@ public class LibrarySearch extends JPanel {
          * @param includeAllDirectories - if true, it will say TRUE to any directory
          * @return
          */
-        public boolean accept(File pathname, boolean includeAllDirectories) {
+        boolean accept(File pathname, boolean includeAllDirectories) {
             if (!pathname.exists()) {
                 return false;
             }
@@ -205,7 +205,7 @@ public class LibrarySearch extends JPanel {
             putValue(Action.NAME, I18n.tr("Search"));
         }
 
-        public boolean validate(SearchInformation info) {
+        boolean validate(SearchInformation info) {
             switch (SearchMediator.validateInfo(info)) {
                 case SearchMediator.QUERY_EMPTY:
                     return false;
@@ -217,7 +217,7 @@ public class LibrarySearch extends JPanel {
             }
         }
 
-        public void perform(String query) {
+        void perform(String query) {
             if (query.length() == 0) {
                 searchField.getToolkit().beep();
                 return;
@@ -259,9 +259,9 @@ public class LibrarySearch extends JPanel {
     }
 
     private abstract class SearchRunnable implements Runnable {
-        protected boolean canceled;
+        boolean canceled;
 
-        public void cancel() {
+        void cancel() {
             canceled = true;
         }
     }

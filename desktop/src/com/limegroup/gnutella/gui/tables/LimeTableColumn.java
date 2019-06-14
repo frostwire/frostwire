@@ -74,7 +74,7 @@ public class LimeTableColumn extends TableColumn {
     /**
      * Creates a new column.
      */
-    public LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, boolean visName, Class<?> clazz) {
+    private LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, boolean visName, Class<?> clazz) {
         super(model);
         initialized = true;
         this.defaultVisibility = vis;

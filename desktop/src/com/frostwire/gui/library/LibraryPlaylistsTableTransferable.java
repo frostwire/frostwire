@@ -35,7 +35,7 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public final class LibraryPlaylistsTableTransferable implements Transferable {
+final class LibraryPlaylistsTableTransferable implements Transferable {
     static final DataFlavor ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
     static final DataFlavor PLAYLIST_ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.PlaylistItemArray");
     private final List<LibraryPlaylistsTableTransferable.Item> items;

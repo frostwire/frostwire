@@ -40,7 +40,7 @@ import java.util.HashMap;
 /**
  *
  */
-public final class LinkHandler {
+final class LinkHandler {
     public static final int X = 0;
     public static final int Y = 1;
     static final int WIDTH = 2;

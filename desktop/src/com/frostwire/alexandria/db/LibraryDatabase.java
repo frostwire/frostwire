@@ -60,7 +60,7 @@ public class LibraryDatabase {
         }
     }
 
-    public boolean isClosed() {
+    private boolean isClosed() {
         return _closed;
     }
 

@@ -30,13 +30,13 @@ import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.TimeUnit;
 
 class LibDispatchSerialQueue extends AbstractExecutorService {
-    static final int RUNNING = 0;
-    static final int SHUTDOWN = 1;
+    private static final int RUNNING = 0;
+    private static final int SHUTDOWN = 1;
     //  static final int STOP       = 2; // not supported by GCD
-    static final int TERMINATED = 3;
-    final Object lock = new Object();
-    LibDispatchQueue nativeQueueWrapper;
-    volatile int runState;
+    private static final int TERMINATED = 3;
+    private final Object lock = new Object();
+    private LibDispatchQueue nativeQueueWrapper;
+    private volatile int runState;
 
     LibDispatchSerialQueue(final long queuePtr) {
         nativeQueueWrapper = new LibDispatchQueue(queuePtr);

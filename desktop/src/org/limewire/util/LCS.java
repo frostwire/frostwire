@@ -63,7 +63,7 @@ public class LCS {
 
         protected abstract VALUE valueOfY(int index);
 
-        protected boolean equals(VALUE x1, VALUE y1) {
+        boolean equals(VALUE x1, VALUE y1) {
             return (null == x1 && null == y1) || x1.equals(y1);
         }
 
@@ -175,7 +175,7 @@ public class LCS {
             }
         }
 
-        public static class DiffEntry<VALUE> {
+        static class DiffEntry<VALUE> {
             private DiffType type;
             private VALUE value;
 
@@ -185,7 +185,7 @@ public class LCS {
                 this.value = value;
             }
 
-            public DiffType getType() {
+            DiffType getType() {
                 return type;
             }
 
@@ -193,7 +193,7 @@ public class LCS {
                 this.type = type;
             }
 
-            public VALUE getValue() {
+            VALUE getValue() {
                 return value;
             }
 
@@ -208,7 +208,7 @@ public class LCS {
         }
     }
 
-    public static class LcsString extends LongestCommonSubsequence<Character> {
+    protected static class LcsString extends LongestCommonSubsequence<Character> {
         private final boolean ignoreCase;
         private final String x;
         private final String y;

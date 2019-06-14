@@ -21,7 +21,7 @@ public class LimeTransferHandler extends TransferHandler {
     /**
      * Constructs a LimeTransferHandler with no supported actions.
      */
-    public LimeTransferHandler() {
+    protected LimeTransferHandler() {
         this.supportedActions = NONE;
     }
 
@@ -30,7 +30,7 @@ public class LimeTransferHandler extends TransferHandler {
      *
      * @param supportedActions
      */
-    public LimeTransferHandler(int supportedActions) {
+    protected LimeTransferHandler(int supportedActions) {
         this.supportedActions = supportedActions;
     }
 

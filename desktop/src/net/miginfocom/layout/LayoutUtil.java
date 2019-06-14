@@ -406,7 +406,7 @@ public final class LayoutUtil {
      * @param sizes The sizes to round
      * @return An array of equal length as <code>sizes</code>.
      */
-    static int[] roundSizes(float[] sizes) {
+    private static int[] roundSizes(float[] sizes) {
         int[] retInts = new int[sizes.length];
         float posD = 0;
         for (int i = 0; i < retInts.length; i++) {
@@ -447,7 +447,7 @@ public final class LayoutUtil {
      * @param o        The object to be serialized.
      * @param listener The listener to recieve the exeptions if there are any. If <code>null</code> not used.
      */
-    static void writeXMLObject(OutputStream os, Object o, ExceptionListener listener) {
+    private static void writeXMLObject(OutputStream os, Object o, ExceptionListener listener) {
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(LayoutUtil.class.getClassLoader());
         XMLEncoder encoder = new XMLEncoder(os);

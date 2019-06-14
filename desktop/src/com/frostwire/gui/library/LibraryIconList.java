@@ -31,7 +31,7 @@ import java.awt.*;
  * @author gubatron
  * @author aldenml
  */
-public class LibraryIconList extends JList<Object> {
+class LibraryIconList extends JList<Object> {
     private Image speaker;
     private Image loading;
 

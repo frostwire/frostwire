@@ -652,7 +652,7 @@ public class JXSearchField extends JXTextField {
          * Sets the search field's text to <code>null</code> and requests the
          * focus for the search field.
          */
-        public void clear() {
+        void clear() {
             setText(null);
             requestFocusInWindow();
         }

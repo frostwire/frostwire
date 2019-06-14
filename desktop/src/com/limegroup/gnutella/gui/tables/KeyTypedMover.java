@@ -13,7 +13,7 @@ import java.awt.event.KeyListener;
  * This works exactly like (and is modelled off of) JList's BasicListUI's
  * Handler.
  */
-public class KeyTypedMover implements KeyListener {
+class KeyTypedMover implements KeyListener {
     private String prefix = "";
     private String typedString = "";
     private long lastTime = 0L;

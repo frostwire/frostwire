@@ -54,7 +54,7 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Constant empty string array for any class to use -- immutable.
      */
-    public static final String[] EMPTY_STRING_ARRAY = new String[0];
+    private static final String[] EMPTY_STRING_ARRAY = new String[0];
     /**
      * The last LimeTableColumn that was removed from this table.
      */

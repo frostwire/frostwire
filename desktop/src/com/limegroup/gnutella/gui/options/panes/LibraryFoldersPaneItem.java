@@ -24,8 +24,8 @@ import java.util.Set;
  * to change the directory that are shared.
  */
 public final class LibraryFoldersPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Library Included Folders");
-    public final static String LABEL = I18n.tr("You can choose the folders for include files when browsing the library.");
+    private final static String TITLE = I18n.tr("Library Included Folders");
+    private final static String LABEL = I18n.tr("You can choose the folders for include files when browsing the library.");
     private final JButton buttonRemoveLibraryDirectory;
     private final RecursiveLibraryDirectoryPanel directoryPanel = new RecursiveLibraryDirectoryPanel(true);
     private Set<File> initialFoldersToInclude;

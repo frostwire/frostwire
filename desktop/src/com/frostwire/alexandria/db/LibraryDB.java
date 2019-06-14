@@ -14,7 +14,7 @@ public class LibraryDB {
         }
     }
 
-    public static void fill(List<Object> row, Library obj) {
+    private static void fill(List<Object> row, Library obj) {
         int id = (Integer) row.get(0);
         String name = (String) row.get(1);
         int version = (Integer) row.get(2);

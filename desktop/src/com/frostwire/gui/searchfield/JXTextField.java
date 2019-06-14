@@ -37,7 +37,7 @@ class JXTextField extends JTextField {
     /**
      * @see PromptSupport#setFontStyle(Integer, javax.swing.text.JTextComponent)
      */
-    public void setPromptFontStyle(Integer fontStyle) {
+    void setPromptFontStyle(Integer fontStyle) {
         PromptSupport.setFontStyle(fontStyle, this);
     }
 

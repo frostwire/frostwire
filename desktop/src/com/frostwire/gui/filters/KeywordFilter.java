@@ -121,7 +121,7 @@ public class KeywordFilter implements SearchFilter {
     /**
      * Returns true if phrase matches any of the entries in ban.
      */
-    protected boolean matches(String phrase) {
+    private boolean matches(String phrase) {
         String canonical = phrase.toLowerCase(Locale.US);
         for (String badWord : ban) {
             if (canonical.contains(badWord))

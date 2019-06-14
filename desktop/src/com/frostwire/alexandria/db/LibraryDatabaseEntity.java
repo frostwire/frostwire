@@ -24,7 +24,7 @@ package com.frostwire.alexandria.db;
 public class LibraryDatabaseEntity {
     protected LibraryDatabase db;
 
-    public LibraryDatabaseEntity(LibraryDatabase db) {
+    protected LibraryDatabaseEntity(LibraryDatabase db) {
         this.db = db;
     }
 

@@ -103,7 +103,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
         return cell != null ? cell.getPlaylist() : null;
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(177, 94));
         GUIMediator.addRefreshListener(this);
@@ -573,7 +573,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             _action = action;
         }
 
-        public String getText() {
+        String getText() {
             if (_text != null) {
                 return _text;
             } else if (_playlist != null && _playlist.getName() != null) {
@@ -583,7 +583,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             }
         }
 
-        public String getDescription() {
+        String getDescription() {
             if (_description != null) {
                 return _description;
             } else if (_playlist != null && _playlist.getDescription() != null) {
@@ -593,7 +593,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             }
         }
 
-        public Icon getIcon() {
+        Icon getIcon() {
             return _icon;
         }
 
@@ -601,7 +601,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
             return _playlist;
         }
 
-        public ActionListener getAction() {
+        ActionListener getAction() {
             return _action;
         }
     }

@@ -5,8 +5,8 @@ import org.limewire.util.CommonUtils;
 
 import java.io.File;
 
-public class LimeWireSettings extends BasicSettingsGroup {
-    public LimeWireSettings(String filename, String header) {
+class LimeWireSettings extends BasicSettingsGroup {
+    LimeWireSettings(String filename, String header) {
         super(new File(CommonUtils.getUserSettingsDir(), filename), header);
     }
 }

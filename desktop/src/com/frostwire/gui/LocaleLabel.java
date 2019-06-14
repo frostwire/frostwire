@@ -56,11 +56,11 @@ public class LocaleLabel extends JLabel {
             this.canDisplay = OSUtils.isWindows() ? null : Boolean.TRUE;
         }
 
-        public String getValue() {
+        String getValue() {
             return value;
         }
 
-        public boolean canDisplay() {
+        boolean canDisplay() {
             if (canDisplay == null) {
                 canDisplay = getDefaultFont().canDisplayUpTo(value) == -1;
             }

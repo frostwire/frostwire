@@ -118,7 +118,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(177, 170));
         setPreferredSize(new Dimension(177, 170));

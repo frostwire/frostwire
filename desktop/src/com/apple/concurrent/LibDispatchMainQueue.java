@@ -28,7 +28,7 @@ package com.apple.concurrent;
 import java.util.concurrent.Executor;
 
 abstract class LibDispatchMainQueue extends LibDispatchQueue implements Executor {
-    public LibDispatchMainQueue() {
+    LibDispatchMainQueue() {
         super(LibDispatchNative.nativeGetMainQueue());
     }
 

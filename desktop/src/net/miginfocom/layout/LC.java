@@ -592,7 +592,7 @@ public final class LC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
      * @since 3.5
      */
-    public final LC pack(String width, String height) {
+    private LC pack(String width, String height) {
         setPackWidth(width != null ? ConstraintParser.parseBoundSize(width, false, false) : BoundSize.NULL_SIZE);
         setPackHeight(height != null ? ConstraintParser.parseBoundSize(height, false, false) : BoundSize.NULL_SIZE);
         return this;
@@ -860,7 +860,7 @@ public final class LC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
      * @see #setAlignX(UnitValue)
      */
-    public final LC alignX(String align) {
+    private LC alignX(String align) {
         setAlignX(ConstraintParser.parseUnitValueOrAlign(align, true, null));
         return this;
     }
@@ -874,7 +874,7 @@ public final class LC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
      * @see #setAlignY(UnitValue)
      */
-    public final LC alignY(String align) {
+    private LC alignY(String align) {
         setAlignY(ConstraintParser.parseUnitValueOrAlign(align, false, null));
         return this;
     }
@@ -909,7 +909,7 @@ public final class LC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
      * @see #setGridGapX(BoundSize)
      */
-    public final LC gridGapX(String boundsSize) {
+    private LC gridGapX(String boundsSize) {
         setGridGapX(ConstraintParser.parseBoundSize(boundsSize, true, true));
         return this;
     }
@@ -925,7 +925,7 @@ public final class LC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new LayoutConstraint().noGrid().gap().fill()</code>.
      * @see #setGridGapY(BoundSize)
      */
-    public final LC gridGapY(String boundsSize) {
+    private LC gridGapY(String boundsSize) {
         setGridGapY(ConstraintParser.parseBoundSize(boundsSize, true, false));
         return this;
     }

@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class LanguagePanel extends JPanel {
+class LanguagePanel extends JPanel {
     private final JLabel languageLabel;
     private final ActionListener actionListener;
     private final JComboBox<Object> languageOptions;
@@ -68,7 +68,7 @@ public class LanguagePanel extends JPanel {
      * Overrides applySettings in SetupWindow superclass.
      * Applies the settings handled in this window.
      */
-    public void applySettings() {
+    private void applySettings() {
         Locale locale = (Locale) languageOptions.getSelectedItem();
         LanguageUtils.setLocale(locale);
         languageLabel.setText(I18n.tr("Language:"));
