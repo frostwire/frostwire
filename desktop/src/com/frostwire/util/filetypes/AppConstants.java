@@ -23,7 +23,7 @@ package com.frostwire.util.filetypes;
 /**
  * Contains constants used by this project
  */
-public interface AppConstants {
+interface AppConstants {
     //Constants for the registration/unregistration level.
     int USER_LEVEL = 1;
     int SYSTEM_LEVEL = 2;

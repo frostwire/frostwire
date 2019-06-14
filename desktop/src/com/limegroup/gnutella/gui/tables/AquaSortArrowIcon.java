@@ -13,7 +13,7 @@ public class AquaSortArrowIcon extends SortArrowIcon {
     private static final Color ARROW_GRAY = new Color(89, 93, 97);
     private static final int BLUR_FIX = 1;
 
-    public AquaSortArrowIcon(int direction) {
+    private AquaSortArrowIcon(int direction) {
         super(direction);
     }
 

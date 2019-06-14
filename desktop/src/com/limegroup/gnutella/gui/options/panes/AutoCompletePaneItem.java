@@ -12,8 +12,8 @@ import java.io.IOException;
  * or disable autocompletion of text fields.
  */
 public final class AutoCompletePaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Text Autocompletion");
-    public final static String LABEL = I18n.tr("You can enable or disable autocompletion of text fields.");
+    private final static String TITLE = I18n.tr("Text Autocompletion");
+    private final static String LABEL = I18n.tr("You can enable or disable autocompletion of text fields.");
     /**
      * Constant for the check box that specifies whether to enable or
      * disable autocompletion

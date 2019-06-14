@@ -17,8 +17,8 @@ import java.util.Map;
  * to choose if FrostWire should open magnet: links and .torrent files.
  */
 public final class AssociationPreferencePaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Links and File Types");
-    public final static String LABEL = I18n.tr("You can use FrostWire to open certain filetypes and protocols. You can also instruct FrostWire to always regain these associations if another program takes them.");
+    private final static String TITLE = I18n.tr("Links and File Types");
+    private final static String LABEL = I18n.tr("You can use FrostWire to open certain filetypes and protocols. You can also instruct FrostWire to always regain these associations if another program takes them.");
     /**
      * a mapping of checkboxes to associations
      */

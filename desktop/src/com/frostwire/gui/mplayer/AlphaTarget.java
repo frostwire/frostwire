@@ -18,6 +18,6 @@
 
 package com.frostwire.gui.mplayer;
 
-public interface AlphaTarget {
+interface AlphaTarget {
     void setAlpha(final float alpha);
 }

@@ -207,7 +207,7 @@ public final class AC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
      * @since 3.7.2
      */
-    public final AC shrink(float w) {
+    private AC shrink(float w) {
         int curIx = 0;
         return shrink(w, curIx);
     }
@@ -222,7 +222,7 @@ public final class AC implements Externalizable {
      * @return <code>this</code> so it is possible to chain calls. E.g. <code>new AxisConstraint().noGrid().gap().fill()</code>.
      * @since 3.7.2
      */
-    public final AC shrink(float w, int... indexes) {
+    private AC shrink(float w, int... indexes) {
         Float sw = w;
         for (int i = indexes.length - 1; i >= 0; i--) {
             int ix = indexes[i];

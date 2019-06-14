@@ -25,7 +25,7 @@ import java.net.URL;
 /**
  * Utility class containing shared methods.
  */
-public class AppUtility {
+class AppUtility {
     /**
      * Suppress default constructor for noninstantiability.
      */

@@ -7,8 +7,8 @@ import javax.swing.*;
 import java.io.IOException;
 
 public class AutomaticInstallerDownloadPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Automatic Installer Download");
-    public final static String LABEL = I18n.tr("FrostWire can automatically download a new installer via BitTorrent for you when it's available. It won't install it but next time you start FrostWire it'll let you know that it's there for you.");
+    private final static String TITLE = I18n.tr("Automatic Installer Download");
+    private final static String LABEL = I18n.tr("FrostWire can automatically download a new installer via BitTorrent for you when it's available. It won't install it but next time you start FrostWire it'll let you know that it's there for you.");
     private final JCheckBox _checkbox;
     private boolean isDirty = false;
 

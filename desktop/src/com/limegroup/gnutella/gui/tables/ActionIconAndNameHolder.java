@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
  * @author gubatron
  * @author aldenml
  */
-public final class ActionIconAndNameHolder implements Comparable<ActionIconAndNameHolder> {
+final class ActionIconAndNameHolder implements Comparable<ActionIconAndNameHolder> {
     private final Icon _icon;
     private final ActionListener _action;
     private final String _name;

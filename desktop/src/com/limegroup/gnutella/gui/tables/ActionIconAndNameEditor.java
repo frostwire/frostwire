@@ -38,11 +38,11 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
     private final Rectangle actionRegion;
     private ActionListener action;
 
-    public ActionIconAndNameEditor(Rectangle actionRegion) {
+    private ActionIconAndNameEditor(Rectangle actionRegion) {
         this.actionRegion = actionRegion;
     }
 
-    public ActionIconAndNameEditor() {
+    private ActionIconAndNameEditor() {
         this(null);
     }
 
@@ -77,7 +77,7 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
         return component;
     }
 
-    protected void component_mousePressed(MouseEvent e) {
+    private void component_mousePressed(MouseEvent e) {
         if (action != null) {
             try {
                 action.actionPerformed(new ActionEvent(e.getSource(), e.getID(), ""));

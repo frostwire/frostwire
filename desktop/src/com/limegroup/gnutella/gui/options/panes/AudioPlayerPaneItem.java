@@ -15,8 +15,8 @@ import java.io.IOException;
  * default audio behavior.
  */
 public class AudioPlayerPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Audio Options");
-    public final static String LABEL = I18n.tr("You can choose which audio player to use.");
+    private final static String TITLE = I18n.tr("Audio Options");
+    private final static String LABEL = I18n.tr("You can choose which audio player to use.");
     /**
      * Handle to the <tt>JTextField</tt> that displays the player name
      */

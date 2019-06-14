@@ -33,7 +33,7 @@ public class AssociationException extends Exception {
     /**
      * Constructs an <code>AssociationException</code> object with no detail message.
      */
-    public AssociationException() {
+    AssociationException() {
         super();
     }
 
@@ -43,7 +43,7 @@ public class AssociationException extends Exception {
      *
      * @param msg the detail message pertaining to this exception.
      */
-    public AssociationException(String msg) {
+    AssociationException(String msg) {
         super(msg);
     }
 }

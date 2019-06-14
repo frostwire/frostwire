@@ -70,7 +70,7 @@ public class AWTSplashWindow extends Window {
      * @param owner       The frame owning the splash window.
      * @param splashImage The splashImage to be displayed.
      */
-    public AWTSplashWindow(Frame owner, Image splashImage) {
+    private AWTSplashWindow(Frame owner, Image splashImage) {
         super(owner);
         this.splashImage = splashImage;
         // Center the window on the screen, and force the image to have a size,

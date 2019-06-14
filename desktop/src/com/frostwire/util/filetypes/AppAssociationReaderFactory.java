@@ -23,7 +23,7 @@ package com.frostwire.util.filetypes;
 /**
  * Create an instance of WinAppAssociationReader
  */
-public class AppAssociationReaderFactory {
+class AppAssociationReaderFactory {
     public static AppAssociationReader newInstance() {
         return new WinAppAssociationReader();
     }

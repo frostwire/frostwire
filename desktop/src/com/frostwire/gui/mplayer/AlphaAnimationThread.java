@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.mplayer;
 
-public class AlphaAnimationThread extends Thread {
+class AlphaAnimationThread extends Thread {
     private static final int TARGET_ALPHA = 90 * 255 / 100;
     private static final int ALPHA_STEP = 20;
     private final Object animationStart = new Object();

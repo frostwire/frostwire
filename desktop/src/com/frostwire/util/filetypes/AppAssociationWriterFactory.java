@@ -23,7 +23,7 @@ package com.frostwire.util.filetypes;
 /**
  * Create an instance of WinAppAssociationWriter
  */
-public class AppAssociationWriterFactory {
+class AppAssociationWriterFactory {
     public static AppAssociationWriter newInstance() {
         return new WinAppAssociationWriter();
     }
