@@ -21,7 +21,7 @@ public class IconManager {
     /**
      * The current ButtonIconController.
      */
-    private ButtonIconController buttonController;
+    private final ButtonIconController buttonController;
 
     /**
      * Constructs a new IconManager.

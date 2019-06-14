@@ -6,7 +6,7 @@ import java.util.Locale;
 
 public class I18n {
     private static final String BASENAME = "org.limewire.i18n.Messages";
-    private static org.xnap.commons.i18n.I18n i18n = I18nFactory.getI18n(I18n.class, BASENAME);
+    private static final org.xnap.commons.i18n.I18n i18n = I18nFactory.getI18n(I18n.class, BASENAME);
 
     public static void setLocale(Locale locale) {
         i18n.setResources(BASENAME, locale, ClassLoader.getSystemClassLoader());

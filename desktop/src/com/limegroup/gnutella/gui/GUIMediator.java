@@ -131,14 +131,14 @@ public final class GUIMediator {
      * Flag for whether or not the app is allowed to become visible.
      */
     private static boolean _allowVisible = false;
-    private static ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
+    private static final ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
     private final RefreshTimer timer;
     private boolean _remoteDownloadsAllowed;
     /**
      * Constant handle to the <tt>MainFrame</tt> instance that handles
      * constructing all of the primary gui components.
      */
-    private MainFrame MAIN_FRAME;
+    private final MainFrame MAIN_FRAME;
     /**
      * Constant handle to the <tt>DownloadMediator</tt> class that is
      * responsible for displaying active downloads to the user.
@@ -1348,7 +1348,7 @@ public final class GUIMediator {
         SEARCH_TRANSFERS(I18n.tr("&Search")),
         LIBRARY(I18n.tr("&Library"));
         public boolean navigatedTo;
-        private Action navAction;
+        private final Action navAction;
 
         Tabs(String nameWithAmpersand) {
             navAction = new NavigationAction(nameWithAmpersand, I18n.tr("Display the {0} Screen",

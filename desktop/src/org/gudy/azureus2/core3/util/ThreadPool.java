@@ -177,7 +177,7 @@ public class ThreadPool {
         private volatile AERunnable runnable;
         private long run_start_time;
         private int warn_count;
-        private String state = "<none>";
+        private final String state = "<none>";
 
         threadPoolWorker() {
             super(NAME_THREADS ? (name + " " + (thread_name_index)) : name, true);

@@ -26,7 +26,7 @@ public class AlphaAnimationThread extends Thread {
     private boolean isHiding;
     private boolean isShowing;
     private int currentAlpha = TARGET_ALPHA;
-    private AlphaTarget target;
+    private final AlphaTarget target;
 
     AlphaAnimationThread(AlphaTarget target) {
         this.target = target;

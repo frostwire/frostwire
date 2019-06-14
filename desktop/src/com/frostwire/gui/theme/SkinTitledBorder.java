@@ -29,7 +29,7 @@ import java.awt.*;
 public final class SkinTitledBorder extends TitledBorder {
     private static Font TITLE_FONT;
     private static Border BORDER;
-    private Point textLoc = new Point();
+    private final Point textLoc = new Point();
 
     public SkinTitledBorder(String title) {
         super(title);

@@ -32,10 +32,10 @@ import java.util.regex.Pattern;
 public class SQLiteQueryBuilder {
     private static final Pattern sLimitPattern =
             Pattern.compile("\\s*\\d+\\s*(,\\s*\\d+\\s*)?");
-    private Map<String, String> mProjectionMap = null;
+    private final Map<String, String> mProjectionMap = null;
     private String mTables = "";
-    private StringBuilder mWhereClause = null;  // lazily created
-    private boolean mDistinct;
+    private final StringBuilder mWhereClause = null;  // lazily created
+    private final boolean mDistinct;
     //private SQLiteDatabase.CursorFactory mFactory;
     private boolean mStrict;
 

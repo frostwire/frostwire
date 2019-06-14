@@ -25,9 +25,9 @@ import com.limegroup.gnutella.gui.GUIUtils;
  * @author aldenml
  */
 public final class GeneralResultFilter implements TableLineFilter<SearchResultDataLine> {
-    private SearchResultMediator _rp;
-    private LabeledRangeSlider _rangeSliderSeeds;
-    private LabeledRangeSlider _rangeSliderSize;
+    private final SearchResultMediator _rp;
+    private final LabeledRangeSlider _rangeSliderSeeds;
+    private final LabeledRangeSlider _rangeSliderSize;
     private int _minResultsSeeds;
     private int _maxResultsSeeds;
     private double _minResultsSize;

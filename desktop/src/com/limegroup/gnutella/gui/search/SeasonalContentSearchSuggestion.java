@@ -36,7 +36,7 @@ import java.util.List;
  * @author aldenml
  */
 final class SeasonalContentSearchSuggestion extends AbstractAction {
-    private static Pattern SEA_EPI_PATTERN = Pattern.compile("s(\\d+)e(\\d+)");
+    private static final Pattern SEA_EPI_PATTERN = Pattern.compile("s(\\d+)e(\\d+)");
     private final String query;
 
     private SeasonalContentSearchSuggestion(String query) {

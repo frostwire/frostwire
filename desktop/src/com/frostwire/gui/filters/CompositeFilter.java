@@ -20,7 +20,7 @@ package com.frostwire.gui.filters;
 import com.limegroup.gnutella.gui.search.UISearchResult;
 
 public class CompositeFilter implements SearchFilter {
-    private SearchFilter[] _delegates;
+    private final SearchFilter[] _delegates;
 
     public CompositeFilter(SearchFilter[] filters) {
         _delegates = filters;

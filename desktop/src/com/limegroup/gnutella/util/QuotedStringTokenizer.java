@@ -102,8 +102,8 @@ public class QuotedStringTokenizer {
     }
 
     private class Token {
-        String text;
-        int nextIndex;
+        final String text;
+        final int nextIndex;
         Token(String text, int nextIndex) {
             this.text = text;
             this.nextIndex = nextIndex;

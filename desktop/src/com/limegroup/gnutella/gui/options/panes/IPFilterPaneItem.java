@@ -443,7 +443,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     private static class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
-        private BufferedReader br;
+        private final BufferedReader br;
         private InputStream is;
         private int bytesRead;
 

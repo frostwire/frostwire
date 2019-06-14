@@ -55,8 +55,8 @@ public final class CC implements Externalizable {
     private String tag = null;
     private String id = null;
     private int hideMode = -1;
-    private DimConstraint hor = new DimConstraint();
-    private DimConstraint ver = new DimConstraint();
+    private final DimConstraint hor = new DimConstraint();
+    private final DimConstraint ver = new DimConstraint();
     private BoundSize newline = null;
     private BoundSize wrap = null;
     private boolean boundsInGrid = true;

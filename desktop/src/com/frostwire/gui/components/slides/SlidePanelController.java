@@ -26,7 +26,7 @@ import org.limewire.util.StringUtils;
  * @author aldenml
  */
 class SlidePanelController {
-    private Slide slide;
+    private final Slide slide;
 
     SlidePanelController(Slide slide) {
         this.slide = slide;

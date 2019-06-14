@@ -64,7 +64,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
     private static final int ssl_socket = 1 << 18;
     private static final int rc4_encrypted = 1 << 19;
     private static final int plaintext_encrypted = 1 << 20;
-    private static LimeTableColumn[] columns = new LimeTableColumn[]{
+    private static final LimeTableColumn[] columns = new LimeTableColumn[]{
             new LimeTableColumn(IP_COLUMN_ID, "IP", I18n.tr("IP"), 180, true, true, true, String.class),
             new LimeTableColumn(CLIENT_COLUMN_ID, "CLIENT", I18n.tr("Client"), 120, true, true, true, String.class),
             new LimeTableColumn(FLAGS_COLUMN_ID, "FLAGS", I18n.tr("Flags"), 70, true, true, true, String.class),

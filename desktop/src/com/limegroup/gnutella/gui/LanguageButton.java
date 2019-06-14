@@ -14,7 +14,7 @@ public class LanguageButton extends JPanel {
      *
      */
     private static final long serialVersionUID = 1795381168007012403L;
-    private JButton bheader;
+    private final JButton bheader;
 
     public LanguageButton() {
         bheader = new JButton();

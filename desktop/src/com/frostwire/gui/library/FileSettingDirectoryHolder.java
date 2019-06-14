@@ -26,9 +26,9 @@ import java.io.File;
  * setting.
  */
 public class FileSettingDirectoryHolder extends AbstractDirectoryHolder {
-    private String name;
-    private String desc;
-    private FileSetting fs;
+    private final String name;
+    private final String desc;
+    private final FileSetting fs;
 
     private FileSettingDirectoryHolder(FileSetting fs, String name, String description) {
         this.name = name;

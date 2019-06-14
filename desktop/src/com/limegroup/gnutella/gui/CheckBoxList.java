@@ -61,8 +61,8 @@ public class CheckBoxList<E> extends BoxPanel {
      * The subset of items that are bolded for notification in the panel.
      */
     private final Set<E> bolded = new HashSet<>();
-    private String disabledTooltip = null;
-    private boolean removeable = false;
+    private final String disabledTooltip = null;
+    private final boolean removeable = false;
     private boolean selectOff;
     private JScrollPane scrollPane;
     private JTable checkBoxList;
@@ -80,7 +80,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Holds the provider used to indicate if an element should have a divider
      * drawn above.  Null if the feature is disabled.
      */
-    private ExtrasProvider<E> extrasProvider;
+    private final ExtrasProvider<E> extrasProvider;
     /**
      * Holds the array of checkboxes that are displayed.
      */
@@ -458,7 +458,7 @@ public class CheckBoxList<E> extends BoxPanel {
          *
          */
         private static final long serialVersionUID = 6985964072155472329L;
-        private Object selected;
+        private final Object selected;
 
         CheckBoxListSelectionEvent(Object source, Object selected) {
             super(source);
@@ -483,8 +483,8 @@ public class CheckBoxList<E> extends BoxPanel {
          *
          */
         private static final long serialVersionUID = -2715339837857605924L;
-        private E selected;
-        private boolean checked;
+        private final E selected;
+        private final boolean checked;
 
         CheckBoxListCheckChangeEvent(Object source, E selected, boolean checked) {
             super(source);
@@ -512,7 +512,7 @@ public class CheckBoxList<E> extends BoxPanel {
     }
 
     private class BoldRemoveListener implements ActionListener {
-        private E key;
+        private final E key;
 
         BoldRemoveListener(E key) {
             this.key = key;
@@ -601,7 +601,7 @@ public class CheckBoxList<E> extends BoxPanel {
      * Check box tree cell renderer.
      */
     private class CheckBoxCellRenderer extends DefaultTableBevelledCellRenderer {
-        private IconDataCheckBox checkBox = new IconDataCheckBox();
+        private final IconDataCheckBox checkBox = new IconDataCheckBox();
 
         @Override
         @SuppressWarnings("unchecked")
@@ -648,7 +648,7 @@ public class CheckBoxList<E> extends BoxPanel {
          *
          */
         private static final long serialVersionUID = 8487646158995389360L;
-        private CustomEditorDelegate customDelegate;
+        private final CustomEditorDelegate customDelegate;
 
         CheckBoxCellEditor() {
             super(new JCheckBox());
@@ -786,13 +786,13 @@ public class CheckBoxList<E> extends BoxPanel {
          */
         private static final long serialVersionUID = 7370736947464891601L;
         private E obj;
-        private JCheckBox checkBox;
-        private JLabel label;
-        private DeleteButton button;
-        private Border blankBorder;
-        private SeperatorBorder sepBorder;
-        private Font originalFont;
-        private Font boldFont;
+        private final JCheckBox checkBox;
+        private final JLabel label;
+        private final DeleteButton button;
+        private final Border blankBorder;
+        private final SeperatorBorder sepBorder;
+        private final Font originalFont;
+        private final Font boldFont;
 
         IconDataCheckBox() {
             super(BoxPanel.X_AXIS);
@@ -899,8 +899,8 @@ public class CheckBoxList<E> extends BoxPanel {
              *
              */
             private static final long serialVersionUID = 2099563643830495610L;
-            private Icon iconReg;
-            private Icon iconHi;
+            private final Icon iconReg;
+            private final Icon iconHi;
 
             DeleteButton() {
                 iconReg = GUIMediator.getThemeImage("delete_small");

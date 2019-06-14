@@ -70,11 +70,11 @@ class ProgressMonitor implements Accessible {
     private JOptionPane pane;
     private JProgressBar myBar;
     private JLabel noteLabel;
-    private Component parentComponent;
+    private final Component parentComponent;
     private String note;
-    private Object[] cancelOption;
-    private Object message;
-    private long T0;
+    private final Object[] cancelOption;
+    private final Object message;
+    private final long T0;
     private int millisToDecideToPopup = 500;
     private int millisToPopup = 2000;
     private int min;

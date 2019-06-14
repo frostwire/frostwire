@@ -197,7 +197,7 @@ final class SlideControlsOverlay extends JPanel {
     }
 
     private static final class InstallAction extends AbstractAction {
-        private SlidePanelController controller;
+        private final SlidePanelController controller;
 
         InstallAction(SlidePanelController controller) {
             this.controller = controller;
@@ -215,7 +215,7 @@ final class SlideControlsOverlay extends JPanel {
     }
 
     private static final class DownloadAction extends AbstractAction {
-        private SlidePanelController controller;
+        private final SlidePanelController controller;
 
         DownloadAction(SlidePanelController controller) {
             this.controller = controller;
@@ -233,7 +233,7 @@ final class SlideControlsOverlay extends JPanel {
     }
 
     private static final class PreviewVideoAction extends AbstractAction {
-        private SlidePanelController controller;
+        private final SlidePanelController controller;
 
         PreviewVideoAction(SlidePanelController controller) {
             this.controller = controller;
@@ -251,7 +251,7 @@ final class SlideControlsOverlay extends JPanel {
     }
 
     private static final class PreviewAudioAction extends AbstractAction {
-        private SlidePanelController controller;
+        private final SlidePanelController controller;
 
         PreviewAudioAction(SlidePanelController controller) {
             this.controller = controller;

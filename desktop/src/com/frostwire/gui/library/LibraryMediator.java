@@ -56,10 +56,10 @@ public class LibraryMediator {
     private LibrarySearch librarySearch;
     private CardLayout _tablesViewLayout = new CardLayout();
     private JPanel _tablesPanel;
-    private Map<Object, Integer> scrollbarValues;
+    private final Map<Object, Integer> scrollbarValues;
     private Object lastSelectedKey;
     private AbstractLibraryTableMediator<?, ?, ?> lastSelectedMediator;
-    private Set<Integer> idScanned;
+    private final Set<Integer> idScanned;
     private AbstractLibraryTableMediator<?, ?, ?> currentMediator;
 
     public LibraryMediator() {

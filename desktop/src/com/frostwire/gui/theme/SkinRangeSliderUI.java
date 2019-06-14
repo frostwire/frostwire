@@ -38,7 +38,7 @@ import java.awt.event.MouseEvent;
 public class SkinRangeSliderUI extends SynthSliderUI {
     private RangeSliderAdditionalUI additonalUi;
     private MouseInputAdapter thumbTrackListener;
-    private Rectangle zeroRect = new Rectangle();
+    private final Rectangle zeroRect = new Rectangle();
     private transient boolean mousePressed;
     private transient boolean mouseOver;
 
@@ -201,9 +201,9 @@ public class SkinRangeSliderUI extends SynthSliderUI {
     }
 
     private static class RangeSliderAdditionalUI {
-        private static Rectangle unionRect = new Rectangle();
+        private static final Rectangle unionRect = new Rectangle();
         private RangeSlider mSlider;
-        private SkinRangeSliderUI ui;
+        private final SkinRangeSliderUI ui;
         private Rectangle[] thumbRects;
         private int thumbNum;
         private transient boolean isDragging;
@@ -307,7 +307,7 @@ public class SkinRangeSliderUI extends SynthSliderUI {
             protected transient int currentMouseX, currentMouseY;
             protected Rectangle adjustingThumbRect = null;
             protected int adjustingThumbIndex;
-            protected RangeSlider slider;
+            protected final RangeSlider slider;
             protected Rectangle trackRect;
 
             TrackListener(RangeSlider slider) {

@@ -53,7 +53,7 @@ public class MPlayer extends BaseMediaPlayer {
             .compile("A:\\s*([0-9\\.]+) V:\\s*[0-9\\.]* .*");
     private static final Pattern a_timeInfo = Pattern
             .compile("A:\\s*([0-9\\.]+) .*");
-    private static Logger LOG = Logger.getLogger(MPlayer.class);
+    private static final Logger LOG = Logger.getLogger(MPlayer.class);
     private final List<String> output;
     private volatile boolean disposed = false;
     private Dimension videoSize = null;

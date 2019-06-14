@@ -57,8 +57,8 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
     private DefaultTreeModel model;
     private JTree tree;
     private TextNode root;
-    private Action refreshAction = new RefreshAction();
-    private Action exploreAction = new ExploreAction();
+    private final Action refreshAction = new RefreshAction();
+    private final Action exploreAction = new ExploreAction();
     private TreeSelectionListener treeSelectionListener;
 
     LibraryExplorer() {

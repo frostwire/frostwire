@@ -46,7 +46,7 @@ public class SendFeedbackDialog {
     private final JTextField userNameTextField;
     private final String FEEDBACK_HINT = I18n.tr("How can we make FrostWire better?") + "\n(" +
             I18n.tr("Please make sure your firewall or antivirus is not blocking FrostWire") + ")";
-    private JTextArea feedbackTextArea;
+    private final JTextArea feedbackTextArea;
 
     SendFeedbackDialog() {
         DIALOG = new JDialog(GUIMediator.getAppFrame());

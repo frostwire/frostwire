@@ -28,7 +28,7 @@ public final class ContentValues /*implements Parcelable*/ {
     /**
      * Holds the actual values
      */
-    private HashMap<String, Object> mValues;
+    private final HashMap<String, Object> mValues;
 
     /**
      * Creates an empty set of values using the default initial size

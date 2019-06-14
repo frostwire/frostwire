@@ -36,7 +36,7 @@ public class KeywordFilter implements SearchFilter {
     /**
      * INVARIANT: strings in ban contain only lowercase
      */
-    private List<String> ban = new ArrayList<>();
+    private final List<String> ban = new ArrayList<>();
 
     /**
      * @modifies this

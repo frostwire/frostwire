@@ -15,7 +15,7 @@ import java.awt.event.MouseEvent;
 public final class TrayNotifier implements NotifyUser {
     private SystemTray _tray;
     private TrayIcon _icon;
-    private boolean _supportsTray;
+    private final boolean _supportsTray;
 
     public TrayNotifier() {
         try {

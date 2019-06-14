@@ -26,7 +26,7 @@ import java.util.List;
  * row underneath.
  */
 public class CheckBoxListPanel<E> extends BoxPanel {
-    private CheckBoxList<E> list;
+    private final CheckBoxList<E> list;
 
     /**
      * Constructs a checkbox list panel for an array of objects.

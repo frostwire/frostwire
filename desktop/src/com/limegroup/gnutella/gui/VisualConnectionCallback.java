@@ -100,7 +100,7 @@ public final class VisualConnectionCallback implements ActivityCallback {
     }
 
     private class AddDownload implements Runnable {
-        private BTDownload mgr;
+        private final BTDownload mgr;
 
         AddDownload(BTDownload mgr) {
             this.mgr = mgr;

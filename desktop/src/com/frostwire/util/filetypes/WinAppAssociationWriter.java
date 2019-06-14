@@ -346,11 +346,11 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
      */
     protected class BackupAssociation {
         // Mime type retrieved from the specified association object.
-        private String curMimeType;
+        private final String curMimeType;
         // File extension retrieved from the specified association object.
         private String curFileExt;
-        private boolean curMimeTypeExisted;
-        private boolean curFileExtExisted;
+        private final boolean curMimeTypeExisted;
+        private final boolean curFileExtExisted;
         private String backupMimeType;
         private String backupClassID;
         private String backupFileExt;

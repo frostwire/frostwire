@@ -27,7 +27,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     private final List<PositionListener> positionListeners;
     private final List<TaskListener> taskListeners;
     private final List<IcyInfoListener> icyInfoListeners;
-    protected PlayerPreferences preferences;
+    protected final PlayerPreferences preferences;
     private MediaPlaybackState currentState;
     private int currentVolume;
     private float currentPositionInSecs;

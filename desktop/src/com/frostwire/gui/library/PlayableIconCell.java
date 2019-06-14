@@ -25,7 +25,7 @@ import javax.swing.*;
  * @author aldenml
  */
 public class PlayableIconCell {
-    private Icon icon;
+    private final Icon icon;
 
     PlayableIconCell(Icon icon) {
         this.icon = icon;

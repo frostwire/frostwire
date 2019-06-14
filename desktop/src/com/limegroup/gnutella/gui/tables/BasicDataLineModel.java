@@ -53,7 +53,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     /**
      * Internally used list object storing the DataLines.
      */
-    protected List<T> _list = new ArrayList<>();
+    protected final List<T> _list = new ArrayList<>();
     /**
      * Variable for whether or not the current sorting scheme
      * is ascending (value 1) or descending (value -1).

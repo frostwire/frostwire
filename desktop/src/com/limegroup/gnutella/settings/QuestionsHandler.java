@@ -45,7 +45,7 @@ public class QuestionsHandler extends LimeWireSettings {
     /**
      * Whether we should always grab associations
      */
-    public static IntSetting GRAB_ASSOCIATIONS =
+    public static final IntSetting GRAB_ASSOCIATIONS =
             FACTORY.createIntSetting("GRAB_ASSOCIATIONS", 0);
 
     private QuestionsHandler() {

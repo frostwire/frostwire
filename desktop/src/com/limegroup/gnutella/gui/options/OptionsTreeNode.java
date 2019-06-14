@@ -36,11 +36,11 @@ public class OptionsTreeNode extends DefaultMutableTreeNode {
     /**
      * The key for uniquely identifying this node.
      */
-    private String _titleKey;
+    private final String _titleKey;
     /**
      * The name of this node as it is displayed to the user.
      */
-    private String _displayName;
+    private final String _displayName;
     private Class<? extends AbstractPaneItem>[] clazzes;
 
     /**

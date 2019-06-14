@@ -21,8 +21,8 @@ import java.util.prefs.Preferences;
  */
 public class RecentSearches implements ActionListener {
     private Preferences prefsNode;
-    private List<String> recentSearches = new ArrayList<>();
-    private List<ChangeListener> listeners = new ArrayList<>();
+    private final List<String> recentSearches = new ArrayList<>();
+    private final List<ChangeListener> listeners = new ArrayList<>();
 
     /**
      * Creates a list of recent searches and uses <code>saveName</code> to
@@ -236,8 +236,8 @@ public class RecentSearches implements ActionListener {
      */
     public static class RecentSearchesPopup extends JPopupMenu implements ActionListener, ChangeListener {
         private static final long serialVersionUID = 3389724537449677787L;
-        private RecentSearches recentSearches;
-        private JTextField searchField;
+        private final RecentSearches recentSearches;
+        private final JTextField searchField;
         private JMenuItem clear;
 
         /**

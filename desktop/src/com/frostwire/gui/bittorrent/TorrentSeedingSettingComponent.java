@@ -25,8 +25,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TorrentSeedingSettingComponent extends JPanel {
-    private boolean _precheck;
-    private boolean _border;
+    private final boolean _precheck;
+    private final boolean _border;
     private JRadioButton seedingRadioButton;
     private JRadioButton notSeedingRadioButton;
 

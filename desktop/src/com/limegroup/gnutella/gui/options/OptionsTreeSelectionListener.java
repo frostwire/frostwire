@@ -13,7 +13,7 @@ final class OptionsTreeSelectionListener implements TreeSelectionListener {
     /**
      * Handle to the <code>JTree</code> instance that utilizes this listener.
      */
-    private JTree _tree;
+    private final JTree _tree;
 
     /**
      * Sets the <code>JTree</code> reference that utilizes this listener.

@@ -38,7 +38,7 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     public final static String LABEL = I18n.tr("Select which search engines you want FrostWire to use.");
     private final Map<JCheckBox, BooleanSetting> cBoxes;
     private final List<JCheckBox> searchEngineCheckboxes;
-    private SearchEngineCheckboxListener searchEnginesCheckboxListener;
+    private final SearchEngineCheckboxListener searchEnginesCheckboxListener;
     private JCheckBox allCheckbox;
 
     public SearchEnginesPaneItem() {

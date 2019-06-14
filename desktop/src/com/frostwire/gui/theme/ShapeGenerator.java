@@ -354,7 +354,7 @@ public final class ShapeGenerator {
         /**
          * The rounding radius.
          */
-        private double radius;
+        private final double radius;
 
         /**
          * Create the corner size.

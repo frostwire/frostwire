@@ -20,7 +20,7 @@ public class AudioPlayerPaneItem extends AbstractPaneItem {
     /**
      * Handle to the <tt>JTextField</tt> that displays the player name
      */
-    private JTextField _playerField;
+    private final JTextField _playerField;
 
     /**
      * Creates new AudioPlayerOptionsPaneItem

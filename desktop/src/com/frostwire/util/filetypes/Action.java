@@ -46,7 +46,7 @@ public class Action {
     /**
      * Name of the verb field.
      */
-    private String verb;
+    private final String verb;
     /**
      * Command field associated with the given verb.
      */

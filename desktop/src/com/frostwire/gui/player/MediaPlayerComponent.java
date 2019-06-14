@@ -96,9 +96,9 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     private MediaButton shareButton;
     private MediaButton socialButton;
     private MediaButton mediaSourceButton;
-    private Pattern facebookURLPattern = Pattern.compile("http(s)?\\:\\/\\/(www\\.)?facebook\\.com\\/([\\w-]+)");
-    private Pattern twitterURLPattern = Pattern.compile("http(s)?\\:\\/\\/(www\\.)?twitter\\.com\\/([\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
-    private Pattern twitterUsernamePattern = Pattern.compile("(@[\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
+    private final Pattern facebookURLPattern = Pattern.compile("http(s)?\\:\\/\\/(www\\.)?facebook\\.com\\/([\\w-]+)");
+    private final Pattern twitterURLPattern = Pattern.compile("http(s)?\\:\\/\\/(www\\.)?twitter\\.com\\/([\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
+    private final Pattern twitterUsernamePattern = Pattern.compile("(@[\\w\\p{L}_]*[\\:|\\.]?\\s?)+");
     private Timer longPressTimer;
 
     /**

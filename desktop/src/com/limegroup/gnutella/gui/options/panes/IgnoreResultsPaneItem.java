@@ -26,7 +26,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
     /**
      * Handle to the check box for ignoring adult content.
      */
-    private JCheckBox IGNORE_ADULT_CHECK_BOX = new JCheckBox();
+    private final JCheckBox IGNORE_ADULT_CHECK_BOX = new JCheckBox();
 
     /**
      * The constructor constructs all of the elements of this

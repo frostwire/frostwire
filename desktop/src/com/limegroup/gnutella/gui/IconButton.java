@@ -23,7 +23,7 @@ public class IconButton extends JButton {
      * had a chance to set our values. So ignore these calls in
      * {@link #updateButton()}.
      */
-    private boolean initialized;
+    private final boolean initialized;
     private PropertyChangeListener listener = null;
     private boolean iconOnly;
 

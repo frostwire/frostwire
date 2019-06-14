@@ -56,7 +56,7 @@ public final class ThemeMediator {
     private static final Logger LOG = Logger.getLogger(ThemeMediator.class);
     private static final int TABLE_FONT_SIZE_MIN = 10;
     private static final int TABLE_FONT_SIZE_MAX = 20;
-    private static Color APPLICATION_HEADER_SEPARATOR_COLOR = new Color(0x295164);
+    private static final Color APPLICATION_HEADER_SEPARATOR_COLOR = new Color(0x295164);
 
     private ThemeMediator() {
     }

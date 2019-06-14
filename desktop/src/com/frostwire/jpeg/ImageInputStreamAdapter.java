@@ -22,7 +22,7 @@ import java.io.IOException;
  * @version 1.0 2009-12-17 Created.
  */
 public class ImageInputStreamAdapter extends FilterInputStream {
-    private ImageInputStream iis;
+    private final ImageInputStream iis;
 
     public ImageInputStreamAdapter(ImageInputStream iis) {
         super(null);

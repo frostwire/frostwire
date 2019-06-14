@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 public class IPFilterHttpListener implements HttpClient.HttpClientListener {
-    private static Logger LOG = Logger.getLogger(IPFilterHttpListener.class);
+    private static final Logger LOG = Logger.getLogger(IPFilterHttpListener.class);
     private final IPFilterPaneItem ipFilterPaneItem;
     private final File downloadedFile;
     private final FileOutputStream fos;

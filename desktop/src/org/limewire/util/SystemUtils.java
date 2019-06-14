@@ -35,7 +35,7 @@ public class SystemUtils {
     /**
      * Whether or not the native libraries could be loaded.
      */
-    private static boolean isLoaded;
+    private static final boolean isLoaded;
 
     static {
         boolean canLoad = false;

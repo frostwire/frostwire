@@ -31,7 +31,7 @@ import java.awt.*;
  * @author aldenml
  */
 public class NodeRenderer extends DefaultTreeCellRenderer {
-    private static AbstractBorder DIRECTORY_HOLDER_NODE_BORDER = new EmptyBorder(5, 5, 5, 5);
+    private static final AbstractBorder DIRECTORY_HOLDER_NODE_BORDER = new EmptyBorder(5, 5, 5, 5);
 
     public NodeRenderer() {
         super();

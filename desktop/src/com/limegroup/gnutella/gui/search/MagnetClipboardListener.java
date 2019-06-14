@@ -48,7 +48,7 @@ public class MagnetClipboardListener extends WindowAdapter {
      */
     private final ExecutorService clipboardParser = ExecutorsHelper.newProcessingQueue("clipboard parser");
     private volatile String copiedText;
-    private Runnable parser = this::parseAndLaunch;
+    private final Runnable parser = this::parseAndLaunch;
 
     private MagnetClipboardListener() {
         super();

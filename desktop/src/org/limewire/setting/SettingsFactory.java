@@ -109,12 +109,12 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     /**
      * <tt>File</tt> object from which settings are loaded and saved
      */
-    private File SETTINGS_FILE;
+    private final File SETTINGS_FILE;
     /**
      * List of all settings associated with this factory
      * LOCKING: must hold this monitor
      */
-    private ArrayList<AbstractSetting> settings = new ArrayList<>(10);
+    private final ArrayList<AbstractSetting> settings = new ArrayList<>(10);
     /**
      * Whether or not expirable settings have expired.
      */

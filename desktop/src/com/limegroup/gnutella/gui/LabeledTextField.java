@@ -26,7 +26,7 @@ public class LabeledTextField extends JPanel {
     /**
      * The <tt>JTextField</tt> part of this component.
      */
-    private JTextField _field;
+    private final JTextField _field;
 
     /**
      * Constructor with the specified width of the text box in columns

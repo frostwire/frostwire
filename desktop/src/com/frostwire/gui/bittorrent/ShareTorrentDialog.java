@@ -47,7 +47,7 @@ import java.util.Random;
  * @author aldenml
  */
 public class ShareTorrentDialog extends JDialog {
-    private TorrentInfo torrent;
+    private final TorrentInfo torrent;
     private Container container;
     private JEditorPane textArea;
     private Action[] actions;

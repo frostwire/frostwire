@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 public class
 MPlayerInstance {
     private static final boolean LOG = true;
-    private static com.frostwire.util.Logger LOGGER = com.frostwire.util.Logger.getLogger(MPlayerInstance.class);
+    private static final com.frostwire.util.Logger LOGGER = com.frostwire.util.Logger.getLogger(MPlayerInstance.class);
     private static File BINARY_PATH;
     volatile boolean activateNextSubtitleLoaded = false;
     private volatile Process mPlayerProcess;
@@ -47,10 +47,10 @@ MPlayerInstance {
     private boolean started;
     private boolean stop_pending;
     private boolean stopped;
-    private AESemaphore stop_sem = new AESemaphore();
+    private final AESemaphore stop_sem = new AESemaphore();
     private boolean paused;
-    private List<String> commands = new LinkedList<>();
-    private AESemaphore command_sem = new AESemaphore();
+    private final List<String> commands = new LinkedList<>();
+    private final AESemaphore command_sem = new AESemaphore();
     private boolean isSeeking;
     private int seekingTo;
     private volatile long seekingSendTime;

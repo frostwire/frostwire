@@ -30,10 +30,10 @@ import java.awt.event.MouseEvent;
  * You may choose a different order by using the other constructor.
  */
 public class FlexibleColumnResizeAdapter extends MouseAdapter {
-    int dMode;
-    int sMode;
-    int cMode;
-    int aMode;
+    final int dMode;
+    final int sMode;
+    final int cMode;
+    final int aMode;
 
     /**
      * Create a FlexibleColumnResizeAdapter with the default settings, as

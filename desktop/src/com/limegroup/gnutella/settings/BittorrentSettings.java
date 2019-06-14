@@ -27,11 +27,11 @@ public final class BittorrentSettings extends LimeProps {
      * false -> Descending
      * true -> Ascending
      */
-    public static BooleanSetting BTMEDIATOR_COLUMN_SORT_ORDER = FACTORY.createBooleanSetting("BTMEDIATOR_COLUMN_SORT_ORDER", true);
+    public static final BooleanSetting BTMEDIATOR_COLUMN_SORT_ORDER = FACTORY.createBooleanSetting("BTMEDIATOR_COLUMN_SORT_ORDER", true);
     /**
      * Records what was the last column you used to sort the transfers table.
      */
-    public static IntSetting BTMEDIATOR_COLUMN_SORT_INDEX = FACTORY.createIntSetting("BTMEDIATOR_COLUMN_SORT_INDEX", -1);
+    public static final IntSetting BTMEDIATOR_COLUMN_SORT_INDEX = FACTORY.createIntSetting("BTMEDIATOR_COLUMN_SORT_INDEX", -1);
 
     private BittorrentSettings() {
     }

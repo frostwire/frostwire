@@ -35,7 +35,7 @@ public class AssociationsWindow extends SetupWindow {
     /**
      * a mapping of checkboxes to associations
      */
-    private Map<JCheckBox, LimeAssociationOption> associations = new HashMap<>();
+    private final Map<JCheckBox, LimeAssociationOption> associations = new HashMap<>();
     /**
      * Check box to check associations on startup.
      */

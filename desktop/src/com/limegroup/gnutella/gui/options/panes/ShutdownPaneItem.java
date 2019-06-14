@@ -35,13 +35,13 @@ public class ShutdownPaneItem extends AbstractPaneItem {
     /**
      * RadioButton for selecting immediate shutdown
      */
-    private JRadioButton shutdownImmediately;
+    private final JRadioButton shutdownImmediately;
     /**
      * RadioButton for selecting the minimize to tray option.  This
      * option is only displayed on systems that support the tray.
      */
-    private JRadioButton minimizeToTray;
-    private JCheckBox _checkBoxShowHideExitDialog;
+    private final JRadioButton minimizeToTray;
+    private final JCheckBox _checkBoxShowHideExitDialog;
 
     /**
      * Creates new ShutdownOptionsPaneItem

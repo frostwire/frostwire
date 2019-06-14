@@ -44,7 +44,7 @@ public class SearchField extends JXSearchField {
     /**
      * The undo action.
      */
-    private static Action UNDO_ACTION = new FieldAction(I18n.tr("Undo")) {
+    private static final Action UNDO_ACTION = new FieldAction(I18n.tr("Undo")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).undo();
         }
@@ -52,7 +52,7 @@ public class SearchField extends JXSearchField {
     /**
      * The cut action
      */
-    private static Action CUT_ACTION = new FieldAction(I18n.tr("Cut")) {
+    private static final Action CUT_ACTION = new FieldAction(I18n.tr("Cut")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).cut();
         }
@@ -60,7 +60,7 @@ public class SearchField extends JXSearchField {
     /**
      * The copy action.
      */
-    private static Action COPY_ACTION = new FieldAction(I18n.tr("Copy")) {
+    private static final Action COPY_ACTION = new FieldAction(I18n.tr("Copy")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).copy();
         }
@@ -68,7 +68,7 @@ public class SearchField extends JXSearchField {
     /**
      * The paste action.
      */
-    private static Action PASTE_ACTION = new FieldAction(I18n.tr("Paste")) {
+    private static final Action PASTE_ACTION = new FieldAction(I18n.tr("Paste")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).paste();
         }
@@ -76,7 +76,7 @@ public class SearchField extends JXSearchField {
     /**
      * The delete action.
      */
-    private static Action DELETE_ACTION = new FieldAction(I18n.tr("Delete")) {
+    private static final Action DELETE_ACTION = new FieldAction(I18n.tr("Delete")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).replaceSelection("");
         }
@@ -84,7 +84,7 @@ public class SearchField extends JXSearchField {
     /**
      * The select all action.
      */
-    private static Action SELECT_ALL_ACTION = new FieldAction(I18n.tr("Select All")) {
+    private static final Action SELECT_ALL_ACTION = new FieldAction(I18n.tr("Select All")) {
         public void actionPerformed(ActionEvent e) {
             getField(e).selectAll();
         }

@@ -15,8 +15,8 @@ import java.io.IOException;
 public final class SmartSearchDBPaneItem extends AbstractPaneItem {
     public final static String TITLE = I18n.tr("Smart Search");
     public final static String LABEL = I18n.tr("The Smart Search database is used to speed up individual file searches, it's how FrostWire remembers information about .torrent contents.");
-    private JLabel _numTorrentsLabel;
-    private JCheckBox smartSearchEnabled;
+    private final JLabel _numTorrentsLabel;
+    private final JCheckBox smartSearchEnabled;
     private long _numTorrents = 0;
 
     /**

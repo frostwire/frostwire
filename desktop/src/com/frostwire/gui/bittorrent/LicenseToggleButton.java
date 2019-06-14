@@ -36,7 +36,7 @@ public class LicenseToggleButton extends JPanel {
     private final JLabel descriptionLabel;
     private boolean selected;
     private boolean toggleable;
-    private LicenseIcon licenseIcon;
+    private final LicenseIcon licenseIcon;
     private LicenseToggleButtonOnToggleListener listener;
 
     LicenseToggleButton(LicenseIcon iconName, String text, String description, boolean selected, boolean toggleable) {

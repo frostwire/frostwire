@@ -37,7 +37,7 @@ public final class SplashWindow {
      * The sole instance of the SplashWindow
      */
     private static SplashWindow INSTANCE;
-    private AtomicBoolean initialized = new AtomicBoolean(false);
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
     /**
      * Constant handle to the glass pane that handles drawing text
      * on top of the splash screen.

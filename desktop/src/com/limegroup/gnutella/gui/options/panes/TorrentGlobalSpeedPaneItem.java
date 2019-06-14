@@ -35,12 +35,12 @@ public final class TorrentGlobalSpeedPaneItem extends AbstractPaneItem {
      * Speeds in Kilobytes/sec
      * From 1Kb to 100Mb - 101 == Unlimited.
      */
-    private JSlider DOWNLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
+    private final JSlider DOWNLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
     /**
      * Speeds in Kilobytes/sec
      * From 1Kb to 100Mb - 101 == Unlimited.
      */
-    private JSlider UPLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
+    private final JSlider UPLOAD_SLIDER = new JSlider(1, MAX_SLIDER_VALUE);
 
     public TorrentGlobalSpeedPaneItem() {
         super(TITLE_DOWNLOAD_SPEED, DESCRIPTION_DOWNLOAD_SPEED);

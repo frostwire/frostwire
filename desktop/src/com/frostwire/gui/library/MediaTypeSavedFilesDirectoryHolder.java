@@ -33,8 +33,8 @@ import java.util.Set;
  * @author aldenml
  */
 public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
-    private MediaType type;
-    private Set<File> cache;
+    private final MediaType type;
+    private final Set<File> cache;
 
     public MediaTypeSavedFilesDirectoryHolder(MediaType type) {
         this.type = type;

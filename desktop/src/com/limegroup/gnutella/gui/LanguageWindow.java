@@ -18,13 +18,13 @@ public class LanguageWindow extends JDialog {
     private static final String TRANSLATE_URL = "https://github.com/frostwire/frostwire";
     private JCheckBox showLanguageCheckbox;
     private JComboBox<Object> localeComboBox;
-    private JPanel mainPanel;
+    private final JPanel mainPanel;
     private OkayAction okayAction;
     private CancelAction cancelAction;
     private Locale currentLocale;
     private URLLabel helpTranslateLabel;
     private boolean defaultLocaleSelectable;
-    private Font dialogFont;
+    private final Font dialogFont;
 
     public LanguageWindow() {
         super(GUIMediator.getAppFrame());

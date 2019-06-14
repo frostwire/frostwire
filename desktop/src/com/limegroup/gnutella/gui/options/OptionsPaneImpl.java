@@ -45,7 +45,7 @@ final class OptionsPaneImpl implements OptionsPane {
      * <tt>String</tt> for the name of this panel.  This name is used as the
      * key for identifying this panel in the <tt>CardLayout</tt>.
      */
-    private String _name;
+    private final String _name;
 
     /**
      * This sole constructor overrides the public accessibility of the

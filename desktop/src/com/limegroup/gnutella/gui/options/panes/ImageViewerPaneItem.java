@@ -26,7 +26,7 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
     /**
      * Handle to the <tt>JTextField</tt> that displays the viewer name
      */
-    private JTextField _viewerField;
+    private final JTextField _viewerField;
 
     /**
      * Creates new ImageViewerOptionsPaneItem

@@ -35,7 +35,7 @@ import java.io.IOException;
  */
 public final class TorrentSaveFolderPaneItem extends AbstractPaneItem {
     public final static String TITLE = I18n.tr("Default Save Folder");
-    private TorrentSaveFolderComponent COMPONENT;
+    private final TorrentSaveFolderComponent COMPONENT;
 
     public TorrentSaveFolderPaneItem() {
         super(TITLE, I18n.tr("Choose the folder where downloads will be saved to"));

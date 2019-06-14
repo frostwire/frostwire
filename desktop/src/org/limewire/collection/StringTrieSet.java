@@ -24,7 +24,7 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
     /**
      * The backing map. A binary-sorted Trie.
      */
-    private transient StringTrie<String> map;
+    private final transient StringTrie<String> map;
 
     /**
      * This constructor sets up a dictionary where case IS significant

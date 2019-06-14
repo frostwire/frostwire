@@ -33,10 +33,10 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
     private final static String VPN_DROP_PROTECTION = I18n.tr("VPN-Drop Protection. Require VPN connection for BitTorrent");
     private final JCheckBox ENABLE_DISTRIBUTED_HASH_TABLE_CHECKBOX_FIELD = new JCheckBox();
     private final JCheckBox VPN_DROP_PROTECTION_CHECKBOX = new JCheckBox();
-    private WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
-    private WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
-    private WholeNumberField MAX_PEERS_FIELD = new SizedWholeNumberField(4);
-    private WholeNumberField MAX_ACTIVE_SEEDS_FIELD = new SizedWholeNumberField(4);
+    private final WholeNumberField MAX_ACTIVE_DOWNLOADS_FIELD = new SizedWholeNumberField(4);
+    private final WholeNumberField MAX_GLOBAL_NUM_CONNECTIONS_FIELD = new SizedWholeNumberField(4);
+    private final WholeNumberField MAX_PEERS_FIELD = new SizedWholeNumberField(4);
+    private final WholeNumberField MAX_ACTIVE_SEEDS_FIELD = new SizedWholeNumberField(4);
 
     public TorrentConnectionPaneItem() {
         super(TITLE, TEXT);

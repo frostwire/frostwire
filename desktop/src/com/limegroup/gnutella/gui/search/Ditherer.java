@@ -128,7 +128,7 @@ public final class Ditherer {
      * Provides a polygonal gradient between the two colors.
      */
     public static class PolygonShader implements Shader {
-        private float exponent;
+        private final float exponent;
 
         /**
          * Constructs a polygon shader for an exponent.

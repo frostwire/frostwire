@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("serial")
 public class CreateTorrentDialog extends JDialog {
     private static final PieceSize[] values = PieceSize.values();
-    private static Logger LOG = Logger.getLogger(CreateTorrentDialog.class);
+    private static final Logger LOG = Logger.getLogger(CreateTorrentDialog.class);
     private final List<String> trackers;
     private final Container container;
     private final JTabbedPane tabbedPane;

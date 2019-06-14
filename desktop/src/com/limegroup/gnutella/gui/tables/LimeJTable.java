@@ -54,7 +54,7 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * Constant empty string array for any class to use -- immutable.
      */
-    public static String[] EMPTY_STRING_ARRAY = new String[0];
+    public static final String[] EMPTY_STRING_ARRAY = new String[0];
     /**
      * The last LimeTableColumn that was removed from this table.
      */
@@ -66,7 +66,7 @@ public class LimeJTable extends JTable implements JSortTable {
     /**
      * The columns that are currently hidden.
      */
-    private Map<Object, LimeTableColumn> _hiddenColumns = new HashMap<>();
+    private final Map<Object, LimeTableColumn> _hiddenColumns = new HashMap<>();
     /**
      * The index of the column that is currently pressed down.
      */

@@ -82,7 +82,7 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
     private JList<Object> list;
     private JTextField textName;
     private Action[] actions;
-    private List<Playlist> importingPlaylists;
+    private final List<Playlist> importingPlaylists;
 
     LibraryPlaylists() {
         setupUI();

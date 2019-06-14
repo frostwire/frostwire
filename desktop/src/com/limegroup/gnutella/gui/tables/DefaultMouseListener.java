@@ -8,7 +8,7 @@ import java.awt.event.MouseListener;
  * This class handles mouse input to the component.
  */
 public final class DefaultMouseListener implements MouseListener {
-    private MouseObserver cm;
+    private final MouseObserver cm;
 
     public DefaultMouseListener(MouseObserver mo) {
         this.cm = mo;

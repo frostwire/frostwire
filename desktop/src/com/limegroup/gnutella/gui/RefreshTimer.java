@@ -14,7 +14,7 @@ final class RefreshTimer {
     /**
      * variable for timer that updates the gui.
      */
-    private Timer timer;
+    private final Timer timer;
 
     /**
      * Creates the timer and the ActionListener associated with it.

@@ -7,7 +7,7 @@ import org.limewire.service.ErrorService;
  * forward uncaught exceptions to {@link ErrorService}.
  */
 class ManagedThread extends Thread {
-    private static UncaughtExceptionHandler HANDLER =
+    private static final UncaughtExceptionHandler HANDLER =
             new ErrorServiceHandler();
 
     /**

@@ -153,8 +153,8 @@ public class LCS {
 
         public enum DiffType {
             ADD("+", "add"), REMOVE("-", "remove"), NONE(" ", "none");
-            private String val;
-            private String name;
+            private final String val;
+            private final String name;
 
             DiffType(String val, String name) {
                 this.val = val;
@@ -210,8 +210,8 @@ public class LCS {
 
     public static class LcsString extends LongestCommonSubsequence<Character> {
         private final boolean ignoreCase;
-        private String x;
-        private String y;
+        private final String x;
+        private final String y;
 
         LcsString(String from, String to, boolean ignoreCase) {
             this.x = from;

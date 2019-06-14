@@ -392,7 +392,7 @@ final class BTDownloadActions {
      */
     static class AddToPlaylistAction extends AbstractAction {
         private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
-        private Playlist playlist;
+        private final Playlist playlist;
 
         AddToPlaylistAction(Playlist playlist) {
             super(getTruncatedString(playlist.getName()));

@@ -14,7 +14,7 @@ public class ConfigureOptionsAction extends AbstractAction {
     /**
      * Resource key to go to in the options window
      */
-    private String paneTitle;
+    private final String paneTitle;
 
     public ConfigureOptionsAction(String pane) {
         paneTitle = pane;

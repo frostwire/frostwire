@@ -25,7 +25,7 @@ import java.util.HashSet;
  * downloads displayed in the download window.
  */
 public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDownload> {
-    private HashSet<String> _hashDownloads;
+    private final HashSet<String> _hashDownloads;
 
     /**
      * Initialize the model by setting the class of its DataLines.

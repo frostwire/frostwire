@@ -123,7 +123,7 @@ public class LibrarySearch extends JPanel {
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         searchField.setFont(newFont);
         searchField.addActionListener(new ActionListener() {
-            private SearchLibraryAction a = new SearchLibraryAction();
+            private final SearchLibraryAction a = new SearchLibraryAction();
 
             @Override
             public void actionPerformed(ActionEvent e) {

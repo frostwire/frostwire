@@ -74,11 +74,11 @@ final class LibraryPlaylistsTableMediator extends AbstractLibraryTableMediator<L
      */
     private static LibraryPlaylistsTableMediator INSTANCE;
     private Playlist currentPlaylist;
-    private Action importToPlaylistAction = new ImportToPlaylistAction();
-    private Action exportPlaylistAction = new ExportPlaylistAction();
-    private Action cleanupPlaylistAction = new CleanupPlaylistAction();
-    private Action refreshID3TagsAction = new RefreshID3TagsAction();
-    private Action COPY_PLAYLIST_FILES_TO_FOLDER_ACTION = new LibraryPlaylists.CopyPlaylistFilesAction();
+    private final Action importToPlaylistAction = new ImportToPlaylistAction();
+    private final Action exportPlaylistAction = new ExportPlaylistAction();
+    private final Action cleanupPlaylistAction = new CleanupPlaylistAction();
+    private final Action refreshID3TagsAction = new RefreshID3TagsAction();
+    private final Action COPY_PLAYLIST_FILES_TO_FOLDER_ACTION = new LibraryPlaylists.CopyPlaylistFilesAction();
     private JPanel mainContainer;
 
     /**

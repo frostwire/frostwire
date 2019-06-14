@@ -55,7 +55,7 @@ public final class MainFrame {
     /**
      * Handle to the <tt>JTabbedPane</tt> instance.
      */
-    private JPanel TABBED_PANE;
+    private final JPanel TABBED_PANE;
     private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
     /**
      * Constant handle to the <tt>LibraryView</tt> class that is
@@ -76,7 +76,7 @@ public final class MainFrame {
     /**
      * The array of tabs in the main application window.
      */
-    private Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
+    private final Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
     /**
      * The last state of the X/Y location and the time it was set.
      * This is necessary to preserve the maximize size & prior size,
@@ -84,7 +84,7 @@ public final class MainFrame {
      * maximizing, prior to the state actually becoming maximized.
      */
     private WindowState lastState = null;
-    private ApplicationHeader APPLICATION_HEADER;
+    private final ApplicationHeader APPLICATION_HEADER;
 
     /**
      * Initializes the primary components of the main application window,

@@ -44,15 +44,15 @@ abstract class SetupWindow extends JPanel {
     /**
      * Variable for the name of this window for use with <tt>CardLayout</tt>.
      */
-    private String _key;
+    private final String _key;
     /**
      * Variable for the key of the label to display.
      */
-    private String _labelKey;
+    private final String _labelKey;
     /**
      * Variable for the URL where more info exists.  Null if none.
      */
-    private String _moreInfoURL;
+    private final String _moreInfoURL;
     /**
      * Variable for the next window in the sequence.
      */

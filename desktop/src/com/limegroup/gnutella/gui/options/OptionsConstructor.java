@@ -348,8 +348,8 @@ public final class OptionsConstructor {
         }
 
         private static class SizeChangeListener extends ComponentAdapter {
-            private IntSetting widthSetting;
-            private IntSetting heightSetting;
+            private final IntSetting widthSetting;
+            private final IntSetting heightSetting;
 
             public SizeChangeListener(IntSetting widthSetting, IntSetting heightSetting) {
                 this.widthSetting = widthSetting;

@@ -35,7 +35,7 @@ public class Playlist extends LibraryDatabaseEntity {
     private String _name;
     private String _description;
     private boolean deleted;
-    private List<PlaylistItem> _items;
+    private final List<PlaylistItem> _items;
 
     public Playlist(LibraryDatabase libraryDB) {
         super(libraryDB);

@@ -40,7 +40,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
     private static final String ADDRESS = "frostwire.networkinterfacepane.address";
     private final ButtonGroup GROUP = new ButtonGroup();
     private final JCheckBox CUSTOM;
-    private List<JRadioButton> activeButtons = new ArrayList<>();
+    private final List<JRadioButton> activeButtons = new ArrayList<>();
 
     public NetworkInterfacePaneItem() {
         super(TITLE, LABEL);

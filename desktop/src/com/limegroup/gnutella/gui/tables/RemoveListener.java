@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
  * selected rows in the component
  */
 public final class RemoveListener implements ActionListener {
-    private ComponentMediator<?> cm;
+    private final ComponentMediator<?> cm;
 
     RemoveListener(ComponentMediator<?> cm) {
         this.cm = cm;

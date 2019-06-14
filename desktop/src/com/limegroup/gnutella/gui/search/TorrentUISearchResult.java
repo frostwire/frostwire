@@ -29,7 +29,7 @@ import javax.swing.*;
  * @author aldenml
  */
 public class TorrentUISearchResult extends AbstractUISearchResult {
-    private TorrentSearchResult sr;
+    private final TorrentSearchResult sr;
 
     TorrentUISearchResult(TorrentSearchResult sr, SearchEngine se, String query) {
         super(sr, se, query);

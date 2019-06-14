@@ -29,7 +29,7 @@ import java.util.Collection;
  * that returns <code>true</code>.
  */
 public class MulticastTransferHandler extends LimeTransferHandler {
-    private ArrayList<LimeTransferHandler> handlers;
+    private final ArrayList<LimeTransferHandler> handlers;
     private LimeTransferHandler lastTransferable;
 
     @SuppressWarnings("unused")

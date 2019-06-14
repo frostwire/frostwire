@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LimeCoreGlue {
     private static final AtomicBoolean preinstalled = new AtomicBoolean(false);
     private static LimeCoreGlue INSTANCE;
-    private AtomicBoolean installed = new AtomicBoolean(false);
+    private final AtomicBoolean installed = new AtomicBoolean(false);
 
     private LimeCoreGlue() {
     }

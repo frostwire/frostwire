@@ -18,7 +18,7 @@ import java.beans.PropertyChangeListener;
 public abstract class TextUIWrapper<UI extends TextUI> {
     private static final DefaultWrapper defaultWrapper = new DefaultWrapper();
     private final TextUIChangeHandler uiChangeHandler = new TextUIChangeHandler();
-    private Class<UI> wrapperClass;
+    private final Class<UI> wrapperClass;
 
     protected TextUIWrapper(Class<UI> wrapperClass) {
         this.wrapperClass = wrapperClass;

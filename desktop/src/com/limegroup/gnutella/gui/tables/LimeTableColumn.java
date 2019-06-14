@@ -49,7 +49,7 @@ public class LimeTableColumn extends TableColumn {
     private final Icon icon;
     private final boolean visName;
     private final Class<?> clazz;
-    private boolean initialized;
+    private final boolean initialized;
 
     /**
      * Creates a new column.

@@ -43,8 +43,8 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     private final WholeNumberField PORT_1_FIELD = new SizedWholeNumberField();
     private final JRadioButton RANDOM_PORT = new JRadioButton(I18n.tr("Use random port (Recommended)"));
     private final JRadioButton MANUAL_PORT = new JRadioButton(I18n.tr("Manual port range"));
-    private JLabel _labelPort0;
-    private JLabel _labelPort1;
+    private final JLabel _labelPort0;
+    private final JLabel _labelPort1;
 
     /**
      * The constructor constructs all of the elements of this

@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Map;
 
 class ISO639 {
-    private static Map<String, String> ISO_639_2_to_ISO_639_1;
+    private static final Map<String, String> ISO_639_2_to_ISO_639_1;
 
     static {
         ISO_639_2_to_ISO_639_1 = new HashMap<>();

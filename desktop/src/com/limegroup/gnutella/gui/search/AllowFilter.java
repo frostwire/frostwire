@@ -24,7 +24,7 @@ class AllowFilter implements TableLineFilter<SearchResultDataLine> {
     /**
      * The sole instance that can be returned, for convenience.
      */
-    private static AllowFilter INSTANCE = new AllowFilter();
+    private static final AllowFilter INSTANCE = new AllowFilter();
 
     /**
      * Returns a reusable instance of AllowFilter.

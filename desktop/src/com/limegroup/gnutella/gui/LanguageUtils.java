@@ -36,7 +36,7 @@ public class LanguageUtils {
     private static final String BUNDLE_PREFIX = "org/limewire/i18n/Messages_";
     private static final String BUNDLE_POSTFIX = ".class";
     private static final String BUNDLE_MARKER = "org/limewire/i18n/Messages.class";
-    private static Logger LOG = Logger.getLogger(LanguageUtils.class);
+    private static final Logger LOG = Logger.getLogger(LanguageUtils.class);
 
     /**
      * Applies this language code to be the new language of the program.

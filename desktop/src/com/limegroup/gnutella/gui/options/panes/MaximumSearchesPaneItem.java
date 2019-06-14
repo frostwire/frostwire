@@ -21,7 +21,7 @@ public final class MaximumSearchesPaneItem extends AbstractPaneItem {
      * Handle to the <tt>WholeNumberField</tt> where the user selects the
      * time to live for outgoing searches.
      */
-    private WholeNumberField _maxSearchesField;
+    private final WholeNumberField _maxSearchesField;
     /**
      * The stored value to allow rolling back changes.
      */

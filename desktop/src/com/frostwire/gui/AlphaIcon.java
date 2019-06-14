@@ -17,8 +17,8 @@ import java.awt.*;
  * @author Darryl
  */
 public class AlphaIcon implements Icon {
-    private Icon icon;
-    private float alpha;
+    private final Icon icon;
+    private final float alpha;
 
     /**
      * Creates an <CODE>AlphaIcon</CODE> with the specified icon and opacity.

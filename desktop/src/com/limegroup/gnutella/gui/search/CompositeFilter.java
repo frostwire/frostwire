@@ -27,7 +27,7 @@ class CompositeFilter implements TableLineFilter<SearchResultDataLine> {
     /**
      * The underlying filters.
      */
-    private List<TableLineFilter<SearchResultDataLine>> delegates;
+    private final List<TableLineFilter<SearchResultDataLine>> delegates;
 
     /**
      * Creates a new CompositeFilter of the specified depth.

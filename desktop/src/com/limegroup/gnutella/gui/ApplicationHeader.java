@@ -72,7 +72,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private final Image headerButtonBackgroundUnselected;
     private final GoogleSearchField cloudSearchField;
     private final JPanel searchPanels;
-    private LogoPanel logoPanel;
+    private final LogoPanel logoPanel;
     private JLabel updateButton;
     private ImageIcon updateImageButtonOn;
     private ImageIcon updateImageButtonOff;

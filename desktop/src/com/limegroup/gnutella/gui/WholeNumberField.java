@@ -14,8 +14,8 @@ public class WholeNumberField extends LimeTextField {
      *
      */
     private static final long serialVersionUID = 5004162823300212516L;
-    private Toolkit toolkit;
-    private NumberFormat integerFormatter;
+    private final Toolkit toolkit;
+    private final NumberFormat integerFormatter;
 
     public WholeNumberField(int value, int columns) {
         super(columns);

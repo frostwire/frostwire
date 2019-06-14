@@ -17,7 +17,7 @@ import java.text.MessageFormat;
  * After the search has been sent the search panel is focused.
  */
 public class SearchAction extends AbstractAction {
-    private SearchInformation info;
+    private final SearchInformation info;
 
     /**
      * Constructs an action that searches a space separated list of keywords.

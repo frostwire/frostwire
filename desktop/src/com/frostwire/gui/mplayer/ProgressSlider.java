@@ -26,13 +26,13 @@ import java.util.LinkedList;
 
 class ProgressSlider extends JPanel {
     private static final long serialVersionUID = 8000075870624583383L;
-    private JSlider progressSlider;
-    private JLabel remainingTime;
-    private JLabel elapsedTime;
+    private final JSlider progressSlider;
+    private final JLabel remainingTime;
+    private final JLabel elapsedTime;
     private float totalTime = 0;
     private float currentTime = 0;
     private boolean mousePressed = false;
-    private LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
+    private final LinkedList<ProgressSliderListener> listeners = new LinkedList<>();
 
     ProgressSlider() {
         setLayout(new BorderLayout());

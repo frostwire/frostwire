@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class HeaderMouseListener implements MouseInputListener {
-    private HeaderMouseObserver hmo;
+    private final HeaderMouseObserver hmo;
     private boolean isResizing = false;
 
     public HeaderMouseListener(HeaderMouseObserver hmo) {

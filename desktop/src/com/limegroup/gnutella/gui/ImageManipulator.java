@@ -12,11 +12,11 @@ public class ImageManipulator extends RGBImageFilter {
     /**
      * Whether or not we are going to brighten the image.
      */
-    private boolean brighter;
+    private final boolean brighter;
     /**
      * The percentage to darken or brighten the image.
      */
-    private int percent;
+    private final int percent;
 
     /**
      * Constructs a new manipulator.

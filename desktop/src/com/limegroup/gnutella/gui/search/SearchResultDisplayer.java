@@ -64,7 +64,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      * <tt>JPanel</tt> containing the primary components of the search result
      * display.
      */
-    private JPanel MAIN_PANEL;
+    private final JPanel MAIN_PANEL;
     /**
      * The main tabbed pane for displaying different search results.
      */
@@ -75,12 +75,12 @@ public final class SearchResultDisplayer implements RefreshListener {
      * Use switcher to switch between the two.  The first entry is the
      * blank results panel; the second is the tabbed panel.
      */
-    private JPanel results;
+    private final JPanel results;
     /**
      * The layout that switches between the dummy result panel
      * and the JTabbedPane.
      */
-    private CardLayout switcher = new CardLayout();
+    private final CardLayout switcher = new CardLayout();
     /**
      * The listener to notify about the currently displaying search
      * changing.

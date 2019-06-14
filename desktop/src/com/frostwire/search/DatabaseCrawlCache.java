@@ -29,7 +29,7 @@ import com.limegroup.gnutella.settings.SearchSettings;
  */
 public class DatabaseCrawlCache implements CrawlCache {
     private static final Logger LOG = Logger.getLogger(DatabaseCrawlCache.class);
-    private CrawlCacheDB db;
+    private final CrawlCacheDB db;
 
     public DatabaseCrawlCache() {
         db = CrawlCacheDB.instance();

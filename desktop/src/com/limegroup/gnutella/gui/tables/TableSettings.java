@@ -22,11 +22,11 @@ public class TableSettings {
     /**
      * The setting for whether or not to sort in real time.
      */
-    public BooleanSetting REAL_TIME_SORT;
+    public final BooleanSetting REAL_TIME_SORT;
     /**
      * The setting for whether or not to display tooltips.
      */
-    BooleanSetting DISPLAY_TOOLTIPS;
+    final BooleanSetting DISPLAY_TOOLTIPS;
 
     /**
      * Constructs a new TableSettings whose settings

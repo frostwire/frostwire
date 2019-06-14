@@ -26,8 +26,8 @@ import java.io.IOException;
  */
 public class SearchResultTransferable implements Transferable {
     public static final DataFlavor dataFlavor = new DataFlavor(SearchResultTransferable.class, "FrostWire Search Result");
-    private SearchResultMediator panel;
-    private SearchResultDataLine[] lines;
+    private final SearchResultMediator panel;
+    private final SearchResultDataLine[] lines;
 
     public SearchResultTransferable(SearchResultMediator panel, SearchResultDataLine[] lines) {
         this.panel = panel;

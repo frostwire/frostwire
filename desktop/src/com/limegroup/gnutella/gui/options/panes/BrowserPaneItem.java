@@ -26,7 +26,7 @@ public class BrowserPaneItem extends AbstractPaneItem {
     /**
      * Handle to the <tt>JTextField</tt> that displays the browser name
      */
-    private JTextField BROWSER;
+    private final JTextField BROWSER;
 
     /**
      * Creates new BrowserOptionsPaneItem

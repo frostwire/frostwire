@@ -22,12 +22,14 @@ public final class AssociationPreferencePaneItem extends AbstractPaneItem {
     /**
      * a mapping of checkboxes to associations
      */
-    private Map<JCheckBox, LimeAssociationOption> associations =
+    private final Map<JCheckBox, LimeAssociationOption> associations =
             new HashMap<>();
     /**
      * Check box to check associations on startup.
      */
-    private JRadioButton always, never, ask;
+    private final JRadioButton always;
+    private final JRadioButton never;
+    private final JRadioButton ask;
 
     /**
      * The constructor constructs all of the elements of this

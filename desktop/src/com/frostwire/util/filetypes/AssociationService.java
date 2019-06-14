@@ -53,9 +53,9 @@ import java.util.List;
  */
 public class AssociationService {
     // A platform-dependent instance of AppAssociationReader.
-    private AppAssociationReader appAssocReader;
+    private final AppAssociationReader appAssocReader;
     // A platform-dependent instance of AppAssociationWriter.
-    private AppAssociationWriter appAssocWriter;
+    private final AppAssociationWriter appAssocWriter;
 
     /**
      * Constructor of an <code>AssociationService</code> object.

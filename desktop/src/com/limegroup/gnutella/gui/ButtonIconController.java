@@ -25,7 +25,7 @@ public class ButtonIconController {
      * so we don't load the resource multiple times.
      */
     private final Map<String, Icon> BUTTON_CACHE = new HashMap<>();
-    private Icon NULL = new ImageIcon();
+    private final Icon NULL = new ImageIcon();
 
     private static Properties loadButtonNameMap() {
         Properties p = new Properties();

@@ -36,7 +36,7 @@ public class ShellFolderColumnInfo {
      * Allowed values are {@link SwingConstants#LEFT}, {@link SwingConstants#RIGHT}, {@link SwingConstants#LEADING},
      * {@link SwingConstants#TRAILING}, {@link SwingConstants#CENTER}
      */
-    private Integer alignment;
+    private final Integer alignment;
     private Comparator<Object> comparator;
     /**
      * <code>false</code> (default) if the comparator expects folders as arguments,
@@ -44,7 +44,7 @@ public class ShellFolderColumnInfo {
      * on Windows and also for separating files from directories when sorting using
      * ShellFolderManager's inner comparator.
      */
-    private boolean compareByColumn;
+    private final boolean compareByColumn;
 
     ShellFolderColumnInfo(String title, Integer width,
                           Integer alignment, boolean visible,

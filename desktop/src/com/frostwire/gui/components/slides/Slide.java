@@ -55,22 +55,22 @@ public class Slide {
     /**
      * url of torrent file that should be opened if user clicks on this slide
      */
-    public String torrent;
+    public final String torrent;
     /**
      *
      */
-    public String httpDownloadURL;
+    public final String httpDownloadURL;
     /**
      * length of time this slide will be shown
      */
-    public long duration;
+    public final long duration;
     /**
      * language (optional filter) = Can be given in the forms of:
      * *
      * en
      * en_US
      */
-    public String language;
+    public final String language;
     /**
      * os (optional filter) = Can be given in the forms of comma separated:
      * windows
@@ -78,73 +78,73 @@ public class Slide {
      * linux
      * android
      */
-    public String os;
+    public final String os;
     /**
      * The Download title.
      */
-    public String title;
+    public final String title;
     /**
      * Content creator name
      */
-    public String author;
+    public final String author;
     /**
      * Download size in bytes.
      */
-    public long size;
+    public final long size;
     /**
      * decide what to do with this Slide onClick.
      */
-    public int method;
+    public final int method;
     /**
      * Optional MD5 hash
      */
-    public String md5;
+    public final String md5;
     /**
      * If != null, rename file to this file name.
      */
-    public String saveFileAs;
+    public final String saveFileAs;
     /**
      * Twitter page associated with slide
      */
-    public String twitter;
+    public final String twitter;
     /**
      * Use these flags to determine how the slide will behave.
      */
-    public int flags;
+    public final int flags;
     public PaymentOptions paymentOptions;
     /**
      * http address where to go if user clicks on this slide
      */
-    String clickURL;
+    final String clickURL;
     /**
      * url of image that will be displayed on this slide
      */
-    String imageSrc;
+    final String imageSrc;
     /**
      * Comma separated list of versions that should not use this
      */
-    String includedVersions;
+    final String includedVersions;
     /**
      * audio file url so user can play preview/promotional audio for promo.
      */
-    String audioURL;
+    final String audioURL;
     /**
      * video file url so frostwire player can be opened, could be a youtube url, player
      * should default to high quality playback
      */
-    String videoURL;
+    final String videoURL;
     /**
      * Facebook page associated with slide
      */
-    String facebook;
+    final String facebook;
     /**
      * Youtube channel
      */
-    String youtube;
+    final String youtube;
     /**
      * Instagram feed
      */
-    String instagram;
+    final String instagram;
 
     /**
      * @param imgSrc                 - slide overlay image url

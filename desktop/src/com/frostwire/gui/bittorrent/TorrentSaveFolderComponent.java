@@ -37,7 +37,7 @@ import java.io.File;
  */
 public final class TorrentSaveFolderComponent extends JPanel {
     private static String errorMessage;
-    private JTextField folderTextField;
+    private final JTextField folderTextField;
 
     public TorrentSaveFolderComponent(boolean border) {
         folderTextField = new JTextField(SharingSettings.TORRENT_DATA_DIR_SETTING.getValueAsString());

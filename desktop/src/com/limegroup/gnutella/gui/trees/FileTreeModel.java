@@ -41,14 +41,14 @@ import java.util.*;
  */
 public class FileTreeModel extends AbstractTreeModel {
     public static final Comparator<File> DEFAULT_COMPARATOR = new FileComparator();
-    private List<File> subRoots;
-    private Hashtable<String, List<File>> subChildren = new Hashtable<>();
+    private final List<File> subRoots;
+    private final Hashtable<String, List<File>> subChildren = new Hashtable<>();
     private File cachedDir;
     private boolean cacheSorted;
     private File[] cache;
-    private Comparator<File> comparator = DEFAULT_COMPARATOR;
+    private final Comparator<File> comparator = DEFAULT_COMPARATOR;
     private FileFilter filter = new DefaultFilter();
-    private boolean sort = true;
+    private final boolean sort = true;
 
     public FileTreeModel(String root, File... roots) {
         super(root);

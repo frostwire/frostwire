@@ -106,7 +106,7 @@ public final class PlatformDefaults {
     private static UnitValue BUTT_WIDTH = null;
     private static Float horScale = null, verScale = null;
     private static int LP_BASE = BASE_SCALE_FACTOR;
-    private static Integer BASE_DPI_FORCED = null;
+    private static final Integer BASE_DPI_FORCED = null;
     private static int BASE_DPI = 96;
 
     static {

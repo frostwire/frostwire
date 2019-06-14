@@ -22,7 +22,7 @@ import java.util.LinkedList;
 
 public class MPlayerUIEventHandler {
     private static MPlayerUIEventHandler instance = null;
-    private LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
+    private final LinkedList<MPlayerUIEventListener> listeners = new LinkedList<>();
 
     private MPlayerUIEventHandler() {
     }

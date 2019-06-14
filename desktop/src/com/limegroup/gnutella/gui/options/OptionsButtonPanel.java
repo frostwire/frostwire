@@ -18,11 +18,11 @@ final class OptionsButtonPanel {
     /**
      * Handle to the enclosed <tt>ButtonRow</tt> instance.
      */
-    private ButtonRow _buttonRow;
+    private final ButtonRow _buttonRow;
     /**
      * Handle to the other button row.
      */
-    private ButtonRow _revertRow;
+    private final ButtonRow _revertRow;
 
     /**
      * The constructor creates the <tt>ButtonRow</tt>.

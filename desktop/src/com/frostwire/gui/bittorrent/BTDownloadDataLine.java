@@ -55,7 +55,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     private static final LimeTableColumn SHARE_RATIO_COLUMN;
     private static final LimeTableColumn SEED_TO_PEER_RATIO_COLUMN;
     private static final LimeTableColumn LICENSE_COLUMN;
-    public static Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
+    public static final Map<TransferState, String> TRANSFER_STATE_STRING_MAP = new HashMap<>();
 
     static {
         columns = new ArrayList<>();

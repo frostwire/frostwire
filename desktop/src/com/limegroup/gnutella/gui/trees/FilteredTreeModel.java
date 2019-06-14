@@ -39,9 +39,9 @@ public class FilteredTreeModel implements TreeModel {
     /**
      * If set to true, keywords will be converted to lower case before stored in the <code>searchTrie</code>.
      */
-    private boolean ignoreCase;
-    private FilteredTreeModelListener listener;
-    private List<TreeModelListener> listeners = new ArrayList<>();
+    private final boolean ignoreCase;
+    private final FilteredTreeModelListener listener;
+    private final List<TreeModelListener> listeners = new ArrayList<>();
     /**
      * The underlying data model.
      */
@@ -50,7 +50,7 @@ public class FilteredTreeModel implements TreeModel {
     /**
      * Maps search keywords to lists of matching nodes.
      */
-    private PatriciaTrie<String, List<Object>> searchTrie = new PatriciaTrie<>(new CharSequenceKeyAnalyzer());
+    private final PatriciaTrie<String, List<Object>> searchTrie = new PatriciaTrie<>(new CharSequenceKeyAnalyzer());
     /**
      * Currently visible nodes. If <code>null</code>, all nodes are visible.
      */

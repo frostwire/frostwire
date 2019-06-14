@@ -76,7 +76,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     private static final Cursor waitCursor =
             Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
     private static final int COLUMN_FILENAME = 0;
-    private static FocusListener repaintListener = new FocusListener() {
+    private static final FocusListener repaintListener = new FocusListener() {
         public void focusGained(FocusEvent fe) {
             repaintSelection(fe.getSource());
         }
@@ -116,7 +116,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     };
     private Action[] actions;
     private int viewType = -1;
-    private JPanel[] viewPanels = new JPanel[VIEWTYPE_COUNT];
+    private final JPanel[] viewPanels = new JPanel[VIEWTYPE_COUNT];
     private JPanel currentViewPanel;
     private String[] viewTypeActionNames;
     private JPopupMenu contextMenu;
@@ -141,7 +141,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     // be selected when it appears in the model.
     private File newFolderFile;
     // Used for accessing methods in the corresponding UI class
-    private FileChooserUIAccessor fileChooserUIAccessor;
+    private final FileChooserUIAccessor fileChooserUIAccessor;
     private DetailsTableModel detailsTableModel;
     private DetailsTableRowSorter rowSorter;
     private final KeyListener detailsKeyListener = new KeyAdapter() {
@@ -235,7 +235,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     private File editFile = null;
     private int editX = 20;
     private JTextField editCell = null;
-    private FocusListener editorFocusListener = new FocusAdapter() {
+    private final FocusListener editorFocusListener = new FocusAdapter() {
         public void focusLost(FocusEvent e) {
             if (!e.isTemporary()) {
                 applyEdit();
@@ -1316,7 +1316,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
          *
          */
         private static final long serialVersionUID = -4836669546572282852L;
-        private int viewType;
+        private final int viewType;
 
         ViewTypeAction(int viewType) {
             super(viewTypeActionNames[viewType]);
@@ -1378,8 +1378,8 @@ public class FilePane extends JPanel implements PropertyChangeListener {
          *
          */
         private static final long serialVersionUID = 6898830676567042099L;
-        JFileChooser chooser;
-        BasicDirectoryModel directoryModel;
+        final JFileChooser chooser;
+        final BasicDirectoryModel directoryModel;
         ShellFolderColumnInfo[] columns;
         int[] columnMap;
 
@@ -1580,8 +1580,8 @@ public class FilePane extends JPanel implements PropertyChangeListener {
      * directory and file to file using the wrapped comparator.
      */
     private class DirectoriesFirstComparatorWrapper implements Comparator<File> {
-        private Comparator<Object> comparator;
-        private int column;
+        private final Comparator<Object> comparator;
+        private final int column;
 
         DirectoriesFirstComparatorWrapper(int column, Comparator<Object> comparator) {
             this.column = column;
@@ -1643,8 +1643,8 @@ public class FilePane extends JPanel implements PropertyChangeListener {
          *
          */
         private static final long serialVersionUID = 4795829282408806063L;
-        JFileChooser chooser;
-        DateFormat df;
+        final JFileChooser chooser;
+        final DateFormat df;
 
         DetailsTableCellRenderer(JFileChooser chooser) {
             this.chooser = chooser;
@@ -1726,7 +1726,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
     }
 
     private class AlignableTableHeaderRenderer implements TableCellRenderer {
-        TableCellRenderer wrappedRenderer;
+        final TableCellRenderer wrappedRenderer;
 
         AlignableTableHeaderRenderer(TableCellRenderer wrappedRenderer) {
             this.wrappedRenderer = wrappedRenderer;

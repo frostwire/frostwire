@@ -36,7 +36,7 @@ public final class DesktopVPNMonitor implements VPNMonitor {
     private static final Logger LOG = Logger.getLogger(DesktopVPNMonitor.class);
     // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
     // when VPN is active
-    private static Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
+    private static final Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
             Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
     private boolean active;
 

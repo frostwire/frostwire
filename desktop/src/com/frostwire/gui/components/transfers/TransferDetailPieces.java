@@ -33,8 +33,8 @@ import java.awt.*;
 public final class TransferDetailPieces extends JPanel implements TransferDetailComponent.TransferDetailPanel {
     private final JLabel pieceSizeLabel;
     private final JLabel totalPiecesLabel;
-    private HexHivePanel hexHivePanel;
-    private HexHiveAdapter hexHivePanelAdapter;
+    private final HexHivePanel hexHivePanel;
+    private final HexHiveAdapter hexHivePanelAdapter;
     private boolean pieceSizeAlreadySet = false;
     private BittorrentDownload bittorrentDownload;
 

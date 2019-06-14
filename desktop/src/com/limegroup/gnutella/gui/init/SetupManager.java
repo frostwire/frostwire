@@ -56,11 +56,11 @@ public final class SetupManager {
      */
     private SetupWindow _currentWindow;
     private Dimension holderPreferredSize;
-    private PreviousAction previousAction = new PreviousAction();
-    private NextAction nextAction = new NextAction();
-    private FinishAction finishAction = new FinishAction();
-    private CancelAction cancelAction = new CancelAction();
-    private LanguageAwareAction[] actions = new LanguageAwareAction[]{previousAction, nextAction, finishAction, cancelAction};
+    private final PreviousAction previousAction = new PreviousAction();
+    private final NextAction nextAction = new NextAction();
+    private final FinishAction finishAction = new FinishAction();
+    private final CancelAction cancelAction = new CancelAction();
+    private final LanguageAwareAction[] actions = new LanguageAwareAction[]{previousAction, nextAction, finishAction, cancelAction};
 
     private boolean shouldShowAssociationsWindow() {
         if (CommonUtils.isPortable() || (InstallSettings.ASSOCIATION_OPTION.getValue() == FrostAssociations.CURRENT_ASSOCIATIONS)) {

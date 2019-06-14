@@ -51,12 +51,12 @@ public class TitledPaddedPanel extends JPanel {
     /**
      * The inner panel that components are added to.
      */
-    private BoxPanel _mainPanel;
+    private final BoxPanel _mainPanel;
     /**
      * The <tt>TitledBorder</tt> for the panel, stored to allow changing
      * the title.
      */
-    private TitledBorder _titledBorder;
+    private final TitledBorder _titledBorder;
 
     /**
      * Creates a <tt>TitledPaddedPanel</tt> with the specified title

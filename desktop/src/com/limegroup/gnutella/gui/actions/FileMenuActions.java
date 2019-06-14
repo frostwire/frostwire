@@ -77,7 +77,7 @@ public final class FileMenuActions {
      */
     public static class OpenMagnetTorrentAction extends AbstractAction {
         private JDialog dialog = null;
-        private LimeTextField PATH_FIELD;
+        private final LimeTextField PATH_FIELD;
 
         public OpenMagnetTorrentAction() {
             super(I18n.tr("O&pen .Torrent or Magnet"));

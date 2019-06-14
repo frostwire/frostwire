@@ -551,7 +551,7 @@ final class TrieNode<E> {
      * i.e., for all i &lt; j,<br>
      * children[i].edge.charAt(0) &lt; children[j].edge.charAt(0)
      */
-    private ArrayList<TrieEdge<E>> children = new ArrayList<>(0);
+    private final ArrayList<TrieEdge<E>> children = new ArrayList<>(0);
 
     /**
      * Creates a trie with no children and no value.
@@ -816,8 +816,8 @@ final class TrieNode<E> {
  * A labeled edge, i.e., a String label and a TrieNode endpoint.
  */
 final class TrieEdge<E> {
-    private String label;
-    private TrieNode<E> child;
+    private final String label;
+    private final TrieNode<E> child;
 
     /**
      * @requires label.size() > 0

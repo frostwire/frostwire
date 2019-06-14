@@ -54,7 +54,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 final class BTDownloadMediatorAdvancedMenuFactory {
-    private static Logger LOG = Logger.getLogger(BTDownloadMediatorAdvancedMenuFactory.class);
+    private static final Logger LOG = Logger.getLogger(BTDownloadMediatorAdvancedMenuFactory.class);
 
     static SkinMenu createAdvancedSubMenu() {
         final com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();

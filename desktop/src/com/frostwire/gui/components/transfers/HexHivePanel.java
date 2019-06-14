@@ -42,7 +42,7 @@ public class HexHivePanel extends JPanel {
     private BufferedImage bitmap;
     private int lastWidth;
     private int lastHeight;
-    private ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
+    private final ExecutorService threadPool = com.frostwire.util.ThreadPool.newThreadPool("HexHivePool", 1);
     private Color backgroundColor;
 
     /**

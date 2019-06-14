@@ -64,15 +64,15 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     private static final Dimension vstrut5 = new Dimension(1, 5);
     private static final Insets shrinkwrap = new Insets(0, 0, 0, 0);
     // Preferred and Minimum sizes for the dialog box
-    private static int PREF_WIDTH = 500;
-    private static int PREF_HEIGHT = 326;
-    private static Dimension PREF_SIZE = new Dimension(PREF_WIDTH, PREF_HEIGHT);
-    private static int MIN_WIDTH = 500;
-    private static int MIN_HEIGHT = 326;
-    private static Dimension MIN_SIZE = new Dimension(MIN_WIDTH, MIN_HEIGHT);
-    private static int LIST_PREF_WIDTH = 405;
-    private static int LIST_PREF_HEIGHT = 135;
-    private static Dimension LIST_PREF_SIZE = new Dimension(LIST_PREF_WIDTH, LIST_PREF_HEIGHT);
+    private static final int PREF_WIDTH = 500;
+    private static final int PREF_HEIGHT = 326;
+    private static final Dimension PREF_SIZE = new Dimension(PREF_WIDTH, PREF_HEIGHT);
+    private static final int MIN_WIDTH = 500;
+    private static final int MIN_HEIGHT = 326;
+    private static final Dimension MIN_SIZE = new Dimension(MIN_WIDTH, MIN_HEIGHT);
+    private static final int LIST_PREF_WIDTH = 405;
+    private static final int LIST_PREF_HEIGHT = 135;
+    private static final Dimension LIST_PREF_SIZE = new Dimension(LIST_PREF_WIDTH, LIST_PREF_HEIGHT);
     // Much of the Metal UI for JFilechooser is just a copy of
     // the windows implementation, but using Metal themed buttons, lists,
     // icons, etc. We are planning a complete rewrite, and hence we've
@@ -80,7 +80,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     private JLabel lookInLabel;
     private JComboBox<Object> directoryComboBox;
     private DirectoryComboBoxModel directoryComboBoxModel;
-    private Action directoryComboBoxAction = new DirectoryComboBoxAction();
+    private final Action directoryComboBoxAction = new DirectoryComboBoxAction();
     private FilterComboBoxModel filterComboBoxModel;
     private JTextField fileNameTextField;
     private FilePaneEx filePane;
@@ -794,8 +794,8 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
      * to the largest preferred size width.
      */
     private static class ButtonAreaLayout implements LayoutManager {
-        private int hGap = 5;
-        private int topMargin = 17;
+        private final int hGap = 5;
+        private final int topMargin = 17;
 
         public void addLayoutComponent(String string, Component comp) {
         }
@@ -932,7 +932,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
          *
          */
         private static final long serialVersionUID = -8500297350257807164L;
-        IndentIcon ii = new IndentIcon();
+        final IndentIcon ii = new IndentIcon();
 
         public Component getListCellRendererComponent(JList<?> list, Object value,
                                                       int index, boolean isSelected,
@@ -980,11 +980,11 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
          *
          */
         private static final long serialVersionUID = -4248097879659126453L;
-        Vector<File> directories = new Vector<>();
+        final Vector<File> directories = new Vector<>();
         int[] depths = null;
         File selectedDirectory = null;
-        JFileChooser chooser = getFileChooser();
-        FileSystemView fsv = chooser.getFileSystemView();
+        final JFileChooser chooser = getFileChooser();
+        final FileSystemView fsv = chooser.getFileSystemView();
 
         public DirectoryComboBoxModel() {
             // Add the current directory to the model, and make it the

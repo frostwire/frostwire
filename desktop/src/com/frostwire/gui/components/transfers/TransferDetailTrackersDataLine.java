@@ -29,7 +29,7 @@ public final class TransferDetailTrackersDataLine extends AbstractDataLine<Trans
     private static final int SEEDS_COLUMN_ID = 2;
     private static final int PEERS_COLUMN_ID = 3;
     private static final int DOWNLOADED_COLUMN_ID = 4;
-    private static LimeTableColumn[] columns = new LimeTableColumn[]{
+    private static final LimeTableColumn[] columns = new LimeTableColumn[]{
             new LimeTableColumn(URL_COLUMN_ID, "URL", I18n.tr("URL"), 180, true, true, true, String.class),
             new LimeTableColumn(STATUS_COLUMN_ID, "STATUS", I18n.tr("Status"), 180, true, true, true, String.class),
             new LimeTableColumn(SEEDS_COLUMN_ID, "SEEDS", I18n.tr("Seeds"), 180, true, true, true, String.class),

@@ -280,7 +280,7 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
      */
     private final class AddToPlaylistAction extends AbstractAction {
         private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
-        private Playlist playlist;
+        private final Playlist playlist;
 
         AddToPlaylistAction(Playlist playlist) {
             super(getTruncatedString(playlist.getName(), MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU));

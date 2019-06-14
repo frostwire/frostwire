@@ -23,7 +23,7 @@ public class DeadlockSupport {
      * so it doesn't use a multiple of 10 for the sleep interval.
      */
     private static final int DEADLOCK_CHECK_INTERVAL = 3001;
-    private static Logger LOG = Logger.getLogger(DeadlockSupport.class);
+    private static final Logger LOG = Logger.getLogger(DeadlockSupport.class);
 
     public static void startDeadlockMonitoring() {
         Thread t = ThreadExecutor.newManagedThread(() -> {

@@ -64,8 +64,8 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
      * Our list of MediaPlayerListeners that are currently listening for events
      * from this player
      */
-    private List<MediaPlayerListener> listenerList = new CopyOnWriteArrayList<>();
-    private MPlayer mplayer;
+    private final List<MediaPlayerListener> listenerList = new CopyOnWriteArrayList<>();
+    private final MPlayer mplayer;
     private MediaSource currentMedia;
     private Playlist currentPlaylist;
     private MediaSource[] playlistFilesView;
@@ -73,7 +73,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     private boolean shuffle;
     private boolean playNextMedia;
     private double volume;
-    private Queue<MediaSource> lastRandomFiles;
+    private final Queue<MediaSource> lastRandomFiles;
     private long durationInSeconds;
     private boolean isPlayPausedForSliding = false;
     private boolean stateNotificationsEnabled = true;
