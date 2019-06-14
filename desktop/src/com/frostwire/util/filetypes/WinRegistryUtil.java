@@ -183,8 +183,10 @@ public class WinRegistryUtil {
     private static boolean isValueExist(String subKey, String valueName, int regLevel) {
         if (isSubKeyExist(subKey, regLevel)) {
             int hKey = getHKeyByLevel(regLevel);
-            return WinRegistryWrapper.WinRegValueExist(hKey, subKey, valueName)
-                    == ERROR_ITEM_EXISTED;
+            if (WinRegistryWrapper.WinRegValueExist(hKey, subKey, valueName)
+                    == ERROR_ITEM_EXISTED) {
+                return true;
+            }
         }
         return false;
     }

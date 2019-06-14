@@ -26,7 +26,7 @@ abstract class AEThread2 {
     private static final int MAX_RETAINED = Math.max(MIN_RETAINED * 4, 16);
     private static final int THREAD_TIMEOUT_CHECK_PERIOD = 10 * 1000;
     private static final int THREAD_TIMEOUT = 60 * 1000;
-    private static final LinkedList daemon_threads = new LinkedList();
+    private static final LinkedList<threadWrapper> daemon_threads = new LinkedList<>();
     private static long last_timeout_check;
     private final boolean daemon;
     private threadWrapper wrapper;

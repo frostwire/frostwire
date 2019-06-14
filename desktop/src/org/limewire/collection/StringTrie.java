@@ -669,7 +669,7 @@ final class TrieNode<E> {
      */
     public void put(String label, TrieNode<E> child) {
         char labelStart;
-        int i;
+        int i=0;
         // If there's a match it is the closest lower or equal one, and
         // precondition requires it to be lower, so we add the edge *after*
         // it. If there's no match, there are two cases: the Trie is empty,

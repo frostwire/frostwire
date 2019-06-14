@@ -23,7 +23,7 @@ import java.util.*;
 
 public class CopyOnWriteList<T> implements Iterable<T> {
     private final boolean use_linked_list;
-    private List list = Collections.EMPTY_LIST;
+    private List<T> list = Collections.EMPTY_LIST;
     private boolean visible = false;
 
     CopyOnWriteList(boolean _use_linked_list) {
