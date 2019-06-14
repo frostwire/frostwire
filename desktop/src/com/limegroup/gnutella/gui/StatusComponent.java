@@ -32,7 +32,7 @@ import java.text.NumberFormat;
  * - Displays an indeterminate JProgressBar with the status text
  * inside the progressbar.
  */
-public final class StatusComponent extends JPanel {
+final class StatusComponent extends JPanel {
     /**
      * The JProgressBar whose text is updated, if not running on OSX.
      */

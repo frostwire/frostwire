@@ -236,9 +236,9 @@ public class SQLiteQueryBuilder {
      *                      formatted as LIMIT clause. Passing null denotes no LIMIT clause.
      * @return a cursor over the result set
      */
-    public Cursor query(SQLiteDatabase db, String[] projectionIn,
-                        String selection, String[] selectionArgs, String groupBy,
-                        String having, String sortOrder, String limit) {
+    private Cursor query(SQLiteDatabase db, String[] projectionIn,
+                         String selection, String[] selectionArgs, String groupBy,
+                         String having, String sortOrder, String limit) {
         if (mTables == null) {
             return null;
         }

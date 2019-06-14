@@ -49,7 +49,7 @@ public class StringTrieSet implements AutoCompleteDictionary, Iterable<String> {
     /**
      * Determines whether or not the Set contains this String.
      */
-    public boolean contains(String data) {
+    private boolean contains(String data) {
         return map.get(data) != null;
     }
 

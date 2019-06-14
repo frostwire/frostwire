@@ -27,8 +27,8 @@ import java.io.IOException;
  * to change whether the firewall indicator is shown in the status bar.
  */
 public final class StatusBarBandwidthPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Bandwidth Indicator");
-    public final static String LABEL = I18n.tr("You can display your bandwidth consumption in the status bar.");
+    private final static String TITLE = I18n.tr("Bandwidth Indicator");
+    private final static String LABEL = I18n.tr("You can display your bandwidth consumption in the status bar.");
     private final JCheckBox CHECK_BOX = new JCheckBox();
 
     /**

@@ -67,7 +67,7 @@ public class StringUtils {
      * Exactly like contains(input, pattern), but case is ignored if
      * ignoreCase==true.
      */
-    public static boolean contains(String input, String pattern, boolean ignoreCase) {
+    private static boolean contains(String input, String pattern, boolean ignoreCase) {
         //More efficient algorithms are possible, e.g. a modified version of the
         //Rabin-Karp algorithm, but they are unlikely to be faster with such
         //short strings.  Also, some contant time factors could be shaved by

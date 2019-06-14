@@ -16,7 +16,7 @@ import java.util.Properties;
  * {@link SettingsFactory#createStringArraySetting(String, String[])}.
  */
 public class StringArraySetting extends AbstractSetting {
-    public static final char SEPARATOR = ';';
+    private static final char SEPARATOR = ';';
     private String[] value;
 
     /**
@@ -34,7 +34,7 @@ public class StringArraySetting extends AbstractSetting {
     /**
      * Splits the string into an Array
      */
-    public static String[] decode(String src) {
+    private static String[] decode(String src) {
         if (src == null || src.length() == 0) {
             return (new String[0]);
         }
@@ -44,7 +44,7 @@ public class StringArraySetting extends AbstractSetting {
     /**
      * Separates each field of the array by a semicolon
      */
-    public static String encode(String[] src) {
+    private static String encode(String[] src) {
         if (src == null || src.length == 0) {
             return "";
         }

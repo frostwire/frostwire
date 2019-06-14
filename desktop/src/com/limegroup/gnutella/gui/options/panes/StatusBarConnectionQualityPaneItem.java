@@ -14,8 +14,8 @@ import java.io.IOException;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class StatusBarConnectionQualityPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Connection Quality Indicator");
-    public final static String LABEL = I18n.tr("You can display a measurement of your connection quality in the status bar.");
+    private final static String TITLE = I18n.tr("Connection Quality Indicator");
+    private final static String LABEL = I18n.tr("You can display a measurement of your connection quality in the status bar.");
     private final JCheckBox CHECK_BOX = new JCheckBox();
 
     /**

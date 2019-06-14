@@ -34,7 +34,7 @@ public abstract class SQLiteOpenHelper {
     private final SQLiteDatabase db;
     private String folderpath;
 
-    public SQLiteOpenHelper(Context context, String name, int version, String extraArgs) {
+    protected SQLiteOpenHelper(Context context, String name, int version, String extraArgs) {
         String dbpath = context.getDatabasePath(name).getAbsolutePath();
         db = openDatabase(dbpath, name, version, extraArgs);
     }
@@ -64,7 +64,7 @@ public abstract class SQLiteOpenHelper {
      *
      * @param db The database.
      */
-    public abstract void onCreate(SQLiteDatabase db);
+    protected abstract void onCreate(SQLiteDatabase db);
 
     /**
      * Called when the database needs to be upgraded. The implementation

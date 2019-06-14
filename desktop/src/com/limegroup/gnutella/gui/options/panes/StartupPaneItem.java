@@ -16,8 +16,8 @@ import javax.swing.*;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class StartupPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("System Startup");
-    public final static String LABEL = I18n.tr("You can choose whether or not to automatically run FrostWire when your computer starts.");
+    private final static String TITLE = I18n.tr("System Startup");
+    private final static String LABEL = I18n.tr("You can choose whether or not to automatically run FrostWire when your computer starts.");
     /**
      * Constant for the check box that specifies whether or not uploads
      * should be automatically cleared.

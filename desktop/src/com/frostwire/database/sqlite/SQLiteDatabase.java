@@ -60,7 +60,7 @@ public class SQLiteDatabase {
      *
      * @return the path to our database file.
      */
-    public final String getPath() {
+    private String getPath() {
         return path;
     }
 
@@ -214,7 +214,7 @@ public class SQLiteDatabase {
     /**
      * @return true if the DB is currently open (has not been closed)
      */
-    public boolean isOpen() {
+    private boolean isOpen() {
         return open.get();
     }
 
