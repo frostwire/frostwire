@@ -32,6 +32,8 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     private int currentVolume;
     private float currentPositionInSecs;
     private float durationInSecs;
+    private final Object audioTracksLock = new Object();
+    private final Object subtitlesLock = new Object();
     private List<Language> audioTracks;
     private List<Language> subtitles;
     private String openedFile;
@@ -198,7 +200,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void foundAudioTrack(Language language) {
-        synchronized (audioTracks) {
+        synchronized (audioTracksLock) {
             audioTracks.add(language);
         }
         synchronized (metaDataListeners) {
@@ -209,7 +211,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     }
 
     public void foundSubtitle(Language language) {
-        synchronized (subtitles) {
+        synchronized (subtitlesLock) {
             subtitles.add(language);
         }
         synchronized (metaDataListeners) {
