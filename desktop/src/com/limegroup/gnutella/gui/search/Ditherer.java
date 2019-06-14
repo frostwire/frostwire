@@ -9,7 +9,7 @@ public final class Ditherer {
     /**
      * Specifies that the gradient is drawn along horizontal axis.
      */
-    public static final int X_AXIS = 0;
+    private static final int X_AXIS = 0;
     /**
      * Specifies that the gradient is drawn along the vertical axis.
      */
@@ -117,7 +117,7 @@ public final class Ditherer {
     /**
      * Defines how the gradient between the two colors should be drawn.
      */
-    public interface Shader {
+    interface Shader {
         /**
          * Returns a value between 0 and 1 for a value between 0 and 1.
          */

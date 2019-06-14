@@ -24,7 +24,7 @@ import com.frostwire.platform.AppSettings;
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopSettings implements AppSettings {
+final class DesktopSettings implements AppSettings {
     @Override
     public String string(String key) {
         return null;

@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopVPNMonitor implements VPNMonitor {
+final class DesktopVPNMonitor implements VPNMonitor {
     private static final Logger LOG = Logger.getLogger(DesktopVPNMonitor.class);
     // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
     // when VPN is active

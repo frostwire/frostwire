@@ -139,7 +139,7 @@ public class DisplayFormatters {
      * @param precision # of digits after the decimal place
      * @return formatted string
      */
-    static String
+    private static String
     formatDecimal(
             double value,
             int precision) {

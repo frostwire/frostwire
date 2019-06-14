@@ -52,7 +52,7 @@ public final class FatalBugManager {
     /**
      * Reviews the bug.
      */
-    public static void reviewBug(final LocalClientInfo info) {
+    private static void reviewBug(final LocalClientInfo info) {
         final JDialog DIALOG = new JDialog();
         DIALOG.setTitle("Fatal Error");
         final Dimension DIALOG_DIMENSION = new Dimension(100, 300);

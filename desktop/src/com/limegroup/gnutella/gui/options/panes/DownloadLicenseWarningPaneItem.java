@@ -31,8 +31,8 @@ import java.io.IOException;
  * a file without a license.
  */
 public class DownloadLicenseWarningPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("License Warning");
-    public final static String LABEL = I18n.tr("You can choose whether to be warned about downloading a file without a license.");
+    private final static String TITLE = I18n.tr("License Warning");
+    private final static String LABEL = I18n.tr("You can choose whether to be warned about downloading a file without a license.");
     /**
      * Constant for the check box that specifies whether or not downloads
      * should be automatically cleared.

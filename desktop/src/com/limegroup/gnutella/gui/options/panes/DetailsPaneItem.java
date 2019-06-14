@@ -31,8 +31,8 @@ import java.io.IOException;
  * @author aldenml
  */
 public class DetailsPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Details Page");
-    public final static String DETAILS = I18n.tr("Show details web page after a download starts.");
+    private final static String TITLE = I18n.tr("Details Page");
+    private final static String DETAILS = I18n.tr("Show details web page after a download starts.");
     private final JCheckBox DETAILS_CHECK_BOX = new JCheckBox();
 
     public DetailsPaneItem() {

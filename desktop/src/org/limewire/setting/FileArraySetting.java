@@ -77,7 +77,7 @@ public class FileArraySetting extends AbstractSetting {
      *
      * @param value the value to store
      */
-    public synchronized void setValue(File[] value) {
+    private synchronized void setValue(File[] value) {
         setValueInternal(decode(value));
     }
 
@@ -131,7 +131,7 @@ public class FileArraySetting extends AbstractSetting {
     /**
      * Returns the index of the given file in this array, -1 if file is not found.
      */
-    public synchronized int indexOf(File file) {
+    private synchronized int indexOf(File file) {
         if (file == null)
             return -1;
         for (int i = 0; i < value.length; i++) {

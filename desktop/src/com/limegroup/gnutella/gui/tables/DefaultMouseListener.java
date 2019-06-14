@@ -65,7 +65,7 @@ public final class DefaultMouseListener implements MouseListener {
     public void mouseExited(MouseEvent event) {
     }
 
-    public boolean tryPopup(MouseEvent ev) {
+    private boolean tryPopup(MouseEvent ev) {
         if (ev.isPopupTrigger()) {
             cm.handlePopupMenu(ev);
             return true;

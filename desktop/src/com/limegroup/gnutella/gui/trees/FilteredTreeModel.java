@@ -178,7 +178,7 @@ public class FilteredTreeModel implements TreeModel {
         return model.isLeaf(node);
     }
 
-    public boolean isVisible(Object node) {
+    private boolean isVisible(Object node) {
         return visibleNodes == null || visibleNodes.contains(node);
     }
 
@@ -191,7 +191,7 @@ public class FilteredTreeModel implements TreeModel {
         return text;
     }
 
-    public void reload() {
+    private void reload() {
         TreeModelEvent event = new TreeModelEvent(this, new Object[]{model.getRoot()});
         for (TreeModelListener listener : listeners) {
             listener.treeStructureChanged(event);
@@ -225,7 +225,7 @@ public class FilteredTreeModel implements TreeModel {
     /**
      * Sets all nodes visible.
      */
-    public void reset() {
+    private void reset() {
         this.visibleNodes = null;
         reload();
     }
@@ -252,7 +252,7 @@ public class FilteredTreeModel implements TreeModel {
     /**
      * Interface to retrieve parent nodes.
      */
-    public interface ParentProvider {
+    interface ParentProvider {
         /**
          * Returns the parent of <code>node</code>.
          *

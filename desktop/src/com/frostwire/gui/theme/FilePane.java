@@ -349,7 +349,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         return fileChooserUIAccessor.getFileChooser();
     }
 
-    protected BasicDirectoryModel getModel() {
+    private BasicDirectoryModel getModel() {
         return fileChooserUIAccessor.getModel();
     }
 
@@ -436,7 +436,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         }
     }
 
-    protected void installDefaults() {
+    void installDefaults() {
         Locale l = getFileChooser().getLocale();
         listViewBorder = UIManager.getBorder("FileChooser.listViewBorder");
         listViewBackground = UIManager.getColor("FileChooser.listViewBackground");
@@ -1158,7 +1158,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         }
     }
 
-    public JMenu getViewMenu() {
+    JMenu getViewMenu() {
         if (viewMenu == null) {
             viewMenu = new JMenu(viewMenuLabelText);
             ButtonGroup viewButtonGroup = new ButtonGroup();
@@ -1241,7 +1241,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
      *
      * @return the value of the <code>directory</code> property
      */
-    protected File getDirectory() {
+    private File getDirectory() {
         return fileChooserUIAccessor.getDirectory();
     }
 
@@ -1261,7 +1261,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
         return null;
     }
 
-    public boolean canWrite(File f) {
+    private boolean canWrite(File f) {
         // Return false for non FileSystem files or if file doesn't exist.
         if (!f.exists()) {
             return false;
@@ -1526,7 +1526,7 @@ public class FilePane extends JPanel implements PropertyChangeListener {
             fireTableRowsDeleted(e.getIndex0(), e.getIndex1());
         }
 
-        public ShellFolderColumnInfo[] getColumns() {
+        ShellFolderColumnInfo[] getColumns() {
             return columns;
         }
     }

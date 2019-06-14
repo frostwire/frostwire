@@ -294,7 +294,7 @@ public class FileUtils {
      * @param directory
      * @return
      */
-    public static boolean deleteRecursive(File directory) {
+    private static boolean deleteRecursive(File directory) {
         // make sure we only delete canonical children of the parent file we
         // wish to delete. I have a hunch this might be an issue on OSX and
         // Linux under certain circumstances.
@@ -333,7 +333,7 @@ public class FileUtils {
      * @return the number of bytes actually copied.  Returns 'amount' if the
      * entire requested range was copied.
      */
-    public static long copy(File src, long amount, File dst) {
+    private static long copy(File src, long amount, File dst) {
         final int BUFFER_SIZE = 1024;
         long amountToRead = amount;
         InputStream in = null;

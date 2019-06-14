@@ -261,7 +261,7 @@ public class ExternalControl {
     }
 
     //refactored the download logic into a separate method
-    public void handleMagnetRequest(String arg) {
+    private void handleMagnetRequest(String arg) {
         LOG.info("enter handleMagnetRequest");
         if (isTorrentMagnetRequest(arg)) {
             LOG.info("ExternalControl.handleMagnetRequest(" + arg + ") -> handleTorrentMagnetRequest()");

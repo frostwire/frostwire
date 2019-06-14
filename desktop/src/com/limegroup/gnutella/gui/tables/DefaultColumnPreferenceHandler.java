@@ -39,7 +39,7 @@ public class DefaultColumnPreferenceHandler implements ColumnPreferenceHandler, 
     /**
      * The current SimpleColumnListener for callbacks.
      */
-    protected SimpleColumnListener listener = null;
+    private SimpleColumnListener listener = null;
     /**
      * Indicates a margin has been changed since we last released the mouse.
      */

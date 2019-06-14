@@ -124,7 +124,7 @@ public class DNDUtils {
      *
      * @return empty array if no uri denotes a local file
      */
-    public static File[] getFiles(URI[] uris) {
+    private static File[] getFiles(URI[] uris) {
         ArrayList<File> files = new ArrayList<>(uris.length);
         for (URI uri : uris) {
             String scheme = uri.getScheme();

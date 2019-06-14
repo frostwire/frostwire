@@ -28,7 +28,7 @@ import java.awt.*;
  * @author gubatron
  * @author aldenml
  */
-public class DonationButtons extends JPanel {
+class DonationButtons extends JPanel {
     private static final Color FONT_COLOR = new Color(0x1f3545);
 
     DonationButtons() {

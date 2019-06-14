@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 /**
  * Simple class to help monitor deadlocking.
  */
-public class DeadlockSupport {
+class DeadlockSupport {
     /**
      * How often to check for deadlocks.
      * <p>

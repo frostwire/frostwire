@@ -21,7 +21,7 @@ import com.frostwire.database.Cursor;
 /**
  * Static utility methods for dealing with databases and {@link Cursor}s.
  */
-public class DatabaseUtils {
+class DatabaseUtils {
     /**
      * Appends an SQL string to the given StringBuilder, including the opening
      * and closing single quotes. Any single quotes internal to sqlString will

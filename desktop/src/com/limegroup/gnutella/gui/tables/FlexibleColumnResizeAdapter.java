@@ -29,11 +29,11 @@ import java.awt.event.MouseEvent;
  * &nbsp;&nbsp; Alt key: AUTO_RESIZE_ALL_COLUMNS <br>
  * You may choose a different order by using the other constructor.
  */
-public class FlexibleColumnResizeAdapter extends MouseAdapter {
-    final int dMode;
-    final int sMode;
-    final int cMode;
-    final int aMode;
+class FlexibleColumnResizeAdapter extends MouseAdapter {
+    private final int dMode;
+    private final int sMode;
+    private final int cMode;
+    private final int aMode;
 
     /**
      * Create a FlexibleColumnResizeAdapter with the default settings, as
@@ -56,8 +56,8 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
      * @param controlMode The resize mode when the control key is pressed
      * @param altMode     The resize mode when the alt key is pressed
      */
-    public FlexibleColumnResizeAdapter(int defaultMode, int shiftMode,
-                                       int controlMode, int altMode) {
+    private FlexibleColumnResizeAdapter(int defaultMode, int shiftMode,
+                                        int controlMode, int altMode) {
         dMode = defaultMode;
         sMode = shiftMode;
         cMode = controlMode;

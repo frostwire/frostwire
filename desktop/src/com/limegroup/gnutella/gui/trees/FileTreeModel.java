@@ -183,7 +183,7 @@ public class FileTreeModel extends AbstractTreeModel {
         this.filter = filter;
     }
 
-    public static class FileComparator implements Comparator<File> {
+    static class FileComparator implements Comparator<File> {
         public int compare(File o1, File o2) {
             return o1.getAbsolutePath().compareToIgnoreCase(
                     o2.getAbsolutePath());

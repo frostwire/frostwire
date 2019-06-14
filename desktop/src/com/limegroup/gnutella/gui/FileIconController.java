@@ -3,7 +3,7 @@ package com.limegroup.gnutella.gui;
 import javax.swing.*;
 import java.io.File;
 
-public interface FileIconController {
+interface FileIconController {
     /**
      * Retrieves the icon for a given file.
      * <p>
