@@ -36,7 +36,7 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
     private List<Language> subtitles;
     private String openedFile;
 
-    public BaseMediaPlayer(PlayerPreferences preferences) {
+    protected BaseMediaPlayer(PlayerPreferences preferences) {
         this.preferences = preferences;
         metaDataListeners = new ArrayList<>(1);
         stateListeners = new ArrayList<>(1);
@@ -79,27 +79,27 @@ public abstract class BaseMediaPlayer implements MediaPlayer, MetaDataListener, 
         }
     }
 
-    public abstract void setStateListener(StateListener listener);
+    protected abstract void setStateListener(StateListener listener);
 
-    public abstract void setVolumeListener(VolumeListener listener);
+    protected abstract void setVolumeListener(VolumeListener listener);
 
-    public abstract void setMetaDataListener(MetaDataListener listener);
+    protected abstract void setMetaDataListener(MetaDataListener listener);
 
-    public abstract void setPositionListener(PositionListener listener);
+    protected abstract void setPositionListener(PositionListener listener);
 
-    public abstract void setIcyInfoListener(IcyInfoListener listener);
+    protected abstract void setIcyInfoListener(IcyInfoListener listener);
 
-    public abstract void doOpen(String fileOrUrl, int initialVolume);
+    protected abstract void doOpen(String fileOrUrl, int initialVolume);
 
-    public abstract void doPause();
+    protected abstract void doPause();
 
-    public abstract void doResume();
+    protected abstract void doResume();
 
-    public abstract void doStop();
+    protected abstract void doStop();
 
-    public abstract void doSeek(float timeInSecs);
+    protected abstract void doSeek(float timeInSecs);
 
-    public abstract void doSetVolume(int volume);
+    protected abstract void doSetVolume(int volume);
 
     @SuppressWarnings("unused")
     public abstract void doLoadSubtitlesFile(String file, boolean autoPlay);

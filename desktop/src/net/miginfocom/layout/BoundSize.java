@@ -49,7 +49,7 @@ import java.io.*;
  */
 public class BoundSize implements Serializable {
     public static final BoundSize NULL_SIZE = new BoundSize(null, null);
-    public static final BoundSize ZERO_PIXEL = new BoundSize(UnitValue.ZERO, "0px");
+    private static final BoundSize ZERO_PIXEL = new BoundSize(UnitValue.ZERO, "0px");
     // ************************************************
     // Persistence Delegate and Serializable combined.
     // ************************************************
@@ -85,7 +85,7 @@ public class BoundSize implements Serializable {
      * @param minMaxPref   The value to use for min/preferred/max size.
      * @param createString The string used to create the BoundsSize.
      */
-    public BoundSize(UnitValue minMaxPref, String createString) {
+    private BoundSize(UnitValue minMaxPref, String createString) {
         this(minMaxPref, minMaxPref, minMaxPref, createString);
     }
 
@@ -225,7 +225,7 @@ public class BoundSize implements Serializable {
      *
      * @return A String. Never <code>null</code>.
      */
-    String getConstraintString() {
+    private String getConstraintString() {
         String cs = LayoutUtil.getCCString(this);
         if (cs != null)
             return cs;

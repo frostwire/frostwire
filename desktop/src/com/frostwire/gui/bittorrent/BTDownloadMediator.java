@@ -899,12 +899,12 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return true;
         }
 
-        public void update(TransfersTab.FilterMode mode, String searchKeywords) {
+        void update(TransfersTab.FilterMode mode, String searchKeywords) {
             this.mode = mode;
             this.searchKeywords = searchKeywords;
         }
 
-        public void update(String searchKeywords) {
+        void update(String searchKeywords) {
             this.searchKeywords = searchKeywords;
         }
     }

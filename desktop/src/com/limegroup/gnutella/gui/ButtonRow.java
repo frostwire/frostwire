@@ -25,7 +25,7 @@ public final class ButtonRow extends JPanel {
     /**
      * Specifies that the buttons should be aligned along the y axis.
      */
-    public static final int Y_AXIS = BoxLayout.Y_AXIS;
+    private static final int Y_AXIS = BoxLayout.Y_AXIS;
     /**
      * This will create a "glue" at the top of the button panel, pushing
      * the buttons to the bottom.
@@ -91,12 +91,12 @@ public final class ButtonRow extends JPanel {
         this(labelKeys, toolTipKeys, listeners, null, orientation, glue);
     }
 
-    public ButtonRow(String[] labelKeys,
-                     String[] toolTipKeys,
-                     EventListener[] listeners,
-                     String[] iconNames,
-                     int orientation,
-                     int glue) {
+    private ButtonRow(String[] labelKeys,
+                      String[] toolTipKeys,
+                      EventListener[] listeners,
+                      String[] iconNames,
+                      int orientation,
+                      int glue) {
         if ((labelKeys.length != listeners.length) ||
                 (toolTipKeys.length != listeners.length)) {
             throw new IllegalArgumentException("invalid ButtonRow constructor: " +
@@ -177,7 +177,7 @@ public final class ButtonRow extends JPanel {
         this(actions, orientation, glue, null);
     }
 
-    public ButtonRow(Action[] actions, int orientation, int glue, JComponent extraComponent) {
+    private ButtonRow(Action[] actions, int orientation, int glue, JComponent extraComponent) {
         BoxLayout bl = new BoxLayout(this, orientation);
         setLayout(bl);
         final int sepLength = actions.length - 1;

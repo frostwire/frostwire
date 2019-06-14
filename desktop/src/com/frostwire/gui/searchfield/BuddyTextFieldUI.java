@@ -15,7 +15,7 @@ import java.awt.*;
 public class BuddyTextFieldUI extends PromptTextFieldUI {
     // Bad hacking: FIXME when know how to get the real margin.
     private static final Insets MAC_MARGIN = new Insets(0, 2, 1, 2);
-    protected BuddyLayoutAndBorder layoutAndBorder;
+    private BuddyLayoutAndBorder layoutAndBorder;
 
     /**
      * Creates a new {@link BuddyTextFieldUI} which delegates most work to
@@ -56,7 +56,7 @@ public class BuddyTextFieldUI extends PromptTextFieldUI {
         layoutAndBorder.install((JTextField) c);
     }
 
-    protected BuddyLayoutAndBorder createBuddyLayoutAndBorder() {
+    BuddyLayoutAndBorder createBuddyLayoutAndBorder() {
         return new BuddyLayoutAndBorder();
     }
 

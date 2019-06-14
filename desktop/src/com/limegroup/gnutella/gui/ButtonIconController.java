@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 
-public class ButtonIconController {
+class ButtonIconController {
     /**
      * A mapping of user-friendly names to the file name
      * of the icon.

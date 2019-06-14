@@ -17,7 +17,7 @@ public class BuddyButton extends JButton {
         this(null);
     }
 
-    public BuddyButton(String text) {
+    private BuddyButton(String text) {
         super(text);
         setFocusable(false);
         setMargin(SearchFieldUI.NO_INSETS);

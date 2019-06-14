@@ -353,13 +353,13 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         //        }
     }
 
-    public interface SpeedAdapter {
+    interface SpeedAdapter {
         void setUpSpeed(int val);
 
         void setDownSpeed(int val);
     }
 
-    public static class EditTrackersAction extends AbstractAction {
+    static class EditTrackersAction extends AbstractAction {
         private final com.frostwire.bittorrent.BTDownload dm;
 
         EditTrackersAction(com.frostwire.bittorrent.BTDownload dm) {
@@ -373,7 +373,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
     }
 
-    public static class UpdateTrackerAction extends AbstractAction {
+    static class UpdateTrackerAction extends AbstractAction {
         private final com.frostwire.bittorrent.BTDownload dm;
 
         UpdateTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
@@ -387,7 +387,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
     }
 
-    public static class ScrapeTrackerAction extends AbstractAction {
+    static class ScrapeTrackerAction extends AbstractAction {
         private final com.frostwire.bittorrent.BTDownload dm;
 
         ScrapeTrackerAction(com.frostwire.bittorrent.BTDownload dm) {
@@ -411,7 +411,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             setLocationRelativeTo(frame);
         }
 
-        protected void setupUI() {
+        void setupUI() {
             setTitle(I18n.tr("Edit trackers"));
             Dimension dim = new Dimension(512, 400);
             setSize(dim);

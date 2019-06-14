@@ -73,7 +73,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Constructor -- creates the model, tying it to
      * a specific DataLine class.
      */
-    public BasicDataLineModel(Class<? extends T> dataLineClass) {
+    protected BasicDataLineModel(Class<? extends T> dataLineClass) {
         _dataLineClass = dataLineClass;
         _internalDataLine = createDataLine();
     }
@@ -203,7 +203,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Extending classes should override this to change the way
      * DataLine's are instantiated.
      */
-    public T createDataLine() {
+    protected T createDataLine() {
         try {
             return _dataLineClass.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException | NoSuchMethodException e) {

@@ -364,7 +364,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         useShellFolder = Objects.requireNonNullElseGet(prop, () -> fc.getFileSystemView().equals(FileSystemView.getFileSystemView()));
     }
 
-    protected JPanel getButtonPanel() {
+    private JPanel getButtonPanel() {
         if (buttonPanel == null) {
             buttonPanel = new JPanel();
         }
@@ -422,7 +422,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         return filePane.createList();
     }
 
-    protected JPanel createDetailsView(JFileChooser fc) {
+    private JPanel createDetailsView(JFileChooser fc) {
         return filePane.createDetailsView();
     }
 
@@ -688,11 +688,11 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         };
     }
 
-    protected void removeControlButtons() {
+    private void removeControlButtons() {
         getBottomPanel().remove(getButtonPanel());
     }
 
-    protected void addControlButtons() {
+    private void addControlButtons() {
         getBottomPanel().add(getButtonPanel());
     }
 
@@ -750,28 +750,28 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         // PENDING(jeff) - set the name in the directory combobox
     }
 
-    protected DirectoryComboBoxRenderer createDirectoryComboBoxRenderer(JFileChooser fc) {
+    private DirectoryComboBoxRenderer createDirectoryComboBoxRenderer(JFileChooser fc) {
         return new DirectoryComboBoxRenderer();
     }
 
     //
     // DataModel for DirectoryComboxbox
     //
-    protected DirectoryComboBoxModel createDirectoryComboBoxModel(JFileChooser fc) {
+    private DirectoryComboBoxModel createDirectoryComboBoxModel(JFileChooser fc) {
         return new DirectoryComboBoxModel();
     }
 
     //
     // Renderer for Types ComboBox
     //
-    protected FilterComboBoxRenderer createFilterComboBoxRenderer() {
+    private FilterComboBoxRenderer createFilterComboBoxRenderer() {
         return new FilterComboBoxRenderer();
     }
 
     //
     // DataModel for Types Comboxbox
     //
-    protected FilterComboBoxModel createFilterComboBoxModel() {
+    private FilterComboBoxModel createFilterComboBoxModel() {
         return new FilterComboBoxModel();
     }
 
@@ -911,7 +911,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     }
 
     // Obsolete class, not used in this version.
-    protected class SingleClickListener extends MouseAdapter {
+    private class SingleClickListener extends MouseAdapter {
         public SingleClickListener(JList<Object> list) {
         }
     }
@@ -986,7 +986,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         final JFileChooser chooser = getFileChooser();
         final FileSystemView fsv = chooser.getFileSystemView();
 
-        public DirectoryComboBoxModel() {
+        DirectoryComboBoxModel() {
             // Add the current directory to the model, and make it the
             // selectedDirectory
             File dir = getFileChooser().getCurrentDirectory();
@@ -1076,7 +1076,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             }
         }
 
-        public int getDepth(int i) {
+        int getDepth(int i) {
             return (depths != null && i >= 0 && i < depths.length) ? depths[i] : 0;
         }
 
@@ -1126,9 +1126,9 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
          *
          */
         private static final long serialVersionUID = -1131578002217361954L;
-        protected FileFilter[] filters;
+        FileFilter[] filters;
 
-        protected FilterComboBoxModel() {
+        FilterComboBoxModel() {
             super();
             filters = getFileChooser().getChoosableFileFilters();
         }
@@ -1196,7 +1196,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
     /**
      * Acts when DirectoryComboBox has changed the selected item.
      */
-    protected class DirectoryComboBoxAction extends AbstractAction {
+    class DirectoryComboBoxAction extends AbstractAction {
         DirectoryComboBoxAction() {
             super("DirectoryComboBoxAction");
         }

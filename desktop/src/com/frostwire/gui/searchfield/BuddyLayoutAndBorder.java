@@ -21,7 +21,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
      * given text field. Registers a {@link PropertyChangeListener} to wrap any
      * subsequently set border on the text field.
      */
-    protected void install(JTextField textField) {
+    void install(JTextField textField) {
         uninstall();
         this.textField = textField;
         textField.setLayout(this);
@@ -38,7 +38,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
      * honor the button margins and sizes of the search, clear and popup buttons
      * and the layout style.
      */
-    protected void replaceBorderIfNecessary() {
+    void replaceBorderIfNecessary() {
         Border original = textField.getBorder();
         if (!(original instanceof BuddyLayoutAndBorder)) {
             borderDelegate = original;
@@ -107,7 +107,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
         }
     }
 
-    protected int centerY(Rectangle rect, Dimension size) {
+    private int centerY(Rectangle rect, Dimension size) {
         return (int) (rect.getCenterY() - (size.height / 2));
     }
 
@@ -116,7 +116,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
      * allocated by the child components left and right, the text fields
      * original border insets and the outer margin.
      */
-    protected Rectangle getVisibleRect() {
+    private Rectangle getVisibleRect() {
         Rectangle alloc = SwingUtilities.getLocalBounds(textField);
         substractInsets(alloc, getRealBorderInsets());
         substractInsets(alloc, BuddySupport.getOuterMargin(textField));

@@ -34,7 +34,7 @@ public class BuddySupport {
         add(c, Position.RIGHT, textField);
     }
 
-    public static void add(Component c, Position pos, JTextField textField) {
+    private static void add(Component c, Position pos, JTextField textField) {
         TextUIWrapper.getDefaultWrapper().install(textField, true);
         List<Component> leftBuddies = buddies(Position.LEFT, textField);
         List<Component> rightBuddies = buddies(Position.RIGHT, textField);
@@ -61,7 +61,7 @@ public class BuddySupport {
         set(leftBuddies, Position.LEFT, textField);
     }
 
-    public static void set(List<Component> buddies, Position pos, JTextField textField) {
+    private static void set(List<Component> buddies, Position pos, JTextField textField) {
         textField.putClientProperty(pos, buddies);
     }
 
