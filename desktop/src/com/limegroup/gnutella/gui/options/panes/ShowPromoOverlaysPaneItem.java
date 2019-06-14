@@ -72,9 +72,8 @@ public final class ShowPromoOverlaysPaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         UpdateManagerSettings.SHOW_PROMOTION_OVERLAYS.setValue(CHECK_BOX.isSelected());
         return false;
     }

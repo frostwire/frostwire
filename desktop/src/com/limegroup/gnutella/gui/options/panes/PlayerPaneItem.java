@@ -69,9 +69,8 @@ public final class PlayerPaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         PlayerSettings.USE_OS_DEFAULT_PLAYER.setValue(CHECK_BOX.isSelected());
         PlayerSettings.USE_FW_PLAYER_FOR_CLOUD_VIDEO_PREVIEWS.setValue(VIDEO_PREVIEW_WITH_INTERNAL_PLAYER_CHECK_BOX.isSelected());
         return false;

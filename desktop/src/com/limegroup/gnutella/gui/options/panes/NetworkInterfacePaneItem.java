@@ -131,9 +131,8 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
-     * @throws IOException if the options could not be fully applied
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         boolean isDirty = isDirty();
         if (!isDirty) {
             return false;

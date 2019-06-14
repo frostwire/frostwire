@@ -256,7 +256,7 @@ public class BoundSize implements Serializable {
             throw new IllegalArgumentException("Size may not contain links");
     }
 
-    protected Object readResolve() throws ObjectStreamException {
+    protected Object readResolve() {
         return LayoutUtil.getSerializedObject(this);
     }
 
@@ -265,7 +265,7 @@ public class BoundSize implements Serializable {
             LayoutUtil.writeAsXML(out, this);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException {
         LayoutUtil.setSerializedObject(this, LayoutUtil.readAsXML(in));
     }
 }

@@ -53,7 +53,7 @@ public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         SharingSettings.SEED_FINISHED_TORRENTS.setValue(COMPONENT.wantsSeeding());
         if (!COMPONENT.wantsSeeding()) {
             BTDownloadMediator.instance().stopCompleted();

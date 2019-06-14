@@ -686,7 +686,7 @@ public final class CC implements Externalizable {
     // Persistence Delegate and Serializable combined.
     // ************************************************
 
-    private Object readResolve() throws ObjectStreamException {
+    private Object readResolve() {
         return LayoutUtil.getSerializedObject(this);
     }
 

@@ -97,7 +97,7 @@ public class FileTransferable implements Transferable {
     }
 
     public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
+            throws UnsupportedFlavorException {
         if (flavor.equals(DataFlavor.javaFileListFlavor)) {
             return getFiles();
         } else if ((URIFlavor != null && URIFlavor.equals(flavor)) ||

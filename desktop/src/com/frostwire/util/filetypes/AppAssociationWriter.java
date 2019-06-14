@@ -68,22 +68,18 @@ public interface AppAssociationWriter {
      *
      * @param assoc a given Association object.
      * @param level a given registration level
-     * @throws AssociationAlreadyRegisteredException if the given association has
-     *                                               been registered in the system.
      * @throws RegisterFailedException               if the given association fails to be registered.
      */
     void registerAssociation(Association assoc, int level)
-            throws AssociationAlreadyRegisteredException, RegisterFailedException;
+            throws RegisterFailedException;
 
     /**
      * Unregisters the given association in specified level.
      *
      * @param assoc a given Association object.
      * @param level a given registration level
-     * @throws AssociationNotRegisteredException if the given association has not been
-     *                                           registered before.
      * @throws RegisterFailedException           if the given association fails to be unregistered.
      */
     void unregisterAssociation(Association assoc, int level)
-            throws AssociationNotRegisteredException, RegisterFailedException;
+            throws RegisterFailedException;
 }

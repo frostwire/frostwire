@@ -140,7 +140,7 @@ abstract class ShellFolder extends File {
      * <p>
      * if no suitable replacement can be found.
      */
-    protected abstract Object writeReplace() throws java.io.ObjectStreamException;
+    protected abstract Object writeReplace();
 
     /**
      * Returns the path for this object's parent,

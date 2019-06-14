@@ -55,9 +55,8 @@ public final class AutoCompletePaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         UISettings.AUTOCOMPLETE_ENABLED.setValue(CHECK_BOX.isSelected());
         return false;
     }

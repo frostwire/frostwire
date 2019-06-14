@@ -30,7 +30,7 @@ public class AutomaticInstallerDownloadPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         UpdateSettings.AUTOMATIC_INSTALLER_DOWNLOAD.setValue(_checkbox.isSelected());
         return isDirty;
     }

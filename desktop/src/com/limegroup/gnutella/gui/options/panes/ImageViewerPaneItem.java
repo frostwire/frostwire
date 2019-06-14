@@ -50,9 +50,8 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
-     * @throws IOException if the options could not be fully applied
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         URLHandlerSettings.IMAGE_VIEWER.setValue(_viewerField.getText());
         return false;
     }

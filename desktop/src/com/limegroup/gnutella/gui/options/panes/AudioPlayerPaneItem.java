@@ -44,9 +44,8 @@ public class AudioPlayerPaneItem extends AbstractPaneItem {
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
-     * @throws IOException if the options could not be fully applied
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         URLHandlerSettings.AUDIO_PLAYER.setValue(_playerField.getText());
         return false;
     }

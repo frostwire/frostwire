@@ -72,7 +72,7 @@ public class ExperimentalFeaturesPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         if (FrostWireUtils.isIsRunningFromSource()) {
             // no need to save these settings when running from source
             return false;

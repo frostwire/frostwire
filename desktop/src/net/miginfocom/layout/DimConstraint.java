@@ -453,11 +453,11 @@ public final class DimConstraint implements Externalizable {
     // Persistence Delegate and Serializable combined.
     // ************************************************
 
-    private Object readResolve() throws ObjectStreamException {
+    private Object readResolve() {
         return LayoutUtil.getSerializedObject(this);
     }
 
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException {
         LayoutUtil.setSerializedObject(this, LayoutUtil.readAsXML(in));
     }
 

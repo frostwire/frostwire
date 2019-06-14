@@ -50,7 +50,7 @@ public class SearchResultTransferable implements Transferable {
         return flavor.equals(dataFlavor);
     }
 
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
         if (!isDataFlavorSupported(flavor))
             throw new UnsupportedFlavorException(flavor);
         else

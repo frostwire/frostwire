@@ -514,7 +514,7 @@ public final class UnitValue implements Serializable {
         return (int) (value * 12345) + (oper >>> 5) + unit >>> 17;
     }
 
-    private Object readResolve() throws ObjectStreamException {
+    private Object readResolve() {
         return LayoutUtil.getSerializedObject(this);
     }
 
@@ -523,7 +523,7 @@ public final class UnitValue implements Serializable {
             LayoutUtil.writeAsXML(out, this);
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException {
         LayoutUtil.setSerializedObject(this, LayoutUtil.readAsXML(in));
     }
 }

@@ -65,9 +65,8 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         Vector<?> model = RESULTS_LIST.getModel();
         String[] bannedResults = new String[model.size()];
         model.copyInto(bannedResults);

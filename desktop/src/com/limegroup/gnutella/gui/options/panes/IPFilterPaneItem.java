@@ -378,7 +378,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         return false;
     }
 

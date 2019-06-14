@@ -528,7 +528,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             private String socialLink;
 
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 if (currentMedia != null && (currentMedia.getFile() != null || currentMedia.getPlaylistItem() != null)) {
                     String commentToParse = "";
                     if (currentMedia.getFile() != null) {
@@ -607,7 +607,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             private String playlistName;
 
             @Override
-            protected Void doInBackground() throws Exception {
+            protected Void doInBackground() {
                 if (currentMedia == null) {
                     return null;
                 }

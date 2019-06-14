@@ -59,7 +59,7 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     public void initOptions() {
     }
 
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         return false;
     }
 
