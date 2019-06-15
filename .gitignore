@@ -56,3 +56,4 @@ local.properties
 .idea
 android/captures/
 /desktop/out
+*.vs/
