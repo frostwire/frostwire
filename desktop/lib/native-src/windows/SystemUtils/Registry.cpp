@@ -10,39 +10,6 @@
 
 // Takes a root key handle name, a key path, and a registry variable name
 // Gets the information from the registry
-// Returns the number, or 0 if not found or any error
-JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_registryReadNumberNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name) {
-	return RegistryReadNumber(e, RegistryName(GetJavaString(e, root)), GetJavaString(e, path), GetJavaString(e, name));
-}
-int RegistryReadNumber(JNIEnv *e, HKEY root, LPCTSTR path, LPCTSTR name) {
-
-	// Open the key
-	CRegistry registry;
-	if (!registry.Open(root, path, false)) return 0;
-
-	// Read the number value
-	DWORD d;
-	DWORD size = sizeof(DWORD);
-	int result = RegQueryValueEx(
-		registry.Key, // Handle to an open key
-		name,         // Name of the value to read
-		0,
-		NULL,
-		(LPBYTE)&d,   // Data buffer
-		&size);       // Size of data buffer
-	if (result != ERROR_SUCCESS) {
-
-		// Throw an exception back to Java
-		ThrowIOException(e, _T("couldn't read integer"));
-		return 0;
-	}
-
-	// Return the number
-	return d;
-}
-
-// Takes a root key handle name, a key path, and a registry variable name
-// Gets the information from the registry
 // Returns the text, blank if not found or any error
 JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_registryReadTextNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name) {
 	return MakeJavaString(e, RegistryReadText(e, RegistryName(GetJavaString(e, root)), GetJavaString(e, path), GetJavaString(e, name)));

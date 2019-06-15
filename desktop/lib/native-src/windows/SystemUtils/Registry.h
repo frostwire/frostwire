@@ -10,7 +10,6 @@ extern "C" {
 #endif
 
 	// Functions in Registry.cpp
-	JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_registryReadNumberNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name);
 	JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_registryReadTextNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name);
 	JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_registryWriteNumberNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name, jint value);
 	JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_registryWriteTextNative(JNIEnv *e, jclass c, jstring root, jstring path, jstring name, jstring value);
@@ -38,7 +37,6 @@ public:
 };
 
 // Functions in Registry.cpp
-int RegistryReadNumber(JNIEnv *e, HKEY root, LPCTSTR path, LPCTSTR name);
 CString RegistryReadText(JNIEnv *e, HKEY root, LPCTSTR path, LPCTSTR name);
 bool RegistryWriteNumber(HKEY root, LPCTSTR path, LPCTSTR name, int value);
 bool RegistryWriteText(HKEY root, LPCTSTR path, LPCTSTR name, LPCTSTR value);
