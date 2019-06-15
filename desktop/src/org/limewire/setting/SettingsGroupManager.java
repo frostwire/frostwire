@@ -1,9 +1,6 @@
 package org.limewire.setting;
 
 import org.limewire.concurrent.ExecutorsHelper;
-import org.limewire.setting.evt.SettingsGroupManagerEvent;
-import org.limewire.setting.evt.SettingsGroupManagerEvent.EventType;
-import org.limewire.setting.evt.SettingsGroupManagerListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +25,7 @@ public final class SettingsGroupManager {
      * The Executor for the Events
      */
     private final Executor executor = ExecutorsHelper.newFixedSizeThreadPool(1, "SettingsHandlerEventDispatcher");
+
     // never instantiate this class.
     private SettingsGroupManager() {
     }
@@ -40,19 +38,11 @@ public final class SettingsGroupManager {
     }
 
     /**
-     * Returns all {@link SettingsGroupManagerListener}s or null if there are none
-     */
-    private SettingsGroupManagerListener[] getSettingsHandlerListeners() {
-        return null;
-    }
-
-    /**
      * Adds a settings class to the list of factories that
      * this handler will act upon.
      */
     void addSettingsGroup(SettingsGroup group) {
         PROPS.add(group);
-        fireSettingsHandlerEvent(EventType.SETTINGS_GROUP_ADDED, group);
     }
 
     /**
@@ -64,7 +54,6 @@ public final class SettingsGroupManager {
                 group.reload();
             }
         }
-        fireSettingsHandlerEvent(EventType.RELOAD, null);
     }
 
     /**
@@ -76,9 +65,6 @@ public final class SettingsGroupManager {
             for (SettingsGroup group : PROPS) {
                 any |= group.save();
             }
-        }
-        if (any) {
-            fireSettingsHandlerEvent(EventType.SAVE, null);
         }
         return any;
     }
@@ -93,26 +79,7 @@ public final class SettingsGroupManager {
                 any |= group.revertToDefault();
             }
         }
-        if (any) {
-            fireSettingsHandlerEvent(EventType.REVERT_TO_DEFAULT, null);
-        }
         return any;
-    }
-
-    /**
-     * Fires a SettingsHandlerEvent
-     */
-    private void fireSettingsHandlerEvent(EventType type, SettingsGroup group) {
-        fireSettingsHandlerEvent(new SettingsGroupManagerEvent(type, this, group));
-    }
-
-    /**
-     * Fires a SettingsHandlerEvent
-     */
-    private void fireSettingsHandlerEvent(final SettingsGroupManagerEvent evt) {
-        if (evt == null) {
-            throw new NullPointerException("SettingsHandlerEvent is null");
-        }
     }
 
     /**
