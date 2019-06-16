@@ -3,10 +3,11 @@
 //  GURL
 //
 //  Created by Curtis Jones on 2008.04.08.
-//  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
-
-#import <JavaVM/jni.h>
+//
+// June 15th 2019
+// cc -framework Foundation -framework CoreServices -framework CoreFoundation -dynamiclib -o ../../native/libMacOSXUtils.jnilib -I${JAVA_HOME}/include MacOSXUtils.m -I{$JAVA_HOME}/include/darwin -arch x86_64
+#import <jni.h>
 #import <Foundation/Foundation.h>
 
 #ifdef __cplusplus
@@ -39,7 +40,8 @@ JNIEXPORT void JNICALL OS_NATIVE(SetLoginStatusNative)
                                                                      kLSSharedFileListItemLast, NULL, NULL,
                                                                      url, NULL, NULL);
             if (item){
-                CFRelease(item);
+              NSLog(@"Objective-C:SetLoginStatusNative(appPath=%@)", appPath);
+              CFRelease(item);
             }
             
         } else {
@@ -56,7 +58,8 @@ JNIEXPORT void JNICALL OS_NATIVE(SetLoginStatusNative)
                 //Resolve the item with URL
                 if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
                     NSString * urlPath = [(NSURL*)url path];
-                    
+                    NSLog(@"Objective-C:SetLoginStatusNative(urlPath=%@)", urlPath);
+                    CFRelease(urlPath);
                     if ([urlPath compare:appPath] == NSOrderedSame){
                         LSSharedFileListItemRemove(loginItems,itemRef);
                     }
