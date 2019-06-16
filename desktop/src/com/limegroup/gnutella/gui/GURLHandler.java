@@ -29,7 +29,7 @@ public final class GURLHandler {
 
     static {
         try {
-            System.loadLibrary("GURLLeopard");
+            System.loadLibrary("GURL");
         } catch (Throwable err) {
             ErrorService.error(err);
         }
@@ -48,9 +48,12 @@ public final class GURLHandler {
      */
     public void register() {
         if (!registered) {
-            if (InstallEventHandler() == 0) {
-                //System.out.println("GURLHandler - AppleEvent handler registered");
+            int error = InstallEventHandler();
+            if (error == 0) {
+                LOG.info("GURLHandler.register() AppleEvent handler registered");
                 registered = true;
+            } else {
+                LOG.error("GURLHandler.register() AppleEvent handler not registered, error " + error);
             }
         }
     }

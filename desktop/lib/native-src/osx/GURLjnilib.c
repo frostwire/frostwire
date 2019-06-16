@@ -1,17 +1,13 @@
 
-#include <JavaVM/jni.h>
+#include <jni.h>
 #include <Carbon/Carbon.h>
 
 static JavaVM *jvm;
 static jobject ref;
 static jmethodID mid;
 
-// compile with:
-// cc -c -dynamiclib -o libGURL.ppc -I/System/Library/Frameworks/JavaVM.framework/Headers GURLjnilib.c -arch ppc
-// cc -c -dynamiclib -o libGURL.i386 -I/System/Library/Frameworks/JavaVM.framework/Headers GURLjnilib.c -arch i386
-// cc -dynamiclib -o libGURL.jnilib libGURL.ppc libGURL.i386 -framework JavaVM -framework Carbon -arch ppc -arch i386
-
-// or build two thin JNI libraries and merge them with lipo to an Universal Binary
+// June 15th 2019
+// cc -framework Carbon -dynamiclib -o ../../native/libGURL.jnilib -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin GURLjnilib.c -arch x86_64
 
 #define OS_NATIVE(func)	Java_com_limegroup_gnutella_gui_GURLHandler_##func
 
