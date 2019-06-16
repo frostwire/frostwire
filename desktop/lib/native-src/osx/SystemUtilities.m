@@ -5,14 +5,15 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
-#include <JavaVM/jni.h>
+#include <jni.h>
 #include <ApplicationServices/ApplicationServices.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-// June 13th 2019
-// cc -dynamiclib -o ../../native/libSystemUtilities.jnilib -I/System/Library/Frameworks/JavaVM.framework/Headers SystemUtilities.m -arch x86_64
-// removed the '-c' flag, otherwise it won't build the shared library and ignores the '-dynamiclib'
+// June 15th 2019
+// cc -dynamiclib -o ../../native/libSystemUtilities.jnilib -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin SystemUtilities.m -arch x86_64
+
+// Note: removed the '-c' flag, otherwise it won't build the shared library and ignores the '-dynamiclib'
 
 // Feb 1st, 2018
 // compile with:
