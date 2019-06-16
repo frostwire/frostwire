@@ -177,7 +177,6 @@ public class ThreadPool {
         private volatile AERunnable runnable;
         private long run_start_time;
         private int warn_count;
-        private final String state = "<none>";
 
         threadPoolWorker() {
             super(NAME_THREADS ? (name + " " + (thread_name_index)) : name, true);
@@ -240,6 +239,7 @@ public class ThreadPool {
                         if (autoRelease) {
                             synchronized (ThreadPool.this) {
                                 long elapsed = SystemTime.getMonotonousTime() - run_start_time;
+                                String state = "<none>";
                                 if (elapsed > WARN_TIME && LOG_WARNINGS)
                                     System.out.println(getWorkerName() + ": terminated, elapsed = " + elapsed + ", state = " + state);
                                 busy.remove(threadPoolWorker.this);
