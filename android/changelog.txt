@@ -1,3 +1,7 @@
+FrostWire 2.1.5 build 595 - JUN/23/2019
+ - fixes, cleanups, optimizations
+ - applovin 9.7.2
+
 FrostWire 2.1.4 build 593 - JUN/01/2019
  - Nyaa search fixed
  - New Torrentz2 search
