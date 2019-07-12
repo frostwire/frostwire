@@ -1,4 +1,5 @@
-FrostWire 2.1.5 build 595 - JUN/23/2019
+FrostWire 2.1.5 build 596 - JUL/12/2019
+ - TPB search censorship improvements
  - fixes, cleanups, optimizations
  - applovin 9.7.2
 
