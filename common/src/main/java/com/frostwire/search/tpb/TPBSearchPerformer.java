@@ -22,8 +22,10 @@ import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
+import com.frostwire.util.HttpClientFactory;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author gubatron
@@ -36,6 +38,48 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
+    }
+
+    public static String getMirrorDomainName() {
+        String baseDomain = "thepiratebay.org";
+        String[] mirrors = {"unblockpirate.uk",
+                "openpirate.org",
+                "mypirate.cc",
+                "tpb.cool",
+                "piratebay.icu",
+                "piratebay.life",
+                "thepiratebay.fail",
+                "thepiratebay.fyi",
+                "piratebay.tech",
+                "thepirate.fun",
+                "thepirate.host",
+                "thepirate.live",
+                "tpb.bike",
+                "tpb.email",
+                "tpb.guru",
+        };
+
+        boolean getRandomMirror = false;
+        String response = null;
+        try {
+             response = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).get("https://" + baseDomain, 3000);
+        } catch (Throwable t) {
+            System.err.println("TPBSearchPerformer:thepiratebay.org unreachable, falling back to random mirror");
+            getRandomMirror = true;
+        }
+
+        if (!getRandomMirror) {
+            return baseDomain;
+        }
+
+        getRandomMirror = response == null;
+
+        if (!getRandomMirror) {
+            return baseDomain;
+        }
+
+        Random r = new Random(System.currentTimeMillis());
+        return mirrors[r.nextInt(mirrors.length)];
     }
 
     @Override

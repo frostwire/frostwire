@@ -56,7 +56,8 @@ public abstract class SearchEngine {
     private static final int ZOOQLE_ID = 21;
     private static final int NYAA_ID = 23;
     private static final int TORRENTZ2_ID = 24;
-    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, "thepiratebay.org") {
+
+    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, TPBSearchPerformer.getMirrorDomainName()) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
