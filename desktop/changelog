@@ -1,3 +1,8 @@
+frostwire (6.8.1) stable; urgency=high
+  * TPB fallback mirrors support
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 11 July 2019 18:33:00 -0600
+
 frostwire (6.8.0) stable; urgency=high
   * Nyaa search fixed
   * Soundcloud search and downloads fixed
