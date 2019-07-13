@@ -20,7 +20,6 @@ package com.frostwire.android.gui;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -47,6 +46,8 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * @author gubatron

@@ -355,7 +355,6 @@
     <string name="or">ili</string>
     <string name="file_names">Nazivi datoteka</string>
     <string name="no_data_check_internet_connection">Mreža nije dostupna, provjerite internetsku vezu.</string>
-    <string name="use_pixabay">Koristi Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Zaustavite sjetvu svih prijenosa</string>
     <string name="seed_stop">Zaustavite zasijavanje</string>
     <string name="transfers_select_seeding">sijanje</string>

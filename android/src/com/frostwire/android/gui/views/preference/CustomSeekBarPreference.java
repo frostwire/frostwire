@@ -20,10 +20,6 @@ package com.frostwire.android.gui.views.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.preference.DialogPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.CheckBox;
@@ -33,6 +29,11 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment.PreferenceDialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.preference.DialogPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 
 /**
  * Support version of a custom dialog preference

@@ -19,12 +19,13 @@ package com.frostwire.android.util;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+
+import androidx.annotation.NonNull;
 
 /**
  * Utility class for asynchronous task in the background.

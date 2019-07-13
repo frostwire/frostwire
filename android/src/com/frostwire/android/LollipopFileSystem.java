@@ -24,8 +24,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 
 import com.frostwire.android.core.Constants;
@@ -50,6 +48,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron

@@ -22,11 +22,11 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v14.preference.PreferenceFragment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.TwoStatePreference;
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceFragment;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+import androidx.preference.TwoStatePreference;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -40,7 +40,7 @@ import java.lang.reflect.Field;
 public abstract class AbstractPreferenceFragment extends PreferenceFragment {
 
     protected static final String DIALOG_FRAGMENT_TAG =
-            "android.support.v14.preference.PreferenceFragment.DIALOG";
+            "androidx.preference.PreferenceFragment.DIALOG";
 
     private final int preferencesResId;
 
@@ -95,7 +95,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     }
 
     public static abstract class PreferenceDialogFragment
-            extends android.support.v14.preference.PreferenceDialogFragment {
+            extends androidx.preference.PreferenceDialogFragment {
 
         @NonNull
         @Override
@@ -138,7 +138,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         @SuppressWarnings("unchecked")
         private <T> T getValue(String name) {
             try {
-                Field f = android.support.v14.preference.PreferenceDialogFragment.class.getDeclaredField(name);
+                Field f = androidx.preference.PreferenceDialogFragment.class.getDeclaredField(name);
                 f.setAccessible(true);
                 return (T) f.get(this);
             } catch (Throwable e) {

@@ -22,7 +22,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
@@ -48,6 +47,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import androidx.annotation.NonNull;
 
 import static com.frostwire.android.util.Asyncs.async;
 

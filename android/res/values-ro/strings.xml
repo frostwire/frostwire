@@ -355,7 +355,6 @@
     <string name="or">sau</string>
     <string name="file_names">Numele fișierelor</string>
     <string name="no_data_check_internet_connection">Rețeaua nu este disponibilă, verificați conexiunea la Internet.</string>
-    <string name="use_pixabay">Utilizați Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Opriți însămânțarea tuturor transferurilor</string>
     <string name="seed_stop">Opriți însămânțarea</string>
     <string name="transfers_select_seeding">însămânțare</string>

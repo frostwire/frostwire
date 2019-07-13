@@ -20,9 +20,6 @@ package com.frostwire.android.gui.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import com.frostwire.android.gui.views.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 
 import com.frostwire.android.R;
@@ -41,11 +38,15 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
+
+import androidx.viewpager.widget.ViewPager;
 
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
     private TimerSubscription subscription;

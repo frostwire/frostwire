@@ -29,10 +29,6 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.design.widget.TabLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.SearchView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,12 +65,17 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -640,7 +641,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
-    private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {
+    private class MyFilesActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
         private ActionMode mode;
         private Menu menu;
         private int numChecked;

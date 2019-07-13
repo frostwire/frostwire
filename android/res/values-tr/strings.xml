@@ -355,7 +355,6 @@
     <string name="or">veya</string>
     <string name="file_names">Dosya adları</string>
     <string name="no_data_check_internet_connection">Ağ kullanılamıyor, lütfen İnternet bağlantınızı kontrol edin.</string>
-    <string name="use_pixabay">Pixabay\'u kullanın</string>
     <string name="transfers_context_stop_seeding_all_transfers">Tüm transferleri durdurmayı bırak</string>
     <string name="seed_stop">Paylaşmayı durdur</string>
     <string name="transfers_select_seeding">paylaşım</string>

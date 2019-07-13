@@ -357,7 +357,6 @@
     <string name="or">या</string>
     <string name="file_names">फ़ाइल नाम</string>
     <string name="no_data_check_internet_connection">नेटवर्क अनुपलब्ध है, कृपया अपने इंटरनेट कनेक्शन की जांच करें।</string>
-    <string name="use_pixabay">उपयोग Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">सभी स्थानान्तरणों को सीडिंग बंद करें</string>
     <string name="seed_stop">बोने बंद करो</string>
     <string name="transfers_select_seeding">बीज बोने की क्रिया</string>

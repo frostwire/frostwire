@@ -357,7 +357,6 @@
     <string name="or">atau</string>
     <string name="file_names">Nama file</string>
     <string name="no_data_check_internet_connection">Jaringan tidak tersedia, periksa koneksi internet Anda.</string>
-    <string name="use_pixabay">Gunakan Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Hentikan penyemaian semua transfer</string>
     <string name="seed_stop">Hentikan penyemaian</string>
     <string name="transfers_select_seeding">penyemaian</string>

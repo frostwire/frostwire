@@ -361,7 +361,6 @@
     <string name="or">o</string>
     <string name="file_names">Nombres de archivo</string>
     <string name="no_data_check_internet_connection">Red no disponible, compruebe su conexión a Internet.</string>
-    <string name="use_pixabay">Usar Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Dejar de compartir todas las transferencias</string>
     <string name="seed_stop">Dejar de compartir</string>
     <string name="transfers_select_seeding">compartiendo</string>

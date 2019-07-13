@@ -19,13 +19,14 @@
 package com.frostwire.android.gui.util;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.frostwire.android.R;
 import com.frostwire.transfers.TransferState;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
 
 /**
  * @author aldenml

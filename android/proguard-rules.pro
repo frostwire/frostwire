@@ -8,7 +8,7 @@
 -keep class org.apache.http.client.utils.URLEncodedUtils { *; }
 -keep class org.conscrypt.Conscrypt { *; }
 -keep class org.conscrypt.org.Conscrypt$ProviderBuilder { *; }
-#-keep class android.support.v4.view.accessibility.AccessibilityManagerCompat$TouchExplorationStateChangeListenerWrapper { *; }
+#-keep class androidx.core.view.accessibility.AccessibilityManagerCompat$TouchExplorationStateChangeListenerWrapper { *; }
 -keep class android.net.http.AndroidHttpClient { *; }
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 

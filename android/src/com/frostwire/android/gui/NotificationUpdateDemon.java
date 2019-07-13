@@ -24,7 +24,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
 
 import com.frostwire.android.R;
@@ -37,6 +36,8 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.util.Logger;
+
+import androidx.core.app.NotificationCompat;
 
 import static com.frostwire.android.util.Asyncs.async;
 

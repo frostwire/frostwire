@@ -15,8 +15,9 @@
  */
 
 /*
- * This is a copy of android.support.v4.app.FragmentPagerAdapter with a
+ * This is a copy of formerly android.support.v4.app.FragmentPagerAdapter with a
  * minor modification in finishUpdate taken from the deprecated v13.
+ * On AndroidX it's androidx.fragment.app.FragmentPagerAdapter
  */
 
 package com.frostwire.android.gui.views;
@@ -25,11 +26,12 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Parcelable;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.FragmentStatePagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 
 /**
  * Implementation of {@link PagerAdapter} that

@@ -355,7 +355,6 @@
     <string name="or">یا</string>
     <string name="file_names">فائل نام</string>
     <string name="no_data_check_internet_connection">نیٹ ورک دستیاب نہیں، براہ مہربانی اپنے انٹرنیٹ کنکشن کی جانچ پڑتالکریں.</string>
-    <string name="use_pixabay">استعمال Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">تمام ٹرانسفروں کو بنو بند کرو</string>
     <string name="seed_stop">بیجنگ بند کرو</string>
     <string name="transfers_select_seeding">بوائ</string>

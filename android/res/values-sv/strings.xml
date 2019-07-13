@@ -357,7 +357,6 @@
     <string name="or">eller</string>
     <string name="file_names">Filnamn</string>
     <string name="no_data_check_internet_connection">Nätverk otillgängligt, kolla din Internetanslutning.</string>
-    <string name="use_pixabay">Använda Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Sluta såga alla överföringar</string>
     <string name="seed_stop">Sluta sådd</string>
     <string name="transfers_select_seeding">sådd</string>

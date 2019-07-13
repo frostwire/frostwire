@@ -45,9 +45,6 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
-import android.support.v4.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -67,6 +64,10 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.Stack;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+import androidx.core.content.ContextCompat;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;

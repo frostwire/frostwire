@@ -357,7 +357,6 @@
     <string name="or">vagy</string>
     <string name="file_names">Fájlnevek</string>
     <string name="no_data_check_internet_connection">A hálózat nem érhető el, ellenőrizze az internetkapcsolatot.</string>
-    <string name="use_pixabay">Használja Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Ne hagyja abba a transzfereket</string>
     <string name="seed_stop">Állítsa le a vetést</string>
     <string name="transfers_select_seeding">vetés</string>

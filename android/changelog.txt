@@ -1,7 +1,8 @@
-FrostWire 2.1.5 build 596 - JUL/12/2019
+FrostWire 2.1.5 build 596 - JUL/13/2019
+ - AndroidX API migration update
  - TPB search censorship improvements
  - fixes, cleanups, optimizations
- - applovin 9.7.2
+ - applovin 9.7.2, play-services-ads 18.1.0
 
 FrostWire 2.1.4 build 593 - JUN/01/2019
  - Nyaa search fixed

@@ -24,7 +24,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +37,8 @@ import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
+
+import androidx.annotation.Nullable;
 
 /**
  * @author aldenml

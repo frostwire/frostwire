@@ -355,7 +355,6 @@
     <string name="or">eller</string>
     <string name="file_names">Filnavn</string>
     <string name="no_data_check_internet_connection">Nettverk utilgjengelig, vennligst sjekk Internett-tilkoblingendin.</string>
-    <string name="use_pixabay">Bruk Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stopp såing alle overføringer</string>
     <string name="seed_stop">Stopp såing</string>
     <string name="transfers_select_seeding">såing</string>

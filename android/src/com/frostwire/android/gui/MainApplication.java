@@ -18,7 +18,6 @@
 package com.frostwire.android.gui;
 
 import android.content.Context;
-import android.support.multidex.MultiDexApplication;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -46,6 +45,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
+
+import androidx.multidex.MultiDexApplication;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;

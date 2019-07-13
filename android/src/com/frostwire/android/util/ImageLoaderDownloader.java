@@ -18,12 +18,11 @@
 package com.frostwire.android.util;
 
 
-import android.support.annotation.NonNull;
-
 import com.squareup.picasso.Downloader;
 
 import java.io.IOException;
 
+import androidx.annotation.NonNull;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;

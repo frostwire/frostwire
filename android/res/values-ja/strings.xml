@@ -358,7 +358,6 @@
     <string name="or">または</string>
     <string name="file_names">ファイル名</string>
     <string name="no_data_check_internet_connection">ネットワークが利用できない場合は、インターネット接続を確認してください。</string>
-    <string name="use_pixabay">Pixabayを使用する</string>
     <string name="transfers_context_stop_seeding_all_transfers">すべての転送のシードを停止する</string>
     <string name="seed_stop">播種を止める</string>
     <string name="transfers_select_seeding">播種</string>

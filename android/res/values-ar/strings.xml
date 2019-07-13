@@ -355,7 +355,6 @@
     <string name="or">أو</string>
     <string name="file_names">أسماء الملفات</string>
     <string name="no_data_check_internet_connection">الشبكة غير متوفرة، يرجى التحقق من اتصالك بالإنترنت.</string>
-    <string name="use_pixabay">استخدام Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">وقف البذر جميع التحويلات</string>
     <string name="seed_stop">وقف البذر</string>
     <string name="transfers_select_seeding">زراعة</string>

@@ -357,7 +357,6 @@
     <string name="or">또는</string>
     <string name="file_names">파일 이름</string>
     <string name="no_data_check_internet_connection">네트워크를 사용할 수 없으므로 인터넷 연결을 확인하십시오.</string>
-    <string name="use_pixabay">Pixabay사용</string>
     <string name="transfers_context_stop_seeding_all_transfers">모든 전송 시딩 중지</string>
     <string name="seed_stop">시딩 중지</string>
     <string name="transfers_select_seeding">시딩</string>

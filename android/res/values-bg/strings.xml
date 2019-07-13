@@ -357,7 +357,6 @@
     <string name="or">или</string>
     <string name="file_names">Име на файловете</string>
     <string name="no_data_check_internet_connection">Мрежата не е налична, моля, проверете връзката си с интернет.</string>
-    <string name="use_pixabay">Използвайте Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Спрете сеитба на всички трансфери</string>
     <string name="seed_stop">Спрете сеитбата</string>
     <string name="transfers_select_seeding">посев</string>

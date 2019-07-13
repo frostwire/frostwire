@@ -17,59 +17,55 @@
  * limitations under the License.
  */
 -->
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.v7.preference.CheckBoxPreference
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.preference_category.select_all"
         android:title="@string/select_all"
         android:layout="@layout/view_preference_search_select_all" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_archiveorg" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_eztv"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_eztv" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_frostclick" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_soundcloud"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_soundcloud" />
-    <android.support.v7.preference.CheckBoxPreference
-        android:key="frostwire.prefs.search.use_pixabay"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_pixabay" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
         android:layout="@layout/view_preference_search_engine"
         android:summary="@string/use_magnet_summary"
         android:title="@string/use_tpb" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torlock"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torlock" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_limetorrents"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_limetorrents" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_nyaa"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_nyaa" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
         android:layout="@layout/view_preference_search_engine"
         android:summary="@string/use_magnet_summary"
         android:title="@string/use_yify" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_zooqle"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_zooqle" />
-</android.support.v7.preference.PreferenceScreen>
+</androidx.preference.PreferenceScreen>

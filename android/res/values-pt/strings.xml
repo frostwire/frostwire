@@ -355,7 +355,6 @@
     <string name="or">ou</string>
     <string name="file_names">Nomes do arquivo</string>
     <string name="no_data_check_internet_connection">Rede indisponível, verifique sua conexão com a Internet.</string>
-    <string name="use_pixabay">Usar Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Pare de semear todas as transferências</string>
     <string name="seed_stop">Pare de semear</string>
     <string name="transfers_select_seeding">semeadura</string>

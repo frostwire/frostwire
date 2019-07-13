@@ -23,13 +23,14 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.v14.preference.PreferenceFragment;
-import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragment;
 
 /**
  * @author gubatron

@@ -357,7 +357,6 @@
     <string name="or">Або</string>
     <string name="file_names">Імена файлів</string>
     <string name="no_data_check_internet_connection">Мережа недоступна, будь ласка, перевірте підключення доІнтернету.</string>
-    <string name="use_pixabay">користування Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Зупинити посіву всіх переказів</string>
     <string name="seed_stop">Зупинити посіву</string>
     <string name="transfers_select_seeding">посів</string>

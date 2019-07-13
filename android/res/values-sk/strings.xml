@@ -357,7 +357,6 @@
     <string name="or">alebo</string>
     <string name="file_names">Názvy súborov</string>
     <string name="no_data_check_internet_connection">Sieť nie je k dispozícii, skontrolujte pripojenie k internetu.</string>
-    <string name="use_pixabay">Použiť Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Zastavte zasievanie všetkých prenosov</string>
     <string name="seed_stop">Zastaviť zasievanie</string>
     <string name="transfers_select_seeding">siatie</string>

@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
 
 import com.frostwire.android.R;
 import com.frostwire.util.HttpClientFactory;
@@ -32,6 +31,8 @@ import org.json.JSONArray;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 
 /**
  * @author gubatron

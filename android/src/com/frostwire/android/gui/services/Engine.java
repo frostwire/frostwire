@@ -34,8 +34,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
 import com.frostwire.android.R;
@@ -50,6 +48,9 @@ import com.frostwire.util.Ref;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import static com.frostwire.android.util.Asyncs.async;
 

@@ -20,7 +20,7 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.frostwire.android.R;

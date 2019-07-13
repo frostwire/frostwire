@@ -25,9 +25,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -39,6 +36,10 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * @author gubatron

@@ -359,7 +359,6 @@
     <string name="or">Или</string>
     <string name="file_names">Имена датотека</string>
     <string name="no_data_check_internet_connection">Мрежа недоступна, молимо проверите вашу интернетску везу.</string>
-    <string name="use_pixabay">Користе Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Престани сјести све преносе</string>
     <string name="seed_stop">Престани сјеме</string>
     <string name="transfers_select_seeding">сјеме</string>

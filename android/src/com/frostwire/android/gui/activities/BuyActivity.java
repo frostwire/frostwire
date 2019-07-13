@@ -20,7 +20,6 @@ package com.frostwire.android.gui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -40,6 +39,8 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
+
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * @author gubatron

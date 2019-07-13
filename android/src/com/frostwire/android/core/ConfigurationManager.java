@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -31,6 +30,8 @@ import com.frostwire.util.Logger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import androidx.annotation.NonNull;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}

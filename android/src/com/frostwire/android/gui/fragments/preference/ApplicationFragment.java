@@ -21,9 +21,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceCategory;
-import android.support.v14.preference.SwitchPreference;
 import android.widget.Toast;
 
 import com.frostwire.android.AndroidPlatform;
@@ -49,6 +46,10 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.SwitchPreference;
 
 /**
  * @author gubatron

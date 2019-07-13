@@ -26,7 +26,9 @@ import android.app.FragmentManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
+
+import androidx.annotation.IdRes;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,12 +138,9 @@ public abstract class AbstractDialog extends DialogFragment {
             dispatchDialogClickSafe(onDialogClickListener, tag, which);
             return;
         }
-
         dispatchDialogClickSafe(activity, tag, which);
-
         if (activity instanceof AbstractActivity) {
             List<Fragment> fragments = ((AbstractActivity) activity).getFragments();
-
             for (Fragment f : fragments) {
                 dispatchDialogClickSafe(f, tag, which);
             }

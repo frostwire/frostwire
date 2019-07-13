@@ -357,7 +357,6 @@
     <string name="or">of</string>
     <string name="file_names">Bestandsnamen</string>
     <string name="no_data_check_internet_connection">Netwerk niet beschikbaar, controleer alstublieft uw internetverbinding.</string>
-    <string name="use_pixabay">Gebruik Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stop met zaaien van alle overdrachten</string>
     <string name="seed_stop">Stop met zaaien</string>
     <string name="transfers_select_seeding">zaaien</string>

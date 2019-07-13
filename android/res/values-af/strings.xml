@@ -218,7 +218,6 @@
     <string name="settings">Instellings</string>
     <string name="enable_seeding">Aktiveer saai</string>
     <string name="data_saving_turn_off_transfers">Geen Wi-Fi beskikbaar nie, alle oordragte is gestop</string>
-    <string name="use_pixabay">Gebruik Pixabay</string>
     <string name="finishing">Afwerking</string>
     <string name="set_as_wallpaper">Stel as plakpapier</string>
     <string name="available">beskikbaar</string>
@@ -411,5 +410,5 @@
     <string name="title_activity_transfer_detail">Oordragdetail</string>
     <string name="piece_size_header">Stuk Grootte:</string>
     <string name="add_tracker">Voeg spoorsnyer by</string>
-    <string name="use_nyaa">Gebruik Pixabay</string>
+    <string name="use_nyaa">Gebruik Nyaa</string>
 </resources>

@@ -20,7 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;

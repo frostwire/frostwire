@@ -357,7 +357,6 @@
     <string name="or">o</string>
     <string name="file_names">Nomi dei file</string>
     <string name="no_data_check_internet_connection">La rete non è disponibile, controllare la connessione a Internet.</string>
-    <string name="use_pixabay">Utilizzare Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Smettere di seminare tutti i trasferimenti</string>
     <string name="seed_stop">Smettere di seminare</string>
     <string name="transfers_select_seeding">semina</string>

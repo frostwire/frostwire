@@ -357,7 +357,6 @@
     <string name="or">ή</string>
     <string name="file_names">Ονόματα αρχείων</string>
     <string name="no_data_check_internet_connection">Το δίκτυο δεν είναι διαθέσιμο, ελέγξτε τη σύνδεση στο Internet.</string>
-    <string name="use_pixabay">Χρήση Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Διακόψτε όλες τις λήψεις και τις μεταφορτώσεις</string>
     <string name="seed_stop">Σταματήστε τη σπορά</string>
     <string name="transfers_select_seeding">σπορά</string>

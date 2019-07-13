@@ -355,7 +355,6 @@
     <string name="or">tai</string>
     <string name="file_names">Tiedostonimet</string>
     <string name="no_data_check_internet_connection">Verkko ei ole käytettävissä, tarkista Internet-yhteys.</string>
-    <string name="use_pixabay">Käytä Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Lopeta kaikkien siirtojen kylvetys</string>
     <string name="seed_stop">Lopeta kylväminen</string>
     <string name="transfers_select_seeding">kylvö</string>

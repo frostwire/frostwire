@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v4.content.LocalBroadcastManager;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Ref;
@@ -33,6 +32,8 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * @author gubatron

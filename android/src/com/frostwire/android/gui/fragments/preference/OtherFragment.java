@@ -19,8 +19,6 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -31,6 +29,9 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.util.Asyncs;
+
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
 
 /**
  * @author gubatron

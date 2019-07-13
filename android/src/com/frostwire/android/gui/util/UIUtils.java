@@ -30,9 +30,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -56,6 +53,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -66,6 +64,9 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import androidx.annotation.StringRes;
+import androidx.core.content.FileProvider;
 
 import static com.frostwire.android.util.Asyncs.async;
 

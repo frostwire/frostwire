@@ -27,11 +27,12 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.frostwire.android.R;
+
+import androidx.annotation.Nullable;
 
 import static com.frostwire.android.util.Asyncs.async;
 

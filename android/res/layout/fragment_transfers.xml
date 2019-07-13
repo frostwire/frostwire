@@ -56,7 +56,7 @@
             frostwire:clearable_hint="@string/add_transfer_label" />
     </LinearLayout>
 
-    <android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.google.android.material.tabs.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fragment_transfers_layout_tab_layout"
         style="@style/AppTabLayout"
@@ -65,26 +65,26 @@
         android:background="@color/basic_blue"
         app:tabMode="scrollable">
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_all" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_downloading" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_seeding" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/transfers_select_completed" />
-    </android.support.design.widget.TabLayout>
+    </com.google.android.material.tabs.TabLayout>
 
     <com.frostwire.android.gui.views.RichNotification
         android:id="@+id/fragment_transfers_sd_card_notification"
@@ -130,7 +130,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/fragment_transfers_list"
                 style="@style/scrollbar_default_style"
                 android:layout_width="match_parent"

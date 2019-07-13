@@ -391,7 +391,6 @@
     <string name="exclude">Exclude</string>
     <string name="try_changing_applied_filters">Try changing applied filters</string>
     <string name="no_data_check_internet_connection">Network unavailable, please check your Internet connection.</string>
-    <string name="use_pixabay">Use Pixabay</string>
     <string name="transfers_context_seed_all_transfers">Seed all finished transfers</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stop seeding all transfers</string>
     <string name="seeding_is_currently_disabled">Seeding is currently disabled</string>

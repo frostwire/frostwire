@@ -17,25 +17,25 @@
  * limitations under the License.
  */
 -->
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:frostwire="http://schemas.android.com/apk/res-auto">
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.enable_permanent_status_notification"
         android:summary="@string/notify_frostwire_is_running_summary"
         android:title="@string/notify_frostwire_is_running" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.show_transfers_on_download_start"
         android:title="@string/show_transfers_on_download_start" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.show_new_transfer_dialog"
         android:title="@string/show_new_transfer_dialog" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.vibrate_on_finished_download"
         android:title="@string/vibrate_on_finished_download" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.haptic_feedback_on"
         android:title="@string/haptic_feedback" />
-    <android.support.v7.preference.CheckBoxPreference
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.distraction_free_search"
         android:summary="@string/distraction_free_search_results_summary"
         android:title="@string/distraction_free_search_results" />
@@ -44,4 +44,4 @@
         android:summary="@string/clear_search_cache_summary"
         android:title="@string/clear_search_cache"
         frostwire:button_text="@string/clear" />
-</android.support.v7.preference.PreferenceScreen>
+</androidx.preference.PreferenceScreen>

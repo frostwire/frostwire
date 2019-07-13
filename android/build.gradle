@@ -184,16 +184,17 @@ dependencies {
     implementation 'com.google.re2j:re2j:1.2'
     implementation 'com.google.code.gson:gson:2.8.5'
     // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
-    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // last compatible one for android 4.4
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:design:28.0.0'
+    implementation 'com.google.android.material:material:1.1.0-alpha08'
     implementation 'com.android.support:animated-vector-drawable:28.0.0'
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'com.android.support:exifinterface:28.0.0'
     implementation 'com.android.support:preference-v7:28.0.0'
     implementation 'com.android.support:preference-v14:28.0.0'
     implementation 'com.android.billingclient:billing:1.2'
-    implementation 'com.google.android.gms:play-services-ads:17.2.1'
+    implementation 'com.google.android.gms:play-services-ads:18.1.0'
 // last version working
 //    implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
 //    implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }

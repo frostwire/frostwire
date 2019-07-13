@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views.preference;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +44,8 @@ import com.frostwire.platform.Platforms;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.preference.DialogPreference;
 
 /**
  * @author gubatron

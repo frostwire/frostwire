@@ -3,7 +3,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v4.view.ViewPager
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/fragment_home_phone_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.design.widget.TabLayout
+            <com.google.android.material.tabs.TabLayout
                 style="@style/AppTabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -41,7 +41,7 @@
                 app:tabPaddingEnd="20dp"
                 app:tabMode="scrollable" />
 
-        </android.support.v4.view.ViewPager>
+        </androidx.viewpager.widget.ViewPager>
 
     </RelativeLayout>
 

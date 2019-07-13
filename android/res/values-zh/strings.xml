@@ -356,7 +356,6 @@
     <string name="or">要么</string>
     <string name="file_names">文件名</string>
     <string name="no_data_check_internet_connection">网络不可用，请检查您的Internet连接。</string>
-    <string name="use_pixabay">使用 Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">停止分享所有转帐</string>
     <string name="seed_stop">停止分享</string>
     <string name="transfers_select_seeding">播种</string>

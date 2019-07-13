@@ -358,7 +358,6 @@
     <string name="or">или</string>
     <string name="file_names">Имена файлов</string>
     <string name="no_data_check_internet_connection">Сеть недоступна, проверьте подключение к Интернету.</string>
-    <string name="use_pixabay">Использовать Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Стоп высева все трансферы</string>
     <string name="seed_stop">Остановить посев</string>
     <string name="transfers_select_seeding">засеивание</string>

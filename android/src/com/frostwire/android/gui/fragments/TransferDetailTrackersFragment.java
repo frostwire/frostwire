@@ -19,8 +19,6 @@
 package com.frostwire.android.gui.fragments;
 
 import android.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +40,9 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author gubatron

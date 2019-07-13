@@ -357,7 +357,6 @@
     <string name="or">אוֹ</string>
     <string name="file_names">שמות קבצים</string>
     <string name="no_data_check_internet_connection">הרשת אינה זמינה, בדוק את חיבור האינטרנט שלך.</string>
-    <string name="use_pixabay">השתמש Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">להפסיק זריעת כל העברות</string>
     <string name="seed_stop">להפסיק זריעה</string>
     <string name="transfers_select_seeding">זריעה</string>
