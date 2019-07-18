@@ -150,7 +150,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     /**
      * Variable for how much time is left.
      */
-    private double timeLeft;
+    private long timeLeft;
     private String seeds;
     private String peers;
     private String shareRatio;

@@ -24,9 +24,9 @@ import org.limewire.util.CommonUtils;
  * @author sberlin
  */
 public final class TimeRemainingHolder implements Comparable<TimeRemainingHolder> {
-    private final double _timeRemaining;
+    private final long _timeRemaining;
 
-    public TimeRemainingHolder(double intValue) {
+    public TimeRemainingHolder(long intValue) {
         _timeRemaining = intValue;
     }
 

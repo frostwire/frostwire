@@ -147,12 +147,12 @@ public class CommonUtils {
      * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
      * "m:ss" where m=minutes<60, ss=seconds
      */
-    public static String seconds2time(double seconds) {
-        double minutes = seconds / 60;
+    public static String seconds2time(long seconds) {
+        int minutes = (int) (seconds / 60);
         seconds = seconds - minutes * 60;
-        double hours = minutes / 60;
+        int hours = minutes / 60;
         minutes = minutes - hours * 60;
-        double days = hours / 24;
+        int days = hours / 24;
         hours = hours - days * 24;
         // build the numbers into a string
         StringBuilder time = new StringBuilder();
