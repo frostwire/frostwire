@@ -17,6 +17,7 @@
 
 package com.frostwire.gui.updates;
 
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -63,6 +64,7 @@ import java.util.HashSet;
  * @author gubatron
  */
 public final class UpdateManager implements Serializable {
+    private static final Logger LOG = Logger.getLogger(UpdateManager.class);
     private static final int OPTION_OPEN_URL = 1;
     private static final int OPTION_LATER = 0;
     private static final int OPTION_DOWNLOAD_TORRENT = 2;
@@ -228,7 +230,10 @@ public final class UpdateManager implements Serializable {
         handlePossibleUpdateMessage(umr, force);
         // attempt to show available non expired announcements
         if (umr.hasAnnouncements()) {
+            LOG.info("checkForUpdates() has announcements");
             attemptShowAnnouncements(umr.getAnnouncements());
+        } else {
+            LOG.info("checkForUpdates() has no announcements");
         }
     } // checkForUpdates
 

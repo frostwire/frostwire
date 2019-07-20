@@ -17,11 +17,13 @@
 
 package com.frostwire.gui.updates;
 
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.OSUtils;
 import org.xml.sax.*;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -39,7 +41,7 @@ import java.util.List;
  */
 @SuppressWarnings("RedundantThrows")
 final class UpdateMessageReader implements ContentHandler {
-    //private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
+    private static final Logger LOG = Logger.getLogger(UpdateMessageReader.class);
     private static final String DEFAULT_UPDATE_URL = "https://update.frostwire.com";
     private HashSet<UpdateMessage> _announcements = null;
     private UpdateMessage _bufferMessage = null;
@@ -269,29 +271,28 @@ final class UpdateMessageReader implements ContentHandler {
         try {
             String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
             connection = (HttpURLConnection) (new URL(DEFAULT_UPDATE_URL)).openConnection();
-            //String url = getUpdateURL();
-            //LOG.info("Reading update file from " + url);
+
+            LOG.info("Reading update file from " + DEFAULT_UPDATE_URL);
             connection.setRequestProperty("User-Agent", userAgent);
             connection.setRequestProperty("Connection", "close");
             connection.setReadTimeout(10000); // 10 secs timeout
-            if (connection.getResponseCode() >= 400) {
+            final int responseCode = connection.getResponseCode();
+            if (responseCode >= 400) {
                 // invalid URL for sure
+                LOG.error("readUpdateFile(): Could not read update file, error code " + responseCode);
                 connection.disconnect();
                 return;
             }
             src = new InputSource(connection.getInputStream());
-            XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
+            //XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
+            XMLReader rdr = XMLReaderFactory.createXMLReader("com.sun.org.apache.xerces.internal.parsers.SAXParser");
             rdr.setContentHandler(this);
+            LOG.info("readUpdateFile(): got update file, about to parse");
             rdr.parse(src);
-        } catch (java.net.SocketTimeoutException e3) {
-            System.err.println("UpdateMessageReader.readUpdateFile() Socket Timeout Exception " + e3.toString());
-        } catch (IOException e) {
-            System.err.println("UpdateMessageReader.readUpdateFile() IO exception " + e.toString());
-        } catch (SAXException e2) {
-            System.err.println("UpdateMessageReader.readUpdateFile() SAX exception " + e2.toString());
-        } catch (ParserConfigurationException e4) {
-            System.err.println("UpdateMessageReader.readUpdateFile() ParserConfigurationException " + e4.toString());
-            e4.printStackTrace();
+            LOG.info("readUpdateFile(): finished parsing");
+        } catch (Throwable t) {
+            System.err.println("UpdateMessageReader.readUpdateFile() " + t.getClass().getName() + " " + t.toString());
+            t.printStackTrace();
         } finally {
             if (connection != null) {
                 try {
@@ -315,6 +316,7 @@ final class UpdateMessageReader implements ContentHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         // deal with the opening tag
+        LOG.info("startElement " + localName);
         if (localName.equalsIgnoreCase("update")) {
             UpdateManager.getInstance().setServerTime(atts.getValue("time"));
             if (atts.getValue("torrentDetailsUrl") != null && atts.getValue("torrentDetailsUrl").length() > 0) {
