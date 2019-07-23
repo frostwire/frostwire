@@ -36,7 +36,7 @@ public final class UpdateManagerSettings extends LimeProps {
     /**
      * URL to feed the Slideshow with the promotional FrostClick overlays
      */
-    public static final StringSetting OVERLAY_SLIDESHOW_JSON_URL = FACTORY.createStringSetting("OVERLAY_SLIDESHOW_JSON_URL", "http://update1.frostwire.com/o2.php?from=desktop&version=" + FrostWireUtils.getFrostWireVersion() + "&build=" + FrostWireUtils.getBuildNumber() + "&os=" + UrlUtils.encode(OSUtils.getFullOS()));
+    public static final StringSetting OVERLAY_SLIDESHOW_JSON_URL = FACTORY.createStringSetting("OVERLAY_SLIDESHOW_JSON_URL", "https://update.frostwire.com/o2.php?from=desktop&version=" + FrostWireUtils.getFrostWireVersion() + "&build=" + FrostWireUtils.getBuildNumber() + "&os=" + UrlUtils.encode(OSUtils.getFullOS()));
 
     private UpdateManagerSettings() {
     }
