@@ -1,4 +1,10 @@
-frostwire (6.8.0) stable; urgency=high
+frostwire (6.8.1) stable; urgency=high
+ * Time remaining renderer bug fixed
+ * Update system bug fixed
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 23 July 2019 05:33:48 -0600
+
+frostwire (6.8.1) stable; urgency=high
   * Nyaa search fixed
   * Soundcloud search and downloads fixed
   * New Torrentz2 search
