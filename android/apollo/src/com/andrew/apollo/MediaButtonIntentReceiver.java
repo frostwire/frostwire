@@ -85,7 +85,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
 
                     if (command != null) {
                         final Context context = (Context) msg.obj;
-                        sencCommandToMusicPlaybackService(context, command);
+                        sendCommandToMusicPlaybackService(context, command);
                     }
                     break;
             }
@@ -101,7 +101,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         if (DEBUG) Log.v(TAG, "Received intent: " + intent);
         final String intentAction = intent.getAction();
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intentAction)) {
-            sencCommandToMusicPlaybackService(context, MusicPlaybackService.CMDPAUSE);
+            sendCommandToMusicPlaybackService(context, MusicPlaybackService.CMDPAUSE);
         } else if (Intent.ACTION_MEDIA_BUTTON.equals(intentAction)) {
             final KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
             if (event == null) {
@@ -172,7 +172,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
                             mLastClickTime = eventtime;
                             acquireWakeLockAndSendMessage(context, msg, delay);
                         } else {
-                            sencCommandToMusicPlaybackService(context, command);
+                            sendCommandToMusicPlaybackService(context, command);
                         }
                         mLaunched = false;
                         mDown = true;
@@ -189,7 +189,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         }
     }
 
-    private static void sencCommandToMusicPlaybackService(Context context, String command) {
+    private static void sendCommandToMusicPlaybackService(Context context, String command) {
         final Intent i = new Intent(context, MusicPlaybackService.class);
         i.setAction(MusicPlaybackService.SERVICECMD);
         i.putExtra(MusicPlaybackService.CMDNAME, command);
