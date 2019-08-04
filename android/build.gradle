@@ -187,7 +187,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.2' // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:design:28.0.0'
-    implementation 'com.google.android.material:material:1.1.0-alpha08'
+    implementation 'com.google.android.material:material:1.1.0-alpha09'
     implementation 'com.android.support:animated-vector-drawable:28.0.0'
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'com.android.support:exifinterface:28.0.0'
