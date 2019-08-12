@@ -35,7 +35,7 @@ import com.frostwire.android.R;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class PlayPauseButton extends ImageButton
+public final class PlayPauseButton extends androidx.appcompat.widget.AppCompatImageButton
         implements OnClickListener, OnLongClickListener {
 
     private int playDrawable;

@@ -31,7 +31,7 @@ import com.frostwire.android.R;
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon
  */
-public final class ShuffleButton extends ImageButton
+public final class ShuffleButton extends androidx.appcompat.widget.AppCompatImageButton
         implements OnClickListener {
 
     private Runnable onClickedCallback;
