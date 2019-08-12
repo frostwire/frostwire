@@ -30,6 +30,7 @@ import android.util.Log;
 import android.util.LruCache;
 
 import com.andrew.apollo.utils.ApolloUtils;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 
@@ -405,20 +406,15 @@ public final class ImageCache {
      * cache first
      */
     public void flush() {
-        ApolloUtils.execute(new AsyncTask<Void, Void, Void>() {
-
-            @Override
-            protected Void doInBackground(final Void... unused) {
-                if (mDiskCache != null) {
-                    try {
-                        if (!mDiskCache.isClosed()) {
-                            mDiskCache.flush();
-                        }
-                    } catch (final IOException e) {
-                        Log.e(TAG, "flush - " + e);
+        Asyncs.async(() -> {
+            if (mDiskCache != null) {
+                try {
+                    if (!mDiskCache.isClosed()) {
+                        mDiskCache.flush();
                     }
+                } catch (final IOException e) {
+                    Log.e(TAG, "flush - " + e);
                 }
-                return null;
             }
         });
     }
