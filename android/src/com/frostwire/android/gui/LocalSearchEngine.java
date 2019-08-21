@@ -91,6 +91,7 @@ public final class LocalSearchEngine {
         });
     }
 
+    @SuppressWarnings("unused")
     public SearchListener getListener() {
         return listener;
     }
@@ -156,7 +157,6 @@ public final class LocalSearchEngine {
 
     private void onResults(long token, List<? extends SearchResult> results) {
         if (token == currentSearchToken) { // one more additional protection
-            @SuppressWarnings("unchecked")
             List<SearchResult> filtered = filter(results);
 
             if (!filtered.isEmpty()) {
