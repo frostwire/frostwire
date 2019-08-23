@@ -1,4 +1,6 @@
-FrostWire 2.1.6 build 597 - AUG/04/2019
+FrostWire 2.1.6 build 597 - AUG/23/2019
+ - Archive.org .torrent download errors fixed
+ - TorLock and Torrentz2 search results are magnet based to reduce fetching errors
  - material:1.1.0-alpha09 update
  - play-services-ads:18.1.1 update
  - mopub-sdk:5.8.0 update
