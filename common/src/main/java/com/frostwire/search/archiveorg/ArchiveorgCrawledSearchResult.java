@@ -30,7 +30,7 @@ import java.util.Locale;
  * @author aldenml
  */
 public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult implements HttpSearchResult {
-    private static final String DOWNLOAD_URL = "http://%s/download/%s/%s";
+    private static final String DOWNLOAD_URL = "https://%s/download/%s/%s";
     private final String filename;
     private final String displayName;
     private final String downloadUrl;

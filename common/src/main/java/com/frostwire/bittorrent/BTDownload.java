@@ -595,13 +595,19 @@ public final class BTDownload implements BittorrentDownload {
 
     public void setSequentialDownload(boolean sequential) {
         if (!th.isValid()) {
+            System.out.println("BTDownload::setSequentialDownload( " +  sequential + ") aborted. Torrent Handle Invalid.");
             return;
         }
         if (sequential) {
+            System.out.println("BTDownload::setFlags(SEQUENTIAL_DOWNLOAD)");
             th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         } else {
+            System.out.println("BTDownload::unsetFlags(SEQUENTIAL_DOWNLOAD)");
             th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         }
+
+        boolean flagSet = th.flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
+        System.out.println("BTDownload::TorrentFlags.SEQUENTIAL_DOWNLOAD set? " + flagSet);
     }
 
     public File partsFile() {

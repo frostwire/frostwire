@@ -202,7 +202,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (uiBittorrentDownload != null) {
-                uiBittorrentDownload.getDl().setSequentialDownload(isChecked);
+                System.out.println("onCheckedChanged(isChecked=" + isChecked + ");");
+                uiBittorrentDownload.getDl().setSequentialDownload(!isChecked);
             }
         }
     }
