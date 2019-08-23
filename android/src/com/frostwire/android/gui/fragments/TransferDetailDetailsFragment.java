@@ -100,7 +100,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     protected void updateComponents() {
         if (uiBittorrentDownload != null) {
             //ensureComponentsReferenced();
-            BTDownload btDL = uiBittorrentDownload.getDl();
+            final BTDownload btDL = uiBittorrentDownload.getDl();
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);
             }
@@ -203,7 +203,7 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (uiBittorrentDownload != null) {
                 System.out.println("onCheckedChanged(isChecked=" + isChecked + ");");
-                uiBittorrentDownload.getDl().setSequentialDownload(!isChecked);
+                uiBittorrentDownload.getDl().setSequentialDownload(isChecked);
             }
         }
     }

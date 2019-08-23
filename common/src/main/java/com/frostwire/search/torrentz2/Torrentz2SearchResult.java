@@ -47,7 +47,7 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
         this.size = parseSize(fileSizeMagnitude + " " + fileSizeUnit);
         this.creationTime = parseCreationTime(ageString);
         this.seeds = seeds;
-        this.torrentUrl = "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(filename) + "&" + trackers;
+        this.torrentUrl = UrlUtils.buildMagnetUrl(infoHash, filename, trackers);
     }
 
     @Override

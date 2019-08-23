@@ -586,11 +586,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isSequentialDownload() {
-        if (!th.isValid()) {
-            return false;
-        }
-        torrent_flags_t flags = th.status().flags();
-        return flags.and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).nonZero();
+        return th.isValid() && th.status().flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
     }
 
     public void setSequentialDownload(boolean sequential) {
@@ -599,15 +595,10 @@ public final class BTDownload implements BittorrentDownload {
             return;
         }
         if (sequential) {
-            System.out.println("BTDownload::setFlags(SEQUENTIAL_DOWNLOAD)");
             th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         } else {
-            System.out.println("BTDownload::unsetFlags(SEQUENTIAL_DOWNLOAD)");
             th.unsetFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         }
-
-        boolean flagSet = th.flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
-        System.out.println("BTDownload::TorrentFlags.SEQUENTIAL_DOWNLOAD set? " + flagSet);
     }
 
     public File partsFile() {

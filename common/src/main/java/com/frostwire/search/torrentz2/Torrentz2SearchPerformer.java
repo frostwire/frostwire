@@ -20,6 +20,7 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentSearchPerformer;
 import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import java.util.List;
  */
 public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
-    private final String usualTrackers;
     private final Pattern pattern;// = Pattern.compile(REGEX);
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
@@ -39,22 +39,6 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?" +
                 "&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span>" +
                 "<span>(?<seeds>\\d+)</span><span>.*?");
-        usualTrackers = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
-                "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
-                "tr=udp://tracker.internetwarriors.net:1337/announce&" +
-                "tr=udp://retracker.akado-ural.ru:80/announce&" +
-                "tr=udp://tracker.moeking.me:6969/announce&" +
-                "tr=udp://carapax.net:6969/announce&" +
-                "tr=udp://retracker.baikal-telecom.net:2710/announce&" +
-                "tr=udp://bt.dy20188.com:80/announce&" +
-                "tr=udp://tracker.nyaa.uk:6969/announce&" +
-                "tr=udp://carapax.net:6969/announce&" +
-                "tr=udp://amigacity.xyz:6969/announce&" +
-                "tr=udp://tracker.supertracker.net:1337/announce&" +
-                "tr=udp://tracker.cyberia.is:6969/announce&" +
-                "tr=udp://tracker.openbittorrent.com:80/announce&" +
-                "tr=udp://tracker.msm8916.com:6969/announce&" +
-                "tr=udp://tracker.sktorrent.net:6969/announce&";
     }
 
     @Override
@@ -75,7 +59,7 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
             seeds = Integer.parseInt(matcher.group("seeds"));
         } catch (Throwable ignored) {
         }
-        return new Torrentz2SearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, usualTrackers);
+        return new Torrentz2SearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
     }
 
     @Override
@@ -96,10 +80,8 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
             }
             if (matcherFound) {
                 Torrentz2SearchResult sr = fromMatcher(matcher);
-                if (sr != null) {
-                    results.add(sr);
-                    //System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
-                }
+                results.add(sr);
+                //System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
             } else {
                 LOG.warn("Torrentz2SearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
             }

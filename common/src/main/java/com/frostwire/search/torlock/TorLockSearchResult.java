@@ -21,6 +21,8 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -50,7 +52,7 @@ public final class TorLockSearchResult extends AbstractTorrentSearchResult {
         this.size = parseSize(matcher.group("filesize"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "https://" + domainName + "/tor/" + matcher.group("torrentid") + ".torrent";
+        this.torrentUrl = UrlUtils.buildMagnetUrl(infoHash, filename, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 

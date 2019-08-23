@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -79,11 +79,12 @@
             android:paddingTop="@dimen/transfers_detail_page_padding_vertical_small">
 
             <TextView
-                style="@style/transferDetailText"
                 android:id="@+id/fragment_transfer_detail_details_sequential_download_textview"
+                style="@style/transferDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:enabled="false"
                 android:text="@string/sequential_download" />
 
             <CheckBox
@@ -91,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:enabled="true"/>
+                android:enabled="false" />
         </LinearLayout>
 
         <ImageView
