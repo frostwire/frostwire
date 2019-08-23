@@ -31,7 +31,7 @@ final class LibDispatchNative {
     static {
         java.security.AccessController.doPrivileged(
                 (PrivilegedAction<Void>) () -> {
-                    System.loadLibrary("osx_jdk8");
+                    System.loadLibrary("dispatch");
                     return null;
                 });
     }
