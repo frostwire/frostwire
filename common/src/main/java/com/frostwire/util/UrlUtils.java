@@ -28,6 +28,22 @@ import java.nio.charset.StandardCharsets;
  * @author aldenml
  */
 public final class UrlUtils {
+    public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
+            "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
+            "tr=udp://tracker.internetwarriors.net:1337/announce&" +
+            "tr=udp://retracker.akado-ural.ru:80/announce&" +
+            "tr=udp://tracker.moeking.me:6969/announce&" +
+            "tr=udp://carapax.net:6969/announce&" +
+            "tr=udp://retracker.baikal-telecom.net:2710/announce&" +
+            "tr=udp://bt.dy20188.com:80/announce&" +
+            "tr=udp://tracker.nyaa.uk:6969/announce&" +
+            "tr=udp://carapax.net:6969/announce&" +
+            "tr=udp://amigacity.xyz:6969/announce&" +
+            "tr=udp://tracker.supertracker.net:1337/announce&" +
+            "tr=udp://tracker.cyberia.is:6969/announce&" +
+            "tr=udp://tracker.openbittorrent.com:80/announce&" +
+            "tr=udp://tracker.msm8916.com:6969/announce&" +
+            "tr=udp://tracker.sktorrent.net:6969/announce&";
     private UrlUtils() {
     }
 
@@ -53,5 +69,9 @@ public final class UrlUtils {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
+        return"magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
     }
 }
