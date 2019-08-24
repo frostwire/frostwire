@@ -4,7 +4,15 @@ FrostWire 2.1.6 build 597 - AUG/23/2019
  - material:1.1.0-alpha09 update
  - play-services-ads:18.1.1 update
  - mopub-sdk:5.8.0 update
-
+ - com.android.tools.build:gradle:3.5.0
+ - com.android.support:design:29.0.0
+ - com.android.support:animated-vector-drawable:29.0.0
+ - com.android.support:customtabs:29.0.0
+ - com.android.support:exifinterface:29.0.0
+ - com.android.support:preference-v7:29.0.0
+ - com.android.support:preference-v14:29.0.0
+ - gradle wrapper distributionUrl=https\://services.gradle.org/distributions/gradle-5.6-all.zip
+     
 FrostWire 2.1.5 build 596 - JUL/13/2019
  - AndroidX API migration update
  - TPB search censorship improvements
