@@ -27,7 +27,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.android.tools.build:gradle:3.5.0' // 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -87,13 +87,13 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 
 android {
 
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         versionName project.ext.versionName
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         multiDexEnabled true
     }
 
@@ -147,7 +147,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             signingConfig signingConfigs.release
@@ -155,7 +154,6 @@ android {
         }
         debug {
             minifyEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             multiDexKeepFile file('multidex-config.txt')
@@ -186,13 +184,13 @@ dependencies {
     // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
     implementation 'com.squareup.okhttp3:okhttp:3.12.2' // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support:design:29.0.0'
     implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation 'com.android.support:animated-vector-drawable:28.0.0'
-    implementation 'com.android.support:customtabs:28.0.0'
-    implementation 'com.android.support:exifinterface:28.0.0'
-    implementation 'com.android.support:preference-v7:28.0.0'
-    implementation 'com.android.support:preference-v14:28.0.0'
+    implementation 'com.android.support:animated-vector-drawable:29.0.0'
+    implementation 'com.android.support:customtabs:29.0.0'
+    implementation 'com.android.support:exifinterface:29.0.0'
+    implementation 'com.android.support:preference-v7:29.0.0'
+    implementation 'com.android.support:preference-v14:29.0.0'
     implementation 'com.android.billingclient:billing:1.2'
     implementation 'com.google.android.gms:play-services-ads:18.1.1'
     implementation('com.mopub:mopub-sdk-banner:5.8.0@aar') { transitive = true }
