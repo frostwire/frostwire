@@ -1,4 +1,5 @@
 FrostWire 2.1.6 build 597 - AUG/23/2019
+ - Fixes bug where sequential downloads couldn't be turned off
  - Archive.org .torrent download errors fixed
  - TorLock and Torrentz2 search results are magnet based to reduce fetching errors
  - material:1.1.0-alpha09 update

@@ -242,7 +242,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public int getProgress() {
         try {
-            checkSequentialDownload();
+            // TODO: Bring back with a setting
+            //checkSequentialDownload();
         } catch (Throwable e) {
             LOG.error("Error checking sequential download");
         }
@@ -428,6 +429,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return l;
     }
 
+    /** Downloads the first 10mb or 30% of the file sequentially */
     private void checkSequentialDownload() {
         BTDownloadItem item = getFirstBiggestItem();
 
