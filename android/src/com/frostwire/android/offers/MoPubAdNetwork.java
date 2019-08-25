@@ -294,7 +294,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         for (String key : placementKeys) {
             MoPubInterstitial interstitial = interstitials.get(key);
             if (interstitial != null) {
-                interstitial.destroy();
+                try {
+                    interstitial.destroy();
+                } catch (Throwable t) {
+                    LOG.warn(t.getMessage(),t);
+                }
             }
         }
     }
