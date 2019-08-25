@@ -194,7 +194,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         i.setAction(MusicPlaybackService.SERVICECMD);
         i.putExtra(MusicPlaybackService.CMDNAME, command);
         i.putExtra(MusicPlaybackService.FROM_MEDIA_BUTTON, true);
-        Engine.startService(context, i);
+        Engine.startForegroundService(context, i);
     }
 
     private static void acquireWakeLockAndSendMessage(Context context, Message msg, long delay) {

@@ -169,7 +169,7 @@ public final class MusicUtils {
             shutdownIntent.putExtra("force", true);
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
-            Engine.startService(context, shutdownIntent);
+            Engine.startForegroundService(context, shutdownIntent);
         } catch (Throwable t) {
             t.printStackTrace();
         }

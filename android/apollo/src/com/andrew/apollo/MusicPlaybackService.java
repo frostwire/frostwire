@@ -538,7 +538,7 @@ public class MusicPlaybackService extends JobIntentService {
      */
     @Override
     public void onCreate() {
-        if (D) LOG.info("Creating service");
+        if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
 
         Engine.foregroundServiceStartForAndroidO(this);
@@ -570,7 +570,7 @@ public class MusicPlaybackService extends JobIntentService {
      */
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (D) LOG.info("Got new intent " + intent + ", startId = " + startId);
+        if (D) LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
         Engine.foregroundServiceStartForAndroidO(this);
 

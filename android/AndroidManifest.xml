@@ -58,7 +58,7 @@
 
     <application
         android:name="com.frostwire.android.gui.MainApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
         android:theme="@style/Theme.FrostWire"

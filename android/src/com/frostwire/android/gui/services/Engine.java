@@ -196,7 +196,7 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            Engine.startService(context, i);
+            Engine.startForegroundService(context, i);
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }
@@ -264,7 +264,7 @@ public final class Engine implements IEngineService {
         }
     }
 
-    public static void startService(final Context context, final Intent intent) {
+    public static void startForegroundService(final Context context, final Intent intent) {
         if (Build.VERSION.SDK_INT >= 26) {
             ContextCompat.startForegroundService(context, intent);
         } else {

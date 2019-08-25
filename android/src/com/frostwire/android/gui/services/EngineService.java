@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
@@ -85,7 +86,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         super.onCreate();
         async(this, EngineService::cancelAllNotificationsTask); // maybe?
         Engine.foregroundServiceStartForAndroidO(this);
-
+        async(this, EngineService::startPermanentNotificationUpdatesTask);
     }
 
     @Override
@@ -95,12 +96,7 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        async(this, EngineService::cancelAllNotificationsTask);
-        Engine.foregroundServiceStartForAndroidO(this);
-        if (intent == null) {
-            return START_NOT_STICKY;
-        }
-        if (SHUTDOWN_ACTION.equals(intent.getAction())) {
+        if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
             new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
                 @Override
@@ -108,6 +104,13 @@ public class EngineService extends JobIntentService implements IEngineService {
                     shutdownSupport();
                 }
             }.start();
+            return START_NOT_STICKY;
+        }
+
+        async(this, EngineService::cancelAllNotificationsTask);
+        Engine.foregroundServiceStartForAndroidO(this);
+
+        if (intent == null) {
             return START_NOT_STICKY;
         }
         LOG.info("FrostWire's EngineService started by this intent:");
@@ -232,7 +235,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         Context ctx = getApplication();
         Intent i = new Intent(ctx, EngineService.class);
         i.setAction(SHUTDOWN_ACTION);
-        Engine.startService(ctx, i);
+        Engine.startForegroundService(ctx, i);
     }
 
     public class EngineServiceBinder extends Binder {
@@ -265,7 +268,12 @@ public class EngineService extends JobIntentService implements IEngineService {
 
         //ImageLoader.getInstance(this).shutdown();
         stopOkHttp();
-        stopForeground(true);
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            stopForeground(true);
+        } else {
+            stopSelf();
+        }
     }
 
     private int getNotificationIcon() {
