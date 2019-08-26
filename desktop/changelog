@@ -1,3 +1,12 @@
+frostwire (6.8.2) stable; urgency=high
+ * Partial downloads now show only the files selected on Transfer details
+ * Archive.org .torrent download errors fixed
+ * TorLock and Torrentz2 search results are magnet based to reduce fetching errors
+ * Mac: All C/C++ source code has been recompiled with MacSDK 10.14
+ * Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 26 August 2019 11:34:22 -0600
+
 frostwire (6.8.1) stable; urgency=high
  * Time remaining renderer bug fixed
  * Update system bug fixed
