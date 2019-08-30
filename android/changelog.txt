@@ -1,4 +1,4 @@
-FrostWire 2.1.6 build 597 - AUG/24/2019
+FrostWire 2.1.6 build 599 - AUG/30/2019
  - Fixes bug where sequential downloads couldn't be turned off
  - Archive.org .torrent download errors fixed
  - TorLock and Torrentz2 search results are magnet based to reduce fetching errors
@@ -15,6 +15,29 @@ FrostWire 2.1.6 build 597 - AUG/24/2019
  - com.android.support:preference-v14:29.0.0 update
  - gradle wrapper distributionUrl=https\://services.gradle.org/distributions/gradle-5.6-all.zip
  - crash fixes and optimizations
+ - New jlibtorrent 1.2.2.0 update
+ - jlibtorrent updated to boost 1.71.0
+ - jlibtorrent upgraded openssl to 1.1.1c
+ - jlibtorrent compiled with std=c++14 (up from c++11)
+ - lt:pick contiguous pieces from peers with high download rate
+ - lt:fix error handling of moving storage to a drive letter that isn't mounted
+ - lt:fix integer overflow in http parser
+ - lt:fix integer overflow in chunked http parser
+ - lt:factor out and unit test parts of the DHT routing table logic
+ - lt:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+ - lt:avoid empty dht routing table buckets
+ - lt:fix dht_stats_alert routing table stats for multi-homed clients
+ - lt:fix entry assignment from bdecode_node and lazy_entry
+ - lt:fix use-after-free issue in socket_type
+ - lt:fix error code messages when building without deprecated functions
+ - lt:feature to disable DHT, PEX and LSD per torrent
+ - lt:fix seeding of random number generator on mingw
+ - lt:fix issue where trackers from magnet links were not included in create_torrent()
+ - lt:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+ - lt:fix error handling of moving storage to a drive letter that isn't mounted
+ - lt:don't leak exceptions out of handler callbacks in resolver
+ - lt:ensure headers build independently
+ - lt:fix unit template's mutating operators to give them proper ref qualifiers
      
 FrostWire 2.1.5 build 596 - JUL/13/2019
  - AndroidX API migration update

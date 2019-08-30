@@ -4,8 +4,31 @@ frostwire (6.8.2) stable; urgency=high
  * TorLock and Torrentz2 search results are magnet based to reduce fetching errors
  * Mac: All C/C++ source code has been recompiled with MacSDK 10.14
  * Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
+ * New jlibtorrent 1.2.2.0 update
+ * jlibtorrent updated to boost 1.71.0
+ * jlibtorrent upgraded openssl to 1.1.1c
+ * jlibtorrent compiled with std=c++14 (up from c++11)
+ * lt:pick contiguous pieces from peers with high download rate
+ * lt:fix error handling of moving storage to a drive letter that isn't mounted
+ * lt:fix integer overflow in http parser
+ * lt:fix integer overflow in chunked http parser
+ * lt:factor out and unit test parts of the DHT routing table logic
+ * lt:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+ * lt:avoid empty dht routing table buckets
+ * lt:fix dht_stats_alert routing table stats for multi-homed clients
+ * lt:fix entry assignment from bdecode_node and lazy_entry
+ * lt:fix use-after-free issue in socket_type
+ * lt:fix error code messages when building without deprecated functions
+ * lt:feature to disable DHT, PEX and LSD per torrent
+ * lt:fix seeding of random number generator on mingw
+ * lt:fix issue where trackers from magnet links were not included in create_torrent()
+ * lt:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+ * lt:fix error handling of moving storage to a drive letter that isn't mounted
+ * lt:don't leak exceptions out of handler callbacks in resolver
+ * lt:ensure headers build independently
+ * lt:fix unit template's mutating operators to give them proper ref qualifiers
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 26 August 2019 11:34:22 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 30 August 2019 15:54:22 -0600
 
 frostwire (6.8.1) stable; urgency=high
  * Time remaining renderer bug fixed
