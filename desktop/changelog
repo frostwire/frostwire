@@ -1,40 +1,40 @@
 frostwire (6.8.2) stable; urgency=high
- * Partial downloads now show only the files selected on Transfer details
- * Archive.org .torrent download errors fixed
- * TorLock and Torrentz2 search results are magnet based to reduce fetching errors
- * Mac: All C/C++ source code has been recompiled with MacSDK 10.14
- * Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
- * New jlibtorrent 1.2.2.0 update
- * jlibtorrent updated to boost 1.71.0
- * jlibtorrent upgraded openssl to 1.1.1c
- * jlibtorrent compiled with std=c++14 (up from c++11)
- * lt:pick contiguous pieces from peers with high download rate
- * lt:fix error handling of moving storage to a drive letter that isn't mounted
- * lt:fix integer overflow in http parser
- * lt:fix integer overflow in chunked http parser
- * lt:factor out and unit test parts of the DHT routing table logic
- * lt:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
- * lt:avoid empty dht routing table buckets
- * lt:fix dht_stats_alert routing table stats for multi-homed clients
- * lt:fix entry assignment from bdecode_node and lazy_entry
- * lt:fix use-after-free issue in socket_type
- * lt:fix error code messages when building without deprecated functions
- * lt:feature to disable DHT, PEX and LSD per torrent
- * lt:fix seeding of random number generator on mingw
- * lt:fix issue where trackers from magnet links were not included in create_torrent()
- * lt:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
- * lt:fix error handling of moving storage to a drive letter that isn't mounted
- * lt:don't leak exceptions out of handler callbacks in resolver
- * lt:ensure headers build independently
- * lt:fix unit template's mutating operators to give them proper ref qualifiers
+  * Partial downloads now show only the files selected on Transfer details
+  * Archive.org .torrent download errors fixed
+  * TorLock and Torrentz2 search results are magnet based to reduce fetching errors
+  * Mac: All C/C++ source code has been recompiled with MacSDK 10.14
+  * Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
+  * New jlibtorrent 1.2.2.0 update
+  * jlibtorrent updated to boost 1.71.0
+  * jlibtorrent upgraded openssl to 1.1.1c
+  * jlibtorrent compiled with std=c++14 (up from c++11)
+  * libtorrent:pick contiguous pieces from peers with high download rate
+  * libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  * libtorrent:fix integer overflow in http parser
+  * libtorrent:fix integer overflow in chunked http parser
+  * libtorrent:factor out and unit test parts of the DHT routing table logic
+  * libtorrent:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+  * libtorrent:avoid empty dht routing table buckets
+  * libtorrent:fix dht_stats_alert routing table stats for multi-homed clients
+  * libtorrent:fix entry assignment from bdecode_node and lazy_entry
+  * libtorrent:fix use-after-free issue in socket_type
+  * libtorrent:fix error code messages when building without deprecated functions
+  * libtorrent:feature to disable DHT, PEX and LSD per torrent
+  * libtorrent:fix seeding of random number generator on mingw
+  * libtorrent:fix issue where trackers from magnet links were not included in create_torrent()
+  * libtorrent:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+  * libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  * libtorrent:don't leak exceptions out of handler callbacks in resolver
+  * libtorrent:ensure headers build independently
+  * libtorrent:fix unit template's mutating operators to give them proper ref qualifiers
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 30 August 2019 15:54:22 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 30 Aug 2019 15:54:22 -0600
 
 frostwire (6.8.1) stable; urgency=high
- * Time remaining renderer bug fixed
- * Update system bug fixed
+  * Time remaining renderer bug fixed
+  * Update system bug fixed
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 23 July 2019 05:33:48 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 23 Jul 2019 05:33:48 -0600
 
 frostwire (6.8.0) stable; urgency=high
   * Nyaa search fixed
@@ -61,7 +61,7 @@ frostwire (6.8.0) stable; urgency=high
   * Pixabay search removed
   * macos: Rebuilt libSystemUtilities.jnilib shared library for x86_64 arch only
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 20 July 2019 15:09:17 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 20 Jul 2019 15:09:17 -0600
 
 frostwire (6.7.9) stable; urgency=high
   * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
