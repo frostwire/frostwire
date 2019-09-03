@@ -102,6 +102,9 @@ final class AboutWindow {
         int r = color.getRed();
         int g = color.getGreen();
         int b = color.getBlue();
+
+        String mplayerVersion = OSUtils.isMacOSX() ? "1.4.0" : "1.3.0";
+
         String hex = toHex(r) + toHex(g) + toHex(b);
         sb.append("<body text='#").append(hex).append("'>");
         sb.append("<h1>Powered by</h1>").
@@ -109,8 +112,9 @@ final class AboutWindow {
                 append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
                 append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum()).
-                append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> 1.3.0</li>").
-                append("</ul>");
+                append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> ");
+        sb.append(mplayerVersion);
+        sb.append("</li></ul>");
         //  introduction
         sb.append("<h1>").append(I18n.tr("FrostWire Logo Designer")).append("</h1>");
         sb.append("<ul><li>Luis Ramirez (Venezuela - <a href='http://www.elblogo.com'>ElBlogo.com</a>)</li></ul>");
