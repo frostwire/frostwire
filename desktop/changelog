@@ -1,6 +1,7 @@
 frostwire (6.8.3) stable; urgency=high
-  * Mac: new mplayer 1.4.0 build
--- FrostWire Team <contact@frostwire.com>  Mon, 2 Sep 2019 19:47:23 -0600
+  * Mac: new mplayer 1.4.0 build with ffmpeg 4.2
+
+-- FrostWire Team <contact@frostwire.com>  Wed, 4 Sep 2019 22:14:34 -0600
 
 frostwire (6.8.2) stable; urgency=high
   * Partial downloads now show only the files selected on Transfer details
