@@ -44,12 +44,10 @@ cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-android-x86-${JLIBTORRENT_VERSION}
 cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-${JLIBTORRENT_VERSION}.jar desktop/lib/jars/
 
 # Windows dlls for both x86 and x86_64
-cp ${JLIBTORRENT_ROOT}/swig/bin/release/windows/x86/jlibtorrent.dll desktop/lib/native/jlibtorrentX86.dll
 cp ${JLIBTORRENT_ROOT}/swig/bin/release/windows/x86_64/jlibtorrent.dll desktop/lib/native/jlibtorrent.dll
 
 # MacOS only x86_64
 cp ${JLIBTORRENT_ROOT}/swig/bin/release/macosx/x86_64/libjlibtorrent.dylib desktop/lib/native/
 
 # Linux
-cp ${JLIBTORRENT_ROOT}/swig/bin/release/linux/x86/libjlibtorrent.so desktop/lib/native/libjlibtorrentX86.so
 cp ${JLIBTORRENT_ROOT}/swig/bin/release/linux/x86_64/libjlibtorrent.so desktop/lib/native/libjlibtorrent.so
