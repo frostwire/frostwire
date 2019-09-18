@@ -103,18 +103,19 @@ final class AboutWindow {
         int g = color.getGreen();
         int b = color.getBlue();
 
-        String mplayerVersion = OSUtils.isMacOSX() ? "1.4.0" : "1.3.0";
-
         String hex = toHex(r) + toHex(g) + toHex(b);
         sb.append("<body text='#").append(hex).append("'>");
         sb.append("<h1>Powered by</h1>").
                 append("<ul>").
                 append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
-                append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum()).
-                append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> ");
-        sb.append(mplayerVersion);
-        sb.append("</li></ul>");
+                append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum());
+
+        if (!OSUtils.isLinux()) {
+            String mplayerVersion = "1.4.0";
+            sb.append("<li><a href='http://www.mplayerhq.hu/'>MPlayer</a> ");
+            sb.append(mplayerVersion);
+        }
         //  introduction
         sb.append("<h1>").append(I18n.tr("FrostWire Logo Designer")).append("</h1>");
         sb.append("<ul><li>Luis Ramirez (Venezuela - <a href='http://www.elblogo.com'>ElBlogo.com</a>)</li></ul>");
