@@ -213,7 +213,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
 
     //https://square.github.io/okhttp/changelog_3x/
-    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.5'
     // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
     // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
 
