@@ -641,7 +641,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
-    private class MyFilesActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
+    private class MyFilesActionModeCallback implements ActionMode.Callback {
         private ActionMode mode;
         private Menu menu;
         private int numChecked;

@@ -289,7 +289,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         }
     }
 
-    private final class ImageViewerActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
+    private final class ImageViewerActionModeCallback implements ActionMode.Callback {
         private final FileDescriptor fd;
         private final int position;
         private ActionMode mode;

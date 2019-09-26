@@ -3,9 +3,11 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import androidx.appcompat.widget.AppCompatAutoCompleteTextView;
+
 import com.frostwire.android.gui.util.UIUtils;
 
-public class FWAutoCompleteTextView extends androidx.appcompat.widget.AppCompatAutoCompleteTextView {
+public class FWAutoCompleteTextView extends AppCompatAutoCompleteTextView {
     private boolean showKeyboardOnPaste;
     
     public FWAutoCompleteTextView(Context context, AttributeSet attrs, int defStyle) {

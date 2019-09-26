@@ -86,12 +86,11 @@ project.ext.versionName = manifestVersionName()
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease")
 
 android {
-
     compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
-        versionName project.ext.versionName
+        versionName versionName
         minSdkVersion 19
         targetSdkVersion 29
         multiDexEnabled true
@@ -179,27 +178,65 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.re2j:re2j:1.2'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
-    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support:design:29.0.0'
+// AndroidX
+    //https://developer.android.com/jetpack/androidx/versions
+    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.core:core:1.0.2'
+    implementation 'androidx.cursoradapter:cursoradapter:1.0.0'
+    implementation 'androidx.documentfile:documentfile:1.0.0'
+    implementation 'androidx.drawerlayout:drawerlayout:1.0.0'
+    implementation 'androidx.fragment:fragment:1.0.0'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+    implementation 'androidx.viewpager:viewpager:1.0.0' //viewpager2
     implementation 'com.google.android.material:material:1.1.0-alpha09'
-    implementation 'com.android.support:animated-vector-drawable:29.0.0'
-    implementation 'com.android.support:customtabs:29.0.0'
-    implementation 'com.android.support:exifinterface:29.0.0'
-    implementation 'com.android.support:preference-v7:29.0.0'
-    implementation 'com.android.support:preference-v14:29.0.0'
+
+
+// Other
+    //https://developer.android.com/google/play/billing/billing_library_releases_notes
     implementation 'com.android.billingclient:billing:1.2'
+
+    //https://github.com/google/re2j/releases
+    implementation 'com.google.re2j:re2j:1.2'
+
+    //https://github.com/google/gson/blob/master/CHANGELOG.md
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    //https://github.com/google/flexbox-layout/releases
+    implementation 'com.google.android:flexbox:1.0.0'
+
+    //https://github.com/square/picasso/blob/master/CHANGELOG.md
+    implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
+
+    //https://square.github.io/okhttp/changelog_3x/
+    implementation 'com.squareup.okhttp3:okhttp:3.12.2'
+    // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
+    // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
+
+
+// Ads
+    //https://developers.google.com/admob/android/rel-notes
     implementation 'com.google.android.gms:play-services-ads:18.1.1'
+
+    //https://mvnrepository.com/artifact/com.applovin/applovin-sdk
+    implementation 'com.applovin:applovin-sdk:9.8.4' //previous 9.7.2
+
+    //https://github.com/mopub/mopub-android-sdk/blob/master/CHANGELOG.md
     implementation('com.mopub:mopub-sdk-banner:5.8.0@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-interstitial:5.8.0@aar') { transitive = true }
-    implementation 'com.applovin:applovin-sdk:9.8.4' //previous 9.7.2
-    implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.google.android:flexbox:1.0.0'
+
+    //https://github.com/Vungle/Android-SDK/blob/master/CHANGELOG.md
     implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
+
+    //https://github.com/mopub/mopub-android-mediation/blob/master/Vungle/CHANGELOG.md
     implementation 'com.mopub.mediation:vungle:6.3.24.0'
+
+
+// JLibTorrent
     implementation files('libs/jlibtorrent-1.2.2.0.jar')
     implementation files('libs/jlibtorrent-android-arm-1.2.2.0.jar')
     implementation files('libs/jlibtorrent-android-x86-1.2.2.0.jar')
