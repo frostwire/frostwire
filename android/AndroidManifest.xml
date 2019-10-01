@@ -29,7 +29,6 @@
     <!-- Plus version example  for 1.7.2 build 242  -> 9050242 -->
     <!-- Basic version example for 1.7.2 build 242  -> 9010242 -->
     <!-- Don't go nuts, max version number will be: 2,147,483,647 -->
-
     <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -43,6 +42,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:remove="android:maxSdkVersion"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -62,7 +62,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
         android:theme="@style/Theme.FrostWire"
-        tools:replace="android:label">
+        tools:replace="android:label"
+        android:requestLegacyExternalStorage="true">
 
         <meta-data
             android:name="com.google.android.gms.version"
