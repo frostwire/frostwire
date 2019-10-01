@@ -37,7 +37,6 @@ repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    maven { url 'https://jitpack.io' } // for Vungle
     flatDir { dirs 'libs' }
 }
 
@@ -197,8 +196,7 @@ dependencies {
     implementation 'com.applovin:applovin-sdk:9.8.4' //previous 9.7.2
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android:flexbox:1.0.0'
-    implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
-    implementation 'com.mopub.mediation:vungle:6.3.24.0'
+    implementation 'com.vungle:publisher-sdk-android:6.4.11'
     implementation files('libs/jlibtorrent-1.2.2.0.jar')
     implementation files('libs/jlibtorrent-android-arm-1.2.2.0.jar')
     implementation files('libs/jlibtorrent-android-x86-1.2.2.0.jar')
