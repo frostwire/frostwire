@@ -1,14 +1,14 @@
 /*
-* Copyright (C) 2012-2018 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
-* Licensed under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with the
-* License. You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
-* or agreed to in writing, software distributed under the License is
-* distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied. See the License for the specific language
-* governing permissions and limitations under the License.
-*/
+ * Copyright (C) 2012-2018 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
+ * Licensed under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
+ * or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
 
 package com.andrew.apollo;
 
@@ -283,15 +283,12 @@ public class MusicPlaybackService extends JobIntentService {
     private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
 
     /**
-     * The max size allowed for the track history
-     */
-    private static final int MAX_HISTORY_SIZE = 100;
-
-    /**
      * The columns used to retrieve any info from the current track
      */
+    private static String AUDIO_ID_COLUMN_NAME = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) ? "_id" : "audio._id AS _id";
+
     private static final String[] PROJECTION = new String[]{
-            "audio._id AS _id", MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
+            AUDIO_ID_COLUMN_NAME, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST_ID
@@ -531,8 +528,6 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -556,7 +551,8 @@ public class MusicPlaybackService extends JobIntentService {
                 // give this is a service declared in AndroidManifest.xml"
                 // -gubatron
                 new Thread(this::initService).start();
-            } catch (Throwable ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
     }
 
@@ -950,7 +946,6 @@ public class MusicPlaybackService extends JobIntentService {
 
     /**
      * Called when we receive a ACTION_MEDIA_EJECT notification.
-     *
      */
     private void closeExternalStorageFiles() {
         stop(true);
@@ -1242,6 +1237,7 @@ public class MusicPlaybackService extends JobIntentService {
         try {
             c = getContentResolver().query(uri, projection, selection, selectionArgs, null);
         } catch (Throwable t) {
+            t.printStackTrace();
             return null;
         }
 
@@ -2127,7 +2123,7 @@ public class MusicPlaybackService extends JobIntentService {
 
     /**
      * Expensive method, do not use in main thread.
-     *
+     * <p>
      * Returns the full duration of the current track
      *
      * @return The duration of the current track in milliseconds
@@ -2411,7 +2407,7 @@ public class MusicPlaybackService extends JobIntentService {
      * Moves an item in the queue from one position to another
      *
      * @param from The position the item is currently at
-     * @param to The position the item is being moved to
+     * @param to   The position the item is being moved to
      */
     public void moveQueueItem(int from, int to) {
         synchronized (this) {
@@ -2483,6 +2479,7 @@ public class MusicPlaybackService extends JobIntentService {
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED, shuffleEnabled);
     }
+
     /**
      * Sets the position of a track in the queue
      *
@@ -2796,8 +2793,8 @@ public class MusicPlaybackService extends JobIntentService {
             if (Ref.alive(mService)) {
                 MusicPlaybackService musicPlaybackService = mService.get();
                 async(musicPlaybackService,
-                      MusicPlaybackService.MultiPlayer::setDataSourceTask,
-                      player, path, callback, this);
+                        MusicPlaybackService.MultiPlayer::setDataSourceTask,
+                        player, path, callback, this);
             }
         }
 
