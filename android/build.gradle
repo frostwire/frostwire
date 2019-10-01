@@ -180,8 +180,7 @@ android {
 dependencies {
     implementation 'com.google.re2j:re2j:1.2'
     implementation 'com.google.code.gson:gson:2.8.5'
-    // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
-    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // 3.12.2 last compatible one for android 4.4 (3.14.2 works fine on Android 9)
+    implementation 'com.squareup.okhttp3:okhttp:3.14.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.1.0-alpha10'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
