@@ -30,8 +30,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
-import com.vungle.warren.InitCallback;
-import com.vungle.warren.Vungle;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,8 +52,6 @@ public final class Offers {
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdnetworksInvocationTimestamp = 0;
     private static boolean FORCED_DISABLED = false;
-    private static boolean VUNGLE_STARTED = false;
-    private static final Object VUNGLE_LOCK = new Object();
 
     private Offers() {
     }
@@ -84,38 +80,7 @@ public final class Offers {
                 }
             }
         }
-
-        initVungleNetwork(activity);
         LOG.info("Offers.initAdNetworks() success");
-    }
-
-    private static void initVungleNetwork(Activity activity) {
-        synchronized (VUNGLE_LOCK) {
-            if (!VUNGLE_STARTED && activity != null && activity.getApplicationContext() != null) {
-                try {
-                    VUNGLE_STARTED = true;
-                    Vungle.init("5c00206d78a5900016b79134", activity.getApplicationContext(), new InitCallback() {
-                        @Override
-                        public void onSuccess() {
-                            VUNGLE_STARTED = true;
-                            LOG.info("Offers.initAdNetworks() - Vungle.init() success");
-                        }
-
-                        @Override
-                        public void onError(Throwable throwable) {
-                            VUNGLE_STARTED = false;
-                            LOG.error("Offers.initAdNetworks() - Vungle.init() error", throwable);
-                        }
-
-                        @Override
-                        public void onAutoCacheAdAvailable(String s) {
-                        }
-                    });
-                } catch (Throwable throwable) {
-                    LOG.error("Unexpected error thrown by Vungle.init()", throwable);
-                }
-            }
-        }
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
