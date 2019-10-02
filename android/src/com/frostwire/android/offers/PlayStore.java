@@ -402,7 +402,7 @@ public final class PlayStore extends StoreBase {
                     try {
                         SkuDetails skuDetails = skuDetailsList.get(0);
                         LOG.info("Launching billing flow for SKU " + skuId);
-                        BillingFlowParams purchaseParams = BillingFlowParams.newBuilder().setOldSku(skuId).setSkuDetails(skuDetails).build();
+                        BillingFlowParams purchaseParams = BillingFlowParams.newBuilder().setSkuDetails(skuDetails).build();
                         billingClient.launchBillingFlow(activity, purchaseParams);
                     } catch (Throwable t) {
                         LOG.error("Error in initiatePurchaseFlow::billingClient.querySkuDetailsAsync callback", t);

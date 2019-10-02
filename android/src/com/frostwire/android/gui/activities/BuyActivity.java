@@ -75,8 +75,13 @@ public final class BuyActivity extends AbstractActivity {
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            PlayStore.getInstance(this).setGlobalPurchasesUpdatedListenerWeakRef(onPurchasesUpdatedListener);
-            PlayStore.getInstance(this).purchase(this, p);
+            PlayStore playStore = PlayStore.getInstance(this);
+            if (playStore == null) {
+                LOG.error("purchaseProduct(tagId="+tagId+") failed, could not get an instance of PlayStore");
+                return;
+            }
+            playStore.setGlobalPurchasesUpdatedListenerWeakRef(onPurchasesUpdatedListener);
+            playStore.purchase(this, p);
         }
     }
 
