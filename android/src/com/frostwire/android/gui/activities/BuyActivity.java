@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -69,11 +70,12 @@ public final class BuyActivity extends AbstractActivity {
         super(R.layout.activity_buy);
     }
 
+    private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, purchases) -> BuyActivity.this.onPurchasesUpdatedOld(billingResult.getResponseCode());
+
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
         if (p != null) {
-            PlayStore.getInstance(this).setGlobalPurchasesUpdatedListener(
-                    (responseCode, purchases) -> onPurchasesUpdated(responseCode));
+            PlayStore.getInstance(this).setGlobalPurchasesUpdatedListenerWeakRef(onPurchasesUpdatedListener);
             PlayStore.getInstance(this).purchase(this, p);
         }
     }
@@ -369,7 +371,7 @@ public final class BuyActivity extends AbstractActivity {
         return intent != null && intent.getBooleanExtra(INTERSTITIAL_MODE, false);
     }
 
-    private void onPurchasesUpdated(int responseCode) {
+    private void onPurchasesUpdatedOld(int responseCode) {
         // RESPONSE_CODE = 0 -> Payment Successful
         // user clicked outside of the PlayStore purchase dialog
         if (responseCode != 0) {

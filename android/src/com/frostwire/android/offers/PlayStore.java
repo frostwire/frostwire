@@ -22,15 +22,15 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+
 import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClient.BillingResponse;
-import com.android.billingclient.api.BillingClient.FeatureType;
-import com.android.billingclient.api.BillingClient.SkuType;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.Purchase.PurchasesResult;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
@@ -50,6 +50,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,8 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import androidx.annotation.NonNull;
 
 import static com.frostwire.android.offers.Products.toDays;
 import static com.frostwire.android.util.Asyncs.async;
@@ -88,10 +87,41 @@ public final class PlayStore extends StoreBase {
     private String lastSkuPurchased;
     private Set<String> tokensToBeConsumed;
 
-    private WeakReference<PurchasesUpdatedListener> globalPurchasesUpdatedListener;
+    private WeakReference<PurchasesUpdatedListener> globalPurchasesUpdatedListenerWeakRef;
 
     private static final Object lock = new Object();
     private static PlayStore instance;
+
+    private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, purchases) -> {
+        if (inventory == null) {
+            LOG.info("Inventory is null, review your logic");
+            return;
+        }
+        int responseCode = billingResult.getResponseCode();
+        if (responseCode == BillingClient.BillingResponseCode.OK) {
+            if (purchases != null) {
+                for (Purchase purchase : purchases) {
+                    handlePurchase(purchase);
+                }
+                products = buildProducts(inventory);
+            } else {
+                LOG.info("Received no purchases");
+            }
+
+        } else if (responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            LOG.info("onPurchasesUpdated() - user cancelled the purchase flow - skipping");
+        } else {
+            LOG.info("onPurchasesUpdated() got unknown resultCode: " + responseCode);
+        }
+
+        try {
+            if (Ref.alive(globalPurchasesUpdatedListenerWeakRef)) {
+                globalPurchasesUpdatedListenerWeakRef.get().onPurchasesUpdated(billingResult, purchases);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error calling global onPurchasesUpdated listener", e);
+        }
+    };
 
     @NonNull
     public static PlayStore getInstance(@NonNull Context context) {
@@ -107,7 +137,8 @@ public final class PlayStore extends StoreBase {
         inventory = new Inventory();
         billingClient = BillingClient
                 .newBuilder(context)
-                .setListener(this::onPurchasesUpdated)
+                .enablePendingPurchases()
+                .setListener(onPurchasesUpdatedListener)
                 .build();
 
         LOG.info("Starting setup.");
@@ -161,7 +192,7 @@ public final class PlayStore extends StoreBase {
         }
 
         try {
-            initiatePurchaseFlow(activity, p.sku(), p.subscription() ? SkuType.SUBS : SkuType.INAPP);
+            initiatePurchaseFlow(activity, p.sku(), p.subscription() ? BillingClient.SkuType.SUBS : BillingClient.SkuType.INAPP);
         } catch (Throwable e) {
             LOG.error("Error launching purchase flow", e);
         }
@@ -207,8 +238,8 @@ public final class PlayStore extends StoreBase {
         }
     }
 
-    public void setGlobalPurchasesUpdatedListener(PurchasesUpdatedListener listener) {
-        this.globalPurchasesUpdatedListener = Ref.weak(listener);
+    public void setGlobalPurchasesUpdatedListenerWeakRef(PurchasesUpdatedListener listener) {
+        this.globalPurchasesUpdatedListenerWeakRef = Ref.weak(listener);
     }
 
     private boolean isClientNull() {
@@ -221,7 +252,7 @@ public final class PlayStore extends StoreBase {
     }
 
     private boolean isClientDisconnected() {
-        if (billingClient == null || !isServiceConnected || billingClientResponseCode != BillingResponse.OK) {
+        if (billingClient == null || !isServiceConnected || billingClientResponseCode != BillingClient.BillingResponseCode.OK) {
             LOG.info("Internal client is disconnected");
             return true;
         } else {
@@ -248,12 +279,13 @@ public final class PlayStore extends StoreBase {
 
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(@BillingResponse int billingResponseCode) {
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                int billingResponseCode = billingResult.getResponseCode();
                 LOG.info("Setup finished. Response code: " + billingResponseCode);
 
                 billingClientResponseCode = billingResponseCode;
 
-                if (billingResponseCode == BillingResponse.OK) {
+                if (billingResponseCode == BillingClient.BillingResponseCode.OK) {
                     isServiceConnected = true;
                     if (executeOnSuccess != null) {
                         executeOnSuccess.run();
@@ -280,23 +312,23 @@ public final class PlayStore extends StoreBase {
 
             try {
                 long time = System.currentTimeMillis();
-                PurchasesResult purchasesResult = billingClient.queryPurchases(SkuType.INAPP);
+                Purchase.PurchasesResult purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP);
                 LOG.info("Querying purchases elapsed time: " + (System.currentTimeMillis() - time) + "ms");
                 // If there are subscriptions supported, we add subscription rows as well
                 if (areSubscriptionsSupported()) {
-                    PurchasesResult subscriptionResult = billingClient.queryPurchases(SkuType.SUBS);
+                    Purchase.PurchasesResult subscriptionResult = billingClient.queryPurchases(BillingClient.SkuType.SUBS);
                     LOG.info("Querying purchases and subscriptions elapsed time: "
                             + (System.currentTimeMillis() - time) + "ms");
                     LOG.info("Querying subscriptions result code: "
                             + subscriptionResult.getResponseCode()
                             + " res: " + subscriptionResult.getPurchasesList().size());
 
-                    if (subscriptionResult.getResponseCode() == BillingResponse.OK) {
+                    if (subscriptionResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
                     } else {
                         LOG.info("Got an error response trying to query subscription purchases");
                     }
-                } else if (purchasesResult.getResponseCode() == BillingResponse.OK) {
+                } else if (purchasesResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     LOG.info("Skipped subscription purchases query since they are not supported");
                 } else {
                     LOG.info("queryPurchases() got an error response code: " + purchasesResult.getResponseCode());
@@ -310,7 +342,7 @@ public final class PlayStore extends StoreBase {
         executeServiceRequest(queryToExecute);
     }
 
-    private void querySkuDetailsAsync(@SkuType final String itemType, final List<String> skuList,
+    private void querySkuDetailsAsync(@BillingClient.SkuType final String itemType, final List<String> skuList,
                                       final SkuDetailsResponseListener listener) {
         Runnable queryRequest = () -> {
             if (isClientDisconnected()) {
@@ -330,13 +362,15 @@ public final class PlayStore extends StoreBase {
     }
 
     private void querySkuDetails() {
-        SkuDetailsResponseListener listener = (responseCode, skuDetailsList) -> {
+        SkuDetailsResponseListener listener = (billingResult, skuDetailsList) -> {
             if (inventory == null) {
                 LOG.warn("Inventory is null, review your logic");
                 return;
             }
 
-            if (responseCode == BillingResponse.OK) {
+            int responseCode = billingResult.getResponseCode();
+
+            if (responseCode == BillingClient.BillingResponseCode.OK) {
                 for (SkuDetails detail : skuDetailsList) {
                     inventory.addSkuDetails(detail);
                 }
@@ -345,15 +379,15 @@ public final class PlayStore extends StoreBase {
                 LOG.info("onSkuDetailsResponse() got unknown resultCode: " + responseCode);
             }
         };
-        querySkuDetailsAsync(SkuType.INAPP, Products.itemSkus(), listener);
-        querySkuDetailsAsync(SkuType.SUBS, Products.subsSkus(), listener);
+        querySkuDetailsAsync(BillingClient.SkuType.INAPP, Products.itemSkus(), listener);
+        querySkuDetailsAsync(BillingClient.SkuType.SUBS, Products.subsSkus(), listener);
     }
 
     /**
      * Start a purchase flow
      */
     private void initiatePurchaseFlow(final Activity activity, final String skuId,
-                                      final @SkuType String billingType) {
+                                      final @BillingClient.SkuType String billingType) {
         Runnable purchaseFlowRequest = () -> {
             if (isClientDisconnected()) {
                 return;
@@ -361,9 +395,20 @@ public final class PlayStore extends StoreBase {
 
             try {
                 LOG.info("Launching in-app purchase flow");
-                BillingFlowParams purchaseParams = BillingFlowParams.newBuilder()
-                        .setSku(skuId).setType(billingType).build();
-                billingClient.launchBillingFlow(activity, purchaseParams);
+                List<String> skusList = new ArrayList<>();
+                skusList.add(skuId);
+                SkuDetailsParams skuDetailsParams = SkuDetailsParams.newBuilder().setSkusList(skusList).setType(billingType).build();
+                billingClient.querySkuDetailsAsync(skuDetailsParams, (billingResult, skuDetailsList) -> {
+                    try {
+                        SkuDetails skuDetails = skuDetailsList.get(0);
+                        LOG.info("Launching billing flow for SKU " + skuId);
+                        BillingFlowParams purchaseParams = BillingFlowParams.newBuilder().setOldSku(skuId).setSkuDetails(skuDetails).build();
+                        billingClient.launchBillingFlow(activity, purchaseParams);
+                    } catch (Throwable t) {
+                        LOG.error("Error in initiatePurchaseFlow::billingClient.querySkuDetailsAsync callback", t);
+                    }
+                });
+
             } catch (Throwable e) {
                 LOG.error("Error in initiatePurchaseFlow()", e);
             }
@@ -397,7 +442,8 @@ public final class PlayStore extends StoreBase {
                 return;
             }
             try {
-                billingClient.consumeAsync(purchaseToken, onConsumeListener);
+                ConsumeParams consumeParams = ConsumeParams.newBuilder().setPurchaseToken(purchaseToken).build();
+                billingClient.consumeAsync(consumeParams, onConsumeListener);
             } catch (Throwable e) {
                 LOG.error("Error calling consumeAsync", e);
             }
@@ -424,58 +470,27 @@ public final class PlayStore extends StoreBase {
      * </p>
      */
     private boolean areSubscriptionsSupported() {
-        int responseCode = billingClient.isFeatureSupported(FeatureType.SUBSCRIPTIONS);
-        if (responseCode != BillingResponse.OK) {
+        int responseCode = billingClient.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS).getResponseCode();
+        if (responseCode != BillingClient.BillingResponseCode.OK) {
             LOG.info("areSubscriptionsSupported() got an error response: " + responseCode);
         }
-        return responseCode == BillingResponse.OK;
+        return responseCode == BillingClient.BillingResponseCode.OK;
     }
 
     /**
      * Handle a result from querying of purchases and report an updated list to the listener
      */
-    private void onQueryPurchasesFinished(PurchasesResult result) {
+    private void onQueryPurchasesFinished(Purchase.PurchasesResult result) {
         // Have we been disposed of in the meantime? If so, or bad result code, then quit
-        if (billingClient == null || result.getResponseCode() != BillingResponse.OK) {
+        if (billingClient == null || result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
             LOG.info("Billing client was null or result code (" + result.getResponseCode()
                     + ") was bad - quitting");
             return;
         }
 
         LOG.info("Query inventory was successful.");
-
-        onPurchasesUpdated(BillingResponse.OK, result.getPurchasesList());
-    }
-
-    private void onPurchasesUpdated(@BillingResponse int responseCode, List<Purchase> purchases) {
-        if (inventory == null) {
-            LOG.info("Inventory is null, review your logic");
-            return;
-        }
-
-        if (responseCode == BillingResponse.OK) {
-            if (purchases != null) {
-                for (Purchase purchase : purchases) {
-                    handlePurchase(purchase);
-                }
-                products = buildProducts(inventory);
-            } else {
-                LOG.info("Received no purchases");
-            }
-
-        } else if (responseCode == BillingResponse.USER_CANCELED) {
-            LOG.info("onPurchasesUpdated() - user cancelled the purchase flow - skipping");
-        } else {
-            LOG.info("onPurchasesUpdated() got unknown resultCode: " + responseCode);
-        }
-
-        try {
-            if (Ref.alive(globalPurchasesUpdatedListener)) {
-                globalPurchasesUpdatedListener.get().onPurchasesUpdated(responseCode, purchases);
-            }
-        } catch (Throwable e) {
-            LOG.error("Error calling global onPurchasesUpdated listener", e);
-        }
+        BillingResult billingResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build();
+        onPurchasesUpdatedListener.onPurchasesUpdated(billingResult, result.getPurchasesList());
     }
 
     /**
@@ -524,22 +539,22 @@ public final class PlayStore extends StoreBase {
         // build each product, one by one, not magic here intentionally
         Product product;
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_MONTH_SKU));
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_MONTH_SKU));
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU));
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU));
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_YEAR_SKU));
+        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_YEAR_SKU));
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
+        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
         m.put(product.sku(), product);
 
         return m;
@@ -553,7 +568,7 @@ public final class PlayStore extends StoreBase {
         // see if product exists
         final boolean exists = d != null && d.getType().equals(type); // product exists in the play store
 
-        final boolean subscription = type.equals(SkuType.SUBS);
+        final boolean subscription = type.equals(BillingClient.SkuType.SUBS);
         final String title = exists ? d.getTitle() : "NA";
         final String description = exists ? d.getDescription() : "NA";
         final String price = exists ? d.getPrice() : "NA";
@@ -579,7 +594,7 @@ public final class PlayStore extends StoreBase {
         // see if product is purchased
         boolean purchased = p != null; // already purchased
         // see if time expired, then consume it
-        if (p != null && type.equals(SkuType.INAPP)) {
+        if (p != null && type.equals(BillingClient.SkuType.INAPP)) {
             long time = TimeUnit.DAYS.toMillis(days);
             long now = System.currentTimeMillis();
             if (now - p.getPurchaseTime() > time) {
@@ -617,7 +632,7 @@ public final class PlayStore extends StoreBase {
 
                 // at this point, the user have it, if it's a subscription
                 // then it is enabled
-                if (type.equals(SkuType.SUBS)) {
+                if (type.equals(BillingClient.SkuType.SUBS)) {
                     return true;
                 }
 

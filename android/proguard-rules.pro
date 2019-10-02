@@ -47,6 +47,9 @@
 -dontwarn org.conscrypt.Conscrypt
 -dontwarn org.conscrypt.OpenSSLProvider
 
+# GoogleBillingClient
+-keep class com.android.billingclient.api.BillingClientImpl$* { *; }
+
 # jlibtorrent
 -keep class com.frostwire.jlibtorrent.swig.libtorrent_jni {*;}
 
