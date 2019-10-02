@@ -268,6 +268,7 @@ public final class Offers {
             store = PlayStore.getInstance(null);
         } catch (Throwable e) {
             store = null;
+            LOG.error(e.getMessage(), e);
         }
         return FORCED_DISABLED || (store != null && Products.disabledAds(store));
     }
