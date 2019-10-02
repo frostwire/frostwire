@@ -1,4 +1,5 @@
 FrostWire 2.1.7 build 600 - OCT/01/2019
+ - Android 10 compatibility updates
  - Android 4.4 support dropped, minimum compatible version is Android 5.0 Lollypop
  - OKHttp 3.14.0 update
  - vungle 6.4.11 update
