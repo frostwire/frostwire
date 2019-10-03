@@ -1,7 +1,7 @@
 frostwire (6.8.3) stable; urgency=high
-  * Mac: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
+  * Mac, Windows: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
 
--- FrostWire Team <contact@frostwire.com>  Fri, 6 Sep 2019 17:06:09 -0600
+-- FrostWire Team <contact@frostwire.com>  Thu, 3 Oct 2019 15:46:22 -0600
 
 frostwire (6.8.2) stable; urgency=high
   * Partial downloads now show only the files selected on Transfer details
