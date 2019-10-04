@@ -1,7 +1,8 @@
 frostwire (6.8.3) stable; urgency=high
   * Mac, Windows: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
+  * Mac: launcher fixes bug that required legacy Java to be present in the system
 
--- FrostWire Team <contact@frostwire.com>  Thu, 3 Oct 2019 15:46:22 -0600
+-- FrostWire Team <contact@frostwire.com>  Thu, 4 Oct 2019 10:24:50 -0600
 
 frostwire (6.8.2) stable; urgency=high
   * Partial downloads now show only the files selected on Transfer details
