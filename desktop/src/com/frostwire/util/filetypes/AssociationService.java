@@ -197,7 +197,7 @@ public class AssociationService {
         appAssocWriter.checkAssociationValidForRegistration(assoc);
         // Check whether the specified association already exists.
         if (appAssocWriter.isAssociationExist(assoc, AppAssociationWriter.USER_LEVEL)) {
-            throw new AssociationAlreadyRegisteredException("Assocation already exists!");
+            throw new AssociationAlreadyRegisteredException("Association already exists!");
         }
         // Perform registration.                
         appAssocWriter.registerAssociation(assoc, AppAssociationWriter.USER_LEVEL);
