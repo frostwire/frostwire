@@ -55,20 +55,36 @@ final class ToolsMenu extends AbstractMenu {
     private static class RebuildiTunesPlaylist extends AbstractAction {
         private static final long serialVersionUID = 8348355619323878579L;
 
+        private static String actionTitle = OSUtils.isMacOSCatalina105OrNewer() ?
+                I18n.tr("Rebuild Apple Music \"FrostWire\" Playlist") :
+                I18n.tr("Rebuild iTunes \"FrostWire\" Playlist");
+        private static String description = OSUtils.isMacOSCatalina105OrNewer() ?
+                I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on Apple Music with all the audio files found on your Torrent Data Folder.") :
+                I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder.");
+
         RebuildiTunesPlaylist() {
-            super(I18n.tr("Rebuild iTunes \"FrostWire\" Playlist"));
-            putValue(LONG_DESCRIPTION, I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder."));
+            super(actionTitle);
+            putValue(LONG_DESCRIPTION, description);
         }
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            DialogOption result = GUIMediator.showYesNoMessage(I18n.tr(
-                    "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
-                            + "it with one containing all the iTunes compatible files in your \n"
-                            + "Frostwire \"Torrent Data Folder\"\n\n"
-                            + "Please note that it will add the files to the iTunes library as well\n"
-                            + "and this could result in duplicate files on your iTunes library\n\n"
-                            + "Are you sure you want to continue?"),
+            String yesNoMessage = OSUtils.isMacOSCatalina105OrNewer() ?
+                    I18n.tr(
+                            "This will remove your \"FrostWire\" playlist in Apple Music and replace\n"
+                                    + "it with one containing all the Apple Music compatible files in your \n"
+                                    + "Frostwire \"Torrent Data Folder\"\n\n"
+                                    + "Please note that it will add the files to the Apple Music library as well\n"
+                                    + "and this could result in duplicate files on your Apple Music library\n\n"
+                                    + "Are you sure you want to continue?") :
+                    I18n.tr(
+                            "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
+                                    + "it with one containing all the iTunes compatible files in your \n"
+                                    + "Frostwire \"Torrent Data Folder\"\n\n"
+                                    + "Please note that it will add the files to the iTunes library as well\n"
+                                    + "and this could result in duplicate files on your iTunes library\n\n"
+                                    + "Are you sure you want to continue?");
+            DialogOption result = GUIMediator.showYesNoMessage(yesNoMessage,
                     I18n.tr("Warning"), JOptionPane.WARNING_MESSAGE);
             if (result == DialogOption.YES) {
                 iTunesMediator.instance().resetFrostWirePlaylist();
