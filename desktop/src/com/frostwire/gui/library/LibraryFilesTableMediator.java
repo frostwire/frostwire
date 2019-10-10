@@ -757,8 +757,15 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
 
         SendAudioFilesToiTunes() {
             if (!OSUtils.isLinux()) {
-                putValue(Action.NAME, I18n.tr("Send to iTunes"));
-                putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send audio files to iTunes"));
+                String actionName = I18n.tr("Send to iTunes");
+                String shortDescription = I18n.tr("Send audio files to iTunes");
+                if (OSUtils.isMacOSCatalina105OrNewer()) {
+                    actionName = I18n.tr("Send to Apple Music");
+                    shortDescription = I18n.tr("Send audio files to Apple Music");
+                }
+
+                putValue(Action.NAME, actionName);
+                putValue(Action.SHORT_DESCRIPTION, shortDescription);
             }
         }
 

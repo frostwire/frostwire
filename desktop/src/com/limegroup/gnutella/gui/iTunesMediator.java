@@ -87,6 +87,10 @@ public final class iTunesMediator {
         return false;
     }
 
+    private static String getItunesMusicAppName() {
+        return OSUtils.isMacOSCatalina105OrNewer() ? "Music" : "iTunes";
+    }
+
     /**
      * Constructs and returns a osascript command.
      */
@@ -104,7 +108,8 @@ public final class iTunesMediator {
         command.add("-e");
         command.add("set thePlaylist to \"" + playlist + "\"");
         command.add("-e");
-        command.add("tell application \"iTunes\"");
+
+        command.add("tell application \"" + getItunesMusicAppName() + "\"");
         command.add("-e");
         command.add("launch");
         command.add("-e");
@@ -154,7 +159,7 @@ public final class iTunesMediator {
                 IOUtils.copy(is, out);
             }
         } catch (IOException e) {
-            LOG.error("Error creating iTunes javascript", e);
+            LOG.error("Error creating " + getItunesMusicAppName() + ".app javascript", e);
         } finally {
             IOUtils.closeQuietly(is);
             IOUtils.closeQuietly(out);
@@ -263,7 +268,7 @@ public final class iTunesMediator {
         String playlistName = iTunesSettings.ITUNES_PLAYLIST.getValue();
         try {
             if (OSUtils.isMacOSX()) {
-                String[] command = new String[]{"osascript", "-e", "tell application \"iTunes\"", "-e", "delete playlist \"" + playlistName + "\"", "-e", "end tell"};
+                String[] command = new String[]{"osascript", "-e", "tell application \"" + getItunesMusicAppName() + "\"", "-e", "delete playlist \"" + playlistName + "\"", "-e", "end tell"};
                 Runtime.getRuntime().exec(command);
             } else if (OSUtils.isWindows()) {
                 ArrayList<String> command = new ArrayList<>();

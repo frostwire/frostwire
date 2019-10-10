@@ -873,8 +873,14 @@ public class LibraryPlaylists extends AbstractLibraryListPanel {
 
     private final class ExportToiTunesAction extends AbstractAction {
         ExportToiTunesAction() {
-            putValue(Action.NAME, I18n.tr("Export Playlist to iTunes"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Export this playlist into an iTunes playlist"));
+            String actionName = I18n.tr("Export Playlist to iTunes");
+            String shortDescription = I18n.tr("Export this playlist into an iTunes playlist");
+            if (OSUtils.isMacOSCatalina105OrNewer()) {
+                actionName = I18n.tr("Export Playlist to Apple Music");
+                shortDescription = I18n.tr("Export this playlist into an Apple Music playlist");
+            }
+            putValue(Action.NAME, actionName);
+            putValue(Action.SHORT_DESCRIPTION, shortDescription);
             putValue(LimeAction.ICON_NAME, "PLAYLIST_IMPORT_NEW");
         }
 

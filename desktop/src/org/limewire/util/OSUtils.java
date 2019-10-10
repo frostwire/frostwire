@@ -321,4 +321,13 @@ public class OSUtils {
         String value = System.getProperty("sun.arch.data.model");
         return value != null && value.equals("64");
     }
+
+    public static boolean isMacOSCatalina105OrNewer() {
+        // iTunes died with Catalina, now it's called "Apple Music", technically "Music.app"
+        String osVersion = OSUtils.getOSVersion();
+        String[] os_parts = osVersion.split("\\.");
+        int major = Integer.parseInt(os_parts[0]);
+        int minor = Integer.parseInt(os_parts[1]);
+        return OSUtils.isAnyMac() && major >= 10 && minor >= 15;
+    }
 }
