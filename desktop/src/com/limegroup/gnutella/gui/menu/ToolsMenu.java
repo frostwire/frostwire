@@ -55,10 +55,10 @@ final class ToolsMenu extends AbstractMenu {
     private static class RebuildiTunesPlaylist extends AbstractAction {
         private static final long serialVersionUID = 8348355619323878579L;
 
-        private static String actionTitle = OSUtils.isMacOSCatalina105OrNewer() ?
+        private static final String actionTitle = OSUtils.isMacOSCatalina105OrNewer() ?
                 I18n.tr("Rebuild Apple Music \"FrostWire\" Playlist") :
                 I18n.tr("Rebuild iTunes \"FrostWire\" Playlist");
-        private static String description = OSUtils.isMacOSCatalina105OrNewer() ?
+        private static final String description = OSUtils.isMacOSCatalina105OrNewer() ?
                 I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on Apple Music with all the audio files found on your Torrent Data Folder.") :
                 I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder.");
 
