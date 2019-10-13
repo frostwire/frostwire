@@ -120,8 +120,12 @@ public final class NotificationUpdateDemon implements TimerObserver {
             String sDown = UIUtils.rate2speed(transferManager.getDownloadsBandwidth() / 1024);
             String sUp = UIUtils.rate2speed(transferManager.getUploadsBandwidth() / 1024);
             // Transfers status.
-            notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-            notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+            try {
+                notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+                notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+            } catch (Throwable t) {
+                //possible ArrayIndexOutOfBoundsException
+            }
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 try {
