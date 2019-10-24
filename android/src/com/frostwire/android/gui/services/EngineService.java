@@ -235,7 +235,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         Context ctx = getApplication();
         Intent i = new Intent(ctx, EngineService.class);
         i.setAction(SHUTDOWN_ACTION);
-        Engine.startForegroundService(ctx, i);
+        ctx.startService(i);
     }
 
     public class EngineServiceBinder extends Binder {
