@@ -24,14 +24,16 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.preference.PreferenceManager;
 
+import androidx.annotation.NonNull;
+
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import androidx.annotation.NonNull;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -47,7 +49,7 @@ public final class ConfigurationManager {
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
 
-    private static final Object creationLock = new Object();
+    private static final CountDownLatch creationLatch = new CountDownLatch(1);
     private static ConfigurationManager instance;
 
     public static void create(@NonNull Context context) {
@@ -57,9 +59,7 @@ public final class ConfigurationManager {
 
         Thread creatorThread = new Thread(() -> {
             instance = new ConfigurationManager(context.getApplicationContext());
-            synchronized (creationLock) {
-                creationLock.notifyAll();
-            }
+            creationLatch.countDown();
         });
         creatorThread.setName("ConfigurationManager::creator");
         creatorThread.setPriority(Thread.MAX_PRIORITY);
@@ -69,9 +69,9 @@ public final class ConfigurationManager {
     public static ConfigurationManager instance() {
         if (instance == null) {
             try {
-                synchronized (creationLock) {
-                    creationLock.wait(20000);
-                }
+                // ANRs are triggered after 5 seconds, don't hold main thread more than double that
+                // (used to be 20 secs)
+                creationLatch.await(10, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
