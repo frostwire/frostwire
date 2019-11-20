@@ -1,4 +1,4 @@
-FrostWire 2.1.7 build 603 - OCT/02/2019
+FrostWire 2.1.7 build 605 - NOV/20/2019
  - Android 10 compatibility updates
  - Android 4.4 support dropped, minimum compatible version is Android 5.0 Lollypop
  - OKHttp 3.14.0 update
@@ -8,8 +8,9 @@ FrostWire 2.1.7 build 603 - OCT/02/2019
  - flexbox:1.1.1 update
  - applovin-sdk:9.9.2 update
  - buildToolsVersion '29.0.2' update
- - play-services-ads:18.2.0 update
- - mopub-sdk 5.9.1 update
+ - play-services-ads:18.3.0 update
+ - mopub-sdk 5.10.0 update
+ - com.google.android.material:material:1.2.0-alpha0
  - vungle-sdk removed
  - ANR and crash fixes
 
