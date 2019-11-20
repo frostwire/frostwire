@@ -260,8 +260,9 @@ public final class Offers {
         // Coded so explicitly for clarity.
         boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
         boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
+        boolean playStoreAvailable = PlayStore.available();
         boolean notDisabledAds = !Offers.disabledAds();
-        return (isBasic || isDevelopment) && notDisabledAds;
+        return (isBasic || isDevelopment || playStoreAvailable) && notDisabledAds;
     }
 
     private static void tryBackToBackInterstitial(Activity activity) {

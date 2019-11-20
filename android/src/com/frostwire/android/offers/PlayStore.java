@@ -68,6 +68,7 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public final class PlayStore extends StoreBase {
 
+    private static boolean AVAILABLE = false;
     private static final Logger LOG = Logger.getLogger(PlayStore.class);
 
     // Taken from: Google Play Developer Console -> Services & APIs
@@ -129,8 +130,13 @@ public final class PlayStore extends StoreBase {
             if (instance == null) {
                 instance = new PlayStore(context.getApplicationContext());
             }
+            AVAILABLE = instance != null;
             return instance;
         }
+    }
+
+    public static boolean available() {
+        return AVAILABLE;
     }
 
     private PlayStore(Context context) {

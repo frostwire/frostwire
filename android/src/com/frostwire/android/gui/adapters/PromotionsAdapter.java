@@ -38,6 +38,7 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
@@ -181,7 +182,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         // "FROSTWIRE FEATURES" view logic.
         int offsetFeaturesTitleHeader = 0;
         // OPTIONAL OFFER ON TOP
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || PlayStore.available()) {
             offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
 
             // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
@@ -263,7 +264,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         // Optimistic: If we're plus, we can't offer ad removal yet.
         specialOfferLayout = NO_SPECIAL_OFFER;
 
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
+        if (Offers.removeAdsOffersEnabled()) {
             specialOfferLayout = R.layout.view_remove_ads_notification;
         }
 

@@ -42,6 +42,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -212,7 +213,7 @@ public final class NavigationMenu {
 
     private void refreshMenuRemoveAdsItem() {
         // only visible for basic or debug build and if ads have not been disabled.
-        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
+        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
         Handler handler = new Handler(Looper.getMainLooper());
