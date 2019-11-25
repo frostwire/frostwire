@@ -236,6 +236,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
 
     private void setupStore(long purchaseTimestamp) {
         Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
+        // rewarded-video-ad-removal TODO: remove preference if reward is still effective
         if (p != null && !Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG && !PlayStore.available()) {
             PreferenceCategory category = findPreference("frostwire.prefs.other_settings");
             category.removePreference(p);
