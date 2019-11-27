@@ -32,18 +32,18 @@ import java.util.Map;
  * @author aldenml
  */
 public class CopyrightLicenseBroker implements Mappable<String, Map<String, String>> {
-    public static final List<String> validLicenseUrls;
-    public static final Map<String, License> urlToLicense;
+    private static final List<String> validLicenseUrls;
+    private static final Map<String, License> urlToLicense;
 
     static {
-        validLicenseUrls = new ArrayList<String>();
+        validLicenseUrls = new ArrayList<>();
         validLicenseUrls.add(Licenses.CC_BY_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_SA_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_ND_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_NC_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_NC_SA_4.getUrl());
         validLicenseUrls.add(Licenses.CC_BY_NC_ND_4.getUrl());
-        urlToLicense = new HashMap<String, License>();
+        urlToLicense = new HashMap<>();
         urlToLicense.put(Licenses.CC_BY_4.getUrl(), Licenses.CC_BY_4);
         urlToLicense.put(Licenses.CC_BY_SA_4.getUrl(), Licenses.CC_BY_SA_4);
         urlToLicense.put(Licenses.CC_BY_ND_4.getUrl(), Licenses.CC_BY_ND_4);
@@ -63,12 +63,13 @@ public class CopyrightLicenseBroker implements Mappable<String, Map<String, Stri
         urlToLicense.put(Licenses.PUBLIC_DOMAIN_CC0.getUrl(), Licenses.PUBLIC_DOMAIN_CC0);
     }
 
-    public final LicenseCategory licenseCategory;
+    private final LicenseCategory licenseCategory;
     public final License license;
-    public final String attributionTitle;
-    public final String attributionAuthor;
-    public final String attributionUrl;
+    private final String attributionTitle;
+    private final String attributionAuthor;
+    private final String attributionUrl;
 
+    @SuppressWarnings("unused")
     public CopyrightLicenseBroker(boolean shareAlike, boolean nonCommercial, boolean noDerivatives, String attributionTitle, String attributionAuthor, String attributionURL) {
         licenseCategory = LicenseCategory.CreativeCommons;
         final String licenseUrl = getCreativeCommonsLicenseUrl(shareAlike, nonCommercial, noDerivatives);

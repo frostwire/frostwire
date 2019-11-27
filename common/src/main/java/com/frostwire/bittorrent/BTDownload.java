@@ -370,34 +370,35 @@ public final class BTDownload implements BittorrentDownload {
                 FileStorage files = torrentInfo.files();
                 Map<String, Long> extensionByteSums = new HashMap<>();
                 int numFiles = files.numFiles();
-                if (files.paths() != null) {
-                    for (int i = 0; i < numFiles; i++) {
-                        String path = files.filePath(i);
-                        String extension = FilenameUtils.getExtension(path);
-                        if ("".equals(extension)) {
-                            // skip folders
-                            continue;
-                        }
-                        if (extensionByteSums.containsKey(extension)) {
-                            Long bytes = extensionByteSums.get(extension);
-                            extensionByteSums.put(extension, bytes + files.fileSize(i));
-                        } else {
-                            extensionByteSums.put(extension, files.fileSize(i));
-                        }
+                files.paths();
+                for (int i = 0; i < numFiles; i++) {
+                    String path = files.filePath(i);
+                    String extension = FilenameUtils.getExtension(path);
+                    if ("".equals(extension)) {
+                        // skip folders
+                        continue;
                     }
-                    String extensionCandidate = null;
-                    Set<String> exts = extensionByteSums.keySet();
-                    for (String ext : exts) {
-                        if (extensionCandidate == null) {
-                            extensionCandidate = ext;
-                        } else {
-                            if (extensionByteSums.get(ext) > extensionByteSums.get(extensionCandidate)) {
-                                extensionCandidate = ext;
-                            }
-                        }
+                    if (extensionByteSums.containsKey(extension)) {
+                        Long bytes = extensionByteSums.get(extension);
+                        extensionByteSums.put(extension, bytes + files.fileSize(i));
+                    } else {
+                        extensionByteSums.put(extension, files.fileSize(i));
                     }
-                    predominantFileExtension = extensionCandidate;
                 }
+                String extensionCandidate = null;
+                Set<String> exts = extensionByteSums.keySet();
+                for (String ext : exts) {
+                    if (extensionCandidate == null) {
+                        extensionCandidate = ext;
+                    } else {
+                        Long extSum = extensionByteSums.get(ext);
+                        Long extSumCandidate = extensionByteSums.get(extensionCandidate);
+                        if (extSum != null && extSumCandidate != null && extSum > extSumCandidate) {
+                            extensionCandidate = ext;
+                        }
+                    }
+                }
+                predominantFileExtension = extensionCandidate;
             }
         }
         return predominantFileExtension;
@@ -425,6 +426,7 @@ public final class BTDownload implements BittorrentDownload {
     private void torrentRemoved() {
         engine.removeListener(innerListener);
         if (parts != null) {
+            //noinspection ResultOfMethodCallIgnored
             parts.delete();
         }
         if (listener != null) {
