@@ -24,11 +24,13 @@ import android.os.Bundle;
 import android.os.Looper;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
+import com.mopub.common.MoPubReward;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.ConsentDialogListener;
@@ -38,6 +40,8 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubRewardedVideo;
+import com.mopub.mobileads.MoPubRewardedVideos;
 import com.mopub.network.Networking;
 
 import java.lang.ref.WeakReference;
@@ -67,6 +71,8 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
+    public static final String UNIT_ID_REWARDED_VIDEO = "15173ac6d3e54c9389b9a5ddca69b34b";//"4e4f31e5067049998664b5ec7b9451";
+
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;
     private Map<String,String> placements;
@@ -139,6 +145,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             start();
             async(MoPubAdNetwork::loadConsentDialogAsync, this);
             loadNewInterstitial(activity);
+            loadRewardedVideo();
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }
@@ -232,6 +239,16 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         for (String placement : placementKeys) {
             loadMoPubInterstitial(activity, placement);
         }
+    }
+
+    public void loadRewardedVideo() {
+        if (!started() || !enabled()) {
+            LOG.info("loadRewardedVideo() aborted. Network not started or not enabled");
+            return; //not ready
+        }
+        MoPubRewardedVideos.setRewardedVideoListener(MoPubRewardedVideoListener.instance());
+        MoPubRewardedVideos.loadRewardedVideo(UNIT_ID_REWARDED_VIDEO);
+        LOG.info("loadRewardedVideo() called");
     }
 
     public void loadMoPubInterstitial(final Activity activity, final String placement) {

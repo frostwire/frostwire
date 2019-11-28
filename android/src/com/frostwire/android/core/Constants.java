@@ -211,6 +211,9 @@ public final class Constants {
     public static final int MIN_REWARD_AD_FREE_MINUTES = 60;
     public static final int MAX_REWARD_AD_FREE_MINUTES = 240;
 
+    public static final String FW_REWARDED_VIDEO_MINUTES = "FW_REWARDED_VIDEO_MINUTES";
+    public static final String FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP = "FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP";
+
     private Constants() {
     }
 }

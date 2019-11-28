@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -74,11 +75,13 @@ public final class BuyActivity extends AbstractActivity {
 
     /**
      * Tasks for this branch:
-     * [ ] Displaying a rewarded ad.
-     * [ ] Logic managing the received reward to turn off all advertising and offers to remove advertisement.
-     * [ ] Being able to remotely disable rewarded ad logic
-     * [x]  Being able to remotely set how many minutes the reward is for
-     * [x]  If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
+     * [x] Displaying a rewarded ad.
+     * [x] Logic managing the received reward to turn off all advertising and offers to remove advertisement.
+     * [x] Ads should appear again everywhere and options to remove ads too after time expires
+     * [x] Being able to remotely disable rewarded ad logic
+     * [x] Being able to remotely set how many minutes the reward is for
+     * [x] If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
+     * [ ] Proper integration with settings menu, shows how many minutes left we have if possible, if not it dissapears
      */
 
     private ProductCardView cardNminutes;
@@ -304,7 +307,8 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private void playRewardedVideo() {
-        UIUtils.showShortMessage(this, "Play rewarded video!");
+        paymentOptionsView.startProgressBar(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
+        Offers.showRewardedVideo(this);
     }
 
     private void initRewardCard(ProductCardView card) {
@@ -376,6 +380,7 @@ public final class BuyActivity extends AbstractActivity {
         };
         card.setTag(R.id.reward_product_tag_id, productReward);
         card.updateData(productReward);
+        card.updateTitle(productReward.title());
     }
 
     private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
@@ -490,6 +495,10 @@ public final class BuyActivity extends AbstractActivity {
         paymentOptionsView.animate().setDuration(200)
                 .scaleY(1).setInterpolator(new DecelerateInterpolator())
                 .start();
+    }
+
+    public void stopProgressbars(ProductPaymentOptionsView.PayButtonType payButtonType) {
+        paymentOptionsView.stopProgressBar(payButtonType);
     }
 
     private class ProductCardViewOnClickListener implements View.OnClickListener {

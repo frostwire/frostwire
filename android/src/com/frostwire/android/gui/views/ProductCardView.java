@@ -70,6 +70,11 @@ public class ProductCardView extends RelativeLayout {
         initComponents();
     }
 
+    public void updateTitle(String title) {
+        TextView titleBoldTextView = findViewById(R.id.view_product_card_title_bold_portion);
+        titleBoldTextView.setText(title);
+    }
+
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();

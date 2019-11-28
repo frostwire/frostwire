@@ -72,7 +72,7 @@ public final class NavigationMenu {
         drawerToggle = new MenuDrawerToggle(controller, drawerLayout, toolbar);
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
-        menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
+        menuRemoveAdsItem = initAdRemovalMenuItemListener(mainActivity);
         refreshMenuRemoveAdsItem();
     }
 
@@ -201,7 +201,7 @@ public final class NavigationMenu {
         SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
     }
 
-    private AdMenuItemView initAdMenuItemListener(final Activity activity) {
+    private AdMenuItemView initAdRemovalMenuItemListener(final Activity activity) {
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(v -> {
@@ -254,6 +254,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerOpened(View drawerView) {
+            refreshMenuRemoveAdsItem();
             if (controller.getActivity() != null) {
                 UIUtils.hideKeyboardFromActivity(controller.getActivity());
             }

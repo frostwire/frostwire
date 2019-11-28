@@ -98,7 +98,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
         buttons[PayButtonType.REWARD_VIDEO.offset].setOnClickListener(clickListener);
     }
 
-    private void stopProgressBar(PayButtonType buttonType) {
+    public void stopProgressBar(PayButtonType buttonType) {
         switch (buttonType) {
             case SUBSCRIPTION:
                 buttons[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.VISIBLE);
@@ -117,7 +117,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
         }
     }
 
-    private void startProgressBar(PayButtonType buttonType) {
+    public void startProgressBar(PayButtonType buttonType) {
         switch (buttonType) {
             case SUBSCRIPTION:
                 buttons[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.GONE);
