@@ -71,7 +71,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
-    public static final String UNIT_ID_REWARDED_VIDEO = "15173ac6d3e54c9389b9a5ddca69b34b";//"4e4f31e5067049998664b5ec7b9451";
+    //private static final String TEST_UNIT_REWARDED_VIDEO_GAME_PLAYABLE = "15173ac6d3e54c9389b9a5ddca69b34b";
+    //private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
+    public static final String UNIT_ID_REWARDED_VIDEO = "4e4f31e5067049998664b5ec7b9451";
 
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;

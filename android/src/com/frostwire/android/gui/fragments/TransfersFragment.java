@@ -26,6 +26,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+
+import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
 import com.google.android.material.tabs.TabLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,7 +54,6 @@ import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
-import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
 import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
@@ -899,7 +900,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             StoragePicker.show(activity);
         } else {
             Intent i = new Intent(activity, SettingsActivity.class);
-            i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, ApplicationFragment.class.getName());
+            i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, ApplicationPreferencesFragment.class.getName());
             activity.startActivity(i);
         }
     }

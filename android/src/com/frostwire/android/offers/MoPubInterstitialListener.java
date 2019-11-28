@@ -120,7 +120,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
             }
         }
 
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(mopubAdNetwork, activity, finishAfterDismiss, shutDownAfter, true, activity.getApplication());
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activity, finishAfterDismiss, shutDownAfter, true, activity.getApplication());
         if (!shutDownAfter && !finishAfterDismiss) {
             mopubAdNetwork.loadMoPubInterstitial(activity, placement);
         }

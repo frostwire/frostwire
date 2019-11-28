@@ -338,6 +338,8 @@
     <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
     <string name="current_plan">Current plan</string>
     <string name="days_left">days left</string>
+    <string name="minutes_left_ad_free">%d minutes left Ad-free</string>
+    <string name="minute_left_ad_free">One minute left Ad-free</string>
     <string name="save_bandwidth">Save Bandwidth</string>
     <string name="cheaper_than_lattes">Cheaper than Lattes</string>
     <string name="cheaper_than_drinks">Cheaper than Drinks</string>

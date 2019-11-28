@@ -28,6 +28,8 @@ import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.util.Set;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoPubRewardedVideoListener  {
     private static Logger LOG = Logger.getLogger(MoPubRewardedVideoListener.class);
     private boolean wasPlayingMusic;
@@ -87,6 +89,6 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
         if (wasPlayingMusic) {
             MusicUtils.play();
         }
-        Asyncs.async(Offers::pauseAdsAsync, reward.getAmount());
+        async(Offers::pauseAdsAsync, reward.getAmount());
     }
 }

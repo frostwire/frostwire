@@ -31,6 +31,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
@@ -43,6 +44,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -180,7 +182,7 @@ public final class Offers {
         showInterstitialOfferIfNecessary(ctx, placement, shutdownAfterwards, dismissAfterwards, false);
     }
 
-    public static void pauseAdsAsync(int minutes) {
+    static void pauseAdsAsync(int minutes) {
         LOG.info("pauseAdsAsync: pausing for " + minutes + " minutes");
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -190,7 +192,7 @@ public final class Offers {
         pausedCheckLock.unlock();
     }
 
-    public static void unPauseAdsAsync() {
+    private static void unPauseAdsAsync() {
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
@@ -199,6 +201,28 @@ public final class Offers {
         pausedCheckLock.unlock();
     }
 
+    public static int getMinutesLeftPausedAsync() {
+        pausedCheckLock.lock();
+        ConfigurationManager CM = ConfigurationManager.instance();
+        int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
+        if (rewarded_video_minutes == -1) {
+            pausedCheckLock.unlock();
+            return -1;
+        }
+        long pause_duration = rewarded_video_minutes * 60_000;
+        long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
+        pausedCheckLock.unlock();
+        if (paused_timestamp == -1) {
+            return -1;
+        }
+
+        long time_on_pause = System.currentTimeMillis() - paused_timestamp;
+        if (time_on_pause > pause_duration) {
+            return 0;
+        }
+
+        return (int) ((pause_duration - time_on_pause) / 60_000);
+    }
 
     private static void checkIfPausedAsync() {
         pausedCheckLock.lock();
@@ -224,11 +248,12 @@ public final class Offers {
             LOG.info("checkIfPausedAsync: UnPausing Offers, Reward has expired");
             CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
             CM.setLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
+            pausedCheckLock.unlock();
         } else {
+            pausedCheckLock.unlock();
             int minutes_left = (int) ((pause_duration - time_on_pause) / 60_000);
             LOG.info("checkIfPausedAsync: PAUSED (" + minutes_left + " minutes left)");
         }
-        pausedCheckLock.unlock();
     }
 
     private static class InterstitialLogicParams {
@@ -263,6 +288,7 @@ public final class Offers {
         while (attempts > 0 && Ref.alive(activityRef) && !MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
             try {
                 LOG.info("keepTryingRewardedVideoAsync: sleeping while ad loads... (attempts=" + attempts + ")");
+                MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
                 Thread.sleep(5000);
                 attempts--;
             } catch (InterruptedException e) {
@@ -304,7 +330,7 @@ public final class Offers {
                 Offers::onReadyForAnotherInterstitialAsyncCallback); // shows offers on main thread if ready received
     }
 
-    private static boolean readyForAnotherInterstitialAsync(Activity activity, InterstitialLogicParams params) {
+    private static boolean readyForAnotherInterstitialAsync(@SuppressWarnings("unused") Activity activity, InterstitialLogicParams params) {
         ConfigurationManager CM = ConfigurationManager.instance();
         final int INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = DEBUG_MODE ? 0 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
         final long INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
@@ -336,7 +362,7 @@ public final class Offers {
     }
 
     public static boolean disabledAds() {
-        if (PAUSED == true) {
+        if (PAUSED) {
             async(Offers::checkIfPausedAsync);
             return true;
         }
@@ -423,8 +449,10 @@ public final class Offers {
         for (String shortCode : waterfallShortcodes) {
             if (allAdNetworks.containsKey(shortCode)) {
                 final AdNetwork adNetwork = allAdNetworks.get(shortCode);
-                adNetwork.enable(true);
-                activeAdNetworksList.add(adNetwork);
+                if (adNetwork != null) {
+                    adNetwork.enable(true);
+                    activeAdNetworksList.add(adNetwork);
+                }
             } else {
                 LOG.warn("unknown ad network shortcode '" + shortCode + "'");
             }
@@ -485,8 +513,7 @@ public final class Offers {
             }
         }
 
-        public static void dismissAndOrShutdownIfNecessary(final AdNetwork adNetwork,
-                                                           final Activity activity,
+        public static void dismissAndOrShutdownIfNecessary(final Activity activity,
                                                            final boolean finishAfterDismiss,
                                                            final boolean shutdownAfter,
                                                            final boolean tryBack2BackRemoveAdsOffer,

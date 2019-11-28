@@ -38,9 +38,11 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
 import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -51,23 +53,26 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreference;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class ApplicationFragment extends AbstractPreferenceFragment implements AbstractDialog.OnDialogClickListener {
+public final class ApplicationPreferencesFragment extends AbstractPreferenceFragment implements AbstractDialog.OnDialogClickListener {
 
-    private static final Logger LOG = Logger.getLogger(ApplicationFragment.class);
+    private static final Logger LOG = Logger.getLogger(ApplicationPreferencesFragment.class);
 
     private static final boolean INTERNAL_BUILD = BuildConfig.DEBUG;
     private static final int MILLISECONDS_IN_A_DAY = 86400000;
-    private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationFragment.DIALOG.stop.http";
+    private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationPreferencesFragment.DIALOG.stop.http";
 
     // TODO: refactor this
     // due to the separation of fragments and activities
     public static long removeAdsPurchaseTime = 0;
+    private static final DoNothingOnPreferenceClickListener doNothingOnPreferenceClickListener = new DoNothingOnPreferenceClickListener();
 
-    public ApplicationFragment() {
+    public ApplicationPreferencesFragment() {
         super(R.xml.settings_application);
     }
 
@@ -78,6 +83,12 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
         setupStorageOption();
         setupDataSaving();
         setupStore(removeAdsPurchaseTime);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initComponents();
     }
 
     private void setupDataSaving() {
@@ -92,7 +103,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
                             R.string.data_saving_kill_http_warning,
                             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
                     );
-                    dlg.setTargetFragment(ApplicationFragment.this, 0);
+                    dlg.setTargetFragment(ApplicationPreferencesFragment.this, 0);
                     dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
                     return false;
@@ -234,28 +245,76 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
         }
     }
 
-    private void setupStore(long purchaseTimestamp) {
-        Preference p = findPreference("frostwire.prefs.offers.buy_no_ads");
-        // rewarded-video-ad-removal TODO: remove preference if reward is still effective
-        if (p != null && !Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG && !PlayStore.available()) {
-            PreferenceCategory category = findPreference("frostwire.prefs.other_settings");
-            category.removePreference(p);
-        } else if (p != null) {
-            PlayStore playStore = PlayStore.getInstance(getActivity());
+    //////////////////////////////
+    // AD REMOVAL PREFERENCE LOGIC
+    //////////////////////////////
+    private void setupStore(final long purchaseTimestamp) {
+        SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
+        // Async gymnastics to pass both the purchase timestamp and the amounts of minutes left paused
+        // to the UI Thread task, we use a Holder object for this.
+        //<T1, R> void async(ResultTask1<T1, R> task,
+        //        T1 arg1,
+        //        ResultPostTask1<T1, R> post) //result post task just doesn't return anything
+        async(ApplicationPreferencesFragment::checkMinutesPassedAsync, paramHolder,
+                ApplicationPreferencesFragment::setupStorePostTask);
+    }
+
+
+    private static class SetupStoreTaskParamHolder {
+        final long purchaseTimestamp;
+        int minutesPaused = -1;
+        WeakReference<ApplicationPreferencesFragment> appPrefsFragRef;
+
+        SetupStoreTaskParamHolder(ApplicationPreferencesFragment referent, long purchaseTimestamp) {
+            appPrefsFragRef = Ref.weak(referent);
+            this.purchaseTimestamp = purchaseTimestamp;
+        }
+    }
+
+    private static SetupStoreTaskParamHolder checkMinutesPassedAsync(SetupStoreTaskParamHolder paramHolder) {
+        paramHolder.minutesPaused = Offers.getMinutesLeftPausedAsync();
+        return paramHolder;
+    }
+
+    private static void setupStorePostTask(SetupStoreTaskParamHolder paramHolder,
+                                           @SuppressWarnings("unused") SetupStoreTaskParamHolder unusedResultTaskParamHolder) {
+        if (!Ref.alive(paramHolder.appPrefsFragRef)) {
+            return;
+        }
+        ApplicationPreferencesFragment applicationPreferencesFragment = paramHolder.appPrefsFragRef.get();
+        Activity settingsActivity = applicationPreferencesFragment.getActivity();
+        final long purchaseTimestamp = paramHolder.purchaseTimestamp;
+        final int minutesPausedLeft = paramHolder.minutesPaused;
+        boolean ADS_PAUSED_WITH_REWARDED_VIDEO = minutesPausedLeft > 0;
+
+        Preference p = applicationPreferencesFragment.findPreference("frostwire.prefs.offers.buy_no_ads");
+        if (p != null && Offers.disabledAds() && ADS_PAUSED_WITH_REWARDED_VIDEO) {
+            // Paused summary
+            String summaryMinutesLeft = minutesPausedLeft > 1 ?
+                    applicationPreferencesFragment.getString(R.string.minutes_left_ad_free, minutesPausedLeft) :
+                    applicationPreferencesFragment.getString(R.string.minute_left_ad_free);
+            p.setSummary(summaryMinutesLeft);
+            p.setOnPreferenceClickListener(doNothingOnPreferenceClickListener);
+            return;
+        } else if (p != null && PlayStore.available() && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
+            PlayStore playStore = PlayStore.getInstance(settingsActivity);
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
             if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
-                initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
+                // HOW MUCH TIME LEFT OR SUBSCRIPTION PLAN SUMMARY
+                applicationPreferencesFragment.initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
                 //otherwise, a BuyActivity intent has been configured on application_preferences.xml
             } else if (purchaseTimestamp > 0 &&
                     (System.currentTimeMillis() - purchaseTimestamp) < 30000) {
-                p.setSummary(getString(R.string.processing_payment) + "...");
-                p.setOnPreferenceClickListener(null);
+                // STILL PROCESSING SUMMARY
+                p.setSummary(applicationPreferencesFragment.getString(R.string.processing_payment) + "...");
+                p.setOnPreferenceClickListener(doNothingOnPreferenceClickListener);
             } else {
+                // ENCOURAGE AD-REMOVAL ACTION SUMMARY
                 p.setSummary(R.string.remove_ads_description);
                 p.setOnPreferenceClickListener(preference -> {
-                    Intent intent = new Intent(getActivity(), BuyActivity.class);
-                    startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
+                    Intent intent = new Intent(settingsActivity, BuyActivity.class);
+                    applicationPreferencesFragment.startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
                     return true;
                 });
             }
@@ -280,6 +339,14 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
         p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(getActivity(), purchasedProducts));
     }
 
+    // Doing this because setting the preference click listener to null seems to keep the old preference
+    // click listener
+    private static final class DoNothingOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            return true;
+        }
+    }
 
     private static final class RemoveAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
 
@@ -329,4 +396,7 @@ public final class ApplicationFragment extends AbstractPreferenceFragment implem
             return false;
         }
     }
+    /////////////////////////////////////
+    // END OF AD REMOVAL PREFERENCE LOGIC
+    /////////////////////////////////////
 }

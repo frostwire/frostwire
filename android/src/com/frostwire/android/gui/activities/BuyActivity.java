@@ -34,7 +34,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.andrew.apollo.utils.MusicUtils;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -81,7 +80,7 @@ public final class BuyActivity extends AbstractActivity {
      * [x] Being able to remotely disable rewarded ad logic
      * [x] Being able to remotely set how many minutes the reward is for
      * [x] If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
-     * [ ] Proper integration with settings menu, shows how many minutes left we have if possible, if not it dissapears
+     * [x] Proper integration with settings menu, shows how many minutes left we have if possible, doesn't invoke BuyActivity
      */
 
     private ProductCardView cardNminutes;
@@ -207,7 +206,6 @@ public final class BuyActivity extends AbstractActivity {
             boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
-                    null,
                     this,
                     dismissActivityAfterward,
                     shutdownActivityAfterwards,

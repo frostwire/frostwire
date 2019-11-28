@@ -26,7 +26,7 @@ import android.preference.PreferenceActivity;
 
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
-import com.frostwire.android.gui.fragments.preference.ApplicationFragment;
+import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
 
 import androidx.preference.Preference;
@@ -83,7 +83,7 @@ public final class SettingsActivity extends AbstractActivity
         CharSequence fragmentTitle = intent.getCharSequenceExtra(EXTRA_SHOW_FRAGMENT_TITLE);
 
         if (fragmentName == null) {
-            fragmentName = ApplicationFragment.class.getName();
+            fragmentName = ApplicationPreferencesFragment.class.getName();
         }
 
         switchToFragment(fragmentName, fragmentArgs, fragmentTitle);
@@ -150,12 +150,12 @@ public final class SettingsActivity extends AbstractActivity
         if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
             StoragePicker.handle(this, requestCode, resultCode, data);
             // refresh the fragment
-            switchToFragment(ApplicationFragment.class.getName(), null, null);
+            switchToFragment(ApplicationPreferencesFragment.class.getName(), null, null);
         } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
-            ApplicationFragment.removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
+            ApplicationPreferencesFragment.removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
