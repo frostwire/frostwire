@@ -74,11 +74,11 @@ public final class BuyActivity extends AbstractActivity {
 
     /**
      * Tasks for this branch:
-     * -> Displaying a rewarded ad.
-     * -> Logic managing the received reward to turn off all advertising and offers to remove advertisement.
-     * -> Being able to remotely disable rewarded ad logic
-     * -> Being able to remotely set how many minutes the reward is for
-     * -> If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
+     * [ ] Displaying a rewarded ad.
+     * [ ] Logic managing the received reward to turn off all advertising and offers to remove advertisement.
+     * [ ] Being able to remotely disable rewarded ad logic
+     * [x]  Being able to remotely set how many minutes the reward is for
+     * [x]  If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
      */
 
     private ProductCardView cardNminutes;
@@ -234,9 +234,13 @@ public final class BuyActivity extends AbstractActivity {
         card6months = findView(R.id.activity_buy_product_card_6_months);
         cardNminutes = findView(R.id.activity_buy_product_card_reward);
 
-        initRewardCard(cardNminutes);
-        cardNminutes.setVisibility(View.VISIBLE);
-        cardNminutes.setOnClickListener(cardClickListener);
+        if (REWARD_FREE_AD_MINUTES > 0) {
+            initRewardCard(cardNminutes);
+            cardNminutes.setVisibility(View.VISIBLE);
+            cardNminutes.setOnClickListener(cardClickListener);
+        } else {
+            cardNminutes.setVisibility(View.GONE);
+        }
 
         PlayStore store = PlayStore.getInstance(this);
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
