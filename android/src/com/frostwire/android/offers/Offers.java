@@ -199,9 +199,6 @@ public final class Offers {
         if (!appStartedLongEnoughAgo || Offers.disabledAds()) {
             return false;
         }
-        final String placement = params.placement;
-        final boolean shutdownAfterwards = params.shutdownAfterwards;
-        final boolean dismissAfterwards = params.dismissAfterwards;
         final boolean ignoreStartedTransfers = params.ignoreStartedTransfers;
         TransferManager TM = TransferManager.instance();
         final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = DEBUG_MODE ? 1 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
@@ -238,6 +235,8 @@ public final class Offers {
         return FORCED_DISABLED || (store != null && Products.disabledAds(store));
     }
 
+    /** Used for hard coded tests only */
+    @SuppressWarnings("unused")
     public static void forceDisabledAds(Context context) {
         FORCED_DISABLED = true;
         if (lastInitAdnetworksInvocationTimestamp != 0) {

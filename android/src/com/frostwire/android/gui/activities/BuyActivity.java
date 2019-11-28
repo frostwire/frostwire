@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
 package com.frostwire.android.gui.activities;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -29,10 +32,15 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.Toolbar;
+
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.PaymentOptionsVisibility;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
@@ -40,8 +48,11 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
-import androidx.appcompat.widget.Toolbar;
+import java.lang.ref.WeakReference;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -59,15 +70,49 @@ public final class BuyActivity extends AbstractActivity {
     private static final String PAYMENT_OPTIONS_VISIBILITY_KEY = "payment_options_visibility";
     private static final String OFFER_ACCEPTED = "offer_accepted";
 
+    private static int REWARD_FREE_AD_MINUTES = Constants.MIN_REWARD_AD_FREE_MINUTES;
+
+    /**
+     * Tasks for this branch:
+     * -> Displaying a rewarded ad.
+     * -> Logic managing the received reward to turn off all advertising and offers to remove advertisement.
+     * -> Being able to remotely disable rewarded ad logic
+     * -> Being able to remotely set how many minutes the reward is for
+     * -> If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
+     */
+
+    private ProductCardView cardNminutes;
     private ProductCardView card30days;
     private ProductCardView card1year;
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
+
+    /** the view with the "Buy" buttons for subscription or one time, which is reused for the PlayStore purchase card views */
     private ProductPaymentOptionsView paymentOptionsView;
+
     private boolean offerAccepted;
 
     public BuyActivity() {
         super(R.layout.activity_buy);
+        async(BuyActivity::getRewardFreeAdMinutesFromConfigAsync, new WeakReference<>(this)); // in the meantime use the default value Constants.MIN_REWARD_AD_FREE_MINUTES
+    }
+
+    private static void getRewardFreeAdMinutesFromConfigAsync(WeakReference<BuyActivity> buyActivityRef) {
+        REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(()->{
+            if (Ref.alive(buyActivityRef)) {
+                buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
+            }
+        });
+    }
+
+    private void refreshPaymentOptionsViewRewardMinutesTextView() {
+        if (paymentOptionsView != null) {
+            TextView textView = paymentOptionsView.findViewById(R.id.view_product_payment_options_temporary_ad_removal_description_textview);
+            String temporary_ad_removal_description = textView.getResources().getString(R.string.temporary_ad_removal_description, REWARD_FREE_AD_MINUTES);
+            textView.setText(temporary_ad_removal_description);
+        }
     }
 
     private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, purchases) -> BuyActivity.this.onPurchasesUpdatedOld(billingResult.getResponseCode());
@@ -183,25 +228,38 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private void initProductCards(int lastSelectedCardViewId) {
+        View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
         card30days = findView(R.id.activity_buy_product_card_30_days);
         card1year = findView(R.id.activity_buy_product_card_1_year);
         card6months = findView(R.id.activity_buy_product_card_6_months);
+        cardNminutes = findView(R.id.activity_buy_product_card_reward);
+
+        initRewardCard(cardNminutes);
+        cardNminutes.setVisibility(View.VISIBLE);
+        cardNminutes.setOnClickListener(cardClickListener);
 
         PlayStore store = PlayStore.getInstance(this);
-        initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
-        initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
-        initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
+            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
+            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
+            initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
+            card30days.setOnClickListener(cardClickListener);
+            card1year.setOnClickListener(cardClickListener);
+            card6months.setOnClickListener(cardClickListener);
+        } else {
+            card30days.setVisibility(View.GONE);
+            card1year.setVisibility(View.GONE);
+            card6months.setVisibility(View.GONE);
+        }
 
-        View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
-        card30days.setOnClickListener(cardClickListener);
-        card1year.setOnClickListener(cardClickListener);
-        card6months.setOnClickListener(cardClickListener);
 
         initLastCardSelection(lastSelectedCardViewId);
     }
 
     private void initLastCardSelection(int lastSelectedCardViewId) {
         switch (lastSelectedCardViewId) {
+            case R.id.activity_buy_product_card_reward:
+                selectedProductCard = cardNminutes;
             case R.id.activity_buy_product_card_30_days:
                 selectedProductCard = card30days;
                 break;
@@ -229,11 +287,91 @@ public final class BuyActivity extends AbstractActivity {
             public void onOneTime() {
                 purchaseProduct(R.id.inapp_product_tag_id);
             }
+
+            @Override
+            public void onRewardedVideo() {
+                playRewardedVideo();
+            }
         });
 
         if (paymentOptionsVisibility == View.VISIBLE) {
             showPaymentOptionsBelowSelectedCard();
         }
+    }
+
+    private void playRewardedVideo() {
+        UIUtils.showShortMessage(this, "Play rewarded video!");
+    }
+
+    private void initRewardCard(ProductCardView card) {
+        if (card == null) {
+            throw new IllegalArgumentException("card argument can't be null");
+        }
+
+        final Resources resources = card.getResources();
+        final String reward_product_title = (resources != null) ?
+                String.format(resources.getString(R.string.reward_product_title), REWARD_FREE_AD_MINUTES) :
+                String.format("%d minutes", REWARD_FREE_AD_MINUTES);
+        final String reward_product_description = (resources != null) ?
+                resources.getString(R.string.ad_free) : "Ad-free";
+        final String reward_product_price = (resources != null) ?
+                resources.getString(R.string.reward_product_price) :
+                "Free, Play 1 Video Ad";
+
+        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, false, true));
+        Product productReward = new Product() {
+            @Override
+            public String sku() {
+                return Products.REWARDS_DISABLE_ADS_MINUTES_SKU;
+            }
+
+            @Override
+            public boolean subscription() {
+                return false;
+            }
+
+            @Override
+            public String title() {
+                return reward_product_title;
+            }
+
+            @Override
+            public String description() {
+                return reward_product_description;
+            }
+
+            @Override
+            public String price() {
+                return reward_product_price;
+            }
+
+            @Override
+            public String currency() {
+                return "";
+            }
+
+            @Override
+            public boolean purchased() {
+                return false;
+            }
+
+            @Override
+            public long purchaseTime() {
+                return REWARD_FREE_AD_MINUTES * 60_000;
+            }
+
+            @Override
+            public boolean available() {
+                return true;
+            }
+
+            @Override
+            public boolean enabled(String feature) {
+                return false;
+            }
+        };
+        card.setTag(R.id.reward_product_tag_id, productReward);
+        card.updateData(productReward);
     }
 
     private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
@@ -260,6 +398,7 @@ public final class BuyActivity extends AbstractActivity {
 
         card.setTag(R.id.subs_product_tag_id, prodSubs);
         card.setTag(R.id.inapp_product_tag_id, prodInApp);
+        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(true, true, false));
 
         if (prodSubs != null) {
             card.updateData(prodSubs);
@@ -301,6 +440,7 @@ public final class BuyActivity extends AbstractActivity {
         card30days.setSelected(selectedProductCard == card30days);
         card1year.setSelected(selectedProductCard == card1year);
         card6months.setSelected(selectedProductCard == card6months);
+        cardNminutes.setSelected(selectedProductCard == cardNminutes);
     }
 
     private void scrollToSelectedCard() {
@@ -312,6 +452,7 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private void showPaymentOptionsBelowSelectedCard() {
+        paymentOptionsView.refreshOptionsVisibility(selectedProductCard);
         final ViewGroup scrollView = findView(R.id.activity_buy_scrollview);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
@@ -336,6 +477,7 @@ public final class BuyActivity extends AbstractActivity {
         }
     }
 
+    // where the actual removal of the view and re-addition to the layout happens.
     private void scaleDownPaymentOptionsView(final ViewGroup layout) {
         layout.removeView(paymentOptionsView);
         int selectedCardIndex = layout.indexOfChild(selectedProductCard);
@@ -360,6 +502,9 @@ public final class BuyActivity extends AbstractActivity {
                         break;
                     case R.id.activity_buy_product_card_6_months:
                         selectedProductCard = card6months;
+                        break;
+                    case R.id.activity_buy_product_card_reward:
+                        selectedProductCard = cardNminutes;
                         break;
                     default:
                         throw new IllegalArgumentException("Card view not handled, review layout");

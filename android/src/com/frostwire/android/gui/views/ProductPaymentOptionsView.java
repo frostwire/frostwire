@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Marcelina Knitter (marcelinkaaa),
  * Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 
 /**
+ * Presents the options to pay for a given product.
+ * <p>
  * Created on 7/7/16.
  *
  * @author gubatron
@@ -34,7 +36,21 @@ import com.frostwire.android.R;
  */
 public class ProductPaymentOptionsView extends LinearLayout {
 
+    public enum PayButtonType {
+        SUBSCRIPTION(0),
+        ONE_TIME(1),
+        REWARD_VIDEO(2);
+        public final int offset;
+
+        PayButtonType(int arrayOffset) {
+            offset = arrayOffset;
+        }
+    }
+
     private OnBuyListener listener;
+    private View[] buttons = null;
+    private View[] progressBars = null;
+    private View[] paymentOptionsLayouts = null;
 
     public ProductPaymentOptionsView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,54 +60,87 @@ public class ProductPaymentOptionsView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_product_payment_options, this);
+        buttons = new View[]{
+                findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button),
+                findViewById(R.id.view_product_payment_options_buy_one_time_button),
+                findViewById(R.id.view_product_payment_options_watch_rewarded_video_button)
+        };
+        progressBars = new View[]{
+                findViewById(R.id.view_product_payment_options_buy_automatic_renewal_progressbar),
+                findViewById(R.id.view_product_payment_options_buy_one_time_progressbar),
+                findViewById(R.id.view_product_payment_options_watch_rewarded_video_progressbar)
+        };
         initClickListeners();
-    }
-
-    private void initClickListeners() {
-        BuyButtonClickListener clickListener = new BuyButtonClickListener();
-        final View automaticRenewalLayout = findViewById(R.id.view_product_payment_options_buy_automatic_renewal_layout);
-        automaticRenewalLayout.setOnClickListener(clickListener);
-        final View oneTimeBuyLayout = findViewById(R.id.view_product_payment_options_buy_one_time_layout);
-        oneTimeBuyLayout.setOnClickListener(clickListener);
-    }
-
-    public OnBuyListener getOnBuyListener() {
-        return listener;
+        paymentOptionsLayouts = new View[]{
+                findViewById(R.id.view_product_payment_options_buy_automatic_renewal_layout),
+                findViewById(R.id.view_product_payment_options_buy_one_time_layout),
+                findViewById(R.id.view_product_payment_options_watch_rewarded_video_layout)
+        };
     }
 
     public void setOnBuyListener(OnBuyListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * More like "Progress circles"
+     */
     public void stopProgressBar() {
-        stopProgressBar(true);
-        stopProgressBar(false);
+        stopProgressBar(PayButtonType.SUBSCRIPTION);
+        stopProgressBar(PayButtonType.ONE_TIME);
+        stopProgressBar(PayButtonType.REWARD_VIDEO);
     }
 
-    private void stopProgressBar(boolean subscription) {
-        View[] views = getButtonAndProgressBarViews(subscription);
-        views[0].setVisibility(View.VISIBLE);
-        views[1].setVisibility(View.GONE);
+    private void initClickListeners() {
+        final BuyButtonClickListener clickListener = new BuyButtonClickListener();
+        buttons[PayButtonType.SUBSCRIPTION.offset].setOnClickListener(clickListener);
+        buttons[PayButtonType.ONE_TIME.offset].setOnClickListener(clickListener);
+        buttons[PayButtonType.REWARD_VIDEO.offset].setOnClickListener(clickListener);
     }
 
-    private void startProgressBar(boolean subscription) {
-        View[] views = getButtonAndProgressBarViews(subscription);
-        views[0].setVisibility(View.GONE);
-        views[1].setVisibility(View.VISIBLE);
+    private void stopProgressBar(PayButtonType buttonType) {
+        switch (buttonType) {
+            case SUBSCRIPTION:
+                buttons[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.VISIBLE);
+                progressBars[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.GONE);
+                break;
+
+            case ONE_TIME:
+                buttons[PayButtonType.ONE_TIME.offset].setVisibility(View.VISIBLE);
+                progressBars[PayButtonType.ONE_TIME.offset].setVisibility(View.GONE);
+                break;
+
+            case REWARD_VIDEO:
+                buttons[PayButtonType.REWARD_VIDEO.offset].setVisibility(View.VISIBLE);
+                progressBars[PayButtonType.REWARD_VIDEO.offset].setVisibility(View.GONE);
+                break;
+        }
     }
 
-    private View[] getButtonAndProgressBarViews(boolean subscription) {
-        View[] views = subscription ?
-                new View[]{
-                        findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button),
-                        findViewById(R.id.view_product_payment_options_progressbar_automatic_renewal)
-                } :
-                new View[]{
-                        findViewById(R.id.view_product_payment_options_buy_one_time_button),
-                        findViewById(R.id.view_product_payment_options_progressbar_one_time)
-                };
+    private void startProgressBar(PayButtonType buttonType) {
+        switch (buttonType) {
+            case SUBSCRIPTION:
+                buttons[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.GONE);
+                progressBars[PayButtonType.SUBSCRIPTION.offset].setVisibility(View.VISIBLE);
+                break;
 
-        return views;
+            case ONE_TIME:
+                buttons[PayButtonType.ONE_TIME.offset].setVisibility(View.GONE);
+                progressBars[PayButtonType.ONE_TIME.offset].setVisibility(View.VISIBLE);
+                break;
+
+            case REWARD_VIDEO:
+                buttons[PayButtonType.REWARD_VIDEO.offset].setVisibility(View.GONE);
+                progressBars[PayButtonType.REWARD_VIDEO.offset].setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    public void refreshOptionsVisibility(ProductCardView selectedProductCard) {
+        PaymentOptionsVisibility paymentOptionsVisibility = selectedProductCard.getPaymentOptionsVisibility();
+        paymentOptionsLayouts[PayButtonType.ONE_TIME.offset].setVisibility(paymentOptionsVisibility.oneTimeOption ? View.VISIBLE : View.GONE);
+        paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset].setVisibility(paymentOptionsVisibility.subscriptionOption ? View.VISIBLE : View.GONE);
+        paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset].setVisibility(paymentOptionsVisibility.rewardOption ? View.VISIBLE : View.GONE);
     }
 
     private class BuyButtonClickListener implements OnClickListener {
@@ -99,13 +148,17 @@ public class ProductPaymentOptionsView extends LinearLayout {
         public void onClick(View v) {
             if (listener != null) {
                 switch (v.getId()) {
-                    case R.id.view_product_payment_options_buy_automatic_renewal_layout:
-                        startProgressBar(true);
+                    case R.id.view_product_payment_options_buy_automatic_renewal_button:
+                        startProgressBar(PayButtonType.SUBSCRIPTION);
                         listener.onAutomaticRenewal();
                         break;
-                    case R.id.view_product_payment_options_buy_one_time_layout:
-                        startProgressBar(false);
+                    case R.id.view_product_payment_options_buy_one_time_button:
+                        startProgressBar(PayButtonType.ONE_TIME);
                         listener.onOneTime();
+                        break;
+                    case R.id.view_product_payment_options_watch_rewarded_video_button:
+                        startProgressBar(PayButtonType.REWARD_VIDEO);
+                        listener.onRewardedVideo();
                         break;
                 }
             }
@@ -117,5 +170,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
         void onAutomaticRenewal();
 
         void onOneTime();
+
+        void onRewardedVideo();
     }
 }

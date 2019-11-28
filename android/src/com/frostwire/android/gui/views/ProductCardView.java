@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public class ProductCardView extends RelativeLayout {
     private final String hintButtonCaption;
     private final boolean selected;
     private final boolean hintButtonVisible;
+    private PaymentOptionsVisibility paymentOptionsVisibility;
 
     public ProductCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -86,6 +87,14 @@ public class ProductCardView extends RelativeLayout {
     public void setSelected(boolean selected) {
         super.setSelected(selected);
         setBackgroundResource(selected ? R.drawable.product_card_background_selected : R.drawable.product_card_background);
+    }
+
+    public void setPaymentOptionsVisibility(PaymentOptionsVisibility optionsVisibility) {
+        paymentOptionsVisibility = optionsVisibility;
+    }
+
+    PaymentOptionsVisibility getPaymentOptionsVisibility() {
+        return paymentOptionsVisibility;
     }
 
     private void initComponents() {

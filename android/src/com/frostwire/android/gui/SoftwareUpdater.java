@@ -292,6 +292,11 @@ public final class SoftwareUpdater {
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES, update.config.interstitialTransferOffersTimeoutInMinutes);
         CM.setInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, update.config.interstitialFirstDisplayDelayInMinutes);
 
+        if (update.config.rewardAdFreeMinutes > Constants.MAX_REWARD_AD_FREE_MINUTES) {
+            update.config.rewardAdFreeMinutes = Constants.MIN_REWARD_AD_FREE_MINUTES;
+        }
+        CM.setInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES, update.config.rewardAdFreeMinutes);
+
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
     }
@@ -346,12 +351,14 @@ public final class SoftwareUpdater {
         int interstitialOffersTransferStarts = 3;
         int interstitialTransferOffersTimeoutInMinutes = 10;
         int interstitialFirstDisplayDelayInMinutes = 3;
+        int rewardAdFreeMinutes = Constants.MIN_REWARD_AD_FREE_MINUTES;
 
         // ux stats
         int mopubSearchHeaderBannerThreshold = 80;
         int mopubSearchHeaderBannerIntervalInMs = 60000; // 1 min
     }
 
+    // TODO: Refactor this to not be an AsyncTask
     private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
         private final SoftwareUpdater softwareUpdater;
         private final WeakReference<MainActivity> activityWeakReference;

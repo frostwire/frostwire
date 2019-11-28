@@ -77,12 +77,14 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, 3);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
+        defaultValues.put(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES, Constants.MIN_REWARD_AD_FREE_MINUTES);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_MOPUB,
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
+
         defaultValues.put(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, true);
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);
         defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);

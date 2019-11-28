@@ -472,4 +472,9 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="play_store_out_of_sync">Play Store needs to synchronize, wait a few minutes</string>
     <string name="contact_us">Contact Us</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="reward_product_title">%d minutes</string>
+    <string name="reward_product_price">Free, Play 1 Video Ad</string>
+    <string name="temporary_ad_removal">Temporary Ad Removal</string>
+    <string name="temporary_ad_removal_description">No ads for %d minutes after playing a video</string>
 </resources>

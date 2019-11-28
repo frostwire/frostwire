@@ -98,6 +98,7 @@ public final class Constants {
     public static final String PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_preview_banner_threshold";
     public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_search_header_banner_threshold";
     public static final String PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS = "frostwire.prefs.gui.mopub_search_header_banner_dismiss_interval_in_ms_int";
+    public static final String PREF_KEY_GUI_REWARD_AD_FREE_MINUTES = "frostwire.prefs.gui.reward_ad_free_minutes";
 
     public static final String PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS = "frostwire.prefs.gui.interstitial_offers_transfer_starts";
     public static final String PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = "frostwire.prefs.gui.interstitial_transfer_offers_timeout_in_minutes";
@@ -207,6 +208,8 @@ public final class Constants {
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
     public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";
 
+    public static final int MIN_REWARD_AD_FREE_MINUTES = 60;
+    public static final int MAX_REWARD_AD_FREE_MINUTES = 240;
 
     private Constants() {
     }

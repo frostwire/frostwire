@@ -109,6 +109,16 @@
                 frostwire:product_card_title_bold="@string/six_months"
                 frostwire:product_card_title_normal="@string/ad_free" />
 
+            <com.frostwire.android.gui.views.ProductCardView
+                android:id="@+id/activity_buy_product_card_reward"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                frostwire:product_card_description="@string/dummy_content_description"
+                frostwire:product_card_hint_button_visible="false"
+                frostwire:product_card_price="$4.45"
+                frostwire:product_card_title_bold="@string/six_months"
+                frostwire:product_card_title_normal="@string/ad_free" />
+
         </LinearLayout>
 
     </ScrollView>
