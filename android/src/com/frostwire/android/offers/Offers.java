@@ -23,6 +23,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
@@ -276,6 +277,7 @@ public final class Offers {
             activity.finish();
             // maybe then exit the invoking BuyActivity, which should then be passed here.
         } else {
+            UIUtils.showShortMessage(activity, R.string.looking_For_rewarded_video);
             async(Offers::keepTryingRewardedVideoAsync, Ref.weak(activity));
         }
     }
@@ -288,29 +290,30 @@ public final class Offers {
         while (attempts > 0 && Ref.alive(activityRef) && !MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
             try {
                 LOG.info("keepTryingRewardedVideoAsync: sleeping while ad loads... (attempts=" + attempts + ")");
-                MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
+                if (Ref.alive(activityRef)) {
+                    activityRef.get().runOnUiThread(() -> MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO));
+                }
                 Thread.sleep(5000);
                 attempts--;
             } catch (InterruptedException e) {
                 return;
             }
         }
-        Handler handler = new Handler(Looper.getMainLooper());
         if (!MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
             async(Offers::unPauseAdsAsync);
-            handler.post(() -> {
-                if (!Ref.alive(activityRef)) {
-                    return;
-                }
+            if (!Ref.alive(activityRef)) {
+                return;
+            }
+            activityRef.get().runOnUiThread(() -> {
                 activityRef.get().stopProgressbars(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
-                UIUtils.showShortMessage(activityRef.get(), "Could not load rewarded video, please try again later and check your internet connectivity");
+                UIUtils.showShortMessage(activityRef.get(), R.string.no_reward_videos_available);
                 activityRef.get().finish();
                 // hopefully the existing listener, set in MoPubAdNetwork's initialization via MoPubAdNetwork::loadRewardedVideo works.
                 MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
                 LOG.info("keepTryingRewardedVideoAsync() invoked MoPubRewardedVideos.loadRewardedVideo() once more");
             });
         } else if (Ref.alive(activityRef)) {
-            handler.post(() -> {
+            activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
                 }
@@ -419,12 +422,10 @@ public final class Offers {
     }
 
     private static boolean stopAdNetworksIfPurchasedRemoveAds(Context context) {
-        //final ConfigurationManager CM = ConfigurationManager.instance();
         boolean stopped = false;
         PlayStore playStore = PlayStore.getInstance(context);
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
         if (purchasedProducts != null && purchasedProducts.size() > 0) {
-            //CM.setBoolean(Constants.PREF_KEY_GUI_SUPPORT_FROSTWIRE, false);
             Offers.stopAdNetworks(context);
             stopped = true;
             LOG.info("Turning off ads, user previously purchased AdRemoval");

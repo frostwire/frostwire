@@ -479,4 +479,6 @@
     <string name="reward_product_price">Free, Play 1 Video Ad</string>
     <string name="temporary_ad_removal">Temporary Ad Removal</string>
     <string name="temporary_ad_removal_description">No ads for %d minutes after playing a video</string>
+    <string name="looking_For_rewarded_video">Looking for a rewarded video...</string>
+    <string name="no_reward_videos_available">Could not fetch a rewarded video for you, please try again</string>
 </resources>
