@@ -89,7 +89,9 @@ public final class BuyActivity extends AbstractActivity {
     private ProductCardView card6months;
     private ProductCardView selectedProductCard;
 
-    /** the view with the "Buy" buttons for subscription or one time, which is reused for the PlayStore purchase card views */
+    /**
+     * the view with the "Buy" buttons for subscription or one time, which is reused for the PlayStore purchase card views
+     */
     private ProductPaymentOptionsView paymentOptionsView;
 
     private boolean offerAccepted;
@@ -102,7 +104,7 @@ public final class BuyActivity extends AbstractActivity {
     private static void getRewardFreeAdMinutesFromConfigAsync(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(()->{
+        handler.post(() -> {
             if (Ref.alive(buyActivityRef)) {
                 buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
             }
@@ -124,7 +126,7 @@ public final class BuyActivity extends AbstractActivity {
         if (p != null) {
             PlayStore playStore = PlayStore.getInstance(this);
             if (playStore == null) {
-                LOG.error("purchaseProduct(tagId="+tagId+") failed, could not get an instance of PlayStore");
+                LOG.error("purchaseProduct(tagId=" + tagId + ") failed, could not get an instance of PlayStore");
                 return;
             }
             playStore.setGlobalPurchasesUpdatedListenerWeakRef(onPurchasesUpdatedListener);
@@ -149,6 +151,13 @@ public final class BuyActivity extends AbstractActivity {
         initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
+
+        // If Google Store not ready or available, auto-select rewarded ad option
+        if (card30days.getVisibility() == View.GONE ||
+            card1year.getVisibility() == View.GONE ||
+            card6months.getVisibility() == View.GONE) {
+            cardNminutes.performClick();
+        }
     }
 
     private String getActionBarTitle() {
@@ -244,6 +253,7 @@ public final class BuyActivity extends AbstractActivity {
         }
 
         PlayStore store = PlayStore.getInstance(this);
+
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
             initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
@@ -256,7 +266,6 @@ public final class BuyActivity extends AbstractActivity {
             card1year.setVisibility(View.GONE);
             card6months.setVisibility(View.GONE);
         }
-
 
         initLastCardSelection(lastSelectedCardViewId);
     }
@@ -381,7 +390,8 @@ public final class BuyActivity extends AbstractActivity {
         card.updateTitle(productReward.title());
     }
 
-    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String inappSKU) {
+    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String
+            inappSKU) {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }

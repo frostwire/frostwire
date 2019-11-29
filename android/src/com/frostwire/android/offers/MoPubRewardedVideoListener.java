@@ -44,18 +44,18 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
 
     @Override
     public void onRewardedVideoLoadSuccess(@NonNull String adUnitId) {
-        LOG.error("onRewardedVideoLoadSuccess() !!!!");
+        LOG.info("onRewardedVideoLoadSuccess() !!!!");
     }
 
     @Override
     public void onRewardedVideoLoadFailure(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
-        LOG.error("onRewardedVideoLoadFailure: " + errorCode.toString());
+        LOG.info("onRewardedVideoLoadFailure: " + errorCode.toString());
         MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
     }
 
     @Override
     public void onRewardedVideoStarted(@NonNull String adUnitId) {
-        LOG.error("onRewardedVideoStarted() started reward video playback");
+        LOG.info("onRewardedVideoStarted() started reward video playback");
         wasPlayingMusic = MusicUtils.isPlaying();
 
         if (wasPlayingMusic) {
@@ -65,7 +65,7 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
 
     @Override
     public void onRewardedVideoPlaybackError(@NonNull String adUnitId, @NonNull MoPubErrorCode errorCode) {
-        LOG.error("onRewardedVideoPlaybackError: " + errorCode.toString());
+        LOG.info("onRewardedVideoPlaybackError: " + errorCode.toString());
         if (wasPlayingMusic) {
             MusicUtils.play();
         }
