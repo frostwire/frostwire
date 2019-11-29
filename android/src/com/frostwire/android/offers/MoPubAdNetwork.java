@@ -73,11 +73,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
     //private static final String TEST_UNIT_REWARDED_VIDEO_GAME_PLAYABLE = "15173ac6d3e54c9389b9a5ddca69b34b";
     //private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
-    public static final String UNIT_ID_REWARDED_VIDEO = "4e4f31e5067049998664b5ec7b9451";
+    public static final String UNIT_ID_REWARDED_VIDEO = "4e4f31e5067049998664b5ec7b9451e1";
 
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;
-    private Map<String,String> placements;
+    private Map<String, String> placements;
     private Map<String, MoPubInterstitial> interstitials;
 
     @Override
@@ -97,11 +97,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
         SdkConfiguration.Builder builder = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER);
-//        if (BuildConfig.DEBUG) {
-//            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
-//        } else {
-//            builder.withLogLevel(MoPubLog.LogLevel.INFO);
-//        }
+        if (Offers.DEBUG_MODE) {
+            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
+        }
         SdkConfiguration sdkConfiguration = builder.build();
         fixExecutor(true);
 
@@ -255,11 +253,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     public void loadMoPubInterstitial(final Activity activity, final String placement) {
         if (activity == null) {
-            LOG.info("Aborted loading interstitial ("+placement+"), no Activity");
+            LOG.info("Aborted loading interstitial (" + placement + "), no Activity");
             return;
         }
         if (!started() || !enabled()) {
-            LOG.info("loadMoPubInterstitial(placement="+placement+") aborted. Network not started or not enabled");
+            LOG.info("loadMoPubInterstitial(placement=" + placement + ") aborted. Network not started or not enabled");
             return;
         }
         LOG.info("Loading " + placement + " interstitial");
@@ -316,7 +314,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
                 try {
                     interstitial.destroy();
                 } catch (Throwable t) {
-                    LOG.warn(t.getMessage(),t);
+                    LOG.warn(t.getMessage(), t);
                 }
             }
         }
@@ -327,7 +325,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
                                      @NonNull ConsentStatus newConsentStatus,
                                      boolean canCollectPersonalInformation) {
         if (!canCollectPersonalInformation) {
-            npaBundle.putString("npa","1");
+            npaBundle.putString("npa", "1");
         } else {
             npaBundle.remove("npa");
         }
