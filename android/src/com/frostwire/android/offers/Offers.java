@@ -20,8 +20,6 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -32,11 +30,9 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
-import com.mopub.mobileads.MoPubRewardedVideo;
 import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.lang.ref.WeakReference;
@@ -45,7 +41,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -59,7 +54,7 @@ public final class Offers {
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
-    public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
+    final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
@@ -137,11 +132,6 @@ public final class Offers {
      * This method has been kept public since we use it as an easter egg
      * when touching the SearchFragment title 5 times to trigger an interstitial
      * on demand, no questions asked
-     *
-     * @param activity
-     * @param placement
-     * @param shutdownAfterwards
-     * @param dismissAfterwards
      */
     public static void showInterstitial(final Activity activity,
                                         String placement,
@@ -246,14 +236,14 @@ public final class Offers {
         PAUSED = time_on_pause < pause_duration;
 
         if (!PAUSED) {
-            LOG.info("checkIfPausedAsync: UnPausing Offers, Reward has expired");
+            //LOG.info("checkIfPausedAsync: UnPausing Offers, Reward has expired");
             CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
             CM.setLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
             pausedCheckLock.unlock();
         } else {
             pausedCheckLock.unlock();
             int minutes_left = (int) ((pause_duration - time_on_pause) / 60_000);
-            LOG.info("checkIfPausedAsync: PAUSED (" + minutes_left + " minutes left)");
+            //LOG.info("checkIfPausedAsync: PAUSED (" + minutes_left + " minutes left)");
         }
     }
 
@@ -394,7 +384,7 @@ public final class Offers {
 
     /**
      * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
-     * it's plus supporting frostwire with ads.
+     * it's plus supporting FrostWire with ads.
      * If it's been less than 2 seconds since the app started, we always return false as there's not
      * enough time to check if user has purchased anything
      */

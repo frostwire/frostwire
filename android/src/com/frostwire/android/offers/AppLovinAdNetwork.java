@@ -23,6 +23,7 @@ import android.content.Context;
 import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
+import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 

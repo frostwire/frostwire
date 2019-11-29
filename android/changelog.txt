@@ -1,3 +1,10 @@
+FrostWire 2.1.8 build 606 - NOV/28/2019 - Happy Thanksgiving!
+ - Ads can be temporarily removed by playing a rewarded video ad
+ - androidx.browser:browser:1.2.0-beta01 update
+ - androidx.exifinterface:exifinterface:1.1.0 update
+ - com.applovin:applovin-sdk:9.10.3
+ - cleanups and optimizations
+
 FrostWire 2.1.7 build 605 - NOV/20/2019
  - Android 10 compatibility updates
  - Android 4.4 support dropped, minimum compatible version is Android 5.0 Lollypop
