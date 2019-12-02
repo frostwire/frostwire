@@ -1,4 +1,4 @@
-FrostWire 2.1.8 build 606 - NOV/28/2019 - Happy Thanksgiving!
+FrostWire 2.1.8 build 607 - DEC/01/2019
  - Ads can be temporarily removed by playing a rewarded video ad
  - androidx.browser:browser:1.2.0-beta01 update
  - androidx.exifinterface:exifinterface:1.1.0 update
