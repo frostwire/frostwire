@@ -145,7 +145,6 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             start();
             async(MoPubAdNetwork::loadConsentDialogAsync, this);
             loadNewInterstitial(activity);
-            loadRewardedVideo();
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }

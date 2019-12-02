@@ -43,12 +43,14 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.PaymentOptionsVisibility;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
+import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.lang.ref.WeakReference;
 
@@ -157,6 +159,10 @@ public final class BuyActivity extends AbstractActivity {
             card1year.getVisibility() == View.GONE ||
             card6months.getVisibility() == View.GONE) {
             cardNminutes.performClick();
+        }
+
+        if (!MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
+            Offers.MOPUB.loadRewardedVideo();
         }
     }
 
@@ -419,9 +425,7 @@ public final class BuyActivity extends AbstractActivity {
         card.setTag(R.id.inapp_product_tag_id, prodInApp);
         card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(true, true, false));
 
-        if (prodSubs != null) {
-            card.updateData(prodSubs);
-        }
+        card.updateData(prodSubs);
     }
 
     @Override
