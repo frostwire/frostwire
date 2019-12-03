@@ -280,10 +280,11 @@ public final class Offers {
         while (attempts > 0 && Ref.alive(activityRef) && !MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
             try {
                 LOG.info("keepTryingRewardedVideoAsync: sleeping while ad loads... (attempts=" + attempts + ")");
+                Thread.sleep(2500);
                 if (Ref.alive(activityRef)) {
                     activityRef.get().runOnUiThread(() -> MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO));
                 }
-                Thread.sleep(5000);
+                Thread.sleep(2500);
                 attempts--;
             } catch (InterruptedException e) {
                 return;
@@ -295,9 +296,11 @@ public final class Offers {
                 return;
             }
             activityRef.get().runOnUiThread(() -> {
+                if (!Ref.alive(activityRef)) {
+                    return;
+                }
                 activityRef.get().stopProgressbars(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
                 UIUtils.showShortMessage(activityRef.get(), R.string.no_reward_videos_available);
-                activityRef.get().finish();
                 // hopefully the existing listener, set in MoPubAdNetwork's initialization via MoPubAdNetwork::loadRewardedVideo works.
                 MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
                 LOG.info("keepTryingRewardedVideoAsync() invoked MoPubRewardedVideos.loadRewardedVideo() once more");
