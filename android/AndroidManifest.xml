@@ -149,9 +149,9 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "app://frostwire.com” -->
+                <!-- Accepts URIs that begin with "app://com.frostwire.android” -->
                 <data android:scheme="app"
-                      android:host="frostwire.com" />
+                      android:host="com.frostwire.android" />
             </intent-filter>
         </activity>
         <activity

@@ -119,9 +119,9 @@ public final class InHouseBannerFactory {
             v.getContext().startActivity(intent);
         });
         if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));
+            CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("https://www.frostwire.com/give?from=android-fallback-ad"));
         }
-        CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("http://www.frostclick.com/?from=android-fallback-ad"));
+        CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("https://www.frostclick.com/?from=android-fallback-ad"));
     }
 
     enum Message {
@@ -131,11 +131,7 @@ public final class InHouseBannerFactory {
 
         static Message random() {
             Message[] messages = new Message[values().length - 1];
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-                // don't show ad removal messages if this is plus
-                // ad_removal should be the first element in the values() array.
-                System.arraycopy(values(), 1, messages, 0, messages.length);
-            } else {
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 // don't show donate message if this is basic
                 System.arraycopy(values(), 0, messages, 0, messages.length);
             }

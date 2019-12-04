@@ -91,17 +91,18 @@ public final class UIUtils {
 
     // put "support" pitches at the beginning and play with the offset
     private static final int[] PITCHES = {
-            R.string.support_frostwire,
-            R.string.support_free_software,
-            R.string.support_frostwire,
-            R.string.support_free_software,
-            R.string.save_bandwidth,
-            R.string.cheaper_than_drinks,
-            R.string.cheaper_than_lattes,
-            R.string.cheaper_than_parking,
-            R.string.cheaper_than_beer,
-            R.string.cheaper_than_cigarettes,
-            R.string.cheaper_than_gas,
+            R.string.support_frostwire, //0
+            R.string.support_free_software, //1
+            R.string.support_frostwire, //2
+            R.string.support_free_software, //3
+            R.string.save_bandwidth, //4
+            R.string.cheaper_than_drinks, //5
+            R.string.cheaper_than_lattes, //6
+            R.string.cheaper_than_parking, //7
+            R.string.cheaper_than_beer, //8
+            R.string.cheaper_than_cigarettes, //9
+            R.string.cheaper_than_gas, //10
+            R.string.try_it_free_for_a_half_hour,
             R.string.keep_the_project_alive
     };
 
@@ -476,6 +477,14 @@ public final class UIUtils {
     }
 
     public static int randomPitchResId(boolean avoidSupportPitches) {
+        if ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && PITCHES[5] != R.string.try_it_free_for_a_half_hour) {
+            PITCHES[5] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[6] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[7] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[8] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[9] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[10] = R.string.try_it_free_for_a_half_hour;
+        }
         int offsetRemoveAds = 4;
         int offset = !avoidSupportPitches ? 0 : offsetRemoveAds;
         return PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
@@ -486,7 +495,7 @@ public final class UIUtils {
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         double x_sq = Math.pow(dm.widthPixels / dm.xdpi, 2);
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
-        // pitagoras
+        // Thank you Pitagoras
         return Math.sqrt(x_sq + y_sq);
     }
 

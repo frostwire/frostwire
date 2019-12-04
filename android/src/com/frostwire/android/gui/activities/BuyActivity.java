@@ -220,11 +220,11 @@ public final class BuyActivity extends AbstractActivity {
         super.onCreate(savedInstanceState);
         // initComponents() and setToolbar() have been called
 
-        // from DEEP-Link House Ad pointing to app://frostwire.com/remove-ads
+        // from DEEP-Link House Ad pointing to app://com.frostwire.android/remove-ads
         Intent intent = getIntent();
         if (intent != null) {
             Uri data = intent.getData();
-            if (data != null && "app://frostwire.com/remove-ads".equals(data.toString()) && cardNminutes != null) {
+            if (data != null && "app://com.frostwire.android/remove-ads".equals(data.toString()) && cardNminutes != null) {
                 cardNminutes.performClick();
             }
         }
