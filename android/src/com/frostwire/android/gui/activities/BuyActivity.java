@@ -20,6 +20,7 @@ package com.frostwire.android.gui.activities;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -211,6 +212,21 @@ public final class BuyActivity extends AbstractActivity {
             finish();
         } else {
             finish();
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // initComponents() and setToolbar() have been called
+
+        // from DEEP-Link House Ad pointing to app://frostwire.com/remove-ads
+        Intent intent = getIntent();
+        if (intent != null) {
+            Uri data = intent.getData();
+            if (data != null && "app://frostwire.com/remove-ads".equals(data.toString()) && cardNminutes != null) {
+                cardNminutes.performClick();
+            }
         }
     }
 
