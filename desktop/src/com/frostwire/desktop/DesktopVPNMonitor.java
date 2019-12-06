@@ -130,7 +130,9 @@ final class DesktopVPNMonitor implements VPNMonitor {
         try {
             String[] output = readProcessOutput(netstatCmd(), "-nr").split("\r\n");
             for (String line : output) {
-                if (line.startsWith("0") && line.contains("tun")) {
+                boolean _0_0_0_0_tunnel_check = line.startsWith("0") && line.contains("tun");
+                boolean default_ipsec0_check = line.startsWith("default") && line.contains("ipsec");
+                if (_0_0_0_0_tunnel_check || default_ipsec0_check) {
                     return true;
                 }
             }

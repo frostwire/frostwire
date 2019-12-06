@@ -18,7 +18,11 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.jlibtorrent.EnumNet;
+import com.frostwire.platform.Platform;
+import com.frostwire.platform.Platforms;
+import com.frostwire.platform.VPNMonitor;
 import org.limewire.util.OSUtils;
 
 import java.util.List;
@@ -35,7 +39,14 @@ public final class VPNs {
             return false;
         }
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+            DesktopPlatform platform = (DesktopPlatform) Platforms.get();
+
             result = isPosixVPNActive();
+            if (!result) {
+                // not returning all the interfaces on macos, could be a false positive
+                platform.vpn().refresh();
+                result = result || platform.vpn().active();
+            }
         } else if (OSUtils.isWindows()) {
             result = isWindowsVPNActive();
         }
