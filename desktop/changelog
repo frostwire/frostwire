@@ -1,3 +1,10 @@
+frostwire (6.8.4) stable; urgency=high
+  * Mac: CyberGHost VPN detection false-negative bug fix
+
+
+-- FrostWire Team <contact@frostwire.com>  Thu, 5 Dec 2019 20:12:20 -0600
+
+
 frostwire (6.8.3) stable; urgency=high
   * Mac, Windows: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
   * Mac: launcher fixes bug that required legacy Java to be present in the system
