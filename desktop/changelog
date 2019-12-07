@@ -1,8 +1,9 @@
 frostwire (6.8.4) stable; urgency=high
+  * Soundcloud search fixed
   * Mac: CyberGHost VPN detection false-negative bug fix
 
 
--- FrostWire Team <contact@frostwire.com>  Thu, 5 Dec 2019 20:12:20 -0600
+-- FrostWire Team <contact@frostwire.com>  Fri, 6 Dec 2019 20:12:20 -0600
 
 
 frostwire (6.8.3) stable; urgency=high
