@@ -30,15 +30,15 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "FweeGBOOEOYJWLJN3oEyToGLKhmSz0I7";
-    private static final String SOUNDCLOUD_APP_VERSION = "1516627364";
+    private static final String SOUNDCLOUD_CLIENTID = "pToAEVYicMm3OkPBnOlGCHfEBFrYx1fz";
+    private static final String SOUNDCLOUD_APP_VERSION = "1575380558";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
     }
 
     public static String resolveUrl(String url) {
-        return "http://api.soundcloud.com/resolve.json?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
+        return "https://api.soundcloud.com/resolve?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
     }
 
     public static LinkedList<SoundcloudSearchResult> fromJson(String json) {
@@ -47,7 +47,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
             if (obj != null && obj.collection != null) {
                 for (SoundcloudItem item : obj.collection) {
-                    if (item != null && item.downloadable) {
+                    if (item != null && item.isValidSearchResult()) {
                         SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                         r.add(sr);
                     }
@@ -85,7 +85,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         // can't use fromJson here due to the isStopped call
         if (obj != null && obj.collection != null) {
             for (SoundcloudItem item : obj.collection) {
-                if (!isStopped() && item != null && item.downloadable) {
+                if (!isStopped() && item != null && item.isValidSearchResult()) {
                     SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                     result.add(sr);
                 }

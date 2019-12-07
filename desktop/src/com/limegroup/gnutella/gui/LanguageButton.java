@@ -16,7 +16,7 @@ public class LanguageButton extends JPanel {
     private static final long serialVersionUID = 1795381168007012403L;
     private final JButton bheader;
 
-    public LanguageButton() {
+    LanguageButton() {
         bheader = new JButton();
         updateLanguageFlag();
         //when pressed displays a dialog that allows you to change the language.
@@ -59,7 +59,7 @@ public class LanguageButton extends JPanel {
         insets.bottom = 0;
     }
 
-    public void updateLanguageFlag() {
+    void updateLanguageFlag() {
         bheader.setContentAreaFilled(false);
         bheader.setBorderPainted(false);
         bheader.setOpaque(false);

@@ -20,7 +20,11 @@ package com.frostwire.search.soundcloud;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.JsonUtils;
+import com.frostwire.util.http.HttpClient;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -37,8 +41,10 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final String source;
     private final String thumbnailUrl;
     private final long date;
-    private final String downloadUrl;
+    private String downloadUrl;
+    private final String progressiveFormatJSONFetcherURL;
     private final double size;
+    private String hash;
 
     SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
@@ -53,7 +59,9 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         }
         this.thumbnailUrl = buildThumbnailUrl(item.artwork_url != null ? item.artwork_url : userAvatarUrl);
         this.date = buildDate(item.created_at);
-        this.downloadUrl = buildDownloadUrl(item, clientId, appVersion);
+        this.progressiveFormatJSONFetcherURL = item.getProgressiveFormatJSONFetcherURL() + "?client_id=" + clientId + "&app_version=" + appVersion;
+        this.hash = Integer.toHexString(item.id * 953 * 631);
+        this.downloadUrl = null;
     }
 
     @Override
@@ -100,7 +108,21 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public String getDownloadUrl() {
-        return downloadUrl;
+        if (downloadUrl != null) {
+            return downloadUrl;
+        }
+        HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+        try {
+            String json = client.get(progressiveFormatJSONFetcherURL);
+            SoundcloudTrackURL soundcloudTrackURL = JsonUtils.toObject(json, SoundcloudTrackURL.class);
+            if (soundcloudTrackURL != null && soundcloudTrackURL.url != null) {
+                return soundcloudTrackURL.url;
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
     private String buildUsername(SoundcloudItem item) {
@@ -176,13 +198,17 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         SoundcloudSearchResult other = (SoundcloudSearchResult) o;
         return this.getDetailsUrl().equals(other.getDetailsUrl()) &&
                 this.getDisplayName().equals(other.getDisplayName()) &&
-                this.getDownloadUrl().equals(other.getDownloadUrl());
+                this.getHash().equals(other.getHash());
     }
 
     @Override
     public int hashCode() {
         return getDetailsUrl().hashCode() +
                 getDisplayName().hashCode() +
-                getDownloadUrl().hashCode();
+                getHash().hashCode();
+    }
+
+    public String getHash() {
+        return hash;
     }
 }

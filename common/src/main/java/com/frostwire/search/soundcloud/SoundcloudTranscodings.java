@@ -17,12 +17,10 @@
 
 package com.frostwire.search.soundcloud;
 
-import java.util.List;
-
-/**
- * @author gubatron
- * @author aldenml
- */
-final class SoundcloudResponse {
-    public List<SoundcloudItem> collection;
+public class SoundcloudTranscodings {
+    public String url;
+    public String preset;
+    public int duration;
+    public SoundcloudFormat format;
+    public String quality;
 }

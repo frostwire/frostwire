@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ package com.frostwire.search.soundcloud;
  */
 final class SoundcloudItem {
     public int id;
-    public SoundcloundUser user;
+    public SoundcloudUser user;
     public String uri;
     public int duration;
     public String permalink;
@@ -35,5 +35,30 @@ final class SoundcloudItem {
     public String created_at;
     public boolean downloadable;
     public String download_url;
-    public long original_content_size;
+    public SoundcloudMedia media;
+
+    boolean isValidSearchResult() {
+      return downloadable && hasProgressiveFormat();
+    }
+
+    private boolean hasProgressiveFormat() {
+        for (SoundcloudTranscodings transcodings : media.transcodings) {
+            if ("progressive".equals(transcodings.format.protocol)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Returns URL that fetches JSON with actual stream URL. You need to concatenate the client_id=XXXX to this URL
+     *  to obtain a valid JSON response.
+     */
+    String getProgressiveFormatJSONFetcherURL() {
+        for (SoundcloudTranscodings transcodings : media.transcodings) {
+            if ("progressive".equals(transcodings.format.protocol)) {
+                return transcodings.url;
+            }
+        }
+        return null;
+    }
 }

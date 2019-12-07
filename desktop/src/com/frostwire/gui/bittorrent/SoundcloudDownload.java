@@ -87,7 +87,7 @@ public class SoundcloudDownload extends HttpBTDownload {
 
     @Override
     public String getHash() {
-        return sr.getDownloadUrl();
+        return sr.getHash();
     }
 
     private void start() {
