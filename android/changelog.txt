@@ -1,9 +1,10 @@
 FrostWire 2.1.8 build 608 - DEC/06/2019
  - SoundCloud search fixed
  - Ads can be temporarily removed by playing a rewarded video ad
- - androidx.browser:browser:1.2.0-beta01 update
+ - androidx.browser:browser:1.2.0-rc01 update
  - androidx.exifinterface:exifinterface:1.1.0 update
  - com.applovin:applovin-sdk:9.10.3
+ - dev: com.android.tools.build:gradle:3.5.3
  - cleanups and optimizations
 
 FrostWire 2.1.7 build 605 - NOV/20/2019
