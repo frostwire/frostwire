@@ -95,7 +95,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     public String getStreamUrl() {
-        return downloadUrl;
+        return getDownloadUrl();
     }
 
     public String getThumbnailUrl() {
