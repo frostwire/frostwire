@@ -38,10 +38,18 @@ final class SoundcloudItem {
     public SoundcloudMedia media;
 
     boolean isValidSearchResult() {
-      return downloadable && hasProgressiveFormat();
+        return isValidSearchResult(false);
+    }
+
+    boolean isValidSearchResult(boolean fromPlaylist) {
+        return (fromPlaylist || downloadable) && hasProgressiveFormat();
     }
 
     private boolean hasProgressiveFormat() {
+        if (media == null) {
+            return false;
+        }
+
         for (SoundcloudTranscodings transcodings : media.transcodings) {
             if ("progressive".equals(transcodings.format.protocol)) {
                 return true;
@@ -50,8 +58,9 @@ final class SoundcloudItem {
         return false;
     }
 
-    /** Returns URL that fetches JSON with actual stream URL. You need to concatenate the client_id=XXXX to this URL
-     *  to obtain a valid JSON response.
+    /**
+     * Returns URL that fetches JSON with actual stream URL. You need to concatenate the client_id=XXXX to this URL
+     * to obtain a valid JSON response.
      */
     String getProgressiveFormatJSONFetcherURL() {
         for (SoundcloudTranscodings transcodings : media.transcodings) {

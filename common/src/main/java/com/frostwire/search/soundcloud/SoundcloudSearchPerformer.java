@@ -30,7 +30,7 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "pToAEVYicMm3OkPBnOlGCHfEBFrYx1fz";
+    private static final String SOUNDCLOUD_CLIENTID = Math.random() % 2 == 0 ? "UW9ajvMgVdMMW3cdeBi8lPfN6dvOVGji" : "pToAEVYicMm3OkPBnOlGCHfEBFrYx1fz";
     private static final String SOUNDCLOUD_APP_VERSION = "1575380558";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
@@ -38,7 +38,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
     }
 
     public static String resolveUrl(String url) {
-        return "https://api.soundcloud.com/resolve?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
+        return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
     }
 
     public static LinkedList<SoundcloudSearchResult> fromJson(String json) {
@@ -47,9 +47,11 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
             if (obj != null && obj.collection != null) {
                 for (SoundcloudItem item : obj.collection) {
-                    if (item != null && item.isValidSearchResult()) {
-                        SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                        r.add(sr);
+                    if (item != null && item.isValidSearchResult(true)) {
+                        try {
+                            SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                            r.add(sr);
+                        } catch (Throwable ignored) {}
                     }
                 }
             }
@@ -57,9 +59,13 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
             if (obj != null && obj.tracks != null) {
                 for (SoundcloudItem item : obj.tracks) {
-                    if (item != null && item.downloadable) {
-                        SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                        r.add(sr);
+                    if (item != null && item.isValidSearchResult(true)) {
+                        try {
+                            SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
+                            r.add(sr);
+                        } catch (Throwable ignored) {
+                            ignored.printStackTrace();
+                        }
                     }
                 }
             }
