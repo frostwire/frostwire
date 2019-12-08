@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.tasks;
@@ -24,7 +23,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.ConfirmSoundcloudDownloadDialog;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -33,6 +31,8 @@ import com.frostwire.util.http.HttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 /*
  * @author aldenml
@@ -43,10 +43,10 @@ public final class AsyncDownloadSoundcloudFromUrl {
     private static final Logger LOG = Logger.getLogger(AsyncDownloadSoundcloudFromUrl.class);
 
     public AsyncDownloadSoundcloudFromUrl(Context ctx, String soundcloudUrl) {
-        Asyncs.async(ctx, AsyncDownloadSoundcloudFromUrl::doInBackground, soundcloudUrl, AsyncDownloadSoundcloudFromUrl::onPostExecute);
+        async(ctx, (context, soundcloudUrl1) -> doInBackground(soundcloudUrl1), soundcloudUrl, AsyncDownloadSoundcloudFromUrl::onPostExecute);
     }
 
-    private static List<SoundcloudSearchResult> doInBackground(final Context context, final String soundcloudUrl) {
+    private static List<SoundcloudSearchResult> doInBackground(final String soundcloudUrl) {
         List<SoundcloudSearchResult> results = new ArrayList<>();
         try {
             String url = soundcloudUrl;
