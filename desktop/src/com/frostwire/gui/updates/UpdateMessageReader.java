@@ -316,7 +316,7 @@ final class UpdateMessageReader implements ContentHandler {
 
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         // deal with the opening tag
-        LOG.info("startElement " + localName);
+        //LOG.info("startElement " + localName);
         if (localName.equalsIgnoreCase("update")) {
             UpdateManager.getInstance().setServerTime(atts.getValue("time"));
             if (atts.getValue("torrentDetailsUrl") != null && atts.getValue("torrentDetailsUrl").length() > 0) {
