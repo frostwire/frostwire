@@ -29,4 +29,6 @@ public interface Platform {
     AppSettings appSettings();
 
     VPNMonitor vpn();
+
+    boolean isUIThread();
 }
