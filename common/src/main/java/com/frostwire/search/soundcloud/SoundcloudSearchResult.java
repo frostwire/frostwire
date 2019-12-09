@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.http.HttpClient;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -59,9 +58,17 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         }
         this.thumbnailUrl = buildThumbnailUrl(item.artwork_url != null ? item.artwork_url : userAvatarUrl);
         this.date = buildDate(item.created_at);
-        this.progressiveFormatJSONFetcherURL = item.getProgressiveFormatJSONFetcherURL() + "?client_id=" + clientId + "&app_version=" + appVersion;
+        if (null != item.getProgressiveFormatJSONFetcherURL()) {
+            this.progressiveFormatJSONFetcherURL = item.getProgressiveFormatJSONFetcherURL() + "?client_id=" + clientId + "&app_version=" + appVersion;
+        } else {
+            this.progressiveFormatJSONFetcherURL = null;
+        }
         this.hash = Integer.toHexString(item.id * 953 * 631);
         this.downloadUrl = null;
+    }
+
+    public boolean fetchedDownloadUrl() {
+        return downloadUrl != null;
     }
 
     @Override
@@ -108,9 +115,24 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public String getDownloadUrl() {
+        if (progressiveFormatJSONFetcherURL == null) {
+            return null;
+        }
         if (downloadUrl != null) {
             return downloadUrl;
         }
+//        Debug on desktop this is not called from main thread
+//        if (SwingUtilities.isEventDispatchThread()) {
+//            StackTraceElement[] stackTrace = new Exception().getStackTrace();
+//            int maxStackShow = 10;
+//            for (StackTraceElement e : stackTrace) {
+//                System.out.println(e.toString());
+//                if (--maxStackShow == 0) {
+//                    break;
+//                }
+//            }
+//            throw new RuntimeException("SoundcloudSearchResult.getDownloadUrl(): Do not invoke getDownloadUrl() from the main thread if downloadUrl is null");
+//        }
         HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         try {
             String json = client.get(progressiveFormatJSONFetcherURL);
