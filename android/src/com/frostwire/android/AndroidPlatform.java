@@ -20,6 +20,7 @@ package com.frostwire.android;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
+import android.os.Looper;
 
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.jlibtorrent.swig.libtorrent;
@@ -54,6 +55,11 @@ public final class AndroidPlatform extends AbstractPlatform {
     @Override
     public VPNMonitor vpn() {
         return null;
+    }
+
+    @Override
+    public boolean isUIThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
     public static boolean saf() {
