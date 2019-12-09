@@ -97,9 +97,12 @@ public class SoundcloudDownload extends HttpBTDownload {
     private void start(final File temp) {
         state = TransferState.WAITING;
         SOUNDCLOUD_THREAD_POOL.execute(() -> {
+            String downloadUrl = null;
             try {
-                httpClient.save(sr.getDownloadUrl(), temp, false);
+                downloadUrl = sr.getDownloadUrl();
+                httpClient.save(downloadUrl, temp, false);
             } catch (Throwable e) {
+                System.err.println("URL at issue: [" + downloadUrl + "]");
                 e.printStackTrace();
                 httpClientListener.onError(httpClient, e);
             }
@@ -113,7 +116,7 @@ public class SoundcloudDownload extends HttpBTDownload {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SoundcloudDownload && sr.getDownloadUrl().equals(((SoundcloudDownload) obj).sr.getDownloadUrl());
+        return obj instanceof SoundcloudDownload && sr.getHash().equals(((SoundcloudDownload) obj).sr.getHash());
     }
 
     private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {

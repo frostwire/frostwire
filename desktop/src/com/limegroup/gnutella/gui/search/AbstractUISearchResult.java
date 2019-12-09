@@ -22,10 +22,14 @@ import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
+
+import javax.swing.*;
 
 /**
  * @author gubatron
@@ -110,15 +114,32 @@ public abstract class AbstractUISearchResult implements UISearchResult {
         // this gets invoked when clicking on a search result play preview button.
         if (sr instanceof StreamableSearchResult) {
             StreamableSearchResult ssr = (StreamableSearchResult) sr;
-            String streamUrl = ssr.getStreamUrl();
-            MediaType mediaType = MediaType.getMediaTypeForExtension(extension);
-            if (mediaType != null) {
-                boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
-                if (isVideo) {
-                    GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
+
+            String streamUrl;
+            if (SwingUtilities.isEventDispatchThread() && sr instanceof SoundcloudSearchResult) {
+                SoundcloudSearchResult scsr = (SoundcloudSearchResult) sr;
+                if (scsr.fetchedDownloadUrl()) {
+                    playStream(ssr.getStreamUrl());
                 } else {
-                    GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
+                    BackgroundExecutorService.schedule(() -> {
+                        String url = ssr.getStreamUrl();
+                        GUIMediator.safeInvokeLater(() -> playStream(url));
+                    });
                 }
+            } else {
+                playStream(ssr.getStreamUrl());
+            }
+        }
+    }
+
+    private void playStream(String streamUrl) {
+        MediaType mediaType = MediaType.getMediaTypeForExtension(extension);
+        if (mediaType != null) {
+            boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
+            if (isVideo) {
+                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
+            } else {
+                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
             }
         }
     }

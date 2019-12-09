@@ -25,6 +25,7 @@ import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
+import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -138,9 +139,12 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private boolean isSearchResultPlayable() {
         boolean playable = false;
-        if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
+        if (searchResult.getSearchResult() instanceof SoundcloudSearchResult) {
+            return true;
+        } else if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
             playable = ((StreamableSearchResult) searchResult.getSearchResult()).getStreamUrl() != null;
         }
+
         if (playable && searchResult.getExtension() != null) {
             MediaType mediaType = MediaType.getMediaTypeForExtension(searchResult.getExtension());
             playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
@@ -182,6 +186,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
         SearchResult delegateSearchResult = sr.getSearchResult();
+        if (delegateSearchResult instanceof SoundcloudSearchResult) {
+            if (!((SoundcloudSearchResult) delegateSearchResult).fetchedDownloadUrl()) {
+                return false;
+            }
+        }
         return delegateSearchResult instanceof StreamableSearchResult && MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult) delegateSearchResult).getStreamUrl());
     }
 }
