@@ -56,7 +56,7 @@ public final class AsyncDownloadSoundcloudFromUrl {
             String resolveURL = SoundcloudSearchPerformer.resolveUrl(url);
             HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
             String json = client.get(resolveURL, 10000);
-            results = SoundcloudSearchPerformer.fromJson(json);
+            results = SoundcloudSearchPerformer.fromJson(json, true);
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -64,11 +64,17 @@ public final class AsyncDownloadSoundcloudFromUrl {
     }
 
     private static void onPostExecute(Context ctx, final String soundcloudUrl, List<SoundcloudSearchResult> results) {
-        if (ctx != null && !results.isEmpty()) {
-            MainActivity activity = (MainActivity) ctx;
-            ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
-            dlg.show(activity.getFragmentManager());
+        if (ctx == null) {
+            return;
         }
+        if (results.isEmpty()) {
+            UIUtils.showLongMessage(ctx, R.string.sorry_could_not_find_valid_download_location_at, soundcloudUrl);
+            return;
+        }
+
+        MainActivity activity = (MainActivity) ctx;
+        ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
+        dlg.show(activity.getFragmentManager());
     }
 
     private static ConfirmSoundcloudDownloadDialog createConfirmListDialog(Context ctx, List<SoundcloudSearchResult> results) {

@@ -1309,9 +1309,9 @@ public final class GUIMediator {
         getBTDownloadMediator().openTorrentSearchResult(sr, partial);
     }
 
-    public void openSoundcloudTrackUrl(String trackUrl, SoundcloudSearchResult sr) {
+    public void openSoundcloudTrackUrl(String trackUrl, SoundcloudSearchResult sr, boolean fromPastedUrl) {
         showTransfers(TransfersTab.FilterMode.ALL);
-        getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, sr);
+        getBTDownloadMediator().downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, sr, fromPastedUrl);
     }
 
     public void openSlide(Slide slide) {

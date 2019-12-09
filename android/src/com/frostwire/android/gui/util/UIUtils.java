@@ -131,6 +131,10 @@ public final class UIUtils {
         Snackbar.make(view, resourceId, Snackbar.LENGTH_LONG).show();
     }
 
+    public static void showLongMessage(Context context, int resourceId, Object... formatArgs) {
+        showLongMessage(context, context.getResources().getString(resourceId, formatArgs));
+    }
+
     public static void showDismissableMessage(View view, int resourceId) {
         final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
         snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
@@ -274,6 +278,7 @@ public final class UIUtils {
 
     /**
      * Takes a screenshot of the given view
+     *
      * @return File with jpeg of the screenshot taken. null if there was a problem.
      */
     public static File takeScreenshot(View view) {

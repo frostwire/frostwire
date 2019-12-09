@@ -40,17 +40,18 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         return "https://api-v2.soundcloud.com/resolve?url=" + url + "&client_id=" + SOUNDCLOUD_CLIENTID + "&app_version=" + SOUNDCLOUD_APP_VERSION;
     }
 
-    public static LinkedList<SoundcloudSearchResult> fromJson(String json) {
+    public static LinkedList<SoundcloudSearchResult> fromJson(String json, boolean fromPastedUrl) {
         LinkedList<SoundcloudSearchResult> r = new LinkedList<>();
         if (json.contains("\"collection\":")) {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
             if (obj != null && obj.collection != null) {
                 for (SoundcloudItem item : obj.collection) {
-                    if (item != null && item.isValidSearchResult(true)) {
+                    if (item != null && item.isValidSearchResult(fromPastedUrl)) {
                         try {
                             SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                             r.add(sr);
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) {
+                        }
                     }
                 }
             }
@@ -58,7 +59,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
             if (obj != null && obj.tracks != null) {
                 for (SoundcloudItem item : obj.tracks) {
-                    if (item != null && item.isValidSearchResult(true)) {
+                    if (item != null && item.isValidSearchResult(fromPastedUrl)) {
                         try {
                             SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                             r.add(sr);
@@ -70,7 +71,7 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
             }
         } else { // assume it's a single item
             SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
-            if (item != null && item.isValidSearchResult()) {
+            if (item != null && item.isValidSearchResult(fromPastedUrl)) {
                 SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                 r.add(sr);
             }

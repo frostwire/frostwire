@@ -48,7 +48,7 @@ public final class FileMenuActions {
         } else if (userText.matches(".*soundcloud.com.*")) {
             //the new soundcloud redirects to what seems to be an ajax page
             String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
-            GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null);
+            GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null, true);
             return true;
         } else if (userText.startsWith("http://") || (userText.startsWith("https://"))) {
             GUIMediator.instance().openTorrentURI(userText, true);
@@ -215,7 +215,7 @@ public final class FileMenuActions {
             }
         }
 
-        private class CancelAction extends AbstractAction {
+        private static class CancelAction extends AbstractAction {
             CancelAction() {
                 super(I18n.tr("Cancel"));
             }

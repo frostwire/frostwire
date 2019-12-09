@@ -57,9 +57,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * This class acts as a mediator between all of the components of the
@@ -794,7 +791,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
     }
 
-    public void downloadSoundcloudFromTrackUrlOrSearchResult(final String trackUrl, final SoundcloudSearchResult sr) {
+    public void downloadSoundcloudFromTrackUrlOrSearchResult(final String trackUrl, final SoundcloudSearchResult sr, boolean fromPastedUrl) {
         if (sr != null) {
             BackgroundExecutorService.schedule(() -> {
                 System.out.println("BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult about to get download url");
@@ -820,7 +817,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     String resolveURL = SoundcloudSearchPerformer.resolveUrl(url);
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     String json = client.get(resolveURL, 10000);
-                    LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson(json);
+                    LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson(json, fromPastedUrl);
                     if (results.isEmpty()) {
                         GUIMediator.safeInvokeLater(() -> {
                             GUIMediator.showError(I18n.tr("Sorry, Couldn't find a valid download location at") + "<br><br><a href=\"" + trackUrl + "\">" + trackUrl + "</a>");
@@ -828,7 +825,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         return;
                     }
                     for (SoundcloudSearchResult urlSr : results) {
-                        downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, urlSr);
+                        downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, urlSr, fromPastedUrl);
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();

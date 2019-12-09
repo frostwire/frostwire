@@ -228,9 +228,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public int hashCode() {
-        return getDetailsUrl().hashCode() +
-                getDisplayName().hashCode() +
-                getHash().hashCode();
+        return getHash().hashCode();
     }
 
     public String getHash() {

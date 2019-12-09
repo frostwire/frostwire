@@ -22,11 +22,8 @@ import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.gui.util.PopupUtils;
-import org.limewire.concurrent.ExecutorsHelper;
 
 import javax.swing.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
 /**
  * @author gubatron
@@ -46,7 +43,7 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
             sr.getDownloadUrl();
             GUIMediator.instance().safeInvokeLater(() -> {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-                GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr);
+                GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr, false);
                 showSearchResultWebPage(false);
             });
         });

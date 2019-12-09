@@ -481,4 +481,5 @@
     <string name="looking_For_rewarded_video">Looking for a rewarded video...</string>
     <string name="no_reward_videos_available">Couldn\'t fetch a rewarded video. Please try again</string>
     <string name="try_it_free_for_a_half_hour">Try it free for a half hour</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Sorry, Couldn\'t find a valid download location at %s</string>
 </resources>
