@@ -66,8 +66,9 @@ public class AsyncStartDownload {
             } else {
                 transfer = TransferManager.instance().download(sr);
                 if(!(transfer instanceof InvalidDownload)) {
-                    //FIXME: this stuff shouldn't be in the background thread
-                    UIUtils.showTransfersOnDownloadStart(ctx);
+                    if (ctx instanceof Activity) {
+                        ((Activity) ctx).runOnUiThread(() -> UIUtils.showTransfersOnDownloadStart(ctx));
+                    }
                 }
             }
         } catch (Throwable e) {
