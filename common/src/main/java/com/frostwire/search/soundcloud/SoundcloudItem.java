@@ -56,9 +56,6 @@ final class SoundcloudItem {
             if ("progressive".equals(transcodings.format.protocol)) {
                 return true;
             }
-            if ("hls".equals(transcodings.format.protocol)) {
-                return true;
-            }
         }
         return false;
     }
@@ -73,9 +70,6 @@ final class SoundcloudItem {
         }
         for (SoundcloudTranscodings transcodings : media.transcodings) {
             if ("progressive".equals(transcodings.format.protocol)) {
-                return transcodings.url;
-            }
-            if ("hls".equals(transcodings.format.protocol)) {
                 return transcodings.url;
             }
         }
