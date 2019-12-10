@@ -372,7 +372,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire ไม่สามารถเริ่มต้นได้อย่างถูกต้องเนื่องจากไม่มีสิทธิ์ โปรดให้สิทธิ์ที่จำเป็นและรีสตาร์ทแอ็พพลิเคชัน</string>
     <string name="vpn_find_out_more">หาข้อมูลเพิ่มเติม</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n การทดลองใช้ฟรี 7 วัน</string>
-    <string name="play_store_out_of_sync">Google Play สโตร์ต้องซิงโครไนซ์รอสักครู่</string>
     <string name="contact_us">ติดต่อเรา</string>
     <string name="uploaded">ที่อัปโหลด</string>
     <string name="trackers">ติดตาม</string>

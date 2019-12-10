@@ -408,7 +408,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire không thể bắt đầu đúng do thiếu quyền truy cập. Vui lòng cấp các quyền cần thiết và khởi động lại ứng dụng</string>
     <string name="vpn_find_out_more">Tìm hiểu thêm</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Dùng thử 7 ngày miễn phí</string>
-    <string name="play_store_out_of_sync">Cửa hàng Google Play cần đồng bộ hóa, đợi một vài phút</string>
     <string name="contact_us">Liên hệ chúng tôi</string>
     <string name="use_nyaa">Chọn Nyaa</string>
 </resources>

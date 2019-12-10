@@ -411,7 +411,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire no pudo iniciarse correctamente por falta de permisos. Por favor ceda los permisos necesarios y reinicie la aplicación</string>
     <string name="vpn_find_out_more">Saber más</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prueba gratuita de 7 días</string>
-    <string name="play_store_out_of_sync">Play Store necesita sincronizarse, espera unos minutos</string>
     <string name="contact_us">Contáctanos</string>
     <string name="play_uppercase">PLAY</string>
     <string name="minutes_left_ad_free">%d minutos restan sin publicidad</string>

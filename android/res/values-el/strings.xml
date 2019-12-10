@@ -408,7 +408,6 @@
     <string name="piece_size_header">Μέγεθος τεμαχίου:</string>
     <string name="add_tracker">Προσθήκη tracker</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Δωρεάν δοκιμή 7 ημερών</string>
-    <string name="play_store_out_of_sync">Το Google Play Store χρειάζεται συγχρονισμό, περιμένετε μερικά λεπτά</string>
     <string name="contact_us">Επικοινωνήστε μαζί μας</string>
     <string name="use_nyaa">Χρήση Nyaa</string>
 </resources>

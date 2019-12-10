@@ -408,7 +408,6 @@
     <string name="title_activity_transfer_detail">Переказ деталей</string>
     <string name="piece_size_header">Розмір шрифту:</string>
     <string name="add_tracker">Додати трекер</string>
-    <string name="play_store_out_of_sync">Google Play Маркет потрібно синхронізувати, зачекайте декілька хвилин</string>
     <string name="contact_us">Зв\'яжіться з нами</string>
     <string name="use_nyaa">користування Nyaa</string>
 </resources>

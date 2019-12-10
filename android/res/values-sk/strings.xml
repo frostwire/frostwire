@@ -371,7 +371,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire sa nemohol správne spustiť kvôli nedostatku povolení. Zadajte požadované povolenia a reštartujte aplikáciu</string>
     <string name="vpn_find_out_more">Dozvedieť sa viac</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Voľná 7-dňová skúška</string>
-    <string name="play_store_out_of_sync">Obchod Google Play potrebuje synchronizáciu, počkajte niekoľko minút</string>
     <string name="uploaded">Nahraný</string>
     <string name="trackers">Trackery</string>
     <string name="source_type">Zdroj: %1$s</string>

@@ -372,7 +372,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire kan niet goed starten vanwege een gebrek aan rechten. Geef de vereiste machtigingen en start de toepassing opnieuw</string>
     <string name="vpn_find_out_more">Meer te weten komen</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis proefperiode van 7 dagen</string>
-    <string name="play_store_out_of_sync">Play Store moet worden gesynchroniseerd, wacht een paar minuten</string>
     <string name="contact_us">Neem contact op</string>
     <string name="uploaded">Geüpload</string>
     <string name="trackers">Trackers</string>

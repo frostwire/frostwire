@@ -390,7 +390,6 @@
     <string name="n_peers">%1$d HOSTÓW</string>
     <string name="transfers_select_seeding">seedowanie</string>
     <string name="sequential_download">Pobieranie Sekwencyjne</string>
-    <string name="play_store_out_of_sync">Play Store wymaga synchronizacji, poczekaj kilka minut</string>
     <string name="downloaded_n">Pobrane %1$s / </string>
     <string name="contact_us">Skontaktuj się z nami</string>
     <string name="remove_tracker">Usuń trackera</string>

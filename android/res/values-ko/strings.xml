@@ -408,7 +408,6 @@
     <string name="frostwire_start_engine_service_security_exception">권한이 없기 때문에 FrostWire를 제대로 시작할 수 없습니다. 필요한 권한을 부여하고 애플리케이션을 다시 시작하십시오.</string>
     <string name="vpn_find_out_more">더 찾아 봐</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 무료 7 일 평가판</string>
-    <string name="play_store_out_of_sync">Google Play 스토어가 동기화되어 잠시 기다려야합니다.</string>
     <string name="contact_us">연락처</string>
     <string name="use_nyaa">Nyaa사용</string>
 </resources>

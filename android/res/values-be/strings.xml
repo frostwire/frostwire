@@ -408,7 +408,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire не можа запусціцца з-за адсутнасці дазволаў. Калі ласка, падайце неабходныя дазволы і перазапусціць прыкладанне</string>
     <string name="vpn_find_out_more">Даведайцеся больш</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Бясплатная 7-дзённая пробная версія</string>
-    <string name="play_store_out_of_sync">Google Play Маркета неабходна сінхранізаваць, пачакайце некалькі хвілін</string>
     <string name="contact_us">Звяжыцеся з намі</string>
     <string name="use_nyaa">выкарыстанне Nyaa</string>
 </resources>

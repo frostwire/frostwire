@@ -409,7 +409,6 @@
     <string name="frostwire_start_engine_service_security_exception">アクセス許可が不足しているため、FrostWireを正しく起動できませんでした。 必要な権限を付与してアプリケーションを再起動してください</string>
     <string name="vpn_find_out_more">詳細はこちら</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 無料の7日間のトライアル</string>
-    <string name="play_store_out_of_sync">Google Playストアが同期する必要があり、数分待ってください</string>
     <string name="contact_us">お問い合わせ</string>
     <string name="use_nyaa">Nyaaを使用する</string>
 </resources>

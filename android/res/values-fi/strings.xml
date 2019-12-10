@@ -408,7 +408,6 @@
     <string name="title_activity_transfer_detail">Yksityiskohtainen siirto</string>
     <string name="piece_size_header">Piece Koko:</string>
     <string name="add_tracker">Lisää seuranta</string>
-    <string name="play_store_out_of_sync">Google Play Kaupan on synkronoitava, odota muutama minuutti</string>
     <string name="contact_us">Ota meihin yhteyttä</string>
     <string name="use_nyaa">Käytä Nyaa</string>
 </resources>

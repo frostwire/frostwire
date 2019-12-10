@@ -408,7 +408,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="vpn_find_out_more">Scopri di più</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prova gratuita di 7 giorni</string>
-    <string name="play_store_out_of_sync">Google Play Store deve essere sincronizzato, attendere alcuni minuti</string>
     <string name="contact_us">Contattaci</string>
     <string name="use_nyaa">Utilizzare Nyaa</string>
 </resources>
