@@ -161,6 +161,7 @@
     <string name="app_shutdown_dlg_message">Dit zal stilgelegd alle transfers en de achtergrond diensten. Weet je het zeker?</string>
     <string name="send_feedback">feedback verzenden</string>
     <string name="use_torrentdownloads">Gebruik TorrentDownloads</string>
+    <string name="use_torrentz2">Gebruik Torrentz2</string>
     <string name="saving_to_internal_memory">Opslaan in het interne geheugen</string>
     <string name="choose_email_app">Kies een e-mail App…</string>
     <string name="my_filetype">Mijn %s</string>

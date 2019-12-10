@@ -411,4 +411,5 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 無料の7日間のトライアル</string>
     <string name="contact_us">お問い合わせ</string>
     <string name="use_nyaa">Nyaaを使用する</string>
+    <string name="use_torrentz2">Torrentz2を使用する</string>
 </resources>

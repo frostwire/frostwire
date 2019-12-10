@@ -410,4 +410,5 @@
     <string name="contact_us">Свържете се с нас</string>
     <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
     <string name="use_nyaa">Използвайте Nyaa</string>
+    <string name="use_torrentz2">Използвайте Torrentz2</string>
 </resources>

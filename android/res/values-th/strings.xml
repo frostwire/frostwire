@@ -410,4 +410,5 @@
     <string name="piece_size_header">ชิ้นขนาด:</string>
     <string name="add_tracker">เพิ่มตัวติดตาม</string>
     <string name="use_nyaa">ใช้ Nyaa</string>
+    <string name="use_torrentz2">ใช้ Torrentz2</string>
 </resources>

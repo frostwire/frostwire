@@ -161,6 +161,7 @@
     <string name="app_shutdown_dlg_message">Questo si spegnerà tutti i trasferimenti e servizi in background. Sei sicuro?</string>
     <string name="send_feedback">Invia feedback</string>
     <string name="use_torrentdownloads">Utilizzare TorrentDownloads</string>
+    <string name="use_torrentz2">Utilizzare Torrentz2</string>
     <string name="saving_to_internal_memory">Salvataggio di memoria interna</string>
     <string name="choose_email_app">Scegliere un Email app…</string>
     <string name="my_filetype">Mio %s</string>

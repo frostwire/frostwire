@@ -75,6 +75,7 @@
     <string name="torrent_max_total_connections">Maks Totale verbindings</string>
     <string name="activity_preferences_name">Instellings</string>
     <string name="use_torrentdownloads">Gebruik TorrentDownloads</string>
+    <string name="use_torrentz2">Gebruik Torrentz2</string>
     <string name="my_files">My lêers</string>
     <string name="saving_to_internal_memory">Stoor na interne geheue</string>
     <string name="choose_email_app">Kies \'n e-posprogram…</string>

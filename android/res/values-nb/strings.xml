@@ -66,6 +66,7 @@
     <string name="torrent_max_total_connections">Maksimale totale Tilkoblinger</string>
     <string name="activity_preferences_name">Innstillinger</string>
     <string name="use_torrentdownloads">Bruk TorrentDownloads</string>
+    <string name="use_torrentz2">Bruk Torrentz2</string>
     <string name="my_files">Mine filer</string>
     <string name="saving_to_internal_memory">Lagrer til internminne</string>
     <string name="choose_email_app">Velg en e-post-appen…</string>

@@ -52,6 +52,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />
     <androidx.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_torrentz2"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_torrentz2" />
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_limetorrents"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_limetorrents" />

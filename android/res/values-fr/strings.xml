@@ -159,6 +159,7 @@
     <string name="drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="use_torlock">Utilisez TorLock</string>
     <string name="use_torrentdownloads">Utilisez TorrentDownloads</string>
+    <string name="use_torrentz2">Utilisez Torrentz2</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va effacer les fichiers téléchargés si FrostWire est désinstallé.</string>
     <string name="use_eztv">Utilisez Eztv</string>
