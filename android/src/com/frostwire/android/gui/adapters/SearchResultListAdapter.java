@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -33,6 +34,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -360,19 +362,35 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if (v == null) {
                 return;
             }
-            StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
-            if (sr != null) {
-                LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
-                PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
-                Intent i = new Intent(ctx, PreviewPlayerActivity.class);
-                i.putExtra("displayName", sr.getDisplayName());
-                i.putExtra("source", sr.getSource());
-                i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
-                i.putExtra("streamUrl", sr.getStreamUrl());
-                i.putExtra("audio", isAudio(sr));
-                i.putExtra("hasVideo", false);
-                ctx.startActivity(i);
+            final StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
+            if (sr != null && ctx != null) {
+                WeakReference<Context> ctxRef = Ref.weak(ctx);
+
+                Engine.instance().getThreadPool().execute(() -> {
+                    if (!Ref.alive(ctxRef)) {
+                        return;
+                    }
+                    Activity activity = (Activity) ctxRef.get();
+                    final Intent i = new Intent(activity, PreviewPlayerActivity.class);
+                    PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
+                    i.putExtra("displayName", sr.getDisplayName());
+                    i.putExtra("source", sr.getSource());
+                    i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
+                    i.putExtra("streamUrl", sr.getStreamUrl());
+                    i.putExtra("audio", isAudio(sr));
+                    i.putExtra("hasVideo", false);
+
+                    activity.runOnUiThread(() -> {
+                        if (!Ref.alive(ctxRef)) {
+                            return;
+                        }
+                        LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
+                        ctxRef.get().startActivity(i);
+                    });
+                });
             }
+
         }
     }
 }
+
