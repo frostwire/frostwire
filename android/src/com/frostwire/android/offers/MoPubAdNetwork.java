@@ -63,14 +63,22 @@ import static com.frostwire.android.util.Asyncs.async;
 public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusChangeListener {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
-    public static final String UNIT_ID_AUDIO_PLAYER = "c737d8a55b2e41189aa1532ae0520ad1";
-    public static final String UNIT_ID_HOME = "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
-    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
-    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
-    public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
-    //private static final String TEST_UNIT_REWARDED_VIDEO_GAME_PLAYABLE = "15173ac6d3e54c9389b9a5ddca69b34b";
-    //private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
-    public static final String UNIT_ID_REWARDED_VIDEO = (Offers.DEBUG_MODE) ? "920b6145fb1546cf8b5cf2ac34638bb7" : "4e4f31e5067049998664b5ec7b9451e1";
+
+    private static final String TEST_320X50_BANNER = "b195f8dd8ded45fe847ad89ed1d016da";
+    private static final String TEST_300X250_MEDIUM_RECTANGLE = "252412d5e9364a05ab77d9396346d73d";
+    private static final String TEST_UNIT_INTERSTITIAL = "24534e1901884e398f1253216226017e";
+    private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
+
+    public static final String UNIT_ID_HOME = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
+    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "a8be0cad4ad0419dbb19601aef3a18d2";
+    static final String UNIT_ID_SEARCH_HEADER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "be0b959f15994fd5b56c997f63530bd0";
+
+    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "c737d8a55b2e41189aa1532ae0520ad1";
+    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "2fd0fafe3d3c4d668385a620caaa694e";
+
+    private static final String UNIT_ID_INTERSTITIAL_TABLET = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "cebdbc56b37c4d31ba79e861d1cb0de4";
+    private static final String UNIT_ID_INTERSTITIAL_MOBILE = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "399a20d69bdc449a8e0ca171f82179c8";
+    public static final String UNIT_ID_REWARDED_VIDEO = (Offers.DEBUG_MODE) ? TEST_UNIT_REWARDED_VIDEO : "4e4f31e5067049998664b5ec7b9451e1";
 
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;
@@ -177,10 +185,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private void initPlacementMappings(boolean isTablet) {
         placements = new HashMap<>();
-        if (!isTablet) {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "399a20d69bdc449a8e0ca171f82179c8");
+        if (isTablet) {
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, MoPubAdNetwork.UNIT_ID_INTERSTITIAL_TABLET);
         } else {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "cebdbc56b37c4d31ba79e861d1cb0de4");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, MoPubAdNetwork.UNIT_ID_INTERSTITIAL_MOBILE);
         }
     }
 
@@ -256,7 +264,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             LOG.info("loadMoPubInterstitial(placement=" + placement + ") aborted. Network not started or not enabled");
             return;
         }
-        LOG.info("Loading " + placement + " interstitial");
+        LOG.info("loadMoPubInterstitial: Loading " + placement + " interstitial");
         try {
             final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
             MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(this, placement);
@@ -270,7 +278,13 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private static void loadMoPubInterstitialAsync(final MoPubInterstitial moPubInterstitial) {
         try {
-            Looper.prepare();
+            if (Looper.myLooper() == null) {
+                Looper.prepare();
+            }
+        } catch (Throwable e) {
+            LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): couldn't do Looper.prepare(), perhaps there was a looper here already", e);
+        }
+        try {
             moPubInterstitial.load();
         } catch (Throwable e) {
             LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): Mopub Interstitial couldn't be loaded", e);
