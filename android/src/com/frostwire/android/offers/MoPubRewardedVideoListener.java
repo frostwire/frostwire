@@ -74,11 +74,12 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
 
     @Override
     public void onRewardedVideoClicked(@NonNull String adUnitId) {
-
+        LOG.info("onRewardedVideoClicked: adUnitId=" + adUnitId);
     }
 
     @Override
     public void onRewardedVideoClosed(@NonNull String adUnitId) {
+        LOG.info("onRewardedVideoClosed: adUnitId=" + adUnitId);
         if (wasPlayingMusic) {
             MusicUtils.play();
         }
@@ -86,6 +87,7 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
 
     @Override
     public void onRewardedVideoCompleted(@NonNull Set<String> adUnitIds, @NonNull MoPubReward reward) {
+        LOG.info("onRewardedVideoCompleted: adUnitId=" + adUnitIds);
         if (wasPlayingMusic) {
             MusicUtils.play();
         }

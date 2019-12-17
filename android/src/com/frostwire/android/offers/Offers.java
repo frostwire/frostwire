@@ -50,7 +50,7 @@ import static com.frostwire.android.util.Asyncs.async;
 public final class Offers {
     private static final Logger LOG = Logger.getLogger(Offers.class);
 
-    static final boolean DEBUG_MODE = false;
+    public static final boolean DEBUG_MODE = false;
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
@@ -280,11 +280,7 @@ public final class Offers {
         while (attempts > 0 && Ref.alive(activityRef) && !MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
             try {
                 LOG.info("keepTryingRewardedVideoAsync: sleeping while ad loads... (attempts=" + attempts + ")");
-                Thread.sleep(2500);
-                if (Ref.alive(activityRef)) {
-                    activityRef.get().runOnUiThread(() -> MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO));
-                }
-                Thread.sleep(2500);
+                Thread.sleep(5000);
                 attempts--;
             } catch (InterruptedException e) {
                 return;
@@ -301,9 +297,6 @@ public final class Offers {
                 }
                 activityRef.get().stopProgressbars(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
                 UIUtils.showShortMessage(activityRef.get(), R.string.no_reward_videos_available);
-                // hopefully the existing listener, set in MoPubAdNetwork's initialization via MoPubAdNetwork::loadRewardedVideo works.
-                MoPubRewardedVideos.loadRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
-                LOG.info("keepTryingRewardedVideoAsync() invoked MoPubRewardedVideos.loadRewardedVideo() once more");
             });
         } else if (Ref.alive(activityRef)) {
             activityRef.get().runOnUiThread(() -> {

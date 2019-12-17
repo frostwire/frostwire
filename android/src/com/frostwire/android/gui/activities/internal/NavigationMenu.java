@@ -44,6 +44,7 @@ import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.google.android.material.navigation.NavigationView;
+import com.mopub.mobileads.AppLovinRewardedVideo;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;

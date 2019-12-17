@@ -23,14 +23,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
-import com.mopub.common.MoPubReward;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.privacy.ConsentDialogListener;
@@ -40,7 +40,6 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
-import com.mopub.mobileads.MoPubRewardedVideo;
 import com.mopub.mobileads.MoPubRewardedVideos;
 import com.mopub.network.Networking;
 
@@ -51,8 +50,6 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import androidx.annotation.NonNull;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -73,7 +70,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
     //private static final String TEST_UNIT_REWARDED_VIDEO_GAME_PLAYABLE = "15173ac6d3e54c9389b9a5ddca69b34b";
     //private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
-    public static final String UNIT_ID_REWARDED_VIDEO = "4e4f31e5067049998664b5ec7b9451e1";
+    public static final String UNIT_ID_REWARDED_VIDEO = (Offers.DEBUG_MODE) ? "920b6145fb1546cf8b5cf2ac34638bb7" : "4e4f31e5067049998664b5ec7b9451e1";
 
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;

@@ -404,7 +404,7 @@ public final class BuyActivity extends AbstractActivity {
 
             @Override
             public boolean enabled(String feature) {
-                return false;
+                return true;
             }
         };
         card.setTag(R.id.reward_product_tag_id, productReward);
