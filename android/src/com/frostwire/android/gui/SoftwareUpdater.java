@@ -56,7 +56,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 public final class SoftwareUpdater {
 
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
-    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
+    private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = true;//false; // debug flag.
 
     private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 

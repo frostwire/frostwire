@@ -22,14 +22,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.KeyguardManager;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.pm.PackageInstaller;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -42,6 +45,7 @@ import android.widget.Toast;
 
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -56,7 +60,6 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
@@ -65,8 +68,11 @@ import com.google.android.material.snackbar.Snackbar;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.List;
@@ -254,6 +260,62 @@ public final class UIUtils {
                 return resources.getString(R.string.unknown);
         }
     }
+
+    public static boolean openAPK(Context context, String filePath) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
+            try {
+                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath));
+                Intent intent = new Intent("android.content.pm.PackageInstaller");
+                intent.setData(uri);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                //intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                context.startActivity(intent);
+            } catch (Throwable t) {
+                PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
+                PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+                try {
+                    Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath));
+                    int sessionID = packageInstaller.createSession(sessionParams);
+                    PackageInstaller.Session session = packageInstaller.openSession(sessionID);
+                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                    OutputStream sessionOutputStream = session.openWrite("mostly-unused", 0, documentFile.length());
+                    InputStream apkInputStream = new FileInputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).listFiles()[1]);//context.getContentResolver().openInputStream(uri);
+                    byte[] buffer = new byte[16384];
+                    int n;
+                    while ((n = apkInputStream.read(buffer)) >= 0) {
+                        sessionOutputStream.write(buffer, 0, n);
+                    }
+                    sessionOutputStream.flush();
+                    sessionOutputStream.close();
+                    apkInputStream.close();
+
+                    // could exit the app for instance
+                    PendingIntent service = PendingIntent.getService(context, 0, new Intent(), 0);
+                    session.commit(service.getIntentSender());
+
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
+                LOG.error("openAPK (using FileProvider) failed with filePath=" + filePath, t);
+                return false;
+            }
+        } else {
+            try {
+                Uri uri = Uri.fromFile(new File(filePath));
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            } catch (Throwable t) {
+                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + filePath, t);
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     /**
      * Opens the given file with the default Android activity for that File and
