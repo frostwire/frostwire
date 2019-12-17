@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,13 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     }
 
     public static SoftwareUpdaterDialog newInstance(
-            Map<String, String> updateMessages, List<String> changelog) {
+            final String apkDownloadURL,
+            final Map<String, String> updateMessages,
+            final List<String> changelog) {
         SoftwareUpdaterDialog dlg = new SoftwareUpdaterDialog();
 
         Bundle args = new Bundle();
+        args.putString("apkDownloadURL", apkDownloadURL);
         args.putSerializable("updateMessages", new HashMap<>(updateMessages));
         args.putStringArrayList("changelog", new ArrayList<>(changelog));
         dlg.setArguments(args);
@@ -63,10 +66,11 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         return dlg;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") final String apkDownloadURL = args.getString("apkDownloadURL");
         HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
@@ -107,7 +111,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
                     Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
             dismiss();
             if (error) {
-                UIUtils.openURL(getActivity(), Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
+                UIUtils.openURL(getActivity(), apkDownloadURL);
             }
         });
         noButton.setOnClickListener(v -> dismiss());

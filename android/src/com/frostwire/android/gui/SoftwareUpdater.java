@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,10 @@ public final class SoftwareUpdater {
                 // MainActivity has had a chance to register the broadcast receiver (onResume)
                 // therefore, the menu update icon will only show on the 2nd run only
                 activity.updateNavigationMenu(true);
-                SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(update.updateMessages, update.changelog);
+                SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(
+                        update.u,
+                        update.updateMessages,
+                        update.changelog);
                 dlg.show(activity.getFragmentManager());
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
 
