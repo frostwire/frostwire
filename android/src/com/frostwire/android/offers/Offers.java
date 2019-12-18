@@ -50,12 +50,13 @@ import static com.frostwire.android.util.Asyncs.async;
 public final class Offers {
     private static final Logger LOG = Logger.getLogger(Offers.class);
 
-    public static final boolean DEBUG_MODE = true;
+    public static final boolean DEBUG_MODE = false;
     static final ThreadPool THREAD_POOL = new ThreadPool("Offers", 1, 5, 1L, new LinkedBlockingQueue<>(), true);
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
     public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
+    private final static UnityAdNetwork UNITY = new UnityAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdnetworksInvocationTimestamp = 0;
@@ -99,6 +100,7 @@ public final class Offers {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
+            AD_NETWORKS.put(UNITY.getShortCode(), UNITY);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
         }
         return AD_NETWORKS;

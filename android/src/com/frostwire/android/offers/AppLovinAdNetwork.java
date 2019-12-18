@@ -27,10 +27,13 @@ import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.frostwire.android.offers.Offers.DEBUG_MODE;
+
 public class AppLovinAdNetwork extends AbstractAdNetwork {
 
     private static final Logger LOG = Logger.getLogger(AppLovinAdNetwork.class);
-    private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
     private static AppLovinAdNetwork APP_LOVIN_ADNETWORK = null;
     private AppLovinInterstitialAdapter interstitialAdapter = null;
 

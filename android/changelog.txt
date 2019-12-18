@@ -4,6 +4,7 @@ FrostWire 2.1.8 build 609 - DEC/17/2019
  - androidx.browser:browser:1.2.0-rc01 update
  - androidx.exifinterface:exifinterface:1.1.0 update
  - com.applovin:applovin-sdk:9.10.5 update
+ - com.unity3d.ads:unity-ads:3.4.0 new
  - com.android.billingclient:billing:2.1.0 update
  - dev: com.android.tools.build:gradle:3.5.3
  - cleanups and optimizations

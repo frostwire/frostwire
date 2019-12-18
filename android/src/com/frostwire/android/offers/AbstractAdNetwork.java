@@ -75,7 +75,7 @@ public abstract class AbstractAdNetwork implements AdNetwork {
         }
     }
 
-    protected final boolean abortInitialize(Context context) {
+    final boolean abortInitialize(Context context) {
         if (!enabled()) {
             if (!started()) {
                 LOG.info(getClass().getSimpleName() + " initialize(): aborted. AdNetwork Not enabled.");
@@ -100,6 +100,4 @@ public abstract class AbstractAdNetwork implements AdNetwork {
         }
         return false;
     }
-
-
 }
