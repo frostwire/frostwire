@@ -322,33 +322,42 @@ public final class Offers {
     }
 
     private static boolean readyForAnotherInterstitialAsync(@SuppressWarnings("unused") Activity activity, InterstitialLogicParams params) {
-        ConfigurationManager CM = ConfigurationManager.instance();
-        final int INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = DEBUG_MODE ? 0 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
-        final long INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
-        boolean appStartedLongEnoughAgo = (System.currentTimeMillis() - Offers.STARTUP_TIME) > INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS;
-        if (!appStartedLongEnoughAgo || Offers.disabledAds()) {
+        try {
+            ConfigurationManager CM = ConfigurationManager.instance();
+            final int INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = DEBUG_MODE ? 0 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
+            final long INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS = TimeUnit.MINUTES.toMillis(INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
+            boolean appStartedLongEnoughAgo = (System.currentTimeMillis() - Offers.STARTUP_TIME) > INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MS;
+            if (!appStartedLongEnoughAgo || Offers.disabledAds()) {
+                return false;
+            }
+            final boolean ignoreStartedTransfers = params.ignoreStartedTransfers;
+            TransferManager TM = TransferManager.instance();
+            final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = DEBUG_MODE ? 1 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
+            final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
+            final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
+            long lastInterstitialShownTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
+            long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
+            boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
+            boolean startedEnoughTransfers = ignoreStartedTransfers || TM.startedTransfers() >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
+            boolean shouldDisplayFirstOne = lastInterstitialShownTimestamp == -1 && startedEnoughTransfers;
+            boolean readyForInterstitial = shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers);
+            if (readyForInterstitial && !ignoreStartedTransfers) {
+                TM.resetStartedTransfers();
+            }
+            return readyForInterstitial;
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
             return false;
         }
-        final boolean ignoreStartedTransfers = params.ignoreStartedTransfers;
-        TransferManager TM = TransferManager.instance();
-        final int INTERSTITIAL_OFFERS_TRANSFER_STARTS = DEBUG_MODE ? 1 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS);
-        final int INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES = CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
-        final long INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS = DEBUG_MODE ? 10000 : TimeUnit.MINUTES.toMillis(INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MINUTES);
-        long lastInterstitialShownTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY);
-        long timeSinceLastOffer = System.currentTimeMillis() - lastInterstitialShownTimestamp;
-        boolean itsBeenLongEnough = timeSinceLastOffer >= INTERSTITIAL_TRANSFER_OFFERS_TIMEOUT_IN_MS;
-        boolean startedEnoughTransfers = ignoreStartedTransfers || TM.startedTransfers() >= INTERSTITIAL_OFFERS_TRANSFER_STARTS;
-        boolean shouldDisplayFirstOne = lastInterstitialShownTimestamp == -1 && startedEnoughTransfers;
-        boolean readyForInterstitial = shouldDisplayFirstOne || (itsBeenLongEnough && startedEnoughTransfers);
-        if (readyForInterstitial && !ignoreStartedTransfers) {
-            TM.resetStartedTransfers();
-        }
-        return readyForInterstitial;
     }
 
     private static void onReadyForAnotherInterstitialAsyncCallback(Activity activity, InterstitialLogicParams params, boolean readyForInterstitial) {
         if (readyForInterstitial) {
-            Offers.showInterstitial(activity, params.placement, params.shutdownAfterwards, params.dismissAfterwards);
+            try {
+                Offers.showInterstitial(activity, params.placement, params.shutdownAfterwards, params.dismissAfterwards);
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
         }
     }
 
