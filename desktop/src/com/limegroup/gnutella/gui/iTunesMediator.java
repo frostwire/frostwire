@@ -49,7 +49,7 @@ public final class iTunesMediator {
     /**
      * The queue that will process the tunes to add.
      */
-    private final ExecutorService QUEUE = ExecutorsHelper.newFixedSizeThreadPool(4, "iTunesAdderThread");
+    private final ExecutorService QUEUE = ExecutorsHelper.newFixedSizeThreadPool(2, "iTunesAdderThread");
 
     /**
      * Initializes iTunesMediator with the script file.
