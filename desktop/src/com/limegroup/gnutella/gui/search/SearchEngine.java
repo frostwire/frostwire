@@ -79,7 +79,7 @@ public abstract class SearchEngine {
                         "tpb12.ukpass.co",
                         "thepiratebay.vip",
                 };
-                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors);
+                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
             }
             ).start();
         }
