@@ -31,10 +31,14 @@ import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.UrlUtils;
+import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,12 +61,37 @@ public abstract class SearchEngine {
     private static final int NYAA_ID = 23;
     private static final int TORRENTZ2_ID = 24;
 
-    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, TPBSearchPerformer.getMirrorDomainName()) {
+    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
+        protected void postInitWork() {
+            // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
+            new Thread(() -> {
+                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                String[] mirrors = {
+                        "thepiratebay.org",
+                        "www.pirate-bay.net",
+                        "pirate-bays.net",
+                        "pirate-bay.info",
+                        "thepiratebay-unblocked.org",
+                        "piratebay.live",
+                        "thepiratebay.zone",
+                        "thepiratebay.monster",
+                        "pirateproxy.llc",
+                        "tpb12.ukpass.co",
+                        "thepiratebay.vip",
+                };
+                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors);
+            }
+            ).start();
+        }
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
+            }
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
+
     private static final SearchEngine SOUNDCLOUD = new SearchEngine(SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -133,20 +162,23 @@ public abstract class SearchEngine {
     };
     private final int _id;
     private final String _name;
-    private final String _domainName;
     private final BooleanSetting _setting;
     private String redirectUrl = null;
+    private String _domainName;
 
     private SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
         _setting = setting;
         _domainName = domainName;
+        postInitWork();
     }
+
+    protected void postInitWork() {}
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        List<SearchEngine> list = Arrays.asList(
+        List<SearchEngine> candidates = Arrays.asList(
                 TORRENTZ2,
                 ZOOQLE,
                 TPB,
@@ -159,6 +191,14 @@ public abstract class SearchEngine {
                 EZTV,
                 TORRENTDOWNLOADS,
                 LIMETORRENTS);
+
+        List<SearchEngine> list = new ArrayList<>();
+        for (SearchEngine candidate : candidates) {
+            if (candidate.isReady()) {
+                list.add(candidate);
+            }
+        }
+
         // ensure that at least one is enabled
         boolean oneEnabled = false;
         for (SearchEngine se : list) {
@@ -220,5 +260,9 @@ public abstract class SearchEngine {
 
     public void setRedirectUrl(String redirectUrl) {
         this.redirectUrl = redirectUrl;
+    }
+
+    public boolean isReady() {
+        return _domainName != null;
     }
 }
