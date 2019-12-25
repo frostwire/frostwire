@@ -18,10 +18,15 @@
 
 package com.frostwire.util;
 
+import com.frostwire.util.http.HttpClient;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @author gubatron
@@ -73,5 +78,43 @@ public final class UrlUtils {
 
     public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
         return"magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
+    }
+
+    public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
+        int httpCode = -1;
+        // shuffle mirrors, keep the fastest valid one
+        long lowest_delta = minResponseTimeInMs*10;
+        long t_a, t_delta;
+        String fastestMirror = null;
+        ArrayList<String> mirrorList = new ArrayList(Arrays.asList(mirrors));
+        Collections.shuffle(mirrorList);
+
+        for (String randomMirror : mirrorList) {
+            try {
+                t_a = System.currentTimeMillis();
+                httpCode = httpClient.head("https://" + randomMirror, minResponseTimeInMs, null);
+                t_delta = System.currentTimeMillis() - t_a;
+                if (100 <= httpCode && httpCode < 400 && t_delta < minResponseTimeInMs) {
+                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " responded in " + t_delta +"ms");
+                    if (t_delta < lowest_delta) {
+                        lowest_delta = t_delta;
+                        fastestMirror = randomMirror;
+                        System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " is new fastest mirror (" + t_delta +"ms)");
+                    }
+                } else {
+                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " too slow, responded in " + t_delta +"ms");
+                }
+            } catch (Throwable t) {
+                System.err.println("UrlUtils.getFastestMirror(): " + randomMirror + " unreachable, not considered");
+                continue;
+            }
+        }
+
+        if (fastestMirror != null) {
+            System.out.println("UrlUtils.getFastestMirror() -> Winner: " + fastestMirror);
+            return fastestMirror;
+        }
+        System.out.println("UrlUtils.getFastestMirror() -> Falling back to: " + mirrors[0]);
+        return mirrors[0];
     }
 }
