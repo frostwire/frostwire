@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.widget.Toolbar;
+
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -404,7 +406,11 @@ public class MainActivity extends AbstractActivity implements
     private void registerMainBroadcastReceiver() {
         mainBroadcastReceiver = new MainBroadcastReceiver(this);
         IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-        registerReceiver(mainBroadcastReceiver, bf);
+        try {
+            registerReceiver(mainBroadcastReceiver, bf);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
