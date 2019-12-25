@@ -42,27 +42,23 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     public static String getMirrorDomainName() {
         String baseDomain = "thepiratebay.org";
-        String[] mirrors = {"unblockpirate.uk",
-                "openpirate.org",
-                "mypirate.cc",
-                "tpb.cool",
-                "piratebay.icu",
-                "piratebay.life",
-                "thepiratebay.fail",
-                "thepiratebay.fyi",
-                "piratebay.tech",
-                "thepirate.fun",
-                "thepirate.host",
-                "thepirate.live",
-                "tpb.bike",
-                "tpb.email",
-                "tpb.guru",
+        String[] mirrors = {
+                "www.pirate-bay.net",
+                "pirate-bays.net",
+                "pirate-bay.info",
+                "thepiratebay-unblocked.org",
+                "piratebay.live",
+                "thepiratebay.zone",
+                "thepiratebay.monster",
+                "pirateproxy.llc",
+                "tpb12.ukpass.co",
+                "thepiratebay.vip",
         };
 
         boolean getRandomMirror = false;
         String response = null;
         try {
-             response = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).get("https://" + baseDomain, 3000);
+            response = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).get("https://" + baseDomain, 3000);
         } catch (Throwable t) {
             System.err.println("TPBSearchPerformer:thepiratebay.org unreachable, falling back to random mirror");
             getRandomMirror = true;
