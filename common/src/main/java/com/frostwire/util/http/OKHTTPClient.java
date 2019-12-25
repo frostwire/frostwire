@@ -95,9 +95,10 @@ public class OKHTTPClient extends AbstractHttpClient {
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
-        Response resp = okHttpClient.build().newCall(req).execute();
-        copyMultiMap(resp.headers().toMultimap(), outputHeaders);
-        return resp.code();
+         Response resp = okHttpClient.build().newCall(req).execute();
+         closeQuietly(resp.body());
+         copyMultiMap(resp.headers().toMultimap(), outputHeaders);
+         return resp.code();
     }
 
     @Override

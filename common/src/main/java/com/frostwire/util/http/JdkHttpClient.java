@@ -48,6 +48,9 @@ public final class JdkHttpClient extends AbstractHttpClient {
         connection.setReadTimeout(connectTimeoutInMillis);
         connection.setRequestMethod("HEAD");
         copyMultiMap(connection.getHeaderFields(), outputHeaders);
+        closeQuietly(connection.getInputStream());
+        closeQuietly(connection.getOutputStream());
+        connection.disconnect();
         return connection.getResponseCode();
     }
 
