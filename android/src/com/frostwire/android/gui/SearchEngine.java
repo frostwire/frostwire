@@ -35,7 +35,11 @@ import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.UrlUtils;
+import com.frostwire.util.http.HttpClient;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +63,14 @@ public abstract class SearchEngine {
         this.name = name;
         this.preferenceKey = preferenceKey;
         this.active = true;
+        postInitWork();
     }
+
+    protected boolean isReady() {
+        return true;
+    }
+
+    protected void postInitWork() {}
 
     public String getName() {
         return name;
@@ -89,9 +100,17 @@ public abstract class SearchEngine {
     }
 
     public static List<SearchEngine> getEngines() {
+        ArrayList<SearchEngine> candidates = new ArrayList<>();
+
+        for (SearchEngine se : ALL_ENGINES) {
+            if (se.isReady()) {
+                candidates.add(se);
+            }
+        }
+
         // ensure that at leas one is enable
         boolean oneEnabled = false;
-        for (SearchEngine se : ALL_ENGINES) {
+        for (SearchEngine se : candidates) {
             if (se.isEnabled()) {
                 oneEnabled = true;
             }
@@ -102,7 +121,7 @@ public abstract class SearchEngine {
             String prefKey = engineToEnable.getPreferenceKey();
             ConfigurationManager.instance().setBoolean(prefKey, true);
         }
-        return ALL_ENGINES;
+        return candidates;
     }
 
     public static SearchEngine forName(String name) {
@@ -111,7 +130,6 @@ public abstract class SearchEngine {
                 return engine;
             }
         }
-
         return null;
     }
 
@@ -183,9 +201,38 @@ public abstract class SearchEngine {
     };
 
     public static final SearchEngine TPB = new SearchEngine("TPB", Constants.PREF_KEY_SEARCH_USE_TPB) {
+        private String domainName = null;
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new TPBSearchPerformer(TPBSearchPerformer.getMirrorDomainName(), token, keywords, DEFAULT_TIMEOUT);
+            if (domainName == null) {
+                throw new RuntimeException("check your logic, this search performer has no domain name ready");
+            }
+            return new TPBSearchPerformer(domainName, token, keywords, DEFAULT_TIMEOUT);
+        }
+        protected void postInitWork() {
+            // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
+            new Thread(() -> {
+                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                String[] mirrors = {
+                        "thepiratebay.org",
+                        "www.pirate-bay.net",
+                        "pirate-bays.net",
+                        "pirate-bay.info",
+                        "thepiratebay-unblocked.org",
+                        "piratebay.live",
+                        "thepiratebay.zone",
+                        "thepiratebay.monster",
+                        "pirateproxy.llc",
+                        "thepiratebay.vip",
+                };
+                domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
+            }
+            ).start();
+        }
+
+        @Override
+        protected boolean isReady() {
+            return domainName != null;
         }
     };
 

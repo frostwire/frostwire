@@ -90,7 +90,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
         // ad failed to load, excellent place to load more ads.
         this.interstitial = null;
-//        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
+        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
         mopubAdNetwork.loadMoPubInterstitial(interstitial.getActivity(), placement);
     }
 
