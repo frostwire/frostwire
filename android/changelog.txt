@@ -1,4 +1,5 @@
-FrostWire 2.1.8 build 609 - DEC/17/2019
+FrostWire 2.1.8 build 610 - DEC/25/2019
+ - TPB picks fastest mirror available
  - SoundCloud search/downloads fixed
  - Ads can be temporarily removed by playing a rewarded video ad
  - androidx.browser:browser:1.2.0-rc01 update
