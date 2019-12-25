@@ -76,7 +76,6 @@ public abstract class SearchEngine {
                         "thepiratebay.zone",
                         "thepiratebay.monster",
                         "pirateproxy.llc",
-                        "tpb12.ukpass.co",
                         "thepiratebay.vip",
                 };
                 TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);

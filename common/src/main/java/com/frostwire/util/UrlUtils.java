@@ -81,7 +81,7 @@ public final class UrlUtils {
     }
 
     public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
-        int httpCode = -1;
+        int httpCode;
         // shuffle mirrors, keep the fastest valid one
         long lowest_delta = minResponseTimeInMs*10;
         long t_a, t_delta;
@@ -106,7 +106,6 @@ public final class UrlUtils {
                 }
             } catch (Throwable t) {
                 System.err.println("UrlUtils.getFastestMirror(): " + randomMirror + " unreachable, not considered");
-                continue;
             }
         }
 
