@@ -1,3 +1,21 @@
+frostwire (6.8.4) stable; urgency=high
+  * New jlibtorrent 1.2.3.0 update
+  * jlibtorrent updated to boost 1.72.0
+  * jlibtorrent upgraded openssl to 1.1.1d
+  * lt:fix erroneous event=completed tracker announce when checking files
+  * lt:promote errors in parsing listen_interfaces to post listen_failed_alert
+  * lt:fix bug in protocol encryption/obfuscation
+  * lt:fix buffer overflow in SOCKS5 UDP logic
+  * lt:fix issue of rapid calls to file_priority() clobbering each other
+  * lt:clear tracker errors on success
+  * lt:optimize setting with unlimited unchoke slots
+  * lt:fixed restoring of trackers, comment, creation date and created-by in resume data
+  * lt:fix handling of torrents with too large pieces
+  * lt:fixed division by zero in anti-leech choker
+  * lt:fixed bug in torrent_info::swap
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 29 Dec 2019 03:17:23 -0600
+
 frostwire (6.8.3) stable; urgency=high
   * Soundcloud search and downloads fixed
   * Mac: CyberGHost VPN detection false-negative bug fix
