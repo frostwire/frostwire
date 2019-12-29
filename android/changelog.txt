@@ -1,3 +1,21 @@
+FrostWire 2.1.9 build 611 - DEC/29/2019
+ - New jlibtorrent 1.2.3
+ - libtorrent 1.2.3.0
+ - boost 1.72.0 build
+ - openssl 1.1.1d
+ - Android NDK 20b
+ - lt:fix erroneous event=completed tracker announce when checking files
+ - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
+ - lt:fix bug in protocol encryption/obfuscation
+ - lt:fix buffer overflow in SOCKS5 UDP logic
+ - lt:fix issue of rapid calls to file_priority() clobbering each other
+ - lt:clear tracker errors on success
+ - lt:optimize setting with unlimited unchoke slots
+ - lt:fixed restoring of trackers, comment, creation date and created-by in resume data
+ - lt:fix handling of torrents with too large pieces
+ - lt:fixed division by zero in anti-leech choker
+ - lt:fixed bug in torrent_info::swap
+  
 FrostWire 2.1.8 build 610 - DEC/25/2019
  - TPB picks fastest mirror available
  - SoundCloud search/downloads fixed

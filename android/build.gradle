@@ -204,11 +204,11 @@ dependencies {
     implementation 'com.unity3d.ads:unity-ads:3.4.0'
     implementation 'com.mopub.mediation:unityads:3.4.0.0'
 
-    implementation files('libs/jlibtorrent-1.2.2.0.jar')
-    implementation files('libs/jlibtorrent-android-arm-1.2.2.0.jar')
-    implementation files('libs/jlibtorrent-android-x86-1.2.2.0.jar')
-    implementation files('libs/jlibtorrent-android-arm64-1.2.2.0.jar')
-    implementation files('libs/jlibtorrent-android-x86_64-1.2.2.0.jar')
+    implementation files('libs/jlibtorrent-1.2.3.0.jar')
+    implementation files('libs/jlibtorrent-android-arm-1.2.3.0.jar')
+    implementation files('libs/jlibtorrent-android-x86-1.2.3.0.jar')
+    implementation files('libs/jlibtorrent-android-arm64-1.2.3.0.jar')
+    implementation files('libs/jlibtorrent-android-x86_64-1.2.3.0.jar')
 }
 
 class DeployRelease extends DefaultTask {
