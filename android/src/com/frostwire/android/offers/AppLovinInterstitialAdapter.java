@@ -28,6 +28,7 @@ import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -131,7 +132,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         if (!shutdownAfter && appLovinAd != null) {
             ad = null;
             if (Ref.alive(activityRef)) {
-                Offers.THREAD_POOL.execute(() -> {
+                Engine.instance().getThreadPool().execute(() -> {
                     if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
                         try {
                             appLovinAdNetwork.loadNewInterstitial(activityRef.get());
