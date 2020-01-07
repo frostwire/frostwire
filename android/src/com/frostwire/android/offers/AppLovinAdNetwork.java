@@ -25,6 +25,7 @@ import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -46,7 +47,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
             return;
         }
 
-        Offers.THREAD_POOL.execute(() -> {
+        Engine.instance().getThreadPool().execute(() -> {
             try {
                 if (!started()) {
                     final Context applicationContext = activity.getApplicationContext();
