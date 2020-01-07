@@ -37,14 +37,16 @@ final class EngineThreadPool extends ThreadPool {
 
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
-    private static final int MAXIMUM_POOL_SIZE = 4;
+    private static final int CORE_POOL_SIZE = 1;
+    private static final int MAXIMUM_POOL_SIZE = 8;
+    private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
+    private static final int MAX_DEBUG_QUEUED_TASKS = 20;
 
     private final WeakHashMap<Object, String> taskStack;
     private final WeakHashMap<Thread, TaskInfo> taskInfo;
 
     EngineThreadPool() {
-        super("Engine", MAXIMUM_POOL_SIZE, new LinkedBlockingQueue<>(), false);
-
+        super("Engine", CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECS, new LinkedBlockingQueue<>(), false);
         taskStack = new WeakHashMap<>();
         taskInfo = new WeakHashMap<>();
     }
@@ -94,8 +96,8 @@ final class EngineThreadPool extends ThreadPool {
             taskStack.put(task, getStack());
         }
 
-        // if debug/development, allow only 20 tasks in the queue
-        if (Debug.isEnabled() && getQueue().size() > 20) {
+        // if debug/development, allow only 50 tasks in the queue
+        if (Debug.isEnabled() && getQueue().size() > MAX_DEBUG_QUEUED_TASKS) {
             dumpTasks();
             throw new RuntimeException("Too many tasks in the queue");
         }
