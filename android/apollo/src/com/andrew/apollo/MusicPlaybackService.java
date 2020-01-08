@@ -27,6 +27,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.graphics.Bitmap;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -34,6 +36,7 @@ import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -45,6 +48,10 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -64,10 +71,6 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.Stack;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.JobIntentService;
-import androidx.core.content.ContextCompat;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;
@@ -294,6 +297,8 @@ public class MusicPlaybackService extends JobIntentService {
             MediaStore.Audio.Media.ARTIST_ID
     };
 
+    private AudioFocusRequest AUDIO_FOCUS_REQUEST;
+
     /**
      * The columns used to retrieve any info from the current album
      */
@@ -479,7 +484,7 @@ public class MusicPlaybackService extends JobIntentService {
      * {@inheritDoc}
      */
     @Override
-    public IBinder onBind(final Intent intent) {
+    public IBinder onBind(@NonNull final Intent intent) {
         if (D) LOG.info("Service bound, intent = " + intent);
         cancelShutdown();
         mServiceInUse = true;
@@ -536,7 +541,8 @@ public class MusicPlaybackService extends JobIntentService {
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
 
-        Engine.foregroundServiceStartForAndroidO(this);
+        prepareAudioFocusRequest();
+        //Engine.foregroundServiceStartForAndroidO(this);
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
@@ -552,7 +558,30 @@ public class MusicPlaybackService extends JobIntentService {
                 // -gubatron
                 new Thread(this::initService).start();
             } catch (Throwable ignored) {
+                LOG.error(ignored.getMessage(), ignored);
             }
+        }
+    }
+
+    private void prepareAudioFocusRequest() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //AudioAttributes.USAGE_MEDIA
+            AudioAttributes.Builder attributeBuilder = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                attributeBuilder.setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL);
+            }
+
+            AudioAttributes audioAttributes = attributeBuilder.build();
+            AUDIO_FOCUS_REQUEST =
+                    new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).
+                            setOnAudioFocusChangeListener(mAudioFocusListener).
+                            setAudioAttributes(audioAttributes).
+                            setWillPauseWhenDucked(true).
+                            build();
         }
     }
 
@@ -626,6 +655,8 @@ public class MusicPlaybackService extends JobIntentService {
         // Initialize the audio manager and register any headset controls for
         // playback
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+
         mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
         try {
@@ -652,12 +683,7 @@ public class MusicPlaybackService extends JobIntentService {
         mPlayer = new MultiPlayer(this);
         mPlayer.setHandler(mPlayerHandler);
 
-        ConfigurationManager CM = ConfigurationManager.instance();
-        // Load Repeat Mode
-        setRepeatMode(CM.getInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE));
-        // Load Shuffle Mode On/Off
-        enableShuffle(CM.getBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED));
-        MusicUtils.isShuffleEnabled();
+        async(this, MusicPlaybackService::initRepeatModeAndShuffleTask);
 
         // Initialize the intent filter and each action
         final IntentFilter filter = new IntentFilter();
@@ -669,6 +695,7 @@ public class MusicPlaybackService extends JobIntentService {
         filter.addAction(PREVIOUS_ACTION);
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
+
         // Attach the broadcast listener
         registerReceiver(mIntentReceiver, filter);
 
@@ -693,6 +720,15 @@ public class MusicPlaybackService extends JobIntentService {
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
         updateNotification();
+    }
+
+    private static void initRepeatModeAndShuffleTask(MusicPlaybackService service) {
+        ConfigurationManager CM = ConfigurationManager.instance();
+        // Load Repeat Mode
+        service.setRepeatMode(CM.getInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE));
+        // Load Shuffle Mode On/Off
+        service.enableShuffle(CM.getBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED));
+        //MusicUtils.isShuffleEnabled();
     }
 
     /**
@@ -779,7 +815,11 @@ public class MusicPlaybackService extends JobIntentService {
 
         // Remove the audio focus listener and lock screen controls
         if (mAudioManager != null) {
-            mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
+            } else {
+                mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            }
             mAudioManager.unregisterRemoteControlClient(mRemoteControlClient);
         }
 
@@ -838,7 +878,11 @@ public class MusicPlaybackService extends JobIntentService {
         // on some devices where it requires MODIFY_PHONE_STATE
         // mAudioManager could be null
         if (mAudioManager != null) {
-            mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
+            } else {
+                mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            }
         }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
 
@@ -1017,11 +1061,14 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void cancelShutdown() {
         if (mAlarmManager != null && mShutdownIntent != null) {
-            async(this, MusicPlaybackService::cancelShutdownTask);
+            if (Asyncs.Throttle.readyToSubmitTask("MusicPlaybackService::cancelShutdownTask",1000)) {
+                async(this, MusicPlaybackService::cancelShutdownTask);
+            }
         }
     }
 
     private static void cancelShutdownTask(MusicPlaybackService musicPlaybackService) {
+        LOG.info("MusicPlaybackService.cancelShutdownTask()!");
         if (musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
             if (D)
                 LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
@@ -1404,16 +1451,13 @@ public class MusicPlaybackService extends JobIntentService {
             // reallocate at 2x requested size so we don't
             // need to grow and copy the array for every
             // insert
-            final long[] newlist = new long[size * 2];
             final int len = mPlayList != null ? mPlayList.length : mPlayListLen;
+            long[] newlist = new long[size * 2];
+
             if (mPlayList != null) {
-                for (int i = 0; i < len; i++) {
-                    newlist[i] = mPlayList[i];
-                }
+                System.arraycopy(mPlayList, 0, newlist, 0, len);
             }
             mPlayList = newlist;
-            // FIXME: shrink the array when the needed size is much smaller
-            // than the allocated size
         }
     }
 
@@ -1421,11 +1465,18 @@ public class MusicPlaybackService extends JobIntentService {
      * Notify the change-receivers that something has changed.
      */
     private void notifyChange(final String change) {
-        async(this, MusicPlaybackService::notifyChangeTask, change);
+        LOG.info("notifyChange(" + change + ") trying...");
+        if (META_CHANGED.equals(change) && Asyncs.Throttle.readyToSubmitTask(change,100)) {
+            async(this, MusicPlaybackService::notifyChangeTask, change);
+            return;
+        }
+        if (Asyncs.Throttle.readyToSubmitTask(change,200)) {
+            async(this, MusicPlaybackService::notifyChangeTask, change);
+        }
     }
 
     private static void notifyChangeTask(MusicPlaybackService musicPlaybackService, String change) {
-        if (D) LOG.info("notifyChange: what = " + change);
+        LOG.info("notifyChangeTask(" + change + ")!");
         // Update the lock screen controls
         musicPlaybackService.updateRemoteControlClient(change);
         if (POSITION_CHANGED.equals(change)) {
@@ -2238,8 +2289,13 @@ public class MusicPlaybackService extends JobIntentService {
 
         stopSimplePlayer();
 
-        int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
-                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        int status = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            status = mAudioManager.requestAudioFocus(AUDIO_FOCUS_REQUEST);
+        } else {
+            status = mAudioManager.requestAudioFocus(mAudioFocusListener,
+                    AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        }
 
         if (D) LOG.info("Starting playback: audio focus request status = " + status);
 
@@ -2591,7 +2647,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
     };
 
-    // TODO: Check why this isn't being used anywhere. Perhaps should be called in EngineService's shutdown logic
+
     public static void stopService(Context context) {
         LOG.info("stopService() <static>");
         Intent i = new Intent();
