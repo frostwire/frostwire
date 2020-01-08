@@ -40,7 +40,7 @@ final class EngineThreadPool extends ThreadPool {
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAXIMUM_POOL_SIZE = 8;
     private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
-    private static final int MAX_DEBUG_QUEUED_TASKS = 20;
+    private static final int MAX_DEBUG_QUEUED_TASKS = 50;
 
     private final WeakHashMap<Object, String> taskStack;
     private final WeakHashMap<Thread, TaskInfo> taskInfo;
@@ -94,12 +94,13 @@ final class EngineThreadPool extends ThreadPool {
 
         if (Debug.isEnabled()) {
             taskStack.put(task, getStack());
+            System.out.println("EngineThreadPool::verifyTask - " + getQueue().size() + " tasks queued");
         }
 
-        // if debug/development, allow only 50 tasks in the queue
+        // if debug/development, allow only MAX_DEBUG_QUEUED_TASKS tasks in the queue
         if (Debug.isEnabled() && getQueue().size() > MAX_DEBUG_QUEUED_TASKS) {
             dumpTasks();
-            throw new RuntimeException("Too many tasks in the queue");
+            throw new RuntimeException("Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
         }
     }
 
