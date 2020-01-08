@@ -1061,7 +1061,7 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void cancelShutdown() {
         if (mAlarmManager != null && mShutdownIntent != null) {
-            if (Asyncs.Throttle.readyToSubmitTask("MusicPlaybackService::cancelShutdownTask",1000)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::cancelShutdownTask",1000)) {
                 async(this, MusicPlaybackService::cancelShutdownTask);
             }
         }
@@ -1466,11 +1466,11 @@ public class MusicPlaybackService extends JobIntentService {
      */
     private void notifyChange(final String change) {
         LOG.info("notifyChange(" + change + ") trying...");
-        if (META_CHANGED.equals(change) && Asyncs.Throttle.readyToSubmitTask(change,100)) {
+        if (META_CHANGED.equals(change) && Asyncs.Throttle.isReadyToSubmitTask(change,100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
             return;
         }
-        if (Asyncs.Throttle.readyToSubmitTask(change,200)) {
+        if (Asyncs.Throttle.isReadyToSubmitTask(change,200)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
         }
     }
