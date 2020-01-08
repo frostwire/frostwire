@@ -27,7 +27,9 @@ import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.frostwire.android.offers.Offers.DEBUG_MODE;
@@ -47,16 +49,20 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
             return;
         }
 
+        final Context applicationContext = activity.getApplicationContext();
+        WeakReference<Activity> activityRef = Ref.weak(activity);
+        WeakReference<Context> appContextRef = Ref.weak(applicationContext);
         Engine.instance().getThreadPool().execute(() -> {
             try {
-                if (!started()) {
-                    final Context applicationContext = activity.getApplicationContext();
-                    AppLovinSdk.initializeSdk(applicationContext);
-                    AppLovinSdk.getInstance(activity).getSettings().setMuted(!DEBUG_MODE);
-                    AppLovinSdk.getInstance(applicationContext).getSettings().setVerboseLogging(DEBUG_MODE);
+                if (!started() && Ref.alive(appContextRef) && Ref.alive(activityRef)) {
+                    Context appContext = appContextRef.get();
+                    Activity activity1 = activityRef.get();
+                    AppLovinSdk.initializeSdk(appContext);
+                    AppLovinSdk.getInstance(activity1).getSettings().setMuted(!DEBUG_MODE);
+                    AppLovinSdk.getInstance(appContext).getSettings().setVerboseLogging(DEBUG_MODE);
                     LOG.info("AppLovin initialized.");
                     start();
-                    loadNewInterstitial(activity);
+                    loadNewInterstitial(activity1);
                 }
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
