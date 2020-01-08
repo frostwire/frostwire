@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -542,5 +543,10 @@ public final class UIUtils {
         } catch (Throwable ignored) {
             // possible Runtime error thrown by Librarian.instance()
         }
+    }
+
+    public static boolean isScreenLocked(final Context context) {
+        KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        return km.isKeyguardLocked();
     }
 }
