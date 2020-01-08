@@ -19,11 +19,15 @@ package com.frostwire.android.util;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 import androidx.annotation.NonNull;
 
@@ -397,5 +401,33 @@ public final class Asyncs {
 
     private interface PostSupport<C, R> {
         void run(C context, Object[] args, R result);
+    }
+
+    public final static class Throttle {
+        private final static Logger LOG = Logger.getLogger(Throttle.class);
+        private final static Hashtable<String, Long> asyncTaskSubmissionTimestampMap = new Hashtable<>();
+        /**
+         * Checks if it's not too early to submit this task again. Updates the Map<TaskName -> TimestampLastSubmitted> when it's ready, assuming the task will be launched right after checking if(ready) async(theTask)
+         * @param taskName
+         * @param minDelta
+         * @return
+         */
+        public static boolean readyToSubmitTask(final String taskName, final long minDelta) {
+            final long now = SystemClock.elapsedRealtime();
+            if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
+                LOG.info("readyToSubmitTask " + taskName + " for the first time");
+                asyncTaskSubmissionTimestampMap.put(taskName, now);
+                return true;
+            }
+            long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
+            if (delta > minDelta) {
+                LOG.info("readyToSubmitTask " + taskName + ", satisfactory delta=" + delta + "ms");
+                asyncTaskSubmissionTimestampMap.put(taskName, now);
+                return true;
+            }
+            LOG.info("not readyToSubmitTask " + taskName + ", submitted " + delta + " ms ago");
+            return false;
+        }
+
     }
 }
