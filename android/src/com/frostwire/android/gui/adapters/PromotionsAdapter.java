@@ -191,23 +191,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
             if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-            } else if (position == 0) {
-                // mopubBannerView does not work well in Android 4.4 (KitKat)
-                // java.lang.ClassCastException:
-                //  at android.widget.GridView.onMeasure (GridView.java:1046)
-                int r = 1 + new Random(System.currentTimeMillis()).nextInt(100);
-                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || r % 2 == 0) {
-                    if (specialOfferLayout == R.layout.view_remove_ads_notification) {
-                        View removeAdsOfferView = setupRemoveAdsOfferView();
-                        if (removeAdsOfferView != null) {
-                            return removeAdsOfferView;
-                        }
-                    }
-                } else {
-                    return getMopubBannerView();
+            } else if (position == 0 && specialOfferLayout == R.layout.view_remove_ads_notification) {
+
+                View removeAdsOfferView = setupRemoveAdsOfferView();
+                if (removeAdsOfferView != null) {
+                    return removeAdsOfferView;
                 }
-                //this line below should be impossible, but we could have some other special offer layout
-                //return View.inflate(getContext(), specialOfferLayout, null);
             } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
                 return super.getView(position - 2, null, parent);
             }
@@ -230,7 +219,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
             // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
             // temp fix placed in MoPubAdNetwork.java#126
-           mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
+            mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
         }
         return mopubBannerView;
     }
