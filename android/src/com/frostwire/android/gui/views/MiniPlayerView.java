@@ -34,6 +34,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 
 import static com.frostwire.android.util.Asyncs.async;
@@ -136,10 +137,13 @@ public class MiniPlayerView extends LinearLayout {
 
     private void refreshComponents() {
         refreshPlayPauseIcon();
-        refreshAlbumCover();
     }
 
     private void refreshAlbumCover() {
+        if (!Asyncs.Throttle.isReadyToSubmitTask("MiniPlayerView::refreshAlbumCover", 5000)) {
+            return;
+        }
+
         if (currentAlbumId != -1) {
             Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
             ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
