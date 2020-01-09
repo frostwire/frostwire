@@ -34,13 +34,19 @@ public final class TimerSubscription {
 
     private static final Logger LOG = Logger.getLogger(TimerSubscription.class);
 
-    private final WeakReference<TimerObserver> observer;
+    private WeakReference<TimerObserver> observer;
+
+    String observerClassName;
 
     private boolean unsubscribed;
 
-    public TimerSubscription(TimerObserver observer) {
-        this.observer = Ref.weak(observer);
+    TimerSubscription(TimerObserver observer) {
+        setObserver(observer);
+    }
 
+    void setObserver(TimerObserver observer) {
+        this.observer = Ref.weak(observer);
+        this.observerClassName = observer.getClass().getCanonicalName();
         this.unsubscribed = false;
     }
 
@@ -60,7 +66,11 @@ public final class TimerSubscription {
     public void onTime() {
         if (isSubscribed()) {
             try {
-                onTime(observer.get());
+                if (Ref.alive(observer)) {
+                    onTime(observer.get());
+                } else {
+                    unsubscribe();
+                }
             } catch (Throwable e) {
                 unsubscribe();
                 LOG.error("Error notifying observer, performed automatic unsubscribe", e);
