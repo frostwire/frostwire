@@ -35,6 +35,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 
 import androidx.core.app.NotificationCompat;
@@ -51,7 +52,7 @@ public final class NotificationUpdateDemon implements TimerObserver {
     private static final int FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS = 5;
 
     private final Context mParentContext;
-    private TimerSubscription mTimerSubscription;
+    private static TimerSubscription mTimerSubscription;
 
     private RemoteViews notificationViews;
     private Notification notificationObject;
@@ -65,19 +66,29 @@ public final class NotificationUpdateDemon implements TimerObserver {
         if (mTimerSubscription != null) {
             LOG.debug("Stopping before (re)starting permanent notification demon");
             mTimerSubscription.unsubscribe();
+            mTimerSubscription.setObserver(this, true);
+            TimerService.reSubscribe(mTimerSubscription, FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS);
+            return;
         }
         mTimerSubscription = TimerService.subscribe(this, FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS);
     }
 
     public void stop() {
-        LOG.debug("Stopping permanent notification demon");
-        mTimerSubscription.unsubscribe();
+        LOG.debug("Stopping permanent NotificationUpdateDemon");
+
+        if (mTimerSubscription != null) {
+            LOG.debug("stop() mTimerSubscription@" + mTimerSubscription.hashCode() + ".unsubscribe()");
+            mTimerSubscription.unsubscribe();
+        } else {
+            LOG.debug("stop() mTimerSubscription was null!!!!!, can't unsubscribe!!!");
+        }
 
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
             try {
                 manager.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
             } catch (SecurityException t) {
+                LOG.warn(t.getMessage(), t);
                 // possible java.lang.SecurityException
             }
         }
@@ -193,7 +204,13 @@ public final class NotificationUpdateDemon implements TimerObserver {
 
     @Override
     public void onTime() {
-        async(this, NotificationUpdateDemon::onTimeRefresh);
+        if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDemon::onTimeRefresh)", 5000)) {
+                async(this, NotificationUpdateDemon::onTimeRefresh);
+            }
+        } else {
+            LOG.error("NotificationUpdateDemon::onTime() invoked by who?", new Throwable());
+        }
     }
 
     @SuppressWarnings("deprecation")
