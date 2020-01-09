@@ -29,6 +29,7 @@ import java.io.File;
  */
 public interface IEngineService {
 
+    byte STATE_UNSTARTED = 0;
     byte STATE_INVALID = -1;
     byte STATE_STARTED = 10;
     byte STATE_STARTING = 11;
