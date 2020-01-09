@@ -1604,13 +1604,12 @@ public final class MusicUtils {
         } else {
             sForegroundActivities--;
         }
-
         if (old == 0 || sForegroundActivities == 0) {
             final Intent intent = new Intent(context, MusicPlaybackService.class);
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
             intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
             try {
-                Engine.startForegroundService(context, intent);
+                Engine.enqueueServiceJob(context, intent, MusicPlaybackService.class);
             } catch (Throwable ignored) {
                 LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
             }

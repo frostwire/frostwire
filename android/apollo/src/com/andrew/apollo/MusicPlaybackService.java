@@ -540,13 +540,10 @@ public class MusicPlaybackService extends JobIntentService {
     public void onCreate() {
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
-
         prepareAudioFocusRequest();
-        //Engine.foregroundServiceStartForAndroidO(this);
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
                         PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
-
         if (permissionGranted) {
 
             try {
@@ -597,7 +594,7 @@ public class MusicPlaybackService extends JobIntentService {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (D) LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
-        Engine.foregroundServiceStartForAndroidO(this);
+        //Engine.foregroundServiceStartForAndroidO(this);
 
         if (intent != null) {
             final String action = intent.getAction();
