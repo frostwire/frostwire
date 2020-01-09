@@ -49,7 +49,8 @@ import java.util.List;
 import androidx.viewpager.widget.ViewPager;
 
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
-    private TimerSubscription subscription;
+    private static final int TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS = 2;
+    private static TimerSubscription subscription;
     private UIBittorrentDownload uiBittorrentDownload;
     private SparseArray<String> tabTitles;
     private AbstractTransferDetailFragment[] detailFragments;
@@ -142,14 +143,17 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void onResume() {
         super.onResume();
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
-        subscription = TimerService.subscribe(this, 2);
+        if (subscription != null) {
+            if (subscription.isSubscribed()) {
+                subscription.unsubscribe();
+            }
+            TimerService.reSubscribe(this, subscription, TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS);
+        } else {
+            subscription = TimerService.subscribe(this, TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS);
+        }
         onTime();
     }
 
