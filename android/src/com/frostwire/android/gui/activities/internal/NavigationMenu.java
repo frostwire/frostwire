@@ -148,7 +148,6 @@ public final class NavigationMenu {
             return;
         }
         checkedNavViewMenuItemId = menuItem.getItemId();
-        Engine.instance().hapticFeedback();
         controller.syncNavigationMenu();
         menuItem.setChecked(true);
         controller.setTitle(menuItem.getTitle());

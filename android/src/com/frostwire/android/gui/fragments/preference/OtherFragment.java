@@ -46,7 +46,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     @Override
     protected void initComponents() {
         setupPermanentStatusNotificationOption();
-        setupHapticFeedback();
         setupClearIndex();
     }
 
@@ -69,21 +68,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 return true;
             });
         }
-    }
-
-    private void setupHapticFeedback() {
-        final CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
-        if (cb != null) {
-            cb.setOnPreferenceClickListener(preference -> {
-                Asyncs.async(OtherFragment::onHapticFeedbackPreferenceChangedTask, cb.isChecked());
-                return true;
-            });
-        }
-    }
-
-    private static void onHapticFeedbackPreferenceChangedTask(boolean checked) {
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, checked);
-        Engine.instance().onHapticFeedbackPreferenceChanged();
     }
 
     private void setupClearIndex() {
