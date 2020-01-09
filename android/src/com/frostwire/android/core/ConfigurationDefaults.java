@@ -86,8 +86,6 @@ final class ConfigurationDefaults {
                         Constants.AD_NETWORK_SHORTCODE_UNITY,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
-
-        defaultValues.put(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, true);
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);
         defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
