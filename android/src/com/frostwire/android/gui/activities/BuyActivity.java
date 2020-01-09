@@ -75,17 +75,6 @@ public final class BuyActivity extends AbstractActivity {
 
     private static int REWARD_FREE_AD_MINUTES = Constants.MIN_REWARD_AD_FREE_MINUTES;
 
-    /**
-     * Tasks for this branch:
-     * [x] Displaying a rewarded ad.
-     * [x] Logic managing the received reward to turn off all advertising and offers to remove advertisement.
-     * [x] Ads should appear again everywhere and options to remove ads too after time expires
-     * [x] Being able to remotely disable rewarded ad logic
-     * [x] Being able to remotely set how many minutes the reward is for
-     * [x] If it's FrostWire Plus, make sure only the rewarded ad option is displayed and not the other purchasable ones
-     * [x] Proper integration with settings menu, shows how many minutes left we have if possible, doesn't invoke BuyActivity
-     */
-
     private ProductCardView cardNminutes;
     private ProductCardView card30days;
     private ProductCardView card1year;
@@ -238,7 +227,7 @@ public final class BuyActivity extends AbstractActivity {
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
                     this,
-                    dismissActivityAfterward,
+                    false,//dismissActivityAfterward,
                     shutdownActivityAfterwards,
                     false,
                     getApplication());
