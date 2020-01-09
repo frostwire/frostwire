@@ -127,7 +127,7 @@ public class MainActivity extends AbstractActivity implements
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
     private final LocalBroadcastReceiver localBroadcastReceiver;
-    private TimerSubscription playerSubscription;
+    private static TimerSubscription playerSubscription;
 
     private boolean shuttingdown = false;
 
@@ -257,7 +257,15 @@ public class MainActivity extends AbstractActivity implements
         updateNavigationMenu();
         setupFragments();
         setupInitialFragment(savedInstanceState);
-        playerSubscription = TimerService.subscribe(((MiniPlayerView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
+        MiniPlayerView miniPlayerView = findView(R.id.activity_main_player_notifier);
+        if (playerSubscription != null) {
+            if (playerSubscription.isSubscribed()) {
+                playerSubscription.unsubscribe();
+            }
+            TimerService.reSubscribe(miniPlayerView.getRefresher(), playerSubscription, MiniPlayerView.REFRESHER_INTERVAL_IN_SECS);
+        } else {
+            playerSubscription = TimerService.subscribe(miniPlayerView.getRefresher(), MiniPlayerView.REFRESHER_INTERVAL_IN_SECS);
+        }
         onNewIntent(getIntent());
         setupActionBar();
     }
