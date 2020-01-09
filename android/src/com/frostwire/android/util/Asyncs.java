@@ -17,6 +17,8 @@
 
 package com.frostwire.android.util;
 
+import android.app.PendingIntent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -26,8 +28,12 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.function.Consumer;
 
 import androidx.annotation.NonNull;
 
@@ -39,6 +45,7 @@ import androidx.annotation.NonNull;
  */
 @SuppressWarnings("unchecked")
 public final class Asyncs {
+    private final static Logger LOG = Logger.getLogger(Asyncs.class);
 
     private Asyncs() {
     }
@@ -51,8 +58,8 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c),
-            (c, args, r) -> post.run(c, r));
+                (c, args) -> task.run(c),
+                (c, args, r) -> post.run(c, r));
     }
 
     public static <C, T1, R> void async(@NonNull C context,
@@ -62,9 +69,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0]),
-            (c, args, r) -> post.run(c, (T1)args[0], r),
-            arg1);
+                (c, args) -> task.run(c, (T1) args[0]),
+                (c, args, r) -> post.run(c, (T1) args[0], r),
+                arg1);
     }
 
     public static <C, T1, T2, R> void async(@NonNull C context,
@@ -74,9 +81,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0], (T2)args[1]),
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], r),
-            arg1, arg2);
+                (c, args) -> task.run(c, (T1) args[0], (T2) args[1]),
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], r),
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3, R> void async(@NonNull C context,
@@ -86,9 +93,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2], r),
-            arg1, arg2, arg3);
+                (c, args) -> task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]),
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], (T3) args[2], r),
+                arg1, arg2, arg3);
     }
 
     public interface ContextResultTask<C, R> {
@@ -128,8 +135,11 @@ public final class Asyncs {
     public static <C> void async(@NonNull C context, ContextTask<C> task) {
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c); return null;},
-            null);
+                (c, args) -> {
+                    task.run(c);
+                    return null;
+                },
+                null);
     }
 
     public static <C, T1> void async(C context,
@@ -138,9 +148,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0]); return null;},
-            null,
-            arg1);
+                (c, args) -> {
+                    task.run(c, (T1) args[0]);
+                    return null;
+                },
+                null,
+                arg1);
     }
 
     public static <C, T1, T2> void async(@NonNull C context,
@@ -149,9 +162,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
-            null,
-            arg1, arg2);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                null,
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3> void async(@NonNull C context,
@@ -160,20 +176,26 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            null,
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3);
     }
 
     public static <C, T1, T2, T3, T4> void async(@NonNull C context,
-                                             ContextTask4<C, T1, T2, T3, T4> task,
-                                             T1 arg1, T2 arg2, T3 arg3, T4 arg4) {
+                                                 ContextTask4<C, T1, T2, T3, T4> task,
+                                                 T1 arg1, T2 arg2, T3 arg3, T4 arg4) {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]); return null;},
-            null,
-            arg1, arg2, arg3, arg4);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3, arg4);
     }
 
     public static <C, T1> void async(@NonNull C context,
@@ -183,9 +205,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0]),
-            arg1);
+                (c, args) -> {
+                    task.run(c, (T1) args[0]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0]),
+                arg1);
     }
 
     public static <C, T1, T2> void async(@NonNull C context,
@@ -195,9 +220,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1]),
-            arg1, arg2);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1]),
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3> void async(@NonNull C context,
@@ -207,9 +235,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], (T3) args[2]),
+                arg1, arg2, arg3);
     }
 
     public interface ContextTask<C> {
@@ -250,8 +281,8 @@ public final class Asyncs {
                                  ResultPostTask<R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run(),
-            (c, args, r) -> post.run(r));
+                (c, args) -> task.run(),
+                (c, args, r) -> post.run(r));
     }
 
     public static <T1, R> void async(ResultTask1<T1, R> task,
@@ -259,9 +290,9 @@ public final class Asyncs {
                                      ResultPostTask1<T1, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0]),
-            (c, args, r) -> post.run((T1)args[0], r),
-            arg1);
+                (c, args) -> task.run((T1) args[0]),
+                (c, args, r) -> post.run((T1) args[0], r),
+                arg1);
     }
 
     public static <T1, T2, R> void async(ResultTask2<T1, T2, R> task,
@@ -269,9 +300,9 @@ public final class Asyncs {
                                          ResultPostTask2<T1, T2, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0], (T2)args[1]),
-            (c, args, r) -> post.run((T1)args[0], (T2)args[1], r),
-            arg1, arg2);
+                (c, args) -> task.run((T1) args[0], (T2) args[1]),
+                (c, args, r) -> post.run((T1) args[0], (T2) args[1], r),
+                arg1, arg2);
     }
 
     public static <T1, T2, T3, R> void async(ResultTask3<T1, T2, T3, R> task,
@@ -279,9 +310,9 @@ public final class Asyncs {
                                              ResultPostTask3<T1, T2, T3, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0], (T2)args[1], (T3)args[2]),
-            (c, args, r) -> post.run((T1)args[0], (T2)args[1], (T3)args[2], r),
-            arg1, arg2, arg3);
+                (c, args) -> task.run((T1) args[0], (T2) args[1], (T3) args[2]),
+                (c, args, r) -> post.run((T1) args[0], (T2) args[1], (T3) args[2], r),
+                arg1, arg2, arg3);
     }
 
     public interface ResultTask<R> {
@@ -320,34 +351,46 @@ public final class Asyncs {
 
     public static void async(Task task) {
         invokeAsyncSupport(null,
-            (c, args)-> {task.run(); return null;},
-            null);
+                (c, args) -> {
+                    task.run();
+                    return null;
+                },
+                null);
     }
 
     public static <T1> void async(Task1<T1> task,
                                   T1 arg1) {
 
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0]); return null;},
-            null,
-            arg1);
+                (c, args) -> {
+                    task.run((T1) args[0]);
+                    return null;
+                },
+                null,
+                arg1);
     }
 
     public static <T1, T2> void async(Task2<T1, T2> task,
                                       T1 arg1, T2 arg2) {
 
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0], (T2)args[1]); return null;},
-            null,
-            arg1, arg2);
+                (c, args) -> {
+                    task.run((T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                null,
+                arg1, arg2);
     }
 
     public static <T1, T2, T3> void async(Task3<T1, T2, T3> task,
                                           T1 arg1, T2 arg2, T3 arg3) {
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            null,
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run((T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3);
     }
 
     public interface Task {
@@ -369,10 +412,21 @@ public final class Asyncs {
     // private helper methods
 
     private static <C, R> void invokeAsyncSupport(C context,
-        TaskSupport<C, R> task,
-        PostSupport<C, R> post,
-        Object... args) {
+                                                  TaskSupport<C, R> task,
+                                                  PostSupport<C, R> post,
+                                                  Object... args) {
 
+//        LOG.info("=====================================================================");
+//        StackTraceElement[] stackTrace = new Exception().getStackTrace();
+//        LOG.info("invokeAsyncSupport: " + stackTrace[4].toString());
+//        LOG.info("invokeAsyncSupport: " + stackTrace[5].toString());
+//        if (stackTrace.length >= 7) {
+//            LOG.info("invokeAsyncSupport: " + stackTrace[6].toString());
+//        }
+//        if (stackTrace.length >= 8) {
+//            LOG.info("invokeAsyncSupport: " + stackTrace[7].toString());
+//        }
+//        LOG.info("=====================================================================");
         WeakReference<C> ctx = context != null ? Ref.weak(context) : null;
 
         Engine.instance().getThreadPool().execute(() -> {
@@ -404,29 +458,96 @@ public final class Asyncs {
     }
 
     public final static class Throttle {
+        private final static boolean PROFILING_ENABLED = false;
         private final static Logger LOG = Logger.getLogger(Throttle.class);
         private final static Hashtable<String, Long> asyncTaskSubmissionTimestampMap = new Hashtable<>();
+        private final static Hashtable<String, Integer> tasksHitsMap = new Hashtable<>(); //used if profiling enabled
+        private final static long RECYCLE_SUBMISSION_TIME_MAP_INTERVAL = 30 * 1000; //recycle every 1 minute
+        private final static long TASK_RECYCLE_INTERVAL_IN_MS = 10000;
+        private static long lastRecycleTimestamp = -1;
+
         /**
          * Checks if it's not too early to submit this task again. Updates the Map<TaskName -> TimestampLastSubmitted> when it's ready, assuming the task will be launched right after checking if(ready) async(theTask)
+         *
          * @param taskName
-         * @param minDelta
+         * @param minIntervalInMillis
          * @return
          */
-        public static boolean readyToSubmitTask(final String taskName, final long minDelta) {
+        public static boolean isReadyToSubmitTask(final String taskName, final long minIntervalInMillis) {
+            tryRecycling();
             final long now = SystemClock.elapsedRealtime();
             if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
-                LOG.info("readyToSubmitTask " + taskName + " for the first time");
+                LOG.info("isReadyToSubmitTask " + taskName + " for the first time");
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
+                profileHit(taskName);
                 return true;
             }
             long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
-            if (delta > minDelta) {
-                LOG.info("readyToSubmitTask " + taskName + ", satisfactory delta=" + delta + "ms");
+            if (delta >= minIntervalInMillis) {
+                LOG.info("isReadyToSubmitTask " + taskName + ", satisfactory delta=" + delta + "ms");
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
+                profileHit(taskName);
                 return true;
             }
-            LOG.info("not readyToSubmitTask " + taskName + ", submitted " + delta + " ms ago");
+            LOG.info("not isReadyToSubmitTask " + taskName + ", submitted " + delta + " ms ago, min required is " + minIntervalInMillis + " ms");
             return false;
+        }
+
+        private static void profileHit(final String taskName) {
+            if (!PROFILING_ENABLED) {
+                return;
+            }
+            if (tasksHitsMap.containsKey(taskName)) {
+                tasksHitsMap.put(taskName, 1 + tasksHitsMap.get(taskName));
+            } else {
+                tasksHitsMap.put(taskName, 1);
+            }
+
+        }
+
+        private static void dumpTaskProfile() {
+            if (!PROFILING_ENABLED) {
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                tasksHitsMap.entrySet().stream().sorted((o1, o2) -> Integer.compare(o1.getValue(), o2.getValue())).forEach(new Consumer<Map.Entry<String, Integer>>() {
+                    @Override
+                    public void accept(Map.Entry<String, Integer> stringIntegerEntry) {
+                        LOG.info("dumpTaskProfile: " + stringIntegerEntry.getKey() + " -> " + stringIntegerEntry.getValue() + " hits");
+                    }
+                });
+            }
+        }
+
+        private static void tryRecycling() {
+            if (asyncTaskSubmissionTimestampMap.size() == 0) {
+                return;
+            }
+            dumpTaskProfile();
+            final long now = SystemClock.elapsedRealtime();
+            if (now - lastRecycleTimestamp > RECYCLE_SUBMISSION_TIME_MAP_INTERVAL) {
+                ArrayList<String> keysToRecycle = new ArrayList<>();
+                int numKeysBeforeRecycle = 0;
+                for (String taskName : asyncTaskSubmissionTimestampMap.keySet()) {
+                    numKeysBeforeRecycle++;
+                    long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
+                    if (delta > TASK_RECYCLE_INTERVAL_IN_MS) {
+                        if (PROFILING_ENABLED) {
+                            LOG.info("Recycling " + taskName + " with " + tasksHitsMap.get(taskName) + " hits, last used " + delta + " ms ago");
+                        } else {
+                            LOG.info("Recycling " + taskName + ", last used " + delta + " ms ago");
+                        }
+                        keysToRecycle.add(taskName);
+                    }
+                }
+                lastRecycleTimestamp = now;
+                int numKeysToRecycle = keysToRecycle.size();
+                double recycleRatio = 100 * numKeysToRecycle / numKeysBeforeRecycle;
+                LOG.info("Recycling " + numKeysToRecycle + " tasks out of " + numKeysBeforeRecycle + " total tasks (freed  " + recycleRatio + "%)");
+                for (String task : keysToRecycle) {
+                    asyncTaskSubmissionTimestampMap.remove(task);
+                }
+            }
         }
 
     }
