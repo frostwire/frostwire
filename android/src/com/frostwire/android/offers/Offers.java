@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -516,7 +516,6 @@ public final class Offers {
                                                            final boolean tryBack2BackRemoveAdsOffer,
                                                            final Application fallbackContext) {
             LOG.info("dismissAndOrShutdownIfNecessary(finishAfterDismiss=" + finishAfterDismiss + ", shutdownAfter=" + shutdownAfter + ", tryBack2BackRemoveAdsOffer= " + tryBack2BackRemoveAdsOffer + ")");
-            Engine.instance().hapticFeedback();
             // dismissAndOrShutdownIfNecessary is invoked on adNetwork listeners when interstitials are dismissed
             // if a user leaves an ad displayed without interacting with it for too long a second
             // ad could be displayed on MainActivity's onResume back to back.

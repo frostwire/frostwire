@@ -232,7 +232,6 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         public void onClick(Context ctx, View v) {
-            Engine.instance().hapticFeedback();
             Object tag = v.getTag();
             if (tag instanceof TransferItem) {
                 TransferItem item = (TransferItem) tag;
