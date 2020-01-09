@@ -21,14 +21,14 @@ package com.frostwire.android.gui.views;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.frostwire.util.Logger;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class TimerService {
-
+    private final static Logger LOG = Logger.getLogger(TimerService.class);
     private static final Handler handler = new Handler(Looper.getMainLooper());
 
     private TimerService() {
@@ -36,19 +36,26 @@ public final class TimerService {
 
     public static TimerSubscription subscribe(TimerObserver observer, int intervalSec) {
         TimerSubscription subscription = new TimerSubscription(observer);
+        //LOG.info("subscribe(" + observer.getClass().getCanonicalName() + ") has created a new TimerSubscription@" + subscription.hashCode());
         long interval = intervalSec * 1000;
 
         handler.postDelayed(new TimerTask(subscription, interval), interval);
-
         return subscription;
     }
 
-    private static final class TimerTask implements Runnable {
+    public static void reSubscribe(TimerObserver observer, TimerSubscription mTimerSubscription, int intervalSec) {
+        mTimerSubscription.setObserver(observer);
+        //LOG.info("reSubscribe(mTimerSubscription=@" + mTimerSubscription.hashCode() + ", intervalSec=" + intervalSec + ")");
+        long intervalInMs = intervalSec * 1000;
+        handler.postDelayed(new TimerTask(mTimerSubscription, intervalInMs), intervalInMs);
+    }
 
+    private static final class TimerTask implements Runnable {
+        private final static Logger LOG = Logger.getLogger(TimerTask.class);
         private final TimerSubscription subscription;
         private final long interval;
 
-        public TimerTask(TimerSubscription subscription, long interval) {
+        TimerTask(TimerSubscription subscription, long interval) {
             this.subscription = subscription;
             this.interval = interval;
         }
@@ -56,9 +63,12 @@ public final class TimerService {
         @Override
         public void run() {
             if (subscription.isSubscribed()) {
+                //LOG.info("TimerTask.run() TimerSubscription@" + subscription.hashCode() + " is still subscribed. Observer=" + subscription.observerClassName);
                 subscription.onTime();
                 handler.postDelayed(this, interval);
-            }
+            } //else {
+                //LOG.info("TimerTask.run() TimerSubscription@" + subscription.hashCode() + " is unsubscribed, not posting again to handler");
+            //}
         }
     }
 }
