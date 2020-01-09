@@ -49,6 +49,7 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public class MiniPlayerView extends LinearLayout {
 
+    public static final int REFRESHER_INTERVAL_IN_SECS = 1; // See MainActivity.initComponents(), that's where the subscription to the timer service happens
     private TextView titleText;
     private TextView artistText;
     private ImageView coverImage;
