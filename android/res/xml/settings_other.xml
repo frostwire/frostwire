@@ -33,9 +33,6 @@
         android:key="frostwire.prefs.gui.vibrate_on_finished_download"
         android:title="@string/vibrate_on_finished_download" />
     <androidx.preference.CheckBoxPreference
-        android:key="frostwire.prefs.gui.haptic_feedback_on"
-        android:title="@string/haptic_feedback" />
-    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.gui.distraction_free_search"
         android:summary="@string/distraction_free_search_results_summary"
         android:title="@string/distraction_free_search_results" />
