@@ -447,14 +447,15 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             Uri uri = ImageLoader.getApplicationArtUri(fd.album);
             thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
         } else {
+            CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
             if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
+                if (mediaPlayer != null && fd.equals(mediaPlayer.getCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
                 }
             } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD(getContext()))) {
+                if (mediaPlayer != null && fd.equals(mediaPlayer.getSimplePlayerCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
