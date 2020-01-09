@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import android.os.Looper;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
+import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -65,8 +67,6 @@ public final class Engine implements IEngineService {
     private EngineService service;
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
-
-    private FWVibrator vibrator;
 
     // the startServices call is a special call that can be made
     // to early (relatively speaking) during the application startup
@@ -137,7 +137,7 @@ public final class Engine implements IEngineService {
             }
             if (wasShutdown) {
                 async(new EngineApplicationRefsHolder(this, getApplication()),
-                      Engine::engineServiceStarter);
+                        Engine::engineServiceStarter);
             }
             wasShutdown = false;
         } else {
@@ -196,7 +196,7 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            Engine.startForegroundService(context, i);
+            Engine.enqueueServiceJob(context, i, EngineService.class);
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }
@@ -215,7 +215,7 @@ public final class Engine implements IEngineService {
             }, 0);
         } catch (SecurityException execution) {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(()->UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception));
+            handler.post(() -> UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception));
             execution.printStackTrace();
         }
     }
@@ -252,90 +252,27 @@ public final class Engine implements IEngineService {
         return r;
     }
 
-    public void onHapticFeedbackPreferenceChanged() {
-        if (vibrator != null) {
-            vibrator.onPreferenceChanged();
+    public static void enqueueServiceJob(final Context context, final Intent intent, final Class targetServiceClazz) {
+        int jobId = 10001;
+        if (EngineService.class.equals(targetServiceClazz)) {
+            jobId = 10001;
+        } else if (MusicPlaybackService.class.equals(targetServiceClazz)) {
+            jobId = 20001;
         }
-    }
-
-    public void hapticFeedback() {
-        if (vibrator != null) {
-            vibrator.hapticFeedback();
-        }
-    }
-
-    public static void startForegroundService(final Context context, final Intent intent) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            ContextCompat.startForegroundService(context, intent);
-        } else {
-            context.startService(intent);
-        }
+        JobIntentService.enqueueWork(context, targetServiceClazz, jobId, intent);
     }
 
     /**
-     * Whenever there's a call to ContextCompat.startForegroundService(context, intent)
-     * the service that's supposed to be started in the foreground is expected to perform
-     * a service.startForeground() call along with a notification within the next 5 seconds,
-     * otherwise you get an IllegalState exception crash for not following the 'contract'
-     * @param service
+     * @deprecated Use Engine#enqueueServiceJob
      */
-    public static void foregroundServiceStartForAndroidO(Service service) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationManager notificationService = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            NotificationChannel channel = new NotificationChannel(
-                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
-                    "FrostWire",
-                    NotificationManager.IMPORTANCE_NONE);
-
-            if (notificationService != null) {
-                notificationService.createNotificationChannel(channel);
-            }
-
-            Notification notification = new NotificationCompat.Builder(
-                    service,
-                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).
-                    setContentTitle("").
-                    setContentText("").
-                    build();
-            service.startForeground(1337, notification);
-        }
-    }
-
-    private static class FWVibrator {
-        private final Vibrator vibrator;
-        private boolean enabled;
-
-        public FWVibrator(Application context) {
-            vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            enabled = isActive();
-        }
-
-        public void hapticFeedback() {
-            if (!enabled) return;
-            try {
-                vibrator.vibrate(50);
-            } catch (Throwable ignored) {
-            }
-        }
-
-        public void onPreferenceChanged() {
-            enabled = isActive();
-        }
-
-        public boolean isActive() {
-            boolean hapticFeedback = false;
-            ConfigurationManager cm = ConfigurationManager.instance();
-            if (cm != null) {
-                hapticFeedback = cm.getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
-            }
-            return vibrator != null && hapticFeedback;
-        }
+    public static void startForegroundService(final Context context, final Intent intent) {
+        ContextCompat.startForegroundService(context, intent);
     }
 
     private class EngineApplicationRefsHolder {
         WeakReference<Engine> engineRef;
         WeakReference<Application> appRef;
+
         EngineApplicationRefsHolder(Engine engine, Application application) {
             engineRef = Ref.weak(engine);
             appRef = Ref.weak(application);
@@ -352,7 +289,6 @@ public final class Engine implements IEngineService {
         Engine engine = refsHolder.engineRef.get();
         Application application = refsHolder.appRef.get();
         if (application != null) {
-            engine.vibrator = new FWVibrator(application);
             engine.startEngineService(application);
         }
     }
