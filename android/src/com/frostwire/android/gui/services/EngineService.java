@@ -36,7 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
-import com.frostwire.android.gui.NotificationUpdateDemon;
+import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.util.Asyncs;
@@ -69,7 +69,7 @@ public class EngineService extends JobIntentService implements IEngineService {
     private final CoreMediaPlayer mediaPlayer;
     private final Object stateLock = new Object();
     private static volatile byte state;
-    private NotificationUpdateDemon notificationUpdateDemon;
+    private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
 
     // public:
@@ -290,8 +290,8 @@ public class EngineService extends JobIntentService implements IEngineService {
     }
 
     private void stopPermanentNotificationUpdates() {
-        if (notificationUpdateDemon != null) {
-            notificationUpdateDemon.stop();
+        if (notificationUpdateDaemon != null) {
+            notificationUpdateDaemon.stop();
         }
     }
 
@@ -453,10 +453,10 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     private static void startPermanentNotificationUpdatesTask(EngineService engineService) {
         try {
-            if (engineService.notificationUpdateDemon == null) {
-                engineService.notificationUpdateDemon = new NotificationUpdateDemon(engineService.getApplicationContext());
+            if (engineService.notificationUpdateDaemon == null) {
+                engineService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineService.getApplicationContext());
             }
-            engineService.notificationUpdateDemon.start();
+            engineService.notificationUpdateDaemon.start();
         } catch (Throwable t) {
             LOG.warn(t.getMessage(), t);
         }
