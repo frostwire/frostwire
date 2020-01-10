@@ -222,13 +222,11 @@ public final class BuyActivity extends AbstractActivity {
     private void onInterstitialActionBarDismiss() {
         if (isInterstitial()) {
             Intent intent = getIntent();
-            boolean dismissActivityAfterward = intent.getBooleanExtra("dismissActivityAfterward", false);
-            boolean shutdownActivityAfterwards = intent.getBooleanExtra("shutdownActivityAfterwards", false);
 
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
                     this,
-                    false,//dismissActivityAfterward,
-                    shutdownActivityAfterwards,
+                    false,
+                    false,
                     false,
                     getApplication());
         }
