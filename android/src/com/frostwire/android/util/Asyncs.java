@@ -453,7 +453,7 @@ public final class Asyncs {
     }
 
     public final static class Throttle {
-        private final static boolean PROFILING_ENABLED = true;
+        private final static boolean PROFILING_ENABLED = false;
         private final static Logger LOG = Logger.getLogger(Throttle.class);
         private final static Hashtable<String, Long> asyncTaskSubmissionTimestampMap = new Hashtable<>();
         private final static Hashtable<String, Integer> tasksHitsMap = new Hashtable<>(); //used if profiling enabled
@@ -469,23 +469,39 @@ public final class Asyncs {
          * @return
          */
         public static boolean isReadyToSubmitTask(final String taskName, final long minIntervalInMillis) {
+
             tryRecycling();
             final long now = SystemClock.elapsedRealtime();
             if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
-                LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted for the first time");
+                if (PROFILING_ENABLED) {
+                    LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted for the first time");
+                }
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
                 profileHit(taskName);
                 return true;
             }
             long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
             if (delta >= minIntervalInMillis) {
-                LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted again, satisfactory delta:" + delta + " ms");
+                if (PROFILING_ENABLED) {
+                    LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted again, satisfactory delta:" + delta + " ms");
+                }
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
                 profileHit(taskName);
                 return true;
             }
-            LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms");
+            //LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms", true);
             return false;
+        }
+
+        public static long getLastSubmissionTimestamp(final String taskName) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                return asyncTaskSubmissionTimestampMap.getOrDefault(taskName, (long) -1);
+            } else {
+                if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
+                    return (long) -1;
+                }
+                return asyncTaskSubmissionTimestampMap.get(taskName);
+            }
         }
 
         private static void profileHit(final String taskName) {
@@ -519,9 +535,9 @@ public final class Asyncs {
             if (asyncTaskSubmissionTimestampMap.size() == 0) {
                 return;
             }
-            dumpTaskProfile();
             final long now = SystemClock.elapsedRealtime();
             if (now - lastRecycleTimestamp > RECYCLE_SUBMISSION_TIME_MAP_INTERVAL) {
+                dumpTaskProfile();
                 ArrayList<String> keysToRecycle = new ArrayList<>();
                 int numKeysBeforeRecycle = 0;
                 for (String taskName : asyncTaskSubmissionTimestampMap.keySet()) {
