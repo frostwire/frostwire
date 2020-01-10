@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -25,6 +26,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +38,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -68,6 +73,7 @@ import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.SearchHeaderBanner;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -86,14 +92,11 @@ import com.frostwire.util.http.HttpClient;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import androidx.drawerlayout.widget.DrawerLayout;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -141,7 +144,6 @@ public final class SearchFragment extends AbstractFragment implements
         if (slides != null) {
             promotions.setSlides(slides);
         } else {
-            //new LoadSlidesTask(this).execute();
             async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
         }
     }
@@ -152,19 +154,7 @@ public final class SearchFragment extends AbstractFragment implements
             String url = String.format("%s&from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
             String json = http.get(url);
             SlideList slides = JsonUtils.toObject(json, SlideList.class);
-            // HACK: Gets rid of the old "see more search results" slide.
-            // TODO: Remove this when unnecessary after several updates
-            if (slides != null && slides.slides != null) {
-                Iterator<Slide> it = slides.slides.iterator();
-                while (it.hasNext()) {
-                    Slide slide = it.next();
-                    if (slide.imageSrc.equals("http://static.frostwire.com/images/overlays/fw-results-overlay-2.jpg")) {
-                        it.remove();
-                    }
-                }
-            }
             // yes, these requests are done only once per session.
-            //LOG.info("SearchFragment.LoadSlidesTask performed http request to " + url);
             return slides != null ? slides.slides : null;
         } catch (Throwable e) {
             LOG.error("Error loading slides from url", e);
@@ -185,7 +175,7 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public View getHeader(Activity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
-        LinearLayout header = (LinearLayout) inflater.inflate(R.layout.view_search_header, null, false);
+        @SuppressLint("InflateParams") LinearLayout header = (LinearLayout) inflater.inflate(R.layout.view_search_header, null, false);
         TextView title = header.findViewById(R.id.view_search_header_text_title);
         title.setText(R.string.search);
         title.setOnClickListener(getHeaderClickListener());
@@ -195,7 +185,6 @@ public final class SearchFragment extends AbstractFragment implements
         filterButton.updateVisibility();
         return header;
     }
-
 
     @Override
     public void onResume() {
@@ -248,7 +237,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
         if (searchHeaderBanner != null) {
             searchHeaderBanner.setSearchFragmentReference(this);
-            if (getCurrentQuery() == null || Offers.disabledAds()){
+            if (getCurrentQuery() == null || Offers.disabledAds()) {
                 searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
             }
         }
@@ -390,18 +379,18 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     @Override
-    public void onDrawerSlide(View view, float v) {
+    public void onDrawerSlide(@NonNull View view, float v) {
         if ((!isVisible() || currentQuery == null) && view == keywordFilterDrawerView) {
             drawerLayout.closeDrawer(view);
         }
     }
 
     @Override
-    public void onDrawerOpened(View view) {
+    public void onDrawerOpened(@NonNull View view) {
     }
 
     @Override
-    public void onDrawerClosed(View view) {
+    public void onDrawerClosed(@NonNull View view) {
         if (view == keywordFilterDrawerView) {
             searchInput.selectTabByMediaType((byte) adapter.getFileType());
         }
@@ -448,13 +437,14 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         @Override
-        public void onScrollUp () {
+        public void onScrollUp() {
             if (Ref.alive(searchFragmentWeakReference)) {
                 searchFragmentWeakReference.get().onSearchScrollUp();
             }
         }
+
         @Override
-        public void onScrollDown () {
+        public void onScrollDown() {
             if (Ref.alive(searchFragmentWeakReference)) {
                 searchFragmentWeakReference.get().onSearchScrollDown();
             }
@@ -892,7 +882,6 @@ public final class SearchFragment extends AbstractFragment implements
         private final TextView counterTextView;
         private Animation pulse;
         private boolean filterButtonClickedBefore;
-        private long lastUIUpdate = 0;
 
         FilterToolbarButton(ImageButton imageButton, TextView counterTextView) {
             this.imageButton = imageButton;
@@ -905,23 +894,18 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         // self determine if it should be hidden or not
-        public void updateVisibility() {
+        void updateVisibility() {
             setVisible(currentQuery != null && adapter != null && adapter.getTotalCount() > 0);
         }
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            // TODO: review this, this is a workaround to a not clear framework logic problem
-            long td = System.currentTimeMillis() - filterButton.lastUIUpdate;
-            if (td <= 300) {
-                // don't bother to enqueue the task
-                return;
+            if (Asyncs.Throttle.isReadyToSubmitTask("SearchFragment::possiblyWaitInBackgroundToUpdateUI", 300)) {
+                async(filterButton,
+                        SearchFragment::possiblyWaitInBackgroundToUpdateUI,
+                        keywordFilterDrawerView, filteredHistograms,
+                        SearchFragment::updateUIWithFilteredHistogramsPerFeature);
             }
-
-            async(filterButton,
-                    SearchFragment::possiblyWaitInBackgroundToUpdateUI,
-                    keywordFilterDrawerView, filteredHistograms,
-                    SearchFragment::updateUIWithFilteredHistogramsPerFeature);
         }
 
         @Override
@@ -1016,11 +1000,10 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    @SuppressWarnings("unused")
     private static void possiblyWaitInBackgroundToUpdateUI(FilterToolbarButton filterToolbarButton,
                                                            KeywordFilterDrawerView keywordFilterDrawerView,
                                                            Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-        long timeSinceLastUpdate = System.currentTimeMillis() - filterToolbarButton.lastUIUpdate;
+        long timeSinceLastUpdate = SystemClock.elapsedRealtime() - Asyncs.Throttle.getLastSubmissionTimestamp("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
         if (timeSinceLastUpdate < 500) {
             try {
                 Thread.sleep(500L - timeSinceLastUpdate);
@@ -1032,7 +1015,6 @@ public final class SearchFragment extends AbstractFragment implements
     private static void updateUIWithFilteredHistogramsPerFeature(FilterToolbarButton filterToolbarButton,
                                                                  KeywordFilterDrawerView keywordFilterDrawerView,
                                                                  Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-        filterToolbarButton.lastUIUpdate = System.currentTimeMillis();
         // should be safe from concurrent modification exception as new list with filtered elements
         for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
             List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
