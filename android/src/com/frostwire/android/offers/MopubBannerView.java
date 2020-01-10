@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +32,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
-
-import androidx.annotation.Nullable;
 
 /**
  * @author aldenml
@@ -160,7 +160,7 @@ public class MopubBannerView extends LinearLayout {
         isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
         if (timeSinceLastBannerInit < 5000) {
-            LOG.info("initAlbumArtBanner() aborted, too soon to attempt another banner load");
+            LOG.info("loadMoPubBanner() aborted, too soon to attempt another banner load");
             return;
         }
         if (Offers.disabledAds()) {
@@ -169,7 +169,7 @@ public class MopubBannerView extends LinearLayout {
         lastInitAlbumArtBanner = System.currentTimeMillis();
         if (moPubView != null && dismissBannerButton != null) {
             if (!Offers.MOPUB.started()) {
-                LOG.warn("MopubBannerView.loadMoPubBanner() abort moPubView loading, MOPUB not started. Loading fallback");
+                LOG.warn("loadMoPubBanner() abort moPubView loading, MOPUB not started. Loading fallback");
                 loadFallbackBanner(adUnitId);
                 return;
             }
@@ -181,7 +181,7 @@ public class MopubBannerView extends LinearLayout {
             try {
                 moPubView.loadAd();
             } catch (Throwable e) {
-                LOG.warn("MopubBannerView banner could not be loaded", e);
+                LOG.warn("loadMoPubBanner() MopubBannerView banner could not be loaded", e);
                 e.printStackTrace();
                 loadFallbackBanner(adUnitId);
                 moPubView.destroy();
@@ -200,13 +200,25 @@ public class MopubBannerView extends LinearLayout {
                         adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
                     } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
                             MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
-                        adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
+                        adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
                     } else {
                         throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
                     }
-                    InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
-                    setVisible(Visibility.FALLBACK, false);
-                    setVisibility(View.INVISIBLE);
+
+                    try {
+                        InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
+                    } catch (Throwable t) {
+                        setVisible(Visibility.ALL, false);
+                        if (onBannerDismissedListener != null) {
+                            try {
+                                onBannerDismissedListener.dispatch();
+                            } catch (Throwable t2) {
+                                t2.printStackTrace();
+                            }
+                        }
+                        return;
+                    }
+                    setVisible(Visibility.FALLBACK, true);
                     dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
                     if (onFallbackBannerLoadedListener != null) {
                         try {
@@ -278,11 +290,13 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded(): " + banner);
             isLoaded = true;
+            setVisible(Visibility.FALLBACK, false);
             setVisible(Visibility.MOPUB, true);
             if (onBannerLoadedListener != null) {
                 try {
                     onBannerLoadedListener.dispatch();
                 } catch (Throwable t) {
+                    onFallbackBannerLoadedListener.dispatch();
                     t.printStackTrace();
                 }
             }
