@@ -17,11 +17,12 @@
 
 package com.frostwire.android.util;
 
-import android.app.PendingIntent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+
+import androidx.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
@@ -29,13 +30,7 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import androidx.annotation.NonNull;
 
 /**
  * Utility class for asynchronous task in the background.
@@ -458,7 +453,7 @@ public final class Asyncs {
     }
 
     public final static class Throttle {
-        private final static boolean PROFILING_ENABLED = false;
+        private final static boolean PROFILING_ENABLED = true;
         private final static Logger LOG = Logger.getLogger(Throttle.class);
         private final static Hashtable<String, Long> asyncTaskSubmissionTimestampMap = new Hashtable<>();
         private final static Hashtable<String, Integer> tasksHitsMap = new Hashtable<>(); //used if profiling enabled
@@ -477,19 +472,19 @@ public final class Asyncs {
             tryRecycling();
             final long now = SystemClock.elapsedRealtime();
             if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
-                LOG.info("isReadyToSubmitTask " + taskName + " for the first time");
+                LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted for the first time");
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
                 profileHit(taskName);
                 return true;
             }
             long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
             if (delta >= minIntervalInMillis) {
-                LOG.info("isReadyToSubmitTask " + taskName + ", satisfactory delta=" + delta + "ms");
+                LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted again, satisfactory delta:" + delta + " ms");
                 asyncTaskSubmissionTimestampMap.put(taskName, now);
                 profileHit(taskName);
                 return true;
             }
-            LOG.info("not isReadyToSubmitTask " + taskName + ", submitted " + delta + " ms ago, min required is " + minIntervalInMillis + " ms");
+            LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms");
             return false;
         }
 
@@ -510,12 +505,13 @@ public final class Asyncs {
                 return;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                tasksHitsMap.entrySet().stream().sorted((o1, o2) -> Integer.compare(o1.getValue(), o2.getValue())).forEach(new Consumer<Map.Entry<String, Integer>>() {
-                    @Override
-                    public void accept(Map.Entry<String, Integer> stringIntegerEntry) {
-                        LOG.info("dumpTaskProfile: " + stringIntegerEntry.getKey() + " -> " + stringIntegerEntry.getValue() + " hits");
-                    }
-                });
+                LOG.info("dumpTaskProfile(): ==============================================================");
+                tasksHitsMap
+                        .entrySet()
+                        .stream()
+                        .sorted((o1, o2) -> Integer.compare(o1.getValue(), o2.getValue()))
+                        .forEach(stringIntegerEntry -> LOG.info("dumpTaskProfile(): " + stringIntegerEntry.getKey() + " -> " + stringIntegerEntry.getValue() + " hits"));
+                LOG.info("dumpTaskProfile(): ==============================================================");
             }
         }
 
