@@ -653,7 +653,6 @@ public class MusicPlaybackService extends JobIntentService {
         // playback
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-
         mMediaButtonReceiverComponent = new ComponentName(getPackageName(),
                 MediaButtonIntentReceiver.class.getName());
         try {
@@ -725,7 +724,7 @@ public class MusicPlaybackService extends JobIntentService {
         service.setRepeatMode(CM.getInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE));
         // Load Shuffle Mode On/Off
         service.enableShuffle(CM.getBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED));
-        //MusicUtils.isShuffleEnabled();
+        MusicUtils.isShuffleEnabled();
     }
 
     /**
@@ -765,6 +764,12 @@ public class MusicPlaybackService extends JobIntentService {
         }
 
         mRemoteControlClient.setTransportControlFlags(flags);
+    }
+
+    @Override
+    public boolean onStopCurrentWork() {
+        onDestroy();
+        return super.onStopCurrentWork();
     }
 
     /**
@@ -851,6 +856,8 @@ public class MusicPlaybackService extends JobIntentService {
                 // might be underlocked and otherwise causing a crash on shutdown
             }
         }
+
+        stopSelf();
     }
 
     /**
@@ -940,7 +947,9 @@ public class MusicPlaybackService extends JobIntentService {
             return;
         }
         if (!musicPlaybackActivityInForeground && isPlaying()) {
-            async(this, MusicPlaybackService::updateNotificationTask);
+            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask",1000)) {
+                async(this, MusicPlaybackService::updateNotificationTask);
+            }
         } else if (musicPlaybackActivityInForeground) {
             mNotificationHelper.killNotification();
             if (!isPlaying()) {
@@ -1467,7 +1476,7 @@ public class MusicPlaybackService extends JobIntentService {
             async(this, MusicPlaybackService::notifyChangeTask, change);
             return;
         }
-        if (Asyncs.Throttle.isReadyToSubmitTask(change,200)) {
+        if (Asyncs.Throttle.isReadyToSubmitTask(change,100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
         }
     }
@@ -2644,13 +2653,6 @@ public class MusicPlaybackService extends JobIntentService {
         }
     };
 
-
-    public static void stopService(Context context) {
-        LOG.info("stopService() <static>");
-        Intent i = new Intent();
-        i.setClass(context, MusicPlaybackService.class);
-        context.stopService(i);
-    }
 
     private static final class MusicPlayerHandler extends Handler {
         private final WeakReference<MusicPlaybackService> mService;
