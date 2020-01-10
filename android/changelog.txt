@@ -1,9 +1,14 @@
-FrostWire 2.1.9 build 611 - DEC/29/2019
+FrostWire 2.1.9 build 611 - JAN/10/2020
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build
  - openssl 1.1.1d
  - Android NDK 20b
+ - EngineService and MusicPlaybackService are no longer ran as foreground services following newer android guidelines
+ - No more annoying ever-present Android notification, only during active transfers
+ - Considerable CPU usage reduction through thread invocation throttling frees resources for better search and download experience
+ - Removed experimental haptic feedback feature
+ - Multiple crashes fixed
  - lt:fix erroneous event=completed tracker announce when checking files
  - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
  - lt:fix bug in protocol encryption/obfuscation
