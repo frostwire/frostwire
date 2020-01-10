@@ -483,4 +483,5 @@
     <string name="try_it_free_for_a_half_hour">Try it free for a half hour</string>
     <string name="sorry_could_not_find_valid_download_location_at">Sorry, Couldn\'t find a valid download location at %s</string>
     <string name="use_torrentz2">Use Torrentz2</string>
+    <string name="free">Free</string>
 </resources>

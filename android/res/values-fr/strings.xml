@@ -421,4 +421,5 @@
     <string name="temporary_ad_removal_description">Aucune annonce pendant %d minutes après la lecture d\'une vidéo</string>
     <string name="looking_For_rewarded_video">Vous recherchez une vidéo récompensée…</string>
     <string name="no_reward_videos_available">Impossible de récupérer une vidéo récompensée. Veuillez réessayer</string>
+    <string name="free">Gratuit</string>
 </resources>

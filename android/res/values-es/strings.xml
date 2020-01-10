@@ -422,4 +422,5 @@
     <string name="temporary_ad_removal_description">Sin publicidad por %d minutos tras tocar un video</string>
     <string name="looking_For_rewarded_video">Buscando video con recompensa…</string>
     <string name="no_reward_videos_available">No pude encontrar un video con recompensa. Intenta de nuevo</string>
+    <string name="free">Gratis</string>
 </resources>

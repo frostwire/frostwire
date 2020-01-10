@@ -418,8 +418,6 @@ public final class BuyActivity extends AbstractActivity {
         Product prodInApp = store.product(inappSKU);
 
         if (prodSubs == null || prodInApp == null) {
-            //UIUtils.showLongMessage(this, R.string.play_store_out_of_sync);
-            //finish();
             card.setVisibility(View.GONE);
             return;
         }

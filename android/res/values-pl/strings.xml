@@ -413,4 +413,5 @@
     <string name="piece_size_header">Rozmiar Fragmentu:</string>
     <string name="add_tracker">Dodaj trackera</string>
     <string name="use_nyaa">Używaj Nyaa</string>
+    <string name="free">Za Darmo</string>
 </resources>
