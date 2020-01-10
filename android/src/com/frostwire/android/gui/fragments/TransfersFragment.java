@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,12 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
+import com.frostwire.android.util.Asyncs;
 import com.google.android.material.tabs.TabLayout;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -91,6 +94,7 @@ import static com.frostwire.android.util.Asyncs.async;
 public class TransfersFragment extends AbstractFragment implements TimerObserver, MainFragment {
     private static final Logger LOG = Logger.getLogger(TransfersFragment.class);
     private static final String SELECTED_STATUS_STATE_KEY = "selected_status";
+    private static final int TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS = 2;
     private final Comparator<Transfer> transferComparator;
     private final TransferStatus[] tabPositionToTransferStatus;
     private TabLayout tabLayout;
@@ -105,7 +109,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TextView vpnRichToast;
     private ClearableEditTextView addTransferUrlTextView;
     private TransferStatus selectedStatus;
-    private TimerSubscription subscription;
+    private static TimerSubscription subscription;
     private boolean isVPNactive;
     private static boolean firstTimeShown = true;
     private final Handler vpnRichToastHandler;
@@ -137,7 +141,22 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        subscription = TimerService.subscribe(this, 2);
+        initTimerServiceSubscription();
+    }
+
+    private void tryTimerServiceUnsubscribe() {
+        if (subscription != null && subscription.isSubscribed()) {
+            subscription.unsubscribe();
+        }
+    }
+
+    private void initTimerServiceSubscription() {
+        tryTimerServiceUnsubscribe();
+        if (subscription != null) {
+            TimerService.reSubscribe(this, subscription, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
+        } else {
+            subscription = TimerService.subscribe(this, TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS);
+        }
     }
 
     @Override
@@ -232,6 +251,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onResume() {
         super.onResume();
+        initTimerServiceSubscription();
         initStorageRelatedRichNotifications(null);
         onTime();
     }
@@ -239,7 +259,9 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        subscription.unsubscribe();
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
         adapter = null;
     }
 
@@ -255,6 +277,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (adapter != null) {
             adapter.dismissDialogs();
         }
+        tryTimerServiceUnsubscribe();
     }
 
     private static class TransfersHolder {
@@ -292,9 +315,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             return;
         }
         if (adapter != null) {
-            async(this,
-                    TransfersFragment::sortSelectedStatusTransfersInBackground,
-                    TransfersFragment::updateTransferList);
+            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)-100)) {
+                async(this,
+                        TransfersFragment::sortSelectedStatusTransfersInBackground,
+                        TransfersFragment::updateTransferList);
+            } else {
+                LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
+            }
         } else if (this.getActivity() != null) {
             setupAdapter(this.getActivity());
         }
@@ -320,12 +347,13 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (selectedStatus != TransferStatus.SEEDING) {
             transfersNoSeedsView.setMode(TransfersNoSeedsView.Mode.INACTIVE);
         }
-        // TODO: optimize these calls
         if (getActivity() != null && isVisible()) {
             getActivity().invalidateOptionsMenu();
         }
         if (BTEngine.ctx != null) {
-            async(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
+            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
+                async(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
+            }
             onCheckDHT();
         }
     }
@@ -885,10 +913,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 LOG.debug("onClear");
             }
         }
-
-//        @Override
-//        public void onTextChanged(View v, String str) {
-//        }
     }
 
     private void showStoragePreference() {
