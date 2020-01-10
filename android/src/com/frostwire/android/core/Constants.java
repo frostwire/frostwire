@@ -202,9 +202,9 @@ public final class Constants {
     public static final String EXPRESSVPN_URL = "https://www.linkev.com/?offer=3monthsfree&a_fid=frostwire";
     public static final String NORDVPN_URL = "https://go.nordvpn.net/aff_c?offer_id=222&aff_id=11226";
 
-    public static final int NOTIFICATION_FROSTWIRE_STATUS = 1000;
-    public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 1001;
-    public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 1002;
+    public static final int NOTIFICATION_FROSTWIRE_STATUS = 112000;
+    public static final int NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED = 112001;
+    public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 112002;
 
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
     public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";

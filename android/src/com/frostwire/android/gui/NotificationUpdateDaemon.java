@@ -95,13 +95,14 @@ public final class NotificationUpdateDaemon implements TimerObserver {
         }
     }
 
-    private void updatePermanentStatusNotification() {
+    private void updateTransfersStatusNotification() {
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
+            LOG.info("updateTransfersStatusNotification() aborted, PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION = false");
             return;
         }
 
         if (notificationViews == null || notificationObject == null) {
-            LOG.warn("Notification views or object are null, review your logic");
+            LOG.warn("updateTransfersStatusNotification() Notification views or object are null, review your logic");
             return;
         }
 
@@ -111,14 +112,15 @@ public final class NotificationUpdateDaemon implements TimerObserver {
         try {
             transferManager = TransferManager.instance();
         } catch (IllegalStateException btEngineNotReadyException) {
+            LOG.error("updateTransfersStatusNotification() " + btEngineNotReadyException.getMessage(), btEngineNotReadyException);
             return;
         }
 
-        // TODO: Debug here, see why the notification isn't being displayed.
         if (transferManager != null) {
             int downloads = transferManager.getActiveDownloads();
             int uploads = transferManager.getActiveUploads();
             if (downloads == 0 && uploads == 0) {
+                LOG.info("updateTransfersStatusNotification() no active transfers, cancelling notification");
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
                     try {
@@ -137,6 +139,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                 notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
                 notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
             } catch (Throwable t) {
+                LOG.error("updateTransfersStatusNotification() error getting Remote notification views: " + t.getMessage(), t);
                 //possible ArrayIndexOutOfBoundsException
             }
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -147,31 +150,36 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
                         try {
                             channel = notificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+                            //LOG.info("updateTransfersStatusNotification() got a channel with notificationManager.getNotificationChannel()? -> " + channel);
                         } catch (Throwable t) {
-                            LOG.error(t.getMessage(), t);
+                            LOG.info("updateTransfersStatusNotification() " + t.getMessage(), t);
                         }
 
                         if (channel == null) {
                             channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
+                            channel.setSound(null, null);
+                            notificationManager.createNotificationChannel(channel);
+                            //LOG.info("updateTransfersStatusNotification() had to create a new channel with notificationManager.createNotificationChannel()");
                         }
-                        channel.setSound(null, null);
-                        notificationManager.createNotificationChannel(channel);
-
                     }
                     notificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
+                    //LOG.info("updateTransfersStatusNotification() notificationManager.notify()!");
                 } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
-                    ignored.printStackTrace();
+                    LOG.error("updateTransfersStatusNotification() " + ignored.getMessage(), ignored);
                 } catch (Throwable ignored2) {
                     // possible android.os.TransactionTooLargeException
-                    ignored2.printStackTrace();
+                    LOG.error("updateTransfersStatusNotification() " + ignored2.getMessage(), ignored2);
                 }
+            } else {
+                LOG.info("updateTransfersStatusNotification() no notification manager available");
             }
         }
     }
 
     private void setupNotification() {
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
+            LOG.info("setupNotification() aborted, PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION=false");
             return;
         }
 
@@ -193,6 +201,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
         notificationViews = remoteViews;
         notificationObject = notification;
+        LOG.info("setupNotification() notificationViews:" + notificationViews + " notificationObject:" + notificationObject);
     }
 
     private PendingIntent createShowFrostwireIntent() {
@@ -218,7 +227,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
     @Override
     public void onTime() {
         if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefresh)", 5000)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefresh)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS*1000)-100)) {
                 async(this, NotificationUpdateDaemon::onTimeRefresh);
             }
         } else {
@@ -234,7 +243,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
     private void onTimeRefresh() {
         if (isScreenOn()) {
-            updatePermanentStatusNotification();
+            updateTransfersStatusNotification();
         }
     }
 }

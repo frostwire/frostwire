@@ -91,6 +91,7 @@ public final class MainController {
                 TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
                 fragment.selectStatusTab(status);
                 switchFragment(R.id.menu_main_transfers);
+                fragment.onTime();
             });
         }
     }
