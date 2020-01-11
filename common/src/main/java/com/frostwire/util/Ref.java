@@ -50,7 +50,9 @@ public final class Ref {
 
     public static void free(Reference<?> ref) {
         try {
-            ref.clear();
+            if (ref != null) {
+                ref.clear();
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
