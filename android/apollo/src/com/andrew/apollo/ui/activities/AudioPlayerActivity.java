@@ -110,7 +110,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private static final Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
     // Message to refresh the time
-    private static final int REFRESH_TIME = 1000;
+    private static final int REFRESH_TIME = 500;
     private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 100;
 
     // The service token
@@ -437,34 +437,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        try {
-            super.onBackPressed();
-        } catch (Throwable ignored) {
-        }
-
-        Asyncs.async(this,
-                AudioPlayerActivity::isMusicPlayingAsync,
-                AudioPlayerActivity::tryShowingInterstitialAndFinish);
-    }
-
-    private static boolean isMusicPlayingAsync(AudioPlayerActivity activity) {
-        return MusicUtils.isPlaying();
-    }
-
-    private static void tryShowingInterstitialAndFinish(AudioPlayerActivity activity, boolean isMusicPlaying) {
-        if (!isMusicPlaying) {
-            Offers.showInterstitialOfferIfNecessary(
-                    activity,
-                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                    false,
-                    false,
-                    true);
-        }
-        activity.finish();
     }
 
     @Override
