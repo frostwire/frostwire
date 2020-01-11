@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.widgets;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -26,16 +27,23 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.ImageButton;
 
+import androidx.appcompat.widget.AppCompatImageButton;
+
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.Asyncs;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * A custom {@link ImageButton} that represents the "play and pause" button.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class PlayPauseButton extends androidx.appcompat.widget.AppCompatImageButton
+public final class PlayPauseButton extends AppCompatImageButton
         implements OnClickListener, OnLongClickListener {
 
     private int playDrawable;
@@ -73,26 +81,28 @@ public final class PlayPauseButton extends androidx.appcompat.widget.AppCompatIm
         }
     }
 
+    public void setPlayDrawable(int resId) {
+        this.playDrawable = resId;
+    }
+
+    public void setPauseDrawable(int resId) {
+        this.pauseDrawable = resId;
+    }
+
     /**
      * Sets the correct drawable for playback.
      */
     public void updateState() {
-        if (MusicUtils.isPlaying()) {
+        Asyncs.async(MusicUtils::isPlaying, PlayPauseButton::updateStatePost, this);
+    }
+
+    private void updateStatePost(Boolean isPlaying) {
+        if (isPlaying) {
             setContentDescription(getResources().getString(R.string.accessibility_pause));
             setImageResource(pauseDrawable);
         } else {
             setContentDescription(getResources().getString(R.string.accessibility_play));
             setImageResource(playDrawable);
         }
-    }
-
-    public void setPlayDrawable(int resId) {
-        this.playDrawable = resId;
-        updateState();
-    }
-
-    public void setPauseDrawable(int resId) {
-        this.pauseDrawable = resId;
-        updateState();
     }
 }
