@@ -30,9 +30,6 @@ import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.SearchView.OnQueryTextListener;
-import androidx.appcompat.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -40,6 +37,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.appcompat.widget.Toolbar;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.IApolloService;
@@ -60,6 +61,7 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.util.Asyncs;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -291,12 +293,16 @@ public abstract class BaseActivity extends AbstractActivity
      * Initializes the items in the bottom action bar.
      */
     private void initBottomActionBar() {
-        boolean isPlaying = !MusicUtils.isStopped();
-        if (isPlaying) {
+        Asyncs.async(MusicUtils::isStopped, BaseActivity::initBottomActionBarPost, this);
+    }
+
+    private void initBottomActionBarPost(Boolean isStopped) {
+        if (!isStopped) {
             // Play and pause button
             mPlayPauseButton = findViewById(R.id.action_button_play);
             mPlayPauseButton.setPlayDrawable(R.drawable.btn_playback_play_bottom);
             mPlayPauseButton.setPauseDrawable(R.drawable.btn_playback_pause_bottom);
+            mPlayPauseButton.updateState();
 
             RepeatingImageButton prevButton = findViewById(R.id.action_button_previous);
             RepeatingImageButton nextButton = findViewById(R.id.action_button_next);
@@ -323,7 +329,7 @@ public abstract class BaseActivity extends AbstractActivity
 
             mPlayPauseButton.setOnLongClickListener(new StopAndHideBottomActionBarListener(this, false));
         }
-        setBottomActionBarVisible(isPlaying);
+        setBottomActionBarVisible(!isStopped);
     }
 
     /**
