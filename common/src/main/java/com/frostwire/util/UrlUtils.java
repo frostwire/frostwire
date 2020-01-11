@@ -49,6 +49,7 @@ public final class UrlUtils {
             "tr=udp://tracker.openbittorrent.com:80/announce&" +
             "tr=udp://tracker.msm8916.com:6969/announce&" +
             "tr=udp://tracker.sktorrent.net:6969/announce&";
+
     private UrlUtils() {
     }
 
@@ -77,13 +78,13 @@ public final class UrlUtils {
     }
 
     public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
-        return"magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
+        return "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
     }
 
     public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
         int httpCode;
         // shuffle mirrors, keep the fastest valid one
-        long lowest_delta = minResponseTimeInMs*10;
+        long lowest_delta = minResponseTimeInMs * 10;
         long t_a, t_delta;
         String fastestMirror = null;
         ArrayList<String> mirrorList = new ArrayList(Arrays.asList(mirrors));
@@ -93,16 +94,19 @@ public final class UrlUtils {
             try {
                 t_a = System.currentTimeMillis();
                 httpCode = httpClient.head("https://" + randomMirror, minResponseTimeInMs, null);
+                boolean validHttpCode = 100 <= httpCode && httpCode < 400;
                 t_delta = System.currentTimeMillis() - t_a;
-                if (100 <= httpCode && httpCode < 400 && t_delta < minResponseTimeInMs) {
-                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " responded in " + t_delta +"ms");
+                if (!validHttpCode) {
+                    System.err.println("UrlUtils.getFastestMirror() -> " + randomMirror + " errored HTTP " + httpCode + " in " + t_delta + "ms");
+                } else if (validHttpCode && t_delta < minResponseTimeInMs) {
+                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " responded in " + t_delta + "ms");
                     if (t_delta < lowest_delta) {
                         lowest_delta = t_delta;
                         fastestMirror = randomMirror;
-                        System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " is new fastest mirror (" + t_delta +"ms)");
+                        System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " is new fastest mirror (" + t_delta + "ms)");
                     }
                 } else {
-                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " too slow, responded in " + t_delta +"ms");
+                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " too slow, responded in " + t_delta + "ms");
                 }
             } catch (Throwable t) {
                 System.err.println("UrlUtils.getFastestMirror(): " + randomMirror + " unreachable, not considered");
