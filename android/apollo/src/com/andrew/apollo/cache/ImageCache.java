@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal Licensed under the Apache License, Version 2.0
+ * Modified by Angel Leon (@gubatron) FrostWire(R) Copyright 2012-2020
+ *
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
@@ -22,14 +24,15 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.LruCache;
 
-import com.andrew.apollo.utils.ApolloUtils;
+import androidx.annotation.NonNull;
+
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
@@ -86,7 +89,7 @@ public final class ImageCache {
      * Used to temporarily pause the disk cache while scrolling
      */
     private boolean mPauseDiskAccess = false;
-    private Object mPauseLock = new Object();
+    private final Object mPauseLock = new Object();
 
     static {
         mArtworkUri = Uri.parse("content://media/external/audio/albumart");
@@ -120,12 +123,14 @@ public final class ImageCache {
      * @param context The {@link Context} to use
      */
     private void init(final Context context) {
-        ApolloUtils.execute(new InitDiskCacheAsyncTask(this, context));
+        InitDiskCacheAsyncTask initDiskCacheAsyncTask = new InitDiskCacheAsyncTask(this, context);
+        Engine.instance().getThreadPool().execute(initDiskCacheAsyncTask::doInBackground);
+
         // Set up the memory cache
         initLruCache(context);
     }
 
-    private final static class InitDiskCacheAsyncTask extends AsyncTask<Void, Void, Void> {
+    private final static class InitDiskCacheAsyncTask {
         private ImageCache imageCache;
         private WeakReference<Context> contextRef;
 
@@ -134,13 +139,12 @@ public final class ImageCache {
             contextRef = Ref.weak(context);
         }
 
-        @Override
-        protected Void doInBackground(final Void... unused) {
-            // Initialize the disk cahe in a background thread
+        void doInBackground() {
+            // Initialize the disk cache in a background thread
             if (Ref.alive(contextRef)) {
                 imageCache.initDiskCache(contextRef.get());
             }
-            return null;
+            Ref.free(contextRef);
         }
     }
 
@@ -192,10 +196,6 @@ public final class ImageCache {
         mLruCache = new MemoryCache(lruCacheSize);
         // Release some memory as needed
         context.registerComponentCallbacks(new ComponentCallbacks2() {
-
-            /**
-             * {@inheritDoc}
-             */
             @Override
             public void onTrimMemory(final int level) {
                 if (level >= TRIM_MEMORY_MODERATE) {
@@ -205,19 +205,13 @@ public final class ImageCache {
                 }
             }
 
-            /**
-             * {@inheritDoc}
-             */
             @Override
             public void onLowMemory() {
                 // Nothing to do
             }
 
-            /**
-             * {@inheritDoc}
-             */
             @Override
-            public void onConfigurationChanged(final Configuration newConfig) {
+            public void onConfigurationChanged(@NonNull final Configuration newConfig) {
                 // Nothing to do
             }
         });
@@ -293,9 +287,7 @@ public final class ImageCache {
         }
         if (mLruCache != null) {
             final Bitmap lruBitmap = mLruCache.get(data);
-            if (lruBitmap != null) {
-                return lruBitmap;
-            }
+            return lruBitmap;
         }
         return null;
     }
@@ -337,7 +329,7 @@ public final class ImageCache {
                     if (inputStream != null) {
                         inputStream.close();
                     }
-                } catch (final IOException e) {
+                } catch (final IOException ignored) {
                 }
             }
         }
@@ -396,7 +388,7 @@ public final class ImageCache {
             evictAll();
         } catch (final NullPointerException e) {
             // Log.e(TAG, "NullPointerException - getArtworkFromFile - ", e);
-        } catch (SecurityException e) {
+        } catch (SecurityException ignored) {
         }
         return artwork;
     }
@@ -406,17 +398,19 @@ public final class ImageCache {
      * cache first
      */
     public void flush() {
-        Asyncs.async(() -> {
-            if (mDiskCache != null) {
-                try {
-                    if (!mDiskCache.isClosed()) {
-                        mDiskCache.flush();
-                    }
-                } catch (final IOException e) {
-                    Log.e(TAG, "flush - " + e);
+        Asyncs.async(this::flushTask);
+    }
+
+    private void flushTask() {
+        if (mDiskCache != null) {
+            try {
+                if (!mDiskCache.isClosed()) {
+                    mDiskCache.flush();
                 }
+            } catch (final IOException e) {
+                Log.e(TAG, "flushTask() - " + e);
             }
-        });
+        }
     }
 
     /**
