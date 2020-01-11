@@ -208,6 +208,26 @@ public final class Asyncs {
                 arg1);
     }
 
+    /**
+     * Example:
+     * <code>Asyncs.async(MusicUtils::isShuffleEnabled, ShuffleButton::isShuffleEnabledPost, this);</code>
+     *
+     * @param task    A background ResultTask that requires no arguments, usually a slow (IO/IPC) static method elsewhere, e.g. MusicUtils.isPlaying()
+     * @param post    The UI/Context post task that will use the result from the background task
+     * @param context The Context, usually the class that owns the post method
+     * @param <R>     Result type for task, which is passed as the argument for the post task
+     * @param <C>
+     */
+    public static <R, C> void async(@NonNull ResultTask<R> task,
+                                    @NonNull ContextPostTask1<C, R> post,
+                                    @NonNull C context) {
+        requireContext(context);
+        invokeAsyncSupport(context,
+                (c, args) -> task.run(),
+                (c, args, result) -> post.run(c, result)
+        );
+    }
+
     public static <C, T1, T2> void async(@NonNull C context,
                                          ContextTask2<C, T1, T2> task,
                                          T1 arg1, T2 arg2,
@@ -433,7 +453,12 @@ public final class Asyncs {
             R r = task.run(c, args);
 
             if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, args, r));
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    post.run(c, args, r);
+                    if (Ref.alive(ctx)) {
+                        Ref.free(ctx);
+                    }
+                });
             }
         });
     }
