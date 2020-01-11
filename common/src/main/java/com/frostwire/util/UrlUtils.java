@@ -97,27 +97,27 @@ public final class UrlUtils {
                 boolean validHttpCode = 100 <= httpCode && httpCode < 400;
                 t_delta = System.currentTimeMillis() - t_a;
                 if (!validHttpCode) {
-                    System.err.println("UrlUtils.getFastestMirror() -> " + randomMirror + " errored HTTP " + httpCode + " in " + t_delta + "ms");
+                    System.err.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " errored HTTP " + httpCode + " in " + t_delta + "ms");
                 } else if (validHttpCode && t_delta < minResponseTimeInMs) {
-                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " responded in " + t_delta + "ms");
+                    System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " responded in " + t_delta + "ms");
                     if (t_delta < lowest_delta) {
                         lowest_delta = t_delta;
                         fastestMirror = randomMirror;
-                        System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " is new fastest mirror (" + t_delta + "ms)");
+                        System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " is new fastest mirror (" + t_delta + "ms)");
                     }
                 } else {
-                    System.out.println("UrlUtils.getFastestMirror() -> " + randomMirror + " too slow, responded in " + t_delta + "ms");
+                    System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " too slow, responded in " + t_delta + "ms");
                 }
             } catch (Throwable t) {
-                System.err.println("UrlUtils.getFastestMirror(): " + randomMirror + " unreachable, not considered");
+                System.err.println("UrlUtils.getFastestMirrorDomain(): " + randomMirror + " unreachable, not considered");
             }
         }
 
         if (fastestMirror != null) {
-            System.out.println("UrlUtils.getFastestMirror() -> Winner: " + fastestMirror);
+            System.out.println("UrlUtils.getFastestMirrorDomain() -> Winner: " + fastestMirror);
             return fastestMirror;
         }
-        System.out.println("UrlUtils.getFastestMirror() -> Falling back to: " + mirrors[0]);
+        System.out.println("UrlUtils.getFastestMirrorDomain() -> Falling back to: " + mirrors[0]);
         return mirrors[0];
     }
 }
