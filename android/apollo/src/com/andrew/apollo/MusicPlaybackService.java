@@ -44,6 +44,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -63,7 +64,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -79,7 +79,7 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
  */
-public class MusicPlaybackService extends JobIntentService {
+public class MusicPlaybackService extends JobIntentService implements IApolloService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
 
@@ -768,8 +768,14 @@ public class MusicPlaybackService extends JobIntentService {
 
     @Override
     public boolean onStopCurrentWork() {
-        onDestroy();
-        return super.onStopCurrentWork();
+        if (mPlayer != null && mPlayer.isInitialized() && mPlayer.position() > 0) {
+            LOG.info("onStopCurrentWork() not destroying, audio still playing, requesting a reschedule");
+            return true;
+        } else {
+            LOG.info("onStopCurrentWork() destroying..., not requesting a reschedule");
+            onDestroy();
+            return false;
+        }
     }
 
     /**
@@ -777,7 +783,7 @@ public class MusicPlaybackService extends JobIntentService {
      */
     @Override
     public void onDestroy() {
-        if (D) LOG.info("Destroying service");
+        LOG.info("onDestroy() destroying MusicPlaybackService");
         super.onDestroy();
 
         // Tell any sound effect processors (e.g. equalizers) that we're leaving
@@ -947,7 +953,7 @@ public class MusicPlaybackService extends JobIntentService {
             return;
         }
         if (!musicPlaybackActivityInForeground && isPlaying()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask",1000)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
                 async(this, MusicPlaybackService::updateNotificationTask);
             }
         } else if (musicPlaybackActivityInForeground) {
@@ -1067,7 +1073,7 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void cancelShutdown() {
         if (mAlarmManager != null && mShutdownIntent != null) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::cancelShutdownTask",1000)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::cancelShutdownTask", 1000)) {
                 async(this, MusicPlaybackService::cancelShutdownTask);
             }
         }
@@ -1134,7 +1140,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
     }
 
-    private void stopSimplePlayer() {
+    public void stopSimplePlayer() {
         if (mSimplePlayer != null) {
             mSimplePlayer.reset();
             mSimplePlayer.release();
@@ -1472,11 +1478,11 @@ public class MusicPlaybackService extends JobIntentService {
      */
     private void notifyChange(final String change) {
         LOG.info("notifyChange(" + change + ") trying...");
-        if (META_CHANGED.equals(change) && Asyncs.Throttle.isReadyToSubmitTask(change,100)) {
+        if (META_CHANGED.equals(change) && Asyncs.Throttle.isReadyToSubmitTask(change, 100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
             return;
         }
-        if (Asyncs.Throttle.isReadyToSubmitTask(change,100)) {
+        if (Asyncs.Throttle.isReadyToSubmitTask(change, 100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
         }
     }
@@ -1798,6 +1804,11 @@ public class MusicPlaybackService extends JobIntentService {
         }
     }
 
+    @Override
+    public IBinder asBinder() {
+        return mBinder;
+    }
+
     interface OpenFileResultCallback {
         void openFileResult(boolean result);
     }
@@ -1878,7 +1889,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current media player audio session ID
      */
-    private int getAudioSessionId() {
+    public int getAudioSessionId() {
         if (mPlayer == null) {
             return -1;
         }
@@ -1893,7 +1904,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return 1 if Intent.ACTION_MEDIA_MOUNTED is called, 0 otherwise
      */
-    private int getMediaMountedCount() {
+    public int getMediaMountedCount() {
         return mMediaMountedCount;
     }
 
@@ -1902,7 +1913,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current shuffle mode (all, party, none)
      */
-    private boolean isShuffleEnabled() {
+    public boolean isShuffleEnabled() {
         return mShuffleEnabled;
     }
 
@@ -1911,7 +1922,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current repeat mode (all, one, none)
      */
-    private int getRepeatMode() {
+    public int getRepeatMode() {
         return mRepeatMode;
     }
 
@@ -1921,7 +1932,7 @@ public class MusicPlaybackService extends JobIntentService {
      * @param id The id to be removed
      * @return how many instances of the track were removed
      */
-    private int removeTrack(final long id) {
+    public int removeTrack(final long id) {
         int numremoved = 0;
         synchronized (this) {
             for (int i = 0; i < mPlayListLen; i++) {
@@ -1946,7 +1957,7 @@ public class MusicPlaybackService extends JobIntentService {
      * @param last  The last file to be removed
      * @return the number of tracks deleted
      */
-    private int removeTracks(final int first, final int last) {
+    public int removeTracks(final int first, final int last) {
         final int numremoved = removeTracksInternal(first, last);
         if (numremoved > 0) {
             notifyChange(QUEUE_CHANGED);
@@ -1959,7 +1970,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return the current position in the queue
      */
-    private int getQueuePosition() {
+    public int getQueuePosition() {
         synchronized (this) {
             return mPlayPos;
         }
@@ -2003,7 +2014,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current song name
      */
-    private String getTrackName() {
+    public String getTrackName() {
         synchronized (this) {
             if (mCursor == null || mCursor.isClosed()) {
                 return null;
@@ -2081,7 +2092,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current song artist ID
      */
-    private long getArtistId() {
+    public long getArtistId() {
         synchronized (this) {
             if (mCursor == null || mCursor.isClosed()) {
                 return -1;
@@ -2095,7 +2106,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current track ID
      */
-    private long getAudioId() {
+    public long getAudioId() {
         if (mPlayList != null &&
                 mPlayPos >= 0 &&
                 mPlayPos < mPlayList.length &&
@@ -2114,7 +2125,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @return The current simple player track ID
      */
-    private long getCurrentSimplePlayerAudioId() {
+    public long getCurrentSimplePlayerAudioId() {
         synchronized (this) {
             long id = -1;
             if (mSimplePlayerPlayingFile != null) {
@@ -2237,6 +2248,13 @@ public class MusicPlaybackService extends JobIntentService {
         return false;
     }
 
+    @Override
+    public void openFile(String path) {
+        openFile(path, result -> {
+            LOG.info("openFile(" + path + ")'s empty callback invoked");
+        });
+    }
+
     /**
      * Opens a list for playback
      *
@@ -2295,7 +2313,7 @@ public class MusicPlaybackService extends JobIntentService {
 
         stopSimplePlayer();
 
-        int status = 0;
+        int status;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             status = mAudioManager.requestAudioFocus(AUDIO_FOCUS_REQUEST);
         } else {
@@ -2442,6 +2460,11 @@ public class MusicPlaybackService extends JobIntentService {
             play();
             notifyChange(META_CHANGED);
         });
+    }
+
+    @Override
+    public void next() throws RemoteException {
+
     }
 
     /**
@@ -2902,13 +2925,16 @@ public class MusicPlaybackService extends JobIntentService {
                 return;
             }
 
-            releaseNextMediaPlayer();
+            // synchronous call
+            releaseNextMediaPlayer(false);
 
             if (path == null) {
                 return;
             }
 
-            initNextMediaPlayer();
+            if (!initNextMediaPlayer()) {
+                return;
+            }
 
             setDataSourceImpl(mNextMediaPlayer, path, result -> {
                 if (result) {
@@ -2918,44 +2944,56 @@ public class MusicPlaybackService extends JobIntentService {
                         LOG.error("Media player fatal error", e);
                     }
                 } else {
-                    releaseNextMediaPlayer();
+                    releaseNextMediaPlayer(true);
                 }
             });
         }
 
-        private void initNextMediaPlayer() {
+        private boolean initNextMediaPlayer() {
             if (Ref.alive(mService)) {
                 mNextMediaPlayer = new MediaPlayer();
                 mNextMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
                 try {
                     mNextMediaPlayer.setAudioSessionId(getAudioSessionId());
+                    return true;
                 } catch (Throwable e) {
                     LOG.error("Media player Illegal State exception", e);
                 }
             }
+            return false;
         }
 
-        private void releaseCurrentMediaPlayer() {
-            if (mCurrentMediaPlayer != null) {
+        private void releaseMediaPlayer(boolean async, MediaPlayer mediaPlayer) {
+            if (mediaPlayer != null) {
                 try {
-                    mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
+                    if (async) {
+                        mediaPlayerAsyncAction(mediaPlayer, MediaPlayerAction.RELEASE);
+                    } else {
+                        mediaPlayerAction(mediaPlayer, MediaPlayerAction.RELEASE);
+                    }
                 } catch (Throwable e) {
-                    LOG.warn("releaseCurrentMediaPlayer() couldn't release mCurrentMediaPlayer", e);
-                } finally {
-                    mCurrentMediaPlayer = null;
+                    throw e;
                 }
             }
         }
 
-        private void releaseNextMediaPlayer() {
-            if (mNextMediaPlayer != null) {
-                try {
-                    mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RELEASE);
-                } catch (Throwable e) {
-                    LOG.warn("releaseNextMediaPlayer() couldn't release mNextMediaPlayer", e);
-                } finally {
-                    mNextMediaPlayer = null;
-                }
+        private void releaseCurrentMediaPlayer(boolean async) {
+            try {
+                releaseMediaPlayer(async, mCurrentMediaPlayer);
+            } catch (Throwable t) {
+                LOG.warn("releaseCurrentMediaPlayer(async=" + async + ") couldn't release mCurrentMediaPlayer", t);
+            } finally {
+                mCurrentMediaPlayer = null;
+            }
+        }
+
+        private void releaseNextMediaPlayer(boolean async) {
+            try {
+                releaseMediaPlayer(async, mNextMediaPlayer);
+            } catch (Throwable t) {
+                LOG.warn("releaseNextMediaPlayer(async=" + async + ") couldn't release mNextMediaPlayer", t);
+            } finally {
+                mNextMediaPlayer = null;
             }
         }
 
@@ -3130,7 +3168,7 @@ public class MusicPlaybackService extends JobIntentService {
                 case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
                     try {
                         mIsInitialized = false;
-                        releaseCurrentMediaPlayer();
+                        releaseCurrentMediaPlayer(false);
                         mCurrentMediaPlayer = new MediaPlayer();
                         mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
                         mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
@@ -3151,7 +3189,7 @@ public class MusicPlaybackService extends JobIntentService {
         public void onCompletion(final MediaPlayer mp) {
             try {
                 if (mp == mCurrentMediaPlayer && mNextMediaPlayer != null) {
-                    releaseCurrentMediaPlayer();
+                    releaseCurrentMediaPlayer(false);
                     mCurrentMediaPlayer = mNextMediaPlayer;
                     mNextMediaPlayer = null;
                     mHandler.sendEmptyMessage(TRACK_WENT_TO_NEXT);
