@@ -18,20 +18,27 @@
 
 package com.andrew.apollo.widgets;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ImageButton;
+
+import androidx.appcompat.widget.AppCompatImageButton;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.Asyncs;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon
  */
-public final class ShuffleButton extends androidx.appcompat.widget.AppCompatImageButton
+public final class ShuffleButton extends AppCompatImageButton
         implements OnClickListener {
 
     private Runnable onClickedCallback;
@@ -67,8 +74,11 @@ public final class ShuffleButton extends androidx.appcompat.widget.AppCompatImag
      * Sets the correct drawable for the shuffle state.
      */
     public void updateShuffleState() {
-        boolean shuffleEnabled = MusicUtils.isShuffleEnabled();
-        setContentDescription(getResources().getString(MusicUtils.isShuffleEnabled() ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
+        Asyncs.async(MusicUtils::isShuffleEnabled, ShuffleButton::isShuffleEnabledPost, this);
+    }
+
+    private void isShuffleEnabledPost(Boolean shuffleEnabled) {
         setImageResource(shuffleEnabled ? R.drawable.btn_playback_shuffle_all : R.drawable.btn_playback_shuffle);
+        setContentDescription(getResources().getString(shuffleEnabled ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
     }
 }
