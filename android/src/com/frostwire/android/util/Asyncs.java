@@ -228,6 +228,29 @@ public final class Asyncs {
         );
     }
 
+    /**
+     * Example:
+     * <code>Asyncs.async(this, ActivityFoo.staticMethodThatTakesContext, ActivityFoo::postMethodWithNoParametersToUpdateUIFromMemberVariables)</code>
+     *
+     * @param context
+     * @param contextTask1 A background context task that returns nothing but takes 1 parameter
+     * @param contextPostTask A foreground context task that takes no parameters
+     * @param <C> Context type
+     * @param <T1> Argument type
+     */
+    public static <C, T1> void async(@NonNull C context,
+                                     ContextTask1<C, T1> contextTask1,
+                                     T1 arg1,
+                                     ContextPostTask<C> contextPostTask) {
+        requireContext(context);
+        invokeAsyncSupport(context,
+                (context1, args) -> {
+                    contextTask1.run(context1, arg1);
+                    return null;
+                },
+                (context2, args, result) -> contextPostTask.run(context2));
+    }
+
     public static <C, T1, T2> void async(@NonNull C context,
                                          ContextTask2<C, T1, T2> task,
                                          T1 arg1, T2 arg2,
@@ -276,6 +299,10 @@ public final class Asyncs {
 
     public interface ContextTask4<C, T1, T2, T3, T4> {
         void run(C context, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
+    }
+
+    public interface ContextPostTask<C> {
+        void run(C context);
     }
 
     public interface ContextPostTask1<C, T1> {
@@ -583,11 +610,12 @@ public final class Asyncs {
                 double recycleRatio = 100 * numKeysToRecycle / numKeysBeforeRecycle;
                 LOG.info("Recycling " + numKeysToRecycle + " tasks out of " + numKeysBeforeRecycle + " total tasks (freed  " + recycleRatio + "%)");
 
-                synchronized(recycleLock) {
+                synchronized (recycleLock) {
                     for (String task : keysToRecycle) {
                         try {
                             asyncTaskSubmissionTimestampMap.remove(task);
-                        } catch (Throwable ignored) {}
+                        } catch (Throwable ignored) {
+                        }
                     }
                 }
             }
