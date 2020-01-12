@@ -619,7 +619,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        updateLastKnown(MusicServiceRequestType.TRACK_ID); // throttled async call
+        updateLastKnown(MusicServiceRequestType.TRACK_ID, false); // throttled async call
 
         if (lastTrackId == -1) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, lastTrackId=-1");
@@ -727,9 +727,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void updateNowPlayingInfo() {
         LOG.info("updateNowPlayingInfo() invoked", true);
-        updateLastKnown(MusicServiceRequestType.TRACK_ID);
-        updateLastKnown(MusicServiceRequestType.TRACK_NAME);
-        updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES);
+        updateLastKnown(MusicServiceRequestType.TRACK_ID, false);
+        updateLastKnown(MusicServiceRequestType.TRACK_NAME, false);
+        updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES, true);
+
+        // Update the current time
+        queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
+    }
+
+    private void onLastKnownUpdatePostTask() {
         // Set the track name
         mTrackName.setText(lastTrackName);
         // Set the artist name
@@ -749,8 +755,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 mAlbumArtSmall.setVisibility(View.VISIBLE);
             }
         }
-        // Update the current time
-        queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
     }
 
     private String getArtistAndAlbumName(String artist, String album) {
@@ -960,8 +964,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void musicServiceRequestTask(AudioPlayerActivity
-                                                        activity, MusicServiceRequestType requestType) {
+    private static void musicServiceRequestTask(AudioPlayerActivity activity,
+                                                MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:
                 activity.lastKnownPosition = MusicUtils.position();
@@ -994,15 +998,19 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private void updateLastKnown(MusicServiceRequestType requestType) {
+    private void updateLastKnown(MusicServiceRequestType requestType, boolean onLastKnownUpdatePostTask) {
         if (Asyncs.Throttle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
-            async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
+            if (onLastKnownUpdatePostTask) {
+                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType, AudioPlayerActivity::onLastKnownUpdatePostTask);
+            } else {
+                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
+            }
         }
     }
 
     private long lastKnownPosition(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.POSITION);
+            updateLastKnown(MusicServiceRequestType.POSITION, false);
         } else {
             lastKnownPosition = MusicUtils.position();
         }
@@ -1011,7 +1019,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private long lastKnownDuration(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.DURATION);
+            updateLastKnown(MusicServiceRequestType.DURATION, false);
         } else {
             lastKnownDuration = MusicUtils.duration();
         }
@@ -1020,7 +1028,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private boolean lastKnownIsPlaying(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.IS_PLAYING);
+            updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
         } else {
             lastKnownIsPlaying = MusicUtils.isPlaying();
         }
