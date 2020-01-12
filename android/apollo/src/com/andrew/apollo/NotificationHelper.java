@@ -19,11 +19,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+
 import androidx.core.app.NotificationCompat;
+
 import android.widget.RemoteViews;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
+import com.frostwire.util.Logger;
+
+import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS;
 
 /**
  * Builds the notification for Apollo's service. Jelly Bean and higher uses the
@@ -32,6 +39,7 @@ import com.frostwire.android.core.Constants;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class NotificationHelper {
+    private static final Logger LOG = Logger.getLogger(NotificationHelper.class);
     private static final String INTENT_AUDIO_PLAYER = "com.frostwire.android.AUDIO_PLAYER";
 
     /**
@@ -64,23 +72,25 @@ public class NotificationHelper {
      */
     private RemoteViews mExpandedView;
 
+    public final static Object NOTIFICATION_LOCK = new Object();
+
     /**
      * Constructor of <code>NotificationHelper</code>
      *
      * @param service The {@link Context} to use
      */
-    public NotificationHelper(final MusicPlaybackService service) {
+    NotificationHelper(final MusicPlaybackService service) {
         mService = service;
-        mNotificationManager = (NotificationManager)service
+        mNotificationManager = (NotificationManager) service
                 .getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     /**
      * Call this to build the {@link Notification}.
      */
-    public void buildNotification(final String albumName, final String artistName,
-                                  final String trackName, final Bitmap albumArt,
-                                  final boolean isPlaying) {
+    void buildNotification(final String albumName, final String artistName,
+                           final String trackName, final Bitmap albumArt,
+                           final boolean isPlaying) {
 
         // Default notification layout
         mNotificationTemplate = new RemoteViews(mService.getPackageName(),
@@ -96,7 +106,7 @@ public class NotificationHelper {
         Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(getNotificationIcon())
                 .setContentIntent(pendingintent)
-                .setVisibility(VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
                 .build();
 
@@ -116,14 +126,33 @@ public class NotificationHelper {
 
         mNotification = aNotification;
         try {
-            mService.startForeground(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
-        } catch (Throwable ignored) {
-            ignored.printStackTrace();
+            // Same as in NotificationUpdateDaemon
+            if (mNotificationManager != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    NotificationChannel channel = null;
+                    try {
+                        channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
+                        LOG.info("buildNotification() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
+                    } catch (Throwable t) {
+                        LOG.error("buildNotification() " + t.getMessage(), t);
+                    }
+                    if (channel == null) {
+                        channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+                        channel.setSound(null, null);
+                        mNotificationManager.createNotificationChannel(channel);
+                        LOG.info("buildNotification() had to create a new channel with notificationManager.createNotificationChannel()", true);
+                    }
+
+
+                    // @see https://github.com/smartdevicelink/sdl_java_suite/pull/849
+                    synchronized (NOTIFICATION_LOCK) {
+                        mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            LOG.error("buildNotification() " + t.getMessage(), t);
         }
-        // TODO: research RuntimeException in Android 7
-        // we are getting this error at Bitmap.nativeWriteToParcel(Native Method:0)
-        // in very low numbers and only in android 7, better research it
-        // and not hide it for now
     }
 
     private int getNotificationIcon() {
@@ -133,9 +162,11 @@ public class NotificationHelper {
     /**
      * Remove notification
      */
-    public void killNotification() {
-        mService.stopForeground(true);
-        mNotification = null;
+    void killNotification() {
+        if (mNotificationManager != null) {
+            mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
+            mNotification = null;
+        }
     }
 
     /**
@@ -143,7 +174,7 @@ public class NotificationHelper {
      *
      * @param isPlaying True if music is playing, false otherwise
      */
-    public void updatePlayState(final boolean isPlaying) {
+    void updatePlayState(final boolean isPlaying) {
         if (mNotification == null || mNotificationManager == null) {
             return;
         }
@@ -159,17 +190,34 @@ public class NotificationHelper {
         try {
             if (mNotification != null) {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-                    channel.setSound(null, null);
+                    NotificationChannel channel = null;
+                    try {
+                        channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
+                        LOG.info("updatePlayState() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
+                    } catch (Throwable t) {
+                        LOG.error("updatePlayState() " + t.getMessage(), t);
+                    }
+                    if (channel == null) {
+                        channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+                        channel.setSound(null, null);
+                        LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
+                    }
                     mNotificationManager.createNotificationChannel(channel);
                 }
-                mNotificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+
+                synchronized (NOTIFICATION_LOCK) {
+                    mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                }
             }
         } catch (SecurityException t) {
             // java.lang.SecurityException
+            LOG.error("updatePlayState() " + t.getMessage(), t);
         } catch (NullPointerException t2) {
             // possible java.lang.NullPointerException: Attempt to read from field 'android.os.Bundle android.app.Notification.extras' on a null object reference
             // when closing the player notification with the 'X' icon.
+            LOG.error("updatePlayState() " + t2.getMessage(), t2);
+        } catch (Throwable t3) {
+            LOG.error("updatePlayState() " + t3.getMessage(), t3);
         }
     }
 
@@ -267,7 +315,7 @@ public class NotificationHelper {
      * Sets the track name, artist name, and album art in the normal layout
      */
     private void initCollapsedLayout(final String trackName, final String artistName,
-            final Bitmap albumArt) {
+                                     final Bitmap albumArt) {
         // Track name (line one)
         mNotificationTemplate.setTextViewText(R.id.notification_base_line_one, trackName != null ? trackName : "---");
         // Artist name (line two)
@@ -283,7 +331,7 @@ public class NotificationHelper {
      * expanded layout
      */
     private void initExpandedLayout(final String trackName, final String artistName,
-            final String albumName, final Bitmap albumArt) {
+                                    final String albumName, final Bitmap albumArt) {
         // Track name (line one)
         mExpandedView.setTextViewText(R.id.notification_expanded_base_line_one, trackName != null ? trackName : "---");
         // Album name (line two)
