@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 611 - JAN/10/2020
+FrostWire 2.1.9 build 613 - JAN/12/2020
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build
@@ -9,6 +9,7 @@ FrostWire 2.1.9 build 611 - JAN/10/2020
  - Considerable CPU usage reduction through thread invocation throttling frees resources for better search and download experience
  - Removed experimental haptic feedback feature
  - Multiple crashes fixed
+ - Music player and notifications framework update
  - lt:fix erroneous event=completed tracker announce when checking files
  - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
  - lt:fix bug in protocol encryption/obfuscation
