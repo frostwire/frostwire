@@ -35,7 +35,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore.Audio.Albums;
 import android.provider.MediaStore.Audio.Artists;
@@ -75,7 +74,6 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
@@ -92,6 +90,7 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
@@ -111,7 +110,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 500;
-    private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 100;
+    private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 200;
+    private static final long UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS = 200;
+
+    private static AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();
 
     // The service token
     private ServiceToken mToken;
@@ -191,6 +193,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private long lastKnownPosition = 0;
     private long lastKnownDuration = 0;
     private boolean lastKnownIsPlaying = false;
+    private String lastTrackName;
+    private String lastArtistName;
+    private String lastAlbumName;
+    private String lastArtistAndAlbumNames;
+    private long lastTrackId = -1;
 
     public AudioPlayerActivity() {
         super(R.layout.activity_player_base);
@@ -221,7 +228,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Album Art Ad Controls
         mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
-        deferredInitAlbumArtBanner();
+        //deferredInitAlbumArtBanner();
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
@@ -231,10 +238,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mAlbumArt.setOnTouchListener(gestureListener);
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+
+        waitingToInitAlbumArtBanner.set(false);
     }
 
     @Override
     public void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent);
         setIntent(intent);
         startPlayback();
     }
@@ -361,7 +371,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!Offers.disabledAds() && mAlbumArt.getVisibility() == View.GONE) {
             mAlbumArt.setVisibility(View.VISIBLE);
             if (mMopubBannerView != null) {
-                mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
             }
         }
         return super.onMenuOpened(featureId, menu);
@@ -442,13 +452,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
         // Current info
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-        deferredInitAlbumArtBanner();
     }
 
     @Override
@@ -593,73 +603,85 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void deferredInitAlbumArtBanner() {
-        if (Asyncs.Throttle.isReadyToSubmitTask("AudioPlayerActivity::::waitToInitAlbumArtBannerTask", 30000)) {
-            // let's not leak ourselves
-            final WeakReference<IApolloService> musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
-            final WeakReference<AudioPlayerActivity> audioPlayerActivityWeakReference = Ref.weak(this);
-            async(AudioPlayerActivity::waitToInitAlbumArtBannerTask, musicPlaybackServiceWeakReference, audioPlayerActivityWeakReference);
+        if (Offers.disabledAds()) {
+            LOG.info("deferredInitAlbumArtBanner() aborted, ads are disabled");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
         }
+        if (UIUtils.isScreenLocked(this)) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, screen is locked");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
+        }
+
+        updateLastKnown(MusicServiceRequestType.TRACK_ID); // throttled async call
+
+        if (lastTrackId == -1) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, lastTrackId=-1");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
+        }
+
+        if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
+        }
+
+        if (waitingToInitAlbumArtBanner.get()) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
+            return;
+        }
+
+        // let's not leak ourselves
+        waitingToInitAlbumArtBanner.set(true);
+
+        //final WeakReference<IApolloService> musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
+        final WeakReference<AudioPlayerActivity> activityRef = Ref.weak(this);
+
+        final long trackIdWeAreMonitoring = lastTrackId;
+        LOG.info("deferredInitAlbumArtBanner() about to postDelayed waiting for track " + trackIdWeAreMonitoring);
+        mTimeHandler.postDelayed(() -> {
+
+            LOG.info("deferredInitAlbumArtBanner() callback invoked!");
+
+            // activity not there anymore, abort
+            if (!Ref.alive(activityRef)) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, audio player activity gone");
+                waitingToInitAlbumArtBanner.set(false);
+                Ref.free(activityRef);
+            }
+
+            // current track is different, maybe call deferredInitAlbumArtBanner again? careful with stack overflow
+
+            if (lastTrackId != trackIdWeAreMonitoring) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, on a different track. trackIdWeAreMonitoring=" + trackIdWeAreMonitoring + " currentTrack=" + lastTrackId);
+                waitingToInitAlbumArtBanner.set(false);
+                deferredInitAlbumArtBanner(); // MAYBE NOT
+                return;
+            }
+
+            // ads got disabled in the meantime
+            if (Offers.disabledAds()) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, ads got disabled in between");
+                waitingToInitAlbumArtBanner.set(false);
+                return;
+            }
+
+            long position = activityRef.get().lastKnownPosition;
+            if (position < 3000) {
+                throw new RuntimeException("deferredInitAlbumArtBanner() callback failed: Position@" +
+                        position + " < 3000??? THIS SHOULD NOT HAPPEN, CRASHING DOWN!");
+            }
+            waitingToInitAlbumArtBanner.set(false);
+            activityRef.get().initAlbumArtBanner();
+        }, 6000);
     }
 
-    /**
-     * Sleep for 5 seconds, if the audio player position is > 3 seconds, then try to initialize the banner
-     *
-     * @param musicPlaybackServiceWeakReference
-     * @param audioPlayerActivityWeakReference
-     */
-    private static void waitToInitAlbumArtBannerTask(final WeakReference<IApolloService> musicPlaybackServiceWeakReference, final WeakReference<AudioPlayerActivity> audioPlayerActivityWeakReference) {
-        try {
-            if (!Ref.alive(musicPlaybackServiceWeakReference)) {
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner, lost weak references to music playback service");
-                Ref.free(musicPlaybackServiceWeakReference);
-                return;
-            }
-            if (!Ref.alive(audioPlayerActivityWeakReference)) {
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner, lost weak references to audio player activity");
-                Ref.free(audioPlayerActivityWeakReference);
-                return;
-            }
-            LOG.info("waitToInitAlbumArtBannerTask() waiting 5000ms before we load the art album banner...", true);
-            Thread.sleep(5000);
-            if (UIUtils.isScreenLocked(audioPlayerActivityWeakReference.get())) {
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner, screen is locked, don't waste request");
-                Ref.free(musicPlaybackServiceWeakReference);
-                Ref.free(audioPlayerActivityWeakReference);
-                return;
-            }
-            if (!Ref.alive(musicPlaybackServiceWeakReference)) {
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner, lost weak references to music playback service");
-                Ref.free(musicPlaybackServiceWeakReference);
-                return;
-            }
-            if (!Ref.alive(audioPlayerActivityWeakReference)) {
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner, lost weak references to audio player activity");
-                Ref.free(audioPlayerActivityWeakReference);
-                return;
-            }
-            try {
-                long position = musicPlaybackServiceWeakReference.get().position();
-                LOG.info("waitToInitAlbumArtBannerTask() done waiting 5000ms, music playback is now at " + position + " ms", true);
-                if (position <= 3000) {
-                    LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner(), song hasn't played for long enough (position=" + position + ")");
-                    return;
-                }
-                audioPlayerActivityWeakReference.get().runOnUiThread(audioPlayerActivityWeakReference.get()::initAlbumArtBanner);
-            } catch (RemoteException e) {
-                // can't get a hold of the music service? probably don't need to show banner
-                LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner(), musicPlaybackService not available.");
-                Ref.free(musicPlaybackServiceWeakReference);
-                Ref.free(audioPlayerActivityWeakReference);
-            }
-        } catch (InterruptedException e) {
-            // nothing to do if the thread was interrupted
-            LOG.info("waitToInitAlbumArtBannerTask() aborting call to initAlbumArtBanner(), deferral thread interrupted.");
-            Ref.free(musicPlaybackServiceWeakReference);
-            Ref.free(audioPlayerActivityWeakReference);
-        }
-    }
 
     private void initAlbumArtBanner() {
+        if (UIUtils.isScreenLocked(this)) {
+            LOG.info("initAlbumArtBanner() aborted, screen locked");
+            return;
+        }
         LOG.info("initAlbumArtBanner() invoked");
         if (mAlbumArt != null) {
             mAlbumArt.setVisibility(View.VISIBLE);
@@ -670,34 +692,29 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
         if (Offers.disabledAds()) {
             LOG.info("initAlbumArtBanner() aborted: Ads are disabled");
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
             return;
         }
-        mMopubBannerView.setShowFallbackBannerOnDismiss(true);
-        mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+        mMopubBannerView.setShowFallbackBannerOnDismiss(false);
+        mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+
         mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
 
         mMopubBannerView.setOnBannerLoadedListener(() -> {
             mAlbumArt.setVisibility(View.GONE);
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.MOPUB, true);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
         });
 
         mMopubBannerView.setOnFallbackBannerLoadedListener(() -> {
             mAlbumArt.setVisibility(View.GONE);
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.FALLBACK, true);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
         });
 
         mMopubBannerView.setOnFallbackBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
 
         mAlbumArt.setVisibility(View.VISIBLE);
 
-        Asyncs.async(
-                mMopubBannerView,
-                (unused) -> UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD),
-                (mopubBanner, passed) -> {
-                    if (passed)
-                        mopubBanner.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
-                });
+        mMopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
     }
 
     /**
@@ -705,28 +722,34 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void updateNowPlayingInfo() {
         LOG.info("updateNowPlayingInfo() invoked", true);
+        updateLastKnown(MusicServiceRequestType.TRACK_ID);
+        updateLastKnown(MusicServiceRequestType.TRACK_NAME);
+        updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES);
         // Set the track name
-        mTrackName.setText(MusicUtils.getTrackName());
+        mTrackName.setText(lastTrackName);
         // Set the artist name
-        mArtistName.setText(getArtistAndAlbumName());//MusicUtils.getArtistName());
+        mArtistName.setText(lastArtistAndAlbumNames);
         // Set the total time
-        mTotalTime.setText(MusicUtils.makeTimeString(this, MusicUtils.duration() / 1000));
+        mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
 
         if (mImageFetcher != null) {
             // Set the album art
-            mImageFetcher.loadCurrentArtwork(mAlbumArt);
+            if (mAlbumArt != null) {
+                mImageFetcher.loadCurrentArtwork(mAlbumArt);
+                mAlbumArt.setVisibility(View.VISIBLE);
+            }
             // Set the small artwork
-            mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
+            if (mAlbumArtSmall != null) {
+                mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
+                mAlbumArtSmall.setVisibility(View.VISIBLE);
+            }
         }
         // Update the current time
-        queueNextRefresh(1);
+        queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
     }
 
-    private String getArtistAndAlbumName() {
+    private String getArtistAndAlbumName(String artist, String album) {
         String str = "";
-
-        String artist = MusicUtils.getArtistName();
-        String album = MusicUtils.getAlbumName();
 
         if (artist != null && album != null) {
             str = artist + " - " + album;
@@ -924,10 +947,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     enum MusicServiceRequestType {
         POSITION,
         DURATION,
-        IS_PLAYING
+        IS_PLAYING,
+        TRACK_ID,
+        TRACK_NAME,
+        ARTIST_NAME,
+        ALBUM_NAME,
+        ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void musicServiceRequestTask(AudioPlayerActivity activity, MusicServiceRequestType requestType) {
+    private static void musicServiceRequestTask(AudioPlayerActivity
+                                                        activity, MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:
                 activity.lastKnownPosition = MusicUtils.position();
@@ -937,6 +966,23 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 break;
             case IS_PLAYING:
                 activity.lastKnownIsPlaying = MusicUtils.isPlaying();
+                break;
+            case TRACK_NAME:
+                activity.lastTrackName = MusicUtils.getTrackName();
+                break;
+            case ARTIST_NAME:
+                activity.lastArtistName = MusicUtils.getArtistName();
+                break;
+            case ALBUM_NAME:
+                activity.lastAlbumName = MusicUtils.getAlbumName();
+                break;
+            case ARTIST_AND_ALBUM_NAMES:
+                activity.lastArtistName = MusicUtils.getArtistName();
+                activity.lastAlbumName = MusicUtils.getAlbumName();
+                activity.lastArtistAndAlbumNames = activity.getArtistAndAlbumName(activity.lastArtistName, activity.lastAlbumName);
+                break;
+            case TRACK_ID:
+                activity.lastTrackId = MusicUtils.getCurrentAudioId();
                 break;
             default:
                 break;
@@ -1073,7 +1119,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void shareCurrentTrack() {
         if (mMopubBannerView != null) {
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
         }
         mAlbumArt.setVisibility(View.VISIBLE);
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
@@ -1186,30 +1232,25 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 return;
             }
             AudioPlayerActivity audioPlayerActivity = mAudioPlayer.get();
-            switch (msg.what) {
-                case REFRESH_TIME:
-                    // we only refresh synchronously when the progress bar has been moved
-                    // by the user, to avoid the progress bar from jumping back and forth
-                    // otherwise, no need to wait for MusicService in the main thread to update
-                    // the UI.
-                    boolean blockingRefresh =
-                            (SystemClock.elapsedRealtime() -
-                                    audioPlayerActivity.lastProgressBarTouched) < 500;
-                    long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
+            if (msg.what == REFRESH_TIME) {// we only refresh synchronously when the progress bar has been moved
+                // by the user, to avoid the progress bar from jumping back and forth
+                // otherwise, no need to wait for MusicService in the main thread to update
+                // the UI.
+                boolean blockingRefresh =
+                        (SystemClock.elapsedRealtime() -
+                                audioPlayerActivity.lastProgressBarTouched) < 500;
+                long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
 
-                    // a blocking refresh could take long and screen could rotate, or activity go away
-                    if (blockingRefresh && Ref.alive(mAudioPlayer)) {
-                        audioPlayerActivity = mAudioPlayer.get();
-                    }
-                    if (!Ref.alive(mAudioPlayer)) {
-                        return;
-                    }
-                    if (audioPlayerActivity != null) {
-                        audioPlayerActivity.queueNextRefresh(next);
-                    }
-                    break;
-                default:
-                    break;
+                // a blocking refresh could take long and screen could rotate, or activity go away
+                if (blockingRefresh && Ref.alive(mAudioPlayer)) {
+                    audioPlayerActivity = mAudioPlayer.get();
+                }
+                if (!Ref.alive(mAudioPlayer)) {
+                    return;
+                }
+                if (audioPlayerActivity != null) {
+                    audioPlayerActivity.queueNextRefresh(next);
+                }
             }
         }
     }
@@ -1249,9 +1290,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     activity.deferredInitAlbumArtBanner();
                     break;
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
+                    LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.PLAYSTATE_CHANGED)");
                     // Set the play and pause image
                     activity.mPlayPauseButton.updateState();
-                    activity.deferredInitAlbumArtBanner();
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:
@@ -1259,7 +1300,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     activity.mRepeatButton.updateRepeatState();
                     // Set the shuffle image
                     activity.mShuffleButton.updateShuffleState();
-                    activity.deferredInitAlbumArtBanner();
                     break;
             }
         }

@@ -48,10 +48,15 @@ import com.mopub.mobileads.MoPubView;
  */
 
 public class MopubBannerView extends LinearLayout {
-    public enum Visibility {
+    public enum Layers {
         MOPUB,
         FALLBACK,
         ALL
+    }
+
+    public static class LayersVisibility {
+        Layers layers;
+        boolean visible;
     }
 
     public interface OnBannerDismissedListener {
@@ -77,6 +82,7 @@ public class MopubBannerView extends LinearLayout {
     private boolean isLoaded;
     private boolean showFallbackBannerOnDismiss;
     private boolean showDismissButton;
+    private final LayersVisibility layersVisibility = new LayersVisibility();
 
     public MopubBannerView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, true, true);
@@ -208,7 +214,7 @@ public class MopubBannerView extends LinearLayout {
                     try {
                         InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
                     } catch (Throwable t) {
-                        setVisible(Visibility.ALL, false);
+                        setLayersVisibility(Layers.ALL, false);
                         if (onBannerDismissedListener != null) {
                             try {
                                 onBannerDismissedListener.dispatch();
@@ -218,7 +224,7 @@ public class MopubBannerView extends LinearLayout {
                         }
                         return;
                     }
-                    setVisible(Visibility.FALLBACK, true);
+                    setLayersVisibility(Layers.FALLBACK, true);
                     dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
                     if (onFallbackBannerLoadedListener != null) {
                         try {
@@ -231,25 +237,33 @@ public class MopubBannerView extends LinearLayout {
         );
     }
 
-    public void setVisible(Visibility visibility, boolean visible) {
+    public void setLayersVisibility(final Layers layers, final boolean visible) {
         isHidden = false;
-        if (visibility == Visibility.ALL) {
+        if (layers == Layers.ALL) {
             isHidden = !visible;
             if (isHidden) {
                 setControlsVisibility(View.GONE);
             }
             setBannerViewVisibility(moPubView, visible);
             setBannerViewVisibility(fallbackBannerView, visible);
-        } else if (visibility == Visibility.MOPUB) {
+        } else if (layers == Layers.MOPUB) {
             setBannerViewVisibility(fallbackBannerView, !visible);
             setControlsVisibility(View.VISIBLE);
             setBannerViewVisibility(moPubView, visible);
-        } else if (visibility == Visibility.FALLBACK) {
+        } else if (layers == Layers.FALLBACK) {
             setControlsVisibility(View.VISIBLE);
             setBannerViewVisibility(moPubView, !visible);
             setBannerViewVisibility(fallbackBannerView, visible);
         }
         setVisibility(isHidden ? View.GONE : View.VISIBLE);
+        layersVisibility.layers = layers;
+        layersVisibility.visible = visible;
+    }
+
+    public boolean areLayerVisible(final Layers layers) {
+        return layersVisibility != null
+                && layersVisibility.layers == layers
+                && layersVisibility.visible;
     }
 
     public void destroy() {
@@ -290,8 +304,8 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded(): " + banner);
             isLoaded = true;
-            setVisible(Visibility.FALLBACK, false);
-            setVisible(Visibility.MOPUB, true);
+            setLayersVisibility(Layers.MOPUB, true);
+            banner.setVisibility(View.VISIBLE);
             if (onBannerLoadedListener != null) {
                 try {
                     onBannerLoadedListener.dispatch();
@@ -305,7 +319,7 @@ public class MopubBannerView extends LinearLayout {
         @Override
         public void onBannerFailed(MoPubView banner, MoPubErrorCode errorCode) {
             LOG.info("onBannerFailed(errorCode=" + errorCode + "): " + banner);
-            setVisible(Visibility.FALLBACK, true);
+            setLayersVisibility(Layers.FALLBACK, showFallbackBannerOnDismiss);
             isLoaded = false;
             // NOTE: I've tried waiting on a background thread for 6-10 seconds to re-invoke loadMoPubBanner (on main thread)
             // and if there's no ads, there's no ads, it's better to let MoPub reload on its own.
@@ -315,7 +329,7 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerClicked(MoPubView banner) {
             LOG.info("onBannerClicked(): " + banner);
             if (showFallbackBannerOnDismiss) {
-                setVisible(Visibility.FALLBACK, true);
+                setLayersVisibility(Layers.FALLBACK, true);
             }
         }
 
@@ -327,7 +341,7 @@ public class MopubBannerView extends LinearLayout {
         @Override
         public void onBannerCollapsed(MoPubView banner) {
             LOG.info("onBannerCollapsed(): " + banner);
-            setVisible(Visibility.ALL, false);
+            setLayersVisibility(Layers.ALL, false);
             isLoaded = false;
             if (onBannerDismissedListener != null) {
                 try {
@@ -341,15 +355,15 @@ public class MopubBannerView extends LinearLayout {
 
     private final OnClickListener onDismissBannerOnClickListener = view -> {
         if (moPubView.getVisibility() == View.VISIBLE) {
-            MoPubView.BannerAdListener bannerAdListener = moPubView.getBannerAdListener();
-            setVisible(
-                    showFallbackBannerOnDismiss ? Visibility.FALLBACK : Visibility.ALL,
+            setLayersVisibility(
+                    showFallbackBannerOnDismiss ? Layers.FALLBACK : Layers.ALL,
                     showFallbackBannerOnDismiss);
+            MoPubView.BannerAdListener bannerAdListener = moPubView.getBannerAdListener();
             if (bannerAdListener != null) {
                 bannerAdListener.onBannerCollapsed(moPubView);
             }
         } else if (fallbackBannerView.getVisibility() == View.VISIBLE) {
-            setVisible(Visibility.ALL, false);
+            setLayersVisibility(Layers.ALL, false);
             if (onFallbackBannerDismissedListener != null) {
                 try {
                     onFallbackBannerDismissedListener.dispatch();
@@ -361,7 +375,7 @@ public class MopubBannerView extends LinearLayout {
     };
 
     private final OnClickListener removeAdsTextViewOnClickListener = view -> {
-        setVisible(Visibility.ALL, false);
+        setLayersVisibility(Layers.ALL, false);
         Intent i = new Intent(getContext(), BuyActivity.class);
         if (getContext() instanceof Activity) {
             ((Activity) getContext()).startActivityForResult(i, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
