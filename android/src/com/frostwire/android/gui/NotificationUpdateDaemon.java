@@ -26,6 +26,7 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.widget.RemoteViews;
 
+import com.andrew.apollo.NotificationHelper;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -162,7 +163,13 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                             //LOG.info("updateTransfersStatusNotification() had to create a new channel with notificationManager.createNotificationChannel()");
                         }
                     }
-                    notificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
+
+                    // "Fix invalid channel issue for foreground service" -> synchronization around notification methods, even though we no longer use foreground services
+                    // but we do share the same notification channel and the player and downloads may concurrently try to send a notification
+                    // https://github.com/smartdevicelink/sdl_java_suite/pull/849
+                    synchronized (NotificationHelper.NOTIFICATION_LOCK) {
+                        notificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
+                    }
                     //LOG.info("updateTransfersStatusNotification() notificationManager.notify()!");
                 } catch (SecurityException ignored) {
                     // possible java.lang.SecurityException
