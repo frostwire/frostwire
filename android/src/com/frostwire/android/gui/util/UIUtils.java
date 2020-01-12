@@ -546,7 +546,13 @@ public final class UIUtils {
     }
 
     public static boolean isScreenLocked(final Context context) {
+        if (context == null) {
+            return true;
+        }
         KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        if (km == null) {
+            return true;
+        }
         return km.isKeyguardLocked();
     }
 }
