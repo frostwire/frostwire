@@ -296,6 +296,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST_ID
     };
+    private static final Object REMOTE_CONTROL_CLIENT_LOCK = new Object();
 
     private AudioFocusRequest AUDIO_FOCUS_REQUEST;
 
@@ -423,7 +424,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     /**
      * Lock screen controls
      */
-    private RemoteControlClient mRemoteControlClient;
+    private RemoteControlClient mRemoteControlClient; // Build.VERSION_CODES.ICE_CREAM_SANDWICH <= version < LOLLIPOP
+
 
     private ComponentName mMediaButtonReceiverComponent;
 
@@ -1565,9 +1567,17 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     private void updateRemoteControlClient(final String what) {
         if (mRemoteControlClient == null) {
-            LOG.info("mRemoteControlClient is null, review your logic");
+            LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
             return;
         }
+
+        if (what == null) {
+            LOG.info("updateRemoteControlClient() aborted. what is null, review your logic");
+            return;
+        }
+
+
+        LOG.info("updateRemoteControlClient(what=" + what + ")");
 
         int playState;
         if (isPlaying()) {
@@ -1577,10 +1587,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             if (what.equals(PLAYSTATE_STOPPED)) {
                 playState = RemoteControlClient.PLAYSTATE_STOPPED;
             }
-        }
-
-        if (what == null) {
-            return;
         }
 
         if (PLAYSTATE_STOPPED.equals(what) && mNotificationHelper != null) {
@@ -1603,9 +1609,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     private static void remoteControlClientSetPlaybackStateTask(RemoteControlClient rc, int playState) {
         try {
-            rc.setPlaybackState(playState);
+            synchronized (REMOTE_CONTROL_CLIENT_LOCK) {
+                rc.setPlaybackState(playState);
+            }
         } catch (Throwable throwable) {
             // rare android internal NPE
+            LOG.error(throwable.getMessage(), throwable);
         }
     }
 
@@ -1645,6 +1654,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
             MusicPlaybackService musicPlaybackService1 = musicPlaybackServiceRef.get();
             try {
+                // TODO: Refactor to use MediaSession instead
                 RemoteControlClient.MetadataEditor editor = musicPlaybackService1.mRemoteControlClient
                         .editMetadata(true)
                         .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artistName)
@@ -1663,9 +1673,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
 
             try {
-                musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
+                synchronized (REMOTE_CONTROL_CLIENT_LOCK) {
+                    musicPlaybackService1.mRemoteControlClient.setPlaybackState(playState, position, 1.0f);
+                }
             } catch (Throwable t) {
-                // temporary fix for Android 4.1, we need MediaSessoin refactor
+                // temporary fix for Android 4.1, we need MediaSession refactor
             }
         };
         musicPlaybackService.mPlayerHandler.post(postExecute);
