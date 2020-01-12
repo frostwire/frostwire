@@ -82,6 +82,24 @@ public class NotificationHelper {
                 .getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
+    void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = null;
+            try {
+                channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
+                LOG.info("updatePlayState() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
+            } catch (Throwable t) {
+                LOG.error("updatePlayState() " + t.getMessage(), t);
+            }
+            if (channel == null) {
+                channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setSound(null, null);
+                LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
+            }
+            mNotificationManager.createNotificationChannel(channel);
+        }
+    }
+
     /**
      * Call this to build the {@link Notification}.
      */
@@ -121,27 +139,11 @@ public class NotificationHelper {
         // Set up the expanded content view
         initExpandedLayout(trackName, albumName, artistName, albumArt);
 
-        if (mNotification != null) {
-            synchronized (NOTIFICATION_LOCK) {
-                mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
-            }
-        }
         mNotification = aNotification;
-        mService.onNotificationCreated(mNotification); // does startForeground(notification) no need to send it ourselves here, or end up with double notifications
-    }
-    
-    private int notificationIcon() {
-        return R.drawable.frostwire_notification_flat;
-    }
+        createNotificationChannel();
 
-    /**
-     * Remove notification
-     */
-    void killNotification() {
-        if (mNotificationManager != null) {
-            mService.stopForeground(true);
-            mNotification = null;
-        }
+        // does service.startForeground(notification)
+        mService.onNotificationCreated(mNotification);
     }
 
     /**
@@ -163,27 +165,13 @@ public class NotificationHelper {
                     isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
         }
         try {
-            if (mNotification != null) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel channel = null;
-                    try {
-                        channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
-                        LOG.info("updatePlayState() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
-                    } catch (Throwable t) {
-                        LOG.error("updatePlayState() " + t.getMessage(), t);
-                    }
-                    if (channel == null) {
-                        channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-                        channel.setSound(null, null);
-                        LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
-                    }
-                    mNotificationManager.createNotificationChannel(channel);
+            synchronized (NOTIFICATION_LOCK) {
+                if (!isPlaying) {
+                    mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
                 }
-
-                synchronized (NOTIFICATION_LOCK) {
-                    if (mNotification != null) {
-                        mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
-                    }
+                if (isPlaying && mNotification != null) {
+                    //mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                    mService.onNotificationCreated(mNotification);
                 }
             }
         } catch (SecurityException t) {
@@ -197,6 +185,24 @@ public class NotificationHelper {
             LOG.error("updatePlayState() " + t3.getMessage(), t3);
         }
     }
+
+    /**
+     * Remove notification
+     */
+    void killNotification() {
+        if (mNotificationManager != null) {
+            synchronized (NOTIFICATION_LOCK) {
+                mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
+            }
+            mService.stopForeground(true);
+            mNotification = null;
+        }
+    }
+
+    private int notificationIcon() {
+        return R.drawable.frostwire_notification_flat;
+    }
+
 
     /**
      * Open to the now playing screen

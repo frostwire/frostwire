@@ -620,6 +620,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 return START_NOT_STICKY;
             }
 
+
             handleCommandIntent(intent);
         }
 
@@ -979,14 +980,18 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (mNotificationHelper == null) {
             return;
         }
-        if (!musicPlaybackActivityInForeground && isPlaying()) {
+        if (isPlaying()) {
             if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
                 async(this, MusicPlaybackService::updateNotificationTask);
             }
-        } else if (musicPlaybackActivityInForeground) {
-            mNotificationHelper.killNotification();
-            if (!isPlaying()) {
+            return;
+        }
+
+        if (musicPlaybackActivityInForeground) {
+            if (!isPlaying() && isStopped()) {
                 updateRemoteControlClient(PLAYSTATE_STOPPED);
+            } else if (isPlaying()) {
+                updateRemoteControlClient(PLAYSTATE_CHANGED);
             }
         }
     }
@@ -1136,7 +1141,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             scheduleDelayedShutdown();
             updateRemoteControlClient(PLAYSTATE_STOPPED);
         } else {
-            stopForeground(false);
+            stopForeground(isStopped());
         }
     }
 
