@@ -610,7 +610,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 // The NotificationHelper in charge of creating the notification channel and notification will call us back
                 // with the notification object, so that we can then invoke startForeground with it if we're on
                 // newer versions of android
-                // see #onNotificationChannelCreated
+                // see #onNotificationCreated
             }
 
             if (SHUTDOWN_ACTION.equals(action)) {
@@ -634,20 +634,20 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         return START_STICKY;
     }
 
-    public void onNotificationChannelCreated(Notification notification) {
+    public void onNotificationCreated(Notification notification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (notification != null) {
-                LOG.info("onNotificationChannelCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK) for MusicPlaybackService with our first notification");
+                LOG.info("onNotificationCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK) for MusicPlaybackService with our first notification");
                 startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
             } else {
-                LOG.error("onNotificationChannelCreated() received null notification, check your logic");
+                LOG.error("onNotificationCreated() received null notification, check your logic");
             }
         } else {
             if (notification != null) {
-                LOG.info("onNotificationChannelCreated() invoking startForeground() for MusicPlaybackService with our first notification");
+                LOG.info("onNotificationCreated() invoking startForeground() for MusicPlaybackService with our first notification");
                 startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
             } else {
-                LOG.error("onNotificationChannelCreated() received null notification, check your logic");
+                LOG.error("onNotificationCreated() received null notification, check your logic");
             }
         }
     }

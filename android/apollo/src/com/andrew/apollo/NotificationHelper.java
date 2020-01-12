@@ -121,35 +121,13 @@ public class NotificationHelper {
         // Set up the expanded content view
         initExpandedLayout(trackName, albumName, artistName, albumArt);
 
-        mNotification = aNotification;
-        try {
-            // Same as in NotificationUpdateDaemon
-            if (mNotificationManager != null) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel channel = null;
-                    try {
-                        channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
-                        LOG.info("buildNotification() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
-                    } catch (Throwable t) {
-                        LOG.error("buildNotification() " + t.getMessage(), t);
-                    }
-                    if (channel == null) {
-                        channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-                        channel.setSound(null, null);
-                        mNotificationManager.createNotificationChannel(channel);
-                        LOG.info("buildNotification() had to create a new channel with notificationManager.createNotificationChannel()", true);
-                    }
-
-
-                    // @see https://github.com/smartdevicelink/sdl_java_suite/pull/849
-                    synchronized (NOTIFICATION_LOCK) {
-                        mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
-                    }
-                }
+        if (mNotification != null) {
+            synchronized (NOTIFICATION_LOCK) {
+                mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
             }
-        } catch (Throwable t) {
-            LOG.error("buildNotification() " + t.getMessage(), t);
         }
+        mNotification = aNotification;
+        mService.onNotificationCreated(mNotification); // does startForeground(notification) no need to send it ourselves here, or end up with double notifications
     }
     
     private int notificationIcon() {
@@ -161,7 +139,7 @@ public class NotificationHelper {
      */
     void killNotification() {
         if (mNotificationManager != null) {
-            mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
+            mService.stopForeground(true);
             mNotification = null;
         }
     }
@@ -200,11 +178,12 @@ public class NotificationHelper {
                         LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
                     }
                     mNotificationManager.createNotificationChannel(channel);
-                    mService.onNotificationChannelCreated(mNotification);
                 }
 
                 synchronized (NOTIFICATION_LOCK) {
-                    mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                    if (mNotification != null) {
+                        mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                    }
                 }
             }
         } catch (SecurityException t) {

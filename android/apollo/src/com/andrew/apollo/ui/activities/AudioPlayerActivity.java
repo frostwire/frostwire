@@ -57,6 +57,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.IApolloService;
@@ -608,6 +609,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             waitingToInitAlbumArtBanner.set(false);
             return;
         }
+        if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+            LOG.info("deferredInitAlbumArtBanner() aborted, activity is not visible to user");
+            return;
+        }
         if (UIUtils.isScreenLocked(this)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, screen is locked");
             waitingToInitAlbumArtBanner.set(false);
@@ -673,7 +678,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
             waitingToInitAlbumArtBanner.set(false);
             activityRef.get().initAlbumArtBanner();
-        }, 6000);
+        }, 8000);
     }
 
 
