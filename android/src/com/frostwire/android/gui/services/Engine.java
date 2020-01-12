@@ -262,13 +262,6 @@ public final class Engine implements IEngineService {
         JobIntentService.enqueueWork(context, targetServiceClazz, jobId, intent);
     }
 
-    /**
-     * @deprecated Use Engine#enqueueServiceJob
-     */
-    public static void startForegroundService(final Context context, final Intent intent) {
-        ContextCompat.startForegroundService(context, intent);
-    }
-
     private class EngineApplicationRefsHolder {
         WeakReference<Engine> engineRef;
         WeakReference<Application> appRef;
