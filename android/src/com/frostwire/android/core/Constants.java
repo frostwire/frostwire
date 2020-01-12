@@ -44,6 +44,9 @@ public final class Constants {
 
     public static final String FROSTWIRE_VERSION_STRING = BuildConfig.VERSION_NAME;
 
+    public static final int JOB_ID_ENGINE_SERVICE = 10001;
+    public static final int JOB_ID_MUSIC_PLAYBACK_SERVICE = 20001;
+
     // preference keys
     public static final String PREF_KEY_CORE_UUID = "frostwire.prefs.core.uuid";
     public static final String PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD = "frostwire.prefs.core.last_seen_version_build";

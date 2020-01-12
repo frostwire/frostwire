@@ -54,6 +54,8 @@ import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
+import static com.frostwire.android.core.Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -253,13 +255,13 @@ public final class Engine implements IEngineService {
     }
 
     public static void enqueueServiceJob(final Context context, final Intent intent, final Class targetServiceClazz) {
-        int jobId = 10001;
-        if (EngineService.class.equals(targetServiceClazz)) {
-            jobId = 10001;
-        } else if (MusicPlaybackService.class.equals(targetServiceClazz)) {
-            jobId = 20001;
+        if (MusicPlaybackService.class.equals(targetServiceClazz)) {
+            context.startService(intent);
+            return;
         }
-        JobIntentService.enqueueWork(context, targetServiceClazz, jobId, intent);
+        if (EngineService.class.equals(targetServiceClazz)) {
+            JobIntentService.enqueueWork(context, targetServiceClazz, JOB_ID_ENGINE_SERVICE, intent);
+        }
     }
 
     private class EngineApplicationRefsHolder {

@@ -19,15 +19,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
-import android.widget.RemoteViews;
-
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.util.Logger;
 
 import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS;
@@ -100,11 +97,11 @@ public class NotificationHelper {
         initCollapsedLayout(trackName, artistName, albumArt);
 
         //  Save this for debugging
-        PendingIntent pendingintent = getPendingIntent();
+        PendingIntent pendingintent = pendingIntent();
 
         // Notification Builder
         Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(getNotificationIcon())
+                .setSmallIcon(notificationIcon())
                 .setContentIntent(pendingintent)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
@@ -154,8 +151,8 @@ public class NotificationHelper {
             LOG.error("buildNotification() " + t.getMessage(), t);
         }
     }
-
-    private int getNotificationIcon() {
+    
+    private int notificationIcon() {
         return R.drawable.frostwire_notification_flat;
     }
 
@@ -203,6 +200,7 @@ public class NotificationHelper {
                         LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
                     }
                     mNotificationManager.createNotificationChannel(channel);
+                    mService.onNotificationChannelCreated(mNotification);
                 }
 
                 synchronized (NOTIFICATION_LOCK) {
@@ -224,7 +222,7 @@ public class NotificationHelper {
     /**
      * Open to the now playing screen
      */
-    private PendingIntent getPendingIntent() {
+    private PendingIntent pendingIntent() {
         return PendingIntent.getActivity(mService, 0, new Intent(INTENT_AUDIO_PLAYER)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0);
     }

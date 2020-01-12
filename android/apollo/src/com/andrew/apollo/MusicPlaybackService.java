@@ -14,6 +14,7 @@ package com.andrew.apollo;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -24,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ServiceInfo;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.graphics.Bitmap;
@@ -49,6 +51,7 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
@@ -596,7 +599,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (D) LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId);
         mServiceStartId = startId;
-        //Engine.foregroundServiceStartForAndroidO(this);
 
         if (intent != null) {
             final String action = intent.getAction();
@@ -604,6 +606,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             if (intent.hasExtra(NOW_IN_FOREGROUND)) {
                 musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
                 updateNotification();
+                // since the notification creation is asynchronous, we don't call startForeground until we have it
+                // The NotificationHelper in charge of creating the notification channel and notification will call us back
+                // with the notification object, so that we can then invoke startForeground with it if we're on
+                // newer versions of android
+                // see #onNotificationChannelCreated
             }
 
             if (SHUTDOWN_ACTION.equals(action)) {
@@ -625,6 +632,24 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         return START_STICKY;
+    }
+
+    public void onNotificationChannelCreated(Notification notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (notification != null) {
+                LOG.info("onNotificationChannelCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK) for MusicPlaybackService with our first notification");
+                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                LOG.error("onNotificationChannelCreated() received null notification, check your logic");
+            }
+        } else {
+            if (notification != null) {
+                LOG.info("onNotificationChannelCreated() invoking startForeground() for MusicPlaybackService with our first notification");
+                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
+            } else {
+                LOG.error("onNotificationChannelCreated() received null notification, check your logic");
+            }
+        }
     }
 
     private void initService() {
@@ -1680,7 +1705,13 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 // temporary fix for Android 4.1, we need MediaSession refactor
             }
         };
-        musicPlaybackService.mPlayerHandler.post(postExecute);
+        try {
+            musicPlaybackService.mPlayerHandler.post(postExecute);
+        } catch (Throwable throwable) {
+            // looks like android can kill the service thread
+            // gotta figure out to deal with this, but let's not crash
+            LOG.error("changeRemoteControlClientTask() " + throwable.getMessage() + " (exception caught but not handled just printed) " + throwable.getMessage(), throwable);
+        }
     }
 
     /**
