@@ -485,6 +485,7 @@ public final class Asyncs {
         private final static long RECYCLE_SUBMISSION_TIME_MAP_INTERVAL = 30 * 1000; //recycle every 1 minute
         private final static long TASK_RECYCLE_INTERVAL_IN_MS = 10000;
         private static long lastRecycleTimestamp = -1;
+        private final static Object recycleLock = new Object();
 
         /**
          * Checks if it's not too early to submit this task again. Updates the Map<TaskName -> TimestampLastSubmitted> when it's ready, assuming the task will be launched right after checking if(ready) async(theTask)
@@ -581,8 +582,13 @@ public final class Asyncs {
                 int numKeysToRecycle = keysToRecycle.size();
                 double recycleRatio = 100 * numKeysToRecycle / numKeysBeforeRecycle;
                 LOG.info("Recycling " + numKeysToRecycle + " tasks out of " + numKeysBeforeRecycle + " total tasks (freed  " + recycleRatio + "%)");
-                for (String task : keysToRecycle) {
-                    asyncTaskSubmissionTimestampMap.remove(task);
+
+                synchronized(recycleLock) {
+                    for (String task : keysToRecycle) {
+                        try {
+                            asyncTaskSubmissionTimestampMap.remove(task);
+                        } catch (Throwable ignored) {}
+                    }
                 }
             }
         }
