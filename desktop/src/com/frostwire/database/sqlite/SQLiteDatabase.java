@@ -81,7 +81,7 @@ public class SQLiteDatabase {
         ResultSet resultSet = null;
         try {
             synchronized (connection) {
-                statement = prepareStatement(connection, sql, selectionArgs);
+                statement = prepareStatement(connection, sql, (Object[]) selectionArgs);
                 resultSet = statement.executeQuery();
                 return new Cursor(statement, resultSet);
             }
