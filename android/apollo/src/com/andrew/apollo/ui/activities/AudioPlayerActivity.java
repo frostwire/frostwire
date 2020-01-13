@@ -74,6 +74,7 @@ import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
@@ -672,9 +673,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
 
             long position = activityRef.get().lastKnownPosition;
-            if (position < 3000) {
-                throw new RuntimeException("deferredInitAlbumArtBanner() callback failed: Position@" +
-                        position + " < 3000??? THIS SHOULD NOT HAPPEN, CRASHING DOWN!");
+            final long minPassedPosition = 3000;
+            if (position < minPassedPosition) {
+                LOG.error("deferredInitAlbumArtBanner() callback failed: Position@" +
+                        position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN");
+                if (BuildConfig.DEBUG) {
+                    throw new RuntimeException("deferredInitAlbumArtBanner() callback failed: Position@" + position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN, CRASHING DOWN!\"");
+                }
+                return;
             }
             waitingToInitAlbumArtBanner.set(false);
             activityRef.get().initAlbumArtBanner();
