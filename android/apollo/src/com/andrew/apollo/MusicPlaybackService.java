@@ -639,14 +639,22 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (notification != null) {
                 LOG.info("onNotificationCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK) for MusicPlaybackService with our first notification");
-                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+                try {
+                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+                } catch (Throwable t) {
+                    LOG.error("onNotificationCreated(SDK > Q) " + t.getMessage(), t);
+                }
             } else {
                 LOG.error("onNotificationCreated() received null notification, check your logic");
             }
         } else {
             if (notification != null) {
                 LOG.info("onNotificationCreated() invoking startForeground() for MusicPlaybackService with our first notification");
-                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
+                try {
+                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
+                } catch (Throwable t) {
+                    LOG.error("onNotificationCreated(SDK < Q) " + t.getMessage(), t);
+                }
             } else {
                 LOG.error("onNotificationCreated() received null notification, check your logic");
             }
