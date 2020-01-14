@@ -628,8 +628,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
+        if (mMopubBannerView == null) {
+            LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready (mMopubBannerView == null)");
+            return;
+        }
+
         if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
+            return;
         }
 
         if (waitingToInitAlbumArtBanner.get()) {
@@ -661,7 +667,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             if (lastTrackId != trackIdWeAreMonitoring) {
                 LOG.info("deferredInitAlbumArtBanner() callback aborted, on a different track. trackIdWeAreMonitoring=" + trackIdWeAreMonitoring + " currentTrack=" + lastTrackId);
                 waitingToInitAlbumArtBanner.set(false);
-                deferredInitAlbumArtBanner(); // MAYBE NOT
+                //deferredInitAlbumArtBanner(); // MAYBE NOT
                 return;
             }
 
@@ -674,7 +680,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
             long position = activityRef.get().lastKnownPosition;
             final long minPassedPosition = 3000;
-            if (position < minPassedPosition) {
+            if (lastKnownIsPlaying && position < minPassedPosition) {
                 LOG.error("deferredInitAlbumArtBanner() callback failed: Position@" +
                         position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN");
                 if (BuildConfig.DEBUG) {
