@@ -230,7 +230,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Album Art Ad Controls
         mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
-        //deferredInitAlbumArtBanner();
 
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
@@ -635,6 +634,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
+            mAlbumArt.setVisibility(View.GONE);
             return;
         }
 
@@ -667,7 +667,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             if (lastTrackId != trackIdWeAreMonitoring) {
                 LOG.info("deferredInitAlbumArtBanner() callback aborted, on a different track. trackIdWeAreMonitoring=" + trackIdWeAreMonitoring + " currentTrack=" + lastTrackId);
                 waitingToInitAlbumArtBanner.set(false);
-                //deferredInitAlbumArtBanner(); // MAYBE NOT
                 return;
             }
 
@@ -759,7 +758,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             // Set the album art
             if (mAlbumArt != null) {
                 mImageFetcher.loadCurrentArtwork(mAlbumArt);
-                mAlbumArt.setVisibility(View.VISIBLE);
+                if (!mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB) &&
+                    !mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
+                    mAlbumArt.setVisibility(View.VISIBLE);
+                }
             }
             // Set the small artwork
             if (mAlbumArtSmall != null) {

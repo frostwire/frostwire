@@ -261,8 +261,7 @@ public class MopubBannerView extends LinearLayout {
     }
 
     public boolean areLayerVisible(final Layers layers) {
-        return layersVisibility != null
-                && layersVisibility.layers == layers
+        return layersVisibility.layers == layers
                 && layersVisibility.visible;
     }
 
