@@ -758,7 +758,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             // Set the album art
             if (mAlbumArt != null) {
                 mImageFetcher.loadCurrentArtwork(mAlbumArt);
-                if (!mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB) &&
+                if (mMopubBannerView != null && !mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB) &&
                     !mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
                     mAlbumArt.setVisibility(View.VISIBLE);
                 }
