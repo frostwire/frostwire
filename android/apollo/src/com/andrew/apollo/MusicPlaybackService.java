@@ -998,7 +998,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (musicPlaybackActivityInForeground) {
             if (!isPlaying() && isStopped()) {
                 updateRemoteControlClient(PLAYSTATE_STOPPED);
-            } else if (isPlaying()) {
+            } else if (!isPlaying() && !isStopped()) {
                 updateRemoteControlClient(PLAYSTATE_CHANGED);
             }
         }
@@ -1540,6 +1540,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         String albumName = musicPlaybackService.getAlbumName();
         String trackName = musicPlaybackService.getTrackName();
         boolean isPlaying = musicPlaybackService.isPlaying();
+        boolean isStopped = musicPlaybackService.isStopped();
         boolean favorite = musicPlaybackService.isFavorite();
         intent.putExtra("id", audioId);
         intent.putExtra("artist", artistName);
@@ -1567,8 +1568,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         } else {
             musicPlaybackService.saveQueue(false);
         }
-        if (PLAYSTATE_CHANGED.equals(change)) {//) || META_CHANGED.equals(change)) {
-            musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying);
+
+        // PLAYSTATE_CHANGED = PLAYING or PAUSED (not stopped)
+        if (PLAYSTATE_CHANGED.equals(change)) {
+            musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying, isStopped);
         }
     }
 
@@ -1617,17 +1620,19 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
         LOG.info("updateRemoteControlClient(what=" + what + ")");
 
-        int playState;
-        if (isPlaying()) {
+        int playState = RemoteControlClient.PLAYSTATE_PLAYING;
+        final boolean isPlaying = isPlaying();
+        final boolean isStopped = isStopped();
+        final boolean isPaused = !isPlaying && !isStopped;
+        if (isPlaying) {
             playState = RemoteControlClient.PLAYSTATE_PLAYING;
-        } else {
+        } else if (isPaused) {
             playState = RemoteControlClient.PLAYSTATE_PAUSED;
-            if (what.equals(PLAYSTATE_STOPPED)) {
-                playState = RemoteControlClient.PLAYSTATE_STOPPED;
-            }
+        } else if (isStopped) {
+            playState = RemoteControlClient.PLAYSTATE_STOPPED;
         }
 
-        if (PLAYSTATE_STOPPED.equals(what) && mNotificationHelper != null) {
+        if (isStopped && mNotificationHelper != null) {
             mNotificationHelper.killNotification();
         }
 
@@ -1635,6 +1640,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             case PLAYSTATE_CHANGED:
             case POSITION_CHANGED:
             case PLAYSTATE_STOPPED:
+                if (mNotificationHelper != null) {
+                    try {
+                        mNotificationHelper.updatePlayState(isPlaying, isStopped);
+                    } catch (Throwable ignored) {
+                    }
+                }
                 async(mRemoteControlClient, MusicPlaybackService::remoteControlClientSetPlaybackStateTask, playState);
                 break;
             case META_CHANGED:
@@ -2413,8 +2424,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
             if (!mIsSupposedToBePlaying) {
                 mIsSupposedToBePlaying = true;
-                notifyChange(PLAYSTATE_CHANGED);
             }
+            notifyChange(PLAYSTATE_CHANGED);
             cancelShutdown();
             updateNotification();
         }
@@ -2434,7 +2445,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 scheduleDelayedShutdown();
                 mIsSupposedToBePlaying = false;
                 if (musicPlaybackActivityInForeground) {
-                    updateRemoteControlClient(PLAYSTATE_STOPPED);
+                    updateRemoteControlClient(PLAYSTATE_CHANGED);
                 } else {
                     notifyChange(PLAYSTATE_CHANGED);
                 }

@@ -151,26 +151,28 @@ public class NotificationHelper {
      *
      * @param isPlaying True if music is playing, false otherwise
      */
-    void updatePlayState(final boolean isPlaying) {
+    void updatePlayState(final boolean isPlaying, final boolean isStopped) {
+        LOG.info("updatePlayState() isPlaying=" + isPlaying + ", isStopped=" + isStopped);
         if (mNotification == null || mNotificationManager == null) {
             return;
         }
+        boolean isPaused = !isPlaying && !isStopped;
         if (mNotificationTemplate != null) {
+
             mNotificationTemplate.setImageViewResource(R.id.notification_base_play,
-                    isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
+                    isPaused ? R.drawable.btn_notification_playback_play : R.drawable.btn_notification_playback_pause);
         }
 
         if (mExpandedView != null) {
             mExpandedView.setImageViewResource(R.id.notification_expanded_base_play,
-                    isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
+                    isPaused ? R.drawable.btn_notification_playback_play : R.drawable.btn_notification_playback_pause);
         }
         try {
             synchronized (NOTIFICATION_LOCK) {
-                if (!isPlaying) {
+                if (isStopped) {
                     mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
                 }
-                if (isPlaying && mNotification != null) {
-                    //mNotificationManager.notify(NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                if (mNotification != null) {
                     mService.onNotificationCreated(mNotification);
                 }
             }
