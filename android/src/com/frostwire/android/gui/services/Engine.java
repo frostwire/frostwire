@@ -44,6 +44,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -63,6 +64,8 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author aldenml
  */
 public final class Engine implements IEngineService {
+
+    private static final Logger LOG = Logger.getLogger(Engine.class);
 
     private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
@@ -256,7 +259,16 @@ public final class Engine implements IEngineService {
 
     public static void enqueueServiceJob(final Context context, final Intent intent, final Class targetServiceClazz) {
         if (MusicPlaybackService.class.equals(targetServiceClazz)) {
-            context.startService(intent);
+            // MusicPlaybackService has to be a foreground service
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent);
+                } else {
+                    context.startService(intent);
+                }
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
             return;
         }
         if (EngineService.class.equals(targetServiceClazz)) {
