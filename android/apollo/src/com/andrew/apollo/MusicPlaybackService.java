@@ -2409,13 +2409,20 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 mHistory.push(mPlayPos);
             }
 
-            final long duration = mPlayer.duration();
-            if (mRepeatMode != REPEAT_CURRENT && duration > 2000
-                    && mPlayer.position() >= duration - 2000) {
-                gotoNext(true);
-            }
+            // it may happen that the service is destroyed between the NPE check above and the following
+            // block, so we'll ask again, and make sure we don't assign mPlayer to null when we try to
+            // start playback
+            if (mPlayer != null) {
+                synchronized (mPlayer) {
+                    final long duration = mPlayer.duration();
+                    if (mRepeatMode != REPEAT_CURRENT && duration > 2000
+                            && mPlayer.position() >= duration - 2000) {
+                        gotoNext(true);
+                    }
 
-            mPlayer.start();
+                    mPlayer.start();
+                }
+            }
 
             if (mPlayerHandler != null) {
                 mPlayerHandler.removeMessages(FADE_DOWN);
