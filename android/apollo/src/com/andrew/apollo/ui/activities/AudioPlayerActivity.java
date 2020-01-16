@@ -60,7 +60,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -68,7 +67,6 @@ import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
@@ -94,7 +92,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -116,9 +113,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private static final long UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS = 200;
 
     private static AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();
-
-    // The service token
-    private ServiceToken mToken;
 
     // Play and pause button
     private PlayPauseButton mPlayPauseButton;
@@ -214,7 +208,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
 
         // Initialize the image fetcher/cache
         mImageFetcher = ApolloUtils.getImageFetcher(this);
@@ -252,7 +246,26 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
+        /**
+        // this shouldn't happen here since we won't be ServiceConnection listeners
+        // we'll ask musicPlaybackService about its state directly
         musicPlaybackService = IApolloService.Stub.asInterface(service);
+        if (musicPlaybackService != null) {
+            try {
+                musicPlaybackService.updateNotification();
+                // How we end up calling foreground
+                // musicPlaybackService.updateNotification() ->
+                // musicPlaybackService.buildNotificationWithAlbumArtPost() ->
+                // musicPlaybackService.mNotificationHelper.buildNotification(...) ->
+                // musicPlaybackService.mNotificationHelper.mService.onNotificationCreated(mNotification);
+                // musicPlaybackService.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification[, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK]);
+            } catch (RemoteException re) {
+                LOG.warn("onServiceConnected() could not send the notification, android will probably shutdown our service", re, true);
+            } catch (Throwable t) {
+                LOG.error("onServiceConnected() " + t.getMessage(), t, true);
+            }
+        }
+         */
         // Check whether we were asked to start any playback
         startPlayback();
         // Set the playback drawables
@@ -265,12 +278,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     @Override
     public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromuser) {
-        if (!fromuser || musicPlaybackService == null) {
+        if (!fromuser || MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         final long now = SystemClock.elapsedRealtime();
@@ -406,7 +419,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 return true;
             case R.id.menu_player_audio_player_stop:
                 try {
-                    MusicUtils.musicPlaybackService.stop();
+                    MusicUtils.getMusicPlaybackService().stop();
                 } catch (Throwable e) {
                     // ignore
                 }
@@ -522,10 +535,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             LOG.error(ignored.getMessage(), ignored);
         }
 
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
+//        if (musicPlaybackService != null) {
+//            MusicUtils.unbindFromService(mToken);
+//            mToken = null;
+//        }
         try {
             unregisterReceiver(mPlaybackStatus);
         } catch (final Throwable ignored) {
@@ -804,9 +817,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * and starts playback if that's the case
      */
     private void startPlayback() {
+        // TODO looks like this will change, we might need to start the service ourselves here
+        // or this should be a callback after the service is started onNewIntent()
         Intent intent = getIntent();
 
-        if (intent == null || musicPlaybackService == null) {
+        if (intent == null || MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
 
@@ -882,7 +897,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * @param delta    The long press duration
      */
     private void scanBackward(final int repcount, long delta) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         if (repcount == 0) {
@@ -925,7 +940,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * @param delta    The long press duration
      */
     private void scanForward(final int repcount, long delta) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         if (repcount == 0) {
@@ -1053,7 +1068,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      *  @return the delay on which this method call should be posted again
      * */
     private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return 500L;
         }
 
@@ -1360,7 +1375,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         @Override
         public void onSwipeLeft() {
             try {
-                MusicUtils.musicPlaybackService.next();
+                MusicUtils.getMusicPlaybackService().next();
             } catch (Throwable e) {
                 // ignore
             }
@@ -1369,7 +1384,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         @Override
         public void onSwipeRight() {
             try {
-                MusicUtils.musicPlaybackService.prev();
+                MusicUtils.getMusicPlaybackService().prev();
             } catch (Throwable e) {
                 // ignore
             }

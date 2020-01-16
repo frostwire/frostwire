@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.StringRes;
+import androidx.core.content.FileProvider;
+
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -54,6 +58,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
+import com.frostwire.util.Ref;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.io.FilenameUtils;
@@ -61,14 +66,11 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
-
-import androidx.annotation.StringRes;
-import androidx.core.content.FileProvider;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -535,13 +537,40 @@ public final class UIUtils {
     }
 
     private static void playEphemeralPlaylistTask(Context context, FileDescriptor fd) {
-        try {
-            CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
-            if (mediaPlayer != null) {
-                mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(context, fd));
+        LOG.info("playEphemeralPlaylistTask() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning(context));
+        final CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
+        final WeakReference<Context> contextRef = Ref.weak(context);
+        if (!MusicUtils.isMusicPlaybackServiceRunning(context)) {
+
+            Runnable playEphemeralPlaylistOfOneCallback = () -> {
+                try {
+                    if (mediaPlayer != null && Ref.alive(contextRef)) {
+                        mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(contextRef.get(), fd));
+                    }
+                } catch (Throwable ignored) {
+                    // possible Runtime error thrown by Librarian.instance()
+                } finally {
+                    Ref.free(contextRef);
+                }
+            };
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                //LOG.info("playEphemeralPlaylistTask() service is not there, and it's null");
+                MusicUtils.addServiceConnectionListener(MusicUtils.UIUTILS_PLAY_EPHEMERAL_SERVICE_CONNECTION_SUB_LISTENER_ID, playEphemeralPlaylistOfOneCallback);
+                MusicUtils.startMusicPlaybackService(context, new Intent(context, MusicPlaybackService.class));
+            } else {
+                //LOG.info("playEphemeralPlaylistTask() calling playEphemeralPlaylistOfOneCallback directly, had music service already");
+                playEphemeralPlaylistOfOneCallback.run();
             }
-        } catch (Throwable ignored) {
-            // possible Runtime error thrown by Librarian.instance()
+
+        } else {
+            try {
+                if (mediaPlayer != null) {
+                    mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(context, fd));
+                }
+            } catch (Throwable ignored) {
+                // possible Runtime error thrown by Librarian.instance()
+            }
         }
     }
 

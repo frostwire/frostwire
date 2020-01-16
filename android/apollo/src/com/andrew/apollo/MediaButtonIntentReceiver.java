@@ -18,13 +18,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.util.Log;
+import android.os.RemoteException;
 import android.view.KeyEvent;
 
-import com.andrew.apollo.ui.activities.HomeActivity;
-import com.frostwire.android.gui.services.Engine;
-
 import androidx.legacy.content.WakefulBroadcastReceiver;
+
+import com.andrew.apollo.ui.activities.HomeActivity;
+import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
 
 /**
  * Used to control headset playback.
@@ -34,6 +36,7 @@ import androidx.legacy.content.WakefulBroadcastReceiver;
  *   Long press: voice search
  */
 public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
+    private static final Logger LOG = Logger.getLogger(MediaButtonIntentReceiver.class);
     private static final boolean DEBUG = false;
     private static final String TAG = "MBIntentReceiver";
 
@@ -60,7 +63,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         public void handleMessage(final Message msg) {
             switch (msg.what) {
                 case MSG_LONGPRESS_TIMEOUT:
-                    if (DEBUG) Log.v(TAG, "Handling long press timeout, launched " + mLaunched);
+                    if (DEBUG) LOG.info( "Handling long press timeout, launched " + mLaunched);
                     if (!mLaunched) {
                         final Context context = (Context)msg.obj;
                         final Intent i = new Intent();
@@ -75,7 +78,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
                     final int clickCount = msg.arg1;
                     final String command;
 
-                    if (DEBUG) Log.v(TAG, "Handling headset click, count = " + clickCount);
+                    if (DEBUG) LOG.info( "Handling headset click, count = " + clickCount);
                     switch (clickCount) {
                         case 1: command = MusicPlaybackService.CMDTOGGLEPAUSE; break;
                         case 2: command = MusicPlaybackService.CMDNEXT; break;
@@ -98,7 +101,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
      */
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        if (DEBUG) Log.v(TAG, "Received intent: " + intent);
+        if (DEBUG) LOG.info( "Received intent: " + intent);
         final String intentAction = intent.getAction();
         if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intentAction)) {
             sendCommandToMusicPlaybackService(context, MusicPlaybackService.CMDPAUSE);
@@ -159,7 +162,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
                             }
 
                             mClickCounter++;
-                            if (DEBUG) Log.v(TAG, "Got headset click, count = " + mClickCounter);
+                            if (DEBUG) LOG.info( "Got headset click, count = " + mClickCounter);
                             mbiReceiverHandler.removeMessages(MSG_HEADSET_DOUBLE_CLICK_TIMEOUT);
 
                             Message msg = mbiReceiverHandler.obtainMessage(
@@ -194,7 +197,15 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         i.setAction(MusicPlaybackService.SERVICECMD);
         i.putExtra(MusicPlaybackService.CMDNAME, command);
         i.putExtra(MusicPlaybackService.FROM_MEDIA_BUTTON, true);
-        Engine.enqueueServiceJob(context, i, MusicPlaybackService.class);
+        if (MusicUtils.isMusicPlaybackServiceRunning(context) && MusicUtils.getMusicPlaybackService() != null) {
+            try {
+                MusicUtils.getMusicPlaybackService().handleIntentFromStub(i);
+            } catch (RemoteException e) {
+                LOG.error("sendCommandToMusicPlaybackService() " + e.getMessage(), e);
+            }
+        } else {
+            MusicUtils.startMusicPlaybackService(context, i);
+        }
     }
 
     private static void acquireWakeLockAndSendMessage(Context context, Message msg, long delay) {
@@ -210,7 +221,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         }
 
         if (mWakeLock != null) {
-            if (DEBUG) Log.v(TAG, "Acquiring wake lock and sending " + msg.what);
+            if (DEBUG) LOG.info( "Acquiring wake lock and sending " + msg.what);
             // Make sure we don't indefinitely hold the wake lock under any circumstances
             mWakeLock.acquire(10000);
             mbiReceiverHandler.sendMessageDelayed(msg, delay);
@@ -220,12 +231,12 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
     private static void releaseWakeLockIfHandlerIdle() {
         if (mbiReceiverHandler.hasMessages(MSG_LONGPRESS_TIMEOUT)
                 || mbiReceiverHandler.hasMessages(MSG_HEADSET_DOUBLE_CLICK_TIMEOUT)) {
-            if (DEBUG) Log.v(TAG, "Handler still has messages pending, not releasing wake lock");
+            if (DEBUG) LOG.info( "Handler still has messages pending, not releasing wake lock");
             return;
         }
 
         if (mWakeLock != null) {
-            if (DEBUG) Log.v(TAG, "Releasing wake lock");
+            if (DEBUG) LOG.info( "Releasing wake lock");
             mWakeLock.release();
             mWakeLock = null;
         }

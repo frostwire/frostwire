@@ -46,8 +46,8 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     @Override
     public void stop() {
         try {
-            if (MusicUtils.musicPlaybackService != null) {
-                MusicUtils.musicPlaybackService.stop();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                MusicUtils.getMusicPlaybackService().stop();
             }
         } catch (Throwable e) {
             e.printStackTrace();

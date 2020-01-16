@@ -18,10 +18,6 @@
 package com.frostwire.android.gui.services;
 
 import android.app.Application;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,17 +25,14 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Vibrator;
 import android.telephony.TelephonyManager;
 
-import com.andrew.apollo.MusicPlaybackService;
+import androidx.core.app.JobIntentService;
+
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
@@ -51,12 +44,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
-import androidx.core.app.JobIntentService;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-
 import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
-import static com.frostwire.android.core.Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -201,7 +189,7 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            Engine.enqueueServiceJob(context, i, EngineService.class);
+            Engine.enqueueServiceJob(context, i);
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }
@@ -257,23 +245,8 @@ public final class Engine implements IEngineService {
         return r;
     }
 
-    public static void enqueueServiceJob(final Context context, final Intent intent, final Class targetServiceClazz) {
-        if (MusicPlaybackService.class.equals(targetServiceClazz)) {
-            // MusicPlaybackService has to be a foreground service
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(intent);
-                } else {
-                    context.startService(intent);
-                }
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
-            }
-            return;
-        }
-        if (EngineService.class.equals(targetServiceClazz)) {
-            JobIntentService.enqueueWork(context, targetServiceClazz, JOB_ID_ENGINE_SERVICE, intent);
-        }
+    public static void enqueueServiceJob(final Context context, final Intent intent) {
+        JobIntentService.enqueueWork(context, EngineService.class, JOB_ID_ENGINE_SERVICE, intent);
     }
 
     private class EngineApplicationRefsHolder {

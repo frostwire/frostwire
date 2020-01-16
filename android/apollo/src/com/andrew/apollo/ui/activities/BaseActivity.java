@@ -43,13 +43,11 @@ import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.appcompat.widget.Toolbar;
 
 import com.andrew.apollo.Config;
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
@@ -66,8 +64,6 @@ import com.frostwire.android.util.Asyncs;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
-
 /**
  * A base {@link Activity} used to update the bottom bar and
  * bind to Apollo's service.
@@ -82,11 +78,6 @@ public abstract class BaseActivity extends AbstractActivity
      * Play state and meta change listener
      */
     private final ArrayList<MusicStateListener> mMusicStateListener = new ArrayList<>();
-
-    /**
-     * The service token
-     */
-    private ServiceToken mToken;
 
     /**
      * Play and pause button (BAB)
@@ -144,7 +135,7 @@ public abstract class BaseActivity extends AbstractActivity
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
         // Initialize the broadcast receiver
         mPlaybackStatus = new PlaybackStatus(this);
         // Initialize the bottom action bar
@@ -163,9 +154,10 @@ public abstract class BaseActivity extends AbstractActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    // TODO: This logic on some sort of listener, if at all
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
+        //musicPlaybackService = IApolloService.Stub.asInterface(service);
         // Set the playback drawables
         updatePlaybackControls();
         // Current info
@@ -176,7 +168,7 @@ public abstract class BaseActivity extends AbstractActivity
 
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     @Override
@@ -266,18 +258,13 @@ public abstract class BaseActivity extends AbstractActivity
     @Override
     protected void onStop() {
         super.onStop();
-        MusicUtils.notifyForegroundStateChanged(this, false);
+        //TODO: testing this commented out to not leak ServiceConnection onStop()
+        //MusicUtils.notifyForegroundStateChanged(this, false);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Unbind from the service
-        if (mToken != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
-
         // Unregister the receiver
         try {
             unregisterReceiver(mPlaybackStatus);

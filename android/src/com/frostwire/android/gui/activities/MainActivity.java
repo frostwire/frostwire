@@ -35,20 +35,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.andrew.apollo.IApolloService;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
@@ -93,9 +91,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -119,7 +114,6 @@ public class MainActivity extends AbstractActivity implements
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
     private final Stack<Integer> fragmentsStack;
     private final MainController controller;
-    private ServiceToken mToken;
     private NavigationMenu navigationMenu;
     private Fragment currentFragment;
     private SearchFragment search;
@@ -377,7 +371,8 @@ public class MainActivity extends AbstractActivity implements
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            checkExternalStoragePermissionsOrBindMusicService();
+            //checkExternalStoragePermissionsOrBindMusicService();
+            checkExternalStoragePermissions();
         }
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
     }
@@ -443,7 +438,7 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
-        checkExternalStoragePermissionsOrBindMusicService();
+        checkExternalStoragePermissions();//OrBindMusicService();
         checkAccessCoarseLocationPermissions();
     }
 
@@ -457,13 +452,11 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkExternalStoragePermissionsOrBindMusicService() {
+    private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
-        } else if (mToken == null && checker != null && !checker.noAccess()) {
-            mToken = MusicUtils.bindToService(this, this);
         }
     }
 
@@ -485,10 +478,6 @@ public class MainActivity extends AbstractActivity implements
         }
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
-        }
-        if (mToken != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
         }
         // necessary unregisters broadcast its internal receivers, avoids leaks.
         Offers.destroyMopubInterstitials();
@@ -797,11 +786,11 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
+        //musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     //@Override commented override since we are in API 16, but it will in API 23

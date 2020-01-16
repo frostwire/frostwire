@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 package com.andrew.apollo.utils;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -31,6 +32,7 @@ import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
@@ -62,7 +64,6 @@ import com.andrew.apollo.provider.RecentStore;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
@@ -74,8 +75,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 
@@ -88,70 +91,66 @@ public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);
 
-    public static IApolloService musicPlaybackService = null;
+    private static IApolloService musicPlaybackService = null;
 
     private static int sForegroundActivities = 0;
 
-    private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
-
     private static final long[] sEmptyList;
+
+    private static final ServiceConnectionListener serviceConnectionListener;
 
     private static ContentValues[] mContentValuesCache = null;
 
+    public static int UIUTILS_PLAY_EPHEMERAL_SERVICE_CONNECTION_SUB_LISTENER_ID = 0;
+
     static {
-        mConnectionMap = new WeakHashMap<>();
         sEmptyList = new long[0];
+        serviceConnectionListener = new ServiceConnectionListener();
     }
 
     /* This class is never initiated */
     public MusicUtils() {
     }
 
-    /**
-     * @param context  The {@link Context} to use
-     * @param callback The {@link ServiceConnection} to use
-     * @return The new instance of {@link ServiceToken}
-     */
-    public static ServiceToken bindToService(final Context context,
-                                             final ServiceConnection callback) {
-        if (context == null) {
-            return null;
+    public static void startMusicPlaybackService(final Context context, final Intent intent) {
+        // MusicPlaybackService has to be a foreground service
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LOG.info("startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+                context.startForegroundService(intent);
+            } else {
+                LOG.info("startMusicPlaybackService() startService(MusicPlaybackService)", true);
+                context.startService(intent);
+            }
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
         }
-        Activity realActivity = ((Activity) context).getParent();
-        if (realActivity == null) {
-            realActivity = (Activity) context;
+        try {
+            if (!serviceConnectionListener.isBound()) {
+                context.bindService(intent, serviceConnectionListener, 0);
+            }
+        } catch (Throwable t) {
+            LOG.error("startMusicPlaybackService() error " + t.getMessage(), t);
         }
-        final ContextWrapper contextWrapper = new ContextWrapper(realActivity);
-        contextWrapper.startService(new Intent(contextWrapper, MusicPlaybackService.class));
-        final ServiceBinder binder = new ServiceBinder(callback);
-        if (contextWrapper.bindService(
-                new Intent().setClass(contextWrapper, MusicPlaybackService.class), binder, 0)) {
-            mConnectionMap.put(contextWrapper, binder);
-            return new ServiceToken(contextWrapper);
-        }
-        return null;
     }
 
-    /**
-     * @param token The {@link ServiceToken} to unbind from
-     */
-    public static void unbindFromService(final ServiceToken token) {
-        if (token == null) {
-            return;
-        }
-        final ContextWrapper mContextWrapper = token.mWrappedContext;
-        try {
-            final ServiceBinder mBinder = mConnectionMap.remove(mContextWrapper);
-            if (mBinder == null) {
-                return;
+    public static void addServiceConnectionListener(int listenerId, Runnable runnable) {
+        serviceConnectionListener.addSubListener(listenerId, runnable);
+    }
+
+    public static IApolloService getMusicPlaybackService() {
+        return musicPlaybackService;
+    }
+
+    public static boolean isMusicPlaybackServiceRunning(final Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        Class serviceClass = MusicPlaybackService.class;
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
             }
-            mContextWrapper.unbindService(mBinder);
-            if (mConnectionMap.isEmpty()) {
-                musicPlaybackService = null;
-            }
-        } catch (Throwable ignored) {
-            LOG.error(ignored.getMessage(), ignored);
         }
+        return false;
     }
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
@@ -169,7 +168,8 @@ public final class MusicUtils {
             shutdownIntent.putExtra("force", true);
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
-            context.startService(shutdownIntent);
+            MusicUtils.getMusicPlaybackService().handleIntentFromStub(shutdownIntent);
+
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -190,45 +190,58 @@ public final class MusicUtils {
         return !MusicUtils.isPlaying() && !MusicUtils.isStopped();
     }
 
-    public static final class ServiceBinder implements ServiceConnection {
-        private final ServiceConnection mCallback;
-
-        /**
-         * Constructor of <code>ServiceBinder</code>
-         *
-         * @param callback The {@link ServiceConnection} to use
-         */
-        public ServiceBinder(final ServiceConnection callback) {
-            mCallback = callback;
-        }
+    private static class ServiceConnectionListener implements ServiceConnection {
+        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
+        private final HashMap<Integer, Runnable> subListeners = new HashMap<>();
+        private boolean bound = false;
 
         @Override
-        public void onServiceConnected(final ComponentName className, final IBinder service) {
-            musicPlaybackService = IApolloService.Stub.asInterface(service);
-            if (mCallback != null) {
-                mCallback.onServiceConnected(className, service);
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            if (service instanceof MusicPlaybackService.Stub) {
+                musicPlaybackService = IApolloService.Stub.asInterface(service);
+                try {
+                    LOG.info("ServiceConnectionListener::onServiceConnected() -> MusicPlaybackService::updateNotification()!", true);
+                    musicPlaybackService.updateNotification();
+                } catch (RemoteException e) {
+                    LOG.error("ServiceConnectionListener::onServiceConnected() " + e.getMessage(), e, true);
+                }
+
+                notifySubListeners();
+
+                // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
+                subListeners.clear();
+                bound = true;
             }
         }
 
         @Override
-        public void onServiceDisconnected(final ComponentName className) {
-            if (mCallback != null) {
-                mCallback.onServiceDisconnected(className);
-            }
+        public void onServiceDisconnected(ComponentName name) {
+            subListeners.clear();
+            bound = false;
             musicPlaybackService = null;
         }
-    }
 
-    public static final class ServiceToken {
-        public ContextWrapper mWrappedContext;
+        void addSubListener(int id, Runnable runnable) {
+            subListeners.put(id, runnable);
+        }
 
-        /**
-         * Constructor of <code>ServiceToken</code>
-         *
-         * @param context The {@link ContextWrapper} to use
-         */
-        public ServiceToken(final ContextWrapper context) {
-            mWrappedContext = context;
+        private void notifySubListeners() {
+            if (subListeners.isEmpty()) {
+                return;
+            }
+            for (Map.Entry<Integer, Runnable> entry : subListeners.entrySet()) {
+                Integer listenerId = entry.getKey();
+                Runnable runnable = entry.getValue();
+                try {
+                    runnable.run();
+                } catch (Throwable t) {
+                    LOG.info("onServiceConnected() listener (id=" + listenerId + ") threw an exception -> " + t.getMessage(), t);
+                }
+            }
+        }
+
+        public boolean isBound() {
+            return bound;
         }
     }
 
@@ -282,7 +295,17 @@ public final class MusicUtils {
     public static void previous(final Context context) {
         final Intent previous = new Intent(context, MusicPlaybackService.class);
         previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        context.startService(previous);
+        if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+            try {
+                LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
+                MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else {
+            LOG.info("previous() starting a new MusicPlaybackService");
+            MusicUtils.startMusicPlaybackService(context, previous);
+        }
     }
 
     /**
@@ -353,7 +376,8 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.enableShuffle(!isShuffleEnabled());
-            } catch (RemoteException ignored) {}
+            } catch (RemoteException ignored) {
+            }
         }
     }
 
@@ -387,7 +411,8 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isShuffleEnabled();
-            } catch (final RemoteException ignored) { }
+            } catch (final RemoteException ignored) {
+            }
         }
         return false;
     }
@@ -784,12 +809,18 @@ public final class MusicUtils {
      */
     public static void playAll(final long[] list, int position,
                                final boolean forceShuffle) {
-        // TODO: Check for PHONE_STATE Permissions here.
-
-        if (list == null || list.length == 0 || musicPlaybackService == null) {
+        if (list == null) {
+            LOG.info("playAll() aborted, song list null");
             return;
         }
-
+        if (list.length == 0) {
+            LOG.info("playAll() aborted, empty song list");
+            return;
+        }
+        if (musicPlaybackService == null) {
+            LOG.info("playAll() aborted, musicPlaybackService is null");
+            return;
+        }
         try {
             musicPlaybackService.enableShuffle(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
@@ -800,16 +831,15 @@ public final class MusicUtils {
             if (position < 0) {
                 position = 0;
             }
-
             musicPlaybackService.open(list, position);
             musicPlaybackService.play();
-
         } catch (final RemoteException ignored) {
+            LOG.error("playAll() " + ignored.getMessage(), ignored);
         } catch (NullPointerException e) {
             // we are getting this error because musicPlaybackService is
             // a global static mutable variable, we can't do anything
             // until a full refactor in player
-            LOG.warn("Review code logic", e);
+            LOG.warn("playAll() Review code logic", e);
         }
     }
 
@@ -1357,11 +1387,11 @@ public final class MusicUtils {
                     MediaStore.Audio.Playlists.Members.AUDIO_ID
             };
             Cursor cursor = context.getContentResolver().query(
-                        MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
-                        projection,
-                        null,
-                        null,
-                        MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
+                    projection,
+                    null,
+                    null,
+                    MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
             if (cursor != null) {
                 final long[] list = getSongListForCursor(cursor);
                 cursor.close();
@@ -1609,7 +1639,14 @@ public final class MusicUtils {
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
             intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
             try {
-                Engine.enqueueServiceJob(context, intent, MusicPlaybackService.class);
+                if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+                    // no need to be calling start service to make it do what we want if it's already there
+                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
+                    MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
+                } else {
+                    LOG.info("notifyForegroundStateChanged() -> starting MusicPlaybackService as a foreground service ...", true);
+                    MusicUtils.startMusicPlaybackService(context, intent);
+                }
             } catch (Throwable ignored) {
                 LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
             }

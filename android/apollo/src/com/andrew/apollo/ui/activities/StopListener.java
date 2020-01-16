@@ -58,7 +58,7 @@ class StopListener implements View.OnLongClickListener {
 
     private static void stopMusicTask(View v) {
         try {
-            MusicUtils.musicPlaybackService.stop();
+            MusicUtils.getMusicPlaybackService().stop();
         } catch (Throwable e) {
             e.printStackTrace();
         }

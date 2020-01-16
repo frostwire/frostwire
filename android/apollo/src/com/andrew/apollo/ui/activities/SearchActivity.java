@@ -35,9 +35,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.SearchView.OnQueryTextListener;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,21 +50,21 @@ import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
-import com.andrew.apollo.IApolloService;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.appcompat.widget.Toolbar;
+
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
 
 import java.util.Locale;
-
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * Provides the search interface for Apollo.
@@ -80,11 +77,6 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
      * Grid view column count. ONE - list, TWO - normal grid
      */
     private static final int ONE = 1, TWO = 2;
-
-    /**
-     * The service token
-     */
-    private ServiceToken mToken;
 
     /**
      * The query
@@ -126,7 +118,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
 
         // Get the query
         final String query = getIntent().getStringExtra(SearchManager.QUERY);
@@ -200,10 +192,10 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
     protected void onDestroy() {
         super.onDestroy();
         // Unbind from the service
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
+//        if (musicPlaybackService != null) {
+//            MusicUtils.unbindFromService(mToken);
+//            mToken = null;
+//        }
     }
 
     @Override
@@ -326,12 +318,12 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
 
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
+        //musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     /**

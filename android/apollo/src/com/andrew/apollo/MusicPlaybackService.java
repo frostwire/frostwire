@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2018 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
+ * Copyright (C) 2012-2020 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
  * Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
@@ -13,7 +13,6 @@
 package com.andrew.apollo;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -51,7 +50,6 @@ import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
-import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
@@ -85,6 +83,8 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 public class MusicPlaybackService extends JobIntentService implements IApolloService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
+
+    //private CountDownLatch initLatch = new CountDownLatch(1);
 
     /**
      * Indicates that the music has paused or resumed
@@ -366,12 +366,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     private WakeLock mWakeLock;
 
-    /**
-     * Alarm intent for removing the notification when nothing is playing
-     * for some time
-     */
-    private AlarmManager mAlarmManager;
-    private PendingIntent mShutdownIntent;
     private boolean mShutdownScheduled;
 
     /**
@@ -489,9 +483,38 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * {@inheritDoc}
      */
     @Override
+    public void onCreate() {
+        if (D) LOG.info("onCreate: Creating service");
+        super.onCreate();
+        prepareAudioFocusRequest();
+        boolean permissionGranted = runStrict(() ->
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                        PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
+        if (permissionGranted) {
+            // Initialize the notification helper
+            mNotificationHelper = new NotificationHelper(this);
+
+            try {
+                // "This initService() call may result in ANRs, when some of the ContentResolver queries (like getCardId())
+                // take too long.
+                //
+                // I didn't want to use Engine.instance().getThreadPool() as this might be initialized before EngineService
+                // give this is a service declared in AndroidManifest.xml"
+                // -gubatron
+                new Thread(this::initService).start();
+                //Asyncs.async(this, MusicPlaybackService::initService);
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public IBinder onBind(@NonNull final Intent intent) {
         if (D) LOG.info("Service bound, intent = " + intent);
-        cancelShutdown();
         mServiceInUse = true;
         return mBinder;
     }
@@ -521,7 +544,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             // Also delay stopping the service if we're transitioning between
             // tracks.
         } else if (mPlayListLen > 0 || (mPlayerHandler != null && mPlayerHandler.hasMessages(TRACK_ENDED))) {
-            scheduleDelayedShutdown();
             return true;
         }
         stopSelf(mServiceStartId);
@@ -533,36 +555,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     @Override
     public void onRebind(final Intent intent) {
-        cancelShutdown();
         mServiceInUse = true;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onCreate() {
-        if (D) LOG.info("onCreate: Creating service");
-        super.onCreate();
-        prepareAudioFocusRequest();
-        boolean permissionGranted = runStrict(() ->
-                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) &&
-                        PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE));
-        if (permissionGranted) {
-
-            try {
-                // "This initService() call may result in ANRs, when some of the ContentResovler queries (like getCardId())
-                // take too long.
-                //
-                // I didn't want to use Engine.instance().getThreadPool() as this might be initialized before EngineService
-                // give this is a service declared in AndroidManifest.xml"
-                // -gubatron
-                new Thread(this::initService).start();
-            } catch (Throwable ignored) {
-                LOG.error(ignored.getMessage(), ignored);
-            }
-        }
     }
 
     private void prepareAudioFocusRequest() {
@@ -613,25 +606,18 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 // see #onNotificationCreated
             }
 
+            handleCommandIntent(intent);
+
             if (SHUTDOWN_ACTION.equals(action)) {
-                cancelShutdown();
-                exiting = intent.hasExtra("force");
-                releaseServiceUiAndStop(exiting);
                 return START_NOT_STICKY;
             }
-
-
-            handleCommandIntent(intent);
         }
 
         // Make sure the service will shut down on its own if it was
         // just started but not bound to and nothing is playing
-        scheduleDelayedShutdown();
-
         if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
             MediaButtonIntentReceiver.completeWakefulIntent(intent);
         }
-
         return START_STICKY;
     }
 
@@ -662,12 +648,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     }
 
     private void initService() {
+        LOG.info("initService() invoked", true);
         // Initialize the favorites and recents databases
         mFavoritesCache = FavoritesStore.getInstance(this);
         mRecentsCache = RecentStore.getInstance(this);
-
-        // Initialize the notification helper
-        mNotificationHelper = new NotificationHelper(this);
 
         // Initialize the image fetcher
         mImageFetcher = ImageFetcher.getInstance(this);
@@ -741,16 +725,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         final Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
         shutdownIntent.setAction(SHUTDOWN_ACTION);
 
-        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        mShutdownIntent = PendingIntent.getService(this, 0, shutdownIntent, 0);
-
-        // Listen for the idle state
-        scheduleDelayedShutdown();
-
         // Bring the queue back
         reloadQueue();
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
+        //initLatch.countDown();
+
         updateNotification();
     }
 
@@ -830,14 +810,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             audioEffectsIntent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, getPackageName());
             sendBroadcast(audioEffectsIntent);
         } catch (Throwable ignored) {
-        }
-
-        // remove any pending alarms
-        // note: mShutdownIntent could be null because during creation
-        // internally PendingIntent.getService is eating (and ignoring)
-        // a possible RemoteException
-        if (mAlarmManager != null && mShutdownIntent != null) {
-            mAlarmManager.cancel(mShutdownIntent);
         }
 
         // Remove all pending messages before kill the player
@@ -935,6 +907,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (!mServiceInUse || force) {
             saveQueue(true);
             stopSelf(mServiceStartId);
+            stopForeground(true);
         }
 
         if (force) {
@@ -944,11 +917,33 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     }
 
+    @Override
+    public void handleIntentFromStub(Intent intent) throws RemoteException {
+        try {
+            handleCommandIntent(intent);
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw new RemoteException(t.getMessage());
+        }
+    }
+
+
     private void handleCommandIntent(Intent intent) {
         final String action = intent.getAction();
         final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
-        if (D) LOG.info("handleCommandIntent: action = " + action + ", command = " + command);
+        LOG.info("handleCommandIntent: action = " + action + ", command = " + command);
+
+        if (action == null && command == null) {
+            LOG.info("handleCommandIntent: nothing to be done here, exiting.");
+            return;
+        }
+
+        if (SHUTDOWN_ACTION.equals(action)) {
+            exiting = intent.hasExtra("force");
+            releaseServiceUiAndStop(exiting);
+            return;
+        }
 
         if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
             gotoNext(true);
@@ -984,15 +979,25 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     /**
      * Updates the notification, considering the current play and activity state
      */
-    private void updateNotification() {
+    public void updateNotification() {
+//        try {
+//            if (initLatch.getCount() == 1) {
+//                LOG.info("updateNotification() waiting for initLatch to release.");
+//            }
+//            initLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         if (mNotificationHelper == null) {
+            LOG.error("updateNotification() failed, mNotificationHelper == null");
             return;
         }
+
         if (isPlaying()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
-                async(this, MusicPlaybackService::updateNotificationTask);
+            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 500)) {
+                async(this, MusicPlaybackService::getAlbumArt, MusicPlaybackService::buildNotificationWithAlbumArtPost);
             }
-            return;
         }
 
         if (musicPlaybackActivityInForeground) {
@@ -1004,17 +1009,13 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    private static void updateNotificationTask(MusicPlaybackService service) {
-        // background portion
-        final Bitmap bitmap = service.getAlbumArt();
-        // TODO: refactor this really bad code
-        Runnable postExecute = () -> service.mNotificationHelper.buildNotification(
-                service.getAlbumName(),
-                service.getArtistName(),
-                service.getTrackName(),
+    private void buildNotificationWithAlbumArtPost(final Bitmap bitmap) {
+        mNotificationHelper.buildNotification(
+                getAlbumName(),
+                getArtistName(),
+                getTrackName(),
                 bitmap,
-                service.isPlaying());
-        service.mPlayerHandler.post(postExecute);
+                isPlaying());
     }
 
 
@@ -1089,67 +1090,29 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    private void scheduleDelayedShutdown() {
-        if (mAlarmManager != null && mShutdownIntent != null) {
-
-            if (mShutdownScheduled) {
-                cancelShutdown();
-            }
-
-            if (isPlaying()) {
-                LOG.info("scheduleDelayedShutdown() aborted, audio is playing.");
-                mShutdownScheduled = true;
-                return;
-            }
-
-            if (D) LOG.info("Scheduling shutdown in " + IDLE_DELAY + " ms");
-            mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + IDLE_DELAY, mShutdownIntent);
-            mShutdownScheduled = true;
-        } else {
-            mShutdownScheduled = false;
-        }
-    }
-
-    private void cancelShutdown() {
-        if (mAlarmManager != null && mShutdownIntent != null) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::cancelShutdownTask", 1000)) {
-                async(this, MusicPlaybackService::cancelShutdownTask);
-            }
-        }
-    }
-
-    private static void cancelShutdownTask(MusicPlaybackService musicPlaybackService) {
-        LOG.info("MusicPlaybackService.cancelShutdownTask()!");
-        if (musicPlaybackService.mAlarmManager != null && musicPlaybackService.mShutdownIntent != null) {
-            if (D)
-                LOG.info("Cancelling delayed shutdown. Was it previously scheduled? : " + musicPlaybackService.mShutdownScheduled);
-            try {
-                musicPlaybackService.mAlarmManager.cancel(musicPlaybackService.mShutdownIntent);
-                musicPlaybackService.mShutdownScheduled = false;
-            } catch (Throwable ignored) {
-                if (D) {
-                    LOG.error(ignored.getMessage(), ignored);
-                }
-            }
-        }
-    }
-
     /**
      * Stops playback
      *
-     * @param scheduleShutdown True to go to the idle state, false otherwise
+     * @param removeNotification
      */
-    private void stop(final boolean scheduleShutdown) {
-        if (D) LOG.info("Stopping playback, scheduleShutdown = " + scheduleShutdown);
+    private void stop(final boolean removeNotification) {
+        if (D) LOG.info("Stopping playback, removeNotification = " + removeNotification);
         stopPlayer();
         mFileToPlay = null;
         closeCursor();
-        if (scheduleShutdown) {
-            scheduleDelayedShutdown();
+        boolean isStopped = isStopped();
+        if (removeNotification) {
+            //scheduleDelayedShutdown();
             updateRemoteControlClient(PLAYSTATE_STOPPED);
+            stopForeground(true);
         } else {
-            stopForeground(isStopped());
+            stopForeground(isStopped);
+        }
+
+        if (removeNotification || isStopped) {
+            Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
+            shutdownIntent.setAction(SHUTDOWN_ACTION);
+            handleCommandIntent(shutdownIntent);
         }
     }
 
@@ -1408,7 +1371,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                         closeCursor();
                         if (mOpenFailedCounter++ < 10 && mPlayListLen > 1) {
                             final int pos = getNextPosition(false, isShuffleEnabled());
-                            if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
+                            if (notifyPlayStateChange(pos)) return;
                             mPlayPos = pos;
                             stop(false);
                             mPlayPos = pos;
@@ -1425,7 +1388,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                         } else {
                             mOpenFailedCounter = 0;
                             LOG.warn("Failed to open file for playback");
-                            scheduleDelayedShutdown();
                             if (mIsSupposedToBePlaying) {
                                 mIsSupposedToBePlaying = false;
                                 notifyChange(PLAYSTATE_CHANGED);
@@ -1607,9 +1569,22 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
+//        try {
+//            if (initLatch.getCount() == 1) {
+//                LOG.info("updateRemoteControlClient() waiting for initLatch to release.");
+//            }
+//            initLatch.await();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         if (mRemoteControlClient == null) {
-            LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
-            return;
+            // TODO cleanup if latch works
+            setUpRemoteControlClient();
+            if (mRemoteControlClient == null) {
+                LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
+                return;
+            }
         }
 
         if (what == null) {
@@ -2375,6 +2350,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     public void play() {
         if (mAudioManager == null) {
+            LOG.info("play() aborted, mAudioManager is null");
             return;
         }
 
@@ -2398,7 +2374,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
                     MediaButtonIntentReceiver.class.getName()));
         } catch (SecurityException e) {
-            e.printStackTrace();
+            LOG.error("play() " + e.getMessage(), e);
             // see explanation in initService
         }
 
@@ -2433,7 +2409,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 mIsSupposedToBePlaying = true;
             }
             notifyChange(PLAYSTATE_CHANGED);
-            cancelShutdown();
             updateNotification();
         }
     }
@@ -2449,7 +2424,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
             if (mIsSupposedToBePlaying && mPlayer != null) {
                 mPlayer.pause();
-                scheduleDelayedShutdown();
                 mIsSupposedToBePlaying = false;
                 if (musicPlaybackActivityInForeground) {
                     updateRemoteControlClient(PLAYSTATE_CHANGED);
@@ -2475,11 +2449,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         synchronized (this) {
             if (mPlayListLen <= 0) {
                 if (D) LOG.info("No play queue");
-                scheduleDelayedShutdown();
                 return;
             }
             final int pos = getNextPosition(force, isShuffleEnabled());
-            if (scheduleShutdownAndNotifyPlayStateChange(pos)) return;
+            if (notifyPlayStateChange(pos)) return;
             mPlayPos = pos;
             stop(false);
             mPlayPos = pos;
@@ -2490,9 +2463,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    private boolean scheduleShutdownAndNotifyPlayStateChange(int pos) {
+    private boolean notifyPlayStateChange(int pos) {
         if (pos < 0) {
-            scheduleDelayedShutdown();
             if (mIsSupposedToBePlaying) {
                 mIsSupposedToBePlaying = false;
                 notifyChange(PLAYSTATE_CHANGED);
@@ -3667,6 +3639,22 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         @Override
+        public void updateNotification() throws RemoteException {
+            if (Ref.alive(mService)) {
+                mService.get().updateNotification();
+                return;
+            }
+            throw new RemoteException("::ServiceStub::updateNotification() failed. Lost weak reference to mService and could not invoke updateNotification()");
+        }
+
+        @Override
+        public void handleIntentFromStub(Intent intent) throws RemoteException {
+            if (Ref.alive(mService)) {
+                mService.get().handleIntentFromStub(intent); // this one may throw RemoteExceptions
+            }
+        }
+
+        @Override
         public void shutdown() {
             if (Ref.alive(mService)) {
                 mService.get().shutdown();
@@ -3695,10 +3683,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     public void shutdown() {
         mPlayPos = -1;
-        stopForeground(true);
-        if (mShutdownIntent != null) {
-            cancelShutdown();
-        }
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 }

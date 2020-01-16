@@ -25,27 +25,18 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.ServiceConnection;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 
 import com.andrew.apollo.Config;
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.format.Capitalize;
-import com.andrew.apollo.loaders.AsyncHandler;
-import com.andrew.apollo.loaders.LastAddedLoader;
 import com.andrew.apollo.loaders.SearchLoader;
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.R;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.andrew.apollo.Config.MIME_TYPE;
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * This class is opened when the user touches a Home screen shortcut or album
@@ -64,11 +55,6 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
      * app-widget
      */
     private static final String OPEN_AUDIO_PLAYER = null;
-
-    /**
-     * Service token
-     */
-    private ServiceToken mToken;
 
     /**
      * Gather the intent action and extras
@@ -102,7 +88,7 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
 
         // Initialize the intent
         mIntent = getIntent();
@@ -113,6 +99,8 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
 
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
+        //TODO Attend this
+        /**
         musicPlaybackService = IApolloService.Stub.asInterface(service);
 
         // Check for a voice query
@@ -164,22 +152,24 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
                 }
             });
         }
+         */
         //else { TODO: show and error explaining why}
     }
 
     @Override
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //TODO perhaps attend this is we're to become some sort of listener
         // Unbind from the service
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
+//        if (musicPlaybackService != null) {
+//            MusicUtils.unbindFromService(mToken);
+//            mToken = null;
+//        }
     }
 
     /**

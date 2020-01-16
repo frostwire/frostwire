@@ -26,12 +26,13 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
+
+import com.frostwire.util.Logger;
 
 /**
  * Implementation of {@link PagerAdapter} that
@@ -70,6 +71,7 @@ import androidx.viewpager.widget.PagerAdapter;
  *      complete}
  */
 public abstract class FragmentPagerAdapter extends PagerAdapter {
+    private static final Logger LOG = Logger.getLogger(FragmentPagerAdapter.class);
     private static final String TAG = "FragmentPagerAdapter";
     private static final boolean DEBUG = false;
 
@@ -107,11 +109,11 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
         String name = makeFragmentName(container.getId(), itemId);
         Fragment fragment = mFragmentManager.findFragmentByTag(name);
         if (fragment != null) {
-            if (DEBUG) Log.v(TAG, "Attaching item #" + itemId + ": f=" + fragment);
+            if (DEBUG) LOG.info( "Attaching item #" + itemId + ": f=" + fragment);
             mCurTransaction.attach(fragment);
         } else {
             fragment = getItem(position);
-            if (DEBUG) Log.v(TAG, "Adding item #" + itemId + ": f=" + fragment);
+            if (DEBUG) LOG.info( "Adding item #" + itemId + ": f=" + fragment);
             mCurTransaction.add(container.getId(), fragment,
                     makeFragmentName(container.getId(), itemId));
         }
@@ -128,7 +130,7 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
-        if (DEBUG) Log.v(TAG, "Detaching item #" + getItemId(position) + ": f=" + object
+        if (DEBUG) LOG.info( "Detaching item #" + getItemId(position) + ": f=" + object
                 + " v=" + ((Fragment)object).getView());
         mCurTransaction.detach((Fragment)object);
     }
