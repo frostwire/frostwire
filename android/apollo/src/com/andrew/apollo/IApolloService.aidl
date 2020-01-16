@@ -42,6 +42,8 @@ interface IApolloService
     int getRepeatMode();
     int getMediaMountedCount();
     int getAudioSessionId();
+    void updateNotification();
+    void handleIntentFromStub(in Intent intent);
 
     void shutdown();
 }
