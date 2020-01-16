@@ -377,8 +377,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         onLocalPlay();
         Context ctx = getContext();
         if (fd.mime != null && fd.mime.contains("audio")) {
-            if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
-                Engine.instance().getMediaPlayer().stop();
+            CoreMediaPlayer coreMediaPlayer = Engine.instance().getMediaPlayer();
+            if (coreMediaPlayer != null && fd.equals(coreMediaPlayer.getCurrentFD(getContext()))) {
+                coreMediaPlayer.stop();
             } else {
                 try {
                     UIUtils.playEphemeralPlaylist(ctx, fd);
