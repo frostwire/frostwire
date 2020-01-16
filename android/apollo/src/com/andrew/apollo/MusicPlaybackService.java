@@ -72,6 +72,7 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;
@@ -84,7 +85,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
 
-    //private CountDownLatch initLatch = new CountDownLatch(1);
+    private CountDownLatch initLatch = new CountDownLatch(1);
 
     /**
      * Indicates that the music has paused or resumed
@@ -658,16 +659,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         // Initialize the image cache
         mImageFetcher.setImageCache(ImageCache.getInstance(this));
 
-        // Start up the thread running the service. Note that we create a
-        // separate thread because the service normally runs in the process's
-        // main thread, which we don't want to block. We also make it
-        // background priority so CPU-intensive work will not disrupt the UI.
-        final HandlerThread thread = new HandlerThread("MusicPlayerHandler",
-                android.os.Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-
-        // Initialize the handler
-        mPlayerHandler = new MusicPlayerHandler(this, thread.getLooper());
+        setupMPlayerHandler();
 
         // Initialize the audio manager and register any headset controls for
         // playback
@@ -699,6 +691,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         mPlayer = new MultiPlayer(this);
         mPlayer.setHandler(mPlayerHandler);
 
+        initLatch.countDown();
+
         async(this, MusicPlaybackService::initRepeatModeAndShuffleTask);
 
         // Initialize the intent filter and each action
@@ -729,9 +723,21 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         reloadQueue();
         notifyChange(QUEUE_CHANGED);
         notifyChange(META_CHANGED);
-        //initLatch.countDown();
 
         updateNotification();
+    }
+
+    private void setupMPlayerHandler() {
+        // Start up the thread running the service. Note that we create a
+        // separate thread because the service normally runs in the process's
+        // main thread, which we don't want to block. We also make it
+        // background priority so CPU-intensive work will not disrupt the UI.
+        final HandlerThread thread = new HandlerThread("MusicPlayerHandler",
+                android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        thread.start();
+
+        // Initialize the handler
+        mPlayerHandler = new MusicPlayerHandler(this, thread.getLooper());
     }
 
     private static void initRepeatModeAndShuffleTask(MusicPlaybackService service) {
@@ -842,7 +848,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         // Remove any callbacks from the handler
         if (mPlayerHandler != null) {
             mPlayerHandler.removeCallbacksAndMessages(null);
-            mPlayerHandler.getLooper().quit();
+            //mPlayerHandler.getLooper().quit();
         }
 
         // Close the cursor
@@ -980,14 +986,14 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * Updates the notification, considering the current play and activity state
      */
     public void updateNotification() {
-//        try {
-//            if (initLatch.getCount() == 1) {
-//                LOG.info("updateNotification() waiting for initLatch to release.");
-//            }
-//            initLatch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (initLatch.getCount() == 1) {
+                LOG.info("updateNotification() waiting for initLatch to release.");
+            }
+            initLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if (mNotificationHelper == null) {
             LOG.error("updateNotification() failed, mNotificationHelper == null");
@@ -1569,14 +1575,14 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @param what The broadcast
      */
     private void updateRemoteControlClient(final String what) {
-//        try {
-//            if (initLatch.getCount() == 1) {
-//                LOG.info("updateRemoteControlClient() waiting for initLatch to release.");
-//            }
-//            initLatch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (initLatch.getCount() == 1) {
+                LOG.info("updateRemoteControlClient() waiting for initLatch to release.");
+            }
+            initLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         if (mRemoteControlClient == null) {
             // TODO cleanup if latch works
@@ -1707,9 +1713,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         try {
             musicPlaybackService.mPlayerHandler.post(postExecute);
         } catch (Throwable throwable) {
-            // looks like android can kill the service thread
-            // gotta figure out to deal with this, but let's not crash
-            LOG.error("changeRemoteControlClientTask() " + throwable.getMessage() + " (exception caught but not handled just printed) " + throwable.getMessage(), throwable);
+            musicPlaybackService.setupMPlayerHandler();
+            try {
+                musicPlaybackService.mPlayerHandler.post(postExecute);
+            } catch (Throwable t) {
+                LOG.error("changeRemoteControlClientTask() " + throwable.getMessage() + " (exception caught but not handled just printed) " + throwable.getMessage(), throwable);
+            }
         }
     }
 

@@ -100,7 +100,6 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class AudioPlayerActivity extends AbstractActivity implements
-        ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -239,46 +238,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public void onNewIntent(Intent intent) {
-        //super.onNewIntent(intent);
+        super.onNewIntent(intent);
         setIntent(intent);
         startPlayback();
-    }
-
-    @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        /**
-        // this shouldn't happen here since we won't be ServiceConnection listeners
-        // we'll ask musicPlaybackService about its state directly
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
-        if (musicPlaybackService != null) {
-            try {
-                musicPlaybackService.updateNotification();
-                // How we end up calling foreground
-                // musicPlaybackService.updateNotification() ->
-                // musicPlaybackService.buildNotificationWithAlbumArtPost() ->
-                // musicPlaybackService.mNotificationHelper.buildNotification(...) ->
-                // musicPlaybackService.mNotificationHelper.mService.onNotificationCreated(mNotification);
-                // musicPlaybackService.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification[, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK]);
-            } catch (RemoteException re) {
-                LOG.warn("onServiceConnected() could not send the notification, android will probably shutdown our service", re, true);
-            } catch (Throwable t) {
-                LOG.error("onServiceConnected() " + t.getMessage(), t, true);
-            }
-        }
-         */
-        // Check whether we were asked to start any playback
-        startPlayback();
-        // Set the playback drawables
-        updatePlaybackControls();
-        // Current info
-        updateNowPlayingInfo();
-        // Update the favorites icon
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        //musicPlaybackService = null;
     }
 
     @Override
