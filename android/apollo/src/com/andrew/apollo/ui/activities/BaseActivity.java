@@ -22,14 +22,12 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -154,23 +152,6 @@ public abstract class BaseActivity extends AbstractActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    // TODO: This logic on some sort of listener, if at all
-    @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        //musicPlaybackService = IApolloService.Stub.asInterface(service);
-        // Set the playback drawables
-        updatePlaybackControls();
-        // Current info
-        updateBottomActionBarInfo();
-        // Update the favorites icon
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        //musicPlaybackService = null;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
@@ -253,13 +234,6 @@ public abstract class BaseActivity extends AbstractActivity
         filter.addAction(MusicPlaybackService.REFRESH);
         registerReceiver(mPlaybackStatus, filter);
         MusicUtils.notifyForegroundStateChanged(this, true);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //TODO: testing this commented out to not leak ServiceConnection onStop()
-        //MusicUtils.notifyForegroundStateChanged(this, false);
     }
 
     @Override

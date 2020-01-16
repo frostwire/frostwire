@@ -22,18 +22,15 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.provider.MediaStore.Audio.Albums;
@@ -779,8 +776,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * and starts playback if that's the case
      */
     private void startPlayback() {
-        // TODO looks like this will change, we might need to start the service ourselves here
-        // or this should be a callback after the service is started onNewIntent()
         Intent intent = getIntent();
 
         if (intent == null || MusicUtils.getMusicPlaybackService() == null) {

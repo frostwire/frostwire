@@ -25,7 +25,6 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -79,7 +78,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -138,6 +137,10 @@ public final class MusicUtils {
         serviceConnectionListener.addSubListener(listenerId, runnable);
     }
 
+    public static ServiceConnectionListener getServiceConnectionListener() {
+        return serviceConnectionListener;
+    }
+
     public static IApolloService getMusicPlaybackService() {
         return musicPlaybackService;
     }
@@ -193,32 +196,34 @@ public final class MusicUtils {
     private static class ServiceConnectionListener implements ServiceConnection {
         private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
         private final HashMap<Integer, Runnable> subListeners = new HashMap<>();
-        private boolean bound = false;
+        private final AtomicBoolean bound = new AtomicBoolean(false);
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (service instanceof MusicPlaybackService.Stub) {
-                musicPlaybackService = IApolloService.Stub.asInterface(service);
-                try {
-                    LOG.info("ServiceConnectionListener::onServiceConnected() -> MusicPlaybackService::updateNotification()!", true);
-                    musicPlaybackService.updateNotification();
-                } catch (RemoteException e) {
-                    LOG.error("ServiceConnectionListener::onServiceConnected() " + e.getMessage(), e, true);
-                }
-
-                notifySubListeners();
-
-                // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
-                subListeners.clear();
-                bound = true;
+            bound.set(true);
+            musicPlaybackService = IApolloService.Stub.asInterface(service);
+            try {
+                LOG.info("ServiceConnectionListener::onServiceConnected() -> MusicPlaybackService::updateNotification()!", true);
+                musicPlaybackService.updateNotification();
+            } catch (RemoteException e) {
+                LOG.error("ServiceConnectionListener::onServiceConnected() " + e.getMessage(), e, true);
             }
+
+            notifySubListeners();
+
+            // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
+            subListeners.clear();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             subListeners.clear();
-            bound = false;
+            bound.set(false);
             musicPlaybackService = null;
+        }
+
+        public boolean isBound() {
+            return bound.get();
         }
 
         void addSubListener(int id, Runnable runnable) {
@@ -240,9 +245,6 @@ public final class MusicUtils {
             }
         }
 
-        public boolean isBound() {
-            return bound;
-        }
     }
 
     /**

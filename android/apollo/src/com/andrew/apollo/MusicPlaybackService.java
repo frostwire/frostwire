@@ -868,6 +868,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mUnmountReceiver = null;
         }
 
+        unbindService(MusicUtils.getServiceConnectionListener());
+
         // Release the wake lock
         if (mWakeLock != null) {
             try {
@@ -1585,12 +1587,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         if (mRemoteControlClient == null) {
-            // TODO cleanup if latch works
-            setUpRemoteControlClient();
-            if (mRemoteControlClient == null) {
-                LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
-                return;
-            }
+            LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
+            return;
         }
 
         if (what == null) {

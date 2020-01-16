@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,9 @@ package com.andrew.apollo.ui.activities;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.format.Capitalize;
@@ -46,7 +43,7 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class ShortcutActivity extends Activity implements ServiceConnection {
+public final class ShortcutActivity extends Activity {
 
     /**
      * If true, this class will begin playback and open
@@ -97,81 +94,6 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
 
     }
 
-    @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        //TODO Attend this
-        /**
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
-
-        // Check for a voice query
-        if (mIntent != null && MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH.equals(mIntent.getAction())) {
-            getLoaderManager().initLoader(0, null, mSongAlbumArtistQuery);
-        } else if (musicPlaybackService != null) {
-            AsyncHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    final String requestedMimeType = mIntent.getExtras().getString(MIME_TYPE);
-                    // Shuffle the artist track list
-                    mShouldShuffle = MusicUtils.isShuffleEnabled();
-                    // First, check the artist MIME type
-                    if (MediaStore.Audio.Artists.CONTENT_TYPE.equals(requestedMimeType)) {
-                        // Get the artist song list
-                        mList = MusicUtils.getSongListForArtist(ShortcutActivity.this, getId());
-                    } else
-                        // Second, check the album MIME type
-                        if (MediaStore.Audio.Albums.CONTENT_TYPE.equals(requestedMimeType)) {
-                            // Get the album song list
-                            mList = MusicUtils.getSongListForAlbum(ShortcutActivity.this, getId());
-                        } else
-                            // Third, check the genre MIME type
-                            if (MediaStore.Audio.Genres.CONTENT_TYPE.equals(requestedMimeType)) {
-                                // Get the genre song list
-                                mList = MusicUtils.getSongListForGenre(ShortcutActivity.this, getId());
-                            } else
-                                // Fourth, check the playlist MIME type
-                                if (MediaStore.Audio.Playlists.CONTENT_TYPE.equals(requestedMimeType)) {
-                                    // Get the playlist song list
-                                    mList = MusicUtils.getSongListForPlaylist(ShortcutActivity.this, getId());
-                                } else
-                                    // Check the Favorites playlist
-                                    if (getString(R.string.playlist_favorites).equals(requestedMimeType)) {
-                                        // Get the Favorites song list
-                                        mList = MusicUtils.getSongListForFavorites(ShortcutActivity.this);
-                                    } else
-                                        // Check for the Last added playlist
-                                        if (getString(R.string.playlist_last_added).equals(requestedMimeType)) {
-                                            // Get the Last added song list
-                                            Cursor cursor = LastAddedLoader.makeLastAddedCursor(ShortcutActivity.this);
-                                            if (cursor != null) {
-                                                mList = MusicUtils.getSongListForCursor(cursor);
-                                                cursor.close();
-                                            }
-                                        }
-                    // Finish up
-                    allDone();
-                }
-            });
-        }
-         */
-        //else { TODO: show and error explaining why}
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        //musicPlaybackService = null;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //TODO perhaps attend this is we're to become some sort of listener
-        // Unbind from the service
-//        if (musicPlaybackService != null) {
-//            MusicUtils.unbindFromService(mToken);
-//            mToken = null;
-//        }
-    }
-
     /**
      * Uses the query from a voice search to try and play a song, then album,
      * then artist. If all of those fail, it checks for playlists and genres
@@ -200,10 +122,8 @@ public final class ShortcutActivity extends Activity implements ServiceConnectio
 
             // Start fresh
             mSong.clear();
-            // Add the data to the adpater
-            for (final Song song : data) {
-                mSong.add(song);
-            }
+            // Add the data to the adapter
+            mSong.addAll(data);
 
             // What's about to happen is similar to the above process. Apollo
             // runs a
