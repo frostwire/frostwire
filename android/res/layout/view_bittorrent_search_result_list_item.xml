@@ -34,7 +34,7 @@
             android:layout_width="52dp"
             android:layout_height="match_parent"
             android:layout_gravity="center|center_vertical"
-            android:layout_marginLeft="3dp"
+            android:layout_marginStart="3dp"
             android:contentDescription="@null"
             />
         <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
@@ -44,7 +44,8 @@
             android:layout_centerInParent="true"
             android:clickable="true"
             android:foregroundGravity="center"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:focusable="true" />
     </RelativeLayout>
 
     <ImageView
@@ -79,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/view_bittorrent_search_result_list_item_title"
             android:layout_marginBottom="4dp"
-            android:text="Ad" />
+            android:text="@string/dummy_ad" />
 
         <TextView
             android:id="@+id/view_bittorrent_search_result_list_item_file_size"
@@ -87,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/view_bittorrent_search_result_list_item_title"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
             android:text="@string/dummy_size" />
 
         <TextView
@@ -96,7 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/view_bittorrent_search_result_list_item_file_size"
-            android:layout_toRightOf="@id/view_bittorrent_search_result_list_item_file_size"
+            android:layout_toEndOf="@id/view_bittorrent_search_result_list_item_file_size"
             android:text="@string/dummy_extra" />
 
         <TextView
@@ -106,7 +107,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/view_bittorrent_search_result_list_item_file_size"
             android:clickable="true"
-            android:text="@string/dummy_engine" />
+            android:text="@string/dummy_engine"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/view_bittorrent_search_result_list_item_text_seeds"
@@ -114,9 +116,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/view_bittorrent_search_result_list_item_text_source"
-            android:layout_marginLeft="6dp"
-            android:layout_toRightOf="@id/view_bittorrent_search_result_list_item_text_source"
+            android:layout_marginStart="6dp"
+            android:layout_toEndOf="@id/view_bittorrent_search_result_list_item_text_source"
             android:text="@string/dummy_sources" />
+
+        <TextView
+            android:id="@+id/view_bittorrent_ssearch_result_list_item_text_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/view_bittorrent_search_result_list_item_text_source"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="6dp"
+            android:text="@string/dummy_age_ago" />
     </RelativeLayout>
 
 </LinearLayout>
