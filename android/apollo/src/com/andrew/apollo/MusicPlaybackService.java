@@ -868,7 +868,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mUnmountReceiver = null;
         }
 
-        unbindService(MusicUtils.getServiceConnectionListener());
+        try {
+            unbindService(MusicUtils.getServiceConnectionListener());
+        } catch (Throwable t) {
+            LOG.error("onDestroy(): unBindService() failed, " + t.getMessage(), t, true);
+        }
 
         // Release the wake lock
         if (mWakeLock != null) {
