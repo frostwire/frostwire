@@ -486,4 +486,15 @@
     <string name="free">Free</string>
     <string name="dummy_ad">Ad</string>
     <string name="dummy_age_ago">2 days ago</string>
+    <string name="one_second">1 second</string>
+    <string name="n_seconds">%s seconds</string>
+    <string name="one_minute">1 minute</string>
+    <string name="n_minutes">%s minutes</string>
+    <string name="one_hour">1 hour</string>
+    <string name="n_hours">%s hours</string>
+    <string name="one_day">1 day</string>
+    <string name="n_days">%s days</string>
+    <string name="one_month">1 month</string>
+    <string name="n_months">%s months</string>
+    <string name="n_years">%s years</string>
 </resources>

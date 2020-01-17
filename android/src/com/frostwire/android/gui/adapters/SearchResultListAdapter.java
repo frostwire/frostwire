@@ -21,6 +21,7 @@ package com.frostwire.android.gui.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.SystemClock;
@@ -143,6 +144,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         extra.setText(FilenameUtils.getExtension(sr.getFilename()));
         TextView seeds = findView(view, R.id.view_bittorrent_search_result_list_item_text_seeds);
         seeds.setText("");
+        TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
+        age.setText("");
         String license = sr.getLicense().equals(Licenses.UNKNOWN) ? "" : " - " + sr.getLicense();
         TextView sourceLink = findView(view, R.id.view_bittorrent_search_result_list_item_text_source);
         sourceLink.setText(sr.getSource() + license); // TODO: ask for design
@@ -179,6 +182,59 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         } else {
             seeds.setText("");
         }
+        TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
+        age.setText(SearchResultListAdapter.formatElapsedTime(view.getResources(), sr.getCreationTime()));
+    }
+
+    /**
+     * Human friendly time elapsed, in minutes, hours, days, months and years.
+     * If we ever need this elsewhere move it to a new common/.../DateUtils.java file
+     * For now it's overkill.
+     */
+    private static String formatElapsedTime(Resources res, long creationTimeInMs) {
+        long secondsElapsed = (System.currentTimeMillis() - creationTimeInMs) / 1000;
+        if (secondsElapsed <= 1) {
+            return res.getString(R.string.one_second);
+        }
+        if (secondsElapsed < 60) {
+            return res.getString(R.string.n_seconds, String.valueOf(secondsElapsed));
+        }
+        int minutesElapsed = (int) (secondsElapsed / 60);
+        if (minutesElapsed <= 1) {
+            return res.getString(R.string.one_minute);
+        }
+        if (minutesElapsed < 60) {
+            return res.getString(R.string.n_minutes, String.valueOf(minutesElapsed));
+        }
+        int hoursElapsed = minutesElapsed / 60;
+        if (hoursElapsed <= 1) {
+            return res.getString(R.string.one_hour);
+        }
+        if (hoursElapsed < 24) {
+            return res.getString(R.string.n_hours, String.valueOf(hoursElapsed));
+        }
+        int daysElapsed = hoursElapsed / 24;
+        if (daysElapsed <= 1) {
+            return res.getString(R.string.one_day);
+        }
+        if (daysElapsed < 30) {
+            return res.getString(R.string.n_days, String.valueOf(daysElapsed));
+        }
+        int monthsElapsed = daysElapsed / 30;
+        if (monthsElapsed <= 1) {
+            return res.getString(R.string.one_month);
+        }
+        if (monthsElapsed < 12) {
+            return res.getString(R.string.n_months, String.valueOf(monthsElapsed));
+        }
+        int yearsElapsed = monthsElapsed/12;
+        if (yearsElapsed <= 1) {
+            return res.getString(R.string.one_year);
+        }
+        if (yearsElapsed > 20) {
+            return "";
+        }
+        return res.getString(R.string.n_years, String.valueOf(yearsElapsed));
     }
 
     @Override

@@ -423,4 +423,15 @@
     <string name="looking_For_rewarded_video">Buscando video con recompensa…</string>
     <string name="no_reward_videos_available">No pude encontrar un video con recompensa. Intenta de nuevo</string>
     <string name="free">Gratis</string>
+    <string name="one_second">1 segundo</string>
+    <string name="n_seconds">%s segundos</string>
+    <string name="one_minute">1 minuto</string>
+    <string name="n_minutes">%s minutos</string>
+    <string name="one_hour">1 hora</string>
+    <string name="n_hours">%s horas</string>
+    <string name="one_day">1 día</string>
+    <string name="n_days">%s días</string>
+    <string name="one_month">1 mes</string>
+    <string name="n_months">%s meses</string>
+    <string name="n_years">%s años</string>
 </resources>
