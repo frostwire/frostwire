@@ -276,6 +276,7 @@
         <service
             android:name="com.andrew.apollo.MusicPlaybackService"
             android:permission="android.permission.BIND_JOB_SERVICE"
+            android:foregroundServiceType="mediaPlayback"
             android:protectionLevel="dangerous" />
 
         <!-- receivers -->
