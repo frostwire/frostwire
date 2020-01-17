@@ -29,9 +29,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -43,9 +46,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -127,20 +127,20 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private TextView fileSizeTextView;
         private ImageButton playButtonImageView;
 
-        public TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
+        TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
             super(itemView);
         }
 
-        public void updateTransferItem(TransferItem transferItem) {
+        void updateTransferItem(TransferItem transferItem) {
             if (fileNameTextView == null) {
                 initComponents();
             }
             final Bundle bundle = new Bundle();
             async(this,
-                  TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
-                  transferItem,
-                  bundle,
-                  TransferDetailFilesTransferItemViewHolder::updateTransferDataPost );
+                    TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
+                    transferItem,
+                    bundle,
+                    TransferDetailFilesTransferItemViewHolder::updateTransferDataPost);
         }
 
         private static void updateTransferDataTask(TransferDetailFilesTransferItemViewHolder holder,
@@ -190,7 +190,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         private final List<TransferItem> items;
 
-        public TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
+        TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
             this.items = new LinkedList<>(items);
         }
 
@@ -201,7 +201,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         @Override
-        public void onBindViewHolder(TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
+        public void onBindViewHolder(@NonNull TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
             if (items.isEmpty()) {
                 return;
             }
@@ -216,7 +216,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             return items.isEmpty() ? 0 : items.size();
         }
 
-        public void updateTransferItems(List<TransferItem> freshItems) {
+        void updateTransferItems(List<TransferItem> freshItems) {
             items.clear();
             if (freshItems != null && freshItems.size() > 0) {
                 items.addAll(freshItems);
@@ -227,7 +227,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
     private static final class OpenOnClickListener extends ClickAdapter<Context> {
 
-        public OpenOnClickListener(Context ctx) {
+        OpenOnClickListener(Context ctx) {
             super(ctx);
         }
 

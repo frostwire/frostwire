@@ -152,8 +152,13 @@ public class NotificationHelper {
      * @param isPlaying True if music is playing, false otherwise
      */
     void updatePlayState(final boolean isPlaying, final boolean isStopped) {
-        LOG.info("updatePlayState() isPlaying=" + isPlaying + ", isStopped=" + isStopped);
-        if (mNotification == null || mNotificationManager == null) {
+        LOG.info("updatePlayState(isPlaying=" + isPlaying + ", isStopped=" + isStopped + ")");
+        if (mNotification == null) {
+            LOG.info("updatePlayState() aborted! mNotification is null");
+            return;
+        }
+        if (mNotificationManager == null) {
+            LOG.info("updatePlayState() aborted! mNotificationManager is null");
             return;
         }
         boolean isPaused = !isPlaying && !isStopped;
@@ -173,6 +178,7 @@ public class NotificationHelper {
                     mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
                 }
                 if (mNotification != null) {
+                    LOG.info("updatePlayState() calling back MusicPlaybackService::onNotificationCreated");
                     mService.onNotificationCreated(mNotification);
                 }
             }

@@ -85,10 +85,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void initEventHandlers() {
-        OnClickListener goToAudioPlayerActivityListener = v -> {
-            openAudioPlayerActivity();
-            NavUtils.openAudioPlayer((Activity) getContext());
-        };
+        OnClickListener goToAudioPlayerActivityListener = v -> NavUtils.openAudioPlayer((Activity) getContext());
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
 
         LinearLayout statusContainer = findViewById(R.id.view_miniplayer_status_container);

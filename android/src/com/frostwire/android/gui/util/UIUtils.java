@@ -542,7 +542,6 @@ public final class UIUtils {
         final CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
         final WeakReference<Context> contextRef = Ref.weak(context);
         if (!MusicUtils.isMusicPlaybackServiceRunning(context)) {
-
             Runnable playEphemeralPlaylistOfOneCallback = () -> {
                 try {
                     if (mediaPlayer != null && Ref.alive(contextRef)) {
@@ -557,8 +556,7 @@ public final class UIUtils {
 
             if (MusicUtils.getMusicPlaybackService() == null) {
                 //LOG.info("playEphemeralPlaylistTask() service is not there, and it's null");
-                MusicUtils.addServiceConnectionListener(MusicUtils.UIUTILS_PLAY_EPHEMERAL_SERVICE_CONNECTION_SUB_LISTENER_ID, playEphemeralPlaylistOfOneCallback);
-                MusicUtils.startMusicPlaybackService(context, new Intent(context, MusicPlaybackService.class));
+                MusicUtils.startMusicPlaybackService(context, new Intent(context, MusicPlaybackService.class), playEphemeralPlaylistOfOneCallback);
             } else {
                 //LOG.info("playEphemeralPlaylistTask() calling playEphemeralPlaylistOfOneCallback directly, had music service already");
                 playEphemeralPlaylistOfOneCallback.run();

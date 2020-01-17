@@ -22,17 +22,14 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -72,7 +69,7 @@ import java.util.Locale;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
-        OnScrollListener, OnQueryTextListener, OnItemClickListener, ServiceConnection {
+        OnScrollListener, OnQueryTextListener, OnItemClickListener {
     /**
      * Grid view column count. ONE - list, TWO - normal grid
      */
@@ -191,11 +188,6 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Unbind from the service
-//        if (musicPlaybackService != null) {
-//            MusicUtils.unbindFromService(mToken);
-//            mToken = null;
-//        }
     }
 
     @Override
@@ -314,16 +306,6 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         cursor.close();
         // All done
         finish();
-    }
-
-    @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        //musicPlaybackService = IApolloService.Stub.asInterface(service);
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        //musicPlaybackService = null;
     }
 
     /**

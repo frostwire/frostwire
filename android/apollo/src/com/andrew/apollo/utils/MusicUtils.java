@@ -180,9 +180,16 @@ public final class MusicUtils {
     }
 
     public static boolean isMusicPlaybackServiceRunning(final Context context) {
+        if (musicPlaybackService == null) {
+            return false;
+        }
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         Class serviceClass = MusicPlaybackService.class;
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+        List<ActivityManager.RunningServiceInfo> runningServices = manager.getRunningServices(Integer.MAX_VALUE);
+        if (runningServices == null || runningServices.isEmpty()) {
+            return false;
+        }
+        for (ActivityManager.RunningServiceInfo service : runningServices) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;
             }

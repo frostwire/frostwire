@@ -629,10 +629,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 try {
                     startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
                 } catch (Throwable t) {
-                    LOG.error("onNotificationCreated(SDK > Q) " + t.getMessage(), t);
+                    LOG.error("error onNotificationCreated(SDK > Q) " + t.getMessage(), t);
                 }
             } else {
-                LOG.error("onNotificationCreated() received null notification, check your logic");
+                LOG.error("error onNotificationCreated() received null notification, check your logic");
             }
         } else {
             if (notification != null) {
@@ -640,10 +640,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 try {
                     startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
                 } catch (Throwable t) {
-                    LOG.error("onNotificationCreated(SDK < Q) " + t.getMessage(), t);
+                    LOG.error("error onNotificationCreated(SDK < Q) " + t.getMessage(), t);
                 }
             } else {
-                LOG.error("onNotificationCreated() received null notification, check your logic");
+                LOG.error("error onNotificationCreated() received null notification, check your logic");
             }
         }
     }

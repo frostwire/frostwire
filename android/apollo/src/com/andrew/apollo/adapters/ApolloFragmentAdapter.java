@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+
 import com.andrew.apollo.cache.ImageFetcher;
-import com.andrew.apollo.model.*;
+import com.andrew.apollo.model.Album;
+import com.andrew.apollo.model.Artist;
+import com.andrew.apollo.model.Genre;
+import com.andrew.apollo.model.Playlist;
+import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
@@ -50,37 +55,37 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
     /**
      * The header view
      */
-    protected static final int ITEM_VIEW_TYPE_HEADER = 0;
+    static final int ITEM_VIEW_TYPE_HEADER = 0;
 
     /**
      * * The data in the list.
      */
-    protected static final int ITEM_VIEW_TYPE_MUSIC = 1;
+    static final int ITEM_VIEW_TYPE_MUSIC = 1;
 
 
     /**
      * Used to set the size of the data in the adapter
      */
-    protected List<I> mDataList = new ArrayList<>();
+    List<I> mDataList = new ArrayList<>();
 
     /**
      * Image cache and image fetcher
      */
-    protected final ImageFetcher mImageFetcher;
+    final ImageFetcher mImageFetcher;
 
     /**
      * Used to cache the album info
      */
-    protected MusicViewHolder.DataHolder[] mData;
+    MusicViewHolder.DataHolder[] mData;
 
     /**
      * Loads line three and the background image if the user decides to.
      */
-    protected boolean mLoadExtraData = false;
+    boolean mLoadExtraData = false;
 
-    protected final int mLayoutId;
+    final int mLayoutId;
 
-    public ApolloFragmentAdapter(Context context, int mLayoutId, int textViewResourceId) {
+    ApolloFragmentAdapter(Context context, int mLayoutId, int textViewResourceId) {
         super(context, textViewResourceId);
         this.mLayoutId = mLayoutId;
         if (context instanceof Activity) {
@@ -123,18 +128,15 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      */
     protected void initAlbumPlayOnClick(final ImageView album, final int position) {
         if (album != null) {
-            album.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    final long id = getItemId(position);
-                    final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                    MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
-                }
+            album.setOnClickListener(v -> {
+                final long id = getItemId(position);
+                final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
+                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
             });
         }
     }
 
-    protected void updateFirstTwoArtistLines(MusicViewHolder holder, MusicViewHolder.DataHolder dataHolder) {
+    void updateFirstTwoArtistLines(MusicViewHolder holder, MusicViewHolder.DataHolder dataHolder) {
         if (holder != null && dataHolder != null) {
             // Set each artist name (line one)
             if (Ref.alive(holder.mLineOne)) {
@@ -148,15 +150,14 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         }
     }
 
-    public static View prepareMusicViewHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
+    static View prepareMusicViewHolder(int mLayoutId, Context context, View convertView, final ViewGroup parent) {
         MusicViewHolder holder = null;
         if (convertView != null) {
             holder = (MusicViewHolder) convertView.getTag();
         } else {
             try {
                 convertView = LayoutInflater.from(context).inflate(mLayoutId, parent, false);
-            } catch (Throwable t) {
-                holder = null;
+            } catch (Throwable ignored) {
             }
         }
         if (holder == null && convertView != null) {
@@ -189,8 +190,6 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
      * Some views have multiple view types.
      * If the View type for the adapter is a ITEM_VIEW_TYPE_HEADER
      * Our elements are actually displayed starting with an offset of 1 on the listView, gridView.
-     *
-     * @return
      */
     public int getOffset() {
         int offset = 0;
@@ -223,7 +222,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
         if (position < 0 || (mDataList != null && position >= mDataList.size())) {
             return null;
         }
-        if (mDataList != null && !mDataList.isEmpty()) {
+        if (mDataList != null) {
             return mDataList.get(position);
         } else {
             try {

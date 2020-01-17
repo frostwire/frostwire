@@ -232,7 +232,19 @@ public abstract class BaseActivity extends AbstractActivity {
         // Update a list, probably the playlist fragment's
         filter.addAction(MusicPlaybackService.REFRESH);
         registerReceiver(mPlaybackStatus, filter);
-        MusicUtils.notifyForegroundStateChanged(this, true);
+
+        // We ask here because we don't yet need to ask for the music service to be started.
+        // On AudioPlayerActivity, it's another story, if we get there, it's because
+        // we're playing a track.
+        if (MusicUtils.isPlaying()) {
+            MusicUtils.notifyForegroundStateChanged(this, true);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        MusicUtils.notifyForegroundStateChanged(this, false);
     }
 
     @Override
