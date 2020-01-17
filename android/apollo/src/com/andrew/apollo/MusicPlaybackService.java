@@ -1117,7 +1117,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             stopForeground(isStopped);
         }
 
-        if (removeNotification || isStopped) {
+        if (removeNotification) {
             Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
             shutdownIntent.setAction(SHUTDOWN_ACTION);
             handleCommandIntent(shutdownIntent);

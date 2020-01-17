@@ -415,6 +415,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
         } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {

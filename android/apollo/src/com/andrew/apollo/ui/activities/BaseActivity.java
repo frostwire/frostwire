@@ -70,8 +70,7 @@ import java.util.ArrayList;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends AbstractActivity
-        implements ServiceConnection {
+public abstract class BaseActivity extends AbstractActivity {
     /**
      * Play state and meta change listener
      */
