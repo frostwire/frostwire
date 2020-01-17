@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 614 - JAN/14/2020
+FrostWire 2.1.9 build 617 - JAN/16/2020
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build
@@ -10,7 +10,11 @@ FrostWire 2.1.9 build 614 - JAN/14/2020
  - Removed experimental haptic feedback feature
  - Multiple crashes fixed
  - Music player and notifications framework update
+ - MusicPlaybackService lifecycle rewrite
  - SoundCloud search/downloads fixed
+ - android material 1.2.0-alpha03
+ - androix browser 1.3.0-alpha01
+ - applovin and mopub mediation 9.11.1
  - lt:fix erroneous event=completed tracker announce when checking files
  - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
  - lt:fix bug in protocol encryption/obfuscation
