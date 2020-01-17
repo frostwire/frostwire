@@ -624,6 +624,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         final WeakReference<AudioPlayerActivity> activityRef = Ref.weak(this);
 
         final long trackIdWeAreMonitoring = lastTrackId;
+        updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
         LOG.info("deferredInitAlbumArtBanner() about to postDelayed waiting for track " + trackIdWeAreMonitoring);
         mTimeHandler.postDelayed(() -> {
 
@@ -656,9 +657,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             if (lastKnownIsPlaying && position < minPassedPosition) {
                 LOG.error("deferredInitAlbumArtBanner() callback failed: Position@" +
                         position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN");
-                if (BuildConfig.DEBUG) {
-                    throw new RuntimeException("deferredInitAlbumArtBanner() callback failed: Position@" + position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN, CRASHING DOWN!\"");
-                }
                 return;
             }
             waitingToInitAlbumArtBanner.set(false);
