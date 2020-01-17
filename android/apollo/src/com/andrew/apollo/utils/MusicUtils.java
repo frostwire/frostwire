@@ -68,16 +68,16 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -100,8 +100,6 @@ public final class MusicUtils {
 
     private static ContentValues[] mContentValuesCache = null;
 
-    public static int UIUTILS_PLAY_EPHEMERAL_SERVICE_CONNECTION_SUB_LISTENER_ID = 0;
-
     static {
         sEmptyList = new long[0];
         serviceConnectionListener = new ServiceConnectionListener();
@@ -111,7 +109,7 @@ public final class MusicUtils {
     public MusicUtils() {
     }
 
-    public static void startMusicPlaybackService(final Context context, final Intent intent) {
+    public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
         // MusicPlaybackService has to be a foreground service
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -126,6 +124,9 @@ public final class MusicUtils {
         }
         try {
             if (!serviceConnectionListener.isBound()) {
+                if (onServiceBoundCallback != null) {
+                    serviceConnectionListener.addSubListener(onServiceBoundCallback);
+                }
                 context.bindService(intent, serviceConnectionListener, 0);
             }
         } catch (Throwable t) {
@@ -133,8 +134,41 @@ public final class MusicUtils {
         }
     }
 
-    public static void addServiceConnectionListener(int listenerId, Runnable runnable) {
-        serviceConnectionListener.addSubListener(listenerId, runnable);
+    public static void startMusicPlaybackService(final Context context, final Intent intent) {
+        startMusicPlaybackService(context, intent, null);
+    }
+
+    /**
+     * Used to build and show a notification when Apollo is sent into the
+     * background
+     *
+     * @param context The {@link Context} to use.
+     */
+    public static void notifyForegroundStateChanged(final Context context, boolean inForeground) {
+        int old = sForegroundActivities;
+        if (inForeground) {
+            sForegroundActivities++;
+        } else {
+            sForegroundActivities--;
+        }
+        if (old == 0 || sForegroundActivities == 0) {
+            boolean startedServiceNow = false;
+            final Intent intent = new Intent(context, MusicPlaybackService.class);
+            intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
+            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
+            try {
+                if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+                    // no need to be calling start service to make it do what we want if it's already there
+                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
+                    MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
+                } else {
+                    LOG.info("notifyForegroundStateChanged() -> starting MusicPlaybackService as a foreground service ...", true);
+                    MusicUtils.startMusicPlaybackService(context, intent);
+                }
+            } catch (Throwable ignored) {
+                LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
+            }
+        }
     }
 
     public static ServiceConnectionListener getServiceConnectionListener() {
@@ -195,7 +229,7 @@ public final class MusicUtils {
 
     private static class ServiceConnectionListener implements ServiceConnection {
         private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
-        private final HashMap<Integer, Runnable> subListeners = new HashMap<>();
+        private final ArrayList<Runnable> subListeners = new ArrayList<>();
         private final AtomicBoolean bound = new AtomicBoolean(false);
 
         @Override
@@ -226,21 +260,19 @@ public final class MusicUtils {
             return bound.get();
         }
 
-        void addSubListener(int id, Runnable runnable) {
-            subListeners.put(id, runnable);
+        void addSubListener(Runnable runnable) {
+            subListeners.add(runnable);
         }
 
         private void notifySubListeners() {
             if (subListeners.isEmpty()) {
                 return;
             }
-            for (Map.Entry<Integer, Runnable> entry : subListeners.entrySet()) {
-                Integer listenerId = entry.getKey();
-                Runnable runnable = entry.getValue();
+            for (Runnable runnable : subListeners) {
                 try {
                     runnable.run();
                 } catch (Throwable t) {
-                    LOG.info("onServiceConnected() listener (id=" + listenerId + ") threw an exception -> " + t.getMessage(), t);
+                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
                 }
             }
         }
@@ -1624,38 +1656,6 @@ public final class MusicUtils {
     }
 
     /**
-     * Used to build and show a notification when Apollo is sent into the
-     * background
-     *
-     * @param context The {@link Context} to use.
-     */
-    public static void notifyForegroundStateChanged(final Context context, boolean inForeground) {
-        int old = sForegroundActivities;
-        if (inForeground) {
-            sForegroundActivities++;
-        } else {
-            sForegroundActivities--;
-        }
-        if (old == 0 || sForegroundActivities == 0) {
-            final Intent intent = new Intent(context, MusicPlaybackService.class);
-            intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
-            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
-            try {
-                if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
-                    // no need to be calling start service to make it do what we want if it's already there
-                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
-                    MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
-                } else {
-                    LOG.info("notifyForegroundStateChanged() -> starting MusicPlaybackService as a foreground service ...", true);
-                    MusicUtils.startMusicPlaybackService(context, intent);
-                }
-            } catch (Throwable ignored) {
-                LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
-            }
-        }
-    }
-
-    /**
      * Permanently deletes item(s) from the user's device.
      *
      * @param context The {@link Context} to use.
@@ -1762,7 +1762,18 @@ public final class MusicUtils {
         if (list.length == 0) {
             pos = 0;
         }
-        MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
+        if (getMusicPlaybackService() == null) {
+            // first time they invoke us from an ApolloFragment the service
+            // needs to be started and we need can get a callback from it
+            final Context context = adapter.getContext();
+            final int posCopy = pos;
+            startMusicPlaybackService(
+                    context,
+                    new Intent(context, MusicPlaybackService.class),
+                    () -> MusicUtils.playAll(list, posCopy, MusicUtils.isShuffleEnabled()));
+        } else {
+            MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
+        }
     }
 
     public static void removeSongFromAllPlaylists(final Context context, final long songId) {
