@@ -25,6 +25,7 @@ import com.frostwire.search.FileSearchResult;
  * @author aldenml
  */
 public interface TorrentSearchResult extends FileSearchResult {
+    /** Creation time, in milliseconds */
     long getCreationTime();
 
     /**
