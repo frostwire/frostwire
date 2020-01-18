@@ -24,6 +24,7 @@ import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -477,11 +478,29 @@ public final class Asyncs {
             }
 
             C c = ctx != null ? ctx.get() : null;
-            R r = task.run(c, args);
+            R r = null;
+
+            try {
+                r = task.run(c, args);
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("invokeAsyncSupport(task.run()) exception: " + t.getMessage(), t);
+            }
+
+            final R rCopy = r;
 
             if (post != null) {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    post.run(c, args, r);
+                    try {
+                        post.run(c, args, rCopy);
+                    } catch (Throwable t) {
+                        if (BuildConfig.DEBUG) {
+                            throw t;
+                        }
+                        LOG.error("invokeAsyncSupport(post) exception: " + t.getMessage(), t);
+                    }
                     if (Ref.alive(ctx)) {
                         Ref.free(ctx);
                     }
