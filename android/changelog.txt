@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 617 - JAN/17/2020
+FrostWire 2.1.9 build 619 - JAN/18/2020
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build
