@@ -193,10 +193,9 @@ public class MainActivity extends AbstractActivity implements
         }
         shuttingdown = true;
         LocalSearchEngine.instance().cancelSearch();
-        //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
+        MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
         Engine.instance().shutdown();
-        MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 
     @Override

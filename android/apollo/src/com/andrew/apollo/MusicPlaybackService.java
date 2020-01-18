@@ -87,6 +87,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     private CountDownLatch initLatch = new CountDownLatch(1);
 
+
     /**
      * Indicates that the music has paused or resumed
      */
@@ -377,6 +378,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     private final Object cursorLock = new Object();
     private final Object audioSessionIdLock = new Object();
+    private final Object openFileLock = new Object();
+    private final Object mPlayerLock = new Object();
 
     /**
      * The cursor used to retrieve info on the album the current track is
@@ -715,9 +718,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
             mWakeLock.setReferenceCounted(false);
         }
-        // Initialize the delayed shutdown intent
-        final Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
-        shutdownIntent.setAction(SHUTDOWN_ACTION);
 
         // Bring the queue back
         reloadQueue();
@@ -867,13 +867,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
             mUnmountReceiver = null;
         }
-
-        try {
-            unbindService(MusicUtils.getServiceConnectionListener());
-        } catch (Throwable t) {
-            LOG.error("onDestroy(): unBindService() failed, " + t.getMessage(), t, true);
-        }
-
         // Release the wake lock
         if (mWakeLock != null) {
             try {
@@ -902,7 +895,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             LOG.info("releaseServiceUiAndStop(force=true) : isPlaying()=" + isPlaying());
             stopPlayer();
         }
-
         if (D) LOG.info("Nothing is playing anymore, releasing notification");
         mNotificationHelper.killNotification();
         // on some devices where it requires MODIFY_PHONE_STATE
@@ -915,18 +907,16 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
         }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
-
         if (!mServiceInUse || force) {
             saveQueue(true);
             stopSelf(mServiceStartId);
             stopForeground(true);
-        }
 
+        }
         if (force) {
             // clear queue position
             mPreferences.edit().putInt("curpos", -1).apply();
         }
-
     }
 
     @Override
@@ -1122,9 +1112,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         if (removeNotification) {
-            Intent shutdownIntent = new Intent(this, MusicPlaybackService.class);
-            shutdownIntent.setAction(SHUTDOWN_ACTION);
-            handleCommandIntent(shutdownIntent);
+            MusicUtils.requestMusicPlaybackServiceShutdown(this);
         }
     }
 
@@ -1830,7 +1818,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                     return;
                 }
             }
-            synchronized (this) {
+            synchronized (cursorLock) {
                 closeCursor();
                 mOpenFailedCounter = 20;
                 openCurrentAndNext();
@@ -1876,7 +1864,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (callback == null) {
             throw new IllegalArgumentException("MusicPlaybackService.openFile requires a non null OpenFileResultCallback argument");
         }
-        synchronized (this) {
+        synchronized (openFileLock) {
             if (path == null) {
                 callback.openFileResult(false);
                 return;
@@ -1919,21 +1907,24 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 }
             }
             mFileToPlay = path;
-            if (mPlayer != null) { // machine state issues in general with original Apollo code
-                mPlayer.setDataSource(mFileToPlay, () -> {
-                    if (mPlayer != null && mPlayer.isInitialized()) {
-                        mOpenFailedCounter = 0;
-                        callback.openFileResult(true);
-                    } else {
-                        stop(true);
-                        callback.openFileResult(false);
-                    }
 
-                });
-            } else {
-                stop(true);
-                callback.openFileResult(false);
+            synchronized (mPlayerLock) {
+                if (mPlayer == null) {
+                    mPlayer = new MultiPlayer(this);
+                }
             }
+
+            mPlayer.setDataSource(mFileToPlay, () -> {
+                if (mPlayer != null && mPlayer.isInitialized()) {
+                    mOpenFailedCounter = 0;
+                    callback.openFileResult(true);
+                } else {
+                    stop(true);
+                    callback.openFileResult(false);
+                }
+
+            });
+
         }
     }
 
@@ -2068,7 +2059,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @return The current song name
      */
     public String getTrackName() {
-        synchronized (this) {
+        synchronized (cursorLock) {
             if (mCursor == null || mCursor.isClosed()) {
                 return null;
             }
@@ -2088,7 +2079,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     public String getArtistName() {
         try {
-            synchronized (this) {
+            synchronized (cursorLock) {
                 if (mCursor == null || mCursor.isClosed()) {
                     return null;
                 }
@@ -2107,7 +2098,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     private String getAlbumArtistName() {
         try {
-            synchronized (this) {
+            synchronized (cursorLock) {
                 if (mAlbumCursor == null || mAlbumCursor.isClosed()) {
                     return null;
                 }
@@ -2125,7 +2116,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @return The current song album ID
      */
     public long getAlbumId() {
-        synchronized (this) {
+        synchronized (cursorLock) {
             try {
                 if (mCursor == null || mCursor.isClosed()) {
                     return -1;
@@ -2146,7 +2137,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @return The current song artist ID
      */
     public long getArtistId() {
-        synchronized (this) {
+        synchronized (cursorLock) {
             if (mCursor == null || mCursor.isClosed()) {
                 return -1;
             }
@@ -2179,7 +2170,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @return The current simple player track ID
      */
     public long getCurrentSimplePlayerAudioId() {
-        synchronized (this) {
+        synchronized (cursorLock) {
             long id = -1;
             if (mSimplePlayerPlayingFile != null) {
                 id = getIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
@@ -2262,14 +2253,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * @return The queue as a long[]
      */
     public long[] getQueue() {
-        synchronized (this) {
-            if (mPlayList == null) {
-                return new long[0];
-            }
-            final long[] list = new long[mPlayListLen];
-            System.arraycopy(mPlayList, 0, list, 0, mPlayListLen);
-            return list;
+        if (mPlayList == null) {
+            return new long[0];
         }
+        final long[] list = new long[mPlayListLen];
+        System.arraycopy(mPlayList, 0, list, 0, mPlayListLen);
+        return list;
     }
 
     /**
@@ -2316,37 +2305,35 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     public void open(final long[] list, final int position) {
         launchPlayerActivity = true;
-        synchronized (this) {
-            final long oldId = getAudioId();
-            final int listlength = list.length;
-            boolean newlist = true;
-            if (mPlayListLen == listlength) {
-                newlist = false;
-                for (int i = 0; i < listlength; i++) {
-                    if (list[i] != mPlayList[i]) {
-                        newlist = true;
-                        break;
-                    }
+        final long oldId = getAudioId();
+        final int listlength = list.length;
+        boolean newlist = true;
+        if (mPlayListLen == listlength) {
+            newlist = false;
+            for (int i = 0; i < listlength; i++) {
+                if (list[i] != mPlayList[i]) {
+                    newlist = true;
+                    break;
                 }
             }
-            if (newlist) {
-                addToPlayList(list, -1);
-                notifyChange(QUEUE_CHANGED);
-            }
-            if (position == -1) {
-                mPlayPos = 0;
-            }
-            if (position >= 0) {
-                mPlayPos = position;
-            }
-            mHistory.clear();
-            openCurrentAndNext(() -> {
-                if (oldId != getAudioId()) {
-                    play();
-                    notifyChange(META_CHANGED);
-                }
-            });
         }
+        if (newlist) {
+            addToPlayList(list, -1);
+            notifyChange(QUEUE_CHANGED);
+        }
+        if (position == -1) {
+            mPlayPos = 0;
+        }
+        if (position >= 0) {
+            mPlayPos = position;
+        }
+        mHistory.clear();
+        openCurrentAndNext(() -> {
+            if (oldId != getAudioId()) {
+                play();
+                notifyChange(META_CHANGED);
+            }
+        });
     }
 
     /**

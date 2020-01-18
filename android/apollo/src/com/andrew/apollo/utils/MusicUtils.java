@@ -123,12 +123,12 @@ public final class MusicUtils {
             LOG.error(t.getMessage(), t);
         }
         try {
-            if (!serviceConnectionListener.isBound()) {
-                if (onServiceBoundCallback != null) {
-                    serviceConnectionListener.addSubListener(onServiceBoundCallback);
-                }
-                context.bindService(intent, serviceConnectionListener, 0);
+            //if (!serviceConnectionListener.isBound()) {
+            if (onServiceBoundCallback != null) {
+                serviceConnectionListener.addSubListener(onServiceBoundCallback);
             }
+            context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
+            //}
         } catch (Throwable t) {
             LOG.error("startMusicPlaybackService() error " + t.getMessage(), t);
         }
@@ -177,21 +177,7 @@ public final class MusicUtils {
     }
 
     public static boolean isMusicPlaybackServiceRunning(final Context context) {
-        if (musicPlaybackService == null) {
-            return false;
-        }
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        Class serviceClass = MusicPlaybackService.class;
-        List<ActivityManager.RunningServiceInfo> runningServices = manager.getRunningServices(Integer.MAX_VALUE);
-        if (runningServices == null || runningServices.isEmpty()) {
-            return false;
-        }
-        for (ActivityManager.RunningServiceInfo service : runningServices) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
+        return musicPlaybackService != null;
     }
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
@@ -199,7 +185,7 @@ public final class MusicUtils {
             LOG.warn("requestMusicPlaybackServiceShutdown() aborted. context is null.");
             return;
         }
-        if (!SystemUtils.isServiceRunning(context, MusicPlaybackService.class)) {
+        if (!MusicUtils.isMusicPlaybackServiceRunning(context)) {
             LOG.info("requestMusicPlaybackServiceShutdown() aborted. MusicPlaybackService has already shutdown.");
             return;
         }
@@ -210,7 +196,10 @@ public final class MusicUtils {
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
             MusicUtils.getMusicPlaybackService().handleIntentFromStub(shutdownIntent);
-
+// Commenting this, it disconnects, but when we launch the service again it doesn't re-connect
+//            if (serviceConnectionListener != null) {
+//                serviceConnectionListener.onServiceDisconnected(null);
+//            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -232,7 +221,7 @@ public final class MusicUtils {
     }
 
     private static class ServiceConnectionListener implements ServiceConnection {
-        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
+        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class); //rviceConnectionListener
         private final ArrayList<Runnable> subListeners = new ArrayList<>();
         private final AtomicBoolean bound = new AtomicBoolean(false);
 
@@ -241,10 +230,10 @@ public final class MusicUtils {
             bound.set(true);
             musicPlaybackService = IApolloService.Stub.asInterface(service);
             try {
-                LOG.info("ServiceConnectionListener::onServiceConnected() -> MusicPlaybackService::updateNotification()!", true);
+                LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
                 musicPlaybackService.updateNotification();
             } catch (RemoteException e) {
-                LOG.error("ServiceConnectionListener::onServiceConnected() " + e.getMessage(), e, true);
+                LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
             notifySubListeners();
@@ -255,9 +244,10 @@ public final class MusicUtils {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            subListeners.clear();
+            LOG.info("onServiceDisconnected() invoked!");
             bound.set(false);
-            musicPlaybackService = null;
+            subListeners.clear();
+            //musicPlaybackService = null;
         }
 
         public boolean isBound() {
@@ -333,7 +323,7 @@ public final class MusicUtils {
     public static void previous(final Context context) {
         final Intent previous = new Intent(context, MusicPlaybackService.class);
         previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        if (MusicUtils.isMusicPlaybackServiceRunning(context) && MusicUtils.getMusicPlaybackService() != null) {
+        if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
             try {
                 LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
                 MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);

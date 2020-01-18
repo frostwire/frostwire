@@ -196,7 +196,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
         i.setAction(MusicPlaybackService.SERVICECMD);
         i.putExtra(MusicPlaybackService.CMDNAME, command);
         i.putExtra(MusicPlaybackService.FROM_MEDIA_BUTTON, true);
-        if (MusicUtils.isMusicPlaybackServiceRunning(context) && MusicUtils.getMusicPlaybackService() != null) {
+        if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
             try {
                 MusicUtils.getMusicPlaybackService().handleIntentFromStub(i);
             } catch (RemoteException e) {
