@@ -496,10 +496,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             LOG.error(ignored.getMessage(), ignored);
         }
 
-//        if (musicPlaybackService != null) {
-//            MusicUtils.unbindFromService(mToken);
-//            mToken = null;
-//        }
         try {
             unregisterReceiver(mPlaybackStatus);
         } catch (final Throwable ignored) {

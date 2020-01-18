@@ -161,9 +161,6 @@ public final class MusicUtils {
                     // no need to be calling start service to make it do what we want if it's already there
                     LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
                     MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
-                } else {
-                    LOG.info("notifyForegroundStateChanged() -> starting MusicPlaybackService as a foreground service ...", true);
-                    MusicUtils.startMusicPlaybackService(context, intent);
                 }
             } catch (Throwable ignored) {
                 LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
@@ -336,7 +333,7 @@ public final class MusicUtils {
     public static void previous(final Context context) {
         final Intent previous = new Intent(context, MusicPlaybackService.class);
         previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+        if (MusicUtils.isMusicPlaybackServiceRunning(context) && MusicUtils.getMusicPlaybackService() != null) {
             try {
                 LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
                 MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);
@@ -344,8 +341,7 @@ public final class MusicUtils {
                 e.printStackTrace();
             }
         } else {
-            LOG.info("previous() starting a new MusicPlaybackService");
-            MusicUtils.startMusicPlaybackService(context, previous);
+            LOG.error("previous() failed, MusicPlaybackService not running and wouldn't know what the previous track was");
         }
     }
 

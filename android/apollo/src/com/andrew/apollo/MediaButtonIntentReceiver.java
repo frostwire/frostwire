@@ -25,7 +25,6 @@ import androidx.legacy.content.WakefulBroadcastReceiver;
 
 import com.andrew.apollo.ui.activities.HomeActivity;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 
 /**
@@ -204,7 +203,7 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
                 LOG.error("sendCommandToMusicPlaybackService() " + e.getMessage(), e);
             }
         } else {
-            MusicUtils.startMusicPlaybackService(context, i);
+            LOG.error("sendCommandToMusicPlaybackService() MusicPlaybackService is not running/not available");
         }
     }
 
