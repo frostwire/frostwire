@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,13 @@
 
 package com.frostwire.util;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -28,8 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author aldenml
  */
 public class ThreadPool extends ThreadPoolExecutor {
+    private static final long THREAD_STACK_SIZE = 1024*4;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String name;
+
 
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
         super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
@@ -76,14 +84,15 @@ public class ThreadPool extends ThreadPoolExecutor {
 
     private static final class PoolThreadFactory implements ThreadFactory {
         private final boolean daemon;
+        private final ThreadGroup threadGroup = new ThreadGroup("PoolThreadFactoryGroup");
 
-        public PoolThreadFactory(boolean daemon) {
+        PoolThreadFactory(boolean daemon) {
             this.daemon = daemon;
         }
 
         @Override
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
+            Thread t = new Thread(threadGroup, r,"", THREAD_STACK_SIZE);
             t.setDaemon(daemon);
             return t;
         }
