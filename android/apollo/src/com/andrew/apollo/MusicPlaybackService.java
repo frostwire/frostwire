@@ -499,14 +499,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mNotificationHelper = new NotificationHelper(this);
 
             try {
-                // "This initService() call may result in ANRs, when some of the ContentResolver queries (like getCardId())
-                // take too long.
-                //
-                // I didn't want to use Engine.instance().getThreadPool() as this might be initialized before EngineService
-                // give this is a service declared in AndroidManifest.xml"
-                // -gubatron
-                new Thread(this::initService).start();
-                //Asyncs.async(this, MusicPlaybackService::initService);
+                Asyncs.async(this, MusicPlaybackService::initService);
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
             }
