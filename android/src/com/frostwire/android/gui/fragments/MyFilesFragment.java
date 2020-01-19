@@ -294,7 +294,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         super.onPause();
         savePreviouslyCheckedFileDescriptors();
         MusicUtils.stopSimplePlayer();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        try {
+            getActivity().unregisterReceiver(broadcastReceiver);
+        } catch (Throwable ignored) {}
     }
 
     @Override

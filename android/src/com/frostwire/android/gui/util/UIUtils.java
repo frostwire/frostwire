@@ -461,7 +461,7 @@ public final class UIUtils {
         socialLinksDialog.show();
     }
 
-    // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
+    // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over engineer.
     public static class IntentByteExtra {
         public final String name;
         public final byte value;
