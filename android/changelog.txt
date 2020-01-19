@@ -1,9 +1,9 @@
-FrostWire 2.1.9 build 619 - JAN/18/2020
+FrostWire 2.1.9 build 620 - JAN/19/2020
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build
  - openssl 1.1.1d
- - Android NDK 20b
+ - Android NDK 21
  - UX: No more annoying ever-present Android notification, only during active transfers or music playback
  - UX: Torrent search results now show how old they are
  - EngineService and MusicPlaybackService are no longer ran as foreground services following newer android guidelines
