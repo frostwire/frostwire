@@ -1081,7 +1081,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             filter.addAction(Intent.ACTION_MEDIA_EJECT);
             filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
             filter.addDataScheme("file");
-            registerReceiver(mUnmountReceiver, filter);
+            try {
+                registerReceiver(mUnmountReceiver, filter);
+            } catch (Throwable notABiggie) {
+                LOG.error("registerExternalStorageListener() could not register ACTION_MEDIA_EJECT|MOUNTED intent filter", notABiggie);
+            }
         }
     }
 
