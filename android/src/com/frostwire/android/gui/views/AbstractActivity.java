@@ -77,7 +77,20 @@ public abstract class AbstractActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         paused = false;
-        super.onResume();
+        try {
+            super.onResume();
+        } catch (Throwable t) {
+            // Rare exception, first seen on Jan 20th 2020, Android 9, Galaxy S9 (starqltesq) build 619
+            //Caused by: java.lang.IllegalArgumentException:
+            //at android.os.Parcel.createException (Parcel.java:1970)
+            //at android.os.Parcel.readException (Parcel.java:1934)
+            //at android.os.Parcel.readException (Parcel.java:1884)
+            //at android.app.IActivityManager$Stub$Proxy.isTopOfTask (IActivityManager.java:7844)
+            //at android.app.Activity.isTopOfTask (Activity.java:6543)
+            //at android.app.Activity.onResume (Activity.java:1403)
+            //at androidx.fragment.app.FragmentActivity.onResume (FragmentActivity.java:456)
+            //at com.frostwire.android.gui.views.AbstractActivity.onResume (AbstractActivity.java:80)
+        }
     }
 
     @Override
