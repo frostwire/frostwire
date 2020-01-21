@@ -182,7 +182,7 @@ public abstract class SearchEngine {
     public static final SearchEngine LIMETORRENTS = new SearchEngine("LimeTorrents", Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new LimeTorrentsSearchPerformer("www.limetorrents.cc", token, keywords, DEFAULT_TIMEOUT);
+            return new LimeTorrentsSearchPerformer("www.limetorrents.info", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

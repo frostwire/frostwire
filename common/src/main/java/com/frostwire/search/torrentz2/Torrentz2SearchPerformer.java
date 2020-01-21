@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
-    private final Pattern pattern;// = Pattern.compile(REGEX);
+    private final Pattern pattern;
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
         super("torrentz2.eu", token, keywords, timeout, 1, 0);

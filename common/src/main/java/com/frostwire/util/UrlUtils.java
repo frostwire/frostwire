@@ -114,7 +114,7 @@ public final class UrlUtils {
         }
 
         if (fastestMirror != null) {
-            System.out.println("UrlUtils.getFastestMirrorDomain() -> Winner: " + fastestMirror);
+            System.out.println("UrlUtils.getFastestMirrorDomain() -> Winner: " + fastestMirror + " " + lowest_delta + " ms");
             return fastestMirror;
         }
         System.out.println("UrlUtils.getFastestMirrorDomain() -> Falling back to: " + mirrors[0]);

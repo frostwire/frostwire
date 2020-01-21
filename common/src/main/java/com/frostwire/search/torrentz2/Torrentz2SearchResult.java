@@ -96,7 +96,7 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
     }
 
     private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
+        long result = 0;
         try {
             String[] ds = dateString.split(" ");
             if (ds[1].contains("hours")) {

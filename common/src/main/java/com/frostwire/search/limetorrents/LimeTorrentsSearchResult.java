@@ -1,33 +1,32 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), alejandroarturom
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.limetorrents;
 
-import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
-import org.apache.commons.io.FilenameUtils;
+import com.frostwire.util.UrlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * Created by alejandroarturom on 26-08-16.
+ * Created by alejandroarturom on 08/26/2016
+ * Modified by gubatron on 01/20/2020
  */
 public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult {
     private final String filename;
@@ -39,15 +38,22 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
     private final long creationTime;
     private final int seeds;
 
-    LimeTorrentsSearchResult(String detailsUrl, SearchMatcher matcher) {
+    LimeTorrentsSearchResult(String detailsUrl,
+                             String infoHash,
+                             String filename,
+                             String fileSize,
+                             String unit,
+                             String age,
+                             String seeds,
+                             String title) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = matcher.group("torrentid");
-        this.filename = parseFileName(matcher.group("filename"));
-        this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
-        this.creationTime = parseCreationTime(matcher.group("time"));
-        this.seeds = parseSeeds(matcher.group("seeds"));
-        this.torrentUrl = "magnet:" + matcher.group("magnet_part");
-        this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
+        this.infoHash = infoHash;
+        this.filename = parseFileName(filename);
+        this.size = parseSize(fileSize + " " + unit);
+        this.creationTime = parseAgeString(age);
+        this.seeds = parseSeeds(seeds);
+        this.torrentUrl = UrlUtils.buildMagnetUrl(infoHash, filename, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+        this.displayName = title;
     }
 
     @Override
@@ -107,23 +113,33 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
         }
     }
 
-    private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
+    private long parseAgeString(String dateString) {
+        long now = System.currentTimeMillis();
         try {
             if (dateString.contains("1 Year+")) {
-                return result - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
+                return now - 365L * 24L * 60L * 60L * 1000L; // a year in milliseconds
             }
             if (dateString.contains("Last Month")) {
-                return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
+                return now - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
+            }
+            if (dateString.contains("months ago")) {
+                int months = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
+                long monthInMillis = 31L * 24L * 60L * 60L * 1000L;
+                return now - months * monthInMillis;
+            }
+            if (dateString.contains("days ago")) {
+                int days = Integer.parseInt(dateString.substring(0, dateString.indexOf(' ')));
+                long dayInMillis = 24L * 60L * 60L * 1000L;
+                return now - days * dayInMillis;
             }
             if (dateString.contains("Yesterday")) {
-                return result - 1L * 24L * 60L * 60L * 1000L; // one day in milliseconds
+                return now - 24L * 60L * 60L * 1000L; // one day in milliseconds
             }
             // this format seems to be not used anymore
             SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            result = myFormat.parse(dateString.trim()).getTime();
+            now = myFormat.parse(dateString.trim()).getTime();
         } catch (Throwable t) {
         }
-        return result;
+        return now;
     }
 }

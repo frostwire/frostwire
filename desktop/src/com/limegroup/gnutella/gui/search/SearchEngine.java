@@ -123,7 +123,7 @@ public abstract class SearchEngine {
             return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.cc") {
+    private static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.info") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
