@@ -261,59 +261,67 @@ public final class UIUtils {
         }
     }
 
-    public static boolean openAPK(Context context, String filePath) {
+
+    public static boolean openAPK(Context context, File updateApk) {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
             try {
-                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath));
+                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
                 Intent intent = new Intent("android.content.pm.PackageInstaller");
                 intent.setData(uri);
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 //intent.setDataAndType(uri, "application/vnd.android.package-archive");
                 context.startActivity(intent);
+                return true;
             } catch (Throwable t) {
+                Uri apkUri = null;
+                // We usually end up here
+                //LOG.error("openAPK() error - " + t.getMessage(), t);
                 PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
                 PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
                 try {
-                    Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath));
+                    apkUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
                     int sessionID = packageInstaller.createSession(sessionParams);
                     PackageInstaller.Session session = packageInstaller.openSession(sessionID);
-                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
+                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, apkUri);
                     OutputStream sessionOutputStream = session.openWrite("mostly-unused", 0, documentFile.length());
-                    InputStream apkInputStream = new FileInputStream(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).listFiles()[1]);//context.getContentResolver().openInputStream(uri);
+                    InputStream apkInputStream = new FileInputStream(updateApk);//context.getContentResolver().openInputStream(apkUri);
                     byte[] buffer = new byte[16384];
                     int n;
                     while ((n = apkInputStream.read(buffer)) >= 0) {
                         sessionOutputStream.write(buffer, 0, n);
                     }
+                    session.fsync(sessionOutputStream);
                     sessionOutputStream.flush();
                     sessionOutputStream.close();
                     apkInputStream.close();
 
                     // could exit the app for instance
-                    PendingIntent service = PendingIntent.getService(context, 0, new Intent(), 0);
+                    Intent shutdownIntent = new Intent(context, MainActivity.class);
+                    shutdownIntent.putExtra("shutdown-frostwire", true);
+                    PendingIntent service = PendingIntent.getBroadcast(context, 2378327, shutdownIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     session.commit(service.getIntentSender());
-
+                    session.close();
+                    LOG.info("openAPK() success!");
+                    return true;
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    LOG.error("openAPK (using FileProvider) failed with filePath=" + apkUri, e);
                     return false;
                 }
-
-                LOG.error("openAPK (using FileProvider) failed with filePath=" + filePath, t);
-                return false;
             }
         } else {
+            Uri uri = null;
             try {
-                Uri uri = Uri.fromFile(new File(filePath));
+                uri = Uri.fromFile(updateApk);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(uri, "application/vnd.android.package-archive");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
+                return true;
             } catch (Throwable t) {
-                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + filePath, t);
+                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + uri, t);
                 return false;
             }
         }
-        return true;
     }
 
 

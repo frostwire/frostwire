@@ -107,7 +107,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
             // since Nougat, a naked file path can't be put directly inside
             // an intent
             boolean useFileProvider = hasNougatOrNewer();
-            boolean error = UIUtils.openAPK(getActivity(), getUpdateApk().getAbsolutePath());
+            boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
 //            boolean error = !UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
 //                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
             dismiss();
