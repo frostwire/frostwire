@@ -111,7 +111,7 @@ public final class LocalSearchEngine {
         currentSearchTokens = tokenize(query);
         searchFinished = false;
 
-        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines());
+        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
         for (SearchEngine se : shuffledEngines) {
             if (se.isEnabled()) {

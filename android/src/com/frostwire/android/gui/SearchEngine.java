@@ -99,12 +99,14 @@ public abstract class SearchEngine {
         return name;
     }
 
-    public static List<SearchEngine> getEngines() {
+    public static List<SearchEngine> getEngines(boolean excludeNonReady) {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
-        for (SearchEngine se : ALL_ENGINES) {
-            if (se.isReady()) {
-                candidates.add(se);
+        if (excludeNonReady) {
+            for (SearchEngine se : ALL_ENGINES) {
+                if (se.isReady()) {
+                    candidates.add(se);
+                }
             }
         }
 
@@ -125,7 +127,7 @@ public abstract class SearchEngine {
     }
 
     public static SearchEngine forName(String name) {
-        for (SearchEngine engine : getEngines()) {
+        for (SearchEngine engine : getEngines(false)) {
             if (engine.getName().equalsIgnoreCase(name)) {
                 return engine;
             }

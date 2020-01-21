@@ -106,7 +106,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         inactive.clear();
         active.clear();
 
-        for (SearchEngine engine : SearchEngine.getEngines()) {
+        for (SearchEngine engine : SearchEngine.getEngines(false)) {
             CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
             if (preference != null) { //it could already have been removed due to remote config value.
                 if (engine.isActive()) {
