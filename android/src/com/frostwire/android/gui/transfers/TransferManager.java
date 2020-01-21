@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ public final class TransferManager {
     private void clearTransfers() {
         this.httpDownloads.clear();
         this.bittorrentDownloadsList.clear();
-        this.bittorrentDownloadsMap .clear();
+        this.bittorrentDownloadsMap.clear();
         this.downloadsToReview = 0;
     }
 
@@ -227,12 +227,12 @@ public final class TransferManager {
     public int getActiveDownloads() {
         int count = 0;
         for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (!d.isComplete() && d.isDownloading()) {
+            if (!TransferState.isErrored(d.getState()) && !d.isComplete() && d.isDownloading()) {
                 count++;
             }
         }
         for (Transfer d : httpDownloads) {
-            if (!d.isComplete() && d.isDownloading()) {
+            if (!TransferState.isErrored(d.getState()) && !d.isComplete() && d.isDownloading()) {
                 count++;
             }
         }
@@ -242,7 +242,7 @@ public final class TransferManager {
     public int getActiveUploads() {
         int count = 0;
         for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (d.isFinished() && !d.isPaused()) {
+            if (!TransferState.isErrored(d.getState()) && d.isFinished() && !d.isPaused()) {
                 count++;
             }
         }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import android.content.Intent;
 import android.os.PowerManager;
 import android.widget.RemoteViews;
 
+import androidx.core.app.NotificationCompat;
+
 import com.andrew.apollo.NotificationHelper;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -38,8 +40,6 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
-
-import androidx.core.app.NotificationCompat;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -234,7 +234,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
     @Override
     public void onTime() {
         if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefresh)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS*1000)-100)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefresh)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
                 async(this, NotificationUpdateDaemon::onTimeRefresh);
             }
         } else {
