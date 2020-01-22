@@ -627,7 +627,9 @@ public final class Asyncs {
                 lastRecycleTimestamp = now;
                 int numKeysToRecycle = keysToRecycle.size();
                 double recycleRatio = 100 * numKeysToRecycle / numKeysBeforeRecycle;
-                LOG.info("Recycling " + numKeysToRecycle + " tasks out of " + numKeysBeforeRecycle + " total tasks (freed  " + recycleRatio + "%)");
+                if (numKeysToRecycle > 0) {
+                    LOG.info("Recycling " + numKeysToRecycle + " tasks out of " + numKeysBeforeRecycle + " total tasks (freed  " + recycleRatio + "%)");
+                }
 
                 synchronized (recycleLock) {
                     for (String task : keysToRecycle) {

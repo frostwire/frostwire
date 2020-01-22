@@ -121,7 +121,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
             int downloads = transferManager.getActiveDownloads();
             int uploads = transferManager.getActiveUploads();
             if (downloads == 0 && uploads == 0) {
-                LOG.info("updateTransfersStatusNotification() no active transfers, cancelling notification");
+                //LOG.info("updateTransfersStatusNotification() no active transfers, cancelling notification");
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
                     try {
