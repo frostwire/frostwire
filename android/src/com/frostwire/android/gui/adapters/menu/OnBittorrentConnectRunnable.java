@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -31,6 +32,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -45,6 +47,7 @@ import java.lang.ref.WeakReference;
 
 final class OnBittorrentConnectRunnable implements Runnable {
     private final WeakReference<MenuAction> menuActionRef;
+    private static final Logger LOG = Logger.getLogger(OnBittorrentConnectRunnable.class);
 
     OnBittorrentConnectRunnable(MenuAction menuAction) {
         menuActionRef = Ref.weak(menuAction);
@@ -61,7 +64,16 @@ final class OnBittorrentConnectRunnable implements Runnable {
         final MenuAction menuAction = menuActionRef.get();
         final Looper mainLooper = menuAction.getContext().getMainLooper();
         Handler h = new Handler(mainLooper);
-        h.post(() -> menuAction.onClick(menuAction.getContext()));
+        h.post(() -> {
+            try {
+                menuAction.onClick(menuAction.getContext());
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("OnBittorrentConnectRunnable::run() error when posting to main looper: " + t.getMessage(), t);
+            }
+        });
     }
 
     void onBittorrentConnect(Context context) {

@@ -32,6 +32,7 @@ import android.telephony.TelephonyManager;
 
 import androidx.core.app.JobIntentService;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
@@ -208,7 +209,19 @@ public final class Engine implements IEngineService {
             }, 0);
         } catch (SecurityException execution) {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception));
+            WeakReference<Context> contextRef = Ref.weak(context);
+            handler.post(() -> {
+                try {
+                    if (Ref.alive(contextRef)) {
+                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception)
+                    }
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("Engine::startEngineService() failed posting UIUtils.showLongMessage error to main looper: " + t.getMessage(), t);
+                }
+            });
             execution.printStackTrace();
         }
     }

@@ -34,6 +34,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -333,14 +334,21 @@ public final class ImageLoader {
             }
             new Handler(Looper.getMainLooper()).post(
                     () -> {
-                        if (!Ref.alive(targetRef)) {
-                            LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
-                            return;
-                        }
-                        if (p.callback != null) {
-                            rc.into(targetRef.get(), new CallbackWrapper(p.callback));
-                        } else {
-                            rc.into(targetRef.get());
+                        try {
+                            if (!Ref.alive(targetRef)) {
+                                LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
+                                return;
+                            }
+                            if (p.callback != null) {
+                                rc.into(targetRef.get(), new CallbackWrapper(p.callback));
+                            } else {
+                                rc.into(targetRef.get());
+                            }
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("ImageLoader::AsyncLoader::run() error posted caught posting to main looper: " + t.getMessage(), t);
                         }
                     });
         }

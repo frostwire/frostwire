@@ -36,6 +36,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -90,15 +91,22 @@ public final class BuyActivity extends AbstractActivity {
 
     public BuyActivity() {
         super(R.layout.activity_buy);
-        async(BuyActivity::getRewardFreeAdMinutesFromConfigAsync, new WeakReference<>(this)); // in the meantime use the default value Constants.MIN_REWARD_AD_FREE_MINUTES
+        async(BuyActivity::getRewardFreeAdMinutesFromConfigTask, new WeakReference<>(this)); // in the meantime use the default value Constants.MIN_REWARD_AD_FREE_MINUTES
     }
 
-    private static void getRewardFreeAdMinutesFromConfigAsync(WeakReference<BuyActivity> buyActivityRef) {
+    private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(() -> {
-            if (Ref.alive(buyActivityRef)) {
-                buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
+            try {
+                if (Ref.alive(buyActivityRef)) {
+                    buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
+                }
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("BuyActivity::getRewardFreeAdMinutesFromConfigTask() posting to main looper: " + t.getMessage(), t);
             }
         });
     }

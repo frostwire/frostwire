@@ -135,11 +135,6 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
             </intent-filter>
-            <intent-filter>
-                <action
-                    android:name="com.frostwire.android.ACTION_PACKAGE_INSTALLED"
-                    android:exported="true" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.frostwire.android.gui.activities.WizardActivity"

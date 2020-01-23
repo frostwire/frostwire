@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.util.Logger;
@@ -199,38 +200,45 @@ public class MopubBannerView extends LinearLayout {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(() ->
                 {
-                    InHouseBannerFactory.AdFormat adFormat;
-                    if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
-                            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
-                            MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
-                        adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
-                    } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
-                            MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
-                        adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
-                    } else {
-                        throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
-                    }
-
                     try {
-                        InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
-                    } catch (Throwable t) {
-                        setLayersVisibility(Layers.ALL, false);
-                        if (onBannerDismissedListener != null) {
+                        InHouseBannerFactory.AdFormat adFormat;
+                        if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
+                                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
+                                MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
+                            adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
+                        } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
+                                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
+                            adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
+                        } else {
+                            throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
+                        }
+
+                        try {
+                            InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
+                        } catch (Throwable t) {
+                            setLayersVisibility(Layers.ALL, false);
+                            if (onBannerDismissedListener != null) {
+                                try {
+                                    onBannerDismissedListener.dispatch();
+                                } catch (Throwable t2) {
+                                    t2.printStackTrace();
+                                }
+                            }
+                            return;
+                        }
+                        setLayersVisibility(Layers.FALLBACK, true);
+                        dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
+                        if (onFallbackBannerLoadedListener != null) {
                             try {
-                                onBannerDismissedListener.dispatch();
-                            } catch (Throwable t2) {
-                                t2.printStackTrace();
+                                onFallbackBannerLoadedListener.dispatch();
+                            } catch (Throwable t) {
+                                t.printStackTrace();
                             }
                         }
-                        return;
-                    }
-                    setLayersVisibility(Layers.FALLBACK, true);
-                    dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
-                    if (onFallbackBannerLoadedListener != null) {
-                        try {
-                            onFallbackBannerLoadedListener.dispatch();
-                        } catch (Throwable t) {
-                            t.printStackTrace();
+                    } catch (Throwable t) {
+                        LOG.error("loadFallbackBanner() error " + t.getMessage(), t);
+                        if (BuildConfig.DEBUG) {
+                            throw t;
                         }
                     }
                 }
