@@ -213,7 +213,7 @@ public final class Engine implements IEngineService {
             handler.post(() -> {
                 try {
                     if (Ref.alive(contextRef)) {
-                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception)
+                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);
                     }
                 } catch (Throwable t) {
                     if (BuildConfig.DEBUG) {
