@@ -17,19 +17,24 @@
 
 package com.frostwire.android.gui.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.text.Html;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.StringUtils;
 
@@ -103,20 +108,24 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
         yesButton.setText(android.R.string.ok);
         yesButton.setOnClickListener(v -> {
-            Engine.instance().stopServices(false);
-            // since Nougat, a naked file path can't be put directly inside
-            // an intent
-            boolean useFileProvider = hasNougatOrNewer();
-            boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
-//            boolean error = !UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
-//                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
+            UIUtils.openURL(getActivity(),Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
+            //Asyncs.async(this, SoftwareUpdaterDialog::onUpdateAcceptedTask, apkDownloadURL);
             dismiss();
-            if (error) {
-                UIUtils.openURL(getActivity(), apkDownloadURL);
-            }
         });
         noButton.setOnClickListener(v -> dismiss());
     }
+
+//    private void onUpdateAcceptedTask(final String apkDownloadURL) {
+//        // since Nougat, a naked file path can't be put directly inside
+//        // an intent
+//        boolean useFileProvider = hasNougatOrNewer();
+//        // this will talk to the PackageManager and MainActivity should get Intent callbacks
+//        //boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
+//        boolean error = !UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
+//        if (error) {
+//            UIUtils.openURL(getActivity(), apkDownloadURL);
+//        }
+//    }
 
     private static File getUpdateApk() {
         return Platforms.get().systemPaths().update();

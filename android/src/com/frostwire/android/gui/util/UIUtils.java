@@ -28,6 +28,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageInstaller;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -68,7 +69,6 @@ import com.google.android.material.snackbar.Snackbar;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -261,68 +261,84 @@ public final class UIUtils {
         }
     }
 
-
-    public static boolean openAPK(Context context, File updateApk) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
-            try {
-                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
-                Intent intent = new Intent("android.content.pm.PackageInstaller");
-                intent.setData(uri);
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                //intent.setDataAndType(uri, "application/vnd.android.package-archive");
-                context.startActivity(intent);
-                return true;
-            } catch (Throwable t) {
-                Uri apkUri = null;
-                // We usually end up here
-                //LOG.error("openAPK() error - " + t.getMessage(), t);
-                PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
-                PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-                try {
-                    apkUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
-                    int sessionID = packageInstaller.createSession(sessionParams);
-                    PackageInstaller.Session session = packageInstaller.openSession(sessionID);
-                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, apkUri);
-                    OutputStream sessionOutputStream = session.openWrite("mostly-unused", 0, documentFile.length());
-                    InputStream apkInputStream = new FileInputStream(updateApk);//context.getContentResolver().openInputStream(apkUri);
-                    byte[] buffer = new byte[16384];
-                    int n;
-                    while ((n = apkInputStream.read(buffer)) >= 0) {
-                        sessionOutputStream.write(buffer, 0, n);
-                    }
-                    session.fsync(sessionOutputStream);
-                    sessionOutputStream.flush();
-                    sessionOutputStream.close();
-                    apkInputStream.close();
-
-                    // could exit the app for instance
-                    Intent shutdownIntent = new Intent(context, MainActivity.class);
-                    shutdownIntent.putExtra("shutdown-frostwire", true);
-                    PendingIntent service = PendingIntent.getBroadcast(context, 2378327, shutdownIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    session.commit(service.getIntentSender());
-                    session.close();
-                    LOG.info("openAPK() success!");
-                    return true;
-                } catch (Throwable e) {
-                    LOG.error("openAPK (using FileProvider) failed with filePath=" + apkUri, e);
-                    return false;
-                }
-            }
-        } else {
-            Uri uri = null;
-            try {
-                uri = Uri.fromFile(updateApk);
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-                return true;
-            } catch (Throwable t) {
-                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + uri, t);
-                return false;
-            }
-        }
-    }
+//    If you found this in Google, I could not make it work in 2 days, I really tried, I got response
+//    from the package installer session and all, but I couldn't start the android screen to ask for
+//    permissions
+//
+//    Leaving this as an example in case they enable the use of PackageInstaller for non-system apps.
+//    or that sometime in the future I figure out what the hell was missing in order to ask the user
+//    for permission to install apks.
+//
+//    This code currently ends up sending an intent from the PackageInstaller to MainActivity
+//    the intent has an extra intent to ask for permissions, but it doesn't work when you do start an
+//    activity with it.  Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
+//    Also commenting out code in MainActivity::onPackageInstalledCallback()
+//    which would handle the intent :_(
+//
+//    Code commented out in MainActivity, and also SoftwareUpdater::notifyUserAboutUpdate() checking if apk is there.
+//
+//    public static boolean openAPK(Context context, File updateApk) {
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
+//            try {
+//                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
+//                Intent intent = new Intent("android.content.pm.PackageInstaller");
+//                intent.setData(uri);
+//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                //intent.setDataAndType(uri, "application/vnd.android.package-archive");
+//                context.startActivity(intent);
+//                return true;
+//            } catch (Throwable t) {
+//                Uri apkUri = null;
+//                // We usually end up here
+//                //LOG.error("openAPK() error - " + t.getMessage(), t);
+//                PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
+//                PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+//                sessionParams.setAppPackageName("com.frostwire.android");
+//                try {
+//                    apkUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
+//                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, apkUri);
+//                    int sessionID = packageInstaller.createSession(sessionParams);
+//                    PackageInstaller.Session session = packageInstaller.openSession(sessionID);
+//                    OutputStream sessionOutputStream = session.openWrite("Package", 0, -1);
+//
+//                    InputStream apkInputStream = context.getContentResolver().openInputStream(apkUri);
+//                    byte[] buffer = new byte[65536];
+//                    int n;
+//                    while ((n = apkInputStream.read(buffer)) >= 0) {
+//                        sessionOutputStream.write(buffer, 0, n);
+//                    }
+//                    apkInputStream.close();
+//                    session.fsync(sessionOutputStream);
+//                    sessionOutputStream.close();
+//
+//                    // could exit the app for instance
+//                    Intent intent = new Intent(context, MainActivity.class);
+//                    intent.setAction(Constants.ACTION_PACKAGE_INSTALLED);
+//                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+//                    IntentSender statusReceiver = pendingIntent.getIntentSender();
+//                    session.commit(statusReceiver);
+//                    LOG.info("openAPK() success!");
+//                    return true;
+//                } catch (Throwable e) {
+//                    LOG.error("openAPK (using FileProvider) failed with filePath=" + apkUri, e);
+//                    return false;
+//                }
+//            }
+//        } else {
+//            Uri uri = null;
+//            try {
+//                uri = Uri.fromFile(updateApk);
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                context.startActivity(intent);
+//                return true;
+//            } catch (Throwable t) {
+//                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + uri, t);
+//                return false;
+//            }
+//        }
+//    }
 
 
     /**
@@ -332,7 +348,7 @@ public final class UIUtils {
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             if (filePath != null && !openAudioInternal(context, filePath)) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
+                Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ? Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
                 i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 if (mime != null && mime.contains("video")) {

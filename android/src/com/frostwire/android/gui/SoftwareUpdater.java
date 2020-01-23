@@ -58,7 +58,7 @@ public final class SoftwareUpdater {
     private static final Logger LOG = Logger.getLogger(SoftwareUpdater.class);
     private static final boolean ALWAYS_SHOW_UPDATE_DIALOG = false; // debug flag.
 
-    private static final long UPDATE_MESSAGE_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+    private static final long UPDATE_MESSAGE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
     private static final String UPDATE_ACTION_OTA = "ota";
     private static final String UPDATE_ACTION_MARKET = "market";
@@ -114,27 +114,33 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
-                // did we download the newest already?
-                if (downloadedLatestFrostWire(update.md5)) {
-                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
-                    return true;
-                }
-                // didn't download it? go get it now
-                else {
-                    File apkDirectory = getUpdateApk().getParentFile();
-                    if (!apkDirectory.exists()) {
-                        apkDirectory.mkdirs();
-                    }
-
-                    LOG.info("handleOTAUpdate(): Downloading update... (" + update.md5 + ")");
-                    HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, getUpdateApk());
-                    LOG.info("handleOTAUpdate(): Finished downloading update... (" + update.md5 + ")");
-                    if (downloadedLatestFrostWire(update.md5)) {
-                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
-                        return true;
-                    }
-                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> false");
-                }
+                //Jan/22/2020 - Until we figure out the PackageManager integration
+                // we won't download the apk, we'll let the user download it with the
+                // web browser.
+                return true;
+////// START OF DOWNLOAD INSTALLER LOGIC SECTION
+//                // did we download the newest already?
+//                if (downloadedLatestFrostWire(update.md5)) {
+//                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
+//                    return true;
+//                }
+//                // didn't download it? go get it now
+//                else {
+//                    File apkDirectory = getUpdateApk().getParentFile();
+//                    if (!apkDirectory.exists()) {
+//                        apkDirectory.mkdirs();
+//                    }
+//
+//                    LOG.info("handleOTAUpdate(): Downloading update... (" + update.md5 + ")");
+//                    HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, getUpdateApk());
+//                    LOG.info("handleOTAUpdate(): Finished downloading update... (" + update.md5 + ")");
+//                    if (downloadedLatestFrostWire(update.md5)) {
+//                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
+//                        return true;
+//                    }
+//                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> false");
+//                }
+////// END OF DOWNLOAD INSTALLER LOGIC SECTION
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
                 return update.m != null;
             }
@@ -153,10 +159,11 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
-                if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
-                    LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
-                    return;
-                }
+// Commenting out until we figure out PackageInstaller interaction
+//                if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
+//                    LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
+//                    return;
+//                }
                 // Fresh runs with fast connections might send the broadcast intent before
                 // MainActivity has had a chance to register the broadcast receiver (onResume)
                 // therefore, the menu update icon will only show on the 2nd run only

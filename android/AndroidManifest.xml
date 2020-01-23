@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
@@ -18,11 +17,11 @@
  */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.frostwire.android"
-          android:installLocation="auto"
-          android:versionCode="603"
-          android:versionName="2.1.9">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.frostwire.android"
+    android:installLocation="auto"
+    android:versionCode="603"
+    android:versionName="2.1.9">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -40,8 +39,10 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- storage -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:remove="android:maxSdkVersion"/>
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:remove="android:maxSdkVersion" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -61,16 +62,16 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
+        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.FrostWire"
-        tools:replace="android:label"
-        android:requestLegacyExternalStorage="true">
+        tools:replace="android:label">
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-0657224435269327~1839292928"/>
+            android:value="ca-app-pub-0657224435269327~1839292928" />
 
         <!-- activities -->
 
@@ -134,6 +135,11 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.torrent" />
             </intent-filter>
+            <intent-filter>
+                <action
+                    android:name="com.frostwire.android.ACTION_PACKAGE_INSTALLED"
+                    android:exported="true" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.frostwire.android.gui.activities.WizardActivity"
@@ -147,11 +153,13 @@
             android:label="@string/remove_ads">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "app://com.frostwire.android” -->
-                <data android:scheme="app"
-                      android:host="com.frostwire.android" />
+                <data
+                    android:host="com.frostwire.android"
+                    android:scheme="app" />
             </intent-filter>
         </activity>
         <activity
@@ -271,12 +279,12 @@
 
         <service
             android:name="com.frostwire.android.gui.services.EngineService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false" />
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name="com.andrew.apollo.MusicPlaybackService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
             android:foregroundServiceType="mediaPlayback"
+            android:permission="android.permission.BIND_JOB_SERVICE"
             android:protectionLevel="dangerous" />
 
         <!-- receivers -->
@@ -314,9 +322,10 @@
             android:name="applovin.sdk.verbose_logging"
             android:value="false" />
 
-        <activity tools:replace="android:configChanges"
+        <activity
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            tools:replace="android:configChanges" />
         <activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
 
         <!-- MoPub -->
@@ -332,8 +341,9 @@
         <activity
             android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity android:name="com.mopub.common.privacy.ConsentDialogActivity"
-                  android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity
+            android:name="com.mopub.common.privacy.ConsentDialogActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />

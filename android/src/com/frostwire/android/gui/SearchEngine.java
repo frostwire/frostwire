@@ -44,10 +44,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class SearchEngine {
 
@@ -70,7 +68,8 @@ public abstract class SearchEngine {
         return true;
     }
 
-    protected void postInitWork() {}
+    protected void postInitWork() {
+    }
 
     public String getName() {
         return name;
@@ -102,11 +101,11 @@ public abstract class SearchEngine {
     public static List<SearchEngine> getEngines(boolean excludeNonReady) {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
-        if (excludeNonReady) {
-            for (SearchEngine se : ALL_ENGINES) {
-                if (se.isReady()) {
-                    candidates.add(se);
-                }
+        for (SearchEngine se : ALL_ENGINES) {
+            if (excludeNonReady && se.isReady()) {
+                candidates.add(se);
+            } else {
+                candidates.add(se);
             }
         }
 
@@ -204,6 +203,7 @@ public abstract class SearchEngine {
 
     public static final SearchEngine TPB = new SearchEngine("TPB", Constants.PREF_KEY_SEARCH_USE_TPB) {
         private String domainName = null;
+
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             if (domainName == null) {
@@ -211,6 +211,7 @@ public abstract class SearchEngine {
             }
             return new TPBSearchPerformer(domainName, token, keywords, DEFAULT_TIMEOUT);
         }
+
         protected void postInitWork() {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
@@ -249,7 +250,7 @@ public abstract class SearchEngine {
 
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT/2);
+            return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT / 2);
         }
     };
 

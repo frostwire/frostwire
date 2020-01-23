@@ -143,6 +143,7 @@ public final class Constants {
     public static final String ACTION_FILE_ADDED_OR_REMOVED = "com.frostwire.android.ACTION_FILE_ADDED_OR_REMOVED";
     public static final String ACTION_NOTIFY_UPDATE_AVAILABLE = "com.frostwire.android.NOTIFY_UPDATE_AVAILABLE";
     public static final String ACTION_NOTIFY_DATA_INTERNET_CONNECTION = "com.frostwire.android.NOTIFY_CHECK_INTERNET_CONNECTION";
+    //public static final String ACTION_PACKAGE_INSTALLED = "com.frostwire.android.ACTION_PACKAGE_INSTALLED";
     public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
     public static final String EXTRA_DOWNLOAD_COMPLETE_PATH = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
     public static final String EXTRA_REFRESH_FILE_TYPE = "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";
@@ -175,7 +176,7 @@ public final class Constants {
     public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
     public static final String ALL_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/";
     public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
-    public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL = "https://www.frostwire.com/download/?os=android&from=failed_android_update";
+    public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL = "https://www.frostwire.com/download/?os=android&from=OTA";
 
     public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus") + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
 

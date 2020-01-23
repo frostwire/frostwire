@@ -30,15 +30,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInstaller;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -309,6 +312,11 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_REQUEST_SHUTDOWN:
                     showShutdownDialog();
                     break;
+//    Leaving this code in case I find a solution later.
+//                case Constants.ACTION_PACKAGE_INSTALLED:
+//                    // see UIUtils.openAPK()
+//                    onPackageInstalledCallback(intent.getExtras());
+//                    break;
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -318,6 +326,44 @@ public class MainActivity extends AbstractActivity implements
             finish();
         }
     }
+
+//    Leaving this code in case I find a solution later.
+//    See the commented code in UIUtils.openAPK for details.
+//    private void onPackageInstalledCallback(Bundle extras) {
+//        int status = extras.getInt(PackageInstaller.EXTRA_STATUS);
+//        String message = extras.getString(PackageInstaller.EXTRA_STATUS_MESSAGE);
+//        switch (status) {
+//            case PackageInstaller.STATUS_PENDING_USER_ACTION:
+//                // This test app isn't privileged, so the user has to confirm the install.
+//                Intent confirmIntent = (Intent) extras.get(Intent.EXTRA_INTENT);
+//                //Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
+//                startActivity(confirmIntent); // <-- this call isn't really launching the screen to ask for permissions to install apks
+//                                              // setting <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> on AndroidManifest.xml doesn't work either
+//                break;
+//            case PackageInstaller.STATUS_SUCCESS:
+//                Engine.instance().stopServices(false);
+//                try {
+//                    MusicUtils.getMusicPlaybackService().stop();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+//                UIUtils.showToastMessage(this, "Install succeeded", Toast.LENGTH_SHORT);
+//                break;
+//            case PackageInstaller.STATUS_FAILURE:
+//            case PackageInstaller.STATUS_FAILURE_ABORTED:
+//            case PackageInstaller.STATUS_FAILURE_BLOCKED:
+//            case PackageInstaller.STATUS_FAILURE_CONFLICT:
+//            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
+//            case PackageInstaller.STATUS_FAILURE_INVALID:
+//            case PackageInstaller.STATUS_FAILURE_STORAGE:
+//                UIUtils.showToastMessage(this, "Install failed! " + status + ", " + message,
+//                        Toast.LENGTH_SHORT);
+//                break;
+//            default:
+//                UIUtils.showToastMessage(this, "Unrecognized status received from installer: " + status,
+//                        Toast.LENGTH_SHORT);
+//        }
+//    }
 
     private void openTorrentUrl(Intent intent) {
         try {
