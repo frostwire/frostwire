@@ -30,18 +30,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.pm.PackageInstaller;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -312,11 +309,13 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_REQUEST_SHUTDOWN:
                     showShutdownDialog();
                     break;
+////// START OF PACKAGE INSTALLER LOGIC SECTION
 //    Leaving this code in case I find a solution later.
 //                case Constants.ACTION_PACKAGE_INSTALLED:
 //                    // see UIUtils.openAPK()
 //                    onPackageInstalledCallback(intent.getExtras());
 //                    break;
+////// END OF PACKAGE INSTALLER LOGIC SECTION
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -327,6 +326,7 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
+////// START OF PACKAGE INSTALLER LOGIC SECTION
 //    Leaving this code in case I find a solution later.
 //    See the commented code in UIUtils.openAPK for details.
 //    private void onPackageInstalledCallback(Bundle extras) {
@@ -364,6 +364,7 @@ public class MainActivity extends AbstractActivity implements
 //                        Toast.LENGTH_SHORT);
 //        }
 //    }
+////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private void openTorrentUrl(Intent intent) {
         try {

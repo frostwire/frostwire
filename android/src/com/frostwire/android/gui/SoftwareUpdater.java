@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package com.frostwire.android.gui;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -29,25 +30,21 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * @author gubatron
@@ -88,14 +85,13 @@ public final class SoftwareUpdater {
             return;
         }
         updateTimestamp = now;
-        AsyncTask<Void, Void, Boolean> updateTask = new CheckUpdateAsyncTask(this, activity);
-        updateTask.execute();
+        Asyncs.async(activity, SoftwareUpdater::checkUpdateAsyncTask, this, SoftwareUpdater::checkUpdateAsyncPost);
     }
 
     /**
      * @return true if there's an update available.
      */
-    private boolean handleOTAUpdate() throws IOException {
+    private boolean handleOTAUpdate() {
         if (update.a != null && !UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
             if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
                 LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
@@ -159,11 +155,13 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
+////// START OF DOWNLOAD INSTALLER LOGIC SECTION
 // Commenting out until we figure out PackageInstaller interaction
 //                if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
 //                    LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
 //                    return;
 //                }
+////// END OF DOWNLOAD INSTALLER LOGIC SECTION
                 // Fresh runs with fast connections might send the broadcast intent before
                 // MainActivity has had a chance to register the broadcast receiver (onResume)
                 // therefore, the menu update icon will only show on the 2nd run only
@@ -210,7 +208,8 @@ public final class SoftwareUpdater {
         return a || b || c;
     }
 
-    private boolean isFrostWireOld(int myBuild, String latestBuild) {
+    private boolean isFrostWireOld(String latestBuild) {
+        int myBuild = BuildConfig.VERSION_CODE;
         if (Constants.IS_BASIC_AND_DEBUG) {
             myBuild += 10000;
         }
@@ -218,8 +217,8 @@ public final class SoftwareUpdater {
         try {
             int latestBuildNum = Integer.parseInt(latestBuild);
             result = myBuild < latestBuildNum;
-        } catch (Throwable ignored) {
-            LOG.error("isFrostWireOld() can't parse latestBuild number.", ignored);
+        } catch (Throwable t) {
+            LOG.error("isFrostWireOld() can't parse latestBuild number.", t);
             result = false;
         }
         LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ") => " + result);
@@ -243,33 +242,19 @@ public final class SoftwareUpdater {
 
             in.close();
 
-            String result = new BigInteger(1, m.digest()).toString(16);
+            StringBuilder result = new StringBuilder(new BigInteger(1, m.digest()).toString(16));
 
             // pad with zeros if until it's 32 chars long.
             if (result.length() < 32) {
                 int paddingSize = 32 - result.length();
                 for (int i = 0; i < paddingSize; i++) {
-                    result = "0" + result;
+                    result.insert(0, "0");
                 }
             }
-            return result;
+            return result.toString();
         } catch (Exception e) {
             return null;
         }
-    }
-
-    private static boolean checkMD5(File f, String expectedMD5) {
-        if (expectedMD5 == null) {
-            return false;
-        }
-
-        if (expectedMD5.length() != 32) {
-            return false;
-        }
-
-        String checkedMD5 = getMD5(f);
-        LOG.info("checkMD5(expected=" + expectedMD5 + ", checked=" + checkedMD5 + ")");
-        return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
     private void updateConfiguration(Update update, MainActivity mainActivity) {
@@ -277,12 +262,14 @@ public final class SoftwareUpdater {
             return;
         }
 
-        if (update.config.activeSearchEngines != null && update.config.activeSearchEngines.keySet() != null) {
+        if (update.config.activeSearchEngines != null) {
             for (String name : update.config.activeSearchEngines.keySet()) {
                 SearchEngine engine = SearchEngine.forName(name);
                 if (engine != null) {
                     //LOG.info(engine.getName() + " is remotely active: " + update.config.activeSearchEngines.get(name));
-                    engine.setActive(update.config.activeSearchEngines.get(name));
+                    Boolean engineActive = update.config.activeSearchEngines.get(name);
+                    engine.setActive(engineActive != null && engineActive);
+
                 } else {
                     LOG.warn("Can't find any search engine by the name of: '" + name + "'");
                 }
@@ -310,6 +297,31 @@ public final class SoftwareUpdater {
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
     }
+
+    private static boolean checkMD5(File f, String expectedMD5) {
+        if (expectedMD5 == null) {
+            return false;
+        }
+
+        if (expectedMD5.length() != 32) {
+            return false;
+        }
+
+        String checkedMD5 = getMD5(f);
+        LOG.info("checkMD5(expected=" + expectedMD5 + ", checked=" + checkedMD5 + ")");
+        return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
+    }
+
+    private static byte[] buildVersion() {
+        try {
+            String[] arr = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
+            return new byte[]{Byte.parseByte(arr[0]), Byte.parseByte(arr[1]), Byte.parseByte(arr[2])};
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return new byte[]{0, 0, 0};
+    }
+
 
     private static class Update {
         /**
@@ -353,6 +365,7 @@ public final class SoftwareUpdater {
 
     @SuppressWarnings("CanBeFinal")
     private static class Config {
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
         Map<String, Boolean> activeSearchEngines;
         String[] waterfall;
         int removeAdsB2bThreshold = 50;
@@ -368,83 +381,49 @@ public final class SoftwareUpdater {
         int mopubSearchHeaderBannerIntervalInMs = 60000; // 1 min
     }
 
-    // TODO: Refactor this to not be an AsyncTask
-    private final static class CheckUpdateAsyncTask extends AsyncTask<Void, Void, Boolean> {
-        private final SoftwareUpdater softwareUpdater;
-        private final WeakReference<MainActivity> activityWeakReference;
-
-        CheckUpdateAsyncTask(SoftwareUpdater softwareUpdater, MainActivity activity) {
-            this.softwareUpdater = softwareUpdater;
-            activityWeakReference = Ref.weak(activity);
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            try {
-                byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
-                        getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
-
-                if (jsonBytes != null) {
-                    softwareUpdater.update = JsonUtils.toObject(new String(jsonBytes), Update.class);
-
-                    if (softwareUpdater.update.vc != null) {
-                        softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(BuildConfig.VERSION_CODE, softwareUpdater.update.vc);
-                    } else {
-                        softwareUpdater.latestVersion = softwareUpdater.update.v;
-                        String[] latestVersionArr = softwareUpdater.latestVersion.split("\\.");
-
-                        // lv = latest version
-                        byte[] lv = new byte[]{Byte.valueOf(latestVersionArr[0]), Byte.valueOf(latestVersionArr[1]), Byte.valueOf(latestVersionArr[2])};
-
-                        // mv = my version
-                        byte[] mv = buildVersion(Constants.FROSTWIRE_VERSION_STRING);
-
-                        softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);
-                    }
-
-                    if (Ref.alive(activityWeakReference)) {
-                        softwareUpdater.updateConfiguration(softwareUpdater.update, activityWeakReference.get());
-                    }
+    private static boolean checkUpdateAsyncTask(MainActivity activity,
+                                                final SoftwareUpdater softwareUpdater) {
+        try {
+            byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
+                    getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
+            if (jsonBytes != null) {
+                softwareUpdater.update = JsonUtils.toObject(new String(jsonBytes), Update.class);
+                if (softwareUpdater.update.vc != null) {
+                    softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(softwareUpdater.update.vc);
                 } else {
-                    LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
+                    softwareUpdater.latestVersion = softwareUpdater.update.v;
+                    String[] latestVersionArr = softwareUpdater.latestVersion.split("\\.");
+                    // lv = latest version
+                    byte[] lv = new byte[]{Byte.valueOf(latestVersionArr[0]), Byte.valueOf(latestVersionArr[1]), Byte.valueOf(latestVersionArr[2])};
+                    // mv = my version
+                    byte[] mv = buildVersion();
+                    softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);
                 }
-
-                return softwareUpdater.handleOTAUpdate();
-            } catch (Throwable e) {
-                LOG.error("Failed to check/retrieve/update the update information", e);
+                softwareUpdater.updateConfiguration(softwareUpdater.update, activity);
+            } else {
+                LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
             }
+            return softwareUpdater.handleOTAUpdate();
+        } catch (Throwable e) {
+            LOG.error("Failed to check/retrieve/update the update information", e);
+        }
+        return false;
+    }
 
-            return false;
+    private static void checkUpdateAsyncPost(MainActivity activity,
+                                             final SoftwareUpdater softwareUpdater, boolean result) {
+        //nav menu or other components always needs to be updated after we read the config.
+        Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
+        intent.putExtra("value", result);
+        LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
+        if (ALWAYS_SHOW_UPDATE_DIALOG || result) {
+            softwareUpdater.notifyUserAboutUpdate(activity);
         }
 
-        private byte[] buildVersion(String v) {
-            try {
-                String[] arr = v.split("\\.");
-                return new byte[]{Byte.parseByte(arr[0]), Byte.parseByte(arr[1]), Byte.parseByte(arr[2])};
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            return new byte[]{0, 0, 0};
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            //nav menu or other components always needs to be updated after we read the config.
-            if (Ref.alive(activityWeakReference)) {
-                MainActivity activity = activityWeakReference.get();
-                Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
-                intent.putExtra("value", result);
-                LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
-                if (ALWAYS_SHOW_UPDATE_DIALOG || (result && !isCancelled())) {
-                    softwareUpdater.notifyUserAboutUpdate(activity);
-                }
-            }
-
-            // Even if we're offline, we need to disable these for the Google Play Distro.
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                SearchEngine scSE = SearchEngine.SOUNCLOUD;
-                scSE.setActive(false);
-            }
+        // Even if we're offline, we need to disable these for the Google Play Distro.
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
+            SearchEngine scSE = SearchEngine.SOUNCLOUD;
+            scSE.setActive(false);
         }
     }
 }

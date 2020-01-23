@@ -22,18 +22,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.KeyguardManager;
-import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageInstaller;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -46,7 +42,6 @@ import android.widget.Toast;
 
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
-import androidx.documentfile.provider.DocumentFile;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -71,8 +66,6 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.List;
@@ -261,6 +254,7 @@ public final class UIUtils {
         }
     }
 
+////// START OF PACKAGE INSTALLER LOGIC SECTION
 //    If you found this in Google, I could not make it work in 2 days, I really tried, I got response
 //    from the package installer session and all, but I couldn't start the android screen to ask for
 //    permissions
@@ -339,7 +333,7 @@ public final class UIUtils {
 //            }
 //        }
 //    }
-
+////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     /**
      * Opens the given file with the default Android activity for that File and

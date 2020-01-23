@@ -115,17 +115,18 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         noButton.setOnClickListener(v -> dismiss());
     }
 
+////// START OF PACKAGE INSTALLER LOGIC SECTION
 //    private void onUpdateAcceptedTask(final String apkDownloadURL) {
 //        // since Nougat, a naked file path can't be put directly inside
 //        // an intent
 //        boolean useFileProvider = hasNougatOrNewer();
 //        // this will talk to the PackageManager and MainActivity should get Intent callbacks
 //        //boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
-//        boolean error = !UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(), Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
 //        if (error) {
 //            UIUtils.openURL(getActivity(), apkDownloadURL);
 //        }
 //    }
+////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private static File getUpdateApk() {
         return Platforms.get().systemPaths().update();
