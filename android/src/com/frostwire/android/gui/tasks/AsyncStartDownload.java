@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ package com.frostwire.android.gui.tasks;
 import android.app.Activity;
 import android.content.Context;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.transfers.ExistingDownload;
@@ -67,7 +68,16 @@ public class AsyncStartDownload {
                 transfer = TransferManager.instance().download(sr);
                 if(!(transfer instanceof InvalidDownload)) {
                     if (ctx instanceof Activity) {
-                        ((Activity) ctx).runOnUiThread(() -> UIUtils.showTransfersOnDownloadStart(ctx));
+                        ((Activity) ctx).runOnUiThread(() -> {
+                            try {
+                                UIUtils.showTransfersOnDownloadStart(ctx);
+                            } catch (Throwable t) {
+                                if (BuildConfig.DEBUG) {
+                                    throw t;
+                                }
+                                LOG.error("doInBackground() " + t.getMessage(), t);
+                            }
+                        });
                     }
                 }
             }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.app.Activity;
 import android.content.Context;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -37,12 +36,16 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
+import com.frostwire.util.Logger;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -64,8 +67,8 @@ public final class KeywordFilterDrawerView extends LinearLayout {
     private KeywordFilterDrawerController keywordFilterDrawerController;
     private ScrollView scrollView;
     private ViewGroup pipelineLayout;
-
     private final KeywordTagListener keywordTagListener = new KeywordTagListener();
+    private final static Logger LOG = Logger.getLogger(KeywordFilterDrawerView.class);
 
     public KeywordFilterDrawerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -174,14 +177,19 @@ public final class KeywordFilterDrawerView extends LinearLayout {
 
     public void updateData(KeywordDetector.Feature feature, List<Entry<String, Integer>> filteredHistogram) {
         TagsController tagsController = featureContainer.get(feature);
-        tagsController.hideHeader();
-        tagsController.showProgressView(true);
+        if (tagsController != null) {
+            tagsController.hideHeader();
+            tagsController.showProgressView(true);
+        }
         updateSuggestedKeywordFilters(feature, filteredHistogram);
         invalidate();
     }
 
     private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
         TagsController tagsController = featureContainer.get(feature);
+        if (tagsController == null) {
+            return;
+        }
         tagsController.showProgressView(true);
         ViewGroup container = tagsController.container;
         container.removeAllViews();
@@ -244,8 +252,15 @@ public final class KeywordFilterDrawerView extends LinearLayout {
     public void reset() {
         // visual reset
         ((Activity) getContext()).runOnUiThread(() -> {
-            clearAppliedFilters();
-            resetTagsContainers();
+            try {
+                clearAppliedFilters();
+                resetTagsContainers();
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("reset() " + t.getMessage(), t);
+            }
         });
     }
 
@@ -262,7 +277,9 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         Set<KeywordDetector.Feature> features = featureContainer.keySet();
         for (KeywordDetector.Feature feature : features) {
             TagsController tagsController = featureContainer.get(feature);
-            tagsController.showProgressView(tagsController.container.getChildCount() == 0);
+            if (tagsController != null) {
+                tagsController.showProgressView(tagsController.container.getChildCount() == 0);
+            }
         }
     }
 
@@ -270,7 +287,9 @@ public final class KeywordFilterDrawerView extends LinearLayout {
         Set<KeywordDetector.Feature> features = featureContainer.keySet();
         for (KeywordDetector.Feature feature : features) {
             TagsController tagsController = featureContainer.get(feature);
-            tagsController.showProgressView(false);
+            if (tagsController != null) {
+                tagsController.showProgressView(false);
+            }
         }
     }
 
@@ -332,7 +351,7 @@ public final class KeywordFilterDrawerView extends LinearLayout {
                 updateAppliedKeywordFilters(pipelineListener.getKeywordFiltersPipeline());
             }
             // un-hide tag in container
-            if (featureContainer != null && view.getKeywordFilter().getFeature() != null) {
+            if (view.getKeywordFilter().getFeature() != null) {
                 TagsController tagsController = featureContainer.get(view.getKeywordFilter().getFeature());
                 if (tagsController == null || tagsController.container == null) {
                     return;
@@ -412,7 +431,7 @@ public final class KeywordFilterDrawerView extends LinearLayout {
             expand();
         }
 
-        public void showProgressView(boolean visible) {
+        void showProgressView(boolean visible) {
             progressBar.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }

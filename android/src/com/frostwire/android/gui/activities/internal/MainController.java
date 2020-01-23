@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package com.frostwire.android.gui.activities.internal;
 import android.app.Fragment;
 import android.content.Intent;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.activities.MainActivity;
@@ -28,6 +29,7 @@ import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -37,7 +39,7 @@ import java.lang.ref.WeakReference;
  * @author aldenml
  */
 public final class MainController {
-
+    private final static Logger LOG = Logger.getLogger(MainController.class);
     private final WeakReference<MainActivity> activityRef;
 
     public MainController(MainActivity activity) {
@@ -62,7 +64,7 @@ public final class MainController {
         }
     }
 
-    public void showPreferences() {
+    void showPreferences() {
         if (!Ref.alive(activityRef)) {
             return;
         }
@@ -71,7 +73,7 @@ public final class MainController {
         activity.startActivity(i);
     }
 
-    public void launchMyMusic() {
+    void launchMyMusic() {
         if (!Ref.alive(activityRef)) {
             return;
         }
@@ -88,15 +90,23 @@ public final class MainController {
         MainActivity activity = activityRef.get();
         if (!(activity.getCurrentFragment() instanceof TransfersFragment)) {
             activity.runOnUiThread(() -> {
-                TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
-                fragment.selectStatusTab(status);
-                switchFragment(R.id.menu_main_transfers);
-                fragment.onTime();
+                try {
+                    TransfersFragment fragment = (TransfersFragment) activity.getFragmentByNavMenuId(R.id.menu_main_transfers);
+                    fragment.selectStatusTab(status);
+                    switchFragment(R.id.menu_main_transfers);
+                    fragment.onTime();
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("showTransfers() " + t.getMessage(), t);
+                }
+
             });
         }
     }
 
-    public void showMyFiles() {
+    void showMyFiles() {
         if (!Ref.alive(activityRef)) {
             return;
         }
@@ -120,7 +130,7 @@ public final class MainController {
         activity.startActivity(i);
     }
 
-    public void showShutdownDialog() {
+    void showShutdownDialog() {
         if (!Ref.alive(activityRef)) {
             return;
         }
@@ -128,7 +138,7 @@ public final class MainController {
         activity.showShutdownDialog();
     }
 
-    public void syncNavigationMenu() {
+    void syncNavigationMenu() {
         if (!Ref.alive(activityRef)) {
             return;
         }
@@ -144,7 +154,7 @@ public final class MainController {
         activity.setTitle(title);
     }
 
-    public Fragment getFragmentByNavMenuId(int itemId) {
+    Fragment getFragmentByNavMenuId(int itemId) {
         if (!Ref.alive(activityRef)) {
             return null;
         }
@@ -152,7 +162,7 @@ public final class MainController {
         return activity.getFragmentByNavMenuId(itemId);
     }
 
-    public void switchContent(Fragment fragment) {
+    void switchContent(Fragment fragment) {
         if (!Ref.alive(activityRef)) {
             return;
         }

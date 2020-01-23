@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,9 +104,16 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 public void adReceived(final AppLovinAd ad) {
                     // Ensure logic is ran on main queue
                     AppLovinSdkUtils.runOnUiThread(() -> {
-                        adView.renderAd(ad);
-                        LOG.debug("Successfully loaded banner ad");
-                        customEventBannerListener.onBannerLoaded(adView);
+                        try {
+                            adView.renderAd(ad);
+                            LOG.debug("Successfully loaded banner ad");
+                            customEventBannerListener.onBannerLoaded(adView);
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("AppLovinAdLoadListener::adReceived " + t.getMessage(), t);
+                        }
                     });
                 }
 
@@ -114,8 +121,15 @@ public class AppLovinCustomEventBanner extends CustomEventBanner {
                 public void failedToReceiveAd(final int errorCode) {
                     // Ensure logic is ran on main queue
                     AppLovinSdkUtils.runOnUiThread(() -> {
-                        LOG.debug("Failed to load banner ad with code: " + errorCode);
-                        customEventBannerListener.onBannerFailed(toMoPubErrorCode(errorCode));
+                        try {
+                            LOG.debug("Failed to load banner ad with code: " + errorCode);
+                            customEventBannerListener.onBannerFailed(toMoPubErrorCode(errorCode));
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("AppLovinAdLoadListener::failedToReceiveAd " + t.getMessage(), t);
+                        }
                     });
                 }
             };

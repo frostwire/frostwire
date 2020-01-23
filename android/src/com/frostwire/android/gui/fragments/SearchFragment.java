@@ -42,6 +42,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -358,9 +359,16 @@ public final class SearchFragment extends AbstractFragment implements
         }
         if (isAdded()) {
             getActivity().runOnUiThread(() -> {
-                adapter.addResults(keywordFiltered, mediaTypeFiltered);
-                showSearchView(getView());
-                refreshFileTypeCounters(true);
+                try {
+                    adapter.addResults(keywordFiltered, mediaTypeFiltered);
+                    showSearchView(getView());
+                    refreshFileTypeCounters(true);
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("onSearchResults() " + t.getMessage(), t);
+                }
             });
         }
     }
@@ -753,9 +761,18 @@ public final class SearchFragment extends AbstractFragment implements
                 if (searchFragment.isAdded()) {
                     searchFragment.getActivity().runOnUiThread(() -> {
                         if (Ref.alive(searchFragmentRef)) {
-                            SearchFragment searchFragment1 = searchFragmentRef.get();
-                            searchFragment1.searchProgress.setProgressEnabled(false);
-                            searchFragment1.deepSearchProgress.setVisibility(View.GONE);
+                            try {
+                                SearchFragment searchFragment1 = searchFragmentRef.get();
+                                searchFragment1.searchProgress.setProgressEnabled(false);
+                                searchFragment1.deepSearchProgress.setVisibility(View.GONE);
+                            } catch (Throwable t) {
+                                if (BuildConfig.DEBUG) {
+                                    throw t;
+                                }
+                                LOG.error("onStopped() " + t.getMessage(), t);
+                            } finally {
+                                Ref.free(searchFragmentRef);
+                            }
                         }
                     });
                 }
@@ -912,8 +929,16 @@ public final class SearchFragment extends AbstractFragment implements
         public void onKeywordDetectorFinished() {
             if (isAdded()) {
                 getActivity().runOnUiThread(() -> {
-                    keywordFilterDrawerView.hideIndeterminateProgressViews();
-                    keywordFilterDrawerView.requestLayout();
+                    try {
+                        keywordFilterDrawerView.hideIndeterminateProgressViews();
+                        keywordFilterDrawerView.requestLayout();
+                    } catch (Throwable t) {
+                        if (BuildConfig.DEBUG) {
+                            throw t;
+                        }
+                        LOG.error("onKeywordDetectorFinished() " + t.getMessage(), t);
+                    }
+
                 });
             }
         }

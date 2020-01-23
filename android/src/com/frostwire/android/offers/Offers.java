@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -296,16 +297,37 @@ public final class Offers {
                 if (!Ref.alive(activityRef)) {
                     return;
                 }
-                activityRef.get().stopProgressbars(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
-                UIUtils.showShortMessage(activityRef.get(), R.string.no_reward_videos_available);
+                try {
+                    activityRef.get().stopProgressbars(ProductPaymentOptionsView.PayButtonType.REWARD_VIDEO);
+                    UIUtils.showShortMessage(activityRef.get(), R.string.no_reward_videos_available);
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("keepTryingRewardedVideoAsync() " + t.getMessage(), t);
+                } finally {
+                    Ref.free(activityRef);
+                }
+
             });
         } else if (Ref.alive(activityRef)) {
             activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
                 }
-                MoPubRewardedVideos.showRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
-                activityRef.get().finish();
+                try {
+                    MoPubRewardedVideos.showRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
+                    if (Ref.alive(activityRef)) {
+                        activityRef.get().finish();
+                    }
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("keepTryingRewardedVideoAsync() " + t.getMessage(), t);
+                } finally {
+                    Ref.free(activityRef);
+                }
             });
         }
     }

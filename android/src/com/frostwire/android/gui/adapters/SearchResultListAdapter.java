@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
@@ -49,6 +50,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -227,7 +229,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         if (monthsElapsed < 12) {
             return res.getString(R.string.n_months, String.valueOf(monthsElapsed));
         }
-        int yearsElapsed = monthsElapsed/12;
+        int yearsElapsed = monthsElapsed / 12;
         if (yearsElapsed <= 1) {
             return res.getString(R.string.one_year);
         }
@@ -341,10 +343,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return filter();
     }
 
-    public FilteredSearchResults clearKeywordFilters() {
+    private void clearKeywordFilters() {
         this.keywordFiltersPipeline.clear();
         cachedFilteredSearchResults = null;
-        return filter();
+        filter();
     }
 
     private static class OnLinkClickListener implements OnClickListener {
@@ -408,6 +410,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private static final class PreviewClickListener extends ClickAdapter<Context> {
         final WeakReference<SearchResultListAdapter> adapterRef;
 
+        private static final Logger LOG = Logger.getLogger(PreviewClickListener.class);
+
         PreviewClickListener(Context ctx, SearchResultListAdapter adapter) {
             super(ctx);
             adapterRef = Ref.weak(adapter);
@@ -440,8 +444,15 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                         if (!Ref.alive(ctxRef)) {
                             return;
                         }
-                        LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
-                        ctxRef.get().startActivity(i);
+                        try {
+                            LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
+                            ctxRef.get().startActivity(i);
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("SearchResultListAdapter::PreviewClickListener::onClick() " + t.getMessage(), t);
+                        }
                     });
                 });
             }
@@ -449,4 +460,3 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
     }
 }
-

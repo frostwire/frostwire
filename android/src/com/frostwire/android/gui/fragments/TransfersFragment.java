@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
 import com.frostwire.android.util.Asyncs;
 import com.google.android.material.tabs.TabLayout;
@@ -315,7 +316,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             return;
         }
         if (adapter != null) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)-100)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 async(this,
                         TransfersFragment::sortSelectedStatusTransfersInBackground,
                         TransfersFragment::updateTransferList);
@@ -335,7 +336,17 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         tab.select();
                     } else {
                         try {
-                            getActivity().runOnUiThread(tab::select);
+                            getActivity().runOnUiThread(() -> {
+                                try {
+                                    tab.select();
+                                } catch (Throwable t) {
+                                    if (BuildConfig.DEBUG) {
+                                        throw t;
+                                    }
+                                    LOG.error("onTime() " + t.getMessage(), t);
+                                }
+                            });
+
                         } catch (Throwable ignored) {
                         }
                     }
