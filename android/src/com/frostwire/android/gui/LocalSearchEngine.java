@@ -114,7 +114,7 @@ public final class LocalSearchEngine {
         ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
         for (SearchEngine se : shuffledEngines) {
-            if (se.isEnabled()) {
+            if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
             }
