@@ -103,6 +103,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     public void onResume() {
         super.onResume();
+        ensureTorrentHandle(); // Purposefully not async.
         updateCommonComponents();
     }
 
@@ -195,10 +196,13 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     private void ensureTorrentHandle() {
-        if (torrentHandle == null && uiBittorrentDownload != null) {
-            torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
-            if (torrentHandle == null) {
-                torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+        if (uiBittorrentDownload != null) {
+            TorrentHandle currentTorrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+            // If the user restarts an existing partial transfer from a torrent in My Files
+            // this makes sure we refresh the UI torrent
+            if (currentTorrentHandle != null && torrentHandle != currentTorrentHandle) {
+                torrentHandle = currentTorrentHandle;
+                uiBittorrentDownload = (UIBittorrentDownload) TransferManager.instance().getBittorrentDownload(uiBittorrentDownload.getInfoHash());
             }
         }
     }

@@ -349,8 +349,9 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                             selection,
                             peers,
                             TransferManager.instance().isDeleteStartedTorrentEnabled());
-                    UIUtils.showTransfersOnDownloadStart(ctx);
                     dlg.removeTorrentFetcherDownloadFromTransfers();
+                    TransferManager.instance().updateUIBittorrentDownload(BTEngine.getInstance().find(dlg.getTorrentInfo().infoHash()));
+                    UIUtils.showTransfersOnDownloadStart(ctx);
                     MainActivity.refreshTransfers(ctx);
                 } catch (Throwable ignored) {
                 }

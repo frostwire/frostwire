@@ -24,6 +24,7 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -348,16 +349,12 @@ public final class BTEngine extends SessionManager {
                     changed = true;
                 }
             }
-            if (!changed) { // nothing to do
-                return;
-            }
         }
         download(ti, saveDir, priorities, null, peers);
-        if (!torrentHandleExists) {
-            saveResumeTorrent(ti);
-            if (!dontSaveTorrentFile) {
-                saveTorrent(ti);
-            }
+
+        saveResumeTorrent(ti);
+        if (!dontSaveTorrentFile) {
+            saveTorrent(ti);
         }
     }
 

@@ -39,6 +39,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.bittorrent.BTDownloadItem;
+import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
 
 import org.apache.commons.io.FilenameUtils;
@@ -78,6 +79,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (uiBittorrentDownload == null) {
             return;
         }
+
         List<TransferItem> items = uiBittorrentDownload.getItems();
         if (items == null) {
             return;

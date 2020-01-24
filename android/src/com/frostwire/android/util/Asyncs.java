@@ -20,7 +20,6 @@ package com.frostwire.android.util;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 
 import androidx.annotation.NonNull;
 
@@ -543,7 +542,7 @@ public final class Asyncs {
         public static boolean isReadyToSubmitTask(final String taskName, final long minIntervalInMillis) {
 
             tryRecycling();
-            final long now = SystemClock.elapsedRealtime();
+            final long now = System.currentTimeMillis();
             if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
                 if (PROFILING_ENABLED) {
                     LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted for the first time");
@@ -561,7 +560,7 @@ public final class Asyncs {
                 profileHit(taskName);
                 return true;
             }
-            //LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms", true);
+            LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms", true);
             return false;
         }
 
@@ -607,7 +606,7 @@ public final class Asyncs {
             if (asyncTaskSubmissionTimestampMap.size() == 0) {
                 return;
             }
-            final long now = SystemClock.elapsedRealtime();
+            final long now = System.currentTimeMillis();
             if (now - lastRecycleTimestamp > RECYCLE_SUBMISSION_TIME_MAP_INTERVAL) {
                 dumpTaskProfile();
                 ArrayList<String> keysToRecycle = new ArrayList<>();

@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.frostwire.android.util.Asyncs.async;
@@ -350,7 +351,9 @@ public final class TransferManager {
                 }
             } else {
                 if (scheme.equalsIgnoreCase("file")) {
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, -1);
+                    // download an existing transfer from a .torrent in My Files (partial download)
+                    // See com.frostwire.android.gui.adapters.menu.OpenMenuAction::onClick()
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, new Random(System.currentTimeMillis()).nextLong());
                 } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
@@ -556,6 +559,24 @@ public final class TransferManager {
     public int startedTransfers() {
         return startedTransfers;
     }
+
+    public void updateUIBittorrentDownload(TorrentHandle torrentHandle) {
+        int index=0;
+        String infoHashString = torrentHandle.infoHash().toHex();
+        for (BittorrentDownload bittorrentDownload : bittorrentDownloadsList) {
+            if (bittorrentDownload.getInfoHash().equals(infoHashString)) {
+                break;
+            }
+            index++;
+        }
+        UIBittorrentDownload uiBtDownload = new UIBittorrentDownload(this, new BTDownload(BTEngine.getInstance(), torrentHandle));
+        synchronized (bittorrentDownloadsMap) {
+            bittorrentDownloadsList.set(index, uiBtDownload);
+            bittorrentDownloadsMap.remove(infoHashString);
+            bittorrentDownloadsMap.put(infoHashString, uiBtDownload);
+        }
+    }
+
 
     static long getCurrentMountAvailableBytes() {
         StatFs stat = new StatFs(ConfigurationManager.instance().getStoragePath());
