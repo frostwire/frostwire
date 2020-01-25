@@ -20,6 +20,9 @@ package com.frostwire.android.gui.tasks;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -36,37 +39,74 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
-import static com.frostwire.android.util.Asyncs.async;
+import java.lang.ref.WeakReference;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class AsyncStartDownload {
 
     private static final Logger LOG = Logger.getLogger(AsyncStartDownload.class);
+    private static final Handler handler;
+
+    static {
+        HandlerThread TH = new HandlerThread("AsyncStartDownload-HandlerThread");
+        TH.start();
+        handler = new Handler(TH.getLooper());
+    }
 
     public AsyncStartDownload(final Context ctx, final SearchResult sr, final String message) {
-        async(ctx, AsyncStartDownload::doInBackground, sr, message, AsyncStartDownload::onPostExecute);
+        //async(ctx, AsyncStartDownload::doInBackground, sr, message, AsyncStartDownload::onPostExecute);
+        WeakReference<Context> ctxRef = Ref.weak(ctx);
+        handler.post(() -> {
+            LOG.info("AsyncStartDownload: posting to handler", true);
+            try {
+                if (!Ref.alive(ctxRef)) {
+                    Ref.free(ctxRef);
+                    return;
+                }
+                final Transfer transfer = doInBackground(ctxRef.get(), sr, message);
+                if (transfer == null) {
+                    Ref.free(ctxRef);
+                    return;
+                }
+                Handler uiHandler = new Handler(Looper.getMainLooper());
+                uiHandler.postAtFrontOfQueue(() -> {
+                    if (!Ref.alive(ctxRef)) {
+                        Ref.free(ctxRef);
+                        return;
+                    }
+                    try {
+                        onPostExecute(ctxRef.get(), sr, message, transfer);
+                    } catch (Throwable t) {
+                        LOG.error(t.getMessage(), t);
+                    } finally {
+                        Ref.free(ctxRef);
+                    }
+                });
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
+        });
     }
-    
-    public AsyncStartDownload(final Context ctx, final SearchResult sr){
-        this(ctx,sr,null);
+
+    public AsyncStartDownload(final Context ctx, final SearchResult sr) {
+        this(ctx, sr, null);
     }
 
     private static Transfer doInBackground(final Context ctx, final SearchResult sr, final String message) {
         Transfer transfer = null;
         try {
             if (sr instanceof TorrentSearchResult &&
-                !(sr instanceof TorrentCrawledSearchResult)) {
+                    !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
                         new HandpickedTorrentDownloadDialogOnFetch((Activity) ctx), sr.getDisplayName());
             } else {
                 transfer = TransferManager.instance().download(sr);
-                if(!(transfer instanceof InvalidDownload)) {
+                if (!(transfer instanceof InvalidDownload)) {
                     if (ctx instanceof Activity) {
                         ((Activity) ctx).runOnUiThread(() -> {
                             try {
@@ -103,8 +143,8 @@ public class AsyncStartDownload {
                     if (tm.isBittorrentDownloadAndMobileDataSavingsOff(transfer)) {
                         UIUtils.showLongMessage(ctx, R.string.torrent_transfer_consuming_mobile_data);
                     }
-                    
-                    if (message != null){
+
+                    if (message != null) {
                         UIUtils.showShortMessage(ctx, message);
                     }
                 }
