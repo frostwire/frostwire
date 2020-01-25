@@ -57,9 +57,11 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
     private RemoteViews notificationViews;
     private Notification notificationObject;
+    private boolean sentNotification;
 
     public NotificationUpdateDaemon(Context parentContext) {
         mParentContext = parentContext;
+        sentNotification = false;
         setupNotification();
     }
 
@@ -125,6 +127,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                 NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 if (manager != null) {
                     try {
+                        sentNotification = false;
                         manager.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
                     } catch (SecurityException ignored) {
                         // possible java.lang.SecurityException
@@ -168,16 +171,14 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                     // but we do share the same notification channel and the player and downloads may concurrently try to send a notification
                     // https://github.com/smartdevicelink/sdl_java_suite/pull/849
                     synchronized (NotificationHelper.NOTIFICATION_LOCK) {
+                        sentNotification = true;
                         notificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
                     }
                     //LOG.info("updateTransfersStatusNotification() notificationManager.notify()!");
-                } catch (SecurityException ignored) {
-                    // possible java.lang.SecurityException
-                    LOG.error("updateTransfersStatusNotification() " + ignored.getMessage(), ignored);
-                } catch (Throwable ignored2) {
-                    // possible android.os.TransactionTooLargeException
-                    LOG.error("updateTransfersStatusNotification() " + ignored2.getMessage(), ignored2);
+                } catch (Throwable t) {
+                    LOG.error("updateTransfersStatusNotification() " + t.getMessage(), t);
                 }
+
             } else {
                 LOG.info("updateTransfersStatusNotification() no notification manager available");
             }
@@ -233,9 +234,18 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
     @Override
     public void onTime() {
+        if (TransferManager.instance() == null) {
+            return;
+        }
+        if (!isScreenOn()) {
+            return;
+        }
+        if (TransferManager.instance().getActiveDownloads() == 0 && TransferManager.instance().getActiveUploads() == 0 && !sentNotification) {
+            return;
+        }
         if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefresh)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
-                async(this, NotificationUpdateDaemon::onTimeRefresh);
+            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefreshTask)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
+                async(this, NotificationUpdateDaemon::onTimeRefreshTask);
             }
         } else {
             LOG.error("NotificationUpdateDaemon::onTime() invoked by who?", new Throwable());
@@ -244,11 +254,12 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
     @SuppressWarnings("deprecation")
     private boolean isScreenOn() {
+        long a = System.currentTimeMillis();
         PowerManager pm = (PowerManager) mParentContext.getSystemService(Context.POWER_SERVICE);
         return pm != null && pm.isScreenOn();
     }
 
-    private void onTimeRefresh() {
+    private void onTimeRefreshTask() {
         if (isScreenOn()) {
             updateTransfersStatusNotification();
         }
