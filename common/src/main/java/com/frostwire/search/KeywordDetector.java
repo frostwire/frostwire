@@ -239,7 +239,7 @@ public final class KeywordDetector {
         private final KeywordDetector keywordDetector;
         private final List<SearchResult> filtered;
 
-        public HistogramUpdateRequestTask(KeywordDetector keywordDetector, List<SearchResult> filtered) {
+        HistogramUpdateRequestTask(KeywordDetector keywordDetector, List<SearchResult> filtered) {
             this.keywordDetector = keywordDetector;
             // TODO: this is necessary to due the amount of concurrency, but not
             // good for memory, need to refactor this
