@@ -27,6 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Use this search performer if you have to crawl search result links to get the data you need,
+ * otherwise @see TorrentSearchPerformer to obtain everything directly from a search results page.
+ *
  * @author gubatron
  * @author aldenml
  */

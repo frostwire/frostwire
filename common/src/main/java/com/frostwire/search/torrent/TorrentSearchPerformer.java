@@ -24,6 +24,8 @@ import com.frostwire.search.SearchResult;
 import java.util.List;
 
 /**
+ * Extend this search performer if you can obtain all you need directly from a search results
+ * page, otherwise extend TorrentRegexSearchPerformer
  * @author gubatron
  * @author aldenml
  */
