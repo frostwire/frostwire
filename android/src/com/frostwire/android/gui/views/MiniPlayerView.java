@@ -161,6 +161,10 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     public void refresherOnTime() {
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
+            // rest :)
+            return;
+        }
         async(this, MiniPlayerView::refreshOnTimerResultTask, MiniPlayerView::refreshOnTimerPostTask);
     }
 
