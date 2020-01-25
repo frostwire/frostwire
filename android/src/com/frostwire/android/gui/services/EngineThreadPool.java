@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author gubatron
  * @author aldenml
  */
-final class EngineThreadPool extends ThreadPool {
+final public class EngineThreadPool extends ThreadPool {
 
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
@@ -107,6 +107,8 @@ final class EngineThreadPool extends ThreadPool {
     }
 
     private void dumpTasks() {
+        System.out.println("EngineThreadPool::dumpTasks()");
+        System.out.println("Active threads: " + getActiveCount());
         System.out.println("Running threads in engine pool");
         long now = System.nanoTime();
         for (Map.Entry<Thread, TaskInfo> e : taskInfo.entrySet()) {
