@@ -721,7 +721,7 @@ public final class SearchFragment extends AbstractFragment implements
             return;
         }
         drawerLayout.openDrawer(keywordFilterDrawerView);
-        keywordDetector.requestHistogramsUpdateAsync(null);
+        keywordDetector.requestHistogramsUpdateAsync(null, true);
     }
 
     private void resetKeywordDetector() {
@@ -917,7 +917,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("SearchFragment::possiblyWaitInBackgroundToUpdateUI", 300)) {
+            if (Asyncs.Throttle.isReadyToSubmitTask("SearchFragment::possiblyWaitInBackgroundToUpdateUI", 3000)) {
                 async(filterButton,
                         SearchFragment::possiblyWaitInBackgroundToUpdateUI,
                         keywordFilterDrawerView, filteredHistograms,

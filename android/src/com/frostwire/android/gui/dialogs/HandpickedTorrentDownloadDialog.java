@@ -27,7 +27,7 @@ import android.view.View;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -332,7 +332,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            Engine.instance().getThreadPool().execute(() -> {
+            AsyncStartDownload.submitRunnable(() -> {
                 try {
                     // there is a still a chance of reference getting null, this is in
                     // the background

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,22 @@
 
 package com.frostwire.search;
 
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
+
 import org.apache.commons.io.FilenameUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -195,12 +204,19 @@ public final class KeywordDetector {
     /**
      * Expensive
      */
-    public void requestHistogramsUpdateAsync(List<SearchResult> filtered) {
-        if (!histogramUpdateRequestsDispatcher.running.get()) {
-            histogramUpdateRequestsDispatcher.start();
+    public void requestHistogramsUpdateAsync(List<SearchResult> filtered, boolean force) {
+        if (force || Asyncs.Throttle.isReadyToSubmitTask("requestHistogramsUpdateAsync",
+                10000)) {
+            if (!histogramUpdateRequestsDispatcher.running.get()) {
+                histogramUpdateRequestsDispatcher.start();
+            }
+            HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, filtered);
+            histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
         }
-        HistogramUpdateRequestTask histogramUpdateRequestTask = new HistogramUpdateRequestTask(this, filtered);
-        histogramUpdateRequestsDispatcher.enqueue(histogramUpdateRequestTask);
+    }
+
+    public void requestHistogramsUpdateAsync(List<SearchResult> filtered) {
+        requestHistogramsUpdateAsync(filtered, false);
     }
 
     public void reset() {

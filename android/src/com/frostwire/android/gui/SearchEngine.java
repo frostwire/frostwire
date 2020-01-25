@@ -50,7 +50,7 @@ import java.util.List;
 public abstract class SearchEngine {
 
     private static final UserAgent FROSTWIRE_ANDROID_USER_AGENT = new UserAgent(getOSVersionString(), Constants.FROSTWIRE_VERSION_STRING, Constants.FROSTWIRE_BUILD);
-    private static final int DEFAULT_TIMEOUT = 10000;
+    private static final int DEFAULT_TIMEOUT = 5000;
 
     private final String name;
     private final String preferenceKey;

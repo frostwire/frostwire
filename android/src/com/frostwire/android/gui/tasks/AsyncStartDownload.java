@@ -97,6 +97,16 @@ public class AsyncStartDownload {
         this(ctx, sr, null);
     }
 
+    public static void submitRunnable(Runnable runnable) {
+        handler.post(() -> {
+            try {
+                runnable.run();
+            } catch (Throwable t) {
+                LOG.error("submitRunnable() failed: " + t.getMessage(), t);
+            }
+        });
+    }
+
     private static Transfer doInBackground(final Context ctx, final SearchResult sr, final String message) {
         Transfer transfer = null;
         try {

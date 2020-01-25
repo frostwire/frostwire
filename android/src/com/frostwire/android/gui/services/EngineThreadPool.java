@@ -40,7 +40,7 @@ final public class EngineThreadPool extends ThreadPool {
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAXIMUM_POOL_SIZE = 8;
     private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
-    private static final int MAX_DEBUG_QUEUED_TASKS = 100;
+    private static final int MAX_DEBUG_QUEUED_TASKS = 1000;
 
     private final WeakHashMap<Object, String> taskStack;
     private final WeakHashMap<Thread, TaskInfo> taskInfo;

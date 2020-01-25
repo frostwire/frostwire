@@ -29,6 +29,7 @@ import android.os.Looper;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.util.Asyncs;
 import com.google.android.material.tabs.TabLayout;
 
@@ -81,6 +82,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -317,9 +319,40 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
         if (adapter != null) {
             if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
-                async(this,
-                        TransfersFragment::sortSelectedStatusTransfersInBackground,
-                        TransfersFragment::updateTransferList);
+                WeakReference<TransfersFragment> contextRef = Ref.weak(this);
+                AsyncStartDownload.submitRunnable(() -> {
+                    if (!Ref.alive(contextRef)) {
+                        Ref.free(contextRef);
+                        return;
+                    }
+                    TransfersHolder transfersHolder;
+                    try {
+                        transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                    } catch (Throwable t) {
+                        LOG.error("onTime() " + t.getMessage(), t);
+                        Ref.free(contextRef);
+                        return;
+                    }
+                    if (!Ref.alive(contextRef)) {
+                        Ref.free(contextRef);
+                        return;
+                    }
+                    final TransfersHolder tfCopy = transfersHolder;
+
+                    contextRef.get().getActivity().runOnUiThread(() -> {
+                        if (!Ref.alive(contextRef)) {
+                            Ref.free(contextRef);
+                            return;
+                        }
+                        try {
+                            contextRef.get().updateTransferList(tfCopy);
+                        } catch (Throwable t) {
+                            LOG.error("onTime() " + t.getMessage(), t);
+                            Ref.free(contextRef);
+                        }
+                    });
+
+                });
             } else {
                 LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
             }
