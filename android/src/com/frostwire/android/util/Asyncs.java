@@ -233,10 +233,10 @@ public final class Asyncs {
      * <code>Asyncs.async(this, ActivityFoo.staticMethodThatTakesContext, ActivityFoo::postMethodWithNoParametersToUpdateUIFromMemberVariables)</code>
      *
      * @param context
-     * @param contextTask1 A background context task that returns nothing but takes 1 parameter
+     * @param contextTask1    A background context task that returns nothing but takes 1 parameter
      * @param contextPostTask A foreground context task that takes no parameters
-     * @param <C> Context type
-     * @param <T1> Argument type
+     * @param <C>             Context type
+     * @param <T1>            Argument type
      */
     public static <C, T1> void async(@NonNull C context,
                                      ContextTask1<C, T1> contextTask1,
@@ -452,25 +452,11 @@ public final class Asyncs {
     }
 
     // private helper methods
-
     private static <C, R> void invokeAsyncSupport(C context,
                                                   TaskSupport<C, R> task,
                                                   PostSupport<C, R> post,
                                                   Object... args) {
-
-//        LOG.info("=====================================================================");
-//        StackTraceElement[] stackTrace = new Exception().getStackTrace();
-//        LOG.info("invokeAsyncSupport: " + stackTrace[4].toString());
-//        LOG.info("invokeAsyncSupport: " + stackTrace[5].toString());
-//        if (stackTrace.length >= 7) {
-//            LOG.info("invokeAsyncSupport: " + stackTrace[6].toString());
-//        }
-//        if (stackTrace.length >= 8) {
-//            LOG.info("invokeAsyncSupport: " + stackTrace[7].toString());
-//        }
-//        LOG.info("=====================================================================");
         WeakReference<C> ctx = context != null ? Ref.weak(context) : null;
-
         Engine.instance().getThreadPool().execute(() -> {
             if (ctx != null && !Ref.alive(ctx)) {
                 return;
