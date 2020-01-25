@@ -157,7 +157,7 @@ public final class MusicUtils {
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
             intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
             try {
-                if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+                if (MusicUtils.isMusicPlaybackServiceRunning()) {
                     // no need to be calling start service to make it do what we want if it's already there
                     LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
                     MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
@@ -176,7 +176,7 @@ public final class MusicUtils {
         return musicPlaybackService;
     }
 
-    public static boolean isMusicPlaybackServiceRunning(final Context context) {
+    public static boolean isMusicPlaybackServiceRunning() {
         return musicPlaybackService != null;
     }
 
@@ -185,7 +185,7 @@ public final class MusicUtils {
             LOG.warn("requestMusicPlaybackServiceShutdown() aborted. context is null.");
             return;
         }
-        if (!MusicUtils.isMusicPlaybackServiceRunning(context)) {
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
             LOG.info("requestMusicPlaybackServiceShutdown() aborted. MusicPlaybackService has already shutdown.");
             return;
         }
@@ -323,7 +323,7 @@ public final class MusicUtils {
     public static void previous(final Context context) {
         final Intent previous = new Intent(context, MusicPlaybackService.class);
         previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        if (MusicUtils.isMusicPlaybackServiceRunning(context)) {
+        if (MusicUtils.isMusicPlaybackServiceRunning()) {
             try {
                 LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
                 MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);

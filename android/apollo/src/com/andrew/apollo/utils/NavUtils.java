@@ -111,7 +111,7 @@ public final class NavUtils {
      * @param activity The {@link Activity} to use.
      */
     public static void openAudioPlayer(final Activity activity) {
-        LOG.info("openAudioPlayer() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning(activity));
+        LOG.info("openAudioPlayer() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning());
         final Intent intent = new Intent(activity, AudioPlayerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);

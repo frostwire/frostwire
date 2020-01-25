@@ -618,10 +618,10 @@ public final class UIUtils {
     }
 
     private static void playEphemeralPlaylistTask(Context context, FileDescriptor fd) {
-        LOG.info("playEphemeralPlaylistTask() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning(context));
+        LOG.info("playEphemeralPlaylistTask() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning());
         final CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
         final WeakReference<Context> contextRef = Ref.weak(context);
-        if (!MusicUtils.isMusicPlaybackServiceRunning(context)) {
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
             Runnable playEphemeralPlaylistOfOneCallback = () -> {
                 try {
                     if (mediaPlayer != null && Ref.alive(contextRef)) {
