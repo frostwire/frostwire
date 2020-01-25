@@ -561,7 +561,7 @@ public final class TransferManager {
     }
 
     public void updateUIBittorrentDownload(TorrentHandle torrentHandle) {
-        int index=0;
+        int index = 0;
         String infoHashString = torrentHandle.infoHash().toHex();
         for (BittorrentDownload bittorrentDownload : bittorrentDownloadsList) {
             if (bittorrentDownload.getInfoHash().equals(infoHashString)) {
@@ -570,11 +570,9 @@ public final class TransferManager {
             index++;
         }
         UIBittorrentDownload uiBtDownload = new UIBittorrentDownload(this, new BTDownload(BTEngine.getInstance(), torrentHandle));
-        synchronized (bittorrentDownloadsMap) {
-            bittorrentDownloadsList.set(index, uiBtDownload);
-            bittorrentDownloadsMap.remove(infoHashString);
-            bittorrentDownloadsMap.put(infoHashString, uiBtDownload);
-        }
+        bittorrentDownloadsList.set(index, uiBtDownload);
+        bittorrentDownloadsMap.remove(infoHashString);
+        bittorrentDownloadsMap.put(infoHashString, uiBtDownload);
     }
 
 
