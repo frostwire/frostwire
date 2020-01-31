@@ -32,11 +32,11 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.util.TaskThrottle;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -113,7 +113,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             if (intent != null) {
                 String infoHash = intent.getStringExtra("infoHash");
                 if (infoHash != null && !infoHash.isEmpty()) {
-                    if (Asyncs.Throttle.isReadyToSubmitTask("AbstractTransferDetailFragment::recoverUIBittorrentDownload", 1000)) {
+                    if (TaskThrottle.isReadyToSubmitTask("AbstractTransferDetailFragment::recoverUIBittorrentDownload", 1000)) {
                         async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
                     } else {
                         System.err.println("AbstractTransferDetailFragment.onTime() Did not submit async task AbstractTransferDetailFragment::recoverUIBittorrentDownload, 1000 ms haven't passed");

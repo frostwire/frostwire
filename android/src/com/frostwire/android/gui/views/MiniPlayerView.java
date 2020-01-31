@@ -34,8 +34,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.util.TaskThrottle;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -138,7 +138,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void refreshAlbumCover() {
-        if (!Asyncs.Throttle.isReadyToSubmitTask("MiniPlayerView::refreshAlbumCover", 5000)) {
+        if (!TaskThrottle.isReadyToSubmitTask("MiniPlayerView::refreshAlbumCover", 5000)) {
             return;
         }
 

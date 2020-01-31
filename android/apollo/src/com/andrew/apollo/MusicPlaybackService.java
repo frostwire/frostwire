@@ -68,6 +68,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.TaskThrottle;
 
 import java.lang.ref.WeakReference;
 import java.util.Random;
@@ -990,7 +991,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         if (isPlaying()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 500)) {
+            if (TaskThrottle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 500)) {
                 async(this, MusicPlaybackService::getAlbumArt, MusicPlaybackService::buildNotificationWithAlbumArtPost);
             }
         }
@@ -1477,11 +1478,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     private void notifyChange(final String change) {
         LOG.info("notifyChange(" + change + ") trying...");
-        if (META_CHANGED.equals(change) && Asyncs.Throttle.isReadyToSubmitTask(change, 100)) {
+        if (META_CHANGED.equals(change) && TaskThrottle.isReadyToSubmitTask(change, 100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
             return;
         }
-        if (Asyncs.Throttle.isReadyToSubmitTask(change, 100)) {
+        if (TaskThrottle.isReadyToSubmitTask(change, 100)) {
             async(this, MusicPlaybackService::notifyChangeTask, change);
         }
     }

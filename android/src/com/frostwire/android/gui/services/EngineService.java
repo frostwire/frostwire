@@ -39,7 +39,6 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Vectors;
@@ -48,6 +47,7 @@ import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OKHTTPClient;
 
 import java.io.File;
@@ -177,7 +177,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
 
         LOG.info("startServices() - invoking resumeBTEngineTask, wasShutdown=" + wasShutdown);
-        Asyncs.Throttle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
+        TaskThrottle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
         async(this, EngineService::resumeBTEngineTask, wasShutdown);
     }
 

@@ -30,7 +30,7 @@ import android.os.Looper;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
 import com.frostwire.android.gui.tasks.AsyncStartDownload;
-import com.frostwire.android.util.Asyncs;
+import com.frostwire.util.TaskThrottle;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -318,7 +318,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             return;
         }
         if (adapter != null) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
+            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
                 AsyncStartDownload.submitRunnable(() -> {
                     if (!Ref.alive(contextRef)) {
@@ -395,7 +395,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             getActivity().invalidateOptionsMenu();
         }
         if (BTEngine.ctx != null) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
+            if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
                 async(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
             }
             onCheckDHT();

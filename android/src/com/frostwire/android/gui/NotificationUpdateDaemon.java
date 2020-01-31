@@ -38,8 +38,8 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -244,7 +244,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
             return;
         }
         if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefreshTask)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
+            if (TaskThrottle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefreshTask)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
                 async(this, NotificationUpdateDaemon::onTimeRefreshTask);
             }
         } else {

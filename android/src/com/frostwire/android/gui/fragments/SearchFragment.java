@@ -74,7 +74,6 @@ import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.SearchHeaderBanner;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
 import com.frostwire.frostclick.TorrentPromotionSearchResult;
@@ -89,6 +88,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.HttpClient;
 
 import java.lang.ref.WeakReference;
@@ -917,7 +917,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         @Override
         public void notifyHistogramsUpdate(final Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-            if (Asyncs.Throttle.isReadyToSubmitTask("SearchFragment::possiblyWaitInBackgroundToUpdateUI", 3000)) {
+            if (TaskThrottle.isReadyToSubmitTask("SearchFragment::possiblyWaitInBackgroundToUpdateUI", 3000)) {
                 async(filterButton,
                         SearchFragment::possiblyWaitInBackgroundToUpdateUI,
                         keywordFilterDrawerView, filteredHistograms,
@@ -1028,7 +1028,7 @@ public final class SearchFragment extends AbstractFragment implements
     private static void possiblyWaitInBackgroundToUpdateUI(FilterToolbarButton filterToolbarButton,
                                                            KeywordFilterDrawerView keywordFilterDrawerView,
                                                            Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-        long timeSinceLastUpdate = SystemClock.elapsedRealtime() - Asyncs.Throttle.getLastSubmissionTimestamp("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
+        long timeSinceLastUpdate = SystemClock.elapsedRealtime() - TaskThrottle.getLastSubmissionTimestamp("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
         if (timeSinceLastUpdate < 500) {
             try {
                 Thread.sleep(500L - timeSinceLastUpdate);

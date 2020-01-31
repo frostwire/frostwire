@@ -17,11 +17,11 @@
 
 package com.frostwire.search;
 
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.TaskThrottle;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -205,7 +205,7 @@ public final class KeywordDetector {
      * Expensive
      */
     public void requestHistogramsUpdateAsync(List<SearchResult> filtered, boolean force) {
-        if (force || Asyncs.Throttle.isReadyToSubmitTask("requestHistogramsUpdateAsync",
+        if (force || TaskThrottle.isReadyToSubmitTask("requestHistogramsUpdateAsync",
                 10000)) {
             if (!histogramUpdateRequestsDispatcher.running.get()) {
                 histogramUpdateRequestsDispatcher.start();
