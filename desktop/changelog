@@ -1,11 +1,7 @@
-frostwire (6.8.5) stable; urgency=high
+frostwire (6.8.4) stable; urgency=high
   * OpenJDK 13 runtime (windows,mac)
   * Soundcloud search and downloads fixed
   * LimeTorrents search and downloads fixed
-
- -- FrostWire Team <contact@frostwire.com>  Mon, 20 Jan 2020 22:19:15 -0600
-
-frostwire (6.8.4) stable; urgency=high
   * New jlibtorrent 1.2.3.0 update
   * jlibtorrent updated to boost 1.72.0
   * jlibtorrent upgraded openssl to 1.1.1d
@@ -21,7 +17,7 @@ frostwire (6.8.4) stable; urgency=high
   * lt:fixed division by zero in anti-leech choker
   * lt:fixed bug in torrent_info::swap
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 29 Dec 2019 03:17:23 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 30 Jan 2019 19:30:45 -0600
 
 frostwire (6.8.3) stable; urgency=high
   * Soundcloud search and downloads fixed
