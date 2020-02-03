@@ -70,6 +70,8 @@ public final class TransferManager {
     private int downloadsToReview;
     private int startedTransfers = 0;
     private final Object alreadyDownloadingMonitor = new Object();
+    private final Object downloadsListMonitor = new Object();
+    private final Object downloadsMapMonitor = new Object();
     private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
     private volatile static TransferManager instance;
 
@@ -104,18 +106,24 @@ public final class TransferManager {
     }
 
     public void forceReannounceTorrents() {
-        for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (d instanceof BTDownload) {
-                BTDownload bt = (BTDownload) d;
-                bt.getTorrentHandle().forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (d instanceof BTDownload) {
+                    BTDownload bt = (BTDownload) d;
+                    bt.getTorrentHandle().forceReannounce(0, -1, TorrentHandle.IGNORE_MIN_INTERVAL);
+                }
             }
         }
     }
 
     private void clearTransfers() {
         this.httpDownloads.clear();
-        this.bittorrentDownloadsList.clear();
-        this.bittorrentDownloadsMap.clear();
+        synchronized (downloadsListMonitor) {
+            this.bittorrentDownloadsList.clear();
+        }
+        synchronized (downloadsMapMonitor) {
+            this.bittorrentDownloadsMap.clear();
+        }
         this.downloadsToReview = 0;
     }
 
@@ -227,9 +235,11 @@ public final class TransferManager {
 
     public int getActiveDownloads() {
         int count = 0;
-        for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (!TransferState.isErrored(d.getState()) && !d.isComplete() && d.isDownloading()) {
-                count++;
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (!TransferState.isErrored(d.getState()) && !d.isComplete() && d.isDownloading()) {
+                    count++;
+                }
             }
         }
         for (Transfer d : httpDownloads) {
@@ -242,9 +252,11 @@ public final class TransferManager {
 
     public int getActiveUploads() {
         int count = 0;
-        for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (!TransferState.isErrored(d.getState()) && d.isFinished() && !d.isPaused()) {
-                count++;
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (!TransferState.isErrored(d.getState()) && d.isFinished() && !d.isPaused()) {
+                    count++;
+                }
             }
         }
         return count;
@@ -284,17 +296,25 @@ public final class TransferManager {
     }
 
     public void stopSeedingTorrents() {
-        for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (d.isSeeding() || d.isComplete()) {
-                d.pause();
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (d.isSeeding() || d.isComplete()) {
+                    d.pause();
+                }
             }
         }
     }
 
     public boolean remove(Transfer transfer) {
         if (transfer instanceof BittorrentDownload) {
-            bittorrentDownloadsMap.remove(((BittorrentDownload) transfer).getInfoHash());
-            return bittorrentDownloadsList.remove(transfer);
+            synchronized (downloadsMapMonitor) {
+                bittorrentDownloadsMap.remove(((BittorrentDownload) transfer).getInfoHash());
+            }
+            boolean removed;
+            synchronized (downloadsListMonitor) {
+                removed = bittorrentDownloadsList.remove(transfer);
+            }
+            return removed;
         } else if (transfer instanceof Transfer) {
             return httpDownloads.remove(transfer);
         }
@@ -302,9 +322,11 @@ public final class TransferManager {
     }
 
     public void pauseTorrents() {
-        for (BittorrentDownload d : bittorrentDownloadsList) {
-            if (!d.isSeeding()) {
-                d.pause();
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload d : bittorrentDownloadsList) {
+                if (!d.isSeeding()) {
+                    d.pause();
+                }
             }
         }
     }
@@ -346,8 +368,12 @@ public final class TransferManager {
                     BTEngine.getInstance().download(new File(u.getPath()), null, null);
                 } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle));
-                    bittorrentDownloadsList.add(download);
-                    bittorrentDownloadsMap.put(download.getInfoHash(), download);
+                    synchronized (downloadsListMonitor) {
+                        bittorrentDownloadsList.add(download);
+                    }
+                    synchronized (downloadsMapMonitor) {
+                        bittorrentDownloadsMap.put(download.getInfoHash(), download);
+                    }
                 }
             } else {
                 if (scheme.equalsIgnoreCase("file")) {
@@ -357,8 +383,12 @@ public final class TransferManager {
                 } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
-                    bittorrentDownloadsList.add(download);
-                    bittorrentDownloadsMap.put(download.getInfoHash(), download);
+                    synchronized (downloadsListMonitor) {
+                        bittorrentDownloadsList.add(download);
+                    }
+                    synchronized (downloadsMapMonitor) {
+                        bittorrentDownloadsMap.put(download.getInfoHash(), download);
+                    }
                     incrementStartedTransfers();
                     return download;
                 }
@@ -388,8 +418,12 @@ public final class TransferManager {
         try {
             BittorrentDownload bittorrentDownload = createBittorrentDownload(this, sr);
             if (bittorrentDownload != null) {
-                bittorrentDownloadsList.add(bittorrentDownload);
-                bittorrentDownloadsMap.put(bittorrentDownload.getInfoHash(), bittorrentDownload);
+                synchronized (downloadsListMonitor) {
+                    bittorrentDownloadsList.add(bittorrentDownload);
+                }
+                synchronized (downloadsMapMonitor) {
+                    bittorrentDownloadsMap.put(bittorrentDownload.getInfoHash(), bittorrentDownload);
+                }
             }
             return bittorrentDownload;
         } catch (Throwable e) {
@@ -563,16 +597,22 @@ public final class TransferManager {
     public void updateUIBittorrentDownload(TorrentHandle torrentHandle) {
         int index = 0;
         String infoHashString = torrentHandle.infoHash().toHex();
-        for (BittorrentDownload bittorrentDownload : bittorrentDownloadsList) {
-            if (bittorrentDownload.getInfoHash().equals(infoHashString)) {
-                break;
+        synchronized (downloadsListMonitor) {
+            for (BittorrentDownload bittorrentDownload : bittorrentDownloadsList) {
+                if (bittorrentDownload.getInfoHash().equals(infoHashString)) {
+                    break;
+                }
+                index++;
             }
-            index++;
         }
         UIBittorrentDownload uiBtDownload = new UIBittorrentDownload(this, new BTDownload(BTEngine.getInstance(), torrentHandle));
-        bittorrentDownloadsList.set(index, uiBtDownload);
-        bittorrentDownloadsMap.remove(infoHashString);
-        bittorrentDownloadsMap.put(infoHashString, uiBtDownload);
+        synchronized (downloadsListMonitor) {
+            bittorrentDownloadsList.set(index, uiBtDownload);
+        }
+        synchronized (downloadsMapMonitor) {
+            bittorrentDownloadsMap.remove(infoHashString);
+            bittorrentDownloadsMap.put(infoHashString, uiBtDownload);
+        }
     }
 
 
@@ -620,8 +660,13 @@ public final class TransferManager {
     }
 
     private void loadTorrentsTask() {
-        bittorrentDownloadsList.clear();
-        bittorrentDownloadsMap.clear();
+        synchronized (downloadsListMonitor) {
+            bittorrentDownloadsList.clear();
+        }
+        synchronized (downloadsMapMonitor) {
+            bittorrentDownloadsMap.clear();
+        }
+
         final BTEngine btEngine = BTEngine.getInstance();
         btEngine.setListener(new BTEngineAdapter() {
             @Override
@@ -635,8 +680,12 @@ public final class TransferManager {
                     return;
                 }
                 UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
-                bittorrentDownloadsList.add(uiBittorrentDownload);
-                bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                synchronized (downloadsListMonitor) {
+                    bittorrentDownloadsList.add(uiBittorrentDownload);
+                }
+                synchronized (downloadsMapMonitor) {
+                    bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                }
             }
 
             @Override
