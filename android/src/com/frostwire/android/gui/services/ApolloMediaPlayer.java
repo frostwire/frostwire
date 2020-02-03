@@ -36,7 +36,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
             idMap.put((long) item.getFD().id, item.getFD());
             if (currentItem != null && currentItem.getFD().id == item.getFD().id) {
                 position = i;
-                break;
+                //do not break here, otherwise the rest of the playlist ids will be 0ed;
             }
         }
 

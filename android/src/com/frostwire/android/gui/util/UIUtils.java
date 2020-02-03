@@ -51,6 +51,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
@@ -625,7 +626,8 @@ public final class UIUtils {
             Runnable playEphemeralPlaylistOfOneCallback = () -> {
                 try {
                     if (mediaPlayer != null && Ref.alive(contextRef)) {
-                        mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(contextRef.get(), fd));
+                        EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(contextRef.get(), fd);
+                        mediaPlayer.play(ephemeralPlaylist);
                     }
                 } catch (Throwable ignored) {
                     // possible Runtime error thrown by Librarian.instance()
@@ -645,7 +647,8 @@ public final class UIUtils {
         } else {
             try {
                 if (mediaPlayer != null) {
-                    mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(context, fd));
+                    EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(context, fd);
+                    mediaPlayer.play(ephemeralPlaylist);
                 }
             } catch (Throwable ignored) {
                 // possible Runtime error thrown by Librarian.instance()

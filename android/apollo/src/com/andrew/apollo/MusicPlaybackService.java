@@ -2450,7 +2450,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             final int pos = getNextPosition(force, isShuffleEnabled());
             if (notifyPlayStateChange(pos)) return;
             mPlayPos = pos;
-            stop(false);
+            //stop(false);
             mPlayPos = pos;
             openCurrentAndNext(() -> {
                 play();

@@ -217,7 +217,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         });
     }
 
-    protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) {
+    private void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) {
         boolean isChecked = getChecked().contains(item);
         boolean showFileSize = false;
 
@@ -685,7 +685,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (!f.exists()) {
             if (SystemUtils.isSecondaryExternalStorageMounted(f.getAbsoluteFile())) {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_mounted);
-                Librarian.instance().deleteFiles(getContext(), fileType, Arrays.asList(fd));
+                Librarian.instance().deleteFiles(getContext(), fileType, Collections.singletonList(fd));
                 deleteItem(fd);
             } else {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_unmounted);
@@ -699,6 +699,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     // Moved here to cleanup base code.
     // Functional abstractions should be used instead
+    @SafeVarargs
     private static <T> boolean in(T needle, T... args) {
         if (args == null) {
             throw new IllegalArgumentException("args on in operation can't be null");
