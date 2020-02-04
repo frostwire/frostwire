@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,12 @@
 
 package com.frostwire.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 public final class HistoHashMap<K> {
@@ -55,7 +60,12 @@ public final class HistoHashMap<K> {
     }
 
     public int get(K key) {
-        return map.get(key);
+        try {
+            //noinspection ConstantConditions
+            return map.get(key);
+        } catch (NullPointerException npe) {
+            return 0;
+        }
     }
 
     /**

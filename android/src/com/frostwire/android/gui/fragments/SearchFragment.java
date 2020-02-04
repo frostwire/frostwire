@@ -1028,7 +1028,8 @@ public final class SearchFragment extends AbstractFragment implements
     private static void possiblyWaitInBackgroundToUpdateUI(FilterToolbarButton filterToolbarButton,
                                                            KeywordFilterDrawerView keywordFilterDrawerView,
                                                            Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
-        long timeSinceLastUpdate = SystemClock.elapsedRealtime() - TaskThrottle.getLastSubmissionTimestamp("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
+        Thread.currentThread().setName("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
+        long timeSinceLastUpdate = System.currentTimeMillis() - TaskThrottle.getLastSubmissionTimestamp("SearchFragment::possiblyWaitInBackgroundToUpdateUI");
         if (timeSinceLastUpdate < 500) {
             try {
                 Thread.sleep(500L - timeSinceLastUpdate);
@@ -1040,6 +1041,7 @@ public final class SearchFragment extends AbstractFragment implements
     private static void updateUIWithFilteredHistogramsPerFeature(FilterToolbarButton filterToolbarButton,
                                                                  KeywordFilterDrawerView keywordFilterDrawerView,
                                                                  Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
+        Thread.currentThread().setName("SearchFragment::updateUIWithFilteredHistogramsPerFeature");
         // should be safe from concurrent modification exception as new list with filtered elements
         for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
             List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);

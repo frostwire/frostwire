@@ -148,6 +148,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private static void updateTransferDataTask(TransferDetailFilesTransferItemViewHolder holder,
                                                    final TransferItem transferItem,
                                                    final Bundle bundleResult) {
+            Thread.currentThread().setName("updateTransferDataTask");
             bundleResult.putInt("fileTypeIconId", MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
             bundleResult.putInt("progress", transferItem.getProgress());
             bundleResult.putString("downloadedPercentage", UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));

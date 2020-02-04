@@ -21,6 +21,7 @@ import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -40,7 +41,7 @@ final public class EngineThreadPool extends ThreadPool {
     private static final int CORE_POOL_SIZE = 1;
     private static final int MAXIMUM_POOL_SIZE = 8;
     private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
-    private static final int MAX_DEBUG_QUEUED_TASKS = 1000;
+    private static final int MAX_DEBUG_QUEUED_TASKS = 100;
 
     private final WeakHashMap<Object, String> taskStack;
     private final WeakHashMap<Thread, TaskInfo> taskInfo;
@@ -104,9 +105,13 @@ final public class EngineThreadPool extends ThreadPool {
             dumpTasks();
             throw new RuntimeException("Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
         }
+        String threadName = Thread.currentThread().getStackTrace()[6].toString();
+        Thread.currentThread().setName(threadName);
+        System.out.println("Thread renamed to -> "+ threadName);
     }
 
     private void dumpTasks() {
+        System.out.println("==============================================");
         System.out.println("EngineThreadPool::dumpTasks()");
         System.out.println("Active threads: " + getActiveCount());
         System.out.println("Running threads in engine pool");
@@ -121,6 +126,15 @@ final public class EngineThreadPool extends ThreadPool {
             System.out.println("\tStack trace:");
             System.out.println(e.getValue().stack);
         }
+        System.out.println("==============================================");
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        System.out.println("All threads in the JVM (" + threads.size() +"):");
+        int i=1;
+        for (Thread t : threads) {
+            System.out.println(i + ": " + t.getName());
+            i++;
+        }
+        System.out.println("==============================================");
     }
 
     private static String getStack() {

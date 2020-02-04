@@ -20,8 +20,8 @@ package com.frostwire.search;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.HistoHashMap;
 import com.frostwire.util.Logger;
-import com.frostwire.util.ThreadPool;
 import com.frostwire.util.TaskThrottle;
+import com.frostwire.util.ThreadPool;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -56,7 +56,7 @@ public final class KeywordDetector {
         feedStopWords("-", "an", "and", "are", "as", "at", "be", "by", "for", "with", "when", "where");
         feedStopWords("from", "has", "he", "in", "is", "it", "its", "of", "on", "we", "why", "your");
         feedStopWords("that", "the", "to", "that", "this", "ft", "ft.", "feat", "feat.", "no", "me", "null");
-        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "youre");
+        feedStopWords("can", "cant", "not", "get", "into", "have", "had", "put", "you", "dont", "don't", "youre");
         // spanish
         feedStopWords("son", "como", "en", "ser", "por", "dónde", "donde", "cuando", "el");
         feedStopWords("de", "tiene", "él", "en", "es", "su", "de", "en", "nosotros", "por", "qué", "que");
@@ -86,7 +86,7 @@ public final class KeywordDetector {
         histoHashMaps.put(Feature.FILE_NAME, new HistoHashMap<>());
     }
 
-    public static List<Map.Entry<String, Integer>> highPassFilter(List<Map.Entry<String, Integer>> histogram, float threshold) {
+    private static List<Map.Entry<String, Integer>> highPassFilter(List<Map.Entry<String, Integer>> histogram, float threshold) {
         int high = 0;
         int totalCount = 0;
         for (Map.Entry<String, Integer> entry : histogram) {
@@ -117,7 +117,7 @@ public final class KeywordDetector {
         return totalHistogramKeysCount;
     }
 
-    public void notifyKeywordDetectorListener() {
+    private void notifyKeywordDetectorListener() {
         if (this.keywordDetectorListener != null) {
             this.keywordDetectorListener.notifyHistogramsUpdate(getFilteredHistograms());
         }
@@ -127,7 +127,7 @@ public final class KeywordDetector {
         this.keywordDetectorListener = listener;
     }
 
-    public void addSearchTerms(Feature feature, String terms) {
+    private void addSearchTerms(Feature feature, String terms) {
         // tokenize
         String[] pre_tokens = REPLACE_ALL_PATTERN.matcher(terms).replaceAll("").toLowerCase().split("\\s");
         if (pre_tokens.length == 0) {
@@ -184,12 +184,12 @@ public final class KeywordDetector {
         histogramUpdateRequestsDispatcher.shutdown();
     }
 
-    public Map<Feature, List<Map.Entry<String, Integer>>> getFilteredHistograms() {
+    private Map<Feature, List<Map.Entry<String, Integer>>> getFilteredHistograms() {
         HashMap<Feature, List<Map.Entry<String, Integer>>> filteredHistograms = new HashMap<>();
         totalHistogramKeysCount = 0;
         for (Feature feature : histoHashMaps.keySet()) {
             HistoHashMap<String> histoHashMap = histoHashMaps.get(feature);
-            if (histoHashMap.getKeyCount() > 0) {
+            if (histoHashMap != null && histoHashMap.getKeyCount() > 0) {
                 List<Map.Entry<String, Integer>> histogram = histoHashMap.histogram();
                 List<Map.Entry<String, Integer>> filteredHistogram = highPassFilter(histogram, feature.filterThreshold);
                 if (filteredHistogram.size() > 0) {
@@ -288,58 +288,56 @@ public final class KeywordDetector {
      */
     private class HistogramUpdateRequestDispatcher implements Runnable {
         private static final long HISTOGRAM_REQUEST_TASK_DELAY_IN_MS = 1000L;
-        private final AtomicLong lastHistogramUpdateRequestFinished;
+        private final AtomicLong lastHistogramUpdateRequestFinished = new AtomicLong(0);
         /**
          * This Map can only contain as many elements as Features are available.
          * For now one SEARCH_SOURCE request
          * one FILE_EXTENSION request
          * one FILE_NAME request
          */
-        private final List<HistogramUpdateRequestTask> histogramUpdateRequests;
+        private final List<HistogramUpdateRequestTask> requestQueue = new LinkedList<>();
+        private final Object requestQueueMonitor = new Object();
         private final AtomicBoolean running = new AtomicBoolean(false);
         private final ReentrantLock lock = new ReentrantLock();
         private final Condition loopLock = lock.newCondition();
 
-        public HistogramUpdateRequestDispatcher() {
-            histogramUpdateRequests = new LinkedList<>();
-            lastHistogramUpdateRequestFinished = new AtomicLong(0);
-        }
-
-        public void enqueue(HistogramUpdateRequestTask updateRequestTask) {
+        void enqueue(HistogramUpdateRequestTask updateRequestTask) {
             if (!running.get() || updateRequestTask == null) {
                 return;
             }
-            synchronized (histogramUpdateRequests) {
-                histogramUpdateRequests.add(0, updateRequestTask);
-                if (histogramUpdateRequests.size() > 4) {
-                    // All these acrobatics are because histogramUpdateRequests.sublist implementations always yield a concurrent modification exception
-                    // when they're trying to obtain their internal array
-                    Object[] requestsArray = histogramUpdateRequests.toArray();
-                    ArrayList<HistogramUpdateRequestTask> head = new ArrayList<>(4);
-                    head.add((HistogramUpdateRequestTask) requestsArray[0]);
-                    head.add((HistogramUpdateRequestTask) requestsArray[1]);
-                    head.add((HistogramUpdateRequestTask) requestsArray[2]);
-                    head.add((HistogramUpdateRequestTask) requestsArray[3]);
-                    histogramUpdateRequests.clear();
-                    histogramUpdateRequests.addAll(head);
+            synchronized (requestQueueMonitor) {
+                requestQueue.add(0, updateRequestTask);
+            }
+            if (requestQueue.size() > 4) {
+                // All these acrobatics are because requestQueue.sublist implementations always yield a concurrent modification exception
+                // when they're trying to obtain their internal array
+                Object[] requestsArray = requestQueue.toArray();
+                ArrayList<HistogramUpdateRequestTask> head = new ArrayList<>(4);
+                head.add((HistogramUpdateRequestTask) requestsArray[0]);
+                head.add((HistogramUpdateRequestTask) requestsArray[1]);
+                head.add((HistogramUpdateRequestTask) requestsArray[2]);
+                head.add((HistogramUpdateRequestTask) requestsArray[3]);
+                synchronized (requestQueueMonitor) {
+                    requestQueue.clear();
+                    requestQueue.addAll(head);
                 }
             }
-            signalLoopLock();
+            releaseLoopLock();
         }
 
         @Override
         public void run() {
             while (running.get()) {
                 // are there any tasks left?
-                if (histogramUpdateRequests.size() > 0) {
+                if (requestQueue.size() > 0) {
                     long timeSinceLastFinished = System.currentTimeMillis() - lastHistogramUpdateRequestFinished.get();
-                    //LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + histogramUpdateRequests.size());
+                    //LOG.info("HistogramUpdateRequestDispatcher timeSinceLastFinished: " + timeSinceLastFinished + "ms - tasks in queue:" + requestQueue.size());
                     if (timeSinceLastFinished > HISTOGRAM_REQUEST_TASK_DELAY_IN_MS) {
                         // take next request in line
                         HistogramUpdateRequestTask histogramUpdateRequestTask;
-                        synchronized (histogramUpdateRequests) {
+                        synchronized (requestQueueMonitor) {
                             try {
-                                histogramUpdateRequestTask = histogramUpdateRequests.remove(0);
+                                histogramUpdateRequestTask = requestQueue.remove(0);
                             } catch (Throwable t) {
                                 histogramUpdateRequestTask = null;
                             }
@@ -355,11 +353,12 @@ public final class KeywordDetector {
                     }
                 }
                 try {
-                    if (histogramUpdateRequests.size() == 0 && keywordDetectorListener != null) {
+                    if (requestQueue.size() == 0 && keywordDetectorListener != null) {
                         keywordDetectorListener.onKeywordDetectorFinished();
-                        signalLoopLock();
+                        releaseLoopLock();
                     }
                     if (running.get()) {
+                        // acquire loop lock
                         lock.lock();
                         loopLock.await(1, TimeUnit.MINUTES);
                         lock.unlock();
@@ -372,11 +371,11 @@ public final class KeywordDetector {
             shutdownThreadPool();
         }
 
-        public void onLastHistogramRequestFinished() {
+        void onLastHistogramRequestFinished() {
             if (running.get()) {
                 lastHistogramUpdateRequestFinished.set(System.currentTimeMillis());
             }
-            signalLoopLock();
+            releaseLoopLock();
         }
 
         public void start() {
@@ -388,7 +387,7 @@ public final class KeywordDetector {
 
         public void shutdown() {
             running.set(false);
-            signalLoopLock();
+            releaseLoopLock();
             shutdownThreadPool();
         }
 
@@ -402,14 +401,14 @@ public final class KeywordDetector {
         }
 
         public void clear() {
-            synchronized (histogramUpdateRequests) {
-                histogramUpdateRequests.clear();
+            synchronized (requestQueueMonitor) {
+                requestQueue.clear();
             }
             lastHistogramUpdateRequestFinished.set(0);
-            signalLoopLock();
+            releaseLoopLock();
         }
 
-        private void signalLoopLock() {
+        private void releaseLoopLock() {
             try {
                 lock.lock();
                 loopLock.signal();
