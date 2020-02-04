@@ -51,6 +51,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.core.app.ActivityCompat;
@@ -240,8 +241,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromuser) {
-        if (!fromuser || MusicUtils.getMusicPlaybackService() == null) {
+    public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromUser) {
+        if (!fromUser || MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         final long now = SystemClock.elapsedRealtime();
@@ -475,6 +476,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
+    @SuppressWarnings("CatchMayIgnoreException")
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -705,8 +707,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void updateNowPlayingInfo() {
         LOG.info("updateNowPlayingInfo() invoked", true);
-        updateLastKnown(MusicServiceRequestType.TRACK_ID, false);
-        updateLastKnown(MusicServiceRequestType.TRACK_NAME, false);
+        updateLastKnown(MusicServiceRequestType.TRACK_ID, true);
+        updateLastKnown(MusicServiceRequestType.TRACK_NAME, true);
+        updateLastKnown(MusicServiceRequestType.DURATION, true);
+        updateLastKnown(MusicServiceRequestType.POSITION, true);
         updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES, true);
 
         // Update the current time
@@ -736,6 +740,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 mAlbumArtSmall.setVisibility(View.VISIBLE);
             }
         }
+        updateQueueFragmentCurrentSong();
     }
 
     private String getArtistAndAlbumName(String artist, String album) {
@@ -979,9 +984,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private void updateLastKnown(MusicServiceRequestType requestType, boolean onLastKnownUpdatePostTask) {
+    private void updateLastKnown(MusicServiceRequestType requestType, boolean callOnLastKnownUpdatePostTaskAfter) {
         if (TaskThrottle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
-            if (onLastKnownUpdatePostTask) {
+            if (callOnLastKnownUpdatePostTaskAfter) {
                 async(this, AudioPlayerActivity::musicServiceRequestTask, requestType, AudioPlayerActivity::onLastKnownUpdatePostTask);
             } else {
                 async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
@@ -1019,6 +1024,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     /* Used to update the current time string
      *  @return the delay on which this method call should be posted again
      * */
+    @SuppressWarnings("CatchMayIgnoreException")
     private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
         if (MusicUtils.getMusicPlaybackService() == null) {
             return 500L;
@@ -1182,6 +1188,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     /**
      * Opens to the current album profile
      */
+    @SuppressWarnings("CatchMayIgnoreException")
     private final OnClickListener mOpenAlbumProfile = v -> {
         long albumId = MusicUtils.getCurrentAlbumId();
         try {
@@ -1221,7 +1228,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
 
         @Override
-        public void handleMessage(final Message msg) {
+        public void handleMessage(@NonNull final Message msg) {
             if (!Ref.alive(mAudioPlayer)) {
                 return;
             }

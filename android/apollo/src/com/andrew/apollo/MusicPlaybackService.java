@@ -873,9 +873,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         stopSelf();
     }
 
-    /**
-     * @return true if serviced was released.
-     */
     private void releaseServiceUiAndStop(boolean force) {
         if (mPlayerHandler == null
                 || (!force && isPlaying())
@@ -2385,13 +2382,16 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             // block, so we'll ask again, and make sure we don't assign mPlayer to null when we try to
             // start playback
             if (mPlayer != null) {
-                synchronized (mPlayer) {
-                    final long duration = mPlayer.duration();
-                    if (mRepeatMode != REPEAT_CURRENT && duration > 2000
-                            && mPlayer.position() >= duration - 2000) {
-                        gotoNext(true);
-                    }
-
+                long duration;
+                synchronized (mPlayerLock) {
+                    duration = mPlayer.duration();
+                }
+                if (mRepeatMode != REPEAT_CURRENT &&
+                    duration > 2000 &&
+                    mPlayer.position() >= duration - 2000) {
+                    gotoNext(true);
+                }
+                synchronized (mPlayerLock) {
                     mPlayer.start();
                 }
             }
@@ -2863,6 +2863,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     static final class MultiPlayer implements MediaPlayer.OnErrorListener,
             MediaPlayer.OnCompletionListener {
+        private final static Logger LOG = Logger.getLogger(MultiPlayer.class);
 
         private final WeakReference<MusicPlaybackService> mService;
 
@@ -2924,6 +2925,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                                               MultiPlayer multiPlayer) {
             try {
                 player.reset();
+                player.setOnCompletionListener(multiPlayer);
+                player.setOnErrorListener(multiPlayer);
                 if (mService.launchPlayerActivity) {
                     player.setOnPreparedListener(new AudioOnPreparedListener(Ref.weak(mService)));
                 }
@@ -2935,12 +2938,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 player.prepare();
             } catch (Throwable e) {
+                LOG.error(e.getMessage(), e);
                 // TODO: notify the user why the file couldn't be opened due to an unknown error
                 callback.onPrepared(false);
                 return;
             }
-            player.setOnCompletionListener(multiPlayer);
-            player.setOnErrorListener(multiPlayer);
             final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
             intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, mService.getAudioSessionId());
             intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, mService.getPackageName());
@@ -3190,7 +3192,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          *
          * @return The current audio session ID.
          */
-        public int getAudioSessionId() {
+        int getAudioSessionId() {
             int result = 0;
             if (mCurrentMediaPlayer != null) {
                 try {
@@ -3206,19 +3208,16 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          */
         @Override
         public boolean onError(final MediaPlayer mp, final int what, final int extra) {
-            switch (what) {
-                case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-                    try {
-                        mIsInitialized = false;
-                        releaseCurrentMediaPlayer(false);
-                        mCurrentMediaPlayer = new MediaPlayer();
-                        mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
-                        mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
-                    } catch (Throwable ignored) {
-                    }
-                    return true;
-                default:
-                    break;
+            if (what == MediaPlayer.MEDIA_ERROR_SERVER_DIED) {
+                try {
+                    mIsInitialized = false;
+                    releaseCurrentMediaPlayer(false);
+                    mCurrentMediaPlayer = new MediaPlayer();
+                    mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
+                    mHandler.sendMessageDelayed(mHandler.obtainMessage(SERVER_DIED), 2000);
+                } catch (Throwable ignored) {
+                }
+                return true;
             }
             return false;
         }

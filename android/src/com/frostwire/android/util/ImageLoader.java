@@ -28,7 +28,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Process;
 import android.os.StatFs;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
@@ -56,13 +58,15 @@ import java.util.HashSet;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class ImageLoader {
+
+    private static final HandlerThread imageLoaderThread = new HandlerThread("ImageLoader-Thread", Process.THREAD_PRIORITY_DISPLAY);
+
+    private static Handler handler;
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
 
@@ -268,7 +272,7 @@ public final class ImageLoader {
                 p,
                 shutdown,
                 Ref.weak(picasso));
-        Asyncs.async(asyncLoader::run);
+        handler.post(asyncLoader);
     }
 
     private static class AsyncLoader implements Runnable {
@@ -280,7 +284,7 @@ public final class ImageLoader {
         private final boolean shutdown;
         private final WeakReference<Picasso> picasso;
 
-        public <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
+        <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
             this.resourceId = resourceId;
             this.uri = uri;
             this.targetRef = targetRef;
@@ -372,8 +376,12 @@ public final class ImageLoader {
         picasso.shutdown();
     }
 
-    public static void start(MainApplication mainApplication) {
-        async(mainApplication, ImageLoader::startImageLoaderBackground);
+    public static void start(final MainApplication mainApplication) {
+        if (!imageLoaderThread.isAlive()) {
+            imageLoaderThread.start();
+            handler = new Handler(imageLoaderThread.getLooper());
+        }
+        handler.postAtFrontOfQueue(() -> startImageLoaderBackground(mainApplication));
     }
 
     private static void startImageLoaderBackground(MainApplication mainApplication) {
