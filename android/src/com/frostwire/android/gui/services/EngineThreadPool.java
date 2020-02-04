@@ -107,7 +107,7 @@ final public class EngineThreadPool extends ThreadPool {
         }
         String threadName = Thread.currentThread().getStackTrace()[6].toString();
         Thread.currentThread().setName(threadName);
-        System.out.println("Thread renamed to -> "+ threadName);
+        //System.out.println("Thread renamed to -> "+ threadName);
     }
 
     private void dumpTasks() {
