@@ -2882,7 +2882,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         /**
          * Constructor of <code>MultiPlayer</code>
          */
-        public MultiPlayer(final MusicPlaybackService service) {
+        MultiPlayer(final MusicPlaybackService service) {
             mService = new WeakReference<>(service);
             mCurrentMediaPlayer.setWakeMode(mService.get(), PowerManager.PARTIAL_WAKE_LOCK);
         }
@@ -2891,7 +2891,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          * @param path The path of the file, or the http/rtsp URL of the stream
          *             you want to play
          */
-        public void setDataSource(final String path, final Runnable callback) {
+        void setDataSource(final String path, final Runnable callback) {
             setDataSourceImpl(mCurrentMediaPlayer, path, result -> {
                 mIsInitialized = result;
                 if (mIsInitialized) {
@@ -2956,7 +2956,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          * @param path The path of the file, or the http/rtsp URL of the stream
          *             you want to play
          */
-        public void setNextDataSource(final String path) {
+        void setNextDataSource(final String path) {
             try {
                 mCurrentMediaPlayer.setNextMediaPlayer(null);
             } catch (IllegalArgumentException e) {
@@ -3053,7 +3053,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         /**
          * @return True if the player is ready to go, false otherwise
          */
-        public boolean isInitialized() {
+        boolean isInitialized() {
             return mIsInitialized;
         }
 
@@ -3148,7 +3148,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          * @param whereto The offset in milliseconds from the start to seek to
          * @return The offset in milliseconds from the start to seek to
          */
-        public long seek(final long whereto) {
+        long seek(final long whereto) {
             if (mCurrentMediaPlayer != null) {
                 try {
                     mCurrentMediaPlayer.seekTo((int) whereto);
@@ -3661,7 +3661,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
         private WeakReference<MusicPlaybackService> serviceRef;
 
-        public AudioOnPreparedListener(WeakReference<MusicPlaybackService> serviceRef) {
+        AudioOnPreparedListener(WeakReference<MusicPlaybackService> serviceRef) {
             this.serviceRef = serviceRef;
         }
 
