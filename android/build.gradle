@@ -71,12 +71,16 @@ def changeApkOutput(variant) {
     variant.outputs.all { output ->
         outputFileName = name + '.apk'
     }
-    variant.assemble.doLast { assemble ->
-        copy {
-            from variant.outputs*.outputFile
-            into "${project.buildDir}"
+    variant.getAssembleProvider().configure() {
+        it.doLast {
+            assemble ->
+                copy {
+                    from variant.outputs*.outputFile
+                    into "${project.buildDir}"
+                }
         }
     }
+
 }
 
 project.ext.versionCode = manifestVersionCode()
