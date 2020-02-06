@@ -179,10 +179,10 @@ android {
 
 dependencies {
     implementation 'com.google.re2j:re2j:1.3'
-    implementation 'com.google.code.gson:gson:2.8.5' //2.8.6 breaks the build
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.okhttp3:okhttp:3.14.0'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.2.0-alpha03' //alpha04 breaks the build
+    implementation 'com.google.android.material:material:1.2.0-alpha04'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.browser:browser:1.3.0-alpha01'
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
