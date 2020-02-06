@@ -309,11 +309,11 @@ public final class ImageLoader {
             if (p == null) {
                 throw new IllegalArgumentException("Params to load image can't be null");
             }
-            if (!(p.callback instanceof RetryCallback) && // don't ask this recursively
+            if (p.callback != null && !(p.callback instanceof RetryCallback) && // don't ask this recursively
                     Debug.hasContext(p.callback)) {
                 throw new RuntimeException("Possible context leak");
             }
-            if (Debug.hasContext(p.filter)) {
+            if (p.filter != null && Debug.hasContext(p.filter)) {
                 throw new RuntimeException("Possible context leak");
             }
             RequestCreator rc;
@@ -526,6 +526,9 @@ public final class ImageLoader {
         private Result loadApplication(Uri uri) {
             Result result;
             String packageName = uri.getLastPathSegment();
+            if (packageName == null) {
+                return null;
+            }
             PackageManager pm = context.getPackageManager();
             try {
                 BitmapDrawable icon = (BitmapDrawable) pm.getApplicationIcon(packageName);
@@ -655,8 +658,7 @@ public final class ImageLoader {
             long available = blockCount * blockSize;
             // Target 2% of the total space.
             size = available / 50;
-        } catch (IllegalArgumentException ignored) {
-        } catch (NoSuchMethodError ignored) {
+        } catch (IllegalArgumentException | NoSuchMethodError ignored) {
         }
 
         // Bound inside min/max size for disk cache.

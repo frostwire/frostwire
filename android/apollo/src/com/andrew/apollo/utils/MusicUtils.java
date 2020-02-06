@@ -19,7 +19,6 @@
 package com.andrew.apollo.utils;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -64,16 +63,13 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -805,8 +801,6 @@ public final class MusicUtils {
      * @param uri The source of the file
      */
     public static void playFile(final Uri uri) {
-        // TODO: Check for PHONE_STATE Permissions here.
-
         if (uri == null || musicPlaybackService == null) {
             return;
         }
@@ -822,7 +816,7 @@ public final class MusicUtils {
         }
 
         try {
-            musicPlaybackService.stop();
+            musicPlaybackService.stopPlayer();
             musicPlaybackService.openFile(filename);
             musicPlaybackService.play();
         } catch (final RemoteException ignored) {

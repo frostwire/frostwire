@@ -105,7 +105,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     // Message to refresh the time
     private static final int REFRESH_TIME = 500;
-    private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 200;
+    private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 150;
     private static final long UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS = 200;
 
     private static AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();

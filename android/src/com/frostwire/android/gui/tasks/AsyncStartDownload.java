@@ -53,9 +53,15 @@ public class AsyncStartDownload {
     private static final Handler handler;
 
     static {
-        HandlerThread TH = new HandlerThread("AsyncStartDownload-HandlerThread");
-        TH.start();
-        handler = new Handler(TH.getLooper());
+        HandlerThread HT = new HandlerThread("AsyncStartDownload-HandlerThread");
+        HT.start();
+        handler = new Handler(HT.getLooper());
+    }
+
+    public static void stopHandlerThread() {
+        if (handler.getLooper().getThread() instanceof HandlerThread) {
+            ((HandlerThread) handler.getLooper().getThread()).quitSafely();
+        }
     }
 
     public AsyncStartDownload(final Context ctx, final SearchResult sr, final String message) {

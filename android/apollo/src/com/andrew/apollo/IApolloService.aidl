@@ -7,6 +7,7 @@ interface IApolloService
     void openFile(String path);
     void open(in long [] list, int position);
     void stop();
+    void stopPlayer();
     void pause();
     void play();
     void playSimple(String path);
