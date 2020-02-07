@@ -325,14 +325,19 @@ public final class PlayStore extends StoreBase {
                     Purchase.PurchasesResult subscriptionResult = billingClient.queryPurchases(BillingClient.SkuType.SUBS);
                     LOG.info("Querying purchases and subscriptions elapsed time: "
                             + (System.currentTimeMillis() - time) + "ms");
-                    LOG.info("Querying subscriptions result code: "
-                            + subscriptionResult.getResponseCode()
-                            + " res: " + subscriptionResult.getPurchasesList().size());
 
-                    if (subscriptionResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
+                    if (subscriptionResult.getPurchasesList() != null) {
+                        LOG.info("Querying subscriptions result code: "
+                                + subscriptionResult.getResponseCode()
+                                + " res: " + subscriptionResult.getPurchasesList().size());
+
+                        if (subscriptionResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                            purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
+                        } else {
+                            LOG.info("Got an error response trying to query subscription purchases");
+                        }
                     } else {
-                        LOG.info("Got an error response trying to query subscription purchases");
+                        LOG.info("subscriptionResult.getPurchasesList() == null when trying to query subscription purchases");
                     }
                 } else if (purchasesResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     LOG.info("Skipped subscription purchases query since they are not supported");
