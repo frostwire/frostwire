@@ -106,7 +106,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void onPreviousClick() {
-        MusicUtils.previous(getContext());
+        MusicUtils.previous();
         refreshComponents();
     }
 

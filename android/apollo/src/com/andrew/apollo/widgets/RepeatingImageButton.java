@@ -70,7 +70,7 @@ public final class RepeatingImageButton extends androidx.appcompat.widget.AppCom
     public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.action_button_previous:
-                MusicUtils.previous(getContext());
+                MusicUtils.previous();
                 break;
             case R.id.action_button_next:
                 MusicUtils.next();

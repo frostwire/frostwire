@@ -870,9 +870,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 delta = 50000 + (delta - 5000) * 40;
             }
             long newpos = mStartSeekPos - delta;
-            if (newpos < 0) {
+            if (newpos <= 0) {
                 // move to previous track
-                MusicUtils.previous(this);
+                MusicUtils.previous();
                 final long duration = MusicUtils.duration();
                 mStartSeekPos += duration;
                 newpos += duration;
@@ -1334,18 +1334,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         @Override
         public void onSwipeLeft() {
             try {
-                MusicUtils.getMusicPlaybackService().next();
-            } catch (Throwable e) {
-                // ignore
+                MusicUtils.next();
+            } catch (Throwable ignored) {
             }
         }
 
         @Override
         public void onSwipeRight() {
             try {
-                MusicUtils.getMusicPlaybackService().prev();
-            } catch (Throwable e) {
-                // ignore
+                MusicUtils.previous();
+            } catch (Throwable ignored) {
             }
         }
 

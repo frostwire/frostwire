@@ -17,8 +17,12 @@
 
 package com.frostwire.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public final class TaskThrottle {
     private final static boolean PROFILING_ENABLED = false;
@@ -38,7 +42,6 @@ public final class TaskThrottle {
      * @return
      */
     public static boolean isReadyToSubmitTask(final String taskName, final long minIntervalInMillis) {
-
         tryRecycling();
         final long now = System.currentTimeMillis();
         if (!asyncTaskSubmissionTimestampMap.containsKey(taskName)) {
@@ -58,7 +61,9 @@ public final class TaskThrottle {
             profileHit(taskName);
             return true;
         }
-        LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms", true);
+        if (PROFILING_ENABLED) {
+            LOG.info("isReadyToSubmitTask(): " + taskName + " too soon, sent only " + delta + " ms ago, min interval required: " + minIntervalInMillis + " ms", true);
+        }
         return false;
     }
 

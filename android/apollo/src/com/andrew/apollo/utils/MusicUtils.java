@@ -32,7 +32,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -47,7 +46,6 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.loaders.FavoritesLoader;
 import com.andrew.apollo.loaders.LastAddedLoader;
@@ -86,7 +84,7 @@ public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);
 
-    private static IApolloService musicPlaybackService = null;
+    private static MusicPlaybackService musicPlaybackService = null;
 
     private static int sForegroundActivities = 0;
 
@@ -130,10 +128,6 @@ public final class MusicUtils {
         }
     }
 
-    public static void startMusicPlaybackService(final Context context, final Intent intent) {
-        startMusicPlaybackService(context, intent, null);
-    }
-
     /**
      * Used to build and show a notification when Apollo is sent into the
      * background
@@ -156,7 +150,7 @@ public final class MusicUtils {
                 if (MusicUtils.isMusicPlaybackServiceRunning()) {
                     // no need to be calling start service to make it do what we want if it's already there
                     LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
-                    MusicUtils.getMusicPlaybackService().handleIntentFromStub(intent);
+                    MusicUtils.getMusicPlaybackService().handleCommandIntent(intent);
                 }
             } catch (Throwable ignored) {
                 LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
@@ -168,7 +162,7 @@ public final class MusicUtils {
         return serviceConnectionListener;
     }
 
-    public static IApolloService getMusicPlaybackService() {
+    public static MusicPlaybackService getMusicPlaybackService() {
         return musicPlaybackService;
     }
 
@@ -191,7 +185,7 @@ public final class MusicUtils {
             shutdownIntent.putExtra("force", true);
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
-            MusicUtils.getMusicPlaybackService().handleIntentFromStub(shutdownIntent);
+            MusicUtils.getMusicPlaybackService().handleCommandIntent(shutdownIntent);
 // Commenting this, it disconnects, but when we launch the service again it doesn't re-connect
 //            if (serviceConnectionListener != null) {
 //                serviceConnectionListener.onServiceDisconnected(null);
@@ -224,11 +218,11 @@ public final class MusicUtils {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             bound.set(true);
-            musicPlaybackService = IApolloService.Stub.asInterface(service);
+            musicPlaybackService = MusicPlaybackService.getInstance();//IApolloService.Stub.asInterface(service);
             try {
                 LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
                 musicPlaybackService.updateNotification();
-            } catch (RemoteException e) {
+            } catch (Throwable e) {
                 LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
@@ -310,25 +304,31 @@ public final class MusicUtils {
     public static void next() {
         try {
             if (musicPlaybackService != null) {
-                musicPlaybackService.next();
+                musicPlaybackService.gotoNext(true);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
-    public static void previous(final Context context) {
-        final Intent previous = new Intent(context, MusicPlaybackService.class);
-        previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        if (MusicUtils.isMusicPlaybackServiceRunning()) {
-            try {
-                LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
-                MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+    public static void previous() {
+        try {
+            if (musicPlaybackService != null) {
+                musicPlaybackService.gotoPrev();
             }
-        } else {
-            LOG.error("previous() failed, MusicPlaybackService not running and wouldn't know what the previous track was");
+        } catch (final Throwable ignored) {
         }
+//        final Intent previous = new Intent(context, MusicPlaybackService.class);
+//        previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
+//        if (MusicUtils.isMusicPlaybackServiceRunning()) {
+//            try {
+//                LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
+//                MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);
+//            } catch (RemoteException e) {
+//                e.printStackTrace();
+//            }
+//        } else {
+//            LOG.error("previous() failed, MusicPlaybackService not running and wouldn't know what the previous track was");
+//        }
     }
 
     /**
@@ -341,6 +341,7 @@ public final class MusicUtils {
                 if (musicPlaybackService.isPlaying()) {
                     musicPlaybackService.pause();
                 } else {
+
                     musicPlaybackService.play();
                 }
             }
@@ -388,7 +389,7 @@ public final class MusicUtils {
                         break;
                 }
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -399,7 +400,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.enableShuffle(!isShuffleEnabled());
-            } catch (RemoteException ignored) {
+            } catch (Throwable ignored) {
             }
         }
     }
@@ -411,7 +412,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isPlaying();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return false;
@@ -421,7 +422,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isStopped();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return true;
@@ -434,7 +435,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isShuffleEnabled();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return false;
@@ -447,7 +448,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getRepeatMode();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -460,7 +461,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getTrackName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -473,7 +474,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getArtistName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -486,7 +487,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAlbumName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -499,7 +500,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAlbumId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -512,7 +513,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAudioId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -525,7 +526,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getCurrentSimplePlayerAudioId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -538,7 +539,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getArtistId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -547,11 +548,11 @@ public final class MusicUtils {
     /**
      * @return The audio session Id.
      */
-    public static int getAudioSessionId() {
+    static int getAudioSessionId() {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAudioSessionId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -565,7 +566,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getQueue();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return sEmptyList;
     }
@@ -579,7 +580,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.removeTrack(id);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return 0;
     }
@@ -587,12 +588,12 @@ public final class MusicUtils {
     /**
      * @return The position of the current track in the queue.
      */
-    public static int getQueuePosition() {
+    private static int getQueuePosition() {
         try {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getQueuePosition();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return 0;
     }
@@ -623,11 +624,10 @@ public final class MusicUtils {
     }
 
     public static Song getSong(Context context, final long songId) {
-        final StringBuilder mSelection = new StringBuilder(BaseColumns._ID + "=?");
-        mSelection.append(" AND " + AudioColumns.IS_MUSIC + "=1");
-        mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
-
-        final Cursor cursor = context.getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
+        String mSelection = BaseColumns._ID + "=?" + " AND " + AudioColumns.IS_MUSIC + "=1" +
+                " AND " + AudioColumns.TITLE + " != ''";//$NON-NLS-2$
+        final Cursor cursor;
+        cursor = context.getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
                 new String[]{
                         /* 0 */
                         BaseColumns._ID,
@@ -640,12 +640,13 @@ public final class MusicUtils {
                         /* 4 */
                         AudioColumns.DURATION
                 },
-                mSelection.toString(),
+                mSelection,
                 new String[]{String.valueOf(songId)},
                 PreferenceUtils.getInstance().getSongSortOrder());
 
         if (cursor != null && cursor.getCount() == 1) {
             cursor.moveToFirst();
+            cursor.close();
             return new Song(songId, cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
         } else {
             return null;
@@ -783,11 +784,10 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 BaseColumns._ID
         };
-        final StringBuilder selection = new StringBuilder();
-        selection.append(AudioColumns.IS_MUSIC + "=1");
-        selection.append(" AND " + MediaColumns.TITLE + "!=''");
         final Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
-        Cursor cursor = context.getContentResolver().query(uri, projection, selection.toString(),
+        String selection = AudioColumns.IS_MUSIC + "=1" +
+                " AND " + MediaColumns.TITLE + "!=''";
+        Cursor cursor = context.getContentResolver().query(uri, projection, selection,
                 null, null);
         if (cursor != null) {
             final long[] mList = getSongListForCursor(cursor);
@@ -819,7 +819,7 @@ public final class MusicUtils {
             musicPlaybackService.stopPlayer();
             musicPlaybackService.openFile(filename);
             musicPlaybackService.play();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -854,13 +854,13 @@ public final class MusicUtils {
             }
             musicPlaybackService.open(list, position);
             musicPlaybackService.play();
-        } catch (final RemoteException ignored) {
-            LOG.error("playAll() " + ignored.getMessage(), ignored);
         } catch (NullPointerException e) {
             // we are getting this error because musicPlaybackService is
             // a global static mutable variable, we can't do anything
             // until a full refactor in player
             LOG.warn("playAll() Review code logic", e);
+        } catch (final Throwable t) {
+            LOG.error("playAll() " + t.getMessage(), t);
         }
     }
 
@@ -870,9 +870,8 @@ public final class MusicUtils {
             if (Arrays.equals(list, playlist)) {
                 try {
                     musicPlaybackService.play();
-                } catch (Throwable ignored) {
-                    ignored.printStackTrace();
-
+                } catch (Throwable t) {
+                    t.printStackTrace();
                     return false;
                 }
                 return true;
@@ -890,7 +889,7 @@ public final class MusicUtils {
         }
         try {
             musicPlaybackService.enqueue(list, MusicPlaybackService.NEXT);
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -916,7 +915,7 @@ public final class MusicUtils {
             musicPlaybackService.open(mTrackList, -1);
             musicPlaybackService.play();
             cursor.close();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1006,8 +1005,7 @@ public final class MusicUtils {
         }
     }
 
-    /*  */
-    public static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
+    private static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
         if (offset + len > ids.length) {
             len = ids.length - offset;
         }
@@ -1175,44 +1173,21 @@ public final class MusicUtils {
     /**
      * Removes a single track from a given playlist
      *
-     * @param context          The {@link Context} to use.
-     * @param id               The id of the song to remove.
-     * @param playlistId       The id of the playlist being removed from.
-     * @param showNotification if true shows a notification at the top.
+     * @param context    The {@link Context} to use.
+     * @param id         The id of the song to remove.
+     * @param playlistId The id of the playlist being removed from.
      */
-    public static void removeFromPlaylist(final Context context, final long id,
-                                          final long playlistId, boolean showNotification) {
+    public static void removeFromPlaylist(final Context context,
+                                           final long id,
+                                           final long playlistId) {
         if (context == null) {
             return;
         }
-
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         final ContentResolver resolver = context.getContentResolver();
         resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{
                 Long.toString(id)
         });
-
-        if (showNotification) {
-            try {
-                final String message = context.getResources().getQuantityString(
-                        R.plurals.NNNtracksfromplaylist, 1, 1);
-                AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-            } catch (Throwable t) {
-                // java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare()
-            }
-        }
-    }
-
-    /**
-     * Removes a single track from a given playlist
-     *
-     * @param context    The {@link Context} to use.
-     * @param id         The id of the song to remove.
-     * @param playlistId The id of the playlist being removed from.
-     */
-    public static void removeFromPlaylist(final Context context, final long id,
-                                          final long playlistId) {
-        removeFromPlaylist(context, id, playlistId, false);
     }
 
     /**
@@ -1227,7 +1202,7 @@ public final class MusicUtils {
             musicPlaybackService.enqueue(list, MusicPlaybackService.LAST);
             final String message = makeLabel(context, R.plurals.NNNtrackstoqueue, list.length);
             AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1254,9 +1229,9 @@ public final class MusicUtils {
             values.put(AudioColumns.IS_RINGTONE, "1");
             values.put(AudioColumns.IS_ALARM, "1");
             resolver.update(uri, values, null, null);
-        } catch (final Throwable ignored) {
+        } catch (final Throwable t) {
             //return;
-            LOG.error(ignored.getMessage(), ignored);
+            LOG.error(t.getMessage(), t);
         }
 
         final String[] projection = new String[]{
@@ -1325,7 +1300,7 @@ public final class MusicUtils {
      * @param id      The id of the album.
      * @return The release date for an album.
      */
-    public static String getReleaseDateForAlbum(final Context context, final long id) {
+    static String getReleaseDateForAlbum(final Context context, final long id) {
         if (context == null || id == -1) {
             return null;
         }
@@ -1350,7 +1325,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getPath();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return null;
     }
@@ -1364,7 +1339,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.moveQueueItem(from, to);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1376,7 +1351,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.toggleFavorite();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1388,7 +1363,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.isFavorite();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return false;
     }
@@ -1443,7 +1418,7 @@ public final class MusicUtils {
      *               database
      * @return The song list for the favorite playlist
      */
-    public static long[] getSongListForFavoritesCursor(Cursor cursor) {
+    private static long[] getSongListForFavoritesCursor(Cursor cursor) {
         if (cursor == null) {
             return sEmptyList;
         }
@@ -1563,7 +1538,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.refresh();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1587,7 +1562,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.seek(position);
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
     }
@@ -1599,7 +1574,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.position();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -1612,7 +1587,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.duration();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -1625,7 +1600,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.setQueuePosition(position);
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
     }
@@ -1638,7 +1613,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.removeTracks(0, Integer.MAX_VALUE);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1763,7 +1738,7 @@ public final class MusicUtils {
         }
     }
 
-    public static void removeSongFromAllPlaylists(final Context context, final long songId) {
+    private static void removeSongFromAllPlaylists(final Context context, final long songId) {
         final List<Playlist> playlists = getPlaylists(context);
 
         if (!playlists.isEmpty()) {
@@ -1805,7 +1780,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.playSimple(path);
             }
-        } catch (RemoteException ignored) {
+        } catch (Throwable ignored) {
         }
     }
 
@@ -1814,7 +1789,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.stopSimplePlayer();
             }
-        } catch (RemoteException ignored) {
+        } catch (Throwable ignored) {
         }
     }
 }

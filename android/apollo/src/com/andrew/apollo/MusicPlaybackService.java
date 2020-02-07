@@ -40,12 +40,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.RemoteException;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -81,12 +79,13 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
  */
-public class MusicPlaybackService extends JobIntentService implements IApolloService {
+public class MusicPlaybackService extends JobIntentService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
 
-    private CountDownLatch initLatch = new CountDownLatch(1);
+    private static MusicPlaybackService INSTANCE = null;
 
+    private CountDownLatch initLatch = new CountDownLatch(1);
 
     /**
      * Indicates that the music has paused or resumed
@@ -332,14 +331,9 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * turn allows us to save the playlist more often without worrying too
      * much about performance
      */
-    private static final char HEX_DIGITS[] = new char[]{
+    private static final char[] HEX_DIGITS = new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
-
-    /**
-     * Service stub
-     */
-    private IBinder mBinder = new ServiceStub(this);
 
     /**
      * The media player
@@ -479,20 +473,22 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
     private boolean launchPlayerActivity;
 
-    private boolean exiting;
-
     private final Random r = new Random();
 
     private final static HashMap<String, Long> notifyChangeIntervals = new HashMap<>();
 
     static {
-        notifyChangeIntervals.put(QUEUE_CHANGED, 1000l);
-        notifyChangeIntervals.put(META_CHANGED, 150l);
-        notifyChangeIntervals.put(POSITION_CHANGED, 300l);
-        notifyChangeIntervals.put(PLAYSTATE_CHANGED, 150l);
-        notifyChangeIntervals.put(REPEATMODE_CHANGED, 150l);
-        notifyChangeIntervals.put(SHUFFLEMODE_CHANGED, 150l);
-        notifyChangeIntervals.put(REFRESH, 1000l);
+        notifyChangeIntervals.put(QUEUE_CHANGED, 1000L);
+        notifyChangeIntervals.put(META_CHANGED, 150L);
+        notifyChangeIntervals.put(POSITION_CHANGED, 300L);
+        notifyChangeIntervals.put(PLAYSTATE_CHANGED, 150L);
+        notifyChangeIntervals.put(REPEATMODE_CHANGED, 150L);
+        notifyChangeIntervals.put(SHUFFLEMODE_CHANGED, 150L);
+        notifyChangeIntervals.put(REFRESH, 1000L);
+    }
+
+    public static MusicPlaybackService getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -500,6 +496,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      */
     @Override
     public void onCreate() {
+        INSTANCE = this;
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
         prepareAudioFocusRequest();
@@ -518,49 +515,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
      * {@inheritDoc}
      */
     @Override
-    public IBinder onBind(@NonNull final Intent intent) {
-        if (D) LOG.info("Service bound, intent = " + intent);
-        mServiceInUse = true;
-        mBinder = new ServiceStub(this);
-        return mBinder;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onUnbind(final Intent intent) {
-        if (D) LOG.info("onUnbind()");
-        if (exiting) {
-            LOG.info("onUnbind() aborted, already taken care of by releaseServiceUiAndStop() (exiting=true)");
-            return true;
-        }
-
-        mServiceInUse = false;
-        saveQueue(true);
-
-        if (mIsSupposedToBePlaying || mPausedByTransientLossOfFocus) {
-            // Something is currently playing, or will be playing once
-            // an in-progress action requesting audio focus ends, so don't stop
-            // the service now.
-            return true;
-
-            // If there is a playlist but playback is paused, then wait a while
-            // before stopping the service, so that pause/resume isn't slow.
-            // Also delay stopping the service if we're transitioning between
-            // tracks.
-        } else if (mPlayListLen > 0 || (mPlayerHandler != null && mPlayerHandler.hasMessages(TRACK_ENDED))) {
-            return true;
-        }
-        stopSelf(mServiceStartId);
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void onRebind(final Intent intent) {
+        INSTANCE = this;
         mServiceInUse = true;
     }
 
@@ -833,7 +789,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             mPlayerHandler.removeCallbacksAndMessages(null);
         }
 
-        // Release the player
+        // Release the players
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer.release();
@@ -888,6 +844,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         stopSelf();
+        INSTANCE = null;
     }
 
     private void releaseServiceUiAndStop(boolean force) {
@@ -930,18 +887,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    @Override
-    public void handleIntentFromStub(Intent intent) throws RemoteException {
-        try {
-            handleCommandIntent(intent);
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw new RemoteException(t.getMessage());
-        }
-    }
 
-
-    private void handleCommandIntent(Intent intent) {
+    public void handleCommandIntent(Intent intent) {
         final String action = intent.getAction();
         final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
@@ -953,7 +900,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         if (SHUTDOWN_ACTION.equals(action)) {
-            exiting = intent.hasExtra("force");
+            boolean exiting = intent.hasExtra("force");
             releaseServiceUiAndStop(exiting);
             return;
         }
@@ -961,12 +908,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         if (CMDNEXT.equals(command) || NEXT_ACTION.equals(action)) {
             gotoNext(true);
         } else if (CMDPREVIOUS.equals(command) || PREVIOUS_ACTION.equals(action)) {
-            if (position() < REWIND_INSTEAD_PREVIOUS_THRESHOLD) {
-                prev();
-            } else {
-                seek(0);
-                play();
-            }
+            gotoPrev();
         } else if (CMDTOGGLEPAUSE.equals(command) || TOGGLEPAUSE_ACTION.equals(action)) {
             if (isPlaying()) {
                 pause();
@@ -1141,7 +1083,9 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    /** Stops the player, not the foreground service */
+    /**
+     * Stops the player, not the foreground service
+     */
     public void stopPlayer() {
         if (mPlayer != null && mPlayer.isInitialized()) {
             LOG.info("stopPlayer()");
@@ -1511,7 +1455,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         try {
             interval = notifyChangeIntervals.get(change);
         } catch (Throwable t) {
-            LOG.error("notifyChange() change="+change+" interval not defined in notifyChangeIntervals, defaulting to 250ms", t);
+            LOG.error("notifyChange() change=" + change + " interval not defined in notifyChangeIntervals, defaulting to 250ms", t);
         }
         if (TaskThrottle.isReadyToSubmitTask(change, interval)) {
             mPlayerHandler.safePost(notifyChangeTaskRunnable);
@@ -1880,11 +1824,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
             mRepeatMode = repmode;
         }
-    }
-
-    @Override
-    public IBinder asBinder() {
-        return mBinder;
     }
 
     interface OpenFileResultCallback {
@@ -2331,7 +2270,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         return false;
     }
 
-    @Override
     public void openFile(String path) {
         openFile(path, result -> {
             LOG.info("openFile(" + path + ")'s empty callback invoked");
@@ -2467,7 +2405,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             if (mIsSupposedToBePlaying && mPlayer != null) {
                 mPlayer.pause();
                 mIsSupposedToBePlaying = false;
-                if (musicPlaybackActivityInForeground) {
+                if (musicPlaybackActivityInForeground) { // this isn't working as it should.
                     updateRemoteControlClient(PLAYSTATE_CHANGED);
                 } else {
                     notifyChange(PLAYSTATE_CHANGED);
@@ -2503,6 +2441,17 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
+    public void gotoPrev() {
+        long position = position();
+        if (position < REWIND_INSTEAD_PREVIOUS_THRESHOLD) {
+            stop(false);
+            prev();
+        } else {
+            seek(0);
+            play();
+        }
+    }
+
     private boolean notifyPlayStateChange(int pos) {
         if (pos < 0) {
             if (mIsSupposedToBePlaying) {
@@ -2517,7 +2466,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
     /**
      * Changes from the current track to the previous played track
      */
-    public void prev() {
+    private void prev() {
         if (D) LOG.info("Going to previous track");
 
         if (mRepeatMode == REPEAT_CURRENT) {
@@ -2541,16 +2490,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             }
         }
 
-        stopPlayer();
         openCurrent(() -> {
             play();
             notifyChange(META_CHANGED);
         });
-    }
-
-    @Override
-    public void next() throws RemoteException {
-
     }
 
     /**
@@ -2774,12 +2717,12 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          * @param service The service to use.
          * @param looper  The thread to run on.
          */
-        public MusicPlayerHandler(final MusicPlaybackService service, final Looper looper) {
+        MusicPlayerHandler(final MusicPlaybackService service, final Looper looper) {
             super(looper);
             mService = new WeakReference<>(service);
         }
 
-        public void safePost(@NonNull Runnable r) {
+        void safePost(@NonNull Runnable r) {
             try {
                 post(r);
             } catch (Throwable t) {
@@ -2885,9 +2828,21 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
     }
 
-    private static void mediaPlayerAsyncAction(MusicPlayerHandler mHandler, MediaPlayer mediaPlayer, MediaPlayerAction action) {
+    private static void mediaPlayerAsyncAction(MusicPlayerHandler mHandler,
+                                               MediaPlayer mediaPlayer,
+                                               MediaPlayerAction action,
+                                               Runnable asyncCallback) {
         if (mHandler != null && mediaPlayer != null) {
-            mHandler.safePost(() -> MusicPlaybackService.mediaPlayerAction(mediaPlayer, action));
+            mHandler.safePost(() -> {
+                MusicPlaybackService.mediaPlayerAction(mediaPlayer, action);
+                if (asyncCallback != null) {
+                    try {
+                        asyncCallback.run();
+                    } catch (Throwable t) {
+                        LOG.error("mediaPlayerAsyncAction: asyncCallback exception: " + t.getMessage(), t);
+                    }
+                }
+            });
         }
     }
 
@@ -2969,6 +2924,9 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
          *             you want to play
          */
         void setDataSource(final String path, final Runnable callback) {
+            if (mCurrentMediaPlayer == null) {
+                initCurrentMediaPlayer();
+            }
             setDataSourceImpl(mCurrentMediaPlayer, path, result -> {
                 mIsInitialized = result;
                 if (callback != null) {
@@ -2990,20 +2948,23 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         private static void setDataSourceTask(MusicPlaybackService mService,
-                                              MediaPlayer player, String path,
+                                              MediaPlayer player,
+                                              String path,
                                               OnPlayerPrepareCallback callback,
                                               MultiPlayer multiPlayer) {
-            if (player == null) {
-                player = new MediaPlayer();
-                player.setWakeMode(mService, PowerManager.PARTIAL_WAKE_LOCK);
-            }
-
             try {
                 player.reset();
+                player.release();
+                if (mService.mPlayer.isCurrentPlayer(player)) {
+                    mService.mPlayer.initCurrentMediaPlayer();
+                    player = mService.mPlayer.mCurrentMediaPlayer;
+                } else if (mService.mPlayer.isNextPlayer(player)) {
+                    mService.mPlayer.initNextMediaPlayer();
+                    player = mService.mPlayer.mNextMediaPlayer;
+                }
             } catch (Throwable t) {
                 //LOG.error("setDataSourceTask() player.reset() failed: " + t.getMessage(), t, true);
                 if (mService.mPlayer.isCurrentPlayer(player)) {
-                    //player = new MediaPlayer();
                     mService.mPlayer.initCurrentMediaPlayer();
                     player = mService.mPlayer.mCurrentMediaPlayer;
                 } else if (mService.mPlayer.isNextPlayer(player)) {
@@ -3011,6 +2972,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                     player = mService.mPlayer.mNextMediaPlayer;
                 }
             }
+
             try {
                 player.setOnCompletionListener(multiPlayer);
                 player.setOnErrorListener(multiPlayer);
@@ -3045,7 +3007,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         }
 
         private boolean isNextPlayer(MediaPlayer player) {
-            return player != null && mNextMediaPlayer != null && mNextMediaPlayer.equals(mCurrentMediaPlayer);
+            return mNextMediaPlayer != null && mNextMediaPlayer.equals(player);
         }
 
         /**
@@ -3067,13 +3029,13 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 return;
             }
 
-            // synchronous call
             releaseNextMediaPlayer(false);
-            if (!initNextMediaPlayer()) {
+
+            if (path == null) {
                 return;
             }
 
-            if (path == null) {
+            if (!initNextMediaPlayer()) {
                 return;
             }
 
@@ -3091,11 +3053,11 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
             });
         }
 
-        private void releaseMediaPlayer(boolean async, MediaPlayer mediaPlayer) {
+        private void releaseMediaPlayer(boolean async, MediaPlayer mediaPlayer, Runnable asyncCallback) {
             if (mediaPlayer != null) {
                 try {
                     if (async) {
-                        mediaPlayerAsyncAction(mHandler, mediaPlayer, MediaPlayerAction.RELEASE);
+                        mediaPlayerAsyncAction(mHandler, mediaPlayer, MediaPlayerAction.RELEASE, asyncCallback);
                     } else {
                         mediaPlayerAction(mediaPlayer, MediaPlayerAction.RELEASE);
                     }
@@ -3107,24 +3069,33 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
 
         private void releaseCurrentMediaPlayer(boolean async) {
             try {
-                releaseMediaPlayer(async, mCurrentMediaPlayer);
+                releaseMediaPlayer(async, mCurrentMediaPlayer, () -> {
+                    mCurrentMediaPlayer = null;
+                    LOG.info("mCurrentMediaPlayer released and nullified");
+                });
             } catch (Throwable t) {
                 LOG.warn("releaseCurrentMediaPlayer(async=" + async + ") couldn't release mCurrentMediaPlayer", t);
             } finally {
                 if (!async) {
                     mCurrentMediaPlayer = null;
+                    LOG.info("mCurrentMediaPlayer released and nullified");
                 }
             }
         }
 
         private void releaseNextMediaPlayer(boolean async) {
             try {
-                releaseMediaPlayer(async, mNextMediaPlayer);
+                releaseMediaPlayer(async, mNextMediaPlayer,
+                        () -> {
+                            mNextMediaPlayer = null;
+                            LOG.info("mNextMediaPlayer released and nullified");
+                        });
             } catch (Throwable t) {
                 LOG.warn("releaseNextMediaPlayer(async=" + async + ") couldn't release mNextMediaPlayer", t);
             } finally {
                 if (!async) {
                     mNextMediaPlayer = null;
+                    LOG.info("mNextMediaPlayer released and nullified");
                 }
             }
         }
@@ -3151,7 +3122,7 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         public void start() {
             if (mCurrentMediaPlayer != null) {
                 try {
-                    mediaPlayerAsyncAction(mHandler, mCurrentMediaPlayer, MediaPlayerAction.START);
+                    mediaPlayerAsyncAction(mHandler, mCurrentMediaPlayer, MediaPlayerAction.START, null);
                 } catch (Throwable ignored) {
                 }
             }
@@ -3163,7 +3134,10 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         public void stop() {
             if (mCurrentMediaPlayer != null) {
                 try {
-                    mediaPlayerAsyncAction(mHandler, mCurrentMediaPlayer, MediaPlayerAction.RESET);
+                    mediaPlayerAsyncAction(mHandler, mCurrentMediaPlayer, MediaPlayerAction.RESET, null);
+                    mediaPlayerAsyncAction(mHandler, mNextMediaPlayer, MediaPlayerAction.RESET, null);
+                    releaseCurrentMediaPlayer(true);
+                    releaseNextMediaPlayer(true);
                     mIsInitialized = false;
                 } catch (Throwable t) {
                     // recover from possible IllegalStateException caused by native _reset() method.
@@ -3178,7 +3152,8 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
         public void release() {
             if (mCurrentMediaPlayer != null) {
                 try {
-                    mediaPlayerAsyncAction(mHandler, mCurrentMediaPlayer, MediaPlayerAction.RELEASE);
+                    releaseCurrentMediaPlayer(true);
+                    releaseNextMediaPlayer(true);
                 } catch (Throwable ignored) {
                 }
             }
@@ -3322,426 +3297,6 @@ public class MusicPlaybackService extends JobIntentService implements IApolloSer
                 }
             } catch (Throwable t) {
                 LOG.error("onCompletion() error: " + t.getMessage(), t);
-            }
-        }
-    }
-
-    private static final class ServiceStub extends IApolloService.Stub {
-
-        private final WeakReference<MusicPlaybackService> mService;
-        private final static long[] EMPTY_LONG_ARRAY = new long[0];
-
-        private ServiceStub(final MusicPlaybackService service) {
-            mService = new WeakReference<>(service);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void openFile(final String path) {
-            if (Ref.alive(mService)) {
-                mService.get().openFile(path, result -> {
-                    // do nothing
-                });
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void open(final long[] list, final int position) {
-            if (list != null && Ref.alive(mService)) {
-                mService.get().open(list, position);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void stop() {
-            if (Ref.alive(mService)) {
-                mService.get().stop();
-            }
-        }
-
-        @Override
-        public void stopPlayer() {
-            if (Ref.alive(mService)) {
-                mService.get().stopPlayer();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void pause() {
-            if (Ref.alive(mService)) {
-                mService.get().pause();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void play() {
-            if (Ref.alive(mService)) {
-                mService.get().play();
-            }
-        }
-
-        @Override
-        public void playSimple(String path) {
-            if (Ref.alive(mService)) {
-                mService.get().playSimple(path);
-            }
-        }
-
-        @Override
-        public void stopSimplePlayer() {
-            if (Ref.alive(mService)) {
-                mService.get().stopSimplePlayer();
-            }
-        }
-
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void prev() {
-            if (Ref.alive(mService)) {
-                mService.get().prev();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void next() {
-            if (Ref.alive(mService)) {
-                mService.get().gotoNext(true);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void enqueue(final long[] list, final int action) {
-            if (list != null && Ref.alive(mService)) {
-                mService.get().enqueue(list, action);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void setQueuePosition(final int index) {
-            if (Ref.alive(mService)) {
-                mService.get().setQueuePosition(index);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void enableShuffle(boolean on) {
-            if (Ref.alive(mService)) {
-                mService.get().enableShuffle(on);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void setRepeatMode(final int repeatMode) {
-            if (Ref.alive(mService)) {
-                mService.get().setRepeatMode(repeatMode);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void moveQueueItem(final int from, final int to) {
-            if (Ref.alive(mService)) {
-                mService.get().moveQueueItem(from, to);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void toggleFavorite() {
-            if (Ref.alive(mService)) {
-                mService.get().toggleFavorite();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void refresh() {
-            if (Ref.alive(mService)) {
-                mService.get().refresh();
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isFavorite() {
-            return Ref.alive(mService) && mService.get().isFavorite();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isPlaying() {
-            return Ref.alive(mService) && mService.get().isPlaying();
-        }
-
-        @Override
-        public boolean isStopped() {
-            return !Ref.alive(mService) || mService.get().isStopped();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long[] getQueue() {
-            if (Ref.alive(mService)) {
-                return mService.get().getQueue();
-            }
-            return EMPTY_LONG_ARRAY;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long duration() {
-            if (Ref.alive(mService)) {
-                return mService.get().duration();
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long position() {
-            if (Ref.alive(mService)) {
-                return mService.get().position();
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long seek(final long position) {
-            if (Ref.alive(mService)) {
-                return mService.get().seek(position);
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long getAudioId() {
-            if (Ref.alive(mService)) {
-                return mService.get().getAudioId();
-            }
-            return -1;
-        }
-
-        @Override
-        public long getCurrentSimplePlayerAudioId() {
-            return mService.get().getCurrentSimplePlayerAudioId();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long getArtistId() {
-            if (Ref.alive(mService)) {
-                return mService.get().getArtistId();
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public long getAlbumId() {
-            if (Ref.alive(mService)) {
-                return mService.get().getAlbumId();
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getArtistName() {
-            if (Ref.alive(mService)) {
-                return mService.get().getArtistName();
-            }
-            return "";
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getTrackName() {
-            if (Ref.alive(mService)) {
-                return mService.get().getTrackName();
-            }
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getAlbumName() {
-            if (Ref.alive(mService)) {
-                return mService.get().getAlbumName();
-            }
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public String getPath() {
-            if (Ref.alive(mService)) {
-                return mService.get().getPath();
-            }
-            return null;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getQueuePosition() {
-            if (Ref.alive(mService)) {
-                return mService.get().getQueuePosition();
-            }
-            return -1;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean isShuffleEnabled() {
-            if (Ref.alive(mService)) {
-                return mService.get().isShuffleEnabled();
-            }
-            return false;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getRepeatMode() {
-            if (Ref.alive(mService)) {
-                return mService.get().getRepeatMode();
-            }
-            return REPEAT_NONE;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int removeTracks(final int first, final int last) {
-            if (Ref.alive(mService)) {
-                return mService.get().removeTracks(first, last);
-            }
-            return 0; //0 tracks deleted.
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int removeTrack(final long id) {
-            if (Ref.alive(mService)) {
-                return mService.get().removeTrack(id);
-            }
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getMediaMountedCount() {
-            if (Ref.alive(mService)) {
-                return mService.get().getMediaMountedCount();
-            }
-            return 0;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getAudioSessionId() {
-            if (Ref.alive(mService)) {
-                return mService.get().getAudioSessionId();
-            }
-            return -1;
-        }
-
-        @Override
-        public void updateNotification() throws RemoteException {
-            if (Ref.alive(mService)) {
-                mService.get().updateNotification();
-                return;
-            }
-            throw new RemoteException("::ServiceStub::updateNotification() failed. Lost weak reference to mService and could not invoke updateNotification()");
-        }
-
-        @Override
-        public void handleIntentFromStub(Intent intent) throws RemoteException {
-            if (Ref.alive(mService)) {
-                mService.get().handleIntentFromStub(intent); // this one may throw RemoteExceptions
-            }
-        }
-
-        @Override
-        public void shutdown() {
-            if (Ref.alive(mService)) {
-                mService.get().shutdown();
             }
         }
     }
