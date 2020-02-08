@@ -50,6 +50,7 @@ public class LimeTorrentsTest {
                     System.out.println("\t Seeds: " + sr.getSeeds());
                     System.out.println("\t Size: " + sr.getSize());
                 }
+                limeTorrentsSearchPerformer.stop();
             }
 
             @Override
