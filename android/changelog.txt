@@ -1,4 +1,8 @@
-FrostWire 2.1.9 build 623 - FEB/05/2020
+FrostWire 2.1.9 build 624 - FEB/08/2020
+ - MusicPlaybackService rewritten
+ - Continuous playback issues fixed
+ - Repeat mode and shuffle mode issues fixed
+ - Save to Playlist issue fixed
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0
  - boost 1.72.0 build

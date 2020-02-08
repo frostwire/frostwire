@@ -31,7 +31,9 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -117,12 +119,10 @@ public final class MusicUtils {
             LOG.error(t.getMessage(), t);
         }
         try {
-            //if (!serviceConnectionListener.isBound()) {
             if (onServiceBoundCallback != null) {
                 serviceConnectionListener.addSubListener(onServiceBoundCallback);
             }
             context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
-            //}
         } catch (Throwable t) {
             LOG.error("startMusicPlaybackService() error " + t.getMessage(), t);
         }
@@ -211,7 +211,7 @@ public final class MusicUtils {
     }
 
     private static class ServiceConnectionListener implements ServiceConnection {
-        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class); //rviceConnectionListener
+        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
         private final ArrayList<Runnable> subListeners = new ArrayList<>();
         private final AtomicBoolean bound = new AtomicBoolean(false);
 
@@ -237,7 +237,6 @@ public final class MusicUtils {
             LOG.info("onServiceDisconnected() invoked!");
             bound.set(false);
             subListeners.clear();
-            //musicPlaybackService = null;
         }
 
         public boolean isBound() {
@@ -254,7 +253,7 @@ public final class MusicUtils {
             }
             for (Runnable runnable : subListeners) {
                 try {
-                    runnable.run();
+                    MusicPlaybackService.safePost(runnable);
                 } catch (Throwable t) {
                     LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
                 }
@@ -852,7 +851,7 @@ public final class MusicUtils {
             // we are getting this error because musicPlaybackService is
             // a global static mutable variable, we can't do anything
             // until a full refactor in player
-            LOG.warn("playAll() Review code logic", e);
+            LOG.error("playAll() Review code logic", e);
         } catch (final Throwable t) {
             LOG.error("playAll() " + t.getMessage(), t);
         }
@@ -1108,24 +1107,30 @@ public final class MusicUtils {
             return;
         }
 
+        if (MusicPlaybackService.getMusicPlayerHandler() == null &&
+                MusicPlaybackService.getMusicPlayerHandler().getHandlerThread() == Thread.currentThread()) {
+            throw new RuntimeException("Do not execute this code unless you're in the MusicPlaybackService handler thread, sorry");
+        }
+
         long[] currentQueue = getQueue();
         long[] playlist = getSongListForPlaylist(context, playlistid);
         boolean updateQueue = isPlaylistInQueue(playlist, currentQueue);
         final int size = ids.length;
         final ContentResolver resolver = context.getContentResolver();
         final String[] projection = new String[]{
-                "count(*)"
+                MediaStore.Audio.Playlists.Members._ID
         };
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
         Cursor cursor = null;
         try {
             cursor = resolver.query(uri, projection, null, null, null);
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            LOG.error("addToPlaylist() resolver.query() failed: " + t.getMessage(), t, true);
         }
 
         if (cursor != null) {
             cursor.moveToFirst();
-            final int base = cursor.getInt(0);
+            final int base = cursor.getCount();
             cursor.close();
             int numinserted = 0;
             //TODO: Check this portion of code, seems is doing extra work.
@@ -1138,8 +1143,13 @@ public final class MusicUtils {
             }
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
-            AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-            refresh();
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                        AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+                        refresh();
+                    }
+            );
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
         }

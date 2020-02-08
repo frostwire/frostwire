@@ -77,6 +77,9 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 /**
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
+ *
+ * TODO:
+ *  - assertInMusicPlayerHandlerThread()
  */
 public class MusicPlaybackService extends JobIntentService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
@@ -528,6 +531,10 @@ public class MusicPlaybackService extends JobIntentService {
 
     public static MusicPlaybackService getInstance() {
         return INSTANCE;
+    }
+
+    public static MusicPlayerHandler getMusicPlayerHandler() {
+        return MusicPlaybackService.mPlayerHandler;
     }
 
     // public methods
@@ -2267,17 +2274,13 @@ public class MusicPlaybackService extends JobIntentService {
             // start playback
             if (mPlayer != null) {
                 long duration;
-                //synchronized (mPlayerLock) {
                 duration = mPlayer.duration();
-                //}
                 if (mRepeatMode != REPEAT_CURRENT &&
                         duration > 2000 &&
                         mPlayer.position() >= duration - 2000) {
                     gotoNext(true);
                 }
-                //synchronized (mPlayerLock) {
                 mPlayer.start();
-                //}
             }
             if (mPlayerHandler != null) {
                 mPlayerHandler.removeMessages(FADE_DOWN);
@@ -2620,7 +2623,7 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
 
-    private static final class MusicPlayerHandler extends Handler {
+    public static final class MusicPlayerHandler extends Handler {
         private final static Logger LOG = Logger.getLogger(MusicPlayerHandler.class);
         private float mCurrentVolume = 1.0f;
 
@@ -2631,6 +2634,10 @@ public class MusicPlaybackService extends JobIntentService {
          */
         MusicPlayerHandler(final Looper looper) {
             super(looper);
+        }
+
+        public HandlerThread getHandlerThread() {
+            return this.getHandlerThread();
         }
 
         void safePost(@NonNull Runnable r) {
@@ -2778,9 +2785,9 @@ public class MusicPlaybackService extends JobIntentService {
             try {
                 mCurrentMediaPlayer.setNextMediaPlayer(null);
             } catch (IllegalArgumentException e) {
-                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e);
+                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e, true);
             } catch (Throwable e) {
-                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e);
+                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e, true);
                 return;
             }
             releaseNextMediaPlayer();
