@@ -75,7 +75,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -420,7 +419,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private void playRingtone(FileDescriptor fileDescriptor) {
         //pause real music if any
         if (MusicUtils.isPlaying()) {
-            MusicUtils.playOrPause();
+            MusicUtils.playPauseOrResume();
         }
         MusicUtils.playSimple(fileDescriptor.filePath);
         notifyDataSetChanged();

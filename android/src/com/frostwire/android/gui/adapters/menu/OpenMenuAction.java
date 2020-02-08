@@ -91,7 +91,7 @@ public class OpenMenuAction extends MenuAction {
             context.startActivity(intent);
         } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
             if (MusicUtils.isPlaying()) {
-                MusicUtils.playOrPause();
+                MusicUtils.playPauseOrResume();
             }
             MusicUtils.playSimple(this.path);
         } else if (fileType == Constants.FILE_TYPE_AUDIO) {

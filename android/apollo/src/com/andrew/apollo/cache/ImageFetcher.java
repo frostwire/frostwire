@@ -13,10 +13,13 @@ package com.andrew.apollo.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.widget.ImageView;
+
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.util.ImageLoader;
 
 /**
  * A subclass of {@link ImageWorker} that fetches images from a URL.
@@ -50,8 +53,10 @@ public class ImageFetcher extends ImageWorker {
     /**
      * Used to fetch album images.
      */
-    public void loadAlbumImage(final String artistName, final String albumName, final long albumId,
-            final ImageView imageView) {
+    public void loadAlbumImage(final String artistName,
+                               final String albumName,
+                               final long albumId,
+                               final ImageView imageView) {
         loadImage(generateAlbumCacheKey(albumName, artistName), artistName, albumId, imageView,
                 ImageType.ALBUM);
     }
@@ -104,10 +109,10 @@ public class ImageFetcher extends ImageWorker {
      * Finds cached or downloads album art. Used in {@link MusicPlaybackService}
      * to set the current album art in the notification and lock screen
      *
-     * @param albumName The name of the current album
-     * @param albumId The ID of the current album
+     * @param albumName  The name of the current album
+     * @param albumId    The ID of the current album
      * @param artistName The album artist in case we should have to download
-     *            missing artwork
+     *                   missing artwork
      * @return The album art as an {@link Bitmap}
      */
     public Bitmap getArtwork(final String albumName, final long albumId, final String artistName) {
@@ -133,7 +138,7 @@ public class ImageFetcher extends ImageWorker {
      * to let to select correct image for the case when there are two albums with the
      * same artist.
      *
-     * @param albumName The album name the cache key needs to be generated.
+     * @param albumName  The album name the cache key needs to be generated.
      * @param artistName The artist name the cache key needs to be generated.
      */
     public static String generateAlbumCacheKey(final String albumName, final String artistName) {

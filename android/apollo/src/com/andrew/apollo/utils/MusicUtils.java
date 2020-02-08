@@ -304,6 +304,7 @@ public final class MusicUtils {
     public static void next() {
         try {
             if (musicPlaybackService != null) {
+                musicPlaybackService.stopPlayer();
                 musicPlaybackService.gotoNext(true);
             }
         } catch (final Throwable ignored) {
@@ -317,32 +318,25 @@ public final class MusicUtils {
             }
         } catch (final Throwable ignored) {
         }
-//        final Intent previous = new Intent(context, MusicPlaybackService.class);
-//        previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-//        if (MusicUtils.isMusicPlaybackServiceRunning()) {
-//            try {
-//                LOG.info("previous() MusicPlaybackService already running, telling it to handleIntentFromStub");
-//                MusicUtils.getMusicPlaybackService().handleIntentFromStub(previous);
-//            } catch (RemoteException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//            LOG.error("previous() failed, MusicPlaybackService not running and wouldn't know what the previous track was");
-//        }
     }
 
     /**
-     * Plays or pauses the music.
+     * Starts Playback, Pauses, or Resumes.
      */
-    public static void playOrPause() {
+    public static void playPauseOrResume() {
         try {
-            // TODO: Check for PHONE_STATE Permissions here.
             if (musicPlaybackService != null) {
-                if (musicPlaybackService.isPlaying()) {
-                    musicPlaybackService.pause();
-                } else {
-
+                // PAUSED
+                if (!musicPlaybackService.isPlaying() && !musicPlaybackService.isStopped()) {
+                    musicPlaybackService.resume();
+                }
+                // STOPPED or UNSTARTED
+                else if (musicPlaybackService.isStopped()) {
                     musicPlaybackService.play();
+                }
+                // PLAYING
+                else if (musicPlaybackService.isPlaying()) {
+                    musicPlaybackService.pause();
                 }
             }
         } catch (final Exception ignored) {
@@ -1178,8 +1172,8 @@ public final class MusicUtils {
      * @param playlistId The id of the playlist being removed from.
      */
     public static void removeFromPlaylist(final Context context,
-                                           final long id,
-                                           final long playlistId) {
+                                          final long id,
+                                          final long playlistId) {
         if (context == null) {
             return;
         }
@@ -1532,6 +1526,7 @@ public final class MusicUtils {
 
     /**
      * Called when one of the lists should refresh or re-query.
+     * Results in a throttled background task submission on our MusicHandlerThread
      */
     public static void refresh() {
         try {

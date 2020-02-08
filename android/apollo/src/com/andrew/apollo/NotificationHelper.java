@@ -103,8 +103,10 @@ public class NotificationHelper {
     /**
      * Call this to build the {@link Notification}.
      */
-    void buildNotification(final String albumName, final String artistName,
-                           final String trackName, final Bitmap albumArt,
+    void buildNotification(final String albumName,
+                           final String artistName,
+                           final String trackName,
+                           final Bitmap albumArt,
                            final boolean isPlaying) {
 
         // Default notification layout
@@ -153,7 +155,7 @@ public class NotificationHelper {
      */
     void updatePlayState(final boolean isPlaying, final boolean isStopped) {
         LOG.info("updatePlayState(isPlaying=" + isPlaying + ", isStopped=" + isStopped + ")");
-        if (mNotification == null) {
+        if (mNotification == null && !isStopped) {
             LOG.info("updatePlayState() aborted! mNotification is null");
             return;
         }

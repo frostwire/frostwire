@@ -475,7 +475,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                     androidMediaPlayer.prepare();
                     androidMediaPlayer.start();
                     if (MusicUtils.isPlaying()) {
-                        MusicUtils.playOrPause();
+                        MusicUtils.playPauseOrResume();
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();

@@ -129,7 +129,7 @@ public class MiniPlayerView extends LinearLayout {
         if (mediaPlayer == null) {
             return;
         }
-        MusicUtils.playOrPause();
+        MusicUtils.playPauseOrResume();
         refreshComponents();
     }
 

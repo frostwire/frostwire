@@ -18,7 +18,6 @@
 
 package com.andrew.apollo.widgets;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -32,11 +31,7 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
 
 /**
  * A custom {@link ImageButton} that represents the "play and pause" button.
@@ -67,7 +62,7 @@ public final class PlayPauseButton extends AppCompatImageButton
 
     @Override
     public void onClick(final View v) {
-        MusicUtils.playOrPause();
+        MusicUtils.playPauseOrResume();
         updateState();
     }
 

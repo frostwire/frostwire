@@ -1359,7 +1359,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         private void onMultiTouchEvent() {
             try {
-                MusicUtils.playOrPause();
+                MusicUtils.playPauseOrResume();
             } catch (Throwable e) {
                 // ignore
             }

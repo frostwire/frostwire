@@ -36,6 +36,7 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.adapters.ApolloFragmentAdapter;
 import com.andrew.apollo.loaders.PlaylistLoader;
@@ -63,8 +64,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 
 import java.util.List;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Created on 1/26/16 in a plane.
@@ -145,7 +144,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected void onSongItemClick(int position) {
         if (mAdapter != null) {
-            async(this, ApolloFragment::songClickTask, position);
+            MusicPlaybackService.safePost(() -> songClickTask(position));
         }
     }
 
@@ -181,7 +180,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mRootView = (ViewGroup) inflater.inflate(R.layout.grid_base, null, false);
             initGridView();
         }
-        if (mEmptyTextView == null ){
+        if (mEmptyTextView == null) {
             mEmptyTextView = mRootView.findViewById(R.id.empty);
         }
         return mRootView;
@@ -207,7 +206,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         int mSelectedPosition = info.position - mAdapter.getOffset();
         // Create a new song
         mItem = mAdapter.getItem(mSelectedPosition);
-        // TODO: Remove these mutable properties, parametrize the onMenuEvent handlers.
         if (mItem instanceof Song) {
             Song mSong = (Song) mItem;
             mSelectedId = mSong.mSongId;
@@ -221,28 +219,39 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mSongName = null;
             mAlbumName = mAlbum.mAlbumName;
             mArtistName = mAlbum.mArtistName;
-            mSongList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
+            MusicPlaybackService.safePost(() -> {
+                mSongList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
+            });
         } else if (mItem instanceof Artist) {
             Artist mArtist = (Artist) mItem;
             mSelectedId = mArtist.mArtistId;
             mSongName = null;
             mArtistName = mArtist.mArtistName;
-            mSongList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId);
+            MusicPlaybackService.safePost(() -> {
+                mSongList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId);
+            });
         } else if (mItem instanceof Genre) {
             Genre mGenre = (Genre) mItem;
             mSelectedId = mGenre.mGenreId;
-            mSongList = MusicUtils.getSongListForGenre(getActivity(), mGenre.mGenreId);
+            MusicPlaybackService.safePost(() -> {
+                mSongList = MusicUtils.getSongListForGenre(getActivity(), mGenre.mGenreId);
+            });
         } else if (mItem instanceof Playlist) {
             Playlist mPlaylist = (Playlist) mItem;
             mSelectedId = mPlaylist.mPlaylistId;
             if (mSelectedId == PlaylistLoader.FAVORITE_PLAYLIST_ID) {
-                mSongList = MusicUtils.getSongListForFavorites(getActivity());
+                MusicPlaybackService.safePost(() -> {
+                    mSongList = MusicUtils.getSongListForFavorites(getActivity());
+                });
             } else if (mSelectedId == PlaylistLoader.LAST_ADDED_PLAYLIST_ID) {
-                mSongList = MusicUtils.getSongListForLastAdded(getActivity());
+                MusicPlaybackService.safePost(() -> {
+                    mSongList = MusicUtils.getSongListForLastAdded(getActivity());
+                });
             } else {
-                mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
+                MusicPlaybackService.safePost(() -> {
+                    mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
+                });
             }
-
         }
         // Play the selected songs
         menu.add(GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, getString(R.string.context_menu_play_selection))
@@ -271,7 +280,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
                 .setIcon(R.drawable.contextmenu_icon_trash);
-
     }
 
     @Override
@@ -282,13 +290,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     new long[]{mSelectedId};
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicUtils.playAll(songList, 0, MusicUtils.isShuffleEnabled());
+                    MusicPlaybackService.safePost(() -> MusicUtils.playAll(songList, 0, MusicUtils.isShuffleEnabled()));
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
-                    MusicUtils.playNext(songList);
+                    MusicPlaybackService.safePost(() -> MusicUtils.playNext(songList));
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
-                    MusicUtils.addToQueue(getActivity(), songList);
+                    MusicPlaybackService.safePost(() -> MusicUtils.addToQueue(getActivity(), songList));
                     return true;
                 case FragmentMenuItems.ADD_TO_FAVORITES:
                     onAddToFavorites();
@@ -301,7 +309,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     return true;
                 case FragmentMenuItems.PLAYLIST_SELECTED:
                     final long playlistId = item.getIntent().getLongExtra("playlist", 0);
-                    MusicUtils.addToPlaylist(getActivity(), songList, playlistId);
+                    MusicPlaybackService.safePost(() -> MusicUtils.addToPlaylist(getActivity(), songList, playlistId));
                     refresh();
                     return true;
                 case FragmentMenuItems.USE_AS_RINGTONE:
@@ -311,9 +319,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
-                    long artistId = MusicUtils.getIdForArtist(getActivity(), mArtistName);
-                    long[] tracks = MusicUtils.getSongListForArtist(getActivity(), artistId);
-                    NavUtils.openArtistProfile(getActivity(), mArtistName, tracks);
+                    MusicPlaybackService.safePost(() -> {
+                        long artistId = MusicUtils.getIdForArtist(getActivity(), mArtistName);
+                        long[] tracks = MusicUtils.getSongListForArtist(getActivity(), artistId);
+                        NavUtils.openArtistProfile(getActivity(), mArtistName, tracks);
+                    });
                     return true;
                 case FragmentMenuItems.REMOVE_FROM_PLAYLIST:
                     return onRemoveFromPlaylist();
@@ -370,8 +380,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         mAdapter.notifyDataSetChanged();
         if (mItem instanceof Song) {
             Song song = (Song) mItem;
-            MusicUtils.removeFromPlaylist(getActivity(), song.mSongId, mPlaylistId);
-            restartLoader(true);
+            MusicPlaybackService.safePost(() ->
+            {
+                MusicUtils.removeFromPlaylist(getActivity(), song.mSongId, mPlaylistId);
+                restartLoader(true);
+            });
             return true;
         }
         return false;
@@ -667,11 +680,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         return 0;
     }
 
-    private static void songClickTask(final ApolloFragment fragment, int position) {
+    private void songClickTask(int position) {
         try {
-            ApolloFragmentAdapter adapter = fragment.getAdapter();
+            ApolloFragmentAdapter adapter = getAdapter(); // in multiple lines for easier debugging
             MusicUtils.playAllFromUserItemClick(adapter, position);
-            Activity activity = fragment.getActivity();
+            Activity activity = getActivity();
             activity.runOnUiThread(adapter::notifyDataSetChanged);
             NavUtils.openAudioPlayer(activity);
         } catch (Throwable t) {

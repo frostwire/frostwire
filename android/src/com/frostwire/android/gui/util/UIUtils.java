@@ -348,7 +348,7 @@ public final class UIUtils {
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 if (mime != null && mime.contains("video")) {
                     if (MusicUtils.isPlaying()) {
-                        MusicUtils.playOrPause();
+                        MusicUtils.playPauseOrResume();
                     }
                 }
                 context.startActivity(i);

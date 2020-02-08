@@ -22,6 +22,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
 
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.model.Song;
@@ -64,9 +67,7 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
         this.itemsOffset = itemsOffset;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @NonNull
     @Override
     public View getView(final int position, View convertView, final ViewGroup parent) {
         convertView = prepareMusicViewHolder(mLayoutId, getContext(), convertView, parent);
@@ -80,9 +81,9 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
             if (dataHolder.mParentId == -1) {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, R.drawable.list_item_audio_icon, musicViewHolder.mImage.get());
                 async(getContext(),
-                      SongAdapter::updateDataHolderAlbumId,
-                      dataHolder, musicViewHolder, mImageFetcher,
-                      SongAdapter::updateAlbumImage);
+                        SongAdapter::updateDataHolderAlbumId,
+                        dataHolder, musicViewHolder, mImageFetcher,
+                        SongAdapter::updateAlbumImage);
             } else {
                 mImageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
             }
@@ -119,18 +120,23 @@ public class SongAdapter extends ApolloFragmentAdapter<Song> implements ApolloFr
     }
 
     @SuppressWarnings("unused")
-    private static void updateDataHolderAlbumId(Context context, DataHolder dataHolder,
-        MusicViewHolder musicViewHolder, ImageFetcher imageFetcher) {
+    private static void updateDataHolderAlbumId(Context context,
+                                                DataHolder dataHolder,
+                                                MusicViewHolder musicViewHolder,
+                                                ImageFetcher imageFetcher) {
         if (dataHolder.mParentId == -1) {
             dataHolder.mParentId = MusicUtils.getAlbumIdForSong(context, dataHolder.mItemId);
         }
     }
 
     @SuppressWarnings("unused")
-    private static void updateAlbumImage(Context context, DataHolder dataHolder,
-        MusicViewHolder musicViewHolder, ImageFetcher imageFetcher) {
-        if (dataHolder != null && dataHolder.mParentId != -1) {
-            imageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, musicViewHolder.mImage.get());
+    private static void updateAlbumImage(Context context,
+                                         DataHolder dataHolder,
+                                         MusicViewHolder musicViewHolder,
+                                         ImageFetcher imageFetcher) {
+        if (dataHolder != null && dataHolder.mParentId != -1 && Ref.alive(musicViewHolder.mImage)) {
+            ImageView imageView = musicViewHolder.mImage.get();
+            imageFetcher.loadAlbumImage(dataHolder.mLineTwo, dataHolder.mLineOne, dataHolder.mParentId, imageView);
         }
     }
 
