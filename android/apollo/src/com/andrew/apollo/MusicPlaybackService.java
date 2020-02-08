@@ -84,8 +84,6 @@ public class MusicPlaybackService extends JobIntentService {
 
     private static MusicPlaybackService INSTANCE = null;
 
-    //private CountDownLatch initLatch = new CountDownLatch(1);
-
     /**
      * Indicates that the music has paused or resumed
      */
@@ -360,12 +358,6 @@ public class MusicPlaybackService extends JobIntentService {
      * necessary queries to play audio files
      */
     private Cursor mCursor;
-
-//    private final Object cursorLock = new Object();
-//    private final Object audioSessionIdLock = new Object();
-//    private final Object openFileLock = new Object();
-//    private final Object mPlayerLock = new Object();
-//private final Object mFavoritesCacheLock = new Object();
 
     /**
      * The cursor used to retrieve info on the album the current track is
@@ -754,15 +746,6 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
     public void updateNotification() {
-//        try {
-//            if (initLatch.getCount() == 1) {
-//                LOG.info("updateNotification() waiting for initLatch to release.");
-//            }
-//            initLatch.await();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-
         if (mNotificationHelper == null) {
             LOG.error("updateNotification() failed, mNotificationHelper == null");
             return;
@@ -884,8 +867,6 @@ public class MusicPlaybackService extends JobIntentService {
 
         // Initialize the media player
         mPlayer = new MultiPlayer(mPlayerHandler);
-
-        //initLatch.countDown();
 
         MusicPlaybackService.initRepeatModeAndShuffleTask(this);
 
@@ -1569,7 +1550,6 @@ public class MusicPlaybackService extends JobIntentService {
                     } catch (Throwable ignored) {
                     }
                 }
-                //mPlayerHandler.safePost(() -> remoteControlClientSetPlaybackStateTask(mRemoteControlClient, playStateFinalCopy));
                 remoteControlClientSetPlaybackStateTask(mRemoteControlClient, playStateFinalCopy);
                 break;
             case META_CHANGED:
