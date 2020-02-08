@@ -75,7 +75,10 @@ public class LimeTorrentsSearchPerformer extends TorrentSearchPerformer {
                 }
                 LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
             } else {
-                LOG.warn("LimeTorrentsSearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
+                LOG.warn("LimeTorrentsSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
+                LOG.warn("========");
+                LOG.warn(page);
+                LOG.warn("========");
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
         return results;

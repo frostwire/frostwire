@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -206,6 +205,8 @@ public final class SearchFragment extends AbstractFragment implements
             getHeader(getActivity());
         }
         ConfigurationManager CM = ConfigurationManager.instance();
+
+        setupAdapter();
         if (adapter != null && (adapter.getCount() > 0 || adapter.getTotalCount() > 0)) {
             refreshFileTypeCounters(true);
             searchInput.selectTabByMediaType((byte) CM.getLastMediaTypeFilter());
@@ -339,6 +340,17 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             };
             LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
+        } else  {
+            SearchListener listener = LocalSearchEngine.instance().getListener();
+            if (listener == null) {
+                LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
+            } else if (listener instanceof LocalSearchEngineListener) {
+                LocalSearchEngineListener localSearchListener = (LocalSearchEngineListener) listener;
+                if (!Ref.alive(localSearchListener.searchFragmentRef)) {
+                    LOG.info("setupAdapter(): found a dead reference to the fragment on the LocalSearchEngineListener");
+                    LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
+                }
+            }
         }
         list.setAdapter(adapter);
     }
@@ -735,7 +747,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private static class LocalSearchEngineListener implements SearchListener {
 
-        private final WeakReference<SearchFragment> searchFragmentRef;
+        private WeakReference<SearchFragment> searchFragmentRef;
 
         LocalSearchEngineListener(SearchFragment searchFragment) {
             searchFragmentRef = Ref.weak(searchFragment);
@@ -746,6 +758,9 @@ public final class SearchFragment extends AbstractFragment implements
             if (Ref.alive(searchFragmentRef)) {
                 //noinspection unchecked
                 searchFragmentRef.get().onSearchResults((List<SearchResult>) results);
+            } else {
+                LOG.warn("LocalSearchEngineListener::onResults() search fragment reference lost, trying to recover...");
+                Ref.free(searchFragmentRef);
             }
         }
 
