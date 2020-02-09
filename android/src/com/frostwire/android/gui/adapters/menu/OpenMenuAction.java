@@ -99,7 +99,7 @@ public class OpenMenuAction extends MenuAction {
         } else if (fd != null && "application/x-bittorrent".equals(fd.mime)) {
             String torrentFileUri = UIUtils.getFileUri(context, fd.filePath, false).toString();
             TransferManager.instance().downloadTorrent(torrentFileUri,
-                    new HandpickedTorrentDownloadDialogOnFetch((MainActivity) context));
+                    new HandpickedTorrentDownloadDialogOnFetch((MainActivity) context, false));
         } else {
             boolean useFileProvider = hasNougatOrNewer();
             UIUtils.openFile(context, path, mime, useFileProvider);

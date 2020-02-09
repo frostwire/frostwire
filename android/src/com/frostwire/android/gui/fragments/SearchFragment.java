@@ -317,7 +317,7 @@ public final class SearchFragment extends AbstractFragment implements
     private void startMagnetDownload(String magnet) {
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
         TransferManager.instance().downloadTorrent(magnet,
-                new HandpickedTorrentDownloadDialogOnFetch(getActivity()));
+                new HandpickedTorrentDownloadDialogOnFetch(getActivity(), false));
     }
 
     private static String extractYTId(String ytUrl) {
@@ -340,7 +340,7 @@ public final class SearchFragment extends AbstractFragment implements
                 }
             };
             LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
-        } else  {
+        } else {
             SearchListener listener = LocalSearchEngine.instance().getListener();
             if (listener == null) {
                 LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));

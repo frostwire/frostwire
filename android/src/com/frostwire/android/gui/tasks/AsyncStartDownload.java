@@ -119,7 +119,7 @@ public class AsyncStartDownload {
             if (sr instanceof TorrentSearchResult &&
                     !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
-                        new HandpickedTorrentDownloadDialogOnFetch((Activity) ctx), sr.getDisplayName());
+                        new HandpickedTorrentDownloadDialogOnFetch((Activity) ctx, false), sr.getDisplayName());
             } else {
                 transfer = TransferManager.instance().download(sr);
                 if (!(transfer instanceof InvalidDownload)) {

@@ -61,9 +61,11 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private TorrentInfo torrentInfo;
     private String magnetUri;
     private long torrentFetcherDownloadTokenId;
+    private boolean openTransfersOnCancel;
     private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
     private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
     private static final String BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID = "torrentFetcherDownloadTokenId";
+    private static final String BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL = "openTransfersOnCancel";
 
     // non-void constructors must be avoided when creating dialogs. use setArguments instead
     public HandpickedTorrentDownloadDialog() {
@@ -74,7 +76,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             Context ctx,
             TorrentInfo tinfo,
             String magnetUri,
-            long torrentFetcherDownloadTokenId) {
+            long torrentFetcherDownloadTokenId,
+            boolean openTransfersOnCancel) {
         //
         // ideas:  - pre-selected file(s) to just check the one(s)
         //         - passing a file path
@@ -101,6 +104,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
         arguments.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
         arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
+        arguments.putBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL, openTransfersOnCancel);
 
         return dlg;
     }
@@ -157,6 +161,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
             magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
             torrentFetcherDownloadTokenId = arguments.getLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID);
+            openTransfersOnCancel = arguments.getBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL);
             if (torrentFetcherDownloadTokenId != -1) {
                 setOnCancelListener(new OnCancelDownloadsClickListener(this));
             }
@@ -257,11 +262,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         public int getItemThumbnailResourceId(TorrentFileEntry data) {
             return MediaType.getFileTypeIconId(FilenameUtils.getExtension(data.getPath()));
         }
-
-//        @Override
-//        public View getView(int position, View view, ViewGroup parent) {
-//            return super.getView(position, view, parent);
-//        }
 
         @Override
         public String getCheckedSum() {
@@ -394,7 +394,9 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 HandpickedTorrentDownloadDialog handpickedTorrentDownloadDialog = dlgRef.get();
                 handpickedTorrentDownloadDialog.removeTorrentFetcherDownloadFromTransfers();
                 // can't use dlgRef.get().getContext() since that call exists only for API >= 23
-                MainActivity.refreshTransfers(dlgRef.get().getDialog().getContext());
+                if (dlgRef.get().openTransfersOnCancel) {
+                    MainActivity.refreshTransfers(dlgRef.get().getDialog().getContext());
+                }
             }
         }
     }

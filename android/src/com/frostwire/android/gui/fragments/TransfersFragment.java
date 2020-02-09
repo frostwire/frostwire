@@ -798,7 +798,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 startCloudTransfer(url);
             } else if (url.startsWith("http")) { //magnets are automatically started if found on the clipboard by autoPasteMagnetOrURL
                 TransferManager.instance().downloadTorrent(url.trim(),
-                        new HandpickedTorrentDownloadDialogOnFetch(getActivity()));
+                        new HandpickedTorrentDownloadDialogOnFetch(getActivity(), true));
                 UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
             }
             addTransferUrlTextView.setText("");
@@ -838,7 +838,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                         } else if (text.startsWith("magnet")) {
                             addTransferUrlTextView.setText(text.trim());
                             TransferManager.instance().downloadTorrent(text.trim(),
-                                    new HandpickedTorrentDownloadDialogOnFetch(getActivity()));
+                                    new HandpickedTorrentDownloadDialogOnFetch(getActivity(), true));
                             UIUtils.showLongMessage(getActivity(), R.string.magnet_url_added);
                             clipboard.setPrimaryClip(ClipData.newPlainText("", ""));
                             toggleAddTransferControls();

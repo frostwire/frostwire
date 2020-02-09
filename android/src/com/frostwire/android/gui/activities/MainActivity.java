@@ -382,11 +382,11 @@ public class MainActivity extends AbstractActivity implements
                         uri.startsWith("http") ||
                         uri.startsWith("https") ||
                         uri.startsWith("magnet")) {
-                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                 } else if (uri.startsWith("content")) {
                     String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
                     if (newUri != null) {
-                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                     }
                 }
             } else {

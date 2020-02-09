@@ -41,18 +41,24 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
     private final WeakReference<Context> contextRef;
     private final WeakReference<FragmentManager> fragmentManagerRef;
     private static final Logger LOG = Logger.getLogger(HandpickedTorrentDownloadDialogOnFetch.class);
+    private final boolean openTransfersOnCancel;
 
-    public HandpickedTorrentDownloadDialogOnFetch(Activity activity) {
+    public HandpickedTorrentDownloadDialogOnFetch(Activity activity, boolean _openTransfersOnCancel) {
         contextRef = Ref.weak(activity);
         fragmentManagerRef = Ref.weak(activity.getFragmentManager());
+        openTransfersOnCancel = _openTransfersOnCancel;
     }
 
     @Override
     public void onTorrentInfoFetched(byte[] torrentInfoData, String magnetUri, long torrentFetcherDownloadTokenId) {
-        createHandpickedTorrentDownloadDialog(torrentInfoData, magnetUri, torrentFetcherDownloadTokenId);
+        createHandpickedTorrentDownloadDialog(torrentInfoData, magnetUri, torrentFetcherDownloadTokenId, openTransfersOnCancel);
     }
 
-    private void createHandpickedTorrentDownloadDialog(byte[] torrentInfoData, String magnetUri, long torrentFetcherDownloadTokenId) {
+    private void createHandpickedTorrentDownloadDialog(
+            byte[] torrentInfoData,
+            String magnetUri,
+            long torrentFetcherDownloadTokenId,
+            boolean openTransfersOnCancel) {
         if (!Ref.alive(contextRef) ||
             !Ref.alive(fragmentManagerRef) ||
             torrentInfoData == null || torrentInfoData.length == 0) {
@@ -67,7 +73,8 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
                             contextRef.get(),
                             TorrentInfo.bdecode(torrentInfoData),
                             magnetUri,
-                            torrentFetcherDownloadTokenId);
+                            torrentFetcherDownloadTokenId,
+                            openTransfersOnCancel);
             dlg.show(fragmentManagerRef.get());
         } catch (Throwable t) {
             LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);
