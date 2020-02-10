@@ -95,17 +95,6 @@ public final class Offers {
         async(Offers::checkIfPausedAsync);
     }
 
-    private static Map<String, AdNetwork> getAllAdNetworks() {
-        if (AD_NETWORKS == null) {
-            AD_NETWORKS = new HashMap<>();
-            AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
-            AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
-            AD_NETWORKS.put(UNITY.getShortCode(), UNITY);
-            AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
-        }
-        return AD_NETWORKS;
-    }
-
     public static void destroyMopubInterstitials() {
         MOPUB.destroyInterstitials();
     }
@@ -215,6 +204,17 @@ public final class Offers {
         }
 
         return (int) ((pause_duration - time_on_pause) / 60_000);
+    }
+
+    private static Map<String, AdNetwork> getAllAdNetworks() {
+        if (AD_NETWORKS == null) {
+            AD_NETWORKS = new HashMap<>();
+            AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
+            AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
+            AD_NETWORKS.put(UNITY.getShortCode(), UNITY);
+            AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
+        }
+        return AD_NETWORKS;
     }
 
     private static void checkIfPausedAsync() {

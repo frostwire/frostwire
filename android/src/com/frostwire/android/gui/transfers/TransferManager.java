@@ -607,7 +607,11 @@ public final class TransferManager {
         }
         UIBittorrentDownload uiBtDownload = new UIBittorrentDownload(this, new BTDownload(BTEngine.getInstance(), torrentHandle));
         synchronized (downloadsListMonitor) {
-            bittorrentDownloadsList.set(index, uiBtDownload);
+            if (index >= bittorrentDownloadsList.size()) {
+                bittorrentDownloadsList.add(uiBtDownload);
+            } else {
+                bittorrentDownloadsList.set(index, uiBtDownload);
+            }
         }
         synchronized (downloadsMapMonitor) {
             bittorrentDownloadsMap.remove(infoHashString);

@@ -57,6 +57,7 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
@@ -336,6 +337,10 @@ public final class UIUtils {
 //    }
 ////// END OF PACKAGE INSTALLER LOGIC SECTION
 
+    public static boolean openFile(Context context, String filePath, String mime) {
+        return openFile(context, filePath, mime, SystemUtils.hasNougatOrNewer());
+    }
+
     /**
      * Opens the given file with the default Android activity for that File and
      * mime type.
@@ -408,6 +413,10 @@ public final class UIUtils {
         return screenshotFile;
     }
 
+    public static Uri getFileUri(Context context, String filePath) {
+        return getFileUri(context, filePath, SystemUtils.hasNougatOrNewer());
+    }
+
     public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {
         return useFileProvider ?
                 FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
@@ -415,7 +424,7 @@ public final class UIUtils {
     }
 
     public static void openFile(Context context, File file) {
-        openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), true);
+        openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), SystemUtils.hasNougatOrNewer());
     }
 
     public static void openFile(Context context, File file, boolean useFileProvider) {

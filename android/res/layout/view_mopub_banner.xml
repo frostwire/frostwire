@@ -19,9 +19,11 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mopub_banner_linear_layout"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="7dp">
 
     <LinearLayout
         android:gravity="center_vertical"

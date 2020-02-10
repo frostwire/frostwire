@@ -101,8 +101,7 @@ public class OpenMenuAction extends MenuAction {
             TransferManager.instance().downloadTorrent(torrentFileUri,
                     new HandpickedTorrentDownloadDialogOnFetch((MainActivity) context, false));
         } else {
-            boolean useFileProvider = hasNougatOrNewer();
-            UIUtils.openFile(context, path, mime, useFileProvider);
+            UIUtils.openFile(context, path, mime);
         }
     }
 }

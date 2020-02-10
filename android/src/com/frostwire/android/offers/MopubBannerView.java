@@ -83,18 +83,25 @@ public class MopubBannerView extends LinearLayout {
     private boolean isLoaded;
     private boolean showFallbackBannerOnDismiss;
     private boolean showDismissButton;
+    private boolean showRemoveAdsTextView;
     private final LayersVisibility layersVisibility = new LayersVisibility();
 
     public MopubBannerView(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, true, true);
+        this(context, attrs, true, true, true);
     }
 
-    public MopubBannerView(Context context, @Nullable AttributeSet attrs, boolean showFallbackBannerOnDismiss, boolean showDismissButton) {
+    public MopubBannerView(
+            Context context,
+            @Nullable AttributeSet attrs,
+            boolean showFallbackBannerOnDismiss,
+            boolean showDismissButton,
+            boolean showRemoveAdsTextView) {
         super(context, attrs);
         onBannerDismissedListener = null;
         onBannerLoadedListener = null;
         this.showFallbackBannerOnDismiss = showFallbackBannerOnDismiss;
         this.showDismissButton = showDismissButton;
+        this.showRemoveAdsTextView = showRemoveAdsTextView;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (inflater != null) {
@@ -109,6 +116,7 @@ public class MopubBannerView extends LinearLayout {
         if (attrs == null) {
             LinearLayout.LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             layoutParams.setLayoutDirection(LinearLayout.VERTICAL);
+            layoutParams.setMargins(0,0,0,!showRemoveAdsTextView ? 20 : 0);
             setLayoutParams(layoutParams);
         }
     }
@@ -301,8 +309,13 @@ public class MopubBannerView extends LinearLayout {
             mAdvertisementText.setVisibility(controlsVisibility);
         }
         if (removeAdsTextView != null) {
-            removeAdsTextView.setVisibility(Offers.removeAdsOffersEnabled() && controlsVisibility == View.VISIBLE ?
-                    View.VISIBLE : View.GONE);
+            int visibility = View.GONE;
+            if (showRemoveAdsTextView &&
+                    Offers.removeAdsOffersEnabled() &&
+                    controlsVisibility == View.VISIBLE) {
+                visibility = View.VISIBLE;
+            }
+            removeAdsTextView.setVisibility(visibility);
         }
     }
 

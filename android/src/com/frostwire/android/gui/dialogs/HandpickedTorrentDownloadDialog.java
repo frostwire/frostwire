@@ -41,6 +41,7 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -279,6 +280,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
+        private final static Logger LOG = Logger.getLogger(OnStartDownloadsClickListener.class);
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
@@ -353,7 +355,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                     TransferManager.instance().updateUIBittorrentDownload(BTEngine.getInstance().find(dlg.getTorrentInfo().infoHash()));
                     UIUtils.showTransfersOnDownloadStart(ctx);
                     MainActivity.refreshTransfers(ctx);
-                } catch (Throwable ignored) {
+                } catch (Throwable t) {
+                    LOG.info("startTorrentPartialDownload(): " + t.getMessage(), t);
                 }
             });
 

@@ -1141,8 +1141,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         File screenshotFile = UIUtils.takeScreenshot(rootView);
         if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
             shareIntent.setType("image/jpg");
-            boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
-            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath(), userFileProvider));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath()));
         } else {
             shareIntent.setType("text/plain");
         }
