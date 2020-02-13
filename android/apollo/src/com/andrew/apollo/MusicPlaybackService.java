@@ -71,15 +71,16 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * A background {@link Service} used to keep music playing between activities
  * and when the user moves Apollo into the background.
- *
+ * <p>
  * TODO:
- *  - assertInMusicPlayerHandlerThread()
+ * - assertInMusicPlayerHandlerThread()
  */
 public class MusicPlaybackService extends JobIntentService {
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
@@ -889,7 +890,11 @@ public class MusicPlaybackService extends JobIntentService {
         filter.addAction(SHUFFLE_ACTION);
 
         // Attach the broadcast listener
-        registerReceiver(mIntentReceiver, filter);
+        try {
+            registerReceiver(mIntentReceiver, filter);
+        } catch (Throwable t) {
+            LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
+        }
 
         // Initialize the wake lock
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -2298,18 +2303,18 @@ public class MusicPlaybackService extends JobIntentService {
     public void pause() {
         if (D) LOG.info("Pausing playback");
         //synchronized (this) {
-            if (mPlayerHandler != null) {
-                mPlayerHandler.removeMessages(FADE_UP);
+        if (mPlayerHandler != null) {
+            mPlayerHandler.removeMessages(FADE_UP);
+        }
+        if (mIsSupposedToBePlaying && mPlayer != null) {
+            mPlayer.pause();
+            mIsSupposedToBePlaying = false;
+            if (musicPlaybackActivityInForeground) { // this isn't working as it should.
+                updateRemoteControlClient(PLAYSTATE_CHANGED);
+            } else {
+                notifyChange(PLAYSTATE_CHANGED);
             }
-            if (mIsSupposedToBePlaying && mPlayer != null) {
-                mPlayer.pause();
-                mIsSupposedToBePlaying = false;
-                if (musicPlaybackActivityInForeground) { // this isn't working as it should.
-                    updateRemoteControlClient(PLAYSTATE_CHANGED);
-                } else {
-                    notifyChange(PLAYSTATE_CHANGED);
-                }
-            }
+        }
         //}
     }
 
