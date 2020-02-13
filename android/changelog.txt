@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 626 - FEB/10/2020
+FrostWire 2.1.9 build 627 - FEB/13/2020
  - Issues with search results not being displayed fixed
  - MusicPlaybackService rewritten
  - Continuous playback issues fixed
