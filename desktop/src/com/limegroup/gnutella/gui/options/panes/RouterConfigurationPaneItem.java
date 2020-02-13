@@ -28,6 +28,9 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 
+import static com.limegroup.gnutella.settings.ConnectionSettings.PORT_RANGE_0;
+import static com.limegroup.gnutella.settings.ConnectionSettings.PORT_RANGE_1;
+
 /**
  * This class defines the panel in the options window that allows the user
  * to force their ip address to the specified value.
@@ -45,6 +48,8 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
     private final JRadioButton MANUAL_PORT = new JRadioButton(I18n.tr("Manual port range"));
     private final JLabel _labelPort0;
     private final JLabel _labelPort1;
+    private static final int PORT_RANGE_MIN = PORT_RANGE_0.getDefaultValue();
+    private static final int PORT_RANGE_MAX = PORT_RANGE_1.getDefaultValue();
 
     /**
      * The constructor constructs all of the elements of this
@@ -126,23 +131,20 @@ public final class RouterConfigurationPaneItem extends AbstractPaneItem {
         if (RANDOM_PORT.isSelected()) {
             ConnectionSettings.MANUAL_PORT_RANGE.setValue(false);
         } else { // PORT.isSelected()
-            int forcedTcpPort = PORT_0_FIELD.getValue();
-            int forcedUdpPort = PORT_1_FIELD.getValue();
-            if (!NetworkUtils.isValidPort(forcedTcpPort)) {
-                GUIMediator.showError(I18n.tr("You must enter a port between 1 and 65535 when manually forcing port."));
-                throw new IOException("bad port: " + forcedTcpPort);
+            int tcpRangeStart = PORT_0_FIELD.getValue();
+            int tcpRangeEnd = PORT_1_FIELD.getValue();
+            if (!NetworkUtils.isValidPort(tcpRangeStart, PORT_RANGE_MIN, PORT_RANGE_MAX)) {
+                GUIMediator.showError(I18n.tr("You must enter a port between {0} and {1} when manually forcing port.", PORT_RANGE_MIN, PORT_RANGE_MAX));
+                throw new IOException("bad port: " + tcpRangeStart);
             }
-            if (!NetworkUtils.isValidPort(forcedUdpPort)) {
-                GUIMediator.showError(I18n.tr("You must enter a port between 1 and 65535 when manually forcing port."));
-                throw new IOException("bad port: " + forcedUdpPort);
-            }
-            if (forcedTcpPort < 0 || forcedUdpPort < forcedTcpPort) {
+
+            if (tcpRangeStart < 0 || tcpRangeEnd < tcpRangeStart) {
                 GUIMediator.showError(I18n.tr("You must enter a valid port range."));
-                throw new IOException("bad port: " + forcedUdpPort);
+                throw new IOException("bad port: " + tcpRangeEnd);
             }
             ConnectionSettings.MANUAL_PORT_RANGE.setValue(true);
-            ConnectionSettings.PORT_RANGE_0.setValue(forcedTcpPort);
-            ConnectionSettings.PORT_RANGE_1.setValue(forcedUdpPort);
+            ConnectionSettings.PORT_RANGE_0.setValue(tcpRangeStart);
+            ConnectionSettings.PORT_RANGE_1.setValue(tcpRangeEnd);
         }
         return true;
     }

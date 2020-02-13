@@ -33,20 +33,20 @@ public final class ConnectionSettings extends LimeProps {
     public static final int C_SOCKS5_PROXY = 5;
     public static final int C_HTTP_PROXY = 1;
     public static final IntSetting PORT_RANGE_0 =
-            FACTORY.createIntSetting("PORT_RANGE_0", 40256);
+            FACTORY.createIntSetting("PORT_RANGE_0", 37000);
     public static final IntSetting PORT_RANGE_1 =
-            FACTORY.createIntSetting("PORT_RANGE_1", 50256);
+            FACTORY.createIntSetting("PORT_RANGE_1", 57000);
     public static final BooleanSetting MANUAL_PORT_RANGE =
             FACTORY.createBooleanSetting("MANUAL_PORT_RANGE", false);
     /**
      * Whether or not to bind to a specific address for outgoing connections.
      */
-    public static final BooleanSetting CUSTOM_NETWORK_INTERFACE =
+    public static final BooleanSetting USE_CUSTOM_NETWORK_INTERFACE =
             FACTORY.createBooleanSetting("CUSTOM_NETWORK_INTERFACE", false);
     /**
      * The inetaddress to use if we're using a custom interface for binding.
      */
-    public static final StringSetting CUSTOM_INETADRESS =
+    public static final StringSetting CUSTOM_INETADRESS_NO_PORT =
             FACTORY.createStringSetting("CUSTOM_INETADRESS_TO_BIND", "0.0.0.0");
     /**
      * Setting for the address of the proxy

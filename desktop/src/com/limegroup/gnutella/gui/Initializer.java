@@ -36,6 +36,7 @@ import com.limegroup.gnutella.util.MacOSXUtils;
 import org.limewire.service.ErrorService;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.I18NConvert;
+import org.limewire.util.NetworkUtils;
 import org.limewire.util.OSUtils;
 
 import javax.swing.*;
@@ -43,7 +44,6 @@ import javax.swing.plaf.basic.BasicHTML;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Random;
 
 /**
  * Initializes (creates, starts, & displays) the LimeWire Core & UI.
@@ -375,33 +375,25 @@ final class Initializer {
         if (!homeDir.exists()) {
             homeDir.mkdirs();
         }
-        // port range [37000, 57000]
-        int port0 = 37000 + new Random().nextInt(20000);
-        int port1 = port0 + 10; // 10 retries
-        if (ConnectionSettings.MANUAL_PORT_RANGE.getValue()) {
-            port0 = ConnectionSettings.PORT_RANGE_0.getValue();
-            port1 = ConnectionSettings.PORT_RANGE_1.getValue();
-        }
-        String iface = "0.0.0.0";
-        if (ConnectionSettings.CUSTOM_NETWORK_INTERFACE.getValue()) {
-            iface = ConnectionSettings.CUSTOM_INETADRESS.getValue();
-        }
-        if (iface.equals("0.0.0.0")) {
-            iface = "0.0.0.0:%1$d,[::]:%1$d";
-        } else {
-            // quick IPv6 test
-            if (iface.contains(":")) {
-                iface = "[" + iface + "]";
-            }
-            iface = iface + ":%1$d";
-        }
-        String if_string = String.format(iface, port0);
+        // We don't save the port we use, just the range, and this is done in RouterConfigurationPaneItem.
+        // We use this range to select a random port every time we apply the settings.
+        int randomPortInRange = NetworkUtils.getPortInRange(
+                ConnectionSettings.MANUAL_PORT_RANGE.getValue(),
+                ConnectionSettings.PORT_RANGE_0.getDefaultValue(),
+                ConnectionSettings.PORT_RANGE_1.getDefaultValue(),
+                ConnectionSettings.PORT_RANGE_0.getValue(),
+                ConnectionSettings.PORT_RANGE_1.getValue());
+        String iface = NetworkUtils.getLibtorrentFormattedNetworkInterface(
+                ConnectionSettings.USE_CUSTOM_NETWORK_INTERFACE.getValue(),
+                "0.0.0.0",
+                ConnectionSettings.CUSTOM_INETADRESS_NO_PORT.getValue(),
+                randomPortInRange);
         BTContext ctx = new BTContext();
         ctx.homeDir = homeDir;
         ctx.torrentsDir = SharingSettings.TORRENTS_DIR_SETTING.getValue();
         ctx.dataDir = SharingSettings.TORRENT_DATA_DIR_SETTING.getValue();
-        ctx.interfaces = if_string;
-        ctx.retries = port1 - port0;
+        ctx.interfaces = iface;
+        ctx.retries = 10;
         ctx.enableDht = SharingSettings.ENABLE_DISTRIBUTED_HASH_TABLE.getValue();
         FrostWireUtils.getFrostWireVersionBuild(ctx.version);
         BTEngine.ctx = ctx;
