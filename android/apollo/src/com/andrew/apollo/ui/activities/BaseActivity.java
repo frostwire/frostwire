@@ -230,7 +230,12 @@ public abstract class BaseActivity extends AbstractActivity {
         filter.addAction(MusicPlaybackService.META_CHANGED);
         // Update a list, probably the playlist fragment's
         filter.addAction(MusicPlaybackService.REFRESH);
-        registerReceiver(mPlaybackStatus, filter);
+
+        try {
+            registerReceiver(mPlaybackStatus, filter);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
 
         // We ask here because we don't yet need to ask for the music service to be started.
         // On AudioPlayerActivity, it's another story, if we get there, it's because

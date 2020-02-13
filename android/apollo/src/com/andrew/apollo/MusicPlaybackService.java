@@ -685,19 +685,8 @@ public class MusicPlaybackService extends JobIntentService {
         // Close the cursor
         closeCursor();
 
-        // Unregister the mount listener
-        try {
-            unregisterReceiver(mIntentReceiver);
-        } catch (Throwable ignored) {
-        }
+        unregisterReceivers();
 
-        if (mUnmountReceiver != null) {
-            try {
-                unregisterReceiver(mUnmountReceiver);
-            } catch (Throwable ignored) {
-            }
-            mUnmountReceiver = null;
-        }
         // Release the wake lock
         if (mWakeLock != null) {
             try {
@@ -706,7 +695,10 @@ public class MusicPlaybackService extends JobIntentService {
                 // might be under lock and otherwise causing a crash on shutdown
             }
         }
-        stopSelf();
+        try {
+            stopSelf();
+        } catch (Throwable ignored) {
+        }
         INSTANCE = null;
     }
 
@@ -893,6 +885,11 @@ public class MusicPlaybackService extends JobIntentService {
         try {
             registerReceiver(mIntentReceiver, filter);
         } catch (Throwable t) {
+            // this can happen if the service got destroyed and didn't have a chance to
+            // register the receiver, current work arounds are extending receiver classes
+            // to track if they've been registered, or using a static map<Receiver,boolean>
+            // for now will just catch the exception and check the code on how this service
+            // is getting destroyed and making sure the unregisterReceiver code is invoked.
             LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
         }
 
@@ -990,14 +987,18 @@ public class MusicPlaybackService extends JobIntentService {
         // on some devices where it requires MODIFY_PHONE_STATE
         // mAudioManager could be null
         if (mAudioManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
-            } else {
-                mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
+                } else {
+                    mAudioManager.abandonAudioFocus(mAudioFocusListener);
+                }
+            } catch (Throwable t) {
             }
         }
         updateRemoteControlClient(PLAYSTATE_STOPPED);
         if (!mServiceInUse || force) {
+            unregisterReceivers();
             saveQueue(true);
             stopSelf(mServiceStartId);
             stop(false); //otherwise, infinite loop
@@ -1008,6 +1009,22 @@ public class MusicPlaybackService extends JobIntentService {
         }
         if (mPlayerHandler != null) {
             mPlayerHandler.removeCallbacksAndMessages(null);
+        }
+    }
+
+    private void unregisterReceivers() {
+        // Unregister the mount listener
+        try {
+            unregisterReceiver(mIntentReceiver);
+        } catch (Throwable ignored) {
+        }
+
+        if (mUnmountReceiver != null) {
+            try {
+                unregisterReceiver(mUnmountReceiver);
+            } catch (Throwable ignored) {
+            }
+            mUnmountReceiver = null;
         }
     }
 
@@ -1272,11 +1289,17 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void closeCursor() {
         if (mCursor != null) {
-            mCursor.close();
+            try {
+                mCursor.close();
+            } catch (Throwable ignored) {
+            }
             mCursor = null;
         }
         if (mAlbumCursor != null) {
-            mAlbumCursor.close();
+            try {
+                mAlbumCursor.close();
+            } catch (Throwable ignored) {
+            }
             mAlbumCursor = null;
         }
     }
