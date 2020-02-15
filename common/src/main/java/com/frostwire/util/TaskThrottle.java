@@ -48,7 +48,9 @@ public final class TaskThrottle {
             if (PROFILING_ENABLED) {
                 LOG.info("isReadyToSubmitTask(): " + taskName + " can be submitted for the first time");
             }
-            asyncTaskSubmissionTimestampMap.put(taskName, now);
+            synchronized(recycleLock) {
+                asyncTaskSubmissionTimestampMap.put(taskName, now);
+            }
             profileHit(taskName);
             return true;
         }
@@ -109,9 +111,18 @@ public final class TaskThrottle {
             dumpTaskProfile();
             ArrayList<String> keysToRecycle = new ArrayList<>();
             int numKeysBeforeRecycle = 0;
-            for (String taskName : asyncTaskSubmissionTimestampMap.keySet()) {
+
+            Set<String> taskNames;
+            synchronized (recycleLock) {
+                taskNames = asyncTaskSubmissionTimestampMap.keySet();
+            }
+            for (String taskName : taskNames) {
                 numKeysBeforeRecycle++;
-                long delta = now - asyncTaskSubmissionTimestampMap.get(taskName);
+                Long submissionTimestamp = asyncTaskSubmissionTimestampMap.get(taskName);
+                if (submissionTimestamp == null) {
+                    continue;
+                }
+                long delta = now - submissionTimestamp;
                 if (delta > TASK_RECYCLE_INTERVAL_IN_MS) {
                     if (PROFILING_ENABLED) {
                         LOG.info("Recycling " + taskName + " with " + tasksHitsMap.get(taskName) + " hits, last used " + delta + " ms ago");
