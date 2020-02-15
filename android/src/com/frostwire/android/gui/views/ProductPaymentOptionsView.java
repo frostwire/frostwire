@@ -141,9 +141,16 @@ public class ProductPaymentOptionsView extends LinearLayout {
             return;
         }
         PaymentOptionsVisibility paymentOptionsVisibility = selectedProductCard.getPaymentOptionsVisibility();
-        paymentOptionsLayouts[PayButtonType.ONE_TIME.offset].setVisibility(paymentOptionsVisibility.oneTimeOption ? View.VISIBLE : View.GONE);
-        paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset].setVisibility(paymentOptionsVisibility.subscriptionOption ? View.VISIBLE : View.GONE);
-        paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset].setVisibility(paymentOptionsVisibility.rewardOption ? View.VISIBLE : View.GONE);
+
+        if (paymentOptionsLayouts[PayButtonType.ONE_TIME.offset] != null) {
+            paymentOptionsLayouts[PayButtonType.ONE_TIME.offset].setVisibility(paymentOptionsVisibility.oneTimeOption ? View.VISIBLE : View.GONE);
+        }
+        if (paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset] != null) {
+            paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset].setVisibility(paymentOptionsVisibility.subscriptionOption ? View.VISIBLE : View.GONE);
+        }
+        if (paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset] != null) {
+            paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset].setVisibility(paymentOptionsVisibility.rewardOption ? View.VISIBLE : View.GONE);
+        }
     }
 
     private class BuyButtonClickListener implements OnClickListener {
