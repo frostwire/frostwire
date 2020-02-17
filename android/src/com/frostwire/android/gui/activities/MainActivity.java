@@ -192,6 +192,7 @@ public class MainActivity extends AbstractActivity implements
             return;
         }
         shuttingdown = true;
+        SearchFragment.freeInstance();
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();

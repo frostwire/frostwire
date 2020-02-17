@@ -109,6 +109,7 @@ public final class SearchFragment extends AbstractFragment implements
         OnDialogClickListener,
         SearchProgressView.CurrentQueryReporter, PromotionDownloader, KeywordFilterDrawerView.KeywordFilterDrawerController, DrawerLayout.DrawerListener {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
+    private static SearchFragment INSTANCE = null;
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
     private SearchInputView searchInput;
@@ -135,6 +136,7 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        INSTANCE = this;
         setupAdapter();
         setupPromoSlides();
         setRetainInstance(true);
@@ -189,6 +191,7 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        INSTANCE = this;
         // getHeader was conceived for quick update of main fragments headers,
         // mainly in a functional style, but it is ill suited to extract from
         // it a mutable state, like filterButton.
@@ -254,6 +257,7 @@ public final class SearchFragment extends AbstractFragment implements
         keywordDetector.shutdownHistogramUpdateRequestDispatcher();
         destroyHeaderBanner();
         destroyPromotionsBanner();
+        INSTANCE = null;
         super.onDestroy();
     }
 
@@ -419,6 +423,10 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     public void onDrawerStateChanged(int i) {
+    }
+
+    public static void freeInstance() {
+        INSTANCE = null;
     }
 
     /**
@@ -761,6 +769,10 @@ public final class SearchFragment extends AbstractFragment implements
             } else {
                 LOG.warn("LocalSearchEngineListener::onResults() search fragment reference lost, trying to recover...");
                 Ref.free(searchFragmentRef);
+                if (SearchFragment.INSTANCE != null) {
+                    searchFragmentRef = Ref.weak(SearchFragment.INSTANCE);
+                    LocalSearchEngine.instance().setListener(this);
+                }
             }
         }
 
