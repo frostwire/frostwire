@@ -27,6 +27,7 @@ import android.os.storage.StorageManager;
 import android.util.LruCache;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
@@ -283,8 +284,11 @@ public final class LollipopFileSystem implements FileSystem {
             }
 
             if (paths.size() > 0) {
-                MediaScanner.scanFiles(app, paths);
-                UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+                // We're usually called from SessionManager-alertsLoop, don't hug that loop
+                Librarian.instance().safePost(() -> {
+                    MediaScanner.scanFiles(app, paths);
+                    UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+                });
             }
         } catch (Throwable e) {
             LOG.error("Error scanning file/directory: " + file, e);

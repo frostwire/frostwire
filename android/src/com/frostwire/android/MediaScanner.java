@@ -22,8 +22,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Looper;
 import android.os.SystemClock;
 
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.util.Logger;
 
 import org.apache.commons.io.IOUtils;
@@ -42,6 +44,10 @@ final class MediaScanner {
     private static final Logger LOG = Logger.getLogger(MediaScanner.class);
 
     public static void scanFiles(Context context, List<String> paths) {
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            Librarian.instance().safePost(()->MediaScanner.scanFiles(context, paths));
+            return;
+        }
         scanFiles(context, paths, 6);
     }
 

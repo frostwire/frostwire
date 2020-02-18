@@ -1111,7 +1111,6 @@ public final class MusicUtils {
             MusicPlaybackService.getMusicPlayerHandler().getThread() != Thread.currentThread()) {
             MusicPlaybackService.getMusicPlayerHandler().post(() -> addToPlaylist(context, ids, playlistid));
             return;
-            //throw new RuntimeException("Do not execute this code unless you're in the MusicPlaybackService handler thread, sorry");
         }
 
         long[] currentQueue = getQueue();

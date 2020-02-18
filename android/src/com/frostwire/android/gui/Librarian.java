@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
@@ -40,6 +42,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -65,9 +68,10 @@ import java.util.Stack;
 public final class Librarian {
 
     private static final String TAG = "FW.Librarian";
-
+    private static final Logger LOG = Logger.getLogger(Librarian.class);
     private static final Object lock = new Object();
     private static Librarian instance;
+    private Handler handler;
 
     public static Librarian instance() {
         if (instance != null) { // quick check to avoid lock
@@ -83,6 +87,25 @@ public final class Librarian {
     }
 
     private Librarian() {
+        initHandler();
+    }
+
+    public void safePost(Runnable r) {
+        if (handler != null) {
+            handler.post(() -> {
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    LOG.error("safePost() " + t.getMessage(), t);
+                }
+            });
+        }
+    }
+
+    public void shutdownHandler() {
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 
     public List<FileDescriptor> getFiles(final Context context, byte fileType, int offset, int pageSize) {
@@ -213,6 +236,10 @@ public final class Librarian {
     }
 
     public void scan(final Context context, File file) {
+        if (Thread.currentThread() != handler.getLooper().getThread()) {
+            safePost(() -> scan(context, file));
+            return;
+        }
         scan(context, file, Transfers.getIgnorableFiles());
         if (context == null) {
             Log.w(TAG, "Librarian has no `context` object to scan() with.");
@@ -376,6 +403,10 @@ public final class Librarian {
         return getFiles(context, fileType, where, whereArgs);
     }
 
+    public Thread getHandlerThread() {
+        return handler.getLooper().getThread();
+    }
+
     private void scan(final Context context, File file, Set<File> ignorableFiles) {
         //if we just have a single file, do it the old way
         if (file.isFile()) {
@@ -395,6 +426,30 @@ public final class Librarian {
             }
         }
     }
+
+    private byte getFileType(String filename, boolean returnTorrentsAsDocument) {
+        byte result = Constants.FILE_TYPE_DOCUMENTS;
+
+        MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(filename));
+
+        if (mt != null) {
+            result = (byte) mt.getId();
+        }
+
+        if (returnTorrentsAsDocument && result == Constants.FILE_TYPE_TORRENTS) {
+            result = Constants.FILE_TYPE_DOCUMENTS;
+        }
+
+        return result;
+    }
+
+    private void initHandler() {
+        final HandlerThread handlerThread = new HandlerThread("Librarian::handler",
+                android.os.Process.THREAD_PRIORITY_BACKGROUND);
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+    }
+
 
     /**
      * Given a folder path it'll return all the files contained within it and it's subfolders
@@ -437,22 +492,6 @@ public final class Librarian {
             }
         }
         return results;
-    }
-
-    private byte getFileType(String filename, boolean returnTorrentsAsDocument) {
-        byte result = Constants.FILE_TYPE_DOCUMENTS;
-
-        MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(filename));
-
-        if (mt != null) {
-            result = (byte) mt.getId();
-        }
-
-        if (returnTorrentsAsDocument && result == Constants.FILE_TYPE_TORRENTS) {
-            result = Constants.FILE_TYPE_DOCUMENTS;
-        }
-
-        return result;
     }
 
     private static String buildSet(List<?> list) {

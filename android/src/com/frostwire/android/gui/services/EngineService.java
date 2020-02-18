@@ -36,6 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -270,6 +271,7 @@ public class EngineService extends JobIntentService implements IEngineService {
     // private:
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
+        Librarian.instance().shutdownHandler();
         stopPermanentNotificationUpdates();
         cancelAllNotificationsTask(this);
         stopServices(false);
