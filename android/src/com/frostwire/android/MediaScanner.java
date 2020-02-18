@@ -50,7 +50,7 @@ final class MediaScanner {
             return;
         }
 
-        LOG.info("About to scan files n: " + paths.size() + ", retries: " + retries);
+        LOG.info("scanFiles: About to scan files n: " + paths.size() + ", retries: " + retries);
 
         final LinkedList<String> failedPaths = new LinkedList<>();
 
@@ -66,13 +66,15 @@ final class MediaScanner {
                     // verify the stored size four faulty scan
                     long size = getSize(context, uri);
                     if (size == 0) {
-                        LOG.warn("Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
+                        LOG.warn("scanFiles: Scan returned an uri but stored size is 0, path: " + path + ", uri:" + uri);
                         success = false;
                         failedPaths.add(path);
                     }
                 }
                 if (!success) {
-                    LOG.info("Scan failed for path: " + path + ", uri: " + uri);
+                    LOG.info("scanFiles: Scan failed for path: " + path + ", uri: " + uri);
+                } else {
+                    LOG.info("scanFiles: Scan success for path: " + path + ", uri: " + uri);
                 }
             } finally {
                 finishSignal.countDown();
