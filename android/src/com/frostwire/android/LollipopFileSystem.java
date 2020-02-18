@@ -273,7 +273,7 @@ public final class LollipopFileSystem implements FileSystem {
 
                     @Override
                     public void file(File file) {
-                        if (!file.isDirectory()) {
+                        if (!file.isDirectory() && !file.getName().contains(".parts")) {
                             paths.add(file.getPath());
                         }
                     }

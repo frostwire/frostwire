@@ -688,10 +688,14 @@ public final class TransferManager {
                 }
                 UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
                 synchronized (downloadsListMonitor) {
-                    bittorrentDownloadsList.add(uiBittorrentDownload);
+                    if (!bittorrentDownloadsList.contains(uiBittorrentDownload)) {
+                        bittorrentDownloadsList.add(uiBittorrentDownload);
+                    }
                 }
                 synchronized (downloadsMapMonitor) {
-                    bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                    if (!bittorrentDownloadsMap.containsKey(dl.getInfoHash())) {
+                        bittorrentDownloadsMap.put(dl.getInfoHash(), uiBittorrentDownload);
+                    }
                 }
             }
 

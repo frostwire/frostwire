@@ -37,6 +37,7 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Ref;
@@ -260,6 +261,7 @@ public final class Librarian {
         syncMediaStore(context, Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
 
         Platforms.fileSystem().scan(Platforms.torrents());
+        Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
     }
 
     private void syncMediaStore(final Context context, byte fileType, Set<File> ignorableFiles) {

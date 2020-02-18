@@ -6,6 +6,7 @@ import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadListener;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 
@@ -32,6 +33,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         finalCleanup(dl, dl.getIncompleteFiles());
         fixBinPaths(torrentSaveFolder);
         Platforms.fileSystem().scan(torrentSaveFolder);
+        Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
     }
 
     // The torrent's folder,e.g. Torrent Data/<foo folder>, not Torrent Data.

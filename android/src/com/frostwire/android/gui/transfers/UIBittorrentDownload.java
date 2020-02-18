@@ -21,6 +21,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.MediaStore;
 
+import androidx.annotation.Nullable;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.providers.TableFetcher;
@@ -390,5 +392,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         }
 
         return item;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object other) {
+        return getInfoHash().equals(((UIBittorrentDownload) other).getInfoHash());
     }
 }
