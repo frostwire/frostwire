@@ -1107,9 +1107,11 @@ public final class MusicUtils {
             return;
         }
 
-        if (MusicPlaybackService.getMusicPlayerHandler() == null &&
-                MusicPlaybackService.getMusicPlayerHandler().getHandlerThread() == Thread.currentThread()) {
-            throw new RuntimeException("Do not execute this code unless you're in the MusicPlaybackService handler thread, sorry");
+        if (MusicPlaybackService.getMusicPlayerHandler() != null &&
+            MusicPlaybackService.getMusicPlayerHandler().getThread() != Thread.currentThread()) {
+            MusicPlaybackService.getMusicPlayerHandler().post(() -> addToPlaylist(context, ids, playlistid));
+            return;
+            //throw new RuntimeException("Do not execute this code unless you're in the MusicPlaybackService handler thread, sorry");
         }
 
         long[] currentQueue = getQueue();

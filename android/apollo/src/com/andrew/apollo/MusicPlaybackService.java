@@ -2664,8 +2664,8 @@ public class MusicPlaybackService extends JobIntentService {
             super(looper);
         }
 
-        public HandlerThread getHandlerThread() {
-            return this.getHandlerThread();
+        public Thread getThread() {
+            return getLooper().getThread();
         }
 
         void safePost(@NonNull Runnable r) {
