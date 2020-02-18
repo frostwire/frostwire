@@ -1109,7 +1109,7 @@ public final class MusicUtils {
 
         if (MusicPlaybackService.getMusicPlayerHandler() != null &&
             MusicPlaybackService.getMusicPlayerHandler().getThread() != Thread.currentThread()) {
-            MusicPlaybackService.getMusicPlayerHandler().post(() -> addToPlaylist(context, ids, playlistid));
+            MusicPlaybackService.getMusicPlayerHandler().safePost(() -> addToPlaylist(context, ids, playlistid));
             return;
         }
 
