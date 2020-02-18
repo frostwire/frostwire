@@ -2671,7 +2671,7 @@ public class MusicPlaybackService extends JobIntentService {
         public void safePost(@NonNull Runnable r) {
             if (Thread.currentThread() == getThread()) {
                 try {
-                    post(r);
+                    r.run();
                 } catch (Throwable t) {
                     LOG.error("safePost() exception from Runnable caught: " + t.getMessage(), t, true);
                 }
