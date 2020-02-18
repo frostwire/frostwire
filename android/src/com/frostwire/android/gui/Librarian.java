@@ -92,13 +92,22 @@ public final class Librarian {
 
     public void safePost(Runnable r) {
         if (handler != null) {
-            handler.post(() -> {
+            // We are already in the Librarian Handler thread, just go!
+            if (Thread.currentThread() == handler.getLooper().getThread()) {
                 try {
                     r.run();
                 } catch (Throwable t) {
                     LOG.error("safePost() " + t.getMessage(), t);
                 }
-            });
+            } else {
+                handler.post(() -> {
+                    try {
+                        r.run();
+                    } catch (Throwable t) {
+                        LOG.error("safePost() " + t.getMessage(), t);
+                    }
+                });
+            }
         }
     }
 
@@ -252,10 +261,7 @@ public final class Librarian {
         if (!SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
-        Thread t = new Thread(() -> syncMediaStoreSupport(contextRef));
-        t.setName("syncMediaStore");
-        t.setDaemon(true);
-        t.start();
+        safePost(() -> syncMediaStoreSupport(contextRef));
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FileDescriptor fd) {
