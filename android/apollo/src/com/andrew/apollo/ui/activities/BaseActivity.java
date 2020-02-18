@@ -167,7 +167,7 @@ public abstract class BaseActivity extends AbstractActivity {
 
                 @Override
                 public boolean onQueryTextSubmit(final String query) {
-                    // Open the search activity
+                    // Open the search activity - This is invoked when searching inside the My Music section
                     NavUtils.openSearch(BaseActivity.this, query);
                     return true;
                 }

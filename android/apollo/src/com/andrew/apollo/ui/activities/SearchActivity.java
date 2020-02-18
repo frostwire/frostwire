@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -53,6 +51,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
+import com.andrew.apollo.loaders.SearchLoader;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
@@ -192,13 +191,14 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        final Uri uri = Uri.parse("content://media/external/audio/search/fancy/"
-                + Uri.encode(mFilterString));
-        final String[] projection = new String[]{
-                BaseColumns._ID, MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Media.TITLE, "data1", "data2"
-        };
-        return new CursorLoader(this, uri, projection, null, null, null);
+        SearchLoader.SearchCursorParameters searchCursorParameters =
+                SearchLoader.SearchCursorParameters.buildSearchCursorParameters(mFilterString);
+        return new CursorLoader(this,
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                searchCursorParameters.projection,
+                searchCursorParameters.selection,
+                searchCursorParameters.selectionArgs,
+                null);
     }
 
     @Override

@@ -30,11 +30,12 @@ import java.util.List;
  */
 public class SearchLoader extends SongLoader {
     private String mQuery;
+
     /**
      * Constructor of <code>SongLoader</code>
-     * 
+     *
      * @param context The {@link Context} to use
-     * @param query The search query
+     * @param query   The search query
      */
     public SearchLoader(final Context context, final String query) {
         super(context);
@@ -111,17 +112,43 @@ public class SearchLoader extends SongLoader {
 
     /**
      * * @param context The {@link Context} to use.
-     * 
+     *
      * @param query The user's query.
      * @return The {@link Cursor} used to perform the search.
      */
     private static Cursor makeSearchCursor(final Context context, final String query) {
+        SearchCursorParameters searchCursorParameters = SearchCursorParameters.buildSearchCursorParameters(query);
         return context.getContentResolver().query(
-                Uri.parse("content://media/external/audio/search/fancy/" + Uri.encode(query)),
-                new String[] {
-                        BaseColumns._ID, MediaStore.Audio.Media.MIME_TYPE,
-                        MediaStore.Audio.Artists.ARTIST, MediaStore.Audio.Albums.ALBUM,
-                        MediaStore.Audio.Media.TITLE, "data1", "data2" //$NON-NLS-2$ 
-                }, null, null, null);
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                searchCursorParameters.projection,
+                searchCursorParameters.selection,
+                searchCursorParameters.selectionArgs,
+                null);
+    }
+
+    public final static class SearchCursorParameters {
+        public final String[] projection = new String[]{
+                BaseColumns._ID,
+                MediaStore.Audio.Media.MIME_TYPE,
+                MediaStore.Audio.Artists.ARTIST,
+                MediaStore.Audio.Albums.ALBUM,
+                MediaStore.Audio.Media.TITLE
+        };
+
+        public final String selection = MediaStore.Audio.Artists.ARTIST + " like ? or " +
+                MediaStore.Audio.Albums.ALBUM + " like ? or " +
+                MediaStore.Audio.Media.TITLE + " like ?";
+
+        public final String[] selectionArgs;
+
+        private SearchCursorParameters(String query) {
+            String encodedQuery = "%" + Uri.encode(query) + "%";
+            selectionArgs = new String[] {encodedQuery, encodedQuery, encodedQuery};
+        }
+
+        public static SearchCursorParameters buildSearchCursorParameters(String query) {
+            SearchCursorParameters result = new SearchCursorParameters(query);
+            return result;
+        }
     }
 }
