@@ -39,7 +39,6 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.bittorrent.BTDownloadItem;
-import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
 
 import org.apache.commons.io.FilenameUtils;

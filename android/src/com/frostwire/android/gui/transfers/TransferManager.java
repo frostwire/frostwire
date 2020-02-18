@@ -683,6 +683,9 @@ public final class TransferManager {
                 if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                     return;
                 }
+                if (dl.getListener() == null) {
+                    dl.setListener(new UIBTDownloadListener());
+                }
                 UIBittorrentDownload uiBittorrentDownload = new UIBittorrentDownload(TransferManager.this, dl);
                 synchronized (downloadsListMonitor) {
                     bittorrentDownloadsList.add(uiBittorrentDownload);
@@ -695,6 +698,10 @@ public final class TransferManager {
             @Override
             public void downloadUpdate(BTEngine engine, BTDownload dl) {
                 try {
+                    if (dl.getListener() == null) {
+                        dl.setListener(new UIBTDownloadListener());
+                    }
+
                     BittorrentDownload bittorrentDownload = bittorrentDownloadsMap.get(dl.getInfoHash());
                     if (bittorrentDownload instanceof UIBittorrentDownload) {
                         UIBittorrentDownload bt = (UIBittorrentDownload) bittorrentDownload;

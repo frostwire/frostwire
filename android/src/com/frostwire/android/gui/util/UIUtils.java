@@ -423,8 +423,8 @@ public final class UIUtils {
                 Uri.fromFile(new File(filePath));
     }
 
-    public static void openFile(Context context, File file) {
-        openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), SystemUtils.hasNougatOrNewer());
+    public static boolean openFile(Context context, File file) {
+        return openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), SystemUtils.hasNougatOrNewer());
     }
 
     public static void openFile(Context context, File file, boolean useFileProvider) {
