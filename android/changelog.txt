@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 627 - FEB/13/2020
+FrostWire 2.1.9 build 628 - FEB/18/2020
  - Issues with search results not being displayed fixed
  - MusicPlaybackService rewritten
  - Continuous playback issues fixed
@@ -19,6 +19,8 @@ FrostWire 2.1.9 build 627 - FEB/13/2020
  - MusicPlaybackService lifecycle rewrite
  - SoundCloud search/downloads fixed
  - LimeTorrents search/downloads fixed
+ - Fixes crash searching for music in My Music screens
+ - Fixes issue media scanning finished download files
  - android material 1.2.0-alpha04
  - androix browser 1.3.0-alpha01
  - applovin and mopub mediation 9.11.1
