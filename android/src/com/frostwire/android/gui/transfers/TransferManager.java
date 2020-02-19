@@ -599,7 +599,7 @@ public final class TransferManager {
         String infoHashString = torrentHandle.infoHash().toHex();
         synchronized (downloadsListMonitor) {
             for (BittorrentDownload bittorrentDownload : bittorrentDownloadsList) {
-                if (bittorrentDownload.getInfoHash().equals(infoHashString)) {
+                if (bittorrentDownload.getInfoHash() != null && bittorrentDownload.getInfoHash().equals(infoHashString)) {
                     break;
                 }
                 index++;
