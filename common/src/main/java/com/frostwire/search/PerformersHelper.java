@@ -109,7 +109,7 @@ public final class PerformersHelper {
         final SearchMatcher matcher = SearchMatcher.from(MAGNET_HASH_PATTERN.matcher(url));
         try {
             if (matcher.find()) {
-                result = matcher.group(1);
+                result = matcher.group(1).toLowerCase();
             }
         } catch (Throwable t) {
             LOG.error("Could not parse magnet out of " + url, t);

@@ -80,7 +80,7 @@ class TPBSearchResult extends AbstractTorrentSearchResult {
         this.filename = buildFilename(temp);
         this.displayName = FilenameUtils.getBaseName(filename);
         this.torrentUrl = matcher.group(4); //let's assign the magnet to this for now.
-        this.infoHash = torrentUrl.substring(20, 60);
+        this.infoHash = torrentUrl.substring(20, 60).toLowerCase();
         this.creationTime = parseCreationTime(matcher.group(5));
         this.size = parseSize(matcher.group(6));
         this.seeds = parseSeeds(matcher.group(7));

@@ -284,7 +284,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public String getInfoHash() {
-        return th.infoHash().toString();
+        return th.infoHash().toString().toLowerCase();
     }
 
     @Override

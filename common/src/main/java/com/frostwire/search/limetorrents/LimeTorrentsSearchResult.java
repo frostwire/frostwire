@@ -47,7 +47,7 @@ public final class LimeTorrentsSearchResult extends AbstractTorrentSearchResult 
                              String seeds,
                              String title) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = infoHash;
+        this.infoHash = (infoHash == null) ? null : infoHash.toLowerCase();
         this.filename = parseFileName(filename);
         this.size = parseSize(fileSize + " " + unit);
         this.creationTime = parseAgeString(age);

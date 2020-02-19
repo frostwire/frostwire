@@ -67,7 +67,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
         this.seeds = parseSeeds(matcher.group("seeds"));
         this.magnetUrl = matcher.group("magnet").replaceAll("&amp;", "&");
         this.filename = buildFileName(detailsUrl);
-        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl); // already comes in lowercase
     }
 
     private static String buildDisplayName(SearchMatcher matcher) {

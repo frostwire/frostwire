@@ -19,13 +19,12 @@ package com.frostwire.search.zooqle;
 
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-
-import static com.frostwire.search.PerformersHelper.parseInfoHash;
 
 /**
  * @author aldenml
@@ -54,7 +53,7 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         //} else {
         this.torrentUrl = magnetUrl;
         //}
-        this.infoHash = parseInfoHash(magnetUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl); //already comes in lowercase
         this.size = calculateSize(matcher.group("sizedata"));
         this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
     }

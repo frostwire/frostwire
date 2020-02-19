@@ -68,7 +68,8 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
             if (matcher.group("infohash") != null) {
                 return matcher.group("infohash");
             } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
-                return torrentUrl.substring(20, 52);
+                String infoHash = torrentUrl.substring(20, 60).toLowerCase();
+                return infoHash;
             }
         } catch (Throwable ignored) {
         }
