@@ -675,6 +675,10 @@ public final class TransferManager {
         btEngine.setListener(new BTEngineAdapter() {
             @Override
             public void downloadAdded(BTEngine engine, BTDownload dl) {
+                if (dl.getInfoHash() == null) {
+                    LOG.error("BTEngineAdapter.downloadAdded()@TransferManager::loadTorrentsTask: Check your logic, BTDownload's infoHash is null");
+                    return;
+                }
                 String name = dl.getName();
                 if (name != null && name.contains("fetch_magnet")) {
                     return;
@@ -702,6 +706,10 @@ public final class TransferManager {
             @Override
             public void downloadUpdate(BTEngine engine, BTDownload dl) {
                 try {
+                    if (dl.getInfoHash() == null) {
+                        LOG.error("BTEngineAdapter.downloadUpdate()@TransferManager::loadTorrentsTask: Check your logic, cannot update BTDownload with null infoHash");
+                        return;
+                    }
                     if (dl.getListener() == null) {
                         dl.setListener(new UIBTDownloadListener());
                     }
