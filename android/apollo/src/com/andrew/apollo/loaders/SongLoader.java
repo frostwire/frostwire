@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
+
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.util.Logger;

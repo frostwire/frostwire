@@ -49,6 +49,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.appcompat.widget.Toolbar;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
 import com.andrew.apollo.loaders.SearchLoader;
@@ -299,7 +300,15 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
             final long[] list = new long[]{
                     id
             };
-            MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+            if (MusicPlaybackService.getInstance() == null) {
+                Context context = parent.getContext();
+                MusicUtils.startMusicPlaybackService(
+                        context,
+                        new Intent(context, MusicPlaybackService.class),
+                        () -> MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled()));
+            } else {
+                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+            }
         }
 
         // Close it up
@@ -368,14 +377,14 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
                 holder.mLineOne.get().setText(artist);
 
                 // Get the album count
-                final int albumCount = cursor.getInt(cursor.getColumnIndexOrThrow("data1"));
-                holder.mLineTwo.get().setText(
-                        MusicUtils.makeLabel(context, R.plurals.Nalbums, albumCount));
+                //final int albumCount = cursor.getInt(cursor.getColumnIndexOrThrow("data1"));
+                holder.mLineTwo.get().setVisibility(View.INVISIBLE);//setText(
+                //MusicUtils.makeLabel(context, R.plurals.Nalbums, albumCount));
 
                 // Get the song count
-                final int songCount = cursor.getInt(cursor.getColumnIndexOrThrow("data2"));
-                holder.mLineThree.get().setText(
-                        MusicUtils.makeLabel(context, R.plurals.Nsongs, songCount));
+                //final int songCount = cursor.getInt(cursor.getColumnIndexOrThrow("data2"));
+                holder.mLineThree.get().setVisibility(View.INVISIBLE); //setText(
+                //MusicUtils.makeLabel(context, R.plurals.Nsongs, songCount));
 
                 // Asynchronously load the artist image into the adapter
                 mImageFetcher.loadArtistImage(artist, holder.mImage.get());
