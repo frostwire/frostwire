@@ -135,7 +135,7 @@ public abstract class SearchEngine {
             return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.re") {
+    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.io") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
