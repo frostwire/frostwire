@@ -1,4 +1,5 @@
-FrostWire 2.1.9 build 628 - FEB/18/2020
+FrostWire 2.1.9 build 629 - FEB/20/2020
+ - Album art display bug fixed
  - Issues with search results not being displayed fixed
  - MusicPlaybackService rewritten
  - Continuous playback issues fixed
