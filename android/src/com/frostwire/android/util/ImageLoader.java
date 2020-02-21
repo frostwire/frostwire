@@ -457,6 +457,7 @@ public final class ImageLoader {
             this.uri = uri;
             this.target = Ref.weak(target);
             this.params = params;
+            this.params.callback = null; // avoid infinite recursion
         }
 
         @Override
@@ -466,7 +467,6 @@ public final class ImageLoader {
         @Override
         public void onError(Exception e) {
             if (Ref.alive(target) && Ref.alive(loader)) {
-                params.callback = null; // avoid recursion
                 loader.get().load(uri, target.get(), params);
             }
         }
