@@ -71,7 +71,6 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.frostwire.android.util.RunStrict.runStrict;
 
@@ -296,9 +295,13 @@ public class MusicPlaybackService extends JobIntentService {
     private static String AUDIO_ID_COLUMN_NAME = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) ? "_id" : "audio._id AS _id";
 
     private static final String[] PROJECTION = new String[]{
-            AUDIO_ID_COLUMN_NAME, MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Media.ALBUM_ID,
+            AUDIO_ID_COLUMN_NAME,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.MIME_TYPE,
+            MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST_ID
     };
 
@@ -308,7 +311,8 @@ public class MusicPlaybackService extends JobIntentService {
      * The columns used to retrieve any info from the current album
      */
     private static final String[] ALBUM_PROJECTION = new String[]{
-            MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Albums.ARTIST,
+            MediaStore.Audio.Albums.ALBUM,
+            MediaStore.Audio.Albums.ARTIST,
             MediaStore.Audio.Albums.LAST_YEAR
     };
 
@@ -316,7 +320,8 @@ public class MusicPlaybackService extends JobIntentService {
      * The columns used to retrieve any info from the current track
      */
     private static final String[] SIMPLE_PROJECTION = new String[]{
-            "_id", MediaStore.Audio.Media.DATA
+            "_id",
+            MediaStore.Audio.Media.DATA
     };
 
     /**
@@ -513,7 +518,8 @@ public class MusicPlaybackService extends JobIntentService {
             mPlayerHandler = null;
         }
 
-        final HandlerThread handlerThread = new HandlerThread("MusicPlaybackService::MusicPlayerHandler",
+        final HandlerThread handlerThread = new HandlerThread(
+                "MusicPlaybackService::MusicPlayerHandler",
                 android.os.Process.THREAD_PRIORITY_BACKGROUND);
         handlerThread.start();
 
