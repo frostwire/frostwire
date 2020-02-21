@@ -84,11 +84,11 @@ public final class ImageLoader {
 
     private static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
 
-    private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
+    private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
-    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
+    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/artists");
 
-    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
+    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/metadata");//Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
     private static final boolean DEBUG_ERRORS = false;
 
@@ -146,6 +146,7 @@ public final class ImageLoader {
 
     public static Uri getAlbumArtUri(long albumId) {
         return ContentUris.withAppendedId(ALBUM_THUMBNAILS_URI, albumId);
+        //return ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),albumId);
     }
 
     public static Uri getArtistArtUri(String artistName) {

@@ -63,6 +63,7 @@ public class RecentLoader extends SongLoader {
                                 AudioColumns.ARTIST,         /* 3 - artistname */
                                 AudioColumns.ALBUM,          /* 4 - albumname */
                                 AudioColumns.DURATION,       /* 5 - duration */
+                                /* Can't add AudioColumns.ALBUM_ID since RecentStore is a sqlitedb created by Apollo and doesn't seem to need it */
                         }, null, null, null, null,
                         RecentStore.RecentStoreColumns.LAST_TIME_PLAYED + " DESC");
     }

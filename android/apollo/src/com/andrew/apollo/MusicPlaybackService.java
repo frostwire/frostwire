@@ -299,7 +299,7 @@ public class MusicPlaybackService extends JobIntentService {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
             MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.DATA, //absolute file path
             MediaStore.Audio.Media.MIME_TYPE,
             MediaStore.Audio.Media.ALBUM_ID,
             MediaStore.Audio.Media.ARTIST_ID
@@ -1244,7 +1244,8 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void updateCursor(final String selection, final String[] selectionArgs) {
         closeCursor();
-        mCursor = openCursorAndGoToFirst(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        mCursor = openCursorAndGoToFirst(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 PROJECTION, selection, selectionArgs);
         updateAlbumCursor();
     }
@@ -2604,8 +2605,10 @@ public class MusicPlaybackService extends JobIntentService {
     public Bitmap getAlbumArt() {
         try {
             // Return the cached artwork
-            return mImageFetcher.getArtwork(getAlbumName(),
-                    getAlbumId(), getArtistName());
+            return mImageFetcher.getArtwork(
+                    getAlbumName(),
+                    getAlbumId(),
+                    getArtistName());
         } catch (Throwable e) {
             e.printStackTrace();
             // due to the lifecycle of android components,

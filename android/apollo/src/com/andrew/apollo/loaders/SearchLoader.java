@@ -65,35 +65,53 @@ public class SearchLoader extends SongLoader {
             do {
                 // Copy the song Id
                 long id = -1;
+                long songId = -1;
+                long albumId = -1;
+                long artistId = -1;
 
                 // Copy the song name
                 final String songName = mCursor.getString(mCursor
                         .getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
 
-                // Check for a song Id
-                if (!TextUtils.isEmpty(songName)) {
-                    id = mCursor.getLong(mCursor
-                            .getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                }
+                // Copy the artist name
+                final String artist = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
 
                 // Copy the album name
                 final String album = mCursor.getString(mCursor
                         .getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM));
 
+
+                // This logic prioritizes ARTIST ID > ALBUM ID > SONG ID
+
+                // Check for a song Id
+                if (!TextUtils.isEmpty(songName)) {
+                    songId = mCursor.getLong(mCursor
+                            .getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                }
+
+                if (songId > 0) {
+                    id = songId;
+                }
+
                 // Check for a album Id
-                if (id < 0 && !TextUtils.isEmpty(album)) {
-                    id = mCursor.getLong(mCursor
+                if (songId < 0 && !TextUtils.isEmpty(album)) {
+                    albumId = mCursor.getLong(mCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Albums._ID));
                 }
 
-                // Copy the artist name
-                final String artist = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
+                if (albumId > 0) {
+                    id = albumId;
+                }
 
                 // Check for a artist Id
-                if (id < 0 && !TextUtils.isEmpty(artist)) {
-                    id = mCursor.getLong(mCursor
+                if (albumId < 0 && !TextUtils.isEmpty(artist)) {
+                    artistId = mCursor.getLong(mCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Artists._ID));
+                }
+
+                if (artistId > 0) {
+                    id = artistId;
                 }
 
                 // Create a new song

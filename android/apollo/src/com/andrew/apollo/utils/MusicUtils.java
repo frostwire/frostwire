@@ -76,6 +76,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
+
 
 /**
  * A collection of helpers directly related to music or Apollo's service.
@@ -680,6 +682,8 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 AudioColumns.ALBUM_ID
         };
+        //DEBUG (to get all fields, select *)
+        //String[] projection = null;
         final String selection = AudioColumns._ID + "=" + songId + " AND " + AudioColumns.IS_MUSIC + "=1";
         Cursor cursor;
         try {
@@ -697,6 +701,22 @@ public final class MusicUtils {
         if (cursor != null) {
             cursor.moveToFirst();
             try {
+                // DEBUG: Show me all the fields and values of this table, do we not have an album ID?
+//                String[] columnNames = cursor.getColumnNames();
+//                int i=0;
+//                for (String column : columnNames) {
+//                    switch (cursor.getType(i)) {
+//                        case Cursor.FIELD_TYPE_STRING:
+//                            LOG.info("getAlbumIdForSong: " + column + " = " + cursor.getString(i));
+//                            break;
+//                        case Cursor.FIELD_TYPE_INTEGER:
+//                            LOG.info("getAlbumIdForSong: " + column + " = " + cursor.getLong(i));
+//                            break;
+//                    }
+//                    i++;
+//                }
+//              albumId = cursor.getLong(cursor.getColumnIndexOrThrow(ALBUM_ID));
+                // END OF DEBUG CODE
                 albumId = cursor.getLong(0);
             } catch (CursorIndexOutOfBoundsException oob) {
                 return -1;
@@ -715,7 +735,7 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 AudioColumns.ALBUM
         };
-        final String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
+        final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -741,7 +761,7 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 BaseColumns._ID
         };
-        final String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
+        final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
                 + "=1";
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
@@ -1634,7 +1654,7 @@ public final class MusicUtils {
             return;
         }
         final String[] projection = new String[]{
-                BaseColumns._ID, MediaColumns.DATA, AudioColumns.ALBUM_ID
+                BaseColumns._ID, MediaColumns.DATA, ALBUM_ID
         };
         final StringBuilder selection = new StringBuilder();
         selection.append(BaseColumns._ID + " IN (");
