@@ -396,6 +396,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
     @Override
     public boolean equals(@Nullable Object other) {
+        if (!(other instanceof UIBittorrentDownload)) {
+            return false;
+        }
         return getInfoHash().equals(((UIBittorrentDownload) other).getInfoHash());
     }
 }
