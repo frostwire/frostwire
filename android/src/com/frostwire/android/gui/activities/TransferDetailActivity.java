@@ -42,6 +42,8 @@ import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.transfers.BittorrentDownload;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
@@ -106,8 +108,12 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             return false;
         }
         if (uiBittorrentDownload == null && !"".equals(infoHash)) {
-            uiBittorrentDownload = (UIBittorrentDownload)
-                    TransferManager.instance().getBittorrentDownload(infoHash);
+            BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infoHash);
+            if (bittorrentDownload instanceof UIBittorrentDownload) {
+                uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
+            } else if (bittorrentDownload instanceof BTDownload) {
+                uiBittorrentDownload = new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload);
+            }
         }
         return uiBittorrentDownload != null;
     }
