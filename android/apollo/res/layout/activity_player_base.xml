@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright (C) 2012 Andrew Neal
  
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +29,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignTop="@android:id/progress" />
+            android:layout_alignTop="@android:id/progress"
+            android:layout_alignParentBottom="true" />
 
         <LinearLayout
             android:id="@+id/audio_player_header"
@@ -57,9 +56,9 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:textColor="@color/audio_player_line_one"
                     android:textSize="@dimen/text_size_medium"
-                    android:textStyle="bold"
-                    android:textColor="@color/audio_player_line_one" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/audio_player_artist_name"
@@ -67,8 +66,8 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:textSize="@dimen/text_size_small"
-                    android:textColor="@color/audio_player_line_two" />
+                    android:textColor="@color/audio_player_line_two"
+                    android:textSize="@dimen/text_size_small" />
             </LinearLayout>
 
             <FrameLayout
@@ -90,7 +89,8 @@
                     android:id="@+id/audio_player_switch_album_art"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:visibility="invisible" />
+                    android:background="@drawable/btn_switch_queue"
+                    android:visibility="visible" />
             </FrameLayout>
         </LinearLayout>
 
@@ -98,9 +98,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@android:id/progress"
+            android:layout_below="@+id/audio_player_header"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/audio_player_header">
+            android:layout_alignParentRight="true">
 
             <com.andrew.apollo.widgets.SquareImageView
                 android:id="@+id/audio_player_album_art"
@@ -109,27 +109,16 @@
                 android:layout_centerHorizontal="true"
                 android:padding="16dp"
                 android:scaleType="fitXY"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
-
-            <FrameLayout
+            <com.frostwire.android.offers.MopubBannerView
+                android:id="@+id/audio_player_mopub_banner_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_alignTop="@+id/audio_player_album_art"
-                    android:background="@drawable/divider_line" />
-
-                <com.frostwire.android.offers.MopubBannerView
-                    android:id="@+id/audio_player_mopub_banner_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:visibility="invisible"/>
-            </FrameLayout>
-
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/audio_player_album_art"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="-118dp"
+                android:visibility="visible" />
 
             <FrameLayout
                 android:id="@+id/audio_player_pager_container"
@@ -137,7 +126,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/audio_player_album_art"
                 android:layout_marginBottom="16dp"
-                android:visibility="invisible">
+                android:visibility="visible"
+                android:background="@drawable/audio_player_pager_container">
 
                 <View
                     android:layout_width="match_parent"
@@ -155,7 +145,6 @@
                     android:id="@+id/audio_player_pager"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
-
             </FrameLayout>
         </RelativeLayout>
 
@@ -163,24 +152,24 @@
             android:id="@+id/audio_player_current_time"
             android:layout_width="@dimen/audio_player_time_width"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@android:id/progress"
             android:layout_alignBottom="@android:id/progress"
             android:layout_alignParentLeft="true"
-            android:layout_alignTop="@android:id/progress"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:textSize="@dimen/text_size_medium"
-            android:textColor="@color/audio_player_current_time" />
+            android:textColor="@color/audio_player_current_time"
+            android:textSize="@dimen/text_size_medium" />
 
         <TextView
             android:id="@+id/audio_player_total_time"
             android:layout_width="@dimen/audio_player_time_width"
             android:layout_height="wrap_content"
+            android:layout_alignTop="@android:id/progress"
             android:layout_alignBottom="@android:id/progress"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@android:id/progress"
             android:gravity="center"
-            android:textSize="@dimen/text_size_medium"
-            android:textColor="@color/audio_player_total_time" />
+            android:textColor="@color/audio_player_total_time"
+            android:textSize="@dimen/text_size_medium" />
 
         <SeekBar
             android:id="@android:id/progress"
@@ -198,9 +187,9 @@
             android:id="@+id/audio_player_controls"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:baselineAligned="false"
             android:gravity="center"
             android:orientation="vertical">

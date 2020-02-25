@@ -76,7 +76,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "a8be0cad4ad0419dbb19601aef3a18d2";
     static final String UNIT_ID_SEARCH_HEADER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "be0b959f15994fd5b56c997f63530bd0";
 
-    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "e97ea70a9fdc483c9be39b39e5a51c3f";
+    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "e97ea70a9fdc483c9be39b39e5a51c3f";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "2fd0fafe3d3c4d668385a620caaa694e";
 
     private static final String UNIT_ID_INTERSTITIAL_TABLET = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "cebdbc56b37c4d31ba79e861d1cb0de4";

@@ -28,7 +28,6 @@ import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -198,7 +197,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        try {
+            super.onCreate(savedInstanceState);
+        } catch (Throwable t) {
+            LOG.error("onCreate() (handled) " + t.getMessage(), t);
+        }
 
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -217,10 +220,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Cache all the items
         initPlaybackControls();
+        initMopubBannerView();
 
         // Album Art Ad Controls
-        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
-
         mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
 
         PlayerGestureListener gestureListener = new PlayerGestureListener();
@@ -339,18 +341,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        // hide ads in case of a share call
-        if (!Offers.disabledAds() && mAlbumArt.getVisibility() == View.GONE) {
-            mAlbumArt.setVisibility(View.VISIBLE);
-            if (mMopubBannerView != null) {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
-            }
-        }
-        return super.onMenuOpened(featureId, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_player_shuffle:
@@ -415,7 +405,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            if (mMopubBannerView != null) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            }
             showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
@@ -552,7 +544,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Album art
         mAlbumArt = findView(R.id.audio_player_album_art);
         // MoPubBannerView
-        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
+        initMopubBannerView();
+
         // Small album art
         mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
@@ -572,9 +565,40 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mNextButton.setRepeatListener(mFastForwardListener);
         // Update the progress
         mProgress.setOnSeekBarChangeListener(this);
+
+        showAlbumArt();
+        if (mMopubBannerView != null && !Offers.disabledAds()) {
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+        }
+    }
+
+    private void initMopubBannerView() {
+        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
+        if (mMopubBannerView != null) {
+            if (Offers.disabledAds()) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+                return;
+            }
+            mMopubBannerView.setShowDismissButton(false);
+            mMopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            mMopubBannerView.setShowFallbackBannerOnDismiss(false);
+            mMopubBannerView.setOnBannerLoadedListener(() -> {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
+            });
+            mMopubBannerView.setOnFallbackBannerLoadedListener(() -> {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            });
+            deferredInitAlbumArtBanner();
+        }
     }
 
     private void deferredInitAlbumArtBanner() {
+        if (mMopubBannerView == null) {
+            LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready or available for this layout (mMopubBannerView == null)");
+            return;
+        }
+
         if (Offers.disabledAds()) {
             LOG.info("deferredInitAlbumArtBanner() aborted, ads are disabled");
             waitingToInitAlbumArtBanner.set(false);
@@ -598,18 +622,17 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        if (mMopubBannerView == null) {
-            LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready (mMopubBannerView == null)");
-            return;
-        }
-
         if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
-            mAlbumArt.setVisibility(View.GONE);
             return;
         }
 
         if (waitingToInitAlbumArtBanner.get()) {
+
+            if (!mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            }
+
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
             return;
         }
@@ -680,25 +703,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
             return;
         }
-        mMopubBannerView.setShowFallbackBannerOnDismiss(false);
-        mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
-
-        mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
-
-        mMopubBannerView.setOnBannerLoadedListener(() -> {
-            mAlbumArt.setVisibility(View.GONE);
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
-        });
-
-        mMopubBannerView.setOnFallbackBannerLoadedListener(() -> {
-            mAlbumArt.setVisibility(View.GONE);
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
-        });
-
-        mMopubBannerView.setOnFallbackBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
-
-        mAlbumArt.setVisibility(View.VISIBLE);
-
         mMopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
     }
 
@@ -729,10 +733,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             // Set the album art
             if (mAlbumArt != null) {
                 mImageFetcher.loadCurrentArtwork(mAlbumArt);
-                if (mMopubBannerView != null && !mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB) &&
-                    !mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
-                    mAlbumArt.setVisibility(View.VISIBLE);
-                }
             }
             // Set the small artwork
             if (mAlbumArtSmall != null) {
@@ -1121,7 +1121,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mMopubBannerView != null) {
             mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
         }
-        mAlbumArt.setVisibility(View.VISIBLE);
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
     }
 

@@ -204,7 +204,7 @@ public class MopubBannerView extends LinearLayout {
         }
     }
 
-    private void loadFallbackBanner(final String adUnitId) {
+    public void loadFallbackBanner(final String adUnitId) {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(() ->
                 {
@@ -303,7 +303,11 @@ public class MopubBannerView extends LinearLayout {
 
     private void setControlsVisibility(int controlsVisibility) {
         if (dismissBannerButton != null) {
-            dismissBannerButton.setVisibility(controlsVisibility);
+            if (showDismissButton) {
+                dismissBannerButton.setVisibility(controlsVisibility);
+            } else {
+                dismissBannerButton.setVisibility(View.INVISIBLE);
+            }
         }
         if (mAdvertisementText != null) {
             mAdvertisementText.setVisibility(controlsVisibility);
@@ -324,7 +328,6 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded(): " + banner);
             isLoaded = true;
-            setLayersVisibility(Layers.MOPUB, true);
             banner.setVisibility(View.VISIBLE);
             if (onBannerLoadedListener != null) {
                 try {
