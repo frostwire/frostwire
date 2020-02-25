@@ -989,7 +989,9 @@ public class MusicPlaybackService extends JobIntentService {
             stopPlayer();
         }
         if (D) LOG.info("Nothing is playing anymore, releasing notification");
-        mNotificationHelper.killNotification();
+        if (mNotificationHelper != null) {
+            mNotificationHelper.killNotification();
+        }
         // on some devices where it requires MODIFY_PHONE_STATE
         // mAudioManager could be null
         if (mAudioManager != null) {
