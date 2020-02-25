@@ -116,7 +116,7 @@ public class MopubBannerView extends LinearLayout {
         if (attrs == null) {
             LinearLayout.LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             layoutParams.setLayoutDirection(LinearLayout.VERTICAL);
-            layoutParams.setMargins(0,0,0,!showRemoveAdsTextView ? 20 : 0);
+            layoutParams.setMargins(0, 0, 0, !showRemoveAdsTextView ? 20 : 0);
             setLayoutParams(layoutParams);
         }
     }
@@ -210,13 +210,13 @@ public class MopubBannerView extends LinearLayout {
                 {
                     try {
                         InHouseBannerFactory.AdFormat adFormat;
-                        if (MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId) ||
-                                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
+                        if (MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId) ||
                                 MoPubAdNetwork.UNIT_ID_HOME.equals(adUnitId)) {
                             adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
                         } else if (MoPubAdNetwork.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
-                                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
-                            adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
+                                MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId) ||
+                                MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER.equals(adUnitId)) {
+                            adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
                         } else {
                             throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
                         }

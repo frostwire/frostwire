@@ -69,11 +69,14 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     private static final String TEST_UNIT_INTERSTITIAL = "24534e1901884e398f1253216226017e";
     private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
 
-    public static final String UNIT_ID_HOME = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
+    // for documentation purposes, delete months later if unused
+    private static final String RETIRED_UNIT_ID_AUDIO_PLAYER_300x250 = "c737d8a55b2e41189aa1532ae0520ad1";
+
+    public static final String UNIT_ID_HOME = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
     public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "a8be0cad4ad0419dbb19601aef3a18d2";
     static final String UNIT_ID_SEARCH_HEADER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "be0b959f15994fd5b56c997f63530bd0";
 
-    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "c737d8a55b2e41189aa1532ae0520ad1";
+    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "e97ea70a9fdc483c9be39b39e5a51c3f";
     public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "2fd0fafe3d3c4d668385a620caaa694e";
 
     private static final String UNIT_ID_INTERSTITIAL_TABLET = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "cebdbc56b37c4d31ba79e861d1cb0de4";
