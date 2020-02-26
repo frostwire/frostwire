@@ -13,13 +13,11 @@ package com.andrew.apollo.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.widget.ImageView;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.util.ImageLoader;
 
 /**
  * A subclass of {@link ImageWorker} that fetches images from a URL.
@@ -57,7 +55,10 @@ public class ImageFetcher extends ImageWorker {
                                final String albumName,
                                final long albumId,
                                final ImageView imageView) {
-        loadImage(generateAlbumCacheKey(albumName, artistName), artistName, albumId, imageView,
+        loadImage(generateAlbumCacheKey(albumName, artistName),
+                artistName,
+                albumId,
+                imageView,
                 ImageType.ALBUM);
     }
 
@@ -66,7 +67,8 @@ public class ImageFetcher extends ImageWorker {
      */
     public void loadCurrentArtwork(final ImageView imageView) {
         loadImage(generateAlbumCacheKey(MusicUtils.getAlbumName(), MusicUtils.getArtistName()),
-                MusicUtils.getArtistName(), MusicUtils.getCurrentAlbumId(),
+                MusicUtils.getArtistName(),
+                MusicUtils.getCurrentAlbumId(),
                 imageView, ImageType.ALBUM);
     }
 

@@ -328,6 +328,7 @@ public class MopubBannerView extends LinearLayout {
         public void onBannerLoaded(MoPubView banner) {
             LOG.info("onBannerLoaded(): " + banner);
             isLoaded = true;
+            setLayersVisibility(Layers.MOPUB, true);
             banner.setVisibility(View.VISIBLE);
             if (onBannerLoadedListener != null) {
                 try {

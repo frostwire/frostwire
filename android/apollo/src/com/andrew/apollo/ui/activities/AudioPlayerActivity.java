@@ -206,9 +206,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // Bind Apollo's service
-        //mToken = MusicUtils.bindToService(this, this);
-
         // Initialize the image fetcher/cache
         mImageFetcher = ApolloUtils.getImageFetcher(this);
 
@@ -233,6 +230,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
 
         waitingToInitAlbumArtBanner.set(false);
+
+        loadCurrentAlbumArt();
     }
 
     @Override
@@ -426,6 +425,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+        initPlaybackControls();
+        initMopubBannerView();
+        loadCurrentAlbumArt();
     }
 
     @Override
@@ -583,12 +585,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mMopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
             mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
             mMopubBannerView.setShowFallbackBannerOnDismiss(false);
-            mMopubBannerView.setOnBannerLoadedListener(() -> {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
-            });
-            mMopubBannerView.setOnFallbackBannerLoadedListener(() -> {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
-            });
+            mMopubBannerView.setOnBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true));
+            mMopubBannerView.setOnFallbackBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true));
             deferredInitAlbumArtBanner();
         }
     }
@@ -729,6 +727,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Set the total time
         mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
 
+        loadCurrentAlbumArt();
+        updateQueueFragmentCurrentSong();
+    }
+
+    private void loadCurrentAlbumArt() {
         if (mImageFetcher != null) {
             // Set the album art
             if (mAlbumArt != null) {
@@ -737,10 +740,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             // Set the small artwork
             if (mAlbumArtSmall != null) {
                 mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
-                mAlbumArtSmall.setVisibility(View.VISIBLE);
             }
         }
-        updateQueueFragmentCurrentSong();
     }
 
     private String getArtistAndAlbumName(String artist, String album) {

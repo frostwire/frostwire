@@ -230,11 +230,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                     true,
                     false,
                     false);
-
             mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
             // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
             // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
             // temp fix placed in MoPubAdNetwork.java#126
+            mopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_HOME);
             mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
         }
         return mopubBannerView;
