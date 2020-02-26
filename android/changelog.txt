@@ -1,5 +1,6 @@
-FrostWire 2.1.9 build 630 - FEB/25/2020
+FrostWire 2.1.9 build 631 - FEB/25/2020
  - Album art display bug fixed
+ - No more annoying 300x250 ad over album art on Music Player
  - Issues with search results not being displayed fixed
  - MusicPlaybackService rewritten
  - Continuous playback issues fixed
