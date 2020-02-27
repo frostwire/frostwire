@@ -505,12 +505,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // ViewPager container
         mPageContainer = findView(R.id.audio_player_pager_container);
         // Theme the pager container background
-        mPageContainer.setBackgroundResource(R.drawable.audio_player_pager_container);
+        if (mPageContainer != null) {
+            mPageContainer.setBackgroundResource(R.drawable.audio_player_pager_container);
+        }
 
         // Now playing header
         mAudioPlayerHeader = findView(R.id.audio_player_header);
-        // Opens the currently playing album profile
-        mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
+        if (mAudioPlayerHeader != null) {
+            // Opens the currently playing album profile
+            mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
+        }
 
         // Used to hide the artwork and show the queue
         final FrameLayout mSwitch = findView(R.id.audio_player_switch);
@@ -523,18 +527,24 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Initialize the ViewPager
         ViewPager mViewPager = findView(R.id.audio_player_pager);
-        // Attach the adapter
-        mViewPager.setAdapter(mPagerAdapter);
-        // Offscreen pager loading limit
-        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+        if (mViewPager != null) {
+            // Attach the adapter
+            mViewPager.setAdapter(mPagerAdapter);
+            // Offscreen pager loading limit
+            mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+        }
         // Play and pause button
         mPlayPauseButton = findView(R.id.action_button_play);
         // Shuffle button
         mShuffleButton = findView(R.id.action_button_shuffle);
         // Repeat button
         mRepeatButton = findView(R.id.action_button_repeat);
-        mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
-        mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
+        if (mShuffleButton != null) {
+            mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
+        }
+        if (mRepeatButton != null) {
+            mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
+        }
         // Previous button
         RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button
@@ -561,12 +571,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Progress
         mProgress = findView(android.R.id.progress);
 
-        // Set the repeat listener for the previous button
-        mPreviousButton.setRepeatListener(mRewindListener);
-        // Set the repeat listener for the next button
-        mNextButton.setRepeatListener(mFastForwardListener);
-        // Update the progress
-        mProgress.setOnSeekBarChangeListener(this);
+        if (mPreviousButton != null) {
+            // Set the repeat listener for the previous button
+            mPreviousButton.setRepeatListener(mRewindListener);
+        }
+
+        if (mNextButton != null) {
+            // Set the repeat listener for the next button
+            mNextButton.setRepeatListener(mFastForwardListener);
+        }
+
+        if (mProgress != null) {
+            // Update the progress
+            mProgress.setOnSeekBarChangeListener(this);
+        }
 
         showAlbumArt();
         if (mMopubBannerView != null && !Offers.disabledAds()) {
@@ -1093,13 +1111,23 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Called to show the album art and hide the queue
      */
     private void showAlbumArt() {
-        mPageContainer.setVisibility(View.INVISIBLE);
-        mAlbumArtSmall.setVisibility(View.GONE);
-        mQueueSwitch.setVisibility(View.VISIBLE);
-        // Fade out the pager container
-        fade(mPageContainer, 0f);
-        // Fade in the album art
-        fade(mAlbumArt, 1f);
+        if (mPageContainer != null) {
+            mPageContainer.setVisibility(View.INVISIBLE);
+        }
+        if (mAlbumArtSmall != null) {
+            mAlbumArtSmall.setVisibility(View.GONE);
+        }
+        if (mQueueSwitch != null) {
+            mQueueSwitch.setVisibility(View.VISIBLE);
+        }
+        if (mPageContainer != null) {
+            // Fade out the pager container
+            fade(mPageContainer, 0f);
+        }
+        if (mAlbumArt != null) {
+            // Fade in the album art
+            fade(mAlbumArt, 1f);
+        }
     }
 
     /**
