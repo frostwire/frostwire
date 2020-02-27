@@ -28,6 +28,7 @@ FrostWire 2.1.9 build 631 - FEB/25/2020
  - Fixes issue media scanning finished download files
  - androix browser 1.3.0-alpha01
  - applovin and mopub mediation 9.11.1
+ - mopub 5.11.0 update
  - lt:fix erroneous event=completed tracker announce when checking files
  - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
  - lt:fix bug in protocol encryption/obfuscation
