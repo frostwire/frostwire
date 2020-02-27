@@ -205,8 +205,8 @@ dependencies {
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:9.11.4'
     implementation 'com.mopub.mediation:applovin:9.11.4.0'
-    implementation 'com.unity3d.ads:unity-ads:3.4.0'
-    implementation 'com.mopub.mediation:unityads:3.4.0.0'
+    implementation 'com.unity3d.ads:unity-ads:3.4.2'
+    implementation 'com.mopub.mediation:unityads:3.4.2.0'
 
     implementation files('libs/jlibtorrent-1.2.3.0.jar')
     implementation files('libs/jlibtorrent-android-arm-1.2.3.0.jar')
