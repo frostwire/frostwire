@@ -7,10 +7,13 @@ FrostWire 2.1.9 build 631 - FEB/25/2020
  - Repeat mode and shuffle mode issues fixed
  - Save to Playlist issue fixed
  - New jlibtorrent 1.2.3
- - libtorrent 1.2.3.0
+ - libtorrent 1.2.3.0 update
+ - com.google.android.material:material:1.2.0-alpha04->1.2.0-alpha05 update
+ - com.google.code.gson:gson:2.8.5 -> 2.8.6 update
  - boost 1.72.0 build
  - openssl 1.1.1d
  - Android NDK 21
+ - R8 code minification enabled to build .apk
  - UX: No more annoying ever-present Android notification, only during active transfers or music playback
  - UX: Torrent search results now show how old they are
  - EngineService and MusicPlaybackService are no longer ran as foreground services following newer android guidelines
@@ -23,7 +26,6 @@ FrostWire 2.1.9 build 631 - FEB/25/2020
  - LimeTorrents search/downloads fixed
  - Fixes crash searching for music in My Music screens
  - Fixes issue media scanning finished download files
- - android material 1.2.0-alpha04
  - androix browser 1.3.0-alpha01
  - applovin and mopub mediation 9.11.1
  - lt:fix erroneous event=completed tracker announce when checking files
