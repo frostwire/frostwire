@@ -43,21 +43,24 @@ import java.util.concurrent.TimeUnit;
  */
 @SuppressLint("CommitPrefEdits") // this is due to a lint false positive
 public final class ConfigurationManager {
-
+    private static final CountDownLatch creationLatch;
     private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
 
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
-
-    private static final CountDownLatch creationLatch = new CountDownLatch(1);
     private static ConfigurationManager instance;
+    private static Thread creatorThread;
+
+    static {
+        creationLatch = new CountDownLatch(1);
+    }
 
     public static void create(@NonNull Context context) {
         if (instance != null) {
             throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
 
-        Thread creatorThread = new Thread(() -> {
+        creatorThread = new Thread(() -> {
             instance = new ConfigurationManager(context.getApplicationContext());
             creationLatch.countDown();
         });
@@ -71,16 +74,29 @@ public final class ConfigurationManager {
             try {
                 // ANRs are triggered after 5 seconds, don't hold main thread more than double that
                 // (used to be 20 secs)
-                creationLatch.await(10, TimeUnit.SECONDS);
+                creationLatch.await(4, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         if (instance == null) {
-            throw new RuntimeException("The ConfigurationManager instance() creation timed out, try reinstalling the app or notify FrostWire developers");
+            waitForCreatorThread();
+            if (instance == null) {
+                throw new RuntimeException("The ConfigurationManager instance() creation timed out, try reinstalling the app or notify FrostWire developers");
+            }
         }
         return instance;
+    }
+
+    private static void waitForCreatorThread() {
+        try {
+            if (creatorThread != null && creatorThread.isAlive()) {
+                creatorThread.join(5000);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private ConfigurationManager(Context context) {
