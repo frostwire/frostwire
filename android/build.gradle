@@ -28,6 +28,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.0'
+        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
     }
 }
 
@@ -183,7 +184,7 @@ android {
 
 dependencies {
     implementation 'com.google.re2j:re2j:1.3'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.okhttp3:okhttp:3.14.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.2.0-alpha04'
