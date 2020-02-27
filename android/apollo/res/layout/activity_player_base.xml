@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/audio_player_album_art"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="-118dp"
+                android:layout_marginBottom="-123dp"
                 android:visibility="visible" />
 
             <FrameLayout
