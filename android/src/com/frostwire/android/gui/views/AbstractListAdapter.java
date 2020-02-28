@@ -192,14 +192,10 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public T getItem(int position) {
-        try {
-            return visualList.get(position);
-        } catch (Throwable e) {
-            if (e instanceof IndexOutOfBoundsException) {
-                IndexOutOfBoundsException ioobe = new IndexOutOfBoundsException(getClass().getName() + ": " + position + " of " + getCount());
-                ioobe.setStackTrace(e.getStackTrace());
-                throw ioobe;
-            }
+        if (position < visualList.size()) {
+            try {
+                return visualList.get(position);
+            } catch (Throwable ignore) {}
         }
         return null;
     }
@@ -279,6 +275,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     /**
      * Note: only calls notifyDataSetChanged if called from the main thread
+     *
      * @param item
      */
     public void deleteItem(T item) {
@@ -664,6 +661,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             onItemChecked(buttonView, isChecked);
         }
+
     }
 
     public void setLastSelectedRadioButton(int index) {
