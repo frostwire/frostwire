@@ -40,6 +40,10 @@
             android:key="froswire.prefs.network.enable_dht"
             android:summary="@string/enable_dht_summary"
             android:title="@string/enable_dht"/>
+        <SwitchPreference
+            android:key="frostwire.prefs.torrent.sequential_transfers_enabled"
+            android:summary="@string/enable_sequential_download_summary"
+            android:title="@string/sequential_download"/>
         <com.frostwire.android.gui.views.preference.CustomSeekBarPreference
             android:key="frostwire.prefs.torrent.max_download_speed"
             android:summary="@string/torrent_max_download_speed_summary"

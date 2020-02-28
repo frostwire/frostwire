@@ -6,6 +6,7 @@ FrostWire 2.1.9 build 632 - FEB/27/2020
  - Continuous playback issues fixed
  - Repeat mode and shuffle mode issues fixed
  - Save to Playlist issue fixed
+ - New Global Sequential Downloads Torrent Setting. Disabled by default.
  - New jlibtorrent 1.2.3
  - libtorrent 1.2.3.0 update
  - com.google.android.material:material:1.2.0-alpha04->1.2.0-alpha05 update

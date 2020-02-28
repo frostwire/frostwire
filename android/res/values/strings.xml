@@ -497,4 +497,5 @@
     <string name="one_month">1 month</string>
     <string name="n_months">%s months</string>
     <string name="n_years">%s years</string>
+    <string name="enable_sequential_download_summary">Pieces are downloaded in order. Not recommended for network health</string>
 </resources>

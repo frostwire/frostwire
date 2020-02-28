@@ -100,6 +100,8 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
             //ensureComponentsReferenced();
             final BTDownload btDL = uiBittorrentDownload.getDl();
 
+            uiBittorrentDownload.getDl().setSequentialDownload(UIBittorrentDownload.SEQUENTIAL_DOWNLOADS);
+            
             if (uiBittorrentDownload.getDl().isSequentialDownload()) {
                 sequentialDividerLine.setVisibility(View.VISIBLE);
                 sequentialDownloadLinearLayout.setVisibility(View.VISIBLE);

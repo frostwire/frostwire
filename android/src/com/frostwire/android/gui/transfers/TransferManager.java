@@ -671,6 +671,8 @@ public final class TransferManager {
             bittorrentDownloadsMap.clear();
         }
 
+        UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
+
         final BTEngine btEngine = BTEngine.getInstance();
         btEngine.setListener(new BTEngineAdapter() {
             @Override

@@ -52,6 +52,7 @@ import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.adapters.menu.TransferDetailsMenuAction;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
@@ -418,6 +419,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 buttonDetails.setTag(download);
                 buttonDetails.setVisibility(View.VISIBLE);
                 buttonDetails.setOnClickListener(transferDetailsClickListener);
+                ((UIBittorrentDownload) download).checkSequentialDownload();
             } else {
                 buttonDetails.setVisibility(View.GONE);
                 buttonDetails.setOnClickListener(null);

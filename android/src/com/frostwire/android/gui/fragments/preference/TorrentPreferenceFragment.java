@@ -27,6 +27,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference;
@@ -82,14 +83,20 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     }
 
     private void setupTorrentOptions() {
-        SwitchPreference pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        pref.setOnPreferenceChangeListener((preference, newValue) -> {
+        SwitchPreference prefEnableDHT = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+        prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean newStatus = (boolean) newValue;
             if (newStatus) {
                 BTEngine.getInstance().startDht();
             } else {
                 BTEngine.getInstance().stopDht();
             }
+            return true;
+        });
+
+        SwitchPreference prefSequentialTransfers = findPreference(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
+        prefSequentialTransfers.setOnPreferenceChangeListener((preference, newValue) -> {
+            UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
             return true;
         });
 

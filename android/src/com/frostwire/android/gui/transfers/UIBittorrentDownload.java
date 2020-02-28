@@ -50,6 +50,7 @@ import java.util.List;
 public final class UIBittorrentDownload implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(UIBittorrentDownload.class);
+    public static boolean SEQUENTIAL_DOWNLOADS = false;
 
     private final TransferManager manager;
     private final BTDownload dl;
@@ -79,6 +80,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
         } catch (Throwable ignored) {
         }
+        checkSequentialDownload();
     }
 
     public BTDownload getDl() {
@@ -306,6 +308,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         displayName = dl.getDisplayName();
         size = calculateSize(dl);
         items = calculateItems(dl);
+        checkSequentialDownload();
     }
 
     private double calculateSize(BTDownload dl) {
@@ -343,36 +346,10 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     /**
-     * Downloads the first 10mb or 30% of the file sequentially
+     * Makes sure download follows the value of the global sequential downloads setting
      */
-    private void checkSequentialDownload() {
-        BTDownloadItem item = getFirstBiggestItem();
-
-        if (item != null) {
-            long downloaded = item.getSequentialDownloaded();
-            long size = item.getSize();
-
-            if (size > 0) {
-
-                long percent = (100 * downloaded) / size;
-
-                if (percent > 30 || downloaded > 10 * 1024 * 1024) {
-                    if (dl.isSequentialDownload()) {
-                        dl.setSequentialDownload(false);
-                    }
-                } else {
-                    if (!dl.isSequentialDownload()) {
-                        dl.setSequentialDownload(true);
-                    }
-                }
-
-                //LOG.debug("Seq: " + dl.isSequentialDownload() + " Downloaded: " + downloaded);
-            }
-        } else {
-            if (dl.isSequentialDownload()) {
-                dl.setSequentialDownload(false);
-            }
-        }
+    public void checkSequentialDownload() {
+        dl.setSequentialDownload(SEQUENTIAL_DOWNLOADS);
     }
 
     private BTDownloadItem getFirstBiggestItem() {
