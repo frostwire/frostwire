@@ -26,11 +26,14 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
@@ -45,9 +48,6 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -56,7 +56,8 @@ import androidx.appcompat.app.AlertDialog;
 
 public class TransferDetailDetailsFragment extends AbstractTransferDetailFragment {
     private TextView storagePath;
-    private CheckBox sequentialDownloadCheckBox;
+    private ImageView sequentialDividerLine;
+    private LinearLayout sequentialDownloadLinearLayout;
     private TextView totalSize;
     private TextView numberOfFiles;
     private TextView downloadSpeedLimit;
@@ -69,7 +70,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     private ImageButton magnetCopyButton;
     private TextView createdOn;
     private TextView comment;
-    private CompoundButton.OnCheckedChangeListener onSequentialDownloadCheckboxCheckedListener;
     private View.OnClickListener onCopyToClipboardListener;
     private View.OnClickListener onRateLimitClickListener;
     private static final int DOWNLOAD_UNLIMITED_VALUE = 0;
@@ -83,7 +83,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     protected void initComponents(View rv, Bundle savedInstanceState) {
         super.initComponents(rv, savedInstanceState);
         storagePath.setText("");
-        sequentialDownloadCheckBox.setChecked(false);
         totalSize.setText("");
         numberOfFiles.setText("");
         downloadSpeedLimit.setText("");
@@ -92,7 +91,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         magnet.setText("");
         createdOn.setText("");
         comment.setText("");
-        onSequentialDownloadCheckboxCheckedListener = null;
         onCopyToClipboardListener = null;
     }
 
@@ -101,6 +99,12 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         if (uiBittorrentDownload != null) {
             //ensureComponentsReferenced();
             final BTDownload btDL = uiBittorrentDownload.getDl();
+
+            if (uiBittorrentDownload.getDl().isSequentialDownload()) {
+                sequentialDividerLine.setVisibility(View.VISIBLE);
+                sequentialDownloadLinearLayout.setVisibility(View.VISIBLE);
+            }
+
             if (onCopyToClipboardListener == null) {
                 onCopyToClipboardListener = new CopyToClipboardOnClickListener(uiBittorrentDownload);
             }
@@ -140,13 +144,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
                     view.setVisibility(View.GONE);
                 }
             }
-            if (onSequentialDownloadCheckboxCheckedListener == null) {
-                onSequentialDownloadCheckboxCheckedListener = new SequentialDownloadCheckboxCheckedListener(uiBittorrentDownload);
-            }
-            sequentialDownloadCheckBox.setOnCheckedChangeListener(null);
-            sequentialDownloadCheckBox.setChecked(btDL.isSequentialDownload());
-            sequentialDownloadCheckBox.setOnCheckedChangeListener(onSequentialDownloadCheckboxCheckedListener);
-
             if (onRateLimitClickListener == null) {
                 onRateLimitClickListener = new OnSpeedLimitClickListener(uiBittorrentDownload, this, getFragmentManager());
                 downloadSpeedLimit.setOnClickListener(onRateLimitClickListener);
@@ -177,7 +174,12 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
     @Override
     public void ensureComponentsReferenced(View rootView) {
         storagePath = findView(rootView, R.id.fragment_transfer_detail_details_storage_path);
-        sequentialDownloadCheckBox = findView(rootView, R.id.fragment_transfer_detail_details_sequential_download_checkBox);
+
+        sequentialDividerLine = findView(rootView, R.id.fragment_transfer_detail_sequential_download_divider_line);
+        sequentialDownloadLinearLayout = findView(rootView, R.id.fragment_transfer_detail_sequential_download_linearlayout);
+        sequentialDividerLine.setVisibility(View.GONE);
+        sequentialDownloadLinearLayout.setVisibility(View.GONE);
+
         totalSize = findView(rootView, R.id.fragment_transfer_detail_details_total_size);
         numberOfFiles = findView(rootView, R.id.fragment_transfer_detail_details_files_number);
         downloadSpeedLimit = findView(rootView, R.id.fragment_transfer_detail_details_speed_limit_download);
@@ -190,22 +192,6 @@ public class TransferDetailDetailsFragment extends AbstractTransferDetailFragmen
         magnetCopyButton = findView(rootView, R.id.fragment_transfer_detail_details_magnet_copy_button);
         createdOn = findView(rootView, R.id.fragment_transfer_detail_details_created_on);
         comment = findView(rootView, R.id.fragment_transfer_detail_details_comment);
-    }
-
-    private static final class SequentialDownloadCheckboxCheckedListener implements CompoundButton.OnCheckedChangeListener {
-        private final UIBittorrentDownload uiBittorrentDownload;
-
-        SequentialDownloadCheckboxCheckedListener(UIBittorrentDownload uiBittorrentDownload) {
-            this.uiBittorrentDownload = uiBittorrentDownload;
-        }
-
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            if (uiBittorrentDownload != null) {
-                System.out.println("onCheckedChanged(isChecked=" + isChecked + ");");
-                uiBittorrentDownload.getDl().setSequentialDownload(isChecked);
-            }
-        }
     }
 
     private static final class CopyToClipboardOnClickListener implements View.OnClickListener {
