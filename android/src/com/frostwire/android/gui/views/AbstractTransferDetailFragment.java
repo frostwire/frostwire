@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
@@ -36,7 +38,10 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
+
+import java.util.List;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -47,7 +52,7 @@ import static com.frostwire.android.util.Asyncs.async;
  * Created on 10/10/17.
  */
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-
+    private Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private String infinity;
     private TransferStateStrings transferStateStrings;
 
@@ -254,5 +259,43 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             return "0%";
         }
         return String.valueOf(100 * ((float) sent / (float) received)) + "%";
+    }
+
+    public static  <T, TH extends RecyclerView.ViewHolder> void updateAdapterItems(
+            RecyclerView.Adapter<TH> adapter,
+            List<T> items,
+            List<T> freshItems) {
+        if (freshItems != null && freshItems.size() > 0) {
+            if (items.isEmpty()) {
+                items.addAll(freshItems);
+
+                adapter.notifyDataSetChanged();
+            } else {
+                // Update existing items
+                for (int i = 0; i < items.size(); i++) {
+                    items.set(i, freshItems.get(i));
+                    adapter.notifyItemChanged(i);
+                }
+                if (items.size() < freshItems.size()) {
+                    // New list is bigger, add new elements
+                    int sizeDifference = freshItems.size() - items.size();
+                    int start = items.size();
+                    int end = freshItems.size();
+                    for (int i = start; i < end; i++) {
+                        items.add(freshItems.get(i));
+                        adapter.notifyItemInserted(i);
+                    }
+                } else if (freshItems.size() < items.size()) {
+                    // New list is smaller, shorten our list to match new list size
+                    while ((items.size() - freshItems.size()) > 0) {
+                        items.remove(items.size() - 1);
+                        adapter.notifyItemRangeRemoved(items.size()-1,1);
+                    }
+                }
+            }
+        } else {
+            items.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 }

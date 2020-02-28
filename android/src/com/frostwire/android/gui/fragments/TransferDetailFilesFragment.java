@@ -32,6 +32,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
@@ -44,6 +45,8 @@ import com.frostwire.transfers.TransferItem;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -99,7 +102,12 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         fileNumberTextView = findView(rootView, R.id.fragment_transfer_detail_files_file_number);
         totalSizeTextView = findView(rootView, R.id.fragment_transfer_detail_files_size_all);
         recyclerView = findView(rootView, R.id.fragment_transfer_detail_files_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            if (recyclerView.getItemAnimator() instanceof SimpleItemAnimator) {
+                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+            }
+        }
     }
 
     @Override
@@ -162,7 +170,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             holder.fileNameTextView.setText(transferItem.getName());
             int progress = bundle.getInt("progress");
             holder.fileProgressBar.setProgress(progress);
-            holder.fileProgressTextView.setText(progress + "%");
+            holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
             holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
             holder.playButtonImageView.setTag(transferItem);
             holder.updatePlayButtonVisibility(bundle.getBoolean("isComplete"), (File) bundle.getSerializable("previewFile"));
@@ -219,11 +227,9 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         void updateTransferItems(List<TransferItem> freshItems) {
-            items.clear();
-            if (freshItems != null && freshItems.size() > 0) {
-                items.addAll(freshItems);
-            }
-            notifyDataSetChanged();
+            Collections.sort(items, (o1, o2) -> -Integer.compare(o1.getProgress(),o2.getProgress()));
+            Collections.sort(freshItems, (o1, o2) -> -Integer.compare(o1.getProgress(),o2.getProgress()));
+            AbstractTransferDetailFragment.updateAdapterItems(this, items, freshItems);
         }
     }
 
