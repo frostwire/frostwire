@@ -272,9 +272,12 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
                 adapter.notifyDataSetChanged();
             } else {
                 // Update existing items
-                for (int i = 0; i < items.size(); i++) {
-                    items.set(i, freshItems.get(i));
-                    adapter.notifyItemChanged(i);
+                int maxSize = Math.min(items.size(), freshItems.size());
+                for (int i = 0; i < maxSize; i++) {
+                    try {
+                        items.set(i, freshItems.get(i));
+                        adapter.notifyItemChanged(i);
+                    } catch (Throwable ignored) {}
                 }
                 if (items.size() < freshItems.size()) {
                     // New list is bigger, add new elements
