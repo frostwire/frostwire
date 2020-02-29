@@ -165,7 +165,7 @@
     <string name="saving_to_internal_memory">Opslaan in het interne geheugen</string>
     <string name="choose_email_app">Kies een e-mail App…</string>
     <string name="my_filetype">Mijn %s</string>
-    <string name="retry_search">Opnieuw proberen</string>
+    <string name="retry">Opnieuw proberen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Het bestand kan niet worden gezaaid. BitTorrent wordt losgekoppeld blijven.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android zal de gedownloade bestanden wissen als FrostWire wordt verwijderd.</string>
     <string name="protected_connection">VPN-beschermde</string>

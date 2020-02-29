@@ -90,7 +90,7 @@
     <string name="share">सामायिक करा</string>
     <string name="accept">स्वीकार करा</string>
     <string name="torrent_max_download_speed_summary">कमाल डाउनलोड स्पीड (0 अमर्यादित म्हणजे)</string>
-    <string name="retry_search">पुन्हा प्रयत्न करा</string>
+    <string name="retry">पुन्हा प्रयत्न करा</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">फाइलची वर्गवारी करणे शक्य नाही. बिटटॉरंट डिस्कनेक्ट केलेले राहतील.</string>
     <string name="seed_all_finished">बीज सर्व पूर्ण</string>
     <string name="exclude">वगळा</string>

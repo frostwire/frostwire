@@ -74,7 +74,7 @@
     <string name="share">Дял</string>
     <string name="accept">Приеми</string>
     <string name="torrent_max_download_speed_summary">Максимална скорост на изтегляне (0 означава неограничен)</string>
-    <string name="retry_search">Повторен опит</string>
+    <string name="retry">Повторен опит</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файлът не може да се засява. BitTorrent ще остане изключен.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ще изтрие изтеглените файлове, ако FrostWire е деинсталиран.</string>
     <string name="protected_connection">VPN-защитени</string>

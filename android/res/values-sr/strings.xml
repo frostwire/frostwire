@@ -159,7 +159,7 @@
     <string name="my_filetype">Moja %s</string>
     <string name="use_soundcloud">Користе Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Довнлоад није подржан</string>
-    <string name="retry_search">Покушајте поново</string>
+    <string name="retry">Покушајте поново</string>
     <string name="use_archiveorg">Користе Archive.org</string>
     <string name="crawl_cache_size">цравл кеш %1$.2fMB</string>
     <string name="deleted_crawl_cache">Делетед краул кеш</string>

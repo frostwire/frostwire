@@ -74,7 +74,7 @@
     <string name="share">Megosztása</string>
     <string name="accept">Elfogad</string>
     <string name="torrent_max_download_speed_summary">Max letöltési sebesség (0 azt jelenti, korlátlan)</string>
-    <string name="retry_search">Próbálja újra</string>
+    <string name="retry">Próbálja újra</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">A fájlt nem lehet magot. BitTorrent marad le.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android törli a letöltött fájlokat, ha FrostWire eltávolításra kerül.</string>
     <string name="protected_connection">VPN-védett</string>

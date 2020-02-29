@@ -163,7 +163,7 @@
     <string name="choose_email_app">이메일 앱 선택…</string>
     <string name="my_filetype">나의 %s</string>
     <string name="accept">수락</string>
-    <string name="retry_search">다시 해 보다</string>
+    <string name="retry">다시 해 보다</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">파일을 시드 할 수 없습니다. BitTorrent는 연결이 끊긴 상태로 유지됩니다.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android는 FrostWire를 제거하면 다운로드 한 파일을 지 웁니다.</string>
     <string name="protected_connection">VPN으로 보호 된</string>

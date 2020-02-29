@@ -103,7 +103,7 @@
     <string name="my_filetype">میرا %s</string>
     <string name="share">سیکنڈ اور</string>
     <string name="accept">قبول کریں</string>
-    <string name="retry_search">دوبارہ کوشش کریں</string>
+    <string name="retry">دوبارہ کوشش کریں</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">فائل کو ترجیح نہیں ہوسکی. BitTorrent کے منقطع رہے گا.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">اگر FrostWire ان انسٹال کیا جاتا ہے لوڈ، اتارنا Android ڈاؤن لوڈ فائلوں کو مٹا دے گا.</string>
     <string name="protected_connection">VPN کے ذریعہ محفوظ</string>

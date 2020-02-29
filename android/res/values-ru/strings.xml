@@ -144,7 +144,7 @@
     <string name="my_filetype">Мои %s</string>
     <string name="use_soundcloud">Использовать SoundCloud</string>
     <string name="torrent_scheme_download_not_supported">Загрузка не поддерживается</string>
-    <string name="retry_search">Повторить поиск</string>
+    <string name="retry">Повторить поиск</string>
     <string name="use_archiveorg">Использовать Archive.org</string>
     <string name="crawl_cache_size">Кэш индекса %1$.2fМБ</string>
     <string name="deleted_crawl_cache">Очистить кэш индекса</string>

@@ -149,7 +149,7 @@
     <string name="saving_to_internal_memory">儲存到內置記憶體</string>
     <string name="my_filetype">我的%s</string>
     <string name="accept">接受</string>
-    <string name="retry_search">重試</string>
+    <string name="retry">重試</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">如果卸載 FrostWire，Android 將會清除所下載的檔案。</string>
     <string name="use_eztv">使用 Eztv</string>
     <string name="please_check_connection_status_before_resuming_download">請檢查網絡連接狀態再重新開始。</string>

@@ -164,7 +164,7 @@
     <string name="saving_to_internal_memory">Ukládání do interní paměti</string>
     <string name="choose_email_app">Vyberte e-mailovou aplikaci…</string>
     <string name="my_filetype">Můj %s</string>
-    <string name="retry_search">Opakovat</string>
+    <string name="retry">Opakovat</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Soubor nemohl být nasazená. BitTorrent zůstane odpojen.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android smaže stažené soubory, pokud FrostWire odinstalování.</string>
     <string name="protected_connection">VPN-chráněné</string>

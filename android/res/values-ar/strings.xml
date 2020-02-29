@@ -141,7 +141,7 @@
     <string name="my_filetype">الخاصة بي %s</string>
     <string name="use_soundcloud">Soundcloud.com استخدم</string>
     <string name="torrent_scheme_download_not_supported">هذا التنزيل غير مدعوم</string>
-    <string name="retry_search">إعادة المحاولة</string>
+    <string name="retry">إعادة المحاولة</string>
     <string name="use_archiveorg">Archive.org استخدم</string>
     <string name="crawl_cache_size">ذاكرة جمع البيانات %1$.2fMB ف.م.ب</string>
     <string name="deleted_crawl_cache">حذف ذاكرة جمع البيانات</string>

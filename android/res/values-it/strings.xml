@@ -165,7 +165,7 @@
     <string name="saving_to_internal_memory">Salvataggio di memoria interna</string>
     <string name="choose_email_app">Scegliere un Email app…</string>
     <string name="my_filetype">Mio %s</string>
-    <string name="retry_search">Riprova</string>
+    <string name="retry">Riprova</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Il archivio non può essere seminato. BitTorrent rimarrà scollegato.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android cancellerà archivio scaricati se FrostWire viene disinstallato.</string>
     <string name="protected_connection">VPN protetto</string>

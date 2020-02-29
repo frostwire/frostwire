@@ -172,7 +172,7 @@
     <string name="send_feedback">Feedback abschicken</string>
     <string name="saving_to_internal_memory">Speichern auf einem internen Speicher</string>
     <string name="choose_email_app">Wählen Sie eine E-Mail-App…</string>
-    <string name="retry_search">Wiederholen</string>
+    <string name="retry">Wiederholen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Die Datei konnte nicht ausgesät werden. BitTorrent bleiben getrennt.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android die heruntergeladenen Dateien löschen, wenn Frostwire deinstalliert.</string>
     <string name="protected_connection">VPN-geschützt</string>

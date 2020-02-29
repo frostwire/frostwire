@@ -165,7 +165,7 @@
     <string name="saving_to_internal_memory">Tiết kiệm để Bộ nhớ trong</string>
     <string name="choose_email_app">Chọn Email App…</string>
     <string name="my_filetype">%s của tôi</string>
-    <string name="retry_search">Thử lại</string>
+    <string name="retry">Thử lại</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Các tập tin không thể được gieo. BitTorrent sẽ vẫn bị ngắt kết nối.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android sẽ xóa các tập tin đã tải về nếu FrostWire được gỡ cài đặt.</string>
     <string name="protected_connection">VPN được bảo vệ</string>

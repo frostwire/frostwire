@@ -88,7 +88,7 @@
     <string name="share">భాగస్వామ్యం</string>
     <string name="accept">అంగీకరించు</string>
     <string name="torrent_max_download_speed_summary">మాక్స్ డౌన్లోడ్ వేగం (0 అర్థం అపరిమిత)</string>
-    <string name="retry_search">మళ్ళీ ప్రయత్నించు</string>
+    <string name="retry">మళ్ళీ ప్రయత్నించు</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ఫైల్ సీడ్ చేయబడలేదు. BitTorrent డిస్కనెక్ట్ చేయబడి ఉంటుంది.</string>
     <string name="seed_all_finished">సీడ్ అన్నీ పూర్తయ్యాయి</string>
     <string name="exclude">మినహాయించాలని</string>

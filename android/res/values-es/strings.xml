@@ -148,7 +148,7 @@
     <string name="my_filetype">Mis %s</string>
     <string name="use_soundcloud">Usar Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Descarga no suportada</string>
-    <string name="retry_search">Reintentar</string>
+    <string name="retry">Reintentar</string>
     <string name="use_archiveorg">Usar Archive.org</string>
     <string name="crawl_cache_size">Arrastrar Cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">Borrar arrastre de cache</string>

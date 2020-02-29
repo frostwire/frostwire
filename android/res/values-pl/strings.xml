@@ -143,7 +143,7 @@
     <string name="my_filetype">Moje %s</string>
     <string name="use_soundcloud">Używaj Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Pobranie nie jest wspomagane</string>
-    <string name="retry_search">Ponów</string>
+    <string name="retry">Ponów</string>
     <string name="use_archiveorg">Używaj Archive.org</string>
     <string name="crawl_cache_size">Indeksuj Pamięć Podręczną %1$.2fMB</string>
     <string name="deleted_crawl_cache">Usunięto Indeks Pamięci Podręcznej</string>

@@ -74,7 +74,7 @@
     <string name="share">ділитися</string>
     <string name="accept">Прийняти</string>
     <string name="torrent_max_download_speed_summary">Максимальна швидкість завантаження (0 означає необмежену)</string>
-    <string name="retry_search">Будь ласка, спробуйте</string>
+    <string name="retry">Будь ласка, спробуйте</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файл не може бути посіяні. BitTorrent залишатиметься відключений.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android буде стерти завантажені файли, якщо FrostWire видаляється.</string>
     <string name="protected_connection">VPN-захищений</string>

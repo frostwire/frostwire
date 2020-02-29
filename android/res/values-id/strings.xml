@@ -162,7 +162,7 @@
     <string name="choose_email_app">Pilih Email App…</string>
     <string name="my_filetype">Saya %s</string>
     <string name="accept">Menerima</string>
-    <string name="retry_search">Mencoba kembali</string>
+    <string name="retry">Mencoba kembali</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">File tidak bisa diunggulkan. BitTorrent akan tetap terputus.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan menghapus file yang didownload jika FrostWire dihapus.</string>
     <string name="protected_connection">VPN-dilindungi</string>

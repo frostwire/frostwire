@@ -150,7 +150,7 @@
     <string name="my_filetype">マイ %s</string>
     <string name="use_soundcloud">Soundcloud.comを使用する</string>
     <string name="torrent_scheme_download_not_supported">ダウンロードはサポートされていません</string>
-    <string name="retry_search">リトライ</string>
+    <string name="retry">リトライ</string>
     <string name="use_archiveorg">Archive.orgを使用する</string>
     <string name="crawl_cache_size">クロールキャッシュ %1$.2fMB</string>
     <string name="deleted_crawl_cache">クロールキャッシュを削除しました</string>

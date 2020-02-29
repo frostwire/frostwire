@@ -74,7 +74,7 @@
     <string name="share">Kongsi</string>
     <string name="accept">Menerimanya</string>
     <string name="torrent_max_download_speed_summary">Maksimum Muat turun kelajuan (0 bermakna tidak terhad)</string>
-    <string name="retry_search">Cuba semula</string>
+    <string name="retry">Cuba semula</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fail tidak boleh diletakkan sebagai pilihan. BitTorrent akan kekal diputuskan.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan memadam fail yang dimuat turun jika FrostWire adalah pemasangan.</string>
     <string name="protected_connection">VPN yang dilindungi</string>

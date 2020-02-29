@@ -74,7 +74,7 @@
     <string name="share">Jakaa</string>
     <string name="accept">Hyväksy</string>
     <string name="torrent_max_download_speed_summary">Enimmäismäärä Latausnopeus (0 tarkoittaa rajoittamatonta)</string>
-    <string name="retry_search">Yritä uudelleen</string>
+    <string name="retry">Yritä uudelleen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Tiedostoa ei kylvetään. BitTorrent pysyy irti.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android poistaa ladattuja tiedostoja, jos FrostWire on poistettu.</string>
     <string name="protected_connection">VPN-suojattu</string>

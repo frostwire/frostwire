@@ -76,7 +76,7 @@
     <string name="share">לַחֲלוֹק</string>
     <string name="accept">לְקַבֵּל</string>
     <string name="torrent_max_download_speed_summary">מקס מהירות הורדה (0 פירושו ללא הגבלה)</string>
-    <string name="retry_search">נסה שוב</string>
+    <string name="retry">נסה שוב</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">הקובץ לא להיות זרע. ביטורנט יישאר מנותק.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ימחק קבצים שהורדו אם FrostWire יוסר.</string>
     <string name="protected_connection">VPN-מוגן</string>

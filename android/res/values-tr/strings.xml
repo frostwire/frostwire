@@ -141,7 +141,7 @@
     <string name="my_filetype">Bana ait %s</string>
     <string name="use_soundcloud">Soundcloud.com\'u kullanın</string>
     <string name="torrent_scheme_download_not_supported">İndirme desteklenmiyor</string>
-    <string name="retry_search">Tekrar Deneyin</string>
+    <string name="retry">Tekrar Deneyin</string>
     <string name="use_archiveorg">Archive.org\'u kullanın</string>
     <string name="crawl_cache_size">%1$.2fMB Alt Önbellek</string>
     <string name="deleted_crawl_cache">Silinmiş alt önbellek</string>

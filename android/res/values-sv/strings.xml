@@ -76,7 +76,7 @@
     <string name="share">Dela med sig</string>
     <string name="accept">Acceptera</string>
     <string name="torrent_max_download_speed_summary">Max nedladdningshastighet (0 betyder obegränsat)</string>
-    <string name="retry_search">Försök igen</string>
+    <string name="retry">Försök igen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunde inte seedas. BitTorrent förblir frånkopplad.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android kommer att radera nedladdade filer om FrostWire avinstalleras .</string>
     <string name="protected_connection">VPN-skyddad</string>

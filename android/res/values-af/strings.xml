@@ -84,7 +84,7 @@
     <string name="share">Deel</string>
     <string name="accept">Aanvaar</string>
     <string name="torrent_max_download_speed_summary">Maksimale aflaai spoed (0 beteken onbeperk)</string>
-    <string name="retry_search">Herprobeer</string>
+    <string name="retry">Herprobeer</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Die lêer kon nie geplant word nie. BitTorrent sal ontkoppel bly.</string>
     <string name="seed_all_finished">Saad Alles Voltooi</string>
     <string name="exclude">Uitsluit</string>

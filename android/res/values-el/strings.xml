@@ -145,7 +145,7 @@
     <string name="my_filetype">Ο %s μου</string>
     <string name="use_soundcloud">Χρήση Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Το κατέβασμα δεν υποστηρίζεται</string>
-    <string name="retry_search">Επανάληψη</string>
+    <string name="retry">Επανάληψη</string>
     <string name="use_archiveorg">Χρήση Archive.org</string>
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">Διαγράφηκε το crawl cache</string>

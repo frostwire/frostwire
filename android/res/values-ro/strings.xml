@@ -72,7 +72,7 @@
     <string name="share">Împărtăşi</string>
     <string name="accept">Accept</string>
     <string name="torrent_max_download_speed_summary">Maxima Viteza de descărcare (0 înseamnă nelimitat)</string>
-    <string name="retry_search">Reîncerca</string>
+    <string name="retry">Reîncerca</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fișierul nu a putut fi însămânțate. BitTorrent va rămâne deconectat.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va șterge fișierele descărcate în cazul în care FrostWire este dezinstalat.</string>
     <string name="protected_connection">Protejat printr-un VPN</string>

@@ -74,7 +74,7 @@
     <string name="share">หุ้น</string>
     <string name="accept">ยอมรับ</string>
     <string name="torrent_max_download_speed_summary">แม็กซ์ความเร็วในการดาวน์โหลด (0 หมายถึงไม่ จำกัด)</string>
-    <string name="retry_search">ลองใหม่อีกครั้ง</string>
+    <string name="retry">ลองใหม่อีกครั้ง</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ไฟล์ที่ไม่สามารถเมล็ด BitTorrent จะยังคงตัดการเชื่อมต่อ</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android จะลบไฟล์ที่ดาวน์โหลด FrostWire ถ้ายกเลิกการติดตั้ง</string>
     <string name="protected_connection">VPN ที่มีการป้องกัน</string>

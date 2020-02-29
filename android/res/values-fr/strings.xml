@@ -144,7 +144,7 @@
     <string name="my_filetype">Mon %s</string>
     <string name="use_soundcloud">Utilisez Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Ce type de téléchargement n\'est pas pris en charge</string>
-    <string name="retry_search">Réessayez</string>
+    <string name="retry">Réessayez</string>
     <string name="use_archiveorg">Utilisez Archive.org</string>
     <string name="crawl_cache_size">Taille du cache de parcourt %1$.2fMB</string>
     <string name="deleted_crawl_cache">Effacer le cache de parcourt</string>

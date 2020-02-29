@@ -160,7 +160,7 @@
     <string name="choose_email_app">एक ईमेल अनुप्रयोग चुनें…</string>
     <string name="my_filetype">मेरे %s</string>
     <string name="accept">स्वीकार करना</string>
-    <string name="retry_search">पुन: प्रयास करें</string>
+    <string name="retry">पुन: प्रयास करें</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">फ़ाइल वरीयता प्राप्त नहीं किया जा सकता है। BitTorrent काट दिया रहेगा।</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">एंड्रॉयड डाउनलोड की फ़ाइलें मिटा देगा यदि FrostWire रद्द की है।</string>
     <string name="protected_connection">वीपीएन की रक्षा की</string>

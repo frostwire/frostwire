@@ -97,7 +97,7 @@
     <string name="support_frostwire">Podrži FrostWire</string>
     <string name="loading">Učitavam</string>
     <string name="stop">Zaustavi</string>
-    <string name="retry_search">Ponovno pokušaj</string>
+    <string name="retry">Ponovno pokušaj</string>
     <string name="use_archiveorg">Koristi Archive.org</string>
     <string name="use_frostclick">Koristi FrostClick</string>
     <string name="use_torlock">Koristi TorLock</string>
