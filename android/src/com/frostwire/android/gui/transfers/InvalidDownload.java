@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.transfers;
 
 import com.frostwire.android.R;
+import com.frostwire.search.SearchResult;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -35,13 +36,16 @@ import java.util.List;
 public class InvalidDownload implements Transfer, InvalidTransfer {
 
     private final int reasonResId;
+    private final SearchResult sr;
 
-    public InvalidDownload(int reasonResId) {
+    public InvalidDownload(int reasonResId, SearchResult searchResult) {
         this.reasonResId = reasonResId;
+        this.sr = searchResult;
     }
 
     public InvalidDownload(){
         this.reasonResId = R.string.download_type_not_supported;
+        sr = null;
     }
 
     @Override
@@ -131,5 +135,10 @@ public class InvalidDownload implements Transfer, InvalidTransfer {
     @Override
     public File previewFile() {
         return null;
+    }
+
+    @Override
+    public SearchResult getSearchResult() {
+        return sr;
     }
 }

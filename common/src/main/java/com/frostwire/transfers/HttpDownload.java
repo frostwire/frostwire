@@ -35,4 +35,8 @@ public class HttpDownload extends BaseHttpDownload {
     protected void onFinishing() {
         moveAndComplete(tempPath, savePath);
     }
+
+    public String getDownloadUrl() {
+        return info.url();
+    }
 }

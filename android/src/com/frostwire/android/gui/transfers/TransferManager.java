@@ -187,11 +187,11 @@ public final class TransferManager {
         Transfer transfer = null;
 
         if (isBittorrentSearchResultAndMobileDataSavingsOn(sr)) {
-            return new InvalidBittorrentDownload(R.string.torrent_transfer_aborted_on_mobile_data);
+            return new InvalidBittorrentDownload(R.string.torrent_transfer_aborted_on_mobile_data, sr);
         }
 
         if (isMobileAndDataSavingsOn()) {
-            return new InvalidDownload(R.string.cloud_download_aborted_on_mobile_data);
+            return new InvalidDownload(R.string.cloud_download_aborted_on_mobile_data, sr);
         }
 
         if (alreadyDownloading(sr.getDetailsUrl())) {
@@ -358,7 +358,7 @@ public final class TransferManager {
                     !scheme.equalsIgnoreCase("https") &&
                     !scheme.equalsIgnoreCase("magnet")) {
                 LOG.warn("Invalid URI scheme: " + u.toString());
-                return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
+                return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
             }
 
             BittorrentDownload download = null;
@@ -399,7 +399,7 @@ public final class TransferManager {
             return download;
         } catch (Throwable e) {
             LOG.warn("Error creating download from uri: " + url, e);
-            return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported);
+            return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
         }
     }
 
@@ -428,7 +428,7 @@ public final class TransferManager {
             return bittorrentDownload;
         } catch (Throwable e) {
             LOG.warn("Error creating download from search result: " + sr);
-            return new InvalidBittorrentDownload(R.string.empty_string);
+            return new InvalidBittorrentDownload(R.string.empty_string, sr);
         }
     }
 

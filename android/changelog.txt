@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 633 - FEB/28/2020
+FrostWire 2.1.9 build 634 - FEB/29/2020
  - Album art display bug fixed
  - No more annoying 300x250 ad over album art on Music Player
  - Issues with search results not being displayed fixed
@@ -16,6 +16,7 @@ FrostWire 2.1.9 build 633 - FEB/28/2020
  - openssl 1.1.1d
  - Android NDK 21
  - R8 code minification enabled to build .apk
+ - UX: New 'Retry Download' action for failed magnet downloads
  - UX: No more annoying ever-present Android notification, only during active transfers or music playback
  - UX: Torrent search results now show how old they are
  - EngineService and MusicPlaybackService are no longer ran as foreground services following newer android guidelines

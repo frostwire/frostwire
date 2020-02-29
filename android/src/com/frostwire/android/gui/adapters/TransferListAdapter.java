@@ -33,6 +33,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -46,13 +48,14 @@ import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.PauseDownloadMenuAction;
 import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
+import com.frostwire.android.gui.adapters.menu.RetryDownloadAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.adapters.menu.TransferDetailsMenuAction;
-import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.InvalidTransfer;
+import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
@@ -80,8 +83,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * @author gubatron
@@ -163,6 +164,11 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         Object tag = view.getTag();
         String title = "";
         List<MenuAction> items = new ArrayList<>();
+        if (tag instanceof Transfer && ((Transfer) tag).getState().name().contains("ERROR")) {
+            if (tag instanceof InvalidTransfer || tag instanceof TorrentFetcherDownload) {
+               items.add(new RetryDownloadAction(contextRef.get(), (Transfer) tag));
+            }
+        }
         if (tag instanceof BittorrentDownload) {
             title = populateBittorrentDownloadMenuActions((BittorrentDownload) tag, items);
         } else if (tag instanceof Transfer) {
@@ -179,6 +185,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         if (finishedSuccessfully && Ref.alive(contextRef)) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
             boolean singleFile = files != null && files.size() == 1;
+
             if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(contextRef.get(), files.get(0), download));
             }
