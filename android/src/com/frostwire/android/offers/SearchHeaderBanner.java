@@ -274,6 +274,7 @@ public final class SearchHeaderBanner extends LinearLayout {
                 return;
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            searchHeaderBanner.dismissBannerButton.setVisibility(View.VISIBLE);
             if (searchHeaderBanner.getCurrentQuery() == null) {
                 LOG.info("onBannerLoaded() hiding, no ongoing query available");
                 searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
@@ -296,6 +297,7 @@ public final class SearchHeaderBanner extends LinearLayout {
                 return;
             }
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            searchHeaderBanner.dismissBannerButton.setVisibility(View.INVISIBLE);
             if (searchHeaderBanner.moPubView != null) {
                 searchHeaderBanner.setBannerViewVisibility(BannerType.MOPUB, false);
                 searchHeaderBanner.moPubView.destroy();
@@ -362,6 +364,7 @@ public final class SearchHeaderBanner extends LinearLayout {
             if (!Ref.alive(searchHeaderBannerRef)) {
                 return;
             }
+            searchHeaderBannerRef.get().dismissBannerButton.setVisibility(View.INVISIBLE);
             SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
             BannerType bannerType = BannerType.MOPUB;
             if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.VISIBLE &&
