@@ -41,7 +41,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        String transformedKeywords = encodedKeywords.replace("0%20", "+");
+        String transformedKeywords = encodedKeywords.replace("%20", "+");
         return "https://" + getDomainName() + "/search/?search=" + transformedKeywords;
     }
 

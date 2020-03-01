@@ -41,7 +41,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        String transformedKeywords = encodedKeywords.replace("0%20", "-");
+        String transformedKeywords = encodedKeywords.replace("%20", "-");
         return "https://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
     }
 
