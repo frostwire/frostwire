@@ -198,6 +198,7 @@
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
+    <string name="use_magnetdl">Use MagnetDL</string>
     <string name="use_nyaa">Use Nyaa</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>

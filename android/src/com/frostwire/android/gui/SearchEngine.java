@@ -27,6 +27,7 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -254,7 +255,16 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine MAGNETDL = new SearchEngine("MagnetDL", Constants.PREF_KEY_SEARCH_USE_MAGNETDL) {
+
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
+            MAGNETDL,
             TORRENTZ2,
             YIFY,
             FROSTCLICK,

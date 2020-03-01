@@ -41,7 +41,6 @@
     <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
         android:layout="@layout/view_preference_search_engine"
-        android:summary="@string/use_magnet_summary"
         android:title="@string/use_tpb" />
     <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_torlock"
@@ -60,13 +59,16 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_limetorrents" />
     <androidx.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_magnetdl"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_magnetdl" />
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_nyaa"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_nyaa" />
     <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
         android:layout="@layout/view_preference_search_engine"
-        android:summary="@string/use_magnet_summary"
         android:title="@string/use_yify" />
     <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_zooqle"

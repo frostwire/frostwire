@@ -156,6 +156,7 @@
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
+    <string name="use_magnetdl">Use MagnetDL</string>
     <string name="transfer_status_demuxing">Demuxeando</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vai deletar arquivos baixados se FrostWire é desinstalado.</string>
     <string name="use_eztv">Use Eztv</string>
