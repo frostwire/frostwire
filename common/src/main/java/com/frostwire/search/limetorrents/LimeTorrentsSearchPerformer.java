@@ -58,7 +58,7 @@ public class LimeTorrentsSearchPerformer extends TorrentSearchPerformer {
         String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length() - htmlPrefixIndex);
 
         ArrayList<LimeTorrentsSearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page)));
+        SearchMatcher matcher = new SearchMatcher((pattern.matcher(reducedHtml)));
         boolean matcherFound;
         int MAX_RESULTS = 50;
         do {
