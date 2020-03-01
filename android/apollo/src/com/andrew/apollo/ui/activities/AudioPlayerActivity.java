@@ -518,7 +518,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Used to hide the artwork and show the queue
         final FrameLayout mSwitch = findView(R.id.audio_player_switch);
-        mSwitch.setOnClickListener(mToggleHiddenPanel);
+        if (mSwitch != null) {
+            mSwitch.setOnClickListener(mToggleHiddenPanel);
+        }
 
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
