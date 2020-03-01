@@ -23,6 +23,7 @@ import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
+import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
@@ -60,6 +61,7 @@ public abstract class SearchEngine {
     private static final int ZOOQLE_ID = 21;
     private static final int NYAA_ID = 23;
     private static final int TORRENTZ2_ID = 24;
+    private static final int MAGNETDL_ID = 25;
 
     private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
@@ -159,6 +161,13 @@ public abstract class SearchEngine {
             return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
+    private static final SearchEngine MAGNETDL = new SearchEngine(MAGNETDL_ID, "MagnetDL", SearchEnginesSettings.MAGNETDL_ENABLED, "www.magnetdl.com") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private final int _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -173,11 +182,13 @@ public abstract class SearchEngine {
         postInitWork();
     }
 
+    /** Override for things like picking the fastest mirror domainName */
     protected void postInitWork() {}
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine> candidates = Arrays.asList(
+                MAGNETDL,
                 TORRENTZ2,
                 ZOOQLE,
                 TPB,

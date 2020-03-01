@@ -489,9 +489,10 @@ public final class SearchMediator {
                 GUIMediator.safeInvokeAndWait(() -> {
                     try {
                         SearchFilter filter = getSearchFilterFactory().createFilter();
+                        SearchResultDisplayer searchResultDisplayer = getSearchResultDisplayer();
                         for (UISearchResult sr : uiResults) {
                             if (filter.allow(sr)) {
-                                getSearchResultDisplayer().addQueryResult(token, sr, rp);
+                                searchResultDisplayer.addQueryResult(token, sr, rp);
                             }
                         }
                     } catch (Exception e) {
