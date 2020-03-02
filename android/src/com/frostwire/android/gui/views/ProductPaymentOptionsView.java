@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Marcelina Knitter (marcelinkaaa),
  * Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,9 @@ public class ProductPaymentOptionsView extends LinearLayout {
             return;
         }
         PaymentOptionsVisibility paymentOptionsVisibility = selectedProductCard.getPaymentOptionsVisibility();
-
+        if (paymentOptionsLayouts == null) {
+            return;
+        }
         if (paymentOptionsLayouts[PayButtonType.ONE_TIME.offset] != null) {
             paymentOptionsLayouts[PayButtonType.ONE_TIME.offset].setVisibility(paymentOptionsVisibility.oneTimeOption ? View.VISIBLE : View.GONE);
         }
