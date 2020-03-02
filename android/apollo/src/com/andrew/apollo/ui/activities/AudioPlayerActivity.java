@@ -551,6 +551,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button
         RepeatingImageButton mNextButton = findView(R.id.action_button_next);
+        if (mPreviousButton != null) {
+            // Set the repeat listener for the previous button
+            mPreviousButton.setRepeatListener(mRewindListener);
+        }
+        if (mNextButton != null) {
+            // Set the repeat listener for the next button
+            mNextButton.setRepeatListener(mFastForwardListener);
+        }
         // Track name
         mTrackName = findView(R.id.audio_player_track_name);
         // Artist name
@@ -559,7 +567,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mAlbumArt = findView(R.id.audio_player_album_art);
         // MoPubBannerView
         initMopubBannerView();
-
         // Small album art
         mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
@@ -569,25 +576,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Used to show and hide the queue fragment
         mQueueSwitch = findView(R.id.audio_player_switch_queue);
         // Theme the queue switch icon
-        mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+        if (mQueueSwitch != null) {
+            mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+        }
         // Progress
         mProgress = findView(android.R.id.progress);
-
-        if (mPreviousButton != null) {
-            // Set the repeat listener for the previous button
-            mPreviousButton.setRepeatListener(mRewindListener);
-        }
-
-        if (mNextButton != null) {
-            // Set the repeat listener for the next button
-            mNextButton.setRepeatListener(mFastForwardListener);
-        }
-
         if (mProgress != null) {
             // Update the progress
             mProgress.setOnSeekBarChangeListener(this);
         }
-
         showAlbumArt();
         if (mMopubBannerView != null && !Offers.disabledAds()) {
             mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
