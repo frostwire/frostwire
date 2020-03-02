@@ -88,15 +88,14 @@ public final class TransferDetailPiecesFragment extends AbstractTransferDetailFr
         TorrentStatus status = torrentHandle.status(TorrentHandle.QUERY_PIECES);
         TorrentInfo torrentInfo = torrentHandle.torrentFile();
 
-        if (pieceSizeString == null) {
+        if (pieceSizeString == null && torrentInfo != null) {
             pieceSizeString = UIUtils.getBytesInHuman(torrentInfo.pieceSize(0));
         }
 
-        if (totalPieces == -1) {
+        if (totalPieces == -1 && torrentInfo != null) {
             totalPieces = torrentInfo.numPieces();
             piecesNumberTextView.setText(String.valueOf(totalPieces));
-            //progressBar.setVisibility(View.VISIBLE);
-            hexHiveView.setVisibility(View.GONE);
+            hexHiveView.setVisibility(View.VISIBLE);
         }
 
         PieceIndexBitfield pieces = status.pieces();
