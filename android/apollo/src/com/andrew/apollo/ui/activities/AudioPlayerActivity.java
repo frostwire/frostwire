@@ -220,12 +220,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         initMopubBannerView();
 
         // Album Art Ad Controls
-        mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+        if (mPlaybackStatus != null) {
+            mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+        }
 
         PlayerGestureListener gestureListener = new PlayerGestureListener();
         gestureDetector = new GestureDetector(this, gestureListener);
         gestureDetector.setOnDoubleTapListener(gestureListener);
-        mAlbumArt.setOnTouchListener(gestureListener);
+        if (mAlbumArt != null) {
+            mAlbumArt.setOnTouchListener(gestureListener);
+        }
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
 
