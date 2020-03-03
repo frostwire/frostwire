@@ -1,4 +1,4 @@
-FrostWire 2.1.9 build 635 - MAR/02/2020
+FrostWire 2.1.9 build 636 - MAR/03/2020
  - Album art display bug fixed
  - No more annoying 300x250 ad over album art on Music Player
  - New MagnetDL search
