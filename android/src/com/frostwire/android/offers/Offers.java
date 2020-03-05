@@ -126,15 +126,15 @@ public final class Offers {
      */
     public static void showInterstitial(final Activity activity,
                                         String placement,
-                                        final boolean shutdownAfterwards,
-                                        final boolean dismissAfterwards) {
+                                        final boolean shutdownAfterward,
+                                        final boolean dismissAfterward) {
         if (Offers.disabledAds()) {
             LOG.info("Skipping interstitial ads display, Offers have been disabled");
         } else {
             for (AdNetwork adNetwork : getActiveAdNetworks()) {
                 if (adNetwork != null && adNetwork.started()) {
                     LOG.info("showInterstitial: AdNetwork " + adNetwork.getClass().getSimpleName() + " started? " + adNetwork.started());
-                    boolean interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterwards, dismissAfterwards);
+                    boolean interstitialShown = adNetwork.showInterstitial(activity, placement, shutdownAfterward, dismissAfterward);
                     if (interstitialShown) {
                         ConfigurationManager.instance().setLong(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, System.currentTimeMillis());
                         LOG.info("showInterstitial: " + adNetwork.getClass().getSimpleName() + " interstitial shown");
@@ -145,10 +145,10 @@ public final class Offers {
                 }
             }
         }
-        if (dismissAfterwards) {
+        if (dismissAfterward) {
             activity.finish();
         }
-        if (shutdownAfterwards) {
+        if (shutdownAfterward) {
             if (activity instanceof MainActivity) {
                 ((MainActivity) activity).shutdown();
             } else {
