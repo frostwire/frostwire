@@ -56,7 +56,7 @@ interface AdNetwork {
 
     boolean showInterstitial(Activity activity,
                              String placement,
-                             final boolean shutdownActivityAfterwards,
+                             final boolean shutdownAfterward,
                              final boolean dismissActivityAfterward);
 
     void loadNewInterstitial(Activity activity);
