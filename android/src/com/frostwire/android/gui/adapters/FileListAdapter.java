@@ -139,8 +139,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private View getListItemView(int position, View view, ViewGroup parent) {
         view = super.getView(position, view, parent);
         final FileDescriptorItem item = getItem(position);
-        if (item != null && item.fd.fileType == Constants.FILE_TYPE_AUDIO || item.fd.fileType == Constants.FILE_TYPE_RINGTONES) {
-            initPlaybackStatusOverlayTouchFeedback(view, item);
+        if (item != null && item.fd != null) {
+            if (item.fd.fileType == Constants.FILE_TYPE_AUDIO ||
+                item.fd.fileType == Constants.FILE_TYPE_RINGTONES) {
+                initPlaybackStatusOverlayTouchFeedback(view, item);
+            }
         }
         ImageView thumbnailView = findView(view, R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         if (thumbnailView != null) {
