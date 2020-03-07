@@ -1517,7 +1517,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
 
         // PLAYSTATE_CHANGED = PLAYING or PAUSED (not stopped)
-        if (PLAYSTATE_CHANGED.equals(change)) {
+        if (PLAYSTATE_CHANGED.equals(change) && musicPlaybackService.mNotificationHelper != null) {
             musicPlaybackService.mNotificationHelper.updatePlayState(isPlaying, isStopped);
         }
     }
