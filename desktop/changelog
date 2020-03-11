@@ -1,6 +1,7 @@
 frostwire (6.8.5) stable; urgency=high
   * New MagnetDL search provider
   * Search improvements
+  * New jlibtorrent 1.2.5.0 update
 
  -- FrostWire Team <contact@frostwire.com>  Sun, 01 Mar 2020 10:53:00 -0600
 
