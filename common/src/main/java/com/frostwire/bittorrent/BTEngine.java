@@ -104,7 +104,7 @@ public final class BTEngine extends SessionManager {
 
     private static SettingsPack defaultSettings() {
         SettingsPack sp = new SettingsPack();
-        sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
+        //sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
         if (ctx.optimizeMemory) {
             int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
             sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
@@ -145,7 +145,7 @@ public final class BTEngine extends SessionManager {
         sp.set_int(settings_pack.int_types.stop_tracker_timeout.swigValue(), 0);
         sp.set_int(settings_pack.int_types.alert_queue_size.swigValue(), 5000);
         sp.set_bool(settings_pack.bool_types.enable_dht.swigValue(), ctx.enableDht);
-        sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true); // will be dropped in libtorrent 1.2.4.0 (Feb 10th 2020)
+        //sp.set_bool(settings_pack.bool_types.upnp_ignore_nonrouters.swigValue(), true); // will be dropped in libtorrent 1.2.4.0 (Feb 10th 2020)
         if (ctx.optimizeMemory) {
             sp.set_bool(settings_pack.bool_types.enable_ip_notifier.swigValue(), false);
         }

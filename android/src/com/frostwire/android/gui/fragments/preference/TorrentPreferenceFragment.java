@@ -19,6 +19,7 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.DialogFragment;
+
 import androidx.preference.SwitchPreference;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
@@ -84,21 +85,25 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
 
     private void setupTorrentOptions() {
         SwitchPreference prefEnableDHT = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean newStatus = (boolean) newValue;
-            if (newStatus) {
-                BTEngine.getInstance().startDht();
-            } else {
-                BTEngine.getInstance().stopDht();
-            }
-            return true;
-        });
+        if (prefEnableDHT != null) {
+            prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean newStatus = (boolean) newValue;
+                if (newStatus) {
+                    BTEngine.getInstance().startDht();
+                } else {
+                    BTEngine.getInstance().stopDht();
+                }
+                return true;
+            });
+        }
 
         SwitchPreference prefSequentialTransfers = findPreference(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
-        prefSequentialTransfers.setOnPreferenceChangeListener((preference, newValue) -> {
-            UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
-            return true;
-        });
+        if (prefSequentialTransfers != null) {
+            prefSequentialTransfers.setOnPreferenceChangeListener((preference, newValue) -> {
+                UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
+                return true;
+            });
+        }
 
         final BTEngine e = BTEngine.getInstance();
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);

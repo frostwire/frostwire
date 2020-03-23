@@ -19,6 +19,7 @@ package com.frostwire.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
@@ -114,7 +115,11 @@ public final class TaskThrottle {
 
             Set<String> taskNames;
             synchronized (recycleLock) {
-                taskNames = asyncTaskSubmissionTimestampMap.keySet();
+                // Android implementations of Hashtable.keySet()
+                // may or may not return a synchronized set, and in any event
+                // we don't want to share the set instance in different threads
+                // Therefore we ensure a copy after seeing 5 crashed users appear among 40k installations.
+                taskNames = new HashSet<>(asyncTaskSubmissionTimestampMap.keySet());
             }
             for (String taskName : taskNames) {
                 numKeysBeforeRecycle++;
