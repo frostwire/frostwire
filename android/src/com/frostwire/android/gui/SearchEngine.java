@@ -226,7 +226,7 @@ public abstract class SearchEngine {
                         "piratebay.live",
                         "thepiratebay.zone",
                         "thepiratebay.monster",
-                        "pirateproxy.llc",
+                        "thepiratebay0.org",
                         "thepiratebay.vip",
                 };
                 domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
