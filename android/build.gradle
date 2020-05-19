@@ -193,7 +193,7 @@ dependencies {
     implementation 'androidx.exifinterface:exifinterface:1.2.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
-    implementation 'com.android.billingclient:billing:2.1.0'
+    implementation 'com.android.billingclient:billing:2.2.0'
     implementation 'com.google.android.gms:play-services-ads:19.1.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android:flexbox:1.1.1'
