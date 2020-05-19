@@ -203,8 +203,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-interstitial:5.11.0@aar') { transitive = true }
     implementation('com.mopub:mopub-sdk-rewardedvideo:5.11.0@aar') { transitive = true }
     // MoPub Mediation Partners
-    implementation 'com.applovin:applovin-sdk:9.11.4'
-    implementation 'com.mopub.mediation:applovin:9.11.4.0'
+    implementation 'com.applovin:applovin-sdk:9.12.6'
+    implementation 'com.mopub.mediation:applovin:9.12.5.0'
     implementation 'com.unity3d.ads:unity-ads:3.4.2'
     implementation 'com.mopub.mediation:unityads:3.4.2.0'
 

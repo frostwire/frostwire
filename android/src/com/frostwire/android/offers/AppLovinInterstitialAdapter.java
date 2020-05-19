@@ -80,18 +80,9 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         if (ad != null && activity != null) {
             try {
                 final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activity), activity);
-
-                if (adDialog.isShowing()) {
-                    // this could happen because a previous ad failed to be properly dismissed
-                    // since the code is obfuscated there is no realistic possibility to detect where
-                    // the error is, then it needs to be discussed with the provider or change
-                    // our usage patter of the framework.
-                    LOG.warn("Review the applovin ad framework");
-                    adDialog.dismiss();
-                    return false;
-                }
                 adDialog.setAdDisplayListener(this);
-                adDialog.showAndRender(ad, placement);
+                adDialog.showAndRender(ad);
+
                 result = true;
             } catch (Throwable t) {
                 result = false;
