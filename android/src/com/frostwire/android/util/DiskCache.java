@@ -27,6 +27,7 @@ import java.io.InputStream;
 import okhttp3.internal.cache.DiskLruCache;
 import okhttp3.internal.cache.DiskLruCache.Editor;
 import okhttp3.internal.cache.DiskLruCache.Snapshot;
+import okhttp3.internal.concurrent.TaskRunner;
 import okhttp3.internal.io.FileSystem;
 import okio.BufferedSink;
 import okio.ByteString;
@@ -42,12 +43,12 @@ public final class DiskCache {
     private static final Logger LOG = Logger.getLogger(DiskCache.class);
 
     private static final int APP_VERSION = 1;
-    private static final int VALUE_COUNT = 1;
+    private static final int VALUE_COUNT_PER_CACHE_ENTRY = 2; // seen at okhttp3.Cache use of DiskLruCache constructor
 
     private final DiskLruCache cache;
 
     public DiskCache(File directory, long size) {
-        this.cache = DiskLruCache.create(FileSystem.SYSTEM, directory, APP_VERSION, VALUE_COUNT, size);
+        this.cache = new DiskLruCache(FileSystem.SYSTEM, directory, APP_VERSION, VALUE_COUNT_PER_CACHE_ENTRY, size, TaskRunner.INSTANCE);
     }
 
     public boolean containsKey(String key) {
@@ -153,21 +154,15 @@ public final class DiskCache {
     }
 
     private void writeTo(Editor editor, byte[] data) throws IOException {
-        BufferedSink out = Okio.buffer(editor.newSink(0));
-        try {
+        try (BufferedSink out = Okio.buffer(editor.newSink(0))) {
             out.write(data);
-        } finally {
-            out.close();
         }
     }
 
     private void writeTo(Editor editor, InputStream in) throws IOException {
-        BufferedSink out = Okio.buffer(editor.newSink(0));
-        Source source = Okio.source(in);
-        try {
+        try (BufferedSink out = Okio.buffer(editor.newSink(0))) {
+            Source source = Okio.source(in);
             out.writeAll(source);
-        } finally {
-            out.close();
         }
     }
 
@@ -186,9 +181,6 @@ public final class DiskCache {
 
         public InputStream getInputStream() {
             final Source source = snapshot.getSource(0);
-            if (source == null) {
-                return null;
-            }
             return Okio.buffer(source).inputStream();
         }
 

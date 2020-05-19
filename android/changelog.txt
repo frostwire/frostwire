@@ -1,3 +1,7 @@
+FrostWire 2.1.10 build 638 - MAY/19/2020
+ - com.squareup.okhttp3:okhttp:3.14.0 -> 4.4.1
+ - dev: com.android.tools.build:gradle:3.6.1->3.6.3
+
 FrostWire 2.1.9 build 637 - MAR/05/2020
  - Album art display bug fixed
  - No more annoying 300x250 ad over album art on Music Player
