@@ -262,6 +262,10 @@ public final class MusicUtils {
             }
         }
 
+        @Override
+        public void onNullBinding(ComponentName name) {
+            LOG.warn("onNullBinding(componentName=" + name + ")");
+        }
     }
 
     /**
@@ -1128,7 +1132,7 @@ public final class MusicUtils {
         }
 
         if (MusicPlaybackService.getMusicPlayerHandler() != null &&
-            MusicPlaybackService.getMusicPlayerHandler().getThread() != Thread.currentThread()) {
+                MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
             MusicPlaybackService.getMusicPlayerHandler().safePost(() -> addToPlaylist(context, ids, playlistid));
             return;
         }

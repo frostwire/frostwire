@@ -22,6 +22,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Ref;
@@ -58,7 +59,10 @@ class StopListener implements View.OnLongClickListener {
 
     private static void stopMusicTask(View v) {
         try {
-            MusicUtils.getMusicPlaybackService().stop();
+            MusicPlaybackService musicPlaybackService = MusicUtils.getMusicPlaybackService();
+            if (musicPlaybackService != null) {
+                musicPlaybackService.stop();
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }

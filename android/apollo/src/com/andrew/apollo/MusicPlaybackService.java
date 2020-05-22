@@ -37,9 +37,11 @@ import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.PowerManager;
@@ -86,6 +88,7 @@ public class MusicPlaybackService extends JobIntentService {
     private static final boolean D = BuildConfig.DEBUG;
 
     private static MusicPlaybackService INSTANCE = null;
+    private static final LocalBinder binder = new LocalBinder();
 
     /**
      * Indicates that the music has paused or resumed
@@ -563,6 +566,17 @@ public class MusicPlaybackService extends JobIntentService {
         }
     }
 
+    private static class LocalBinder extends Binder {
+        MusicPlaybackService getMusicPlaybackService() {
+            return MusicPlaybackService.INSTANCE;
+        }
+    }
+
+    @Override
+    public IBinder onBind(@NonNull Intent intent) {
+        return binder;
+    }
+
     @Override
     public void onRebind(final Intent intent) {
         INSTANCE = this;
@@ -706,6 +720,7 @@ public class MusicPlaybackService extends JobIntentService {
         } catch (Throwable ignored) {
         }
         INSTANCE = null;
+        mServiceInUse = false;
     }
 
     public void handleCommandIntent(Intent intent) {
@@ -1128,6 +1143,11 @@ public class MusicPlaybackService extends JobIntentService {
         if (removeNotification) {
             updateRemoteControlClient(PLAYSTATE_STOPPED);
             stopForeground(true);
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP ||
+                    Build.VERSION.SDK_INT == Build.VERSION_CODES.LOLLIPOP_MR1) {
+                stopService(new Intent(this, MusicPlaybackService.class));
+            }
         } else {
             stopForeground(isStopped);
         }
@@ -2675,12 +2695,12 @@ public class MusicPlaybackService extends JobIntentService {
             super(looper);
         }
 
-        public Thread getThread() {
+        public Thread getLooperThread() {
             return getLooper().getThread();
         }
 
         public void safePost(@NonNull Runnable r) {
-            if (Thread.currentThread() == getThread()) {
+            if (Thread.currentThread() == getLooperThread()) {
                 try {
                     r.run();
                 } catch (Throwable t) {
