@@ -178,7 +178,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private static void loadConsentDialogAsync(MoPubAdNetwork mopubAdNetwork) {
         PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
-        personalInfoManager.forceGdprApplies(); //uncomment to test in the US
+        //personalInfoManager.forceGdprApplies(); //uncomment to test in the US
 
         if (personalInfoManager != null && personalInfoManager.shouldShowConsentDialog()) {
             personalInfoManager.subscribeConsentStatusChangeListener(mopubAdNetwork);

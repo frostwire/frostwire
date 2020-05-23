@@ -2392,7 +2392,6 @@ public class MusicPlaybackService extends JobIntentService {
             setRepeatMode(REPEAT_ALL);
         }
 
-        //synchronized (this) {
         if (mPlayListLen <= 0) {
             if (D) LOG.info("No play queue");
             return;
@@ -2408,7 +2407,6 @@ public class MusicPlaybackService extends JobIntentService {
             }
             notifyChange(META_CHANGED);
         }
-        //}
     }
 
     public void gotoPrev() {
