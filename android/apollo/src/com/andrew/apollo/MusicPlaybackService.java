@@ -2387,6 +2387,7 @@ public class MusicPlaybackService extends JobIntentService {
     public void gotoNext(final boolean force) {
         if (D) LOG.info("Going to next track");
 
+        int currentRepeatMode = mRepeatMode;
         if (force && mRepeatMode == REPEAT_CURRENT) {
             setRepeatMode(REPEAT_ALL);
         }
@@ -2401,6 +2402,10 @@ public class MusicPlaybackService extends JobIntentService {
         mPlayPos = pos;
         if (openCurrentAndNext()) {
             play();
+            if (force) {
+                // make sure repeat mode is restored
+                setRepeatMode(currentRepeatMode);
+            }
             notifyChange(META_CHANGED);
         }
         //}
