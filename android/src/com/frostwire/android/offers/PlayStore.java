@@ -24,6 +24,7 @@ import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
@@ -85,10 +86,11 @@ public final class PlayStore extends StoreBase {
     private int billingClientResponseCode = BILLING_MANAGER_NOT_INITIALIZED;
 
     private long lastRefreshTime;
-    private String lastSkuPurchased;
+    private String lastDebugSkuPurchased;
     private Set<String> tokensToBeConsumed;
 
     private WeakReference<PurchasesUpdatedListener> globalPurchasesUpdatedListenerWeakRef;
+    private WeakReference<Activity> activityWeakReference;
 
     private static final Object lock = new Object();
     private static PlayStore instance;
@@ -112,7 +114,7 @@ public final class PlayStore extends StoreBase {
         } else if (responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
             LOG.info("onPurchasesUpdated() - user cancelled the purchase flow - skipping");
         } else {
-            LOG.info("onPurchasesUpdated() got unknown resultCode: " + responseCode);
+            LOG.warn("onPurchasesUpdated() got unknown resultCode: " + responseCode);
         }
 
         try {
@@ -205,14 +207,14 @@ public final class PlayStore extends StoreBase {
 
         if (BuildConfig.DEBUG) {
             UIUtils.showLongMessage(activity, "The purchase will be mocked");
-            lastSkuPurchased = p.sku();
+            lastDebugSkuPurchased = p.sku();
         }
     }
 
     @Override
     public boolean enabled(String code) {
         if (BuildConfig.DEBUG) {
-            if (lastSkuPurchased != null) {
+            if (lastDebugSkuPurchased != null) {
                 return true;
             }
         }
@@ -399,6 +401,7 @@ public final class PlayStore extends StoreBase {
      */
     private void initiatePurchaseFlow(final Activity activity, final String skuId,
                                       final @BillingClient.SkuType String billingType) {
+        activityWeakReference = new WeakReference<>(activity);
         Runnable purchaseFlowRequest = () -> {
             if (isClientDisconnected()) {
                 return;
@@ -414,9 +417,13 @@ public final class PlayStore extends StoreBase {
                         SkuDetails skuDetails = skuDetailsList.get(0);
                         LOG.info("Launching billing flow for SKU " + skuId);
                         BillingFlowParams purchaseParams = BillingFlowParams.newBuilder().setSkuDetails(skuDetails).build();
-                        billingClient.launchBillingFlow(activity, purchaseParams);
+                        if (Ref.alive(activityWeakReference)) {
+                            billingClient.launchBillingFlow(activityWeakReference.get(), purchaseParams);
+                        } else {
+                            LOG.error("executeServiceRequest::initiatePurchaseFlow::billingClient.querySkuDetailsAsync: could not do billingClient.launchBillingFlow, reference to activity lost");
+                        }
                     } catch (Throwable t) {
-                        LOG.error("Error in initiatePurchaseFlow::billingClient.querySkuDetailsAsync callback", t);
+                        LOG.error("executeServiceRequest::initiatePurchaseFlow::billingClient.querySkuDetailsAsync callback", t);
                     }
                 });
 
@@ -520,6 +527,20 @@ public final class PlayStore extends StoreBase {
         }
 
         LOG.info("Got a verified purchase: " + purchase);
+
+        if (purchase.isAutoRenewing() && !purchase.isAcknowledged()) {
+            AcknowledgePurchaseParams acknowledgePurchaseParams = AcknowledgePurchaseParams.
+                    newBuilder().
+                    setPurchaseToken(purchase.getPurchaseToken()).
+                    build();
+
+            this.billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
+                if (Ref.alive(activityWeakReference)) {
+                    LOG.info("PlayStore::handlePurchase::acknowledgePurchase callback -> subs");
+                    UIUtils.showLongMessage(activityWeakReference.get(), "Subscription acknowledged!");
+                }
+            });
+        }
 
         inventory.addPurchase(purchase);
     }
