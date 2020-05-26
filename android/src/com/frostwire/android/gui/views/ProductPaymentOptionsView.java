@@ -22,6 +22,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.frostwire.android.R;
 
@@ -48,6 +49,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
     }
 
     private OnBuyListener listener;
+    private TextView autoRenewalTextView = null;
     private View[] buttons = null;
     private View[] progressBars = null;
     private View[] paymentOptionsLayouts = null;
@@ -60,6 +62,9 @@ public class ProductPaymentOptionsView extends LinearLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         View.inflate(getContext(), R.layout.view_product_payment_options, this);
+        TextView selectOptionViewTextView = findViewById(R.id.view_product_payment_options_select_option_below_text);
+        selectOptionViewTextView.setVisibility(View.GONE);
+        autoRenewalTextView = findViewById(R.id.view_product_payment_options_automatic_renewal);
         buttons = new View[]{
                 findViewById(R.id.view_product_payment_options_buy_automatic_renewal_button),
                 findViewById(R.id.view_product_payment_options_buy_one_time_button),
@@ -149,6 +154,12 @@ public class ProductPaymentOptionsView extends LinearLayout {
         }
         if (paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset] != null) {
             paymentOptionsLayouts[PayButtonType.SUBSCRIPTION.offset].setVisibility(paymentOptionsVisibility.subscriptionOption ? View.VISIBLE : View.GONE);
+            if (paymentOptionsVisibility.subscriptionOption) {
+                String subscriptionPeriodString = selectedProductCard.getSubscriptionPeriodString().toLowerCase();
+                subscriptionPeriodString = subscriptionPeriodString.substring(0, 1).toUpperCase() + subscriptionPeriodString.substring(1);
+                String autoRenewalString = getResources().getString(R.string.automatic_renewal) + " " + subscriptionPeriodString;
+                autoRenewalTextView.setText(autoRenewalString);
+            }
         }
         if (paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset] != null) {
             paymentOptionsLayouts[PayButtonType.REWARD_VIDEO.offset].setVisibility(paymentOptionsVisibility.rewardOption ? View.VISIBLE : View.GONE);

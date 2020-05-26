@@ -70,9 +70,9 @@ public class ProductCardView extends RelativeLayout {
         if (sku != null) {
             subscriptionPeriod = "";
             if (Products.SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
-                subscriptionPeriod = "/" + getContext().getResources().getString(R.string.period_monthly);
+                subscriptionPeriod = getContext().getResources().getString(R.string.period_monthly);
             } else if (Products.SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
-                subscriptionPeriod = "/" + getContext().getResources().getString(R.string.period_yearly);
+                subscriptionPeriod = getContext().getResources().getString(R.string.period_yearly);
             }
         }
         if (productDescription != null) {
@@ -117,7 +117,7 @@ public class ProductCardView extends RelativeLayout {
         initTextView(R.id.view_product_card_title_bold_portion, titleBold);
         initTextView(R.id.view_product_card_title_normal_portion, titleNormal);
         initTextView(R.id.view_product_card_price, price);
-        initTextView(R.id.view_product_card_subscription_period, subscriptionPeriod);
+        initTextView(R.id.view_product_card_subscription_period, "/" + subscriptionPeriod);
         initTextView(R.id.view_product_card_description, description);
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
     }
@@ -134,5 +134,9 @@ public class ProductCardView extends RelativeLayout {
         } else {
             textView.setVisibility(View.GONE);
         }
+    }
+
+    public String getSubscriptionPeriodString() {
+        return subscriptionPeriod;
     }
 }
