@@ -27,13 +27,11 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.ThreadPool;
 import com.mopub.mobileads.MoPubRewardedVideos;
 
 import java.lang.ref.WeakReference;
@@ -42,7 +40,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -443,7 +440,7 @@ public final class Offers {
         boolean stopped = false;
         PlayStore playStore = PlayStore.getInstance(context);
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-        if (purchasedProducts != null && purchasedProducts.size() > 0) {
+        if (purchasedProducts.size() > 0) {
             Offers.stopAdNetworks(context);
             stopped = true;
             LOG.info("Turning off ads, user previously purchased AdRemoval");

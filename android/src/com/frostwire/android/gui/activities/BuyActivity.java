@@ -79,7 +79,7 @@ public final class BuyActivity extends AbstractActivity {
     private ProductCardView cardNminutes;
     private ProductCardView card30days;
     private ProductCardView card1year;
-    private ProductCardView card6months;
+    //private ProductCardView card6months;
     private ProductCardView selectedProductCard;
 
     /**
@@ -154,8 +154,8 @@ public final class BuyActivity extends AbstractActivity {
 
         // If Google Store not ready or available, auto-select rewarded ad option
         if (card30days.getVisibility() == View.GONE ||
-            card1year.getVisibility() == View.GONE ||
-            card6months.getVisibility() == View.GONE) {
+                card1year.getVisibility() == View.GONE) {
+                //card6months.getVisibility() == View.GONE) {
             cardNminutes.performClick();
         }
 
@@ -199,7 +199,7 @@ public final class BuyActivity extends AbstractActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        scrollToSelectedCard();
+        scrollToSelectedCard(selectedProductCard);
     }
 
     @Override
@@ -258,7 +258,7 @@ public final class BuyActivity extends AbstractActivity {
         View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
         card30days = findView(R.id.activity_buy_product_card_30_days);
         card1year = findView(R.id.activity_buy_product_card_1_year);
-        card6months = findView(R.id.activity_buy_product_card_6_months);
+        //card6months = findView(R.id.activity_buy_product_card_6_months);
         cardNminutes = findView(R.id.activity_buy_product_card_reward);
 
         if (REWARD_FREE_AD_MINUTES > 0) {
@@ -272,37 +272,24 @@ public final class BuyActivity extends AbstractActivity {
         PlayStore store = PlayStore.getInstance(this);
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
-            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, Products.INAPP_DISABLE_ADS_1_MONTH_SKU);
-            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, Products.INAPP_DISABLE_ADS_1_YEAR_SKU);
-            initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, Products.INAPP_DISABLE_ADS_6_MONTHS_SKU);
+            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, null);
+            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, null);
+            //initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, null);
             card30days.setOnClickListener(cardClickListener);
             card1year.setOnClickListener(cardClickListener);
-            card6months.setOnClickListener(cardClickListener);
+            //card6months.setOnClickListener(cardClickListener);
         } else {
             card30days.setVisibility(View.GONE);
             card1year.setVisibility(View.GONE);
-            card6months.setVisibility(View.GONE);
+            //card6months.setVisibility(View.GONE);
         }
 
         initLastCardSelection(lastSelectedCardViewId);
     }
 
     private void initLastCardSelection(int lastSelectedCardViewId) {
-        switch (lastSelectedCardViewId) {
-            case R.id.activity_buy_product_card_reward:
-                selectedProductCard = cardNminutes;
-            case R.id.activity_buy_product_card_30_days:
-                selectedProductCard = card30days;
-                break;
-            case R.id.activity_buy_product_card_6_months:
-                selectedProductCard = card6months;
-                break;
-            case R.id.activity_buy_product_card_1_year:
-            default:
-                selectedProductCard = card1year;
-                break;
-        }
-        highlightSelectedCard();
+        selectedProductCard = getSelectedProductCard(lastSelectedCardViewId, this);
+        highlightSelectedCard(selectedProductCard);
     }
 
     private void initPaymentOptionsView(int paymentOptionsVisibility) {
@@ -326,7 +313,7 @@ public final class BuyActivity extends AbstractActivity {
         });
 
         if (paymentOptionsVisibility == View.VISIBLE) {
-            showPaymentOptionsBelowSelectedCard();
+            showPaymentOptionsBelowSelectedCard(selectedProductCard);
         }
     }
 
@@ -407,8 +394,10 @@ public final class BuyActivity extends AbstractActivity {
         card.updateTitle(productReward.title());
     }
 
-    private void initProductCard(ProductCardView card, PlayStore store, String subsSKU, String
-            inappSKU) {
+    private void initProductCard(ProductCardView card,
+                                 PlayStore store,
+                                 String subsSKU,
+                                 String inappSKU) {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }
@@ -418,22 +407,16 @@ public final class BuyActivity extends AbstractActivity {
         if (subsSKU == null) {
             throw new IllegalArgumentException("subsSKU argument can't be null");
         }
-        if (inappSKU == null) {
-            throw new IllegalArgumentException("inappSKU argument can't be null");
-        }
-
-        Product prodSubs = store.product(subsSKU);
-        Product prodInApp = store.product(inappSKU);
-
-        if (prodSubs == null || prodInApp == null) {
+        final boolean includeOnetimeProducts = inappSKU != null;
+        final Product prodSubs = store.product(subsSKU);
+        final Product prodInApp = includeOnetimeProducts ? store.product(inappSKU) : null;
+        if (prodSubs == null && prodInApp == null) {
             card.setVisibility(View.GONE);
             return;
         }
-
         card.setTag(R.id.subs_product_tag_id, prodSubs);
         card.setTag(R.id.inapp_product_tag_id, prodInApp);
-        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(true, true, false));
-
+        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(includeOnetimeProducts, true, false));
         card.updateData(prodSubs);
     }
 
@@ -465,30 +448,30 @@ public final class BuyActivity extends AbstractActivity {
         return paymentOptionsVisibility;
     }
 
-    private void highlightSelectedCard() {
-        if (selectedProductCard == null) {
+    private void highlightSelectedCard(ProductCardView productCardView) {
+        if (productCardView == null) {
             return;
         }
-        card30days.setSelected(selectedProductCard == card30days);
-        card1year.setSelected(selectedProductCard == card1year);
-        card6months.setSelected(selectedProductCard == card6months);
-        cardNminutes.setSelected(selectedProductCard == cardNminutes);
+        card30days.setSelected(productCardView == card30days);
+        card1year.setSelected(productCardView == card1year);
+        //card6months.setSelected(productCardView == card6months);
+        cardNminutes.setSelected(productCardView == cardNminutes);
     }
 
-    private void scrollToSelectedCard() {
+    private void scrollToSelectedCard(ProductCardView productCardView) {
         ScrollView scrollView = findView(R.id.activity_buy_scrollview);
         LinearLayout linearLayout = (LinearLayout) scrollView.getChildAt(0);
-        int index = linearLayout.indexOfChild(selectedProductCard);
-        int cardHeight = selectedProductCard.getHeight() + selectedProductCard.getPaddingTop();
+        int index = linearLayout.indexOfChild(productCardView);
+        int cardHeight = productCardView.getHeight() + productCardView.getPaddingTop();
         scrollView.scrollTo(0, index * cardHeight);
     }
 
-    private void showPaymentOptionsBelowSelectedCard() {
-        paymentOptionsView.refreshOptionsVisibility(selectedProductCard);
+    private void showPaymentOptionsBelowSelectedCard(ProductCardView productCardView) {
+        paymentOptionsView.refreshOptionsVisibility(productCardView);
         final ViewGroup scrollView = findView(R.id.activity_buy_scrollview);
         final ViewGroup layout = (ViewGroup) scrollView.getChildAt(0);
         if (layout != null) {
-            int selectedCardIndex = layout.indexOfChild(selectedProductCard);
+            int selectedCardIndex = layout.indexOfChild(productCardView);
             final int paymentOptionsViewIndex = layout.indexOfChild(paymentOptionsView);
 
             if (paymentOptionsView.getVisibility() == View.VISIBLE) {
@@ -524,30 +507,42 @@ public final class BuyActivity extends AbstractActivity {
         paymentOptionsView.stopProgressBar(payButtonType);
     }
 
+    private static ProductCardView getSelectedProductCard(int productCardViewId, BuyActivity buyActivity) {
+        if (buyActivity == null) {
+            throw new IllegalArgumentException("BuyActivity::getSelectedProductCard(productCardViewId=" + productCardViewId + ", buyActivity=null!!!)");
+        }
+        ProductCardView productCard;
+        switch (productCardViewId) {
+            case R.id.activity_buy_product_card_30_days:
+                productCard = buyActivity.card30days;
+                break;
+//            case R.id.activity_buy_product_card_6_months:
+//                productCard = buyActivity.card6months;
+//                break;
+            case R.id.activity_buy_product_card_1_year:
+                productCard = buyActivity.card1year;
+                break;
+            case R.id.activity_buy_product_card_reward:
+                productCard = buyActivity.cardNminutes;
+                break;
+            default:
+                productCard = buyActivity.card1year;
+        }
+        return productCard;
+    }
+
     private class ProductCardViewOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             if (v instanceof ProductCardView) {
                 int id = v.getId();
-                switch (id) {
-                    case R.id.activity_buy_product_card_30_days:
-                        selectedProductCard = card30days;
-                        break;
-                    case R.id.activity_buy_product_card_1_year:
-                        selectedProductCard = card1year;
-                        break;
-                    case R.id.activity_buy_product_card_6_months:
-                        selectedProductCard = card6months;
-                        break;
-                    case R.id.activity_buy_product_card_reward:
-                        selectedProductCard = cardNminutes;
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Card view not handled, review layout");
-                }
-                highlightSelectedCard();
-                showPaymentOptionsBelowSelectedCard();
-                scrollToSelectedCard();
+                BuyActivity buyActivity = (BuyActivity) v.getContext();
+                ProductCardView selectedProductCard = BuyActivity.getSelectedProductCard(id, buyActivity);
+                buyActivity.selectedProductCard = selectedProductCard;
+                highlightSelectedCard(selectedProductCard);
+                showPaymentOptionsBelowSelectedCard(selectedProductCard);
+                scrollToSelectedCard(selectedProductCard);
+
             }
         }
     }

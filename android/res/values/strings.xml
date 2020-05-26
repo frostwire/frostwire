@@ -499,4 +499,7 @@
     <string name="n_months">%s months</string>
     <string name="n_years">%s years</string>
     <string name="enable_sequential_download_summary">Pieces are downloaded in order. Not recommended for network health</string>
+    <string name="dummy_period">/period</string>
+    <string name="period_monthly">monthly</string>
+    <string name="period_yearly">yearly</string>
 </resources>

@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.offers.Product;
+import com.frostwire.android.offers.Products;
 
 /**
  * @author gubatron
@@ -38,6 +39,7 @@ public class ProductCardView extends RelativeLayout {
     private final String titleBold;
     private final String titleNormal;
     private String price;
+    private String subscriptionPeriod;
     private String description;
     private final String hintButtonCaption;
     private final boolean selected;
@@ -58,11 +60,20 @@ public class ProductCardView extends RelativeLayout {
     }
 
     public void updateData(Product p) {
+        String sku = p.sku();
         String currency = p.currency();
         String productPrice = p.price();
         String productDescription = p.description();
         if (currency != null && productPrice != null) {
             price = currency + " " + productPrice;
+        }
+        if (sku != null) {
+            subscriptionPeriod = "";
+            if (Products.SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
+                subscriptionPeriod = "/" + getContext().getResources().getString(R.string.period_monthly);
+            } else if (Products.SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
+                subscriptionPeriod = "/" + getContext().getResources().getString(R.string.period_yearly);
+            }
         }
         if (productDescription != null) {
             description = productDescription;
@@ -106,6 +117,7 @@ public class ProductCardView extends RelativeLayout {
         initTextView(R.id.view_product_card_title_bold_portion, titleBold);
         initTextView(R.id.view_product_card_title_normal_portion, titleNormal);
         initTextView(R.id.view_product_card_price, price);
+        initTextView(R.id.view_product_card_subscription_period, subscriptionPeriod);
         initTextView(R.id.view_product_card_description, description);
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
     }

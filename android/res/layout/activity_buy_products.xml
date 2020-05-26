@@ -103,6 +103,7 @@
                 android:id="@+id/activity_buy_product_card_6_months"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 frostwire:product_card_description="@string/dummy_content_description"
                 frostwire:product_card_hint_button_visible="false"
                 frostwire:product_card_price="$4.45"
