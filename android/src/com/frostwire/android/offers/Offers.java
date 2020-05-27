@@ -171,7 +171,7 @@ public final class Offers {
         pausedCheckLock.unlock();
     }
 
-    private static void unPauseAdsAsync() {
+    public static void unPauseAdsAsync() {
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
@@ -262,6 +262,7 @@ public final class Offers {
 
     public static void showRewardedVideo(BuyActivity activity) {
         if (MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
+            MoPubRewardedVideos.setRewardedVideoListener(MoPubRewardedVideoListener.instance());
             MoPubRewardedVideos.showRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO);
             activity.finish();
             // maybe then exit the invoking BuyActivity, which should then be passed here.

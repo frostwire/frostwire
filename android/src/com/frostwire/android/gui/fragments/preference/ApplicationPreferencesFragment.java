@@ -23,6 +23,10 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.preference.Preference;
+import androidx.preference.PreferenceCategory;
+import androidx.preference.SwitchPreference;
+
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -48,10 +52,6 @@ import com.frostwire.util.Ref;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 
-import androidx.preference.Preference;
-import androidx.preference.PreferenceCategory;
-import androidx.preference.SwitchPreference;
-
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -66,10 +66,12 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     private static final int MILLISECONDS_IN_A_DAY = 86400000;
     private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationPreferencesFragment.DIALOG.stop.http";
 
+    private static DoNothingOnPreferenceClickListener doNothingOnPreferenceClickListener;
+    private static PausedAdsOnPreferenceClickListener pausedAdsPreferenceClickListener;
+
     // TODO: refactor this
     // due to the separation of fragments and activities
     public static long removeAdsPurchaseTime = 0;
-    private static final DoNothingOnPreferenceClickListener doNothingOnPreferenceClickListener = new DoNothingOnPreferenceClickListener();
 
     public ApplicationPreferencesFragment() {
         super(R.xml.settings_application);
@@ -248,13 +250,14 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     // AD REMOVAL PREFERENCE LOGIC
     //////////////////////////////
     private void setupStore(final long purchaseTimestamp) {
+        pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
         SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
         // Async gymnastics to pass both the purchase timestamp and the amounts of minutes left paused
         // to the UI Thread task, we use a Holder object for this.
         //<T1, R> void async(ResultTask1<T1, R> task,
         //        T1 arg1,
         //        ResultPostTask1<T1, R> post) //result post task just doesn't return anything
-        async(ApplicationPreferencesFragment::checkMinutesPassedAsync, paramHolder,
+        async(ApplicationPreferencesFragment::checkMinutesLeftPausedAsync, paramHolder,
                 ApplicationPreferencesFragment::setupStorePostTask);
     }
 
@@ -270,7 +273,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         }
     }
 
-    private static SetupStoreTaskParamHolder checkMinutesPassedAsync(SetupStoreTaskParamHolder paramHolder) {
+    private static SetupStoreTaskParamHolder checkMinutesLeftPausedAsync(SetupStoreTaskParamHolder paramHolder) {
         paramHolder.minutesPaused = Offers.getMinutesLeftPausedAsync();
         return paramHolder;
     }
@@ -283,23 +286,22 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         ApplicationPreferencesFragment applicationPreferencesFragment = paramHolder.appPrefsFragRef.get();
         Activity settingsActivity = applicationPreferencesFragment.getActivity();
         final long purchaseTimestamp = paramHolder.purchaseTimestamp;
-        final int minutesPausedLeft = paramHolder.minutesPaused;
-        boolean ADS_PAUSED_WITH_REWARDED_VIDEO = minutesPausedLeft > 0;
+
 
         Preference p = applicationPreferencesFragment.findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (p != null && Offers.disabledAds() && ADS_PAUSED_WITH_REWARDED_VIDEO) {
+        if (p != null && Offers.disabledAds() && pausedAdsPreferenceClickListener.adsPaused()) {
+            final int minutesPausedLeft = paramHolder.minutesPaused;
             // Paused summary
             String summaryMinutesLeft = minutesPausedLeft > 1 ?
                     applicationPreferencesFragment.getString(R.string.minutes_left_ad_free, minutesPausedLeft) :
                     applicationPreferencesFragment.getString(R.string.minute_left_ad_free);
             p.setSummary(summaryMinutesLeft);
-            p.setOnPreferenceClickListener(doNothingOnPreferenceClickListener);
-            return;
+            p.setOnPreferenceClickListener(pausedAdsPreferenceClickListener);
         } else if (p != null && PlayStore.available() && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
             PlayStore playStore = PlayStore.getInstance(settingsActivity);
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-            if (purchaseTimestamp == 0 && purchasedProducts != null && purchasedProducts.size() > 0) {
+            if (purchaseTimestamp == 0 && purchasedProducts.size() > 0) {
                 // HOW MUCH TIME LEFT OR SUBSCRIPTION PLAN SUMMARY
                 applicationPreferencesFragment.initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
                 //otherwise, a BuyActivity intent has been configured on application_preferences.xml
@@ -321,26 +323,28 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     }
 
     private void initRemoveAdsSummaryWithPurchaseInfo(Preference p, Collection<Product> purchasedProducts) {
-        Product product = purchasedProducts.iterator().next();
-        String daysLeft = "";
-        // if it's a one time purchase, show user how many days left she has.
-        if (!product.subscription() && product.purchased()) {
-            int daysBought = Products.toDays(product.sku());
-            if (daysBought > 0) {
-                long timePassed = System.currentTimeMillis() - product.purchaseTime();
-                int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
-                if (daysPassed > 0 && daysPassed < daysBought) {
-                    daysLeft = " (" + getString(R.string.days_left) + ": " + String.valueOf(daysBought - daysPassed) + ")";
+        if (purchasedProducts != null && purchasedProducts.size() > 0) {
+            Product product = purchasedProducts.iterator().next();
+            String daysLeft = "";
+            // if it's a one time purchase, show user how many days left she has.
+            if (!product.subscription() && product.purchased()) {
+                int daysBought = Products.toDays(product.sku());
+                if (daysBought > 0) {
+                    long timePassed = System.currentTimeMillis() - product.purchaseTime();
+                    int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
+                    if (daysPassed > 0 && daysPassed < daysBought) {
+                        daysLeft = " (" + getString(R.string.days_left) + ": " + (daysBought - daysPassed) + ")";
+                    }
                 }
             }
+            p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
         }
-        p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
         p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(getActivity(), purchasedProducts));
     }
 
-    // Doing this because setting the preference click listener to null seems to keep the old preference
-    // click listener
+
     private static final class DoNothingOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
+
         @Override
         public boolean onPreferenceClick(Preference preference) {
             return true;
@@ -360,39 +364,87 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
         @Override
         public boolean onPreferenceClick(Preference preference) {
-            if (purchasedProducts != null && !purchasedProducts.isEmpty()) {
-                LOG.info("Products purchased by user:");
-                for (Product p : purchasedProducts) {
-                    LOG.info(" - " + p.description() + " (" + p.sku() + ")");
+            final boolean gotProducts = purchasedProducts != null && !purchasedProducts.isEmpty();
+            if (gotProducts) {
+                if (gotProducts) {
+                    LOG.info("onPreferenceClick(): Products purchased by user:");
+                    for (Product p : purchasedProducts) {
+                        LOG.info(" - " + p.description() + " (" + p.sku() + ")");
+                    }
                 }
 
                 if (INTERNAL_BUILD) {
                     clicksLeftToConsumeProducts--;
-                    LOG.info("If you click again " + clicksLeftToConsumeProducts + " times, all your ONE-TIME purchases will be forced-consumed.");
-                    if (0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11) {
+                    LOG.info("onPreferenceClick(): If you click again " + clicksLeftToConsumeProducts + " times, all ONE-TIME purchases or Paused Ads Time left will be forced-consumed.");
+                    if ((0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11)) {
                         if (clicksLeftToConsumeProducts == 0) {
-                            for (Product p : purchasedProducts) {
-                                if (p.subscription()) {
-                                    continue;
+                            if (gotProducts) {
+                                for (Product p : purchasedProducts) {
+                                    if (p.subscription()) {
+                                        continue;
+                                    }
+                                    PlayStore.getInstance(activityRef.get()).consume(p);
+                                    LOG.info("onPreferenceClick() - " + p.description() + " (" + p.sku() + ") force-consumed!");
+                                    UIUtils.showToastMessage(preference.getContext(),
+                                            "Product " + p.sku() + " forced-consumed.",
+                                            Toast.LENGTH_SHORT);
                                 }
-                                PlayStore.getInstance(activityRef.get()).consume(p);
-                                LOG.info(" - " + p.description() + " (" + p.sku() + ") force-consumed!");
-                                UIUtils.showToastMessage(preference.getContext(),
-                                        "Product " + p.sku() + " forced-consumed.",
-                                        Toast.LENGTH_SHORT);
-                            }
-                            if (Ref.alive(activityRef)) {
-                                activityRef.get().finish();
+                                if (Ref.alive(activityRef)) {
+                                    activityRef.get().finish();
+                                }
                             }
                         }
                     }
                 }
-
                 return true; // true = click was handled.
             } else {
                 LOG.info("Couldn't find any purchases.");
             }
             return false;
+        }
+
+
+    }
+
+    private static final class PausedAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
+        private WeakReference<Activity> activityRef;
+        private static int rewarded_video_minutes = -1;
+        private static long paused_timestamp = -1;
+        private static int clicksLeft = 10;
+
+        PausedAdsOnPreferenceClickListener(Activity activity) {
+            activityRef = Ref.weak(activity);
+            async(PausedAdsOnPreferenceClickListener::loadPausedAdsInfoAsync);
+        }
+
+        @Override
+        public boolean onPreferenceClick(Preference preference) {
+            // reset reward video timer
+            LOG.info("onPreferenceClick() clicks left: " + clicksLeft);
+            if (adsPaused() && --clicksLeft <= 0) {
+                clicksLeft = 10;
+                async(Offers::unPauseAdsAsync);
+                if (Ref.alive(activityRef)) {
+                    activityRef.get().finish();
+                }
+                LOG.info("onPreferenceClick(): ads un-paused");
+                return true;
+            }
+            return true;
+        }
+
+        private boolean adsPaused() {
+            long pause_duration = rewarded_video_minutes * 60_000;
+            long time_on_pause = System.currentTimeMillis() - paused_timestamp;
+            LOG.info("areAdsPaused(): " + (time_on_pause < pause_duration));
+            return time_on_pause < pause_duration;
+        }
+
+        private static void loadPausedAdsInfoAsync() {
+            ConfigurationManager CM = ConfigurationManager.instance();
+            rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
+            paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
+            LOG.info("loadPausedAdsInfoAsync() ");
         }
     }
     /////////////////////////////////////
