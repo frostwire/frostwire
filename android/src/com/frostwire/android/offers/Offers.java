@@ -175,7 +175,7 @@ public final class Offers {
         final ConfigurationManager CM = ConfigurationManager.instance();
         final int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
         final long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
-        if (rewarded_video_minutes == -1 || paused_timestamp == 01) {
+        if (rewarded_video_minutes == -1 || paused_timestamp == -1) {
             return false;
         }
         final long pause_duration = rewarded_video_minutes * 60_000;
