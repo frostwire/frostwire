@@ -385,6 +385,18 @@ public final class Offers {
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
             }
+        } else {
+            // honor shutdownAfterwards and dismissAfterwards
+            if (params.dismissAfterwards) {
+                activity.finish();
+            }
+            if (params.shutdownAfterwards) {
+                if (activity instanceof MainActivity) {
+                    ((MainActivity) activity).shutdown();
+                } else {
+                    UIUtils.sendShutdownIntent(activity);
+                }
+            }
         }
     }
 

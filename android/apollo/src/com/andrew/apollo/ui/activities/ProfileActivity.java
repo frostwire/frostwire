@@ -510,16 +510,16 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             if (tracksHolder != null) {
                 NavUtils.openArtistProfile(this, mArtistName, tracksHolder.tracks);
             }
-        } else if (!MusicUtils.isPlaying()) {
+            finish();
+        }
+        else if (!MusicUtils.isPlaying()) {
             Offers.showInterstitialOfferIfNecessary(
                     this,
                     Offers.PLACEMENT_INTERSTITIAL_MAIN,
                     false,
-                    false,
-                    true);
-
+                    true
+            );
         }
-        finish();
     }
 
     /**

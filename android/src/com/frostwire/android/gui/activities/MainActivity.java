@@ -178,7 +178,7 @@ public class MainActivity extends AbstractActivity implements
                     this,
                     Offers.PLACEMENT_INTERSTITIAL_MAIN,
                     false,
-                    true,
+                    false,
                     true);
         }
     }
