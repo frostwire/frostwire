@@ -243,10 +243,29 @@ public final class Engine implements IEngineService {
 
         IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
-        context.registerReceiver(receiver, fileFilter);
-        context.registerReceiver(receiver, connectivityFilter);
-        context.registerReceiver(receiver, audioFilter);
-        context.registerReceiver(receiver, telephonyFilter);
+        try {
+            context.registerReceiver(receiver, fileFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, connectivityFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, audioFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, telephonyFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override

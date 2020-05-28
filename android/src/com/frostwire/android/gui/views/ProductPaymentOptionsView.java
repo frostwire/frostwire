@@ -141,7 +141,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
         }
     }
 
-    public void refreshOptionsVisibility(ProductCardView selectedProductCard) {
+    public void refreshOptionsVisibility(final ProductCardView selectedProductCard) {
         if (selectedProductCard == null) {
             return;
         }
