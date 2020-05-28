@@ -1,4 +1,4 @@
-FrostWire 2.1.11 build 639 - MAY/27/2020
+FrostWire 2.1.10 build 639 - MAY/27/2020
  - Less interstitial ads
  - Fixes music playback bug on Android 5.x (Lollypop)
  - Fixes bug where playing a Unity Video Reward didn't pause ads
