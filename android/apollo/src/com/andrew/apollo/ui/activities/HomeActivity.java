@@ -23,6 +23,7 @@ import android.os.Bundle;
 import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.offers.Offers;
 
@@ -51,6 +52,9 @@ public final class HomeActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (MusicUtils.isPlaying()) {
+            return;
+        }
         Offers.showInterstitialOfferIfNecessary(
                 this,
                 Offers.PLACEMENT_INTERSTITIAL_MAIN,
