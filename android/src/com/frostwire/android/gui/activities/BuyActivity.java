@@ -50,6 +50,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.mobileads.MoPubRewardedVideos;
@@ -155,11 +156,22 @@ public final class BuyActivity extends AbstractActivity {
         // If Google Store not ready or available, auto-select rewarded ad option
         if (card30days.getVisibility() == View.GONE ||
                 card1year.getVisibility() == View.GONE) {
-                //card6months.getVisibility() == View.GONE) {
+            //card6months.getVisibility() == View.GONE) {
             cardNminutes.performClick();
         }
 
+        async(Offers::adsPausedAsync,
+                (Asyncs.ResultPostTask<Boolean>)
+                        BuyActivity::onAdsPausedAsyncFinished);
+    }
+
+    private static void onAdsPausedAsyncFinished(boolean adsPaused) {
+        if (adsPaused) {
+            // we shouldn't be here if ads have been paused, do not load rewarded videos
+            return;
+        }
         if (!MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
+            LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
             Offers.MOPUB.loadRewardedVideo();
         }
     }

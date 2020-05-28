@@ -171,6 +171,19 @@ public final class Offers {
         pausedCheckLock.unlock();
     }
 
+    public static boolean adsPausedAsync() {
+        final ConfigurationManager CM = ConfigurationManager.instance();
+        final int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
+        final long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
+        if (rewarded_video_minutes == -1 || paused_timestamp == 01) {
+            return false;
+        }
+        final long pause_duration = rewarded_video_minutes * 60_000;
+        final long time_on_pause = System.currentTimeMillis() - paused_timestamp;
+        LOG.info("adsPausedAsync(): " + (time_on_pause < pause_duration));
+        return time_on_pause < pause_duration;
+    }
+
     public static void unPauseAdsAsync() {
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -181,25 +194,20 @@ public final class Offers {
     }
 
     public static int getMinutesLeftPausedAsync() {
-        pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
         int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
         if (rewarded_video_minutes == -1) {
-            pausedCheckLock.unlock();
             return -1;
         }
         long pause_duration = rewarded_video_minutes * 60_000;
         long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
-        pausedCheckLock.unlock();
         if (paused_timestamp == -1) {
             return -1;
         }
-
         long time_on_pause = System.currentTimeMillis() - paused_timestamp;
         if (time_on_pause > pause_duration) {
             return 0;
         }
-
         return (int) ((pause_duration - time_on_pause) / 60_000);
     }
 

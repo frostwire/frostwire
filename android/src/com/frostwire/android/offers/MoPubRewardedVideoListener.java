@@ -20,6 +20,7 @@ package com.frostwire.android.offers;
 import androidx.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.mopub.common.MoPubReward;
@@ -30,6 +31,8 @@ import java.util.Set;
 
 import static com.frostwire.android.util.Asyncs.async;
 
+// NOTE:
+// Unity's RewardedVideoListener is implemented in UnityAdNetwork.java
 public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoPubRewardedVideoListener {
     private static Logger LOG = Logger.getLogger(MoPubRewardedVideoListener.class);
     private boolean wasPlayingMusic;
@@ -87,7 +90,7 @@ public final class MoPubRewardedVideoListener implements com.mopub.mobileads.MoP
     @Override
     public void onRewardedVideoCompleted(@NonNull Set<String> adUnitIds, @NonNull MoPubReward reward) {
         LOG.info("onRewardedVideoCompleted: adUnitId=" + adUnitIds);
-        async(Offers::pauseAdsAsync, reward.getAmount());
+        async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
         if (wasPlayingMusic) {
             MusicUtils.play();
         }

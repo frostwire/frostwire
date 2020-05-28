@@ -215,7 +215,7 @@ public final class Constants {
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
     public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";
 
-    public static final int MIN_REWARD_AD_FREE_MINUTES = 60;
+    public static final int MIN_REWARD_AD_FREE_MINUTES = 30;
     public static final int MAX_REWARD_AD_FREE_MINUTES = 240;
 
     public static final String FW_REWARDED_VIDEO_MINUTES = "FW_REWARDED_VIDEO_MINUTES";

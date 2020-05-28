@@ -436,7 +436,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         private boolean adsPaused() {
             long pause_duration = rewarded_video_minutes * 60_000;
             long time_on_pause = System.currentTimeMillis() - paused_timestamp;
-            LOG.info("areAdsPaused(): " + (time_on_pause < pause_duration));
             return time_on_pause < pause_duration;
         }
 
@@ -444,7 +443,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             ConfigurationManager CM = ConfigurationManager.instance();
             rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
             paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
-            LOG.info("loadPausedAdsInfoAsync() ");
         }
     }
     /////////////////////////////////////

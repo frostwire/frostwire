@@ -10,6 +10,8 @@ import com.unity3d.ads.UnityAds;
 
 import java.lang.ref.WeakReference;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 public class UnityAdNetwork extends AbstractAdNetwork {
     private static Logger LOG = Logger.getLogger(UnityAdNetwork.class);
     private static final String INTERSTITIAL_PLACEMENT_ID = "Interstitial_All";
@@ -79,6 +81,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
         private boolean interstitialReady = false;
         private boolean shutdownAfterward;
         private boolean dismissActivityAfterward;
+        private boolean dismissBuyActivityAfterReward;
 
         UnityAdsListener(UnityAdNetwork adNetwork) {
             this.adNetwork = Ref.weak(adNetwork);
@@ -100,7 +103,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
         @Override
         public void onUnityAdsStart(String placementId) {
             if (Ref.alive(adNetwork)) {
-                LOG.info("UnityAdNetwork.onUnityAdsStart()");
+                LOG.info("UnityAdNetwork.onUnityAdsStart() placementId=" + placementId);
                 adNetwork.get().start();
             }
         }
@@ -124,6 +127,12 @@ public class UnityAdNetwork extends AbstractAdNetwork {
                         adNetwork.get().loadNewInterstitial(lastActivity.get());
                     }
                 }
+            } else if ("rewardedVideo".equals(placementId)) {
+                LOG.info("UnityAdNetwork.onUnityAdsFinish() placementId = " + placementId);
+                if (result == UnityAds.FinishState.COMPLETED) {
+                    dismissBuyActivityAfterReward = true;
+                    async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
+                }
             }
         }
 
@@ -145,6 +154,10 @@ public class UnityAdNetwork extends AbstractAdNetwork {
             lastActivity = Ref.weak(activity);
             this.shutdownAfterward = shutdownAfterward;
             this.dismissActivityAfterward = dismissActivityAfterward;
+            if (dismissBuyActivityAfterReward && activity != null) {
+                dismissBuyActivityAfterReward = false;
+                activity.finish();
+            }
         }
     }
 }
