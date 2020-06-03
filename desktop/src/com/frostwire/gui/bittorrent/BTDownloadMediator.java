@@ -78,6 +78,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Variables so only one ActionListener needs to be created for both
      * the buttons & popup menu.
      */
+    private Action retryAction;
     private Action removeAction;
     private Action removeYouTubeAction;
     private Action resumeAction;
@@ -181,6 +182,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         // YUP, if you try to do this by overriding super.addActions() you will get a crash
         // it's easier to just leave this here, let it go. :) -gubatron Mon Jun 18th 2018
         clearInactiveAction = BTDownloadActions.CLEAR_INACTIVE_ACTION;
+        retryAction = BTDownloadActions.RETRY_ACTION;
         removeAction = BTDownloadActions.REMOVE_ACTION;
         removeYouTubeAction = BTDownloadActions.REMOVE_YOUTUBE_ACTION;
         resumeAction = BTDownloadActions.RESUME_ACTION;
@@ -198,7 +200,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Returns the most prominent actions that operate on the download table.
      */
     public Action[] getActions() {
-        return new Action[]{resumeAction, pauseAction, showInLibraryAction, exploreAction, removeAction, clearInactiveAction};
+        return new Action[]{resumeAction, pauseAction, retryAction, showInLibraryAction, exploreAction, removeAction, clearInactiveAction};
     }
 
     /**
@@ -312,6 +314,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     BTDownload dl = dataLine.getInitializeObject();
                     if (dl != null) {
                         boolean completed = dl.isCompleted();
+                        retryAction.setEnabled(dl.getState() == TransferState.ERROR_NOT_ENOUGH_PEERS);
                         resumeAction.setEnabled(dl.isResumable());
                         pauseAction.setEnabled(dl.isPausable());
                         exploreAction.setEnabled(completed);
@@ -452,6 +455,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
         menu.add(new SkinMenuItem(resumeAction));
         menu.add(new SkinMenuItem(pauseAction));
+        menu.add(new SkinMenuItem(retryAction));
         menu.addSeparator();
         menu.add(new SkinMenuItem(showInLibraryAction));
         menu.add(new SkinMenuItem(exploreAction));
@@ -515,6 +519,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     public void handleNoSelection() {
         removeAction.setEnabled(false);
         resumeAction.setEnabled(false);
+        retryAction.setEnabled(false);
         clearInactiveAction.setEnabled(false);
         pauseAction.setEnabled(false);
         exploreAction.setEnabled(false);
@@ -539,32 +544,33 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      */
     public void handleSelection(int row) {
         BTDownloadDataLine dataLine = DATA_MODEL.get(row);
-        boolean pausable = dataLine.getInitializeObject().isPausable();
-        boolean resumable = dataLine.getInitializeObject().isResumable();
-        boolean isTransferFinished = dataLine.getInitializeObject().isCompleted();
-        File saveLocation = dataLine.getInitializeObject().getSaveLocation();
+        BTDownload dl = dataLine.getInitializeObject();
+        boolean pausable = dl.isPausable();
+        boolean resumable = dl.isResumable();
+        boolean isTransferFinished = dl.isCompleted();
+        File saveLocation = dl.getSaveLocation();
         boolean hasMediaFiles = selectionHasMediaFiles(dataLine.getInitializeObject());
         boolean hasMP4s = selectionHasMP4s(saveLocation);
         boolean isSingleFile = selectionIsSingleFile(saveLocation);
         removeAction.putValue(Action.NAME, I18n.tr("Cancel Download"));
         removeAction.putValue(LimeAction.SHORT_NAME, I18n.tr("Cancel"));
         removeAction.putValue(Action.SHORT_DESCRIPTION, I18n.tr("Cancel Selected Downloads"));
-        BTDownload dl = dataLine.getInitializeObject();
         exploreAction.setEnabled(dl.isCompleted());
         showInLibraryAction.setEnabled(dl.isCompleted());
         removeAction.setEnabled(true);
         resumeAction.setEnabled(resumable);
+        retryAction.setEnabled(dl.getState() == TransferState.ERROR_NOT_ENOUGH_PEERS);
         pauseAction.setEnabled(pausable);
-        copyMagnetAction.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
-        copyHashAction.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
+        copyMagnetAction.setEnabled(!isHttpTransfer(dl));
+        copyHashAction.setEnabled(!isHttpTransfer(dl));
         sendToItunesAction.setEnabled(isTransferFinished && (hasMediaFiles || hasMP4s));
-        shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dataLine.getInitializeObject().isPausable());
+        shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dl.isPausable());
         playSingleMediaFileAction.setEnabled(getSelectedDownloaders().length == 1 && hasMediaFiles && isSingleFile);
-        removeYouTubeAction.setEnabled(isHttpTransfer(dataLine.getInitializeObject()));
-        BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
-        BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(!isHttpTransfer(dataLine.getInitializeObject()));
+        removeYouTubeAction.setEnabled(isHttpTransfer(dl));
+        BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dl));
+        BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(!isHttpTransfer(dl));
         if (GUIMediator.Tabs.TRANSFERS.equals(GUIMediator.instance().getSelectedTab())) {
-            notifyTransferTabSelectionListener(dataLine.getInitializeObject());
+            notifyTransferTabSelectionListener(dl);
         }
     }
 

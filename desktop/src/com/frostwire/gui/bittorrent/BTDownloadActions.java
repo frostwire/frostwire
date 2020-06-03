@@ -25,6 +25,7 @@ import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -47,6 +48,7 @@ final class BTDownloadActions {
     static final ResumeAction RESUME_ACTION = new ResumeAction();
     static final PauseAction PAUSE_ACTION = new PauseAction();
     static final ClearInactiveAction CLEAR_INACTIVE_ACTION = new ClearInactiveAction();
+    static final RetryAction RETRY_ACTION = new RetryAction();
     static final RemoveAction REMOVE_ACTION = new RemoveAction(false, false);
     static final RemoveAction REMOVE_YOUTUBE_ACTION = new RemoveYouTubeAction();
     static final RemoveAction REMOVE_TORRENT_ACTION = new RemoveAction(true, false);
@@ -195,15 +197,47 @@ final class BTDownloadActions {
         }
     }
 
+    public static class RetryAction extends com.limegroup.gnutella.gui.actions.AbstractAction {
+        private static Logger LOG = Logger.getLogger(RetryAction.class);
+
+        RetryAction() {
+            putValue(Action.NAME, I18n.tr("Retry Transfer"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Retry Transfer"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Retry Transfer"));
+            putValue(LimeAction.ICON_NAME, "MAGNET");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
+            if (downloaders == null) {
+                LOG.info("actionPerformed() aborted. No selected transfers to retry");
+                return;
+            }
+            new RemoveAction(true, true, false).performAction();
+            BTDownloadMediator.instance().refresh();
+
+            for (BTDownload download : downloaders) {
+                LOG.info("actionPerformed() retry " + download.getClass().getCanonicalName());
+                if (download instanceof TorrentFetcherDownload) {
+                    GUIMediator.instance().openTorrentURI(((TorrentFetcherDownload) download).getUri(),false);
+                }
+            }
+
+
+        }
+    }
+
     public static class RemoveAction extends RefreshingAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -1742554445891016991L;
         private final boolean _deleteTorrent;
         private final boolean _deleteData;
+        private final boolean _showDialogIfDeleteData;
 
         RemoveAction(boolean deleteTorrent, boolean deleteData) {
+            this(deleteTorrent, deleteData, true);
+        }
+
+        RemoveAction(boolean deleteTorrent, boolean deleteData, boolean showDialogIfDeleteData) {
             if (deleteTorrent && deleteData) {
                 putValue(Action.NAME, I18n.tr("Remove Torrent and Data"));
                 putValue(LimeAction.SHORT_NAME, I18n.tr("Remove Torrent and Data"));
@@ -220,10 +254,11 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_KILL");
             _deleteTorrent = deleteTorrent;
             _deleteData = deleteData;
+            _showDialogIfDeleteData = showDialogIfDeleteData;
         }
 
         public void performAction() {
-            if (_deleteData) {
+            if (_deleteData && _showDialogIfDeleteData) {
                 DialogOption result = GUIMediator.showYesNoMessage(I18n.tr("Are you sure you want to remove the data files from your computer?\n\nYou won't be able to recover the files."), I18n.tr("Are you sure?"), JOptionPane.QUESTION_MESSAGE);
                 if (result != DialogOption.YES)
                     return;
