@@ -123,7 +123,7 @@ class TPBSearchResult extends AbstractTorrentSearchResult {
 
     @Override
     public String getDetailsUrl() {
-        return "http://" + domainName + detailsUrl;
+        return detailsUrl;
     }
 
     @Override
