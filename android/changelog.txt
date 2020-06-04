@@ -1,4 +1,4 @@
-FrostWire 2.1.10 build 639 - JUN/04/2020
+FrostWire 2.1.10 build 640 - JUN/04/2020
  - Less interstitial ads
  - Fixes Torrentz2 search
  - Fixes music playback bug on Android 5.x (Lollypop)
