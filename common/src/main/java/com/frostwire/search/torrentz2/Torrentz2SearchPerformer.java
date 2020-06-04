@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private final Pattern pattern;
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
-        super("torrentz2.eu", token, keywords, timeout, 1, 0);
-        pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?" +
-                "&#x2714;</span><span title=(\\d+)?>(?<age>.*?)</span><span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span>" +
-                "<span>(?<seeds>\\d+)</span><span>.*?");
+        //https://torrentz2.eu
+        //https://torrentz2.unblockninja.com/
+        super("torrentz2.unblockninja.com/", token, keywords, timeout, 1, 0);
+        pattern = Pattern.compile("(?is)<dl><dt><a href='(?<infohash>[a-f0-9]{40})'>(?<filename>.*?)</a>.*?<span class='a'><span title='.*?'>(?<age>.*?)</span><span class='s'>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span> <span class='u'>(?<seeds>\\d+)</span><span class='d'>.*?");
     }
 
     @Override

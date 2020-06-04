@@ -25,7 +25,6 @@ compileJava {
 
 repositories {
     mavenCentral()
-
     maven { url  "http://dl.bintray.com/ijabz/maven" }
 }
 
