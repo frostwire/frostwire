@@ -41,29 +41,31 @@ final class HelpMenu extends AbstractMenu {
      */
     HelpMenu() {
         super(I18n.tr("&Help"));
-        addMenuItem(new OpenLinkAction("http://www.frostwire-preview.com/?type=yt&displayName=How%20to%20search%20and%20download%20files%20with%20FrostWire%20Wynwood%20(5.6)%20-%20YouTube&source=YouTube+-+FrostWireVideos&detailsUrl=http://www.youtube.com/watch?v=A0p_DpOjpO8", I18n.tr("How to use FrostWire (Video)"), I18n.tr("How to use FrostWire (Video)")));
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/android", I18n.tr("FrostWire for Android"), I18n.tr("Get FrostWire on your Android phone, tablet or google tv, all free.")));
+        addMenuItem(new OpenLinkAction("https://www.youtube.com/watch?v=A0p_DpOjpO8", I18n.tr("How to use FrostWire (Video)"), I18n.tr("How to use FrostWire (Video)")));
+        addMenuItem(new OpenLinkAction("https://www.frostwire.com/android", I18n.tr("FrostWire for Android"), I18n.tr("Get FrostWire on your Android phone, tablet or google tv, all free.")));
         addMenuItem(new OpenLinkAction("https://www.quora.com/What-is-seeding-on-FrostWire", I18n.tr("What is \"Seeding\"?"), I18n.tr("Learn about BitTorrent Seeding")));
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/vpn", I18n.tr("What is a VPN?"), I18n.tr("Learn about how to protect your internet connection and your privacy online")));
+        addMenuItem(new OpenLinkAction("https://www.frostwire.com/vpn", I18n.tr("What is a VPN?"), I18n.tr("Learn about how to protect your internet connection and your privacy online")));
         addSeparator();
-        addMenuItem(new OpenLinkAction("http://www.frostwire.com/give?from=desktop-help", I18n.tr("Support FrostWire"), I18n.tr("Support FrostWire")));
+        addMenuItem(new OpenLinkAction("https://www.frostwire.com/give?from=desktop-help", I18n.tr("Support FrostWire"), I18n.tr("Support FrostWire")));
         JMenu cryptoCurrenciesMenu = new JMenu(I18n.tr("Support with CryptoCurrencies"));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin", I18n.tr("Bitcoin")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/bitcoin-cash", I18n.tr("Bitcoin Cash")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/ethereum", I18n.tr("Ethereum")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/dash", I18n.tr("Dash")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/litecoin", I18n.tr("LiteCoin")));
-        cryptoCurrenciesMenu.add(new OpenLinkAction("http://www.frostwire.com/zcash", I18n.tr("ZCash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/bitcoin", I18n.tr("Bitcoin")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/bitcoin-cash", I18n.tr("Bitcoin Cash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/ethereum", I18n.tr("Ethereum")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/dash", I18n.tr("Dash")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/litecoin", I18n.tr("LiteCoin")));
+        cryptoCurrenciesMenu.add(new OpenLinkAction("https://www.frostwire.com/zcash", I18n.tr("ZCash")));
         getMenu().add(cryptoCurrenciesMenu);
         addMenuItem(new OpenLinkAction("http://www.frostclick.com/wp/?from=frostwire" + com.limegroup.gnutella.util.FrostWireUtils.getFrostWireVersion(),
                 "FrostClick.com", I18n.tr("Free Legal Downloads")));
         addSeparator();
-        addMenuItem(new OpenLinkAction("http://www.facebook.com/pages/FrostWire/110265295669948", I18n.tr("Follow us on Facebook"), I18n.tr("Come and say hi to the community on Facebook")));
+        addMenuItem(new OpenLinkAction("https://www.frostwire.com/chat",I18n.tr("Discord Chat"), I18n.tr("Talk to other users, get help and help others, talk to developers")));
+        addMenuItem(new OpenLinkAction("https://reddit.com/r/frostwire", I18n.tr("Reddit"), I18n.tr("Access the FrostWire Subreddit")));
+        addMenuItem(new OpenLinkAction("https://twitter.com/frostwire", I18n.tr("Follow us on Twitter"), I18n.tr("Follow us on Twitter")));
+        addMenuItem(new OpenLinkAction("https://www.facebook.com/pages/FrostWire/110265295669948", I18n.tr("Follow us on Facebook"), I18n.tr("Come and say hi to the community on Facebook")));
         addMenuItem(new OpenLinkAction("https://instagram.com/frostwire", I18n.tr("Follow us on Instagram"), I18n.tr("Follow us on Instagram")));
-        addMenuItem(new OpenLinkAction("http://twitter.com/#!/frostwire", I18n.tr("Follow us on Twitter"), I18n.tr("Follow us on Twitter")));
-        addMenuItem(new OpenLinkAction("http://forum.frostwire.com/?from=desktop-help", I18n.tr("Foru&m"), I18n.tr("Access the FrostWire Users\' Forum")));
+
         addSeparator();
-        addMenuItem(new OpenLinkAction("http://frostwire.wordpress.com/2012/02/14/dont-get-scammed-frostwire-is-free/", I18n.tr("&Did you pay for FrostWire?"),
+        addMenuItem(new OpenLinkAction("https://frostwire.wordpress.com/2012/02/14/dont-get-scammed-frostwire-is-free/", I18n.tr("&Did you pay for FrostWire?"),
                 I18n.tr("Did you pay for FrostWire? FrostWire is Free as in Free Beer. Avoid Scams.")));
         addMenuItem(new ShowTipOfTheDayAction());
         if (!OSUtils.isMacOSX()) {
