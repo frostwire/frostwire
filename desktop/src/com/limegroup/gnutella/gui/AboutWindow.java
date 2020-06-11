@@ -109,7 +109,7 @@ final class AboutWindow {
                 append("<ul>").
                 append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
-                append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersionNum());
+                append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersion());
 
         if (!OSUtils.isLinux()) {
             String mplayerVersion = "1.4.0";
