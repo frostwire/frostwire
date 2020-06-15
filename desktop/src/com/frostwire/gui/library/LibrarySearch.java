@@ -370,7 +370,7 @@ public class LibrarySearch extends JPanel {
                 if (child.isDirectory() && !exludedSubFolders.contains(child)) {
                     directories.add(child);
                 } else if (child.isFile()) {
-                    if (directoryHolder instanceof SavedFilesDirectoryHolder) {
+                    if (directoryHolder instanceof FileSettingDirectoryHolder) {
                         if (searchFilter.accept(child, false)) {
                             results.add(child);
                         }

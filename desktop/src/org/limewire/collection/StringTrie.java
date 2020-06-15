@@ -677,7 +677,9 @@ final class TrieNode<E> {
         assert (i = search(labelStart = label.charAt(0), // find closest match
                 false)) < 0 || get(i).getLabelStart() != labelStart :
                 "Precondition of TrieNode.put violated.";
-        children.add(i + 1, new TrieEdge<>(label, child));
+        try {
+            children.add(i + 1, new TrieEdge<>(label, child));
+        } catch (Throwable ignored){}
     }
 
     /**
