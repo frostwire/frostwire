@@ -25,7 +25,7 @@ compileJava {
 
 repositories {
     mavenCentral()
-    maven { url  "http://dl.bintray.com/ijabz/maven" }
+    maven { url  "https://dl.bintray.com/ijabz/maven" }
 }
 
 dependencies {
@@ -63,7 +63,7 @@ sourceSets {
 }
 
 jar {
-    archiveName = 'frostwire.jar'
+    archiveFileName = 'frostwire.jar'
 
     exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF')
 
