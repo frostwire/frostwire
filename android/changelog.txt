@@ -1,3 +1,37 @@
+FrostWire 2.2.1 build 641 - JUN/17/2020
+ - jlibtorrent/libtorrent 1.2.7.0 update
+ - OpenSSL 1.1.1g update
+ - dev: jlibtorrent build with boost 1.73.0
+ - Fixes bug getting source URL from TPB search result
+ - lt: fix incorrect filename truncation at multi-byte character
+ - lt: always announce listen port 1 when using a proxy
+ - lt: add set_alert_fd in python binding, to supersede set_alert_notify
+ - lt: fix bug in part files > 2 GiB
+ - lt: add function to clear the peer list for a torrent
+ - lt: fix resume data functions to save/restore more torrent flags
+ - lt: limit number of concurrent HTTP announces
+ - lt: fix queue position for force_rechecking a torrent that is not auto-managed
+ - lt: improve rate-based choker documentation, and minor tweak
+ - lt: undeprecate upnp_ignore_nonrouters (but refering to devices on our subnet)
+ - lt: increase default tracker timeout
+ - lt: retry failed socks5 server connections
+ - lt: allow UPnP lease duration to be changed after device discovery
+ - lt: fix IPv6 address change detection on Windows
+ - lt: fix peer timeout logic
+ - lt: simplify proxy handling. A proxy now overrides listen_interfaces
+ - lt: fix issues when configured to use a non-default choking algorithm
+ - lt: fix issue in reading resume data
+ - lt: revert NXDOMAIN change from 1.2.4
+ - lt: don't open any listen sockets if listen_interfaces is empty or misconfigured
+ - lt: fix bug in auto disk cache size logic
+ - lt: fix issue with outgoing_interfaces setting, where bind() would be called twice
+ - lt: add build option to disable share-mode
+ - lt: support validation of HTTPS trackers
+ - lt: deprecate strict super seeding mode
+ - lt: make UPnP port-mapping lease duration configurable
+ - lt: deprecate the bittyrant choking algorithm
+ - lt: add build option to disable streaming
+
 FrostWire 2.1.10 build 640 - JUN/04/2020
  - Less interstitial ads
  - Fixes Torrentz2 search
