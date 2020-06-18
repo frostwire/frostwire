@@ -9,6 +9,7 @@ frostwire (6.8.5) stable; urgency=high
   * New jlibtorrent 1.2.7.0 update
   * jlibtorrent upgraded to build with boost 1.73.0
   * jlibtorrent upgraded to openssl 1.1.1g
+  * OpenJDK 14 runtime (Windows, Linux), macOS still on OpenJDK 13
   * lt: fix incorrect filename truncation at multi-byte character
   * lt: always announce listen port 1 when using a proxy
   * lt: add set_alert_fd in python binding, to supersede set_alert_notify
@@ -38,7 +39,7 @@ frostwire (6.8.5) stable; urgency=high
   * lt: deprecate the bittyrant choking algorithm
   * lt: add build option to disable streaming
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 15 Jun 2020 15:40:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Jun 2020 17:06:00 -0600
 
 frostwire (6.8.4) stable; urgency=high
   * OpenJDK 13 runtime (windows,mac)
