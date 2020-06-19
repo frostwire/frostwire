@@ -55,10 +55,10 @@ final class AboutWindow {
         JLabel osInfo = new JLabel(OSUtils.getFullOS());
         osInfo.setHorizontalAlignment(SwingConstants.CENTER);
         // set up frostwire.com label
-        JLabel url = new URLLabel("http://www.frostwire.com");
+        JLabel url = new URLLabel("https://www.frostwire.com");
         url.setHorizontalAlignment(SwingConstants.CENTER);
-        JLabel EULA_LABEL = new URLLabel("http://www.frostwire.com/eula", I18n.tr("End User License Agreement"));
-        JLabel PRIVACY_POLICY_LABEL = new URLLabel("http://www.frostwire.com/privacy", I18n.tr("Privacy Policy"));
+        JLabel EULA_LABEL = new URLLabel("https://www.frostwire.com/eula", I18n.tr("End User License Agreement"));
+        JLabel PRIVACY_POLICY_LABEL = new URLLabel("https://www.frostwire.com/privacy", I18n.tr("Privacy Policy"));
         // set up close closeButton
         JButton closeButton = new JButton(I18n.tr("Close"));
         DIALOG.getRootPane().setDefaultButton(closeButton);
@@ -107,8 +107,8 @@ final class AboutWindow {
         sb.append("<body text='#").append(hex).append("'>");
         sb.append("<h1>Powered by</h1>").
                 append("<ul>").
-                append("<li><a href='http://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
-                append("<li><a href='http://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
+                append("<li><a href='https://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
+                append("<li><a href='https://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
                 append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersion());
 
         if (!OSUtils.isLinux()) {
@@ -125,7 +125,7 @@ final class AboutWindow {
         sb.append("<li>Arianys Wilson - Splash 4.18 (New York - <a href='http://www.arianyswilson.com/'>Arianys Wilson Photography</a>)</li>");
         sb.append("<li>Scott Kellum - Splash 4.17 (New York - <a href='http://www.scottkellum.net'>ScottKellum.net</a>)</li>");
         sb.append("<li>Shelby Allen - Splash 4.13 (New Zealand)</li>");
-        sb.append("<li>Cecko Hanssen - <a href='http://www.flickr.com/photos/cecko/95013472/'>Frozen Brothers</a> CC Photograph for 4.17 Splash (Tilburg, Netherlands)</li>");
+        sb.append("<li>Cecko Hanssen - <a href='https://www.flickr.com/photos/cecko/95013472/'>Frozen Brothers</a> CC Photograph for 4.17 Splash (Tilburg, Netherlands)</li>");
         sb.append("<li>Marcelina Knitter - <a href='https://twitter.com/#!/marcelinkaaa'>@Marcelinkaaa</a></li>");
         sb.append("</ul>");
         sb.append("<h1>").append(I18n.tr("Thanks to Former FrostWire Developers")).append("</h1>");
