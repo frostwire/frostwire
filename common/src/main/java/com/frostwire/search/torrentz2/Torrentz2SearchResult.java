@@ -96,38 +96,43 @@ public final class Torrentz2SearchResult extends AbstractTorrentSearchResult {
     }
 
     private long parseCreationTime(String dateString) {
-        long result = 0;
+        long result = System.currentTimeMillis();
         try {
             String[] ds = dateString.split(" ");
-            if (ds[1].contains("hours")) {
+            if (ds[1].contains("hour")) {
                 try {
                     int hours = Integer.parseInt(ds[0]);
                     return result - (hours * 60 * 60 * 1000L);
                 } catch (Exception ignored) {
                 }
             }
-            if (ds[1].contains("years")) {
+            if (ds[1].contains("Year")) {
                 try {
                     int years = Integer.parseInt(ds[0]);
                     return result - (years * 365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
                 } catch (Exception ignored) {
                 }
             }
-            if (ds[1].contains("year")) {
-                try {
-                    return result - (365L * 24L * 60L * 60L * 1000L); // a year in milliseconds
-                } catch (Exception ignored) {
-                }
-            }
-            if (ds[1].contains("months")) {
+            if (ds[1].contains("Month")) {
                 try {
                     int months = Integer.parseInt(ds[0]);
                     return result - (months * 31L * 24L * 60L * 60L * 1000L); // a month in milliseconds
                 } catch (Exception ignored) {
                 }
             }
-            if (dateString.contains("1 month")) {
-                return result - 31L * 24L * 60L * 60L * 1000L; // a month in milliseconds
+            if (ds[1].contains("week")) {
+                try {
+                    int weeks = Integer.parseInt(ds[0]);
+                    return result - (weeks * 7L * 24L * 60L * 60L * 1000L); // a month in milliseconds
+                } catch (Exception ignored) {
+                }
+            }
+            if (ds[1].contains("day")) {
+                try {
+                    int days = Integer.parseInt(ds[0]);
+                    return result - (days * 24L * 60L * 60L * 1000L); // a month in milliseconds
+                } catch (Exception ignored) {
+                }
             }
             return result;
         } catch (Throwable t) {
