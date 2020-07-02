@@ -29,6 +29,7 @@ import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
+import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -247,6 +248,14 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine ONE337X = new SearchEngine("1337x", Constants.PREF_KEY_SEARCH_USE_ONE337X) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new One337xSearchPerformer("www.1377x.to", token, keywords, DEFAULT_TIMEOUT);
+            // change www.1377x.to to other like www.1337x.gd, www.1337x.to or other proxy site etc
+        }
+    };
+
     public static final SearchEngine TORRENTZ2 = new SearchEngine("Torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
 
         @Override
@@ -267,6 +276,7 @@ public abstract class SearchEngine {
             MAGNETDL,
             TORRENTZ2,
             YIFY,
+            ONE337X,
             FROSTCLICK,
             ZOOQLE,
             TPB,
