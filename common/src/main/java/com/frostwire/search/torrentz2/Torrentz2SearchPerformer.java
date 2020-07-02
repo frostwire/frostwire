@@ -38,7 +38,7 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         //https://torrentz2.eu
         //https://torrentz2.unblockninja.com/
         super("torrentz2.unblockninja.com/", token, keywords, timeout, 1, 0);
-        pattern = Pattern.compile("(?is)<dl><dt><a href='(?<infohash>[a-f0-9]{40})'>(?<filename>.*?)</a>.*?<span class='a'><span title='.*?'>(?<age>.*?)</span><span class='s'>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span> <span class='u'>(?<seeds>\\d+)</span><span class='d'>.*?");
+        pattern = Pattern.compile("(?is)<dl><dt><a href='(?<infohash>[a-f0-9]{40})'>(?<filename>.*?)</a>.*?<span class='a'><span title='.*?'>(?<age>.*?)</span>.*?<span class='s'>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span> <span class='u'>(?<seeds>\\d+)</span><span class='d'>.*?");
     }
 
     @Override
