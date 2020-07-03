@@ -379,7 +379,7 @@ public final class SearchMediator {
         }
         manager.stop(token);
         for (SearchEngine se : SearchEngine.getEngines()) {
-            if (se.isEnabled()) {
+            if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(token, query);
                 manager.perform(p);
             }
