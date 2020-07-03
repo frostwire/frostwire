@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Himanshu Sharma (HimanshuSharma789)
  * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,6 @@
 
 package com.frostwire.search.one337x;
 
-import android.util.Log;
-
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
@@ -26,20 +24,17 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 /**
  * @author gubatron
  * @author aldenml
+ * @author HimanshuSharma789
  */
 public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<One337xSearchResult> {
-    public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"/torrent/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">";
+    public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"/torrent/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">(?<displayName>.*?)</a>";
 
     public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<div class=\"box-info-heading clearfix\">.*?" +
-            "<h1>(?<displayName>.*?)</h1>.*?" +
             "<a class=\"(.*)\" href=\"(?<magnet>.*?)\" onclick=\"(.*?)\">.*?" +
             "<strong>Language</strong> <span>(?<language>.*?)</span>.*?" +
             "<strong>Total size</strong> <span>(?<size>.*?)</span>.*?" +
             "<strong>Date uploaded</strong> <span>(?<creationDate>.*?)</span>.*?" +
             "<strong>Seeders</strong> <span class=\"seeds\">(?<seeds>[0-9]+)</span>";
-//            "<div class=\"torrent-image\">.*?<img src=\"(?<cover>.*?)\" alt";
-    // uncomment above code for thumbnail of each torrent
-    // commented because not all 1337x-torrent page have thumbnail
 
 
     private static final int MAX_RESULTS = 20;
@@ -57,12 +52,13 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group("itemId");
         String htmlFileName = matcher.group("htmlFileName");
-        return new One337xTempSearchResult(getDomainName(), itemId, htmlFileName);
+        String displayName = matcher.group("displayName");
+        return new One337xTempSearchResult(getDomainName(), itemId, htmlFileName, displayName);
     }
 
     @Override
     protected One337xSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        return new One337xSearchResult(sr.getDetailsUrl(), matcher);
+        return new One337xSearchResult(sr.getDetailsUrl(), sr.getDisplayName(), matcher);
     }
 
     @Override

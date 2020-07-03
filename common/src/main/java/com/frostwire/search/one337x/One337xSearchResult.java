@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Himanshu Sharma (HimanshuSharma789)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,6 @@
 
 package com.frostwire.search.one337x;
 
-import android.util.Log;
-
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
@@ -28,10 +26,10 @@ import org.apache.commons.io.FilenameUtils;
 /**
  * @author gubatron
  * @author aldenml
+ * @author HimanshuSharma789
  */
 public final class One337xSearchResult extends AbstractTorrentSearchResult {
 
-//    private final String thumbnailUrl;
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
@@ -41,34 +39,16 @@ public final class One337xSearchResult extends AbstractTorrentSearchResult {
     private final int seeds;
     private final String magnetUrl;
 
-    public One337xSearchResult(String detailsUrl, SearchMatcher matcher) {
+    public One337xSearchResult(String detailsUrl, String displayName, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.displayName = buildDisplayName(matcher);
+        this.displayName = displayName;
         this.size = parseSize(matcher.group("size"));
-//        this.thumbnailUrl = buildThumbnailUrl(matcher.group("cover"));
         this.creationTime = parseCreationTime(matcher.group("creationDate"));
         this.seeds = parseSeeds(matcher.group("seeds"));
         this.magnetUrl = matcher.group("magnet");
         this.filename = buildFileName(detailsUrl);
         this.infoHash = PerformersHelper.parseInfoHash(magnetUrl); // already comes in lowercase
     }
-
-    private static String buildDisplayName(SearchMatcher matcher) {
-        String displayName = matcher.group("displayName");
-        String lang = matcher.group("language");
-
-        if (lang != null) {
-            displayName += " (" + lang + ")";
-        }
-        return displayName;
-    }
-
-    /*private static String buildThumbnailUrl(String str) {
-        if (str == null) {
-            return null;
-        }
-        return str.startsWith("//") ? "https:" + str : null;
-    }*/
 
     private static String buildFileName(String detailsUrl) {
         return FilenameUtils.getBaseName(detailsUrl) + ".torrent";
@@ -126,11 +106,6 @@ public final class One337xSearchResult extends AbstractTorrentSearchResult {
     public String getFilename() {
         return filename;
     }
-
-    /*@Override
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
-    }*/
 
     private long parseCreationTime(String dateString) {
         long result = System.currentTimeMillis();
