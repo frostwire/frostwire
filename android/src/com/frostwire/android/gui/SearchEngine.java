@@ -249,10 +249,33 @@ public abstract class SearchEngine {
     };
 
     public static final SearchEngine ONE337X = new SearchEngine("1337x", Constants.PREF_KEY_SEARCH_USE_ONE337X) {
+        private String domainName = null;
+
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new One337xSearchPerformer("www.1377x.to", token, keywords, DEFAULT_TIMEOUT);
-            // change www.1377x.to to other like www.1337x.gd, www.1337x.to or other proxy site etc
+            if (domainName == null) {
+                throw new RuntimeException("check your logic, this search performer has no domain name ready");
+            }
+            return new One337xSearchPerformer(domainName, token, keywords, DEFAULT_TIMEOUT);
+        }
+
+        protected void postInitWork() {
+            new Thread(() -> {
+                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                String[] mirrors = {
+                        "1337x.to",
+                        "1337xto.to",
+                        "www.1377x.to",
+                        "1337x.gd",
+                };
+                domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 7000);
+            }
+            ).start();
+        }
+
+        @Override
+        protected boolean isReady() {
+            return domainName != null;
         }
     };
 

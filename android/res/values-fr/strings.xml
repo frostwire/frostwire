@@ -183,6 +183,7 @@
     <string name="please_enter_valid_url">S\'il vous plaît entrer une URL valide</string>
     <string name="available">disponible</string>
     <string name="use_yify">Utilisez Yify</string>
+    <string name="use_one337x">Utilisez 1337x</string>
     <string name="torrent_transfer_consuming_mobile_data">Attention: Ce transfert de torrent utilise vos données 3G/4G. (Vérifiez vos préférences de réseau si vous souhaitez utiliser BitTorrent uniquement sur WiFi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Reprendre tous les transferts torrent</string>
     <string name="storage_setting_confirm_dialog_title">CARTE SD</string>

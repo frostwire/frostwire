@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Himanshu Sharma (HimanshuSharma789)
  * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,25 +17,26 @@
 
 package com.frostwire.search.one337x;
 
-import android.util.Log;
-
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
 /**
  * @author gubatron
  * @author aldenml
+ * @author HimanshuSharma789
  */
 final class One337xTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
     private final String detailsUrl;
+    private final String displayName;
 
-    One337xTempSearchResult(String domainName, String itemId, String htmlFilename) {
+    One337xTempSearchResult(String domainName, String itemId, String htmlFilename, String displayName) {
         this.detailsUrl = "https://" + domainName + "/torrent/" + itemId + "/" + htmlFilename;
+        this.displayName = displayName;
     }
 
     @Override
     public String getDisplayName() {
-        return null;
+        return displayName;
     }
 
     @Override
@@ -45,7 +46,7 @@ final class One337xTempSearchResult extends AbstractSearchResult implements Craw
 
     @Override
     public String getSource() {
-        return null;
+        return "1337x";
     }
 
     @Override
