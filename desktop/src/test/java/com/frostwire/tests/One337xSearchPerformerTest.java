@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Himanshu Sharma (HimanshuSharma789)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public final class One337xSearchPerformerTest {
     public static void main(String[] args) throws Throwable {
-        String TEST_SEARCH_TERM = "avengers";
+        String TEST_SEARCH_TERM = "foo";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
-        String fileStr = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM+"/1/");
+        String fileStr = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM + "/1/");
         Pattern searchResultsDetailURLPattern = Pattern.compile(One337xSearchPerformer.SEARCH_RESULTS_REGEX);
         Pattern detailPagePattern = Pattern.compile(One337xSearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
