@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
+import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -56,6 +57,7 @@ public abstract class SearchEngine {
     private static final int TORLOCK_ID = 14;
     private static final int EZTV_ID = 15;
     private static final int YIFI_ID = 17;
+    private static final int ONE337X_ID = 26;
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
@@ -149,6 +151,14 @@ public abstract class SearchEngine {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
+
+    private static final SearchEngine ONE337X = new SearchEngine(ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private static final SearchEngine ZOOQLE = new SearchEngine(ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -198,6 +208,7 @@ public abstract class SearchEngine {
                 TORLOCK,
                 NYAA,
                 YIFY,
+                ONE337X,
                 EZTV,
                 TORRENTDOWNLOADS,
                 LIMETORRENTS);
