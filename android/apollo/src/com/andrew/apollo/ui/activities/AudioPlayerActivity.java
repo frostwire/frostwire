@@ -220,7 +220,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         initMopubBannerView();
 
         // Album Art Ad Controls
-        if (mPlaybackStatus != null) {
+        if (mPlayPauseButton != null) {
             mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
         }
 
@@ -846,11 +846,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void updatePlaybackControls() {
         // Set the repeat image
-        mRepeatButton.updateRepeatState();
+        if (mRepeatButton != null) {
+            mRepeatButton.updateRepeatState();
+        }
         // Set the play and pause image
-        mPlayPauseButton.updateState();
+        if (mPlayPauseButton != null) {
+            if (mPlaybackStatus != null && !mPlayPauseButton.hasOnLongClickListener()) {
+                mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+            }
+            mPlayPauseButton.updateState();
+        }
         // Set the shuffle image
-        mShuffleButton.updateShuffleState();
+        if (mShuffleButton != null) {
+            mShuffleButton.updateShuffleState();
+        }
     }
 
     private void updateQueueFragmentCurrentSong() {

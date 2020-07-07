@@ -43,6 +43,7 @@ public final class PlayPauseButton extends AppCompatImageButton
 
     private int playDrawable;
     private int pauseDrawable;
+    private boolean hasLongClickListener;
 
     /**
      * @param context The {@link Context} to use
@@ -89,6 +90,15 @@ public final class PlayPauseButton extends AppCompatImageButton
      */
     public void updateState() {
         Asyncs.async(MusicUtils::isPlaying, PlayPauseButton::updateStatePost, this);
+    }
+
+    public void setOnLongClickListener(OnLongClickListener l) {
+        super.setOnLongClickListener(l);
+        hasLongClickListener = l != null;
+    }
+
+    public boolean hasOnLongClickListener() {
+        return hasLongClickListener;
     }
 
     private void updateStatePost(Boolean isPlaying) {
