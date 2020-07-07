@@ -263,10 +263,7 @@ public abstract class SearchEngine {
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
                 String[] mirrors = {
-                        "1337x.to",
-                        "1337xto.to",
-                        "www.1377x.to",
-                        "1337x.gd",
+                        "www.1377x.to"
                 };
                 domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 7000);
             }
