@@ -153,8 +153,24 @@ public abstract class SearchEngine {
     };
 
     private static final SearchEngine ONE337X = new SearchEngine(ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
+        protected void postInitWork() {
+            new Thread(() -> {
+                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                String[] mirrors = {
+                        "1337x.to",
+                        "1337xto.to",
+                        "www.1377x.to",
+                        "1337x.gd",
+                };
+                ONE337X._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
+            }
+            ).start();
+        }
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
+            if (!isReady()) {
+                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
+            }
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
