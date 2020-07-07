@@ -1,4 +1,6 @@
-FrostWire 2.2.1 build 641 - JUN/17/2020
+FrostWire 2.2.1 build 642 - JUL/07/2020
+ - New 1337x search (thanks to @HimanshuSharma789)
+ - Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
  - jlibtorrent/libtorrent 1.2.7.0 update
  - OpenSSL 1.1.1g update
  - dev: jlibtorrent build with boost 1.73.0

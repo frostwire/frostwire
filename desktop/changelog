@@ -1,3 +1,9 @@
+frostwire (6.8.6) stable; urgency=high
+ * New 1337x search (thanks to @HimanshuSharma789)
+ * Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 07 Jul 2020 08:35:00 -0600
+
 frostwire (6.8.5) stable; urgency=high
   * New MagnetDL search provider
   * Fixed Torrentz2 search
