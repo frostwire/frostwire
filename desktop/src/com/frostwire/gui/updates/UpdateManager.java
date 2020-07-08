@@ -315,8 +315,28 @@ public final class UpdateManager implements Serializable {
         options[OPTION_OPEN_URL] = I18n.tr("Go to webpage");
         final int finalOptionType = optionType;
         final String[] finalOptions = options;
+
+        String updateMessage = "";
+
+        if (msg.getMessage() != null && msg.getMessage().length() > 0) {
+            updateMessage = msg.getMessage(); //value="..."
+        }
+
+        // if msg.getMessageInstallerReady() exists it will be used instead of message.
+        if (msg.getMessageInstallerReady() != null && msg.getMessageInstallerReady().length() > 0) {
+            updateMessage = msg.getMessageInstallerReady(); //valueInstallerReady="..."
+        }
+
+        final String finalUpdateMessage = updateMessage;
+
         SwingUtilities.invokeLater(() -> {
-            int result = JOptionPane.showOptionDialog(null, msg.getMessage(), title, finalOptionType, JOptionPane.INFORMATION_MESSAGE, null, // Icon
+            int result = JOptionPane.showOptionDialog(
+                    null,
+                    finalUpdateMessage,
+                    title,
+                    finalOptionType,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null, // Icon
                     finalOptions, // Options[]
                     null); // Initial value (Object)
             if (result == OPTION_OPEN_URL) {
