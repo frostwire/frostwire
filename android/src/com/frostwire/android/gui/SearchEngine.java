@@ -281,7 +281,7 @@ public abstract class SearchEngine {
 
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT / 2);
+            return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
