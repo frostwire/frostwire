@@ -75,6 +75,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_one337x" />
     <androidx.preference.CheckBoxPreference
+        android:key="frostwire.prefs.search.use_idope"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_idope" />
+    <androidx.preference.CheckBoxPreference
         android:key="frostwire.prefs.search.use_zooqle"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_zooqle" />

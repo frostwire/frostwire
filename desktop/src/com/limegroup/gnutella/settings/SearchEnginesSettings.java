@@ -36,6 +36,7 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting EZTV_SEARCH_ENABLED = FACTORY.createBooleanSetting("EZTV_SEARCH_ENABLED", true);
     public static final BooleanSetting YIFY_SEARCH_ENABLED = FACTORY.createBooleanSetting("YIFY_SEARCH_ENABLED", true);
     public static final BooleanSetting ONE337X_SEARCH_ENABLED = FACTORY.createBooleanSetting("ONE337X_SEARCH_ENABLED", true);
+    public static final BooleanSetting IDOPE_SEARCH_ENABLED = FACTORY.createBooleanSetting("IDOPE_SEARCH_ENABLED", true);
     public static final BooleanSetting ZOOQLE_SEARCH_ENABLED = FACTORY.createBooleanSetting("ZOOQLE_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTZ2_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTZ2_SEARCH_ENABLED", true);
     public static final BooleanSetting NYAA_SEARCH_ENABLED = FACTORY.createBooleanSetting("NYAA_SEARCH_ENABLED", true);

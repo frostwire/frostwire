@@ -22,6 +22,7 @@ import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
@@ -58,6 +59,7 @@ public abstract class SearchEngine {
     private static final int EZTV_ID = 15;
     private static final int YIFI_ID = 17;
     private static final int ONE337X_ID = 26;
+    private static final int IDOPE_ID = 27;
     private static final int TORRENTDOWNLOADS_ID = 19;
     private static final int LIMETORRENTS_ID = 20;
     private static final int ZOOQLE_ID = 21;
@@ -86,6 +88,7 @@ public abstract class SearchEngine {
             }
             ).start();
         }
+
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {
@@ -163,12 +166,20 @@ public abstract class SearchEngine {
             }
             ).start();
         }
+
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             if (!isReady()) {
                 throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
             }
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
+    private static final SearchEngine IDOPE = new SearchEngine(IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.se") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -205,8 +216,11 @@ public abstract class SearchEngine {
         postInitWork();
     }
 
-    /** Override for things like picking the fastest mirror domainName */
-    protected void postInitWork() {}
+    /**
+     * Override for things like picking the fastest mirror domainName
+     */
+    protected void postInitWork() {
+    }
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
@@ -214,6 +228,7 @@ public abstract class SearchEngine {
                 MAGNETDL,
                 TORRENTZ2,
                 ZOOQLE,
+                IDOPE,
                 TPB,
                 SOUNDCLOUD,
                 FROSTCLICK,

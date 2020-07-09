@@ -228,6 +228,7 @@
     <string name="check_internet_connection">इंटरनेट कनेक्शन की जांच</string>
     <string name="use_yify">उपयोग Yify</string>
     <string name="use_one337x">उपयोग 1337x</string>
+    <string name="use_idope">उपयोग Idope</string>
     <string name="transfers_context_menu_copy_infohash_copied">जानकारी हैश क्लिपबोर्ड करने के लिए नकल</string>
     <string name="haptic_feedback">हप्टिक राय</string>
     <string name="yes_no_cancel_transfer_question_cloud">तुम बंद करो और सूची से यह डाउनलोड निकालना चाहते हैं, आप सुनिश्चित हैं?</string>

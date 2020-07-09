@@ -180,6 +180,7 @@
     <string name="please_enter_valid_url">Por favor, ingresa una URL válida</string>
     <string name="use_yify">Usar Yify</string>
     <string name="use_one337x">Usar 1337x</string>
+    <string name="use_idope">Usar Idope</string>
     <string name="torrent_transfer_consuming_mobile_data">Advertencia: Esta transferencia de torrent está usando tu data 3G/4G (Revisa tus preferencias de red si deseas usar BitTorrent solo con Wi-Fi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Reanudar todas las transferencias Torrent</string>
     <string name="cant_open_file_does_not_exist">No puedo abrir %1$s, el archivo no existe.</string>

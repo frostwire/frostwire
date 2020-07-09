@@ -26,6 +26,7 @@ import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
@@ -276,6 +277,14 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine IDOPE = new SearchEngine("Idope", Constants.PREF_KEY_SEARCH_USE_IDOPE) {
+
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT / 2);
+        }
+    };
+
     public static final SearchEngine TORRENTZ2 = new SearchEngine("Torrentz2", Constants.PREF_KEY_SEARCH_USE_TORRENTZ2) {
 
         @Override
@@ -297,6 +306,7 @@ public abstract class SearchEngine {
             TORRENTZ2,
             YIFY,
             ONE337X,
+            IDOPE,
             FROSTCLICK,
             ZOOQLE,
             TPB,
