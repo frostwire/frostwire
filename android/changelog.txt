@@ -1,5 +1,6 @@
-FrostWire 2.2.2 build 643 - JUL/07/2020
+FrostWire 2.2.2 build 644 - JUL/09/2020
  - New 1337x (LeetX) search (thanks to @HimanshuSharma789 for his contribution)
+ - New iDope search (thanks to @HimanshuSharma789 for his contribution)
  - Fixed Torrentz2 search dates (thanks to @HimanshuSharma789 for his contribution)
  - com.google.android.material:material:1.2.0-alpha06 -> 1.3.0-alpha01
  - androidx.browser:browser:1.3.0-alpha01 -> 1.3.0-alpha04
