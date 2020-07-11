@@ -99,7 +99,7 @@ Then run the project with:
 
     ./run
     
-If you are using Windows, run the project with `run.bat` in the `src` folder.
+If you are using Windows, run the project with `run.bat`.
 
 # HAVING ISSUES BUILDING?
 
