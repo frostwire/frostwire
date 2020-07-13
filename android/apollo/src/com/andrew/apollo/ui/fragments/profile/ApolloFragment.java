@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,38 +219,26 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             mSongName = null;
             mAlbumName = mAlbum.mAlbumName;
             mArtistName = mAlbum.mArtistName;
-            MusicPlaybackService.safePost(() -> {
-                mSongList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId);
-            });
+            MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForAlbum(getActivity(), mAlbum.mAlbumId));
         } else if (mItem instanceof Artist) {
             Artist mArtist = (Artist) mItem;
             mSelectedId = mArtist.mArtistId;
             mSongName = null;
             mArtistName = mArtist.mArtistName;
-            MusicPlaybackService.safePost(() -> {
-                mSongList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId);
-            });
+            MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForArtist(getActivity(), mArtist.mArtistId));
         } else if (mItem instanceof Genre) {
             Genre mGenre = (Genre) mItem;
             mSelectedId = mGenre.mGenreId;
-            MusicPlaybackService.safePost(() -> {
-                mSongList = MusicUtils.getSongListForGenre(getActivity(), mGenre.mGenreId);
-            });
+            MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForGenre(getActivity(), mGenre.mGenreId));
         } else if (mItem instanceof Playlist) {
             Playlist mPlaylist = (Playlist) mItem;
             mSelectedId = mPlaylist.mPlaylistId;
             if (mSelectedId == PlaylistLoader.FAVORITE_PLAYLIST_ID) {
-                MusicPlaybackService.safePost(() -> {
-                    mSongList = MusicUtils.getSongListForFavorites(getActivity());
-                });
+                MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForFavorites(getActivity()));
             } else if (mSelectedId == PlaylistLoader.LAST_ADDED_PLAYLIST_ID) {
-                MusicPlaybackService.safePost(() -> {
-                    mSongList = MusicUtils.getSongListForLastAdded(getActivity());
-                });
+                MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForLastAdded(getActivity()));
             } else {
-                MusicPlaybackService.safePost(() -> {
-                    mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId);
-                });
+                MusicPlaybackService.safePost(() -> mSongList = MusicUtils.getSongListForPlaylist(getActivity(), mPlaylist.mPlaylistId));
             }
         }
         // Play the selected songs
@@ -391,17 +379,18 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private void onAddToFavorites() {
+        FavoritesStore favoritesStore = FavoritesStore.getInstance(getActivity());
         if (mSongList != null) {
             int added = 0;
             for (Long songId : mSongList) {
                 try {
                     final Song song = MusicUtils.getSong(getActivity(), songId);
-                    if (song != null) {
-                        FavoritesStore.getInstance(getActivity()).addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
+                    if (song != null && favoritesStore != null) {
+                        favoritesStore.addSongId(songId, song.mSongName, song.mAlbumName, song.mArtistName);
                         added++;
                     }
-                } catch (Throwable ignored) {
-                    ignored.printStackTrace();
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
             }
             if (added > 0) {
@@ -409,16 +398,18 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                         R.plurals.NNNtrackstoplaylist, added, added);
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
-        } else if (mSelectedId != -1) {
-            FavoritesStore.getInstance(getActivity()).addSongId(
-                    mSelectedId, mSongName, mAlbumName, mArtistName);
+        } else if (mSelectedId != -1 && favoritesStore != null) {
+            favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
         }
     }
 
     private void onRemoveFromFavorites() {
         mAdapter.remove(mItem);
         mAdapter.notifyDataSetChanged();
-        FavoritesStore.getInstance(getActivity()).removeItem(mSelectedId);
+        FavoritesStore favoritesStore = FavoritesStore.getInstance(getActivity());
+        if (favoritesStore != null) {
+            favoritesStore.removeItem(mSelectedId);
+        }
         refresh();
     }
 
@@ -526,17 +517,15 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         restartLoader(false);
     }
 
-    public boolean restartLoader(boolean force) {
+    public void restartLoader(boolean force) {
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000 && isAdded()) {
             lastRestartLoader = System.currentTimeMillis();
             try {
                 getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
-                return true;
             } catch (Throwable t) {
-                return false;
+                t.printStackTrace();
             }
         }
-        return false;
     }
 
     private void initLoader() {
@@ -673,7 +662,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             return 0;
         }
         for (int i = 0; i < mAdapter.getCount(); i++) {
-            if (((Song) mAdapter.getItem(i)).mSongId == trackId) {
+            final Song item = (Song) mAdapter.getItem(i);
+            if (item != null && item.mSongId == trackId) {
                 return i;
             }
         }
