@@ -1580,7 +1580,11 @@ public final class MusicUtils {
      * @return The last album name played by an artist
      */
     public static String getLastAlbumForArtist(final Context context, final String artistName) {
-        return RecentStore.getInstance(context).getAlbumName(artistName);
+        RecentStore recentStore = RecentStore.getInstance(context);
+        if (recentStore == null) {
+            return null;
+        }
+        return recentStore.getAlbumName(artistName);
     }
 
     /**
