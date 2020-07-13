@@ -19,6 +19,7 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
@@ -26,7 +27,7 @@ import com.andrew.apollo.provider.RecentStore;
 
 /**
  * Used to query {@link RecentStore} and return the last listened to albums.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (gubatron@gmail.com)
  */
@@ -34,7 +35,7 @@ public class RecentLoader extends SongLoader {
 
     /**
      * Constructor of <code>RecentLoader</code>
-     * 
+     *
      * @param context The {@link Context} to use
      */
     public RecentLoader(final Context context) {
@@ -48,23 +49,37 @@ public class RecentLoader extends SongLoader {
 
     /**
      * Creates the {@link Cursor} used to run the query.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the album query.
      */
     private static Cursor makeRecentCursor(final Context context) {
-        return RecentStore
-                .getInstance(context)
+        if (context == null) {
+            return null;
+        }
+
+        RecentStore recentStore = RecentStore.getInstance(context);
+
+        if (recentStore == null) {
+            return null;
+        }
+
+        String durationColumn = "duration";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            durationColumn = AudioColumns.DURATION;
+        }
+        return recentStore
                 .getReadableDatabase()
                 .query(RecentStore.TABLE_NAME,
-                        new String[] {
+                        new String[]{
                                 BaseColumns._ID + " as id",  /* 0 - id */
                                 AudioColumns.TITLE,          /* 2 - songname */
                                 AudioColumns.ARTIST,         /* 3 - artistname */
                                 AudioColumns.ALBUM,          /* 4 - albumname */
-                                AudioColumns.DURATION,       /* 5 - duration */
+                                durationColumn,              /* 5 - duration */
                                 /* Can't add AudioColumns.ALBUM_ID since RecentStore is a sqlitedb created by Apollo and doesn't seem to need it */
                         }, null, null, null, null,
                         RecentStore.RecentStoreColumns.LAST_TIME_PLAYED + " DESC");
+
     }
 }

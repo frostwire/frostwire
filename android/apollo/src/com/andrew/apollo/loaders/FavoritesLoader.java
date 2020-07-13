@@ -13,6 +13,7 @@ package com.andrew.apollo.loaders;
 
 import android.content.Context;
 import android.database.Cursor;
+
 import com.andrew.apollo.model.Song;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.FavoritesStore.FavoriteColumns;
@@ -22,7 +23,7 @@ import java.util.List;
 
 /**
  * Used to query the {@link FavoritesStore} for the tracks marked as favorites.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  * @author Alden Torres (@aldenml)
@@ -30,7 +31,7 @@ import java.util.List;
 public class FavoritesLoader extends SongLoader {
     /**
      * Constructor of <code>FavoritesHandler</code>
-     * 
+     *
      * @param context The {@link Context} to use.
      */
     public FavoritesLoader(final Context context) {
@@ -50,12 +51,16 @@ public class FavoritesLoader extends SongLoader {
         if (context == null) {
             return null;
         }
-        
-        return FavoritesStore
-                .getInstance(context)
+
+        FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+        if (favoritesStore == null) {
+            return null;
+        }
+
+        return favoritesStore
                 .getReadableDatabase()
                 .query(FavoriteColumns.NAME,
-                        new String[] {
+                        new String[]{
                                 FavoriteColumns.ID + " as _id", FavoriteColumns.ID,
                                 FavoriteColumns.SONGNAME, FavoriteColumns.ALBUMNAME,
                                 FavoriteColumns.ARTISTNAME, FavoriteColumns.PLAYCOUNT

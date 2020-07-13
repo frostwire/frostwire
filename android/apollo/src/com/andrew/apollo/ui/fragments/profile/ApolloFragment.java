@@ -338,7 +338,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private boolean onRemoveFromRecent() {
-        RecentStore.getInstance(getActivity()).removeItem(mSelectedId);
+        RecentStore recentStore = RecentStore.getInstance(getActivity());
+        if (recentStore != null) {
+            recentStore.removeItem(mSelectedId);
+        }
         MusicUtils.refresh();
         restartLoader(true);
         return true;

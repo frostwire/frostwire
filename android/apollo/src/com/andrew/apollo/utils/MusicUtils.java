@@ -1685,9 +1685,15 @@ public final class MusicUtils {
                 final long id = c.getLong(0);
                 removeTrack(id);
                 // Remove from the favorites playlist.
-                FavoritesStore.getInstance(context).removeItem(id);
+                FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+                if (favoritesStore != null) {
+                    favoritesStore.removeItem(id);
+                }
                 // Remove any items in the recent's database
-                RecentStore.getInstance(context).removeItem(id);
+                RecentStore recentStore = RecentStore.getInstance(context);
+                if (recentStore != null) {
+                    recentStore.removeItem(id);
+                }
                 // Remove from all remaining playlists.
                 removeSongFromAllPlaylists(context, id);
                 c.moveToNext();
