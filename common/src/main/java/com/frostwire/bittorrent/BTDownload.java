@@ -549,7 +549,7 @@ public final class BTDownload implements BittorrentDownload {
     @Override
     public List<TransferItem> getItems() {
         ArrayList<TransferItem> items = new ArrayList<>();
-        if (th.isValid()) {
+        if (th != null && th.isValid()) {
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.isValid()) {
                 FileStorage fs = ti.files();
