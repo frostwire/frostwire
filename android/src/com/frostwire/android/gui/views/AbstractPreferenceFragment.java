@@ -22,14 +22,15 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.preference.PreferenceFragment;
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.Preference;
-import androidx.preference.TwoStatePreference;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragment;
+import androidx.preference.TwoStatePreference;
 
 import java.lang.reflect.Field;
 
@@ -57,6 +58,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        //Fragment f = getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         // this is necessary to avoid a crash with double rotation of the screen
         Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         if (f != null) {

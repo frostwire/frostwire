@@ -2,7 +2,7 @@
 <!--
 /*
  * Criado por Angel Leon (@gubatron), Alden Torres (aldenml)
- * Direitos Autorais (c) 2011-2016, FrostWire(R). Todos os direitos reservados.
+ * Direitos Autorais (c) 2011-2020, FrostWire(R). Todos os direitos reservados.
  *
  * Este programa é um software gratuito: você pode redistribui-lo e/ou modifica-lo
  * sob os termos de GNU General Public License como publicado por 
@@ -408,6 +408,7 @@
     <string name="vpn_find_out_more">Descubra mais</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Julgamento gratuito de 7 dias</string>
     <string name="contact_us">Contate-nos</string>
+    <string name="community">Comunidade</string>
     <string name="use_nyaa">Usar Nyaa</string>
     <string name="use_torrentz2">Usar Torrentz2</string>
     <string name="free">Livre</string>

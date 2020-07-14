@@ -39,6 +39,8 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 
+import static com.frostwire.android.gui.util.UIUtils.setupClickUrl;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -112,10 +114,6 @@ public final class AboutFragment extends AbstractFragment {
         } catch (Throwable e) {
             return "";
         }
-    }
-
-    private static void setupClickUrl(View v, final String url) {
-        v.setOnClickListener(view -> UIUtils.openURL(view.getContext(), url));
     }
 
     private static String jlibtorrentVersion() {

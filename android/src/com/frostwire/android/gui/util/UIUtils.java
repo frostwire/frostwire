@@ -443,6 +443,10 @@ public final class UIUtils {
         }
     }
 
+    public static void setupClickUrl(View v, final String url) {
+        v.setOnClickListener(view -> UIUtils.openURL(view.getContext(), url));
+    }
+
     public static String getMimeType(String filePath) {
         try {
             return MimeDetector.getMimeType(FilenameUtils.getExtension(filePath));

@@ -474,6 +474,7 @@
     <string name="vpn_find_out_more">Find out more</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="contact_us">Contact Us</string>
+    <string name="community">Community</string>
     <string name="play_uppercase">PLAY</string>
     <string name="minutes_left_ad_free">%d minutes left Ad-free</string>
     <string name="minute_left_ad_free">One minute left Ad-free</string>

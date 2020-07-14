@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -413,6 +413,7 @@
     <string name="vpn_find_out_more">Finde mehr heraus</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Kostenlose 7-Tage-Testversion</string>
     <string name="contact_us">Kontaktiere uns</string>
+    <string name="community">Gemeinschaft</string>
     <string name="use_nyaa">Benutze Nyaa</string>
     <string name="free">Kostenlos</string>
 </resources>

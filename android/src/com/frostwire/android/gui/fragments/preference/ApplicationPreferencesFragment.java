@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                 ApplicationPreferencesFragment::setupStorePostTask);
     }
 
-
     private static class SetupStoreTaskParamHolder {
         final long purchaseTimestamp;
         int minutesPaused = -1;
@@ -286,7 +285,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         ApplicationPreferencesFragment applicationPreferencesFragment = paramHolder.appPrefsFragRef.get();
         Activity settingsActivity = applicationPreferencesFragment.getActivity();
         final long purchaseTimestamp = paramHolder.purchaseTimestamp;
-
 
         Preference p = applicationPreferencesFragment.findPreference("frostwire.prefs.offers.buy_no_ads");
         if (p != null && Offers.disabledAds() && pausedAdsPreferenceClickListener.adsPaused()) {
@@ -402,8 +400,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             }
             return false;
         }
-
-
     }
 
     private static final class PausedAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
