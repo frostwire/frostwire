@@ -18,7 +18,11 @@
 package com.frostwire.android.gui.views.preference;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.AttributeSet;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import androidx.preference.Preference;
@@ -42,24 +46,37 @@ public class CommunityButtonsPreference extends Preference {
         super.onBindViewHolder(holder);
         setupCommunityButtons(holder);
     }
+
     /**
      * Event handlers for community links/imagebuttons
      */
     private void setupCommunityButtons(PreferenceViewHolder holder) {
+        Button blogButton = (Button) holder.findViewById(R.id.view_preference_community_blog_button);
+        Button rateOurAppButton = (Button) holder.findViewById(R.id.view_preference_community_rate_our_app_button);
+
         ImageButton facebookButton = (ImageButton) holder.findViewById(R.id.view_preference_community_facebook_button);
         ImageButton githubButton = (ImageButton) holder.findViewById(R.id.view_preference_community_github_button);
         ImageButton redditButton = (ImageButton) holder.findViewById(R.id.view_preference_community_reddit_button);
         ImageButton chatButton = (ImageButton) holder.findViewById(R.id.view_preference_community_slack_button);
         ImageButton twitterButton = (ImageButton) holder.findViewById(R.id.view_preference_community_twitter_button);
 
-        if (facebookButton != null) {
-            String referrerParam = "?ref=android_preferences";
-            UIUtils.setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
-            UIUtils.setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
-            UIUtils.setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
-            UIUtils.setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
-            UIUtils.setupClickUrl(chatButton, Constants.SOCIAL_URL_SLACK_PAGE + referrerParam);
-        }
+        String referrerParam = "?ref=android_preferences";
+        UIUtils.setupClickUrl(blogButton, "https://blog.frostwire.com/" + referrerParam);
+        UIUtils.setupClickUrl(facebookButton, Constants.SOCIAL_URL_FACEBOOK_PAGE + referrerParam);
+        UIUtils.setupClickUrl(twitterButton, Constants.SOCIAL_URL_TWITTER_PAGE + referrerParam);
+        UIUtils.setupClickUrl(redditButton, Constants.SOCIAL_URL_REDDIT_PAGE + referrerParam);
+        UIUtils.setupClickUrl(githubButton, Constants.SOCIAL_URL_GITHUB_PAGE + referrerParam);
+        UIUtils.setupClickUrl(chatButton, Constants.SOCIAL_URL_SLACK_PAGE + referrerParam);
+
+        rateOurAppButton.setOnClickListener(v -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse("market://details?id=" + Constants.APP_PACKAGE_NAME));
+                    try {
+                        getContext().startActivity(intent);
+                    } catch (Throwable ignored) {
+                    }
+                }
+        );
     }
 
 }

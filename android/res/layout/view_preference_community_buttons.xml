@@ -5,6 +5,23 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+            android:id="@+id/view_preference_community_blog_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blog"/>
+        <Button
+            android:id="@+id/view_preference_community_rate_our_app_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rate_our_app"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -57,6 +74,6 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_slack" />
+            android:src="@drawable/about_social_discord" />
     </LinearLayout>
 </LinearLayout>
