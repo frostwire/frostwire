@@ -1315,6 +1315,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 return;
             }
             AudioPlayerActivity activity = mReference.get();
+            if (activity == null) {
+                return;
+            }
             final String action = intent.getAction();
             if (action == null) {
                 return;
@@ -1332,14 +1335,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
                     LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.PLAYSTATE_CHANGED)");
                     // Set the play and pause image
-                    activity.mPlayPauseButton.updateState();
+                    if (activity.mPlayPauseButton != null) {
+                        activity.mPlayPauseButton.updateState();
+                    }
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:
                     // Set the repeat image
-                    activity.mRepeatButton.updateRepeatState();
+                    if (activity.mRepeatButton != null) {
+                        activity.mRepeatButton.updateRepeatState();
+                    }
                     // Set the shuffle image
-                    activity.mShuffleButton.updateShuffleState();
+                    if (activity.mShuffleButton != null) {
+                        activity.mShuffleButton.updateShuffleState();
+                    }
                     break;
             }
         }
