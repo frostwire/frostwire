@@ -1,9 +1,11 @@
-FrostWire 2.2.2 build 644 - JUL/09/2020
+FrostWire 2.2.2 build 645 - JUL/16/2020
  - Considerably faster app startup
  - .apk size reduced 2.1MB
  - New 1337x (LeetX) search (thanks to @HimanshuSharma789 for his contribution)
  - New iDope search (thanks to @HimanshuSharma789 for his contribution)
  - Fixed Torrentz2 search dates (thanks to @HimanshuSharma789 for his contribution)
+ - Multiple crash fixes on My Music (Player)
+ - Settings screen now includes links to official reddit, twitter, facebook, discord chat, blog, rate us
  - com.google.android.material:material:1.2.0-alpha06 -> 1.3.0-alpha01
  - com.android.tools.build:gradle:3.6.3 -> 4.0.0
  - gradle-5.6.4 -> gradle-6.1.1
