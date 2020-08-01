@@ -1,4 +1,4 @@
-FrostWire 2.2.2 build 646 - JUL/19/2020
+FrostWire 2.2.2 build 646 - AUG/01/2020
  - Considerably faster app startup
  - .apk size reduced 2.1MB
  - New 1337x (LeetX) search (thanks to @HimanshuSharma789 for his contribution)
