@@ -1,9 +1,21 @@
 frostwire (6.8.6) stable; urgency=high
+ * New jlibtorrent 1.2.8.0 update
  * New 1337x search (thanks to @HimanshuSharma789)
  * New iDope search (thanks to @HimanshuSharma789)
  * Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
+ * lt: validate UTF-8 encoding of client version strings from peers
+ * lt: don't time out tracker announces as eagerly while resolving hostnames
+ * lt: fix NAT-PMP shutdown issue
+ * lt: improve hostname lookup by merging identical lookups
+ * lt: fix network route enumeration for large routing tables
+ * lt: fixed issue where pop_alerts() could return old, invalid alerts
+ * lt: fix issue when receiving have-all message before the metadata
+ * lt: don't leave lingering part files handles open
+ * lt: disallow calling add_piece() during checking
+ * lt: fix incorrect filename truncation at multi-byte character
+ * lt: always announce listen port 1 when using a proxy
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 09 Jul 2020 01:32:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 04 Ago 2020 01:07:00 -0600
 
 frostwire (6.8.5) stable; urgency=high
   * New MagnetDL search provider
