@@ -411,7 +411,7 @@ public final class BTEngine extends SessionManager {
                         File savePath = readSavePath(infoHash);
                         if (setupSaveDir(savePath) == null) {
                             LOG.warn("Can't create data dir or mount point is not accessible");
-                            return;
+                            continue;
                         }
                         restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
                     }
