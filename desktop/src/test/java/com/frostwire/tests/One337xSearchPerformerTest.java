@@ -62,7 +62,10 @@ public final class One337xSearchPerformerTest {
                 One337xSearchResult sr = new One337xSearchResult(detailUrl, displayName, sm);
                 System.out.println(sr);
             } else {
-                System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
+                System.err.println("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
+                System.err.println("HTML @ " + detailUrl + ":");
+                System.err.println(detailPage);
+                return;
             }
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");

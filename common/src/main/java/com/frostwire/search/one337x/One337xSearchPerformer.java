@@ -30,11 +30,11 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
     public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"/torrent/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">(?<displayName>.*?)</a>";
 
     public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<div class=\"box-info-heading clearfix\">.*?" +
-            "<a class=\"(.*)\" href=\"(?<magnet>.*?)\" onclick=\"(.*?)\">.*?" +
-            "<strong>Language</strong> <span>(?<language>.*?)</span>.*?" +
-            "<strong>Total size</strong> <span>(?<size>.*?)</span>.*?" +
-            "<strong>Date uploaded</strong> <span>(?<creationDate>.*?)</span>.*?" +
-            "<strong>Seeders</strong> <span class=\"seeds\">(?<seeds>[0-9]+)</span>";
+            "<a class=\".*\" href=\"(?<magnet>.*?)\" onclick=\".*\">.*?" +
+            "<strong>Language</strong>.*?<span>.*?</span>.*?" +
+            "<strong>Total size</strong>.*?<span>(?<size>.*?)</span>.*?" +
+            "<strong>Date uploaded</strong>.*?<span>(?<creationDate>.*?)</span>.*?" +
+            "<strong>Seeders</strong>.*?<span class=\"seeds\">(?<seeds>[0-9]+)</span>";
 
 
     private static final int MAX_RESULTS = 20;
