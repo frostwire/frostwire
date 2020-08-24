@@ -1,4 +1,4 @@
-FrostWire 2.2.3 build 648 - AUG/23/2020
+FrostWire 2.2.3 build 649 - AUG/23/2020
  - jlibtorrent 1.2.7.0 -> 1.2.8.0 update
  - com.squareup.okhttp3:okhttp:4.4.1 -> 4.8.1
  - com.mopub:mopub-sdk-banner:5.12.0 -> 5.13.1
@@ -9,6 +9,7 @@ FrostWire 2.2.3 build 648 - AUG/23/2020
  - com.applovin:applovin-sdk:9.12.6 -> 9.13.1
  - com.unity3d.ads:unity-ads:3.4.2 -> 3.4.6
  - 1337 search fixed
+ - SC search fixed
 
 FrostWire 2.2.2 build 646 - AUG/01/2020
  - Considerably faster app startup
