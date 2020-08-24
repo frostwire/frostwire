@@ -149,7 +149,8 @@ public class MediaType implements Serializable {
                             "pcd", "tga", "pic", "fig",
                             "psd", "wpg", "dcx", "cpt", "mic",
                             "pbm", "pnm", "ppm", "xbm", "xpm", "xwd",
-                            "sgi", "fax", "rgb", "ras"
+                            "sgi", "fax", "rgb", "ras",
+                            "webm"
                     });
     /**
      * Type for 'torrents'
