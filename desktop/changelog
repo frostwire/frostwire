@@ -3,6 +3,7 @@ frostwire (6.8.6) stable; urgency=high
  * New 1337x search (thanks to @HimanshuSharma789)
  * New iDope search (thanks to @HimanshuSharma789)
  * Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
+ * Discontinues mplayer video playback, uses os default video player for videos
  * com.google.re2j:re2j:1.3 -> 1.4
  * com.squareup.okhttp3:okhttp:4.4.1 -> 4.8.1
  * com.h2database:h2:1.4.199 -> 200
@@ -18,7 +19,7 @@ frostwire (6.8.6) stable; urgency=high
  * lt: fix incorrect filename truncation at multi-byte character
  * lt: always announce listen port 1 when using a proxy
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 06 Ago 2020 18:17:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 23 Ago 2020 09:52:00 -0600
 
 frostwire (6.8.5) stable; urgency=high
   * New MagnetDL search provider
