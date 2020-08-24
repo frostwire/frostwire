@@ -20,7 +20,7 @@ frostwire (6.8.6) stable; urgency=high
  * lt: fix incorrect filename truncation at multi-byte character
  * lt: always announce listen port 1 when using a proxy
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 23 Ago 2020 10:45:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 23 Aug 2020 10:45:00 -0600
 
 frostwire (6.8.5) stable; urgency=high
   * New MagnetDL search provider
