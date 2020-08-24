@@ -122,4 +122,16 @@ public class MediaSource {
     public String getToolTipText() {
         return toolTipText;
     }
+
+    public boolean isFile() {
+        return file != null;
+    }
+
+    public boolean isURL() {
+        return url != null;
+    }
+
+    public boolean isPlaylistItem() {
+        return playlistItem != null;
+    }
 }
