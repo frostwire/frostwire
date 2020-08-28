@@ -155,6 +155,8 @@ gettextBundle.dependsOn gettextInit
 test {
     useJUnitPlatform()
 
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+
     filter {
         //include specific method in any of the tests
         includeTestsMatching "com.frostwire.tests.*"

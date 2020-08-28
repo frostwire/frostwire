@@ -102,7 +102,7 @@ public final class EztvSearchPerformerTest {
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -49,7 +49,7 @@ public final class One337xSearchPerformerTest {
         Pattern detailPagePattern = Pattern.compile(One337xSearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
         int found = 0;
-        while (searchResultsMatcher.find() && found < 10) {
+        while (searchResultsMatcher.find() && found < 5) {
             found++;
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
@@ -93,7 +93,7 @@ public final class One337xSearchPerformerTest {
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
