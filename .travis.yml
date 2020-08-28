@@ -25,3 +25,4 @@ matrix:
       script:
         - cd desktop
         - gradle build
+        - gradle test
