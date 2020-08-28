@@ -161,7 +161,7 @@ test {
     }
 
     testLogging {
-        events "passed", "failed"
+        events "passed", "failed", "standardError"
         showExceptions true
         showCauses true
         showStackTraces false

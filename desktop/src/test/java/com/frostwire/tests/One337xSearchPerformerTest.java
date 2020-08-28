@@ -22,22 +22,34 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchResult;
+import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.OKHTTPClient;
+import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 public final class One337xSearchPerformerTest {
-    public static void main(String[] args) throws Throwable {
+    @Test
+    public void one377xsearchTest() {
         String TEST_SEARCH_TERM = "foo";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
-        String fileStr = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM + "/1/");
+        String fileStr = null;
+        try {
+            fileStr = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM + "/1/");
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
         Pattern searchResultsDetailURLPattern = Pattern.compile(One337xSearchPerformer.SEARCH_RESULTS_REGEX);
         Pattern detailPagePattern = Pattern.compile(One337xSearchPerformer.TORRENT_DETAILS_PAGE_REGEX);
         Matcher searchResultsMatcher = searchResultsDetailURLPattern.matcher(fileStr);
         int found = 0;
-        while (searchResultsMatcher.find()) {
+        while (searchResultsMatcher.find() && found < 10) {
             found++;
             System.out.println("\nfound " + found);
             System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
@@ -45,9 +57,14 @@ public final class One337xSearchPerformerTest {
             String displayName = searchResultsMatcher.group("displayName");
             System.out.println("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
-            String detailPage = httpClient.get(detailUrl, 5000);
+            String detailPage = null;
+            try {
+                detailPage = httpClient.get(detailUrl, 5000);
+            } catch (IOException e) {
+                fail(e.getMessage());
+            }
             if (detailPage == null) {
-                System.out.println("Error fetching from " + detailUrl);
+                fail("Error fetching from " + detailUrl);
                 continue;
             }
             long downloadTime = System.currentTimeMillis() - start;
@@ -55,21 +72,31 @@ public final class One337xSearchPerformerTest {
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
                 System.out.println("displayname: [" + displayName + "]");
+                assertTrue(!StringUtils.isNullOrEmpty(displayName), "displayName is null or empty");
                 System.out.println("size: [" + sm.group("size") + "]");
+                assertTrue(!StringUtils.isNullOrEmpty(sm.group("size")), "size is null or empty");
                 System.out.println("creationDate: [" + sm.group("creationDate") + "]");
+                assertTrue(!StringUtils.isNullOrEmpty(sm.group("creationDate")), "creationDate is null or empty");
                 System.out.println("seeds: [" + sm.group("seeds") + "]");
+                assertTrue(!StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds is null or empty");
                 System.out.println("magnet: [" + sm.group("magnet") + "]");
+                assertTrue(!StringUtils.isNullOrEmpty(sm.group("magnet")), "magnet is null or empty");
                 One337xSearchResult sr = new One337xSearchResult(detailUrl, displayName, sm);
                 System.out.println(sr);
             } else {
                 System.err.println("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
                 System.err.println("HTML @ " + detailUrl + ":");
                 System.err.println(detailPage);
+                fail("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX (" + detailUrl + ")");
                 return;
             }
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");
-            Thread.sleep(5000);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         System.out.println("-done-");
         if (found == 0) {
