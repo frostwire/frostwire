@@ -20,56 +20,107 @@ package com.frostwire.tests;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchResult;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchResult;
 import com.frostwire.util.UrlUtils;
+import org.junit.jupiter.api.Test;
+import org.limewire.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author gubatron
  */
 public class MagnetDLTest {
 
-    public static void main(String[] args) {
-        String TEST_SEARCH_TERM = UrlUtils.encode("foobar");
+    @Test
+    public void main() {
+        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
         MagnetDLSearchPerformer magnetDLSearchPerformer = new MagnetDLSearchPerformer(1, TEST_SEARCH_TERM, 5000);
-        magnetDLSearchPerformer.setListener(new SearchListener() {
-            @Override
-            public void onResults(long token, List<? extends SearchResult> results) {
-                for (SearchResult result : results) {
-                    MagnetDLSearchResult sr = (MagnetDLSearchResult) result;
-                    System.out.println("MagnetDLSearchResult.SearchListener.onResults:");
-                    System.out.println("\t DisplayName: " + sr.getDisplayName());
-                    System.out.println("\t Source: " + sr.getSource());
-                    System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                    System.out.println("\t Filename: " + sr.getFilename());
-                    System.out.println("\t Hash: " + sr.getHash());
-                    System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
-                    System.out.println("\t Seeds: " + sr.getSeeds());
-                    System.out.println("\t Size: " + sr.getSize());
-                }
-                magnetDLSearchPerformer.stop();
-            }
-
-            @Override
-            public void onError(long token, SearchError error) {
-                System.err.println(error.toString());
-            }
-
-            @Override
-            public void onStopped(long token) {
-            }
-        });
+        MagnetDLSearchListener magnetDLSearchListener = new MagnetDLSearchListener();
+        magnetDLSearchPerformer.setListener(magnetDLSearchListener);
         try {
             magnetDLSearchPerformer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Aborting test.");
+            fail(t.getMessage());
             return;
         }
+        if (magnetDLSearchListener.failedTests.size() > 0) {
+            fail(magnetDLSearchListener.getFailedTestsMessages());
+        }
         System.out.println("-done-");
+    }
+
+    static class MagnetDLSearchListener implements SearchListener {
+        final List<String> failedTests = new ArrayList<>();
+
+        @Override
+        public void onResults(long token, List<? extends SearchResult> results) {
+            for (SearchResult result : results) {
+                MagnetDLSearchResult sr = (MagnetDLSearchResult) result;
+                System.out.println("MagnetDLSearchResult.SearchListener.onResults:");
+                System.out.println("\t DisplayName: " + sr.getDisplayName());
+                System.out.println("\t Source: " + sr.getSource());
+                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
+                System.out.println("\t Filename: " + sr.getFilename());
+                System.out.println("\t Hash: " + sr.getHash());
+                System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
+                System.out.println("\t Seeds: " + sr.getSeeds());
+                System.out.println("\t Size: " + sr.getSize());
+
+                if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
+                    failedTests.add("getDisplayName was null or empty");
+                }
+
+                if (StringUtils.isNullOrEmpty(sr.getSource())) {
+                    failedTests.add("getSource was null or empty");
+                }
+
+                if (StringUtils.isNullOrEmpty(sr.getDetailsUrl())) {
+                    failedTests.add("getDetailsUrl was null or empty");
+                }
+
+                if (StringUtils.isNullOrEmpty(sr.getFilename())) {
+                    failedTests.add("getFilename was null or empty");
+                }
+
+                if (StringUtils.isNullOrEmpty(sr.getHash())) {
+                    failedTests.add("getHash was null or empty");
+                }
+
+                if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
+                    failedTests.add("getHash was null or empty");
+                }
+
+                if (failedTests.size() > 0) {
+                    return;
+                }
+            }
+        }
+
+        @Override
+        public void onError(long token, SearchError error) {
+            failedTests.add(error.toString());
+        }
+
+        @Override
+        public void onStopped(long token) {
+        }
+
+        String getFailedTestsMessages() {
+            if (failedTests.size() == 0) {
+                return "";
+            }
+            StringBuffer buffer = new StringBuffer();
+            for (String msg : failedTests) {
+                buffer.append(msg).append("\n");
+            }
+            return buffer.toString();
+        }
     }
 }
