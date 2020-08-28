@@ -37,6 +37,7 @@ dependencies {
     implementation 'net.jthink:jaudiotagger:2.2.5'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 }
 
 sourceSets {
@@ -150,3 +151,20 @@ task gettextBundle {
 
 gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
+
+test {
+    useJUnitPlatform()
+
+    filter {
+        //include specific method in any of the tests
+        includeTestsMatching "com.frostwire.tests.*"
+    }
+
+    testLogging {
+        events "passed", "failed", "standardOut", "standardError"
+				showExceptions true
+				showCauses true
+				showStackTraces true
+        exceptionFormat "full"
+    }
+}
