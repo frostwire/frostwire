@@ -56,6 +56,10 @@ public class NyaaSearchPerformerTest {
 
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
+            if (results == null || results.size() == 0) {
+                failedTests.add("no search results");
+                return;
+            }
             for (SearchResult result : results) {
                 NyaaSearchResult sr = (NyaaSearchResult) result;
                 System.out.println("NyaaSearchPerformer.SearchListener.onResults:");

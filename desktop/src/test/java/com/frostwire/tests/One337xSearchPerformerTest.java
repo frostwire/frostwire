@@ -101,6 +101,7 @@ public final class One337xSearchPerformerTest {
         System.out.println("-done-");
         if (found == 0) {
             System.out.println(fileStr);
+            fail("No search results");
         }
     }
 }

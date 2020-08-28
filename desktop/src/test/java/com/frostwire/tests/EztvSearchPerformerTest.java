@@ -97,7 +97,7 @@ public final class EztvSearchPerformerTest {
                 EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
                 System.out.println(sr);
             } else {
-                fail("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
+                fail("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX (" + detailUrl + ")");
             }
             System.out.println("===");
             System.out.println("Sleeping 5 seconds...");
@@ -106,6 +106,9 @@ public final class EztvSearchPerformerTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+        if (found == 0) {
+            fail("No search results");
         }
         System.out.println("-done-");
     }

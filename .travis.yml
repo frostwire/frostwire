@@ -25,4 +25,10 @@ matrix:
       script:
         - cd desktop
         - gradle build
+
+    - language: java
+      jdk:
+        - openjdk11
+      script:
+        - cd desktop
         - gradle test

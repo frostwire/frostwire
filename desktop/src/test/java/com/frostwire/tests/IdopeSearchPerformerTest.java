@@ -50,6 +50,9 @@ public class IdopeSearchPerformerTest {
             System.out.println("Aborting test.");
             fail(t.getMessage());
         }
+        if (searchListener.failedTests.size() > 0) {
+            fail(searchListener.getFailedMessages());
+        }
     }
 
     private static class IdopeSearchListener implements SearchListener {
@@ -59,6 +62,7 @@ public class IdopeSearchPerformerTest {
         public void onResults(long token, List<? extends SearchResult> results) {
             if (results == null || results.size() == 0) {
                 fail("IdopeSearchPerformerTest: no search results");
+                return;
             }
             for (SearchResult result : results) {
                 IdopeSearchResult sr = (IdopeSearchResult) result;
