@@ -25,7 +25,7 @@ compileJava {
 
 repositories {
     mavenCentral()
-    maven { url  "https://dl.bintray.com/ijabz/maven" }
+    maven { url "https://dl.bintray.com/ijabz/maven" }
 }
 
 dependencies {
@@ -161,10 +161,10 @@ test {
     }
 
     testLogging {
-        events "passed", "failed", "standardOut", "standardError"
-				showExceptions true
-				showCauses true
-				showStackTraces true
+        events "passed", "failed"
+        showExceptions true
+        showCauses true
+        showStackTraces false
         exceptionFormat "full"
     }
 }

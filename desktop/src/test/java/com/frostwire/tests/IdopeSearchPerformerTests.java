@@ -90,12 +90,16 @@ public class IdopeSearchPerformerTests {
                 }
                 System.out.println("\t Seeds: " + sr.getSeeds());
                 System.out.println("\t Size: " + sr.getSize());
+
+                if (failedTests.size() > 0) {
+                    return;
+                }
             }
         }
 
         @Override
         public void onError(long token, SearchError error) {
-            fail("IdopeSearchPerformerTest: " + error.toString());
+            failedTests.add("IdopeSearchPerformerTest: " + error.toString());
         }
 
         @Override
