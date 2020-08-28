@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public final class One337xSearchPerformerTest {
     @Test
-    public void one377xsearchTest() {
+    public void one377xSearchTest() {
         String TEST_SEARCH_TERM = "foo";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = null;

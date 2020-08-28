@@ -31,7 +31,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class IdopeSearchPerformerTests {
+public class IdopeSearchPerformerTest {
     @Test
     public void iDopeTest() {
         System.out.println("IdopeSearchPerformerTests::iDopeTest() invoked");
