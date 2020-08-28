@@ -153,6 +153,7 @@ gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
 
 test {
+    enabled = gradle.startParameter.taskNames.contains("test")
     useJUnitPlatform()
 
     maxParallelForks = Runtime.getRuntime().availableProcessors()
