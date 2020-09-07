@@ -17,11 +17,11 @@
  */
 -->
 <!-- see ApplicationPreferencesFragment -->
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.preference.PreferenceCategory
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
         android:key="frostwire.prefs.general"
         android:title="@string/general_settings">
-        <androidx.preference.Preference
+        <Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:layout="@layout/view_preference_buy_ads"
             android:summary="@string/remove_ads_description"
@@ -30,7 +30,7 @@
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
                 android:targetPackage="com.frostwire.android" />
-        </androidx.preference.Preference>
+        </Preference>
         <SwitchPreference
             android:key="frostwire.prefs.internal.connect_disconnect"
             android:summary="@string/bittorrent_network_summary"
@@ -47,53 +47,53 @@
             android:key="frostwire.prefs.storage.path"
             android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title" />
-        <androidx.preference.Preference
+        <Preference
             android:key="frostwire.prefs.storage.path_asf"
             android:summary="@string/storage_preference_summary"
             android:title="@string/storage_preference_title">
             <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
-        </androidx.preference.Preference>
-    </androidx.preference.PreferenceCategory>
+        </Preference>
+    </PreferenceCategory>
 
-    <androidx.preference.PreferenceCategory android:title="@string/search_torrent_settings">
-        <androidx.preference.Preference
+    <PreferenceCategory android:title="@string/search_torrent_settings">
+        <Preference
             android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
             android:title="@string/search_header" />
-        <androidx.preference.Preference
+        <Preference
             android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
             android:title="@string/torrent_preferences_header" />
-    </androidx.preference.PreferenceCategory>
+    </PreferenceCategory>
 
-    <androidx.preference.PreferenceCategory
+    <PreferenceCategory
         android:key="frostwire.prefs.community_buttons_category"
         android:title="@string/community">
         <com.frostwire.android.gui.views.preference.CommunityButtonsPreference
             android:key="frostwire.prefs.community_buttons"
             android:title="" />
-    </androidx.preference.PreferenceCategory>
+    </PreferenceCategory>
 
-    <androidx.preference.PreferenceCategory
+    <PreferenceCategory
         android:key="frostwire.prefs.other_settings"
         android:title="@string/other_settings">
-        <androidx.preference.Preference
+        <Preference
             android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
             android:title="@string/notification_other_header" />
-        <androidx.preference.Preference android:title="@string/about">
+        <Preference android:title="@string/about">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
                 android:targetPackage="com.frostwire.android" />
-        </androidx.preference.Preference>
-        <!--<androidx.preference.Preference android:title="@string/send_feedback">-->
+        </Preference>
+        <!--<Preference android:title="@string/send_feedback">-->
         <!--<intent-->
         <!--android:action="android.intent.action.VIEW"-->
         <!--android:data="https://support.frostwire.com/hc/en-us/requests/new"/>-->
-        <!--</androidx.preference.Preference>-->
+        <!--</Preference>-->
 
-        <!--<androidx.preference.Preference android:title="@string/join_frostwire_chat">-->
+        <!--<Preference android:title="@string/join_frostwire_chat">-->
         <!--<intent-->
         <!--android:action="android.intent.action.VIEW"-->
         <!--android:data="http://www.frostwire.com/chat"/>-->
-        <!--</androidx.preference.Preference>-->
-    </androidx.preference.PreferenceCategory>
-</androidx.preference.PreferenceScreen>
+        <!--</Preference>-->
+    </PreferenceCategory>
+</PreferenceScreen>

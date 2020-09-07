@@ -17,25 +17,25 @@
  * limitations under the License.
  */
 -->
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                                                 xmlns:frostwire="http://schemas.android.com/apk/res-auto">
-    <androidx.preference.PreferenceCategory android:title="@string/sharing_privacy_settings">
-        <androidx.preference.CheckBoxPreference
+    <PreferenceCategory android:title="@string/sharing_privacy_settings">
+        <CheckBoxPreference
             android:key="frostwire.prefs.torrent.seed_finished_torrents"
             android:summary="@string/seed_finished_torrents_summary"
             android:title="@string/seed_finished_torrents"/>
-        <androidx.preference.CheckBoxPreference
+        <CheckBoxPreference
             android:key="frostwire.prefs.torrent.seed_finished_torrents_wifi_only"
             android:layout="@layout/view_preference_checkbox_seeding"
             android:summary="@string/seed_finished_torrents_wifi_only_summary"
             android:title="@string/seed_finished_torrents_wifi_only"/>
-        <androidx.preference.CheckBoxPreference
+        <CheckBoxPreference
             android:key="frostwire.prefs.torrent.delete_started_torrent_files"
             android:summary="@string/delete_started_torrents_summary"
             android:title="@string/delete_started_torrents"/>
-    </androidx.preference.PreferenceCategory>
+    </PreferenceCategory>
 
-    <androidx.preference.PreferenceCategory android:title="@string/bandwidth_usage_settings">
+    <PreferenceCategory android:title="@string/bandwidth_usage_settings">
         <SwitchPreference
             android:key="froswire.prefs.network.enable_dht"
             android:summary="@string/enable_dht_summary"
@@ -99,5 +99,5 @@
             frostwire:seekbar_endRange="200"
             frostwire:seekbar_pluralUnitResourceId="@plurals/unit_peers"
             frostwire:seekbar_startRange="10"/>
-    </androidx.preference.PreferenceCategory>
-</androidx.preference.PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

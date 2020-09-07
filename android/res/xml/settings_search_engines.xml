@@ -17,69 +17,69 @@
  * limitations under the License.
  */
 -->
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.preference.CheckBoxPreference
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.preference_category.select_all"
         android:title="@string/select_all"
         android:layout="@layout/view_preference_search_select_all" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_archiveorg" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_eztv"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_eztv" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_frostclick" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_soundcloud"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_soundcloud" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_tpb"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_tpb" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torlock"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torlock" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentz2"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentz2" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_limetorrents"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_limetorrents" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_magnetdl"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_magnetdl" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_nyaa"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_nyaa" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_yify"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_yify" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_one337x"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_one337x" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_idope"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_idope" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_zooqle"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_zooqle" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>
