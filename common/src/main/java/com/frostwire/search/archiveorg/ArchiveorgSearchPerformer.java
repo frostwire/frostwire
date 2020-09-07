@@ -90,7 +90,7 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
 
     private List<ArchiveorgFile> readFiles(String json) {
         List<ArchiveorgFile> result = new LinkedList<>();
-        JsonElement element = new JsonParser().parse(json);
+        JsonElement element = JsonParser.parseString(json);
         JsonObject obj = element.getAsJsonObject();
         JsonObject files = obj.getAsJsonObject("files");
         Iterator<Map.Entry<String, JsonElement>> it = files.entrySet().iterator();
