@@ -17,22 +17,22 @@
  * limitations under the License.
  */
 -->
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:frostwire="http://schemas.android.com/apk/res-auto">
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.gui.enable_permanent_status_notification"
         android:summary="@string/notify_frostwire_is_running_summary"
         android:title="@string/notify_frostwire_is_running" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.gui.show_transfers_on_download_start"
         android:title="@string/show_transfers_on_download_start" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.gui.show_new_transfer_dialog"
         android:title="@string/show_new_transfer_dialog" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.gui.vibrate_on_finished_download"
         android:title="@string/vibrate_on_finished_download" />
-    <androidx.preference.CheckBoxPreference
+    <CheckBoxPreference
         android:key="frostwire.prefs.gui.distraction_free_search"
         android:summary="@string/distraction_free_search_results_summary"
         android:title="@string/distraction_free_search_results" />
@@ -41,4 +41,4 @@
         android:summary="@string/clear_search_cache_summary"
         android:title="@string/clear_search_cache"
         frostwire:button_text="@string/clear" />
-</androidx.preference.PreferenceScreen>
+</PreferenceScreen>
