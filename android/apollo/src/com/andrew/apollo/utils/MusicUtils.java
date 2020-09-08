@@ -1161,7 +1161,10 @@ public final class MusicUtils {
             //TODO: Check this portion of code, seems is doing extra work.
             for (int offSet = 0; offSet < size; offSet += 1000) {
                 makeInsertItems(ids, offSet, 1000, base);
-                numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+                try {
+                    numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+                } catch (Throwable ignored) {
+                }
             }
             if (updateQueue) {
                 addToQueue(context, ids);
