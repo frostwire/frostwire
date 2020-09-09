@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -209,10 +209,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
             return View.inflate(getContext(), R.layout.view_invisible_promo, null);
         } else if (position == 0 && adsAreOn) {
-            View removeAdsOfferView = setupRemoveAdsOfferView();
-            if (removeAdsOfferView != null) {
-                return removeAdsOfferView;
-            }
+            return setupRemoveAdsOfferView();
         } else if (position == 1 && adsAreOn && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
             MopubBannerView mopubBannerView = getMopubBannerView();
             return mopubBannerView;
