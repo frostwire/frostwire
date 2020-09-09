@@ -216,8 +216,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         } else if (position == 1 && adsAreOn && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
             MopubBannerView mopubBannerView = getMopubBannerView();
             return mopubBannerView;
-        } else if (position > 2) { // everything after the "FROSTWIRE FEATURES" title view.
-            return super.getView(position - 3, null, parent);
+        } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
+            return super.getView(position - 2, null, parent);
         }
         return null;
     }
