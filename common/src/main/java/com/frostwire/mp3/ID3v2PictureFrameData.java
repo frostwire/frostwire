@@ -118,9 +118,8 @@ public class ID3v2PictureFrameData extends AbstractID3v2FrameData {
         } else if (other.description == null) return false;
         else if (!description.equals(other.description)) return false;
         if (imageData == null) {
-            if (other.imageData != null) return false;
+            return other.imageData == null;
         } else if (other.imageData == null) return false;
-        else if (!Arrays.equals(imageData, other.imageData)) return false;
-        return true;
+        else return Arrays.equals(imageData, other.imageData);
     }
 }

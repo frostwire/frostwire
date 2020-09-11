@@ -106,9 +106,8 @@ public class ID3v2CommentFrameData extends AbstractID3v2FrameData {
         } else if (other.description == null) return false;
         else if (!description.equals(other.description)) return false;
         if (comment == null) {
-            if (other.comment != null) return false;
+            return other.comment == null;
         } else if (other.comment == null) return false;
-        else if (!comment.equals(other.comment)) return false;
-        return true;
+        else return comment.equals(other.comment);
     }
 }

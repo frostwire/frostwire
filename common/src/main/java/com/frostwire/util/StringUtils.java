@@ -95,36 +95,21 @@ public class StringUtils {
         // return big.indexOf(little.substring(littleStart, littleStop), bigStart);
         //but without an allocation.
         //Note special case for ignoreCase below.
-        if (ignoreCase) {
-            final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop:
-            for (int i = bigStart; i < n; i++) {
-                //Check if little[littleStart...littleStop-1] matches with shift i
-                final int n2 = littleStop - littleStart;
-                for (int j = 0; j < n2; j++) {
-                    char c1 = big.charAt(i + j);
-                    char c2 = little.charAt(littleStart + j);
-                    if (c1 != c2 && c1 != toOtherCase(c2)) //Ignore case. See below.
-                        continue outerLoop;
-                }
-                return i;
+        //Consider case.  See above.
+        final int n = big.length() - (littleStop - littleStart) + 1;
+        outerLoop:
+        for (int i = bigStart; i < n; i++) {
+            //Check if little[littleStart...littleStop-1] matches with shift i
+            final int n2 = littleStop - littleStart;
+            for (int j = 0; j < n2; j++) {
+                char c1 = big.charAt(i + j);
+                char c2 = little.charAt(littleStart + j);
+                if (c1 != c2 && c1 != toOtherCase(c2)) //Ignore case. See below.
+                    continue outerLoop;
             }
-            return -1;
-        } else {
-            final int n = big.length() - (littleStop - littleStart) + 1;
-            outerLoop:
-            for (int i = bigStart; i < n; i++) {
-                final int n2 = littleStop - littleStart;
-                for (int j = 0; j < n2; j++) {
-                    char c1 = big.charAt(i + j);
-                    char c2 = little.charAt(littleStart + j);
-                    if (c1 != c2) //Consider case.  See above.
-                        continue outerLoop;
-                }
-                return i;
-            }
-            return -1;
+            return i;
         }
+        return -1;
     }
 
     /**

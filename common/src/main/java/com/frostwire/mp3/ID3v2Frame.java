@@ -185,9 +185,8 @@ public class ID3v2Frame {
         } else if (other.id == null) return false;
         else if (!id.equals(other.id)) return false;
         if (data == null) {
-            if (other.data != null) return false;
+            return other.data == null;
         } else if (other.data == null) return false;
-        else if (!Arrays.equals(data, other.data)) return false;
-        return true;
+        else return Arrays.equals(data, other.data);
     }
 }

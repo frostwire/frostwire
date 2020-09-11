@@ -199,8 +199,7 @@ public class Mp3File extends FileWrapper {
                 if (bytes.length >= offset + XING_MARKER_OFFSET_3 + 3) {
                     if ("Xing".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_3, 4)))
                         return true;
-                    if ("Info".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_3, 4)))
-                        return true;
+                    return "Info".equals(BufferTools.byteBufferToString(bytes, offset + XING_MARKER_OFFSET_3, 4));
                 }
             }
         }

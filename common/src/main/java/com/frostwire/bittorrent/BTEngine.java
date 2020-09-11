@@ -636,15 +636,13 @@ public final class BTEngine extends SessionManager {
                     throw new IllegalArgumentException("The priorities length should be equals to the number of files");
                 }
                 th.prioritizeFiles(priorities);
-                fireDownloadUpdate(th);
-                th.resume();
             } else {
                 // did they just add the entire torrent (therefore not selecting any priorities)
                 final Priority[] wholeTorrentPriorities = Priority.array(Priority.NORMAL, ti.numFiles());
                 th.prioritizeFiles(wholeTorrentPriorities);
-                fireDownloadUpdate(th);
-                th.resume();
             }
+            fireDownloadUpdate(th);
+            th.resume();
         } else { // new download
             download(ti, saveDir, resumeFile, priorities, peers);
             th = find(ti.infoHash());

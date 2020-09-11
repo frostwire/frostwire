@@ -50,9 +50,8 @@ public class ID3v2TextFrameData extends AbstractID3v2FrameData {
         if (!super.equals(obj)) return false;
         ID3v2TextFrameData other = (ID3v2TextFrameData) obj;
         if (text == null) {
-            if (other.text != null) return false;
+            return other.text == null;
         } else if (other.text == null) return false;
-        else if (!text.equals(other.text)) return false;
-        return true;
+        else return text.equals(other.text);
     }
 }

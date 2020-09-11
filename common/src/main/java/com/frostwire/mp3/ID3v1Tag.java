@@ -224,9 +224,8 @@ public class ID3v1Tag implements ID3v1 {
         } else if (other.year == null) return false;
         else if (!year.equals(other.year)) return false;
         if (comment == null) {
-            if (other.comment != null) return false;
+            return other.comment == null;
         } else if (other.comment == null) return false;
-        else if (!comment.equals(other.comment)) return false;
-        return true;
+        else return comment.equals(other.comment);
     }
 }

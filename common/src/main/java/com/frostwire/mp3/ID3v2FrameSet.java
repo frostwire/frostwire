@@ -42,9 +42,8 @@ public class ID3v2FrameSet {
         } else if (other.id == null) return false;
         else if (!id.equals(other.id)) return false;
         if (frames == null) {
-            if (other.frames != null) return false;
+            return other.frames == null;
         } else if (other.frames == null) return false;
-        else if (!frames.equals(other.frames)) return false;
-        return true;
+        else return frames.equals(other.frames);
     }
 }

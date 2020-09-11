@@ -81,9 +81,8 @@ public class ID3v2UrlFrameData extends AbstractID3v2FrameData {
         } else if (other.url == null) return false;
         else if (!url.equals(other.url)) return false;
         if (description == null) {
-            if (other.description != null) return false;
+            return other.description == null;
         } else if (other.description == null) return false;
-        else if (!description.equals(other.description)) return false;
-        return true;
+        else return description.equals(other.description);
     }
 }

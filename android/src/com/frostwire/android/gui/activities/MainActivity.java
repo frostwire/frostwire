@@ -798,10 +798,7 @@ public class MainActivity extends AbstractActivity implements
         if (item == null) {
             return false;
         }
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

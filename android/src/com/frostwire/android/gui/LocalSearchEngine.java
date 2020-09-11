@@ -59,16 +59,14 @@ public final class LocalSearchEngine {
     private boolean searchFinished;
 
     public static LocalSearchEngine instance() {
-        if (instance != null) {
-            return instance;
-        } else {
+        if (instance == null) {
             synchronized (instanceLock) {
                 if (instance == null) {
                     instance = new LocalSearchEngine();
                 }
             }
-            return instance;
         }
+        return instance;
     }
 
     private LocalSearchEngine() {

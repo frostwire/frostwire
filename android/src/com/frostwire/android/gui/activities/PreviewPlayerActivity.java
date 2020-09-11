@@ -122,15 +122,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.activity_preview_player_menu_fullscreen:
-                final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
-                toggleFullScreen(videoTexture);
+        if (item.getItemId() == R.id.activity_preview_player_menu_fullscreen) {
+            final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
+            toggleFullScreen(videoTexture);
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("ClickableViewAccessibility")

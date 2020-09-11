@@ -74,7 +74,6 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
             // Current Status Text
             vpnText.setText(fromHtml(R.string.protected_connections_visibility_bullet_html));
             // learnVPNText
-            learnVPNText.setText(R.string.vpn_find_out_more);
         } else {
             // Current Status Icon
             headerIcon.setImageResource(R.drawable.vpn_icon_off_info);
@@ -84,8 +83,8 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
             // Current Status Text
             vpnText.setText(fromHtml(R.string.unprotected_connections_visibility_bullet_html));
             // learnVPNText
-            learnVPNText.setText(R.string.vpn_find_out_more);
         }
+        learnVPNText.setText(R.string.vpn_find_out_more);
 
         learnVPNText.setPaintFlags(learnVPNText.getPaintFlags() |   Paint.UNDERLINE_TEXT_FLAG);
 
@@ -111,13 +110,11 @@ public final class VPNStatusDetailActivity extends AbstractActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
