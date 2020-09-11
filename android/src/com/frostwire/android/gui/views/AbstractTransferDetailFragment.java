@@ -233,22 +233,22 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         // build the numbers into a string
         StringBuilder time = new StringBuilder();
         if (days != 0) {
-            time.append(Long.toString(days));
+            time.append(days);
             time.append(":");
             if (hours < 10)
                 time.append("0");
         }
         if (days != 0 || hours != 0) {
-            time.append(Long.toString(hours));
+            time.append(hours);
             time.append(":");
             if (minutes < 10)
                 time.append("0");
         }
-        time.append(Long.toString(minutes));
+        time.append(minutes);
         time.append(":");
         if (seconds < 10)
             time.append("0");
-        time.append(Long.toString(seconds));
+        time.append(seconds);
         return time.toString();
     }
 
@@ -258,7 +258,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (received < 0) {
             return "0%";
         }
-        return String.valueOf(100 * ((float) sent / (float) received)) + "%";
+        return 100 * ((float) sent / (float) received) + "%";
     }
 
     public static  <T, TH extends RecyclerView.ViewHolder> void updateAdapterItems(

@@ -452,7 +452,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
     private void updateHeaderPostTask(byte fileType, int numFiles) {
         if (header != null && fileType == lastFileType) {
-            headerTotal.setText("(" + String.valueOf(numFiles) + ")");
+            headerTotal.setText("(" + numFiles + ")");
         }
         if (adapter == null) {
             clickFileTypeTab(lastFileType);
