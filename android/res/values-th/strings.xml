@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">การติดตั้งเสร็จสมบูรณ์</string>
     <string name="error_connection_timed_out">ข้อผิดพลาด: หมดเวลาเชื่อมต่อ/ลดลง ลองอีกครั้ง.</string>
     <string name="azureus_manager_item_seeding">การเพาะ</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
     <string name="torrent_max_download_speed">แม็กซ์ความเร็วในการดาวน์โหลด</string>
     <string name="torrent_max_peers">ทำเนียบแม็กซ์</string>

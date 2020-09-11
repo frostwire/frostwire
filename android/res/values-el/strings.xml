@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Η ιδιωτική σας ζωή είναι ένα θεμελιώδες ανθρώπινο δικαίωμα</b>. Μια μη προστατευμένη σύνδεση σημαίνει ότι ό, τι κάνετε online, συμπεριλαμβανομένων των <b>λήψεων, αναζητήσεων, μηνυμάτων</b>, μπορεί να παρακολουθείται και να παρεμποδίζεται από οποιονδήποτε στο δίκτυό σας, π.χ. Πάροχοι υπηρεσιών διαδικτύου, χάκερ, κυβερνήσεις.<br><br><b>We STRONGLY recommend using a VPN service</b>. <br> Εδώ είναι μερικές επιλογές που παρέχουν αξιόπιστες υπηρεσίες και λειτουργούν καλά με το FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Συνδέεστε στο Internet χρησιμοποιώντας ένα VPN. <br><br> Αν δεν το έχετε ήδη, συνιστούμε να χρησιμοποιήσετε μία από τις παρακάτω υπηρεσίες για να κρυπτογραφήσετε τη σύνδεσή σας και <b>να διαφυλάξετε τα προσωπικά σας δεδομένα</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="exit">Έξοδος</string>
     <string name="search_label">Αναζήτηση</string>

@@ -23,7 +23,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Afsløring:</b> Selvom anbefalet til dine downloads, især når du downloader eller udveksler følsomme oplysninger (f.eks. bank) og samtidig bruger offentlige Wi-Fi- eller mobildata, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du er forbundet til internettet ved hjælp af en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge en af nedenstående tjenester til at kryptere din forbindelse og <b>beskytte dit privatliv</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Dit privatliv er en grundlæggende menneskerettighed</b>. En ubeskyttet forbindelse betyder alt, hvad du gør online, herunder <b>downloads, søgninger, meddelelser</b>, kan overvåges og opfanges af alle på dit netværk, f.eks. Internetudbydere, hackere, regeringer.<br><br><b>Vi anbefaler stærkt at bruge en VPN-tjeneste</b>. <br> Her er nogle muligheder, der giver pålidelig service og fungerer godt med FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Indstillinger</string>
     <string name="exit">Afslut</string>
     <string name="search_label">Søg</string>

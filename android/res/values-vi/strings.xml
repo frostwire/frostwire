@@ -24,7 +24,6 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Quyền riêng tư của bạn là quyền cơ bản của con người</b>. Kết nối không được bảo vệ có nghĩa là mọi thứ bạn thực hiện trực tuyến bao gồm <b>tải xuống, tìm kiếm, nhắn tin</b>, có thể được theo dõi và chặn bởi bất kỳ ai trên mạng của bạn, ví dụ: Nhà cung cấp dịch vụ Internet, tin tặc, chính phủ.<br><br><b>Chúng tôi mạnh mẽ khuyên bạn nên sử dụng dịch vụ VPN</b>. <br> Dưới đây là một số tùy chọn cung cấp dịch vụ đáng tin cậy và hoạt động tốt với FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bạn đang kết nối với Internet bằng VPN. <br><br> Nếu bạn chưa sẵn sàng, chúng tôi khuyên bạn nên sử dụng một trong các dịch vụ bên dưới để mã hóa kết nối của bạn và <b>bảo vệ quyền riêng tư của bạn</b>. ]]></string>
     <string name="invalid_tracker_url">URL trình theo dõi không hợp lệ</string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
     <string name="exit">Thoát</string>
     <string name="search_label">Tìm kiếm</string>

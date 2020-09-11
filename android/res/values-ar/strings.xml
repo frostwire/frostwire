@@ -21,7 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* على الرغم من أن أوصى لتحميل الخاص بك، فإنك لا تحتاج إلى VPN لاستخدام برنامج FrostWire. ]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>النصيحة:</b> المس العلامات المطبقة على]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">إعدادات</string>
     <string name="exit">خروج</string>
     <string name="search_label">بحث</string>

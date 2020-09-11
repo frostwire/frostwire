@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>WSKAZÓWKA:</b> Dotchnij dodane tagi aby]]></string>
 
     <!-- non HTML tags. -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ustawienia</string>
     <string name="exit">Zamknij</string>
     <string name="search_label">Szukaj</string>

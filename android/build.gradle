@@ -94,6 +94,7 @@ android {
     buildToolsVersion '29.0.3'
 
     defaultConfig {
+        applicationId 'com.frostwire.android'
         versionName project.ext.versionName
         minSdkVersion 21 // Lollipop 5.0
         targetSdkVersion 29 // Android 10
@@ -117,8 +118,6 @@ android {
                 srcDir 'src'
             }
         }
-
-        plus1.res.srcDirs = ['res-plus1']
     }
 
     lintOptions {
@@ -167,12 +166,12 @@ android {
 
     productFlavors {
         basic {
-            applicationId 'com.frostwire.android'
             versionCode 9060000 + project.ext.versionCode
+            resValue "string", "application_label", "FrostWire"
         }
         plus1 {
-            applicationId 'com.frostwire.android'
             versionCode 9070000 + project.ext.versionCode
+            resValue "string", "application_label", "FrostWire Plus"
         }
     }
 

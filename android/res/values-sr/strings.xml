@@ -25,7 +25,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Повезани сте на Интернет помоћу ВПН-а. <br><br> Ако нисте већ, препоручујемо вам да користите једну од услуга испод да бисте шифровали везу и <b>заштитили своју приватност </b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ваша приватност је основно људско право</b>. Незаштићена веза значи све што радите на мрежи, укључујући <b>преузимање, претраживање, размену порука</b>, може се пратити и пресретнути од стране било кога на вашој мрежи, нпр. Интернет провајдери, хакери, владе.<br><br><b>Стално препоручујемо коришћење ВПН сервиса</b>. <br> Ево неких опција које пружају поуздан сервис и добро функционишу са ФростВире:]]></string>
     <!-- non HTML tags. -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Подешавања</string>
     <string name="activity_VPN">веза</string>
     <string name="exit">Exit</string>

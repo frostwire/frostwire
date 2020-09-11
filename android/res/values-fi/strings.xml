@@ -25,7 +25,6 @@
     <string name="your_installation_is_complete">Asennus on valmis.</string>
     <string name="error_connection_timed_out">Virhe: yhteyden aikakatkaisu/laski. Yritä uudelleen.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Kaikki ilmaiseksi ladattavia</string>
     <string name="torrent_max_download_speed">Suurin Latausnopeus</string>
     <string name="torrent_max_peers">Max Peers</string>

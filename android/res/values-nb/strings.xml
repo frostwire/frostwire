@@ -25,7 +25,6 @@
     <string name="your_installation_is_complete">Installasjonen er fullført.</string>
     <string name="error_connection_timed_out">Feil: tilkobling tids ut/droppet. Prøv igjen.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Alle gratis nedlastinger</string>
     <string name="torrent_max_download_speed">Maksimal nedlastingshastighet</string>
     <string name="torrent_max_peers">Maks Peers</string>

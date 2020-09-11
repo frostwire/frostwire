@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>あなたのプライバシーは基本的な人権です</b>. 保護されていない接続は、オンラインを含めないすべてのものを意味し、 <b>ダウンロード、検索、メッセージング</b>あなたのネットワーク上の誰かが監視して傍受することができます。 インターネットサービスプロバイダ、ハッカー、政府.<br><br><b>VPNサービスを使用することを強くお勧めします</b>. <br> 信頼できるサービスを提供し、FrostWireでうまくいくいくつかのオプションがあります：]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだ接続していない場合は、以下のいずれかのサービスを使用して接続を暗号化することをお勧めします <b>あなたのプライバシーを守る</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
     <string name="exit">終了する</string>
     <string name="search_label">検索する</string>

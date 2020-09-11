@@ -25,7 +25,6 @@
     <string name="your_installation_is_complete">Instalarea este completă.</string>
     <string name="error_connection_timed_out">Eroare: conexiunea a expirat / a scăzut. Încearcă din nou.</string>
     <string name="azureus_manager_item_seeding">Însămânțarea</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Toate descărcările gratuite</string>
     <string name="torrent_max_download_speed">Maxima viteza de descărcare</string>
     <string name="torrent_max_peers">Max Peers</string>

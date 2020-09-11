@@ -28,7 +28,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touch applied tags to]]></string>
 
     <!-- non HTML tags. -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Settings</string>
     <string name="activity_VPN">Connection</string>
     <string name="exit">Exit</string>

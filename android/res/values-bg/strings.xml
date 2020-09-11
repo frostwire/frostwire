@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Вашата инсталация е завършена.</string>
     <string name="error_connection_timed_out">Грешка: връзка с изтичане на времето/спадна. Опитай пак.</string>
     <string name="azureus_manager_item_seeding">Засяване</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Всички свободно сваляне</string>
     <string name="torrent_max_download_speed">Максимална скорост на изтегляне</string>
     <string name="torrent_max_peers">Макс връстници</string>

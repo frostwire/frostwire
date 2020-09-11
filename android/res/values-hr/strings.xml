@@ -21,7 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Razotkrivanje:</b> Iako je preporučeno za download, osobito pri svakom preuzimanju ili razmjeni osjetljivih informacija (npr. bankarstva) i tijekom korištenja javnih Wi-Fi ili mobilnih podataka, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
     <string name="exit">Izađi</string>
     <string name="search_label">Traži</string>
