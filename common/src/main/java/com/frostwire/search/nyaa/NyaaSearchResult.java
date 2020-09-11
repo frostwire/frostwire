@@ -55,7 +55,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         thumbnailUrl = urlPrefix + matcher.group("thumbnailurl");
         displayName = matcher.group("displayname");
         hash = parseHash(matcher.group("magneturl"));
-        creationTime = Long.valueOf(matcher.group("timestamp"));
+        creationTime = Long.parseLong(matcher.group("timestamp"));
         String extension = FilenameUtils.getExtension(displayName);
         fileName = displayName + "." + ((extension.isEmpty()) ? "torrent" : extension);
         torrentUrl = urlPrefix + matcher.group("torrenturl");

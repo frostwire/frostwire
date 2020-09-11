@@ -394,7 +394,7 @@ public final class SoftwareUpdater {
                     softwareUpdater.latestVersion = softwareUpdater.update.v;
                     String[] latestVersionArr = softwareUpdater.latestVersion.split("\\.");
                     // lv = latest version
-                    byte[] lv = new byte[]{Byte.valueOf(latestVersionArr[0]), Byte.valueOf(latestVersionArr[1]), Byte.valueOf(latestVersionArr[2])};
+                    byte[] lv = new byte[]{Byte.parseByte(latestVersionArr[0]), Byte.parseByte(latestVersionArr[1]), Byte.parseByte(latestVersionArr[2])};
                     // mv = my version
                     byte[] mv = buildVersion();
                     softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);

@@ -207,13 +207,9 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
     }
 
     private int packSpecifiedFrames(byte[] bytes, int offset, String onlyId, String notId) throws NotSupportedException {
-        Iterator<ID3v2FrameSet> setIterator = frameSets.values().iterator();
-        while (setIterator.hasNext()) {
-            ID3v2FrameSet frameSet = setIterator.next();
+        for (ID3v2FrameSet frameSet : frameSets.values()) {
             if ((onlyId == null || onlyId.equals(frameSet.getId())) && (notId == null || !notId.equals(frameSet.getId()))) {
-                Iterator<ID3v2Frame> frameIterator = frameSet.getFrames().iterator();
-                while (frameIterator.hasNext()) {
-                    ID3v2Frame frame = (ID3v2Frame) frameIterator.next();
+                for (ID3v2Frame frame : frameSet.getFrames()) {
                     if (frame.getDataLength() > 0) {
                         byte[] frameData = frame.toBytes();
                         BufferTools.copyIntoByteBuffer(frameData, 0, frameData.length, bytes, offset);
@@ -246,12 +242,8 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
         if (extendedHeader) length += extendedHeaderLength;
         if (footer) length += FOOTER_LENGTH;
         else if (padding) length += PADDING_LENGTH;
-        Iterator<ID3v2FrameSet> setIterator = frameSets.values().iterator();
-        while (setIterator.hasNext()) {
-            ID3v2FrameSet frameSet = setIterator.next();
-            Iterator<ID3v2Frame> frameIterator = frameSet.getFrames().iterator();
-            while (frameIterator.hasNext()) {
-                ID3v2Frame frame = (ID3v2Frame) frameIterator.next();
+        for (ID3v2FrameSet frameSet : frameSets.values()) {
+            for (ID3v2Frame frame : frameSet.getFrames()) {
                 length += frame.getLength();
             }
         }
@@ -663,9 +655,7 @@ public abstract class AbstractID3v2Tag implements ID3v2 {
     private ID3v2CommentFrameData extractCommentFrameData(String id, boolean itunes) {
         ID3v2FrameSet frameSet = frameSets.get(id);
         if (frameSet != null) {
-            Iterator<ID3v2Frame> iterator = frameSet.getFrames().iterator();
-            while (iterator.hasNext()) {
-                ID3v2Frame frame = iterator.next();
+            for (ID3v2Frame frame : frameSet.getFrames()) {
                 ID3v2CommentFrameData frameData;
                 try {
                     frameData = new ID3v2CommentFrameData(useFrameUnsynchronisation(), frame.getData());
