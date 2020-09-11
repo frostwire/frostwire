@@ -15,8 +15,7 @@ public class BufferTools {
 
     public static byte[] stringToByteBuffer(String s, int offset, int length) {
         String stringToCopy = s.substring(offset, offset + length);
-        byte[] bytes = stringToCopy.getBytes();
-        return bytes;
+        return stringToCopy.getBytes();
     }
 
     public static void stringIntoByteBuffer(String s, int offset, int length, byte[] bytes, int destOffset) {

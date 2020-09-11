@@ -45,7 +45,6 @@ public final class PerformersHelper {
             return result;
         }
         SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(page));
-        int max = regexMaxResults;
         int i = 0;
         boolean matcherFound;
         do {
@@ -62,7 +61,7 @@ public final class PerformersHelper {
                     i++;
                 }
             }
-        } while (matcherFound && i < max && !performer.isStopped());
+        } while (matcherFound && i < regexMaxResults && !performer.isStopped());
         return result;
     }
 
@@ -118,17 +117,15 @@ public final class PerformersHelper {
     }
 
     public static String reduceHtml(String html, int prefixOffset, int suffixOffset) {
-        int preOffset = prefixOffset;
-        int sufOffset = suffixOffset;
-        if (preOffset == -1 || sufOffset == -1) {
+        if (prefixOffset == -1 || suffixOffset == -1) {
             html = null;
-        } else if ((preOffset > 0 || sufOffset < html.length())) {
-            if (preOffset > suffixOffset) {
+        } else if ((prefixOffset > 0 || suffixOffset < html.length())) {
+            if (prefixOffset > suffixOffset) {
                 LOG.warn("PerformersHelper.reduceHtml() Check your logic: prefixOffset:" + prefixOffset + " > suffixOffset:" + suffixOffset);
                 LOG.info(html);
                 return null;
             }
-            html = new String(html.substring(preOffset, sufOffset).toCharArray());
+            html = new String(html.substring(prefixOffset, suffixOffset).toCharArray());
         }
         return html;
     }

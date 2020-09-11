@@ -286,8 +286,7 @@ public final class ImageCache {
             return null;
         }
         if (mLruCache != null) {
-            final Bitmap lruBitmap = mLruCache.get(data);
-            return lruBitmap;
+            return mLruCache.get(data);
         }
         return null;
     }
