@@ -36,6 +36,7 @@ public class LayoutSuppressingImageView extends androidx.appcompat.widget.AppCom
      */
     @Override
     public void requestLayout() {
+        super.requestLayout();
         forceLayout();
     }
 
