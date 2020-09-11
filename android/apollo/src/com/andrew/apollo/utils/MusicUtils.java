@@ -204,8 +204,7 @@ public final class MusicUtils {
         final Uri mUri = ContentUris.withAppendedId(
                 MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 playlistId);
-        int deleted = activity.getContentResolver().delete(mUri, null, null);
-        return deleted;
+        return activity.getContentResolver().delete(mUri, null, null);
     }
 
     public static boolean isPaused() {

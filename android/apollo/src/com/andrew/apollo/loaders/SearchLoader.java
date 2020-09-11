@@ -165,8 +165,7 @@ public class SearchLoader extends SongLoader {
         }
 
         public static SearchCursorParameters buildSearchCursorParameters(String query) {
-            SearchCursorParameters result = new SearchCursorParameters(query);
-            return result;
+            return new SearchCursorParameters(query);
         }
     }
 }

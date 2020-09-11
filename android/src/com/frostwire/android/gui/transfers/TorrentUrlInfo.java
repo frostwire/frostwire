@@ -62,8 +62,7 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
     @Override
     public String getHash() {
         if (url != null && url.startsWith("magnet:?xt=urn:btih:")) {
-            String infoHash = url.substring(20,60).toLowerCase();
-            return infoHash;
+            return url.substring(20,60).toLowerCase();
         }
 
         return null;

@@ -304,14 +304,13 @@ public final class TableFetchers {
 
         @Override
         public String where() {
-            String where = FileColumns.DATA + " NOT LIKE ? AND " +
+            return FileColumns.DATA + " NOT LIKE ? AND " +
                     FileColumns.DATA + " NOT LIKE ? AND " +
                     FileColumns.DATA + " NOT LIKE ? AND " +
                     FileColumns.DATA + " NOT LIKE ? AND " +
                     extensionsWhereSubClause +
                     FileColumns.MEDIA_TYPE + " = " + FileColumns.MEDIA_TYPE_NONE + " AND " +
                     FileColumns.SIZE + " > 0 AND " + FileColumns.SIZE + " != 4096";
-            return where;
         }
 
         @Override

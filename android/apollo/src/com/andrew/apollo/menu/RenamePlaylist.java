@@ -97,7 +97,6 @@ public class RenamePlaylist extends BasePlaylistDialog {
                 }, MediaStore.Audio.Playlists._ID + "=?", new String[] {
                     String.valueOf(id)
                 }, MediaStore.Audio.Playlists.NAME);
-        String playlistName = MusicUtils.getFirstStringResult(cursor, true);
-        return playlistName;
+        return MusicUtils.getFirstStringResult(cursor, true);
     }
 }
