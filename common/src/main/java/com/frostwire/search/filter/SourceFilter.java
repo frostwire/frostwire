@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,14 +28,13 @@ import java.util.HashMap;
  * @author aldenml
  */
 public final class SourceFilter implements SearchFilter {
-    private static final Comparator<SearchResult> CMP = new Comparator<SearchResult>() {
-        @Override
-        public int compare(SearchResult o1, SearchResult o2) {
-            int x = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
-            int y = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
-            return (x < y) ? -1 : ((x == y) ? 0 : 1);
-        }
+
+    private static final Comparator<SearchResult> CMP = (o1, o2) -> {
+        int x = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
+        int y = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
+        return Integer.compare(x, y);
     };
+
     private final HashMap<String, SourceKey> keys;
 
     public SourceFilter(SourceKey... keys) {

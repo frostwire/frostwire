@@ -50,8 +50,7 @@ public final class SourceKey implements FilterKey {
         if (!(o instanceof SourceKey)) {
             return -1;
         }
-        int x = ordinal;
         int y = ((SourceKey) o).ordinal;
-        return (x < y) ? -1 : ((x == y) ? 0 : 1);
+        return Integer.compare(ordinal, y);
     }
 }

@@ -65,7 +65,7 @@ public class ContainerBox extends Box {
                         y = i;
                     }
                 }
-                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+                return Integer.compare(x, y);
             }
         });
     }
