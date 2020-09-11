@@ -109,7 +109,7 @@ public final class SystemUtils {
             }
         }
 
-        return dirs.toArray(new File[dirs.size()]);
+        return dirs.toArray(new File[0]);
     }
 
     private static boolean hasSdkOrNewer(int versionCode) {

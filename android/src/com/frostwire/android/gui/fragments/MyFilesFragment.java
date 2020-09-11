@@ -236,7 +236,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.fragment_my_files_menu_filter:
-                return true;
             case R.id.fragment_my_files_menu_checkbox:
                 return true;
             default:

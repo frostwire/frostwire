@@ -113,9 +113,8 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
      * @return The {@link Cursor} used to run the song query.
      */
     private static Cursor makeSongCursor(final Context context) {
-        final StringBuilder mSelection = new StringBuilder();
-        mSelection.append(AudioColumns.IS_MUSIC + "=1");
-        mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
+        String mSelection = AudioColumns.IS_MUSIC + "=1" +
+                " AND " + AudioColumns.TITLE + " != ''";//$NON-NLS-2$
         return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
@@ -128,7 +127,7 @@ public class SongLoader extends WrappedAsyncTaskLoader<List<Song>> {
                         AudioColumns.ALBUM,
                         /* 4 */
                         AudioColumns.DURATION
-                }, mSelection.toString(), null,
+                }, mSelection, null,
                 PreferenceUtils.getInstance().getSongSortOrder());
     }
 }

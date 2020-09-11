@@ -616,10 +616,10 @@ public final class PlayStore extends StoreBase {
                 Products.SUBS_DISABLE_ADS_1_YEAR_SKU
         };
         boolean conflict = false;
-        for (int i = 0; !conflict && i < disableAdsSku.length; i++) {
-            String s = disableAdsSku[i];
+        for (String s : disableAdsSku) {
             if (!s.equals(sku) && inventory.hasPurchase(s)) {
                 conflict = true;
+                break;
             }
         }
 

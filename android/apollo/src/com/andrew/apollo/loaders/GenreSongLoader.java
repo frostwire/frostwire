@@ -51,9 +51,8 @@ public class GenreSongLoader extends SongLoader {
      */
     private static Cursor makeGenreSongCursor(final Context context, final Long genreId) {
         // Match the songs up with the genre
-        final StringBuilder selection = new StringBuilder();
-        selection.append(MediaStore.Audio.Genres.Members.IS_MUSIC + "=1");
-        selection.append(" AND " + MediaStore.Audio.Genres.Members.TITLE + "!=''"); //$NON-NLS-2$
+        String selection = MediaStore.Audio.Genres.Members.IS_MUSIC + "=1" +
+                " AND " + MediaStore.Audio.Genres.Members.TITLE + "!=''";//$NON-NLS-2$
         return context.getContentResolver().query(
                 MediaStore.Audio.Genres.Members.getContentUri("external", genreId), new String[] {
                         /* 0 */
@@ -66,6 +65,6 @@ public class GenreSongLoader extends SongLoader {
                         MediaStore.Audio.Genres.Members.ARTIST,
                         /* 4 */
                         MediaStore.Audio.Genres.Members.DURATION
-                }, selection.toString(), null, MediaStore.Audio.Genres.Members.DEFAULT_SORT_ORDER);
+                }, selection, null, MediaStore.Audio.Genres.Members.DEFAULT_SORT_ORDER);
     }
 }

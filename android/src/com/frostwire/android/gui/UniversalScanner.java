@@ -37,8 +37,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +64,7 @@ final class UniversalScanner {
     }
 
     public void scan(final String filePath) {
-        scan(Arrays.asList(new File(filePath)));
+        scan(Collections.singletonList(new File(filePath)));
     }
 
     public void scan(final Collection<File> filesToScan) {

@@ -557,13 +557,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 changeVideoSize();
                 startedPlayback = true;
                 break;
-            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-                break;
-            case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-                break;
-            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-                break;
             case MediaPlayer.MEDIA_INFO_UNKNOWN:
+            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+            case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
             default:
                 break;
         }

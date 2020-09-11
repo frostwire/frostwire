@@ -57,9 +57,8 @@ public class PlaylistSongLoader extends SongLoader {
      * @return The {@link Cursor} used to run the song query.
      */
     private static Cursor makePlaylistSongCursor(final Context context, final Long playlistID) {
-        final StringBuilder mSelection = new StringBuilder();
-        mSelection.append(AudioColumns.IS_MUSIC + "=1");
-        mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
+        String mSelection = AudioColumns.IS_MUSIC + "=1" +
+                " AND " + AudioColumns.TITLE + " != ''";//$NON-NLS-2$
         return context.getContentResolver().query(
                 MediaStore.Audio.Playlists.Members.getContentUri("external", playlistID),
                 new String[] {
@@ -75,7 +74,7 @@ public class PlaylistSongLoader extends SongLoader {
                         AudioColumns.ALBUM,
                         /* 5 */
                         AudioColumns.DURATION
-                }, mSelection.toString(), null,
+                }, mSelection, null,
                 MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
     }
 

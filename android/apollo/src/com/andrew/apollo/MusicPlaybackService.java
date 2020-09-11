@@ -1415,10 +1415,7 @@ public class MusicPlaybackService extends JobIntentService {
      */
     private int getNextPosition(final boolean force, final boolean shuffleEnabled) {
         if (!force && mRepeatMode == REPEAT_CURRENT) {
-            if (mPlayPos < 0) {
-                return 0;
-            }
-            return mPlayPos;
+            return Math.max(mPlayPos, 0);
         } else if (shuffleEnabled) {
             if (mPlayListLen <= 0) {
                 return -1;
