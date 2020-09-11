@@ -120,18 +120,13 @@ public final class ImageLoader {
         Bitmap bitmap = null;
         try {
             Uri albumUri = Uri.withAppendedPath(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, albumId);
-            Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null);
-            try {
+            try (Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null)) {
                 LOG.info("getAlbumArt(albumId=" + albumId + ") Using album_art path for uri: " + albumUri, true);
                 if (cursor != null && cursor.moveToFirst()) {
                     String albumArt = cursor.getString(0);
                     if (albumArt != null) {
                         bitmap = BitmapFactory.decodeFile(albumArt);
                     }
-                }
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
                 }
             }
         } catch (Throwable e) {
