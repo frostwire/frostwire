@@ -25,7 +25,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.views.AbstractDialog;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -47,7 +47,7 @@ public final class DeleteSingleFileMenuAction extends AbstractDeleteFilesMenuAct
 
     protected void onDeleteClicked() {
         if (getContext() != null && fileType != (byte) -1) {
-            async(getContext(), Librarian.instance()::deleteFiles, fileType, Arrays.asList(fileDescriptor));
+            async(getContext(), Librarian.instance()::deleteFiles, fileType, Collections.singletonList(fileDescriptor));
         }
     }
 }

@@ -528,15 +528,13 @@ public final class BuyActivity extends AbstractActivity {
             case R.id.activity_buy_product_card_30_days:
                 productCard = buyActivity.card30days;
                 break;
+            case R.id.activity_buy_product_card_reward:
+                productCard = buyActivity.cardNminutes;
+                break;
 //            case R.id.activity_buy_product_card_6_months:
 //                productCard = buyActivity.card6months;
 //                break;
             case R.id.activity_buy_product_card_1_year:
-                productCard = buyActivity.card1year;
-                break;
-            case R.id.activity_buy_product_card_reward:
-                productCard = buyActivity.cardNminutes;
-                break;
             default:
                 productCard = buyActivity.card1year;
         }

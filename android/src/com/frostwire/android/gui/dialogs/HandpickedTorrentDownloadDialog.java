@@ -48,6 +48,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -91,9 +92,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         // we are able to use such Bundle to create our adapter.
         final TorrentFileEntryList torrentInfoList = getTorrentInfoList(tinfo.files());
         boolean[] allChecked = new boolean[torrentInfoList.list.size()];
-        for (int i = 0; i < allChecked.length; i++) {
-            allChecked[i] = true;
-        }
+        Arrays.fill(allChecked, true);
 
         dlg.prepareArguments(R.drawable.download_icon,
                 tinfo.name(),

@@ -46,12 +46,11 @@ public class LastAddedLoader extends SongLoader {
      */
     public static Cursor makeLastAddedCursor(final Context context) {
         final int fourWeeks = 4 * 3600 * 24 * 7;
-        final StringBuilder selection = new StringBuilder();
-        selection.append(AudioColumns.IS_MUSIC + "=1");
-        selection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
-        selection.append(" AND " + MediaStore.Audio.Media.DATE_ADDED + ">"); //$NON-NLS-2$
-        selection.append(System.currentTimeMillis() / 1000 - fourWeeks);
-        Cursor c = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+        String selection = AudioColumns.IS_MUSIC + "=1" +
+                " AND " + AudioColumns.TITLE + " != ''" + //$NON-NLS-2$
+                " AND " + MediaStore.Audio.Media.DATE_ADDED + ">" + //$NON-NLS-2$
+                (System.currentTimeMillis() / 1000 - fourWeeks);
+        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 new String[] {
                         /* 0 */
                         BaseColumns._ID,
@@ -63,7 +62,6 @@ public class LastAddedLoader extends SongLoader {
                         AudioColumns.ALBUM,
                         /* 4 */
                         AudioColumns.DURATION
-                }, selection.toString(), null, MediaStore.Audio.Media.DATE_ADDED + " DESC");
-        return c;
+                }, selection, null, MediaStore.Audio.Media.DATE_ADDED + " DESC");
     }
 }

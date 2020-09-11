@@ -600,15 +600,13 @@ public class TouchImageView extends AppCompatImageView {
     private int setViewSize(int mode, int size, int drawableWidth) {
         int viewSize;
         switch (mode) {
-            case MeasureSpec.EXACTLY:
-                viewSize = size;
-                break;
             case MeasureSpec.AT_MOST:
                 viewSize = Math.min(drawableWidth, size);
                 break;
             case MeasureSpec.UNSPECIFIED:
                 viewSize = drawableWidth;
                 break;
+            case MeasureSpec.EXACTLY:
             default:
                 viewSize = size;
                 break;
