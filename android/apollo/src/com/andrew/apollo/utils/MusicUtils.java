@@ -1270,9 +1270,8 @@ public final class MusicUtils {
         };
 
         final String selection = BaseColumns._ID + "=" + id;
-        Cursor cursor = resolver.query(contentUri, projection,
-                selection, null, null);
-        try {
+        try (Cursor cursor = resolver.query(contentUri, projection,
+                selection, null, null)) {
             if (cursor != null && cursor.getCount() == 1) {
                 cursor.moveToFirst();
                 RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, uri);
@@ -1284,10 +1283,6 @@ public final class MusicUtils {
             }
         } catch (Throwable ignored) {
             UIUtils.showLongMessage(context, R.string.ringtone_not_set);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 

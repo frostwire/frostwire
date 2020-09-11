@@ -56,8 +56,7 @@ public class Mp3File extends FileWrapper {
     }
 
     private void init() throws IOException, UnsupportedTagException, InvalidDataException {
-        RandomAccessFile file = new RandomAccessFile(filename, "r");
-        try {
+        try (RandomAccessFile file = new RandomAccessFile(filename, "r")) {
             initId3v1Tag(file);
             scanFile(file);
             if (startOffset < 0) {
@@ -67,8 +66,6 @@ public class Mp3File extends FileWrapper {
             if (scanFile) {
                 initCustomTag(file);
             }
-        } finally {
-            file.close();
         }
     }
 
@@ -81,9 +78,7 @@ public class Mp3File extends FileWrapper {
                 try {
                     ID3v2TagFactory.sanityCheckTag(bytes);
                     return AbstractID3v2Tag.HEADER_LENGTH + BufferTools.unpackSynchsafeInteger(bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 1], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 2], bytes[AbstractID3v2Tag.DATA_LENGTH_OFFSET + 3]);
-                } catch (NoSuchTagException e) {
-                    // do nothing
-                } catch (UnsupportedTagException e) {
+                } catch (NoSuchTagException | UnsupportedTagException e) {
                     // do nothing
                 }
             }
@@ -392,8 +387,7 @@ public class Mp3File extends FileWrapper {
         if (filename.compareToIgnoreCase(newFilename) == 0) {
             throw new IllegalArgumentException("Save filename same as source filename");
         }
-        RandomAccessFile saveFile = new RandomAccessFile(newFilename, "rw");
-        try {
+        try (RandomAccessFile saveFile = new RandomAccessFile(newFilename, "rw")) {
             if (hasId3v2Tag()) {
                 saveFile.write(id3v2Tag.toBytes());
             }
@@ -404,8 +398,6 @@ public class Mp3File extends FileWrapper {
             if (hasId3v1Tag()) {
                 saveFile.write(id3v1Tag.toBytes());
             }
-        } finally {
-            saveFile.close();
         }
     }
 
@@ -414,9 +406,8 @@ public class Mp3File extends FileWrapper {
         if (filePos < 0) filePos = startOffset;
         if (filePos < 0) return;
         if (endOffset < filePos) return;
-        RandomAccessFile file = new RandomAccessFile(filename, "r");
-        byte[] bytes = new byte[bufferLength];
-        try {
+        try (RandomAccessFile file = new RandomAccessFile(filename, "r")) {
+            byte[] bytes = new byte[bufferLength];
             file.seek(filePos);
             while (true) {
                 int bytesRead = file.read(bytes, 0, bufferLength);
@@ -428,8 +419,6 @@ public class Mp3File extends FileWrapper {
                     break;
                 }
             }
-        } finally {
-            file.close();
         }
     }
 }

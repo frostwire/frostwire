@@ -43,11 +43,8 @@ public final class ZipUtils {
         boolean result = false;
         try {
             FileUtils.deleteDirectory(outputDir);
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-            try {
+            try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
                 unzipEntries(outputDir, zis, getItemCount(zipFile), System.currentTimeMillis(), listener);
-            } finally {
-                zis.close();
             }
             result = true;
         } catch (IOException e) {
@@ -75,8 +72,7 @@ public final class ZipUtils {
                 int progress = (item == itemCount) ? 100 : (int) (((double) (item * 100)) / (double) (itemCount));
                 listener.onUnzipping(fileName, progress);
             }
-            FileOutputStream fos = new FileOutputStream(newFile);
-            try {
+            try (FileOutputStream fos = new FileOutputStream(newFile)) {
                 int n;
                 byte[] buffer = new byte[1024];
                 while ((n = zis.read(buffer)) > 0) {
@@ -86,7 +82,6 @@ public final class ZipUtils {
                     }
                 }
             } finally {
-                fos.close();
                 zis.closeEntry();
             }
             newFile.setLastModified(time);
