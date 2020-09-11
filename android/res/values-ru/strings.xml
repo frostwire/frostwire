@@ -241,7 +241,6 @@
     <string name="unprotected_connection">Незащищенное соединение</string>
     <string name="protected_connection">Защищенное соединение</string>
     <string name="error_connection_timed_out">Ошибка: тайм-аут подключения/упал. Попробуй еще раз.</string>
-    <string name="application_label">FrostWire</string>
     <string name="buy_uppercase">КУПИТЬ</string>
     <string name="selected">выбранный</string>
     <string name="bittorrent_off">БитТоррента выкл</string>

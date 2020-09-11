@@ -21,7 +21,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Divulgação: Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Sua privacidade é um direito humano fundamental</b>. Uma conexão desprotegida significa que tudo que você faz online <b>buscas, mensagens e downloads</b>, pode ser monitorado e interceptado por qualquer pessoa em sua rede, por exemplo, provedores de serviços de Internet, hackers, governos.<br><br><b>Recomendamos ALTAMENTE o uso de um serviço VPN</b> especialmente ao baixar ou trocar informações confidenciais (por exemplo, bancos) e ao usar Wi-Fi público ou dados móveis. <br><br> Aqui estão algumas opções que fornecem um serviço confiável e funcionam bem com o FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de um dos serviços abaixo para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configurações</string>
     <string name="exit">Sair</string>
     <string name="search_label">Pesquisar</string>

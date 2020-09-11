@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>आपकी गोपनीयता एक मौलिक मानव अधिकार है</b>. एक असुरक्षित कनेक्शन का अर्थ है कि आप <b>डाउनलोड, खोज, संदेश</b> सहित ऑनलाइन सबकुछ करते हैं, आपके नेटवर्क पर किसी भी व्यक्ति द्वारा निगरानी और अवरोध किया जा सकता है, उदा। इंटरनेट सेवा प्रदाता, हैकर्स, सरकारें।<br><br><b>हम दृढ़ता से एक वीपीएन सेवा का उपयोग करने की सलाह देते हैं</b>. <br> यहां कुछ विकल्प हैं जो विश्वसनीय सेवा प्रदान करते हैं और फ्रॉस्टवायर के साथ अच्छी तरह से काम करते हैं:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ आप एक वीपीएन का उपयोग कर इंटरनेट से जुड़े हुए हैं।<br><br> यदि आप पहले से नहीं हैं, तो हम आपके कनेक्शन को एन्क्रिप्ट करने के लिए नीचे दी गई सेवाओं में से एक का उपयोग करने की सलाह देते हैं और <b>अपनी गोपनीयता की रक्षा करें</b>। ]]></string>
-    <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
     <string name="exit">निकास</string>
     <string name="search_label">तलाश</string>

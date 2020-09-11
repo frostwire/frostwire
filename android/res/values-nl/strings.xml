@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste tags aan]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ U bent verbonden met internet via een VPN. <br><br> Als u dit nog niet doet, raden we u aan een van de onderstaande services te gebruiken om uw verbinding te versleutelen en <b>uw privacy te beschermen</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Uw privacy is een fundamenteel mensenrecht</b>. Een onbeveiligde verbinding betekent dat alles wat u online doet, inclusief <b>downloads, zoekopdrachten, berichten</b>, kan worden gecontroleerd en onderschept door iedereen in uw netwerk, bijvoorbeeld Internetproviders, hackers, overheden.<br><br><b>We raden ten stelligste aan een VPN-service te gebruiken</b>. <br> Hier zijn enkele opties die betrouwbare service bieden en goed werken met FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Instellingen</string>
     <string name="exit">Exit</string>
     <string name="search_label">Zoek</string>

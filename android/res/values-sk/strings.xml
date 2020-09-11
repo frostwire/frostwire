@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Vaša inštalácia je dokončená.</string>
     <string name="error_connection_timed_out">Chyba: Pripojenie vypršal/poklesla. Skúste to znova.</string>
     <string name="azureus_manager_item_seeding">Siatie</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Všetci na stiahnutie zadarmo</string>
     <string name="torrent_max_download_speed">Maximálna rýchlosť sťahovania</string>
     <string name="torrent_max_peers">Maximálna rovesníkmi</string>

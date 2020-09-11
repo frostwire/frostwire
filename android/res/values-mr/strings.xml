@@ -24,7 +24,6 @@
     <string name="your_installation_is_complete">आपली स्थापना पूर्ण झाली आहे.</string>
     <string name="error_connection_timed_out">त्रुटी: कनेक्शन कालबाह्य/वगळले पुन्हा प्रयत्न करा.</string>
     <string name="azureus_manager_item_seeding">बीजन</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">सर्व बदल्यांची बीजारोणा थांबवा</string>
     <string name="cloud_download_aborted_on_mobile_data">वर्तमान सेटिंग जेव्हा Wi-Fi नेटवर्कवर नाही तेव्हा डाउनलोड करण्यास प्रतिबंधित करते</string>
     <string name="filter_ellipsis">फिल्टर…</string>

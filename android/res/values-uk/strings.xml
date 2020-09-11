@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Ваша установка завершена.</string>
     <string name="error_connection_timed_out">Помилка: тайм-аут підключення/впав. Спробуйте ще раз.</string>
     <string name="azureus_manager_item_seeding">посів</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Всі вільні скачування</string>
     <string name="torrent_max_download_speed">Максимальна швидкість скачування</string>
     <string name="torrent_max_peers">максимум Однолітки</string>

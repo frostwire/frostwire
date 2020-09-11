@@ -26,7 +26,6 @@
     <string name="azureus_peer_manager_status_finished">Klaar</string>
     <string name="your_installation_is_complete">Jou installasie is voltooi.</string>
     <string name="azureus_manager_item_seeding">Saai</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">Hou op om alle oordragte te saai</string>
     <string name="cloud_download_aborted_on_mobile_data">Huidige instelling verhoed dat aflaai wanneer dit nie op Wi-Fi-netwerk is nie</string>
     <string name="filter_ellipsis">Filter…</string>

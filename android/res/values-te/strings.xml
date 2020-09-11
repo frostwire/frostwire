@@ -23,7 +23,6 @@
     <string name="your_installation_is_complete">మీ సంస్థాపన పూర్తయింది.</string>
     <string name="error_connection_timed_out">లోపం: కనెక్షన్ సమయం ముగిసింది/పడిపోయింది. మళ్ళీ ప్రయత్నించండి.</string>
     <string name="azureus_manager_item_seeding">నాట్లు</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">అన్ని బదిలీలు నాటడం ఆపండి</string>
     <string name="cloud_download_aborted_on_mobile_data">ప్రస్తుత సెట్టింగ్ Wi-Fi నెట్వర్క్లో లేనప్పుడు డౌన్లోడ్ చేయడాన్ని నిరోధిస్తుంది</string>
     <string name="filter_ellipsis">వడపోత…</string>

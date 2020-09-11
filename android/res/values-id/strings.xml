@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum melakukannya, kami sarankan menggunakan salah satu layanan di bawah ini untuk mengenkripsi koneksi Anda dan <b>menjaga privasi Anda</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Privasi Anda adalah hak asasi manusia yang fundamental</b>. Sambungan tidak terlindungi artinya semua yang Anda lakukan secara online termasuk <b>unduhan, penelusuran, perpesanan</b>, dapat dipantau dan disadap oleh siapa saja di jaringan Anda, mis. Penyedia Layanan Internet, peretas, pemerintah.<br><br><b>Kami SANGAT merekomendasikan menggunakan layanan VPN</b>. <br> Berikut adalah beberapa opsi yang menyediakan layanan andal dan berfungsi baik dengan FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
     <string name="exit">Keluar</string>
     <string name="search_label">Pencarian</string>

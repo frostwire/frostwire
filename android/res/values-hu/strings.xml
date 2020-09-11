@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">A telepítés befejezése után.</string>
     <string name="error_connection_timed_out">Hiba: kapcsolat időtúllépés/csökkent. Próbáld újra.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Minden ingyenes letöltések</string>
     <string name="torrent_max_download_speed">Max letöltési sebesség</string>
     <string name="torrent_max_peers">Max Peers</string>

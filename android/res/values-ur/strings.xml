@@ -67,7 +67,6 @@
     <string name="azureus_peer_manager_status_finished">ختم</string>
     <string name="your_installation_is_complete">آپ کی تنصیب مکمل ہو گیا ہے.</string>
     <string name="error_connection_timed_out">غلطی: کنکشن / وقت ختم گرا. دوبارہ کوشش کریں.</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">تمام مفت ڈاؤن لوڈ</string>
     <string name="request_again">درخواست دوبارہ</string>
     <string name="use_zooqle">استعمال Zooqle.com</string>
