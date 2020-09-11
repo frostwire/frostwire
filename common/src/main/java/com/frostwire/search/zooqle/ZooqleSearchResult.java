@@ -46,7 +46,7 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         this.detailsUrl = detailsUrl;
         this.filename = matcher.group("filename") + ".torrent";
         this.displayName = matcher.group("filename");
-        this.seeds = Integer.valueOf(matcher.group("seeds").trim());
+        this.seeds = Integer.parseInt(matcher.group("seeds").trim());
         String magnetUrl = "magnet:?xt=urn:btih:" + matcher.group("magnet");
         //if (matcher.group("torrent") != null) {
         //    this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";

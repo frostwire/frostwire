@@ -153,9 +153,9 @@ public class MainApplication extends MultiDexApplication {
 //            } catch (InterruptedException e) {
 //            }
             String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
-            ctx.version[0] = Integer.valueOf(vStrArray[0]);
-            ctx.version[1] = Integer.valueOf(vStrArray[1]);
-            ctx.version[2] = Integer.valueOf(vStrArray[2]);
+            ctx.version[0] = Integer.parseInt(vStrArray[0]);
+            ctx.version[1] = Integer.parseInt(vStrArray[1]);
+            ctx.version[2] = Integer.parseInt(vStrArray[2]);
             ctx.version[3] = BuildConfig.VERSION_CODE;
 
             BTEngine.ctx = ctx;

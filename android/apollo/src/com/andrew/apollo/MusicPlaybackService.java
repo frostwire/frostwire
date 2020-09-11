@@ -1839,7 +1839,7 @@ public class MusicPlaybackService extends JobIntentService {
             Uri uri = Uri.parse(path);
             long id = -1;
             try {
-                id = Long.valueOf(uri.getLastPathSegment());
+                id = Long.parseLong(uri.getLastPathSegment());
             } catch (NumberFormatException ex) {
                 // Ignore
             }
