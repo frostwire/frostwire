@@ -185,354 +185,64 @@ public class Box {
 
     private static HashMap<Integer, BoxLambda> buildMapping() {
         HashMap<Integer, BoxLambda> map = new HashMap<>();
-        map.put(mdat, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MediaDataBox();
-            }
-        });
-        map.put(ftyp, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new FileTypeBox();
-            }
-        });
-        map.put(moov, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MovieBox();
-            }
-        });
-        map.put(mvhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MovieHeaderBox();
-            }
-        });
-        map.put(iods, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new ObjectDescriptorBox();
-            }
-        });
-        map.put(trak, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackBox();
-            }
-        });
-        map.put(tkhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackHeaderBox();
-            }
-        });
-        map.put(edts, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new EditBox();
-            }
-        });
-        map.put(elst, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new EditListBox();
-            }
-        });
-        map.put(udta, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new UserDataBox();
-            }
-        });
-        map.put(mdia, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MediaBox();
-            }
-        });
-        map.put(mdhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MediaHeaderBox();
-            }
-        });
-        map.put(hdlr, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new HandlerBox();
-            }
-        });
-        map.put(minf, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MediaInformationBox();
-            }
-        });
-        map.put(vmhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new VideoMediaHeaderBox();
-            }
-        });
-        map.put(smhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SoundMediaHeaderBox();
-            }
-        });
-        map.put(hmhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new HintMediaHeaderBox();
-            }
-        });
-        map.put(nmhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new NullMediaHeaderBox();
-            }
-        });
-        map.put(dinf, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new DataInformationBox();
-            }
-        });
-        map.put(dref, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new DataReferenceBox();
-            }
-        });
-        map.put(url_, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new DataEntryUrlBox();
-            }
-        });
-        map.put(urn_, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new DataEntryUrnBox();
-            }
-        });
-        map.put(stbl, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SampleTableBox();
-            }
-        });
-        map.put(stsd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SampleDescriptionBox();
-            }
-        });
-        map.put(stts, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TimeToSampleBox();
-            }
-        });
-        map.put(ctts, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new CompositionOffsetBox();
-            }
-        });
-        map.put(stss, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SyncSampleBox();
-            }
-        });
-        map.put(stsh, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new ShadowSyncSampleBox();
-            }
-        });
-        map.put(sbgp, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SampleToGroupBox();
-            }
-        });
-        map.put(stsc, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SampleToChunkBox();
-            }
-        });
-        map.put(stsz, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SampleSizeBox();
-            }
-        });
-        map.put(stz2, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new CompactSampleSizeBox();
-            }
-        });
-        map.put(stco, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new ChunkOffsetBox();
-            }
-        });
-        map.put(co64, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new ChunkLargeOffsetBox();
-            }
-        });
-        map.put(esds, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new ESDBox();
-            }
-        });
-        map.put(meta, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MetaBox();
-            }
-        });
-        map.put(ilst, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleItemListBox();
-            }
-        });
-        map.put(Cnam, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleNameBox();
-            }
-        });
-        map.put(CART, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleArtistBox();
-            }
-        });
-        map.put(aART, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleAlbumArtistBox();
-            }
-        });
-        map.put(Calb, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleAlbumBox();
-            }
-        });
-        map.put(stik, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleMediaTypeBox();
-            }
-        });
-        map.put(covr, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleCoverBox();
-            }
-        });
-        map.put(Ccmt, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleCommentBox();
-            }
-        });
-        map.put(Cgen, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleGenreBox();
-            }
-        });
-        map.put(gnre, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleGenreIDBox();
-            }
-        });
-        map.put(Cday, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new AppleYearBox();
-            }
-        });
-        map.put(free, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new FreeSpaceBox(free);
-            }
-        });
-        map.put(skip, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new FreeSpaceBox(skip);
-            }
-        });
-        map.put(mvex, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MovieExtendsBox();
-            }
-        });
-        map.put(trex, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackExtendsBox();
-            }
-        });
-        map.put(sidx, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new SegmentIndexBox();
-            }
-        });
-        map.put(moof, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MovieFragmentBox();
-            }
-        });
-        map.put(mfhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new MovieFragmentHeaderBox();
-            }
-        });
-        map.put(traf, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackFragmentBox();
-            }
-        });
-        map.put(tfhd, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackFragmentHeaderBox();
-            }
-        });
-        map.put(tfdt, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackFragmentBaseMediaDecodeTimeBox();
-            }
-        });
-        map.put(trun, new BoxLambda() {
-            @Override
-            public Box empty() {
-                return new TrackRunBox();
-            }
-        });
+        map.put(mdat, MediaDataBox::new);
+        map.put(ftyp, FileTypeBox::new);
+        map.put(moov, MovieBox::new);
+        map.put(mvhd, MovieHeaderBox::new);
+        map.put(iods, ObjectDescriptorBox::new);
+        map.put(trak, TrackBox::new);
+        map.put(tkhd, TrackHeaderBox::new);
+        map.put(edts, EditBox::new);
+        map.put(elst, EditListBox::new);
+        map.put(udta, UserDataBox::new);
+        map.put(mdia, MediaBox::new);
+        map.put(mdhd, MediaHeaderBox::new);
+        map.put(hdlr, HandlerBox::new);
+        map.put(minf, MediaInformationBox::new);
+        map.put(vmhd, VideoMediaHeaderBox::new);
+        map.put(smhd, SoundMediaHeaderBox::new);
+        map.put(hmhd, HintMediaHeaderBox::new);
+        map.put(nmhd, NullMediaHeaderBox::new);
+        map.put(dinf, DataInformationBox::new);
+        map.put(dref, DataReferenceBox::new);
+        map.put(url_, DataEntryUrlBox::new);
+        map.put(urn_, DataEntryUrnBox::new);
+        map.put(stbl, SampleTableBox::new);
+        map.put(stsd, SampleDescriptionBox::new);
+        map.put(stts, TimeToSampleBox::new);
+        map.put(ctts, CompositionOffsetBox::new);
+        map.put(stss, SyncSampleBox::new);
+        map.put(stsh, ShadowSyncSampleBox::new);
+        map.put(sbgp, SampleToGroupBox::new);
+        map.put(stsc, SampleToChunkBox::new);
+        map.put(stsz, SampleSizeBox::new);
+        map.put(stz2, CompactSampleSizeBox::new);
+        map.put(stco, ChunkOffsetBox::new);
+        map.put(co64, ChunkLargeOffsetBox::new);
+        map.put(esds, ESDBox::new);
+        map.put(meta, MetaBox::new);
+        map.put(ilst, AppleItemListBox::new);
+        map.put(Cnam, AppleNameBox::new);
+        map.put(CART, AppleArtistBox::new);
+        map.put(aART, AppleAlbumArtistBox::new);
+        map.put(Calb, AppleAlbumBox::new);
+        map.put(stik, AppleMediaTypeBox::new);
+        map.put(covr, AppleCoverBox::new);
+        map.put(Ccmt, AppleCommentBox::new);
+        map.put(Cgen, AppleGenreBox::new);
+        map.put(gnre, AppleGenreIDBox::new);
+        map.put(Cday, AppleYearBox::new);
+        map.put(free, () -> new FreeSpaceBox(free));
+        map.put(skip, () -> new FreeSpaceBox(skip));
+        map.put(mvex, MovieExtendsBox::new);
+        map.put(trex, TrackExtendsBox::new);
+        map.put(sidx, SegmentIndexBox::new);
+        map.put(moof, MovieFragmentBox::new);
+        map.put(mfhd, MovieFragmentHeaderBox::new);
+        map.put(traf, TrackFragmentBox::new);
+        map.put(tfhd, TrackFragmentHeaderBox::new);
+        map.put(tfdt, TrackFragmentBaseMediaDecodeTimeBox::new);
+        map.put(trun, TrackRunBox::new);
         return map;
     }
 

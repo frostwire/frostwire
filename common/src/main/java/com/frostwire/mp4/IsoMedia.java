@@ -149,12 +149,7 @@ public final class IsoMedia {
     }
 
     public interface OnBoxListener {
-        OnBoxListener ALL = new OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                return true;
-            }
-        };
+        OnBoxListener ALL = b -> true;
 
         /**
          * Give the opportunity to react on box read/write and together

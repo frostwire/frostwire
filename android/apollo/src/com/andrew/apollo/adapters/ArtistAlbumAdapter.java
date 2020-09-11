@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -145,14 +144,10 @@ public class ArtistAlbumAdapter extends ApolloFragmentAdapter<Album> {
      */
     protected void initAlbumPlayOnClick(final ImageView album, final int pos) {
         if (album != null) {
-            album.setOnClickListener(new OnClickListener() {
-
-                @Override
-                public void onClick(final View v) {
-                    final long id = getItem(pos).mAlbumId;
-                    final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                    MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
-                }
+            album.setOnClickListener(v -> {
+                final long id = getItem(pos).mAlbumId;
+                final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
+                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
             });
         }
     }

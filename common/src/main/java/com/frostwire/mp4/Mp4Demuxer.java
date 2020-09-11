@@ -73,15 +73,12 @@ public final class Mp4Demuxer {
         final InputChannel in = new InputChannel(input.getChannel());
         final OutputChannel out = new OutputChannel(output.getChannel());
         final LinkedList<Box> boxes = new LinkedList<>();
-        IsoMedia.read(in, input.length(), null, buf, new IsoMedia.OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                notifyCount(l, in.count());
-                if (b.parent == null) {
-                    boxes.add(b);
-                }
-                return b.type != Box.mdat;
+        IsoMedia.read(in, input.length(), null, buf, b -> {
+            notifyCount(l, in.count());
+            if (b.parent == null) {
+                boxes.add(b);
             }
+            return b.type != Box.mdat;
         });
         FileTypeBox ftyp = Box.findFirst(boxes, Box.ftyp);
         ftyp.major_brand = inf.majorBrand;

@@ -14,7 +14,6 @@ package com.andrew.apollo.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.andrew.apollo.model.Artist;
@@ -147,14 +146,10 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
      * @param position The position of the artist to play.
      */
     private void initArtistPlayOnClick(final ImageView artist, final int position) {
-        artist.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-                final long id = getItem(position).mArtistId;
-                final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
-                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
-            }
+        artist.setOnClickListener(v -> {
+            final long id = getItem(position).mArtistId;
+            final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
+            MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
         });
     }
 

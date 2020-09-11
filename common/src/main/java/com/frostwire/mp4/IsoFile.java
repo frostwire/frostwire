@@ -34,14 +34,11 @@ public final class IsoFile {
         in.seek(0);
         final InputChannel ch = new InputChannel(in.getChannel());
         final LinkedList<Box> boxes = new LinkedList<>();
-        IsoMedia.read(ch, buf, new IsoMedia.OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                if (b.parent == null) {
-                    boxes.add(b);
-                }
-                return b.type != Box.mdat;
+        IsoMedia.read(ch, buf, b -> {
+            if (b.parent == null) {
+                boxes.add(b);
             }
+            return b.type != Box.mdat;
         });
         in.seek(0);
         return boxes;
@@ -51,14 +48,11 @@ public final class IsoFile {
         in.seek(0);
         final InputChannel ch = new InputChannel(in.getChannel());
         final Int32 n = new Int32(0);
-        IsoMedia.read(ch, buf, new IsoMedia.OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                if (b.type == type || type == 0) {
-                    n.increment();
-                }
-                return true;
+        IsoMedia.read(ch, buf, b -> {
+            if (b.type == type || type == 0) {
+                n.increment();
             }
+            return true;
         });
         in.seek(0);
         return n.get();
@@ -77,21 +71,18 @@ public final class IsoFile {
         in.seek(0);
         final InputChannel ch = new InputChannel(in.getChannel());
         final LinkedList<Box> boxes = new LinkedList<>();
-        IsoMedia.read(ch, buf, new IsoMedia.OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) throws IOException {
-                if (b.parent == null) {
-                    boxes.add(b);
-                }
-                if (b.type == type) {
-                    if (b.parent != null) {
-                        b.parent.boxes.remove(b);
-                        b.parent.boxes.add(FreeSpaceBox.free(b.length()));
-                        IO.skip(ch, b.length(), buf);
-                    }
-                }
-                return b.type != Box.mdat;
+        IsoMedia.read(ch, buf, b -> {
+            if (b.parent == null) {
+                boxes.add(b);
             }
+            if (b.type == type) {
+                if (b.parent != null) {
+                    b.parent.boxes.remove(b);
+                    b.parent.boxes.add(FreeSpaceBox.free(b.length()));
+                    IO.skip(ch, b.length(), buf);
+                }
+            }
+            return b.type != Box.mdat;
         });
         in.seek(0);
         OutputChannel out = new OutputChannel(in.getChannel());

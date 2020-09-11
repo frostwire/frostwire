@@ -20,7 +20,6 @@ package com.frostwire.mp4;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -52,21 +51,18 @@ public class ContainerBox extends Box {
     }
 
     static void sort(LinkedList<Box> boxes, final int[] list) {
-        Collections.sort(boxes, new Comparator<Box>() {
-            @Override
-            public int compare(Box o1, Box o2) {
-                int x = Integer.MAX_VALUE;
-                int y = Integer.MAX_VALUE;
-                for (int i = 0; i < list.length; i++) {
-                    if (list[i] == o1.type) {
-                        x = i;
-                    }
-                    if (list[i] == o2.type) {
-                        y = i;
-                    }
+        Collections.sort(boxes, (o1, o2) -> {
+            int x = Integer.MAX_VALUE;
+            int y = Integer.MAX_VALUE;
+            for (int i = 0; i < list.length; i++) {
+                if (list[i] == o1.type) {
+                    x = i;
                 }
-                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+                if (list[i] == o2.type) {
+                    y = i;
+                }
             }
+            return (x < y) ? -1 : ((x == y) ? 0 : 1);
         });
     }
 

@@ -28,13 +28,10 @@ import java.util.HashMap;
  * @author aldenml
  */
 public final class SourceFilter implements SearchFilter {
-    private static final Comparator<SearchResult> CMP = new Comparator<SearchResult>() {
-        @Override
-        public int compare(SearchResult o1, SearchResult o2) {
-            int x = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
-            int y = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
-            return (x < y) ? -1 : ((x == y) ? 0 : 1);
-        }
+    private static final Comparator<SearchResult> CMP = (o1, o2) -> {
+        int x = o1 instanceof TorrentSearchResult ? ((TorrentSearchResult) o1).getSeeds() : 0;
+        int y = o2 instanceof TorrentSearchResult ? ((TorrentSearchResult) o2).getSeeds() : 0;
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     };
     private final HashMap<String, SourceKey> keys;
 

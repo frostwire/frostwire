@@ -67,11 +67,7 @@ public class PlaylistAdapter extends ApolloFragmentAdapter<Playlist> implements 
         if (position ==  0) {
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.new_playlist_list_item, null);
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        onNewPlaylistItemClick();
-                    }
-                });
+                convertView.setOnClickListener(v -> onNewPlaylistItemClick());
             }
         } else if (position >= 1) {
             // Recycle ViewHolder's items
