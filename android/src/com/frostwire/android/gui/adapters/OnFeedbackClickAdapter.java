@@ -70,8 +70,7 @@ public class OnFeedbackClickAdapter extends ClickAdapter<Fragment> {
                 Build.MODEL,
                 Build.DEVICE,
                 Build.BOARD,
-                Build.CPU_ABI,
-                Build.CPU_ABI2);
+                Build.SUPPORTED_ABIS);
 
         intent.putExtra(Intent.EXTRA_TEXT, body);
         owner.startActivity(Intent.createChooser(intent, owner.getString(R.string.choose_email_app)));

@@ -77,7 +77,7 @@ public final class SystemUtils {
             return false;
         }
 
-        return Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path));
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path));
     }
 
     public static boolean isPrimaryExternalPath(File path) {
