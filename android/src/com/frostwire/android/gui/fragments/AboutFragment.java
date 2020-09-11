@@ -38,6 +38,7 @@ import com.frostwire.jlibtorrent.LibTorrent;
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static com.frostwire.android.gui.util.UIUtils.setupClickUrl;
 
@@ -110,7 +111,7 @@ public final class AboutFragment extends AbstractFragment {
     private String getAboutText() {
         try {
             InputStream raw = getResources().openRawResource(R.raw.about);
-            return IOUtils.toString(raw, "UTF-8");
+            return IOUtils.toString(raw, StandardCharsets.UTF_8);
         } catch (Throwable e) {
             return "";
         }

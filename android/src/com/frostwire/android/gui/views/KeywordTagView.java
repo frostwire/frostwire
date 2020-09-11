@@ -121,7 +121,7 @@ public final class KeywordTagView extends AppCompatTextView {
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         if (count != -1) {
-            sb = append(sb, "  (" + String.valueOf(count) + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb = append(sb, "  (" + count + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         setText(sb, TextView.BufferType.NORMAL);
 
