@@ -11,6 +11,7 @@
 
 package com.andrew.apollo.widgets;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
@@ -54,8 +55,9 @@ public class SquareView extends ViewGroup {
     }
 
     /**
-     * {@inheritDoc}
+     * we're not calling super.requestLayout() on purpose
      */
+    @SuppressLint("MissingSuperCall")
     @Override
     public void requestLayout() {
         forceLayout();

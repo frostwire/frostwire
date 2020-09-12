@@ -11,6 +11,7 @@
 
 package com.andrew.apollo.widgets;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -32,8 +33,9 @@ public class LayoutSuppressingImageView extends androidx.appcompat.widget.AppCom
     }
 
     /**
-     * {@inheritDoc}
+     * We're not calling super.requestLayout() on purpose
      */
+    @SuppressLint("MissingSuperCall")
     @Override
     public void requestLayout() {
         forceLayout();
