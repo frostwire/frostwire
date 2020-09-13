@@ -1,7 +1,20 @@
-FrostWire 2.2.4 build 650 - SEP/08/2020
+FrostWire 2.2.4 build 650 - SEP/13/2020
+ - New jlibtorrent 1.2.10.0 update
  - Fixes bug where frostclick promo slide would render twice
  - dev: buildToolsVersion '29.0.2' -> '29.0.3' (@TacoTheDank)
  - Archive search Json parsing deprecation fix (@TacoTheDank)
+ - lt: improve stat_file() performance on Windows
+ - lt: fix issue with loading invalid torrents with only 0-sized files
+ - lt: fix to avoid large stack allocations
+ - lt: add macro TORRENT_CXX11_ABI for clients building with C++14 against
+   libtorrent build with C++11
+ - lt: removed deprecated wstring overloads on non-windows systems
+ - lt: drop dependency on Unicode's ConvertUTF code (which had a license
+   incompatible with Debian)
+ - lt: fix bugs exposed on big-endian systems
+ - lt: fix detection of hard-links not being supported by filesystem
+ - lt: fixed resume data regression for seeds with prio 0 files
+ - binaries: compiler upgraded from g++-5 to g++-7
 
 FrostWire 2.2.3 build 649 - AUG/23/2020
  - jlibtorrent 1.2.7.0 -> 1.2.8.0 update
