@@ -622,7 +622,7 @@ public final class TransferManager {
 
     static long getCurrentMountAvailableBytes() {
         StatFs stat = new StatFs(ConfigurationManager.instance().getStoragePath());
-        return ((long) stat.getBlockSize() * (long) stat.getAvailableBlocks());
+        return ((long) stat.getBlockSizeLong() * (long) stat.getAvailableBlocksLong());
     }
 
     private void registerPreferencesChangeListener() {
