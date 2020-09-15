@@ -1,5 +1,6 @@
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
+ * OpenJDK 14.0.2 update for Windows and macOS
  * lt: improve stat_file() performance on Windows
  * lt: fix issue with loading invalid torrents with only 0-sized files
  * lt: fix to avoid large stack allocations
@@ -13,7 +14,7 @@ frostwire (6.8.7) stable; urgency=high
  * lt: fixed resume data regression for seeds with prio 0 files
  * binaries: compiler upgraded from g++-5 to g++-7
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 13 Sep 2020 16:16:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Sep 2020 16:35:00 -0600
 
 frostwire (6.8.6) stable; urgency=high
  * New jlibtorrent 1.2.8.0 update
