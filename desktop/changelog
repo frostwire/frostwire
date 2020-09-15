@@ -4,11 +4,8 @@ frostwire (6.8.7) stable; urgency=high
  * lt: improve stat_file() performance on Windows
  * lt: fix issue with loading invalid torrents with only 0-sized files
  * lt: fix to avoid large stack allocations
- * lt: add macro TORRENT_CXX11_ABI for clients building with C++14 against
-   libtorrent build with C++11
  * lt: removed deprecated wstring overloads on non-windows systems
- * lt: drop dependency on Unicode's ConvertUTF code (which had a license
-   incompatible with Debian)
+ * lt: drop dependency on Unicode's ConvertUTF code (which had a license incompatible with Debian)
  * lt: fix bugs exposed on big-endian systems
  * lt: fix detection of hard-links not being supported by filesystem
  * lt: fixed resume data regression for seeds with prio 0 files
