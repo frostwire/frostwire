@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -346,7 +346,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
     }
 
     private void setHostnameVerifier(HttpsURLConnection conn) {
-        conn.setHostnameVerifier(Ssl.nullHostnameVerifier());
+        conn.setHostnameVerifier(Ssl.fwHostnameVerifier());
         conn.setSSLSocketFactory(Ssl.nullSocketFactory());
     }
 

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     public static OkHttpClient.Builder configNullSsl(OkHttpClient.Builder b) {
         b.followSslRedirects(true);
-        b.hostnameVerifier(Ssl.nullHostnameVerifier());
+        b.hostnameVerifier(Ssl.fwHostnameVerifier());
         b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
         ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
         ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
