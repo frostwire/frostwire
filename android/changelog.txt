@@ -1,4 +1,4 @@
-FrostWire 2.2.4 build 650 - SEP/13/2020
+FrostWire 2.2.4 build 652 - SEP/20/2020
  - New jlibtorrent 1.2.10.0 update
  - Fixes bug where frostclick promo slide would render twice
  - dev: buildToolsVersion '29.0.2' -> '29.0.3' (@TacoTheDank)
@@ -11,10 +11,11 @@ FrostWire 2.2.4 build 650 - SEP/13/2020
  - lt: removed deprecated wstring overloads on non-windows systems
  - lt: drop dependency on Unicode's ConvertUTF code (which had a license
    incompatible with Debian)
- - lt: fix bugs exposed on big-endian systems
+ - lt: fix bugs exposed on big-endian systems`
  - lt: fix detection of hard-links not being supported by filesystem
  - lt: fixed resume data regression for seeds with prio 0 files
  - binaries: compiler upgraded from g++-5 to g++-7
+ - reverted to com.mopub:mopub-sdk-banner:5.12.0 (mopub 5.13.1 very unstable)
 
 FrostWire 2.2.3 build 649 - AUG/23/2020
  - jlibtorrent 1.2.7.0 -> 1.2.8.0 update

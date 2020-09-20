@@ -136,7 +136,7 @@ public final class Ssl {
             if (!validDomainsSet.contains(s) && !unSeenDomains.contains(s)) {
                 logUnseenDomain(s);
             }
-            return true;
+            return validDomainsSet.contains(s);
         }
 
         private void logUnseenDomain(String s) {
