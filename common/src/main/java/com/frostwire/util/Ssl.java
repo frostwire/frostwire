@@ -34,6 +34,7 @@ import java.util.HashSet;
  * @author aldenml
  */
 public final class Ssl {
+    private static final Logger LOG = Logger.getLogger(Ssl.class);
     private static final HostnameVerifier FW_HOSTNAME_VERIFIER = new FWHostnameVerifier();
     private static final X509TrustManager NULL_TRUST_MANAGER = new NullTrustManager();
     private static final SSLSocketFactory NULL_SOCKET_FACTORY = buildNullSSLSocketFactory();
@@ -88,7 +89,6 @@ public final class Ssl {
     }
 
     private final static HashSet<String> unSeenDomains = new HashSet<>();
-    private final static File unseenDomainFile = new File("seenDomains.txt");
     private static final class FWHostnameVerifier implements HostnameVerifier {
 
         private static final String[] validDomains = {
@@ -102,6 +102,9 @@ public final class Ssl {
                 "pirate-bay.info",
                 "pirate-bays.net",
                 "piratebay.live",
+                "static.frostclick.com",
+                "static.frostwire.com",
+                "www.frostwire.com",
                 "thepiratebay0.org",
                 "thepiratebay-unblocked.org",
                 "thepiratebay.org",
@@ -140,16 +143,8 @@ public final class Ssl {
         }
 
         private void logUnseenDomain(String s) {
-            System.out.println("FWHostnameVerifier::logUnseenDomain(): " + s);
+            LOG.warn("FWHostnameVerifier::logUnseenDomain(): " + s);
             unSeenDomains.add(s);
-            try {
-                FileOutputStream fos = new FileOutputStream(unseenDomainFile, true);
-                fos.write(s.getBytes());
-                fos.write('\n');
-                fos.flush();
-                fos.close();
-            } catch (Throwable t) {
-            }
         }
     }
 
