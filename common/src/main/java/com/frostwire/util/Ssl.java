@@ -96,6 +96,7 @@ public final class Ssl {
                 "api.frostclick.com",
                 "archive.org",
                 "clients1.google.com",
+                "dl.frostwire.com",
                 "eztv.io",
                 "idope.se",
                 "nyaa.si",
