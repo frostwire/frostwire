@@ -1,4 +1,4 @@
-FrostWire 2.2.4 build 652 - SEP/20/2020
+FrostWire 2.2.4 build 653 - SEP/22/2020
  - New jlibtorrent 1.2.10.0 update
  - Fixes bug where frostclick promo slide would render twice
  - dev: buildToolsVersion '29.0.2' -> '29.0.3' (@TacoTheDank)
