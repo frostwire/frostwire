@@ -1,8 +1,9 @@
-FrostWire 2.2.4 build 653 - SEP/22/2020
+FrostWire 2.2.4 build 654 - SEP/24/2020
  - New jlibtorrent 1.2.10.0 update
  - Fixes bug where frostclick promo slide would render twice
  - dev: buildToolsVersion '29.0.2' -> '29.0.3' (@TacoTheDank)
  - Archive search Json parsing deprecation fix (@TacoTheDank)
+ - com.squareup.okhttp3:okhttp:4.8.1 -> 4.9.0
  - lt: improve stat_file() performance on Windows
  - lt: fix issue with loading invalid torrents with only 0-sized files
  - lt: fix to avoid large stack allocations

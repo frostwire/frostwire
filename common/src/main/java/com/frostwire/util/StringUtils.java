@@ -429,8 +429,7 @@ public class StringUtils {
     public static int quickHash(String s) {
         int hash = 1;
         for (int i = 0; i < s.length(); i++) {
-            int cInt = s.charAt(i);
-            hash = (hash * cInt) % 0x7fffffff; // modded to int max val
+            hash = (hash * (int) s.charAt(i)) % 0x7fffffff; // modded to int max val
         }
         return hash;
     }
