@@ -181,12 +181,11 @@ public final class KeywordFilterDrawerView extends LinearLayout {
             tagsController.hideHeader();
             tagsController.showProgressView(true);
         }
-        updateSuggestedKeywordFilters(feature, filteredHistogram);
+        updateSuggestedKeywordFilters(tagsController, feature, filteredHistogram);
         invalidate();
     }
 
-    private void updateSuggestedKeywordFilters(KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
-        TagsController tagsController = featureContainer.get(feature);
+    private void updateSuggestedKeywordFilters(TagsController tagsController, KeywordDetector.Feature feature, List<Entry<String, Integer>> histogram) {
         if (tagsController == null) {
             return;
         }

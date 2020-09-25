@@ -95,6 +95,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1071,7 +1072,8 @@ public final class SearchFragment extends AbstractFragment implements
                                                                  Map<KeywordDetector.Feature, List<Map.Entry<String, Integer>>> filteredHistograms) {
         Thread.currentThread().setName("SearchFragment::updateUIWithFilteredHistogramsPerFeature");
         // should be safe from concurrent modification exception as new list with filtered elements
-        for (KeywordDetector.Feature feature : filteredHistograms.keySet()) {
+        Set<KeywordDetector.Feature> features = filteredHistograms.keySet();
+        for (KeywordDetector.Feature feature : features) {
             List<Map.Entry<String, Integer>> filteredHistogram = filteredHistograms.get(feature);
             keywordFilterDrawerView.updateData(
                     feature,

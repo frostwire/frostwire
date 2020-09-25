@@ -162,6 +162,7 @@ public final class LocalSearchEngine {
             if (!filtered.isEmpty()) {
                 if (listener != null) {
                     listener.onResults(token, filtered);
+                    filtered.clear();
                 }
             }
         }
