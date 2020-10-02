@@ -1,3 +1,11 @@
+FrostWire 2.2.5 build 655 - OCT/02/2020
+ - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
+ - material 1.3.0-alpha02 -> 1.3.0-alpha03
+ - browser 1.3.0-alpha05 -> 1.3.0->alpha06
+ - exifinterface 1.2.0 -> 1.3.0
+ - play-services 19.3.0 -> 19.4.0
+ - core-ktx 1.3.1 -> 1.3.2
+
 FrostWire 2.2.4 build 654 - SEP/24/2020
  - New jlibtorrent 1.2.10.0 update
  - Fixes bug where frostclick promo slide would render twice
