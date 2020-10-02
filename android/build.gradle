@@ -38,7 +38,7 @@ repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     // remove when new mopub 5.14.x available or 5.13.2 fixes crashes
-    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
+    // maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
 
     flatDir { dirs 'libs' }
 }
@@ -211,14 +211,14 @@ dependencies {
     implementation 'com.mopub.volley:mopub-volley:2.1.0'
 
     // MoPub SDK
-    // waiting for 5.14, 5.13.1 has too many crashes
-    //implementation('com.mopub:mopub-sdk-banner:5.13.1@aar') { transitive = true }
-    //implementation('com.mopub:mopub-sdk-fullscreen:5.13.1@aar') { transitive = true }
+    // waiting for a stable 5.14, 5.13.1 has too many crashes
+    implementation('com.mopub:mopub-sdk-banner:5.14.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-fullscreen:5.14.0@aar') { transitive = true }
 
-    // delete these 3 lines when there's a new 5.14.x
-    implementation('com.mopub:mopub-sdk-banner:5.12.0@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-interstitial:5.12.0@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-rewardedvideo:5.12.0@aar') { transitive = true }
+    // delete these 3 lines when there's a new stable 5.14.x
+    //implementation('com.mopub:mopub-sdk-banner:5.12.0@aar') { transitive = true }
+    //implementation('com.mopub:mopub-sdk-interstitial:5.12.0@aar') { transitive = true }
+    //implementation('com.mopub:mopub-sdk-rewardedvideo:5.12.0@aar') { transitive = true }
 
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:9.13.1'
