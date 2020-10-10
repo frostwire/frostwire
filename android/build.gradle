@@ -21,6 +21,9 @@ import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 buildscript {
     repositories {
         google()
@@ -29,6 +32,9 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.2'
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+
+        classpath 'com.google.gms:google-services:4.3.4'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
     }
 }
 
@@ -197,6 +203,11 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:19.4.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android:flexbox:1.1.1'
+
+    // Firebase Crashlytics
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
 
     // MoPub SDK requirements - https://github.com/mopub/mopub-android-sdk#requirements
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
