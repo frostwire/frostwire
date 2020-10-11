@@ -227,8 +227,22 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         void updateTransferItems(List<TransferItem> freshItems) {
-            Collections.sort(items, (o1, o2) -> -Integer.compare(o1.getProgress(),o2.getProgress()));
-            Collections.sort(freshItems, (o1, o2) -> -Integer.compare(o1.getProgress(),o2.getProgress()));
+            try {
+                if (items != null && items.size() > 1) {
+                    Collections.sort(items, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                }
+            } catch (Throwable ignored) {
+                //Fatal Exception: java.lang.IllegalArgumentException
+                //Comparison method violates its general contract!
+            }
+            try {
+                if (freshItems != null && freshItems.size() > 1) {
+                    Collections.sort(freshItems, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                }
+            } catch (Throwable ignored) {
+                //Fatal Exception: java.lang.IllegalArgumentException
+                //Comparison method violates its general contract!
+            }
             AbstractTransferDetailFragment.updateAdapterItems(this, items, freshItems);
         }
     }
