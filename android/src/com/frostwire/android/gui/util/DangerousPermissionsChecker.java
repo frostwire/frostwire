@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -36,10 +40,6 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 /**
  * @author gubatron
@@ -194,7 +194,11 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         try {
             final Class<?> SystemClass = android.provider.Settings.System.class;
             final Method canWriteMethod = SystemClass.getMethod("canWrite", Context.class);
-            return (boolean) canWriteMethod.invoke(null, context);
+            Object boolResult = canWriteMethod.invoke(null, context);
+            if (boolResult == null) {
+                return false;
+            }
+            return (boolean) boolResult;
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
