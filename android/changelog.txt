@@ -1,4 +1,4 @@
-FrostWire 2.2.5 build 656 - OCT/09/2020
+FrostWire 2.2.5 build 656 - OCT/12/2020
  - New: Firebase Crash Analytics support
  - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
  - com.applovin:applovin-sdk:9.13.1 -> 9.14.4
@@ -7,7 +7,8 @@ FrostWire 2.2.5 build 656 - OCT/09/2020
  - exifinterface 1.2.0 -> 1.3.0
  - play-services 19.3.0 -> 19.4.0
  - core-ktx 1.3.1 -> 1.3.2
- - com.android.tools.build:gradle:4.0.1 -> 4.0.2
+ - com.android.tools.build:gradle:4.0.1 -> 4.1.0
+ - gradle wrapper update 6.1.1->6.6.1
 
 FrostWire 2.2.4 build 654 - SEP/24/2020
  - New jlibtorrent 1.2.10.0 update
