@@ -28,9 +28,10 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath 'com.android.tools.build:gradle:4.1.0'
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
         classpath 'com.google.gms:google-services:4.3.4'
@@ -95,7 +96,7 @@ def changeApkOutput(variant) {
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
-boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease")
+boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 
 android {
 
