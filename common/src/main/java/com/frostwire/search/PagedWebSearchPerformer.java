@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -56,6 +58,9 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         } catch (Throwable e) {
             if (url == null) {
                 url = "n.a";
+            }
+            if (e instanceof SSLPeerUnverifiedException) {
+                LOG.error("Make sure to add " + getDomainName() + " to Ssl.FWHostnameVerifier valid host name list");
             }
             LOG.error("Error searching page [" + url + "]: " + e.getMessage());
         }
