@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import android.app.Fragment;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
@@ -37,7 +36,7 @@ import com.frostwire.android.offers.Offers;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class HomeActivity extends BaseActivity implements OnRequestPermissionsResultCallback {
+public final class HomeActivity extends BaseActivity {
 
     private DangerousPermissionsChecker dangerousPermissionsChecker;
 
