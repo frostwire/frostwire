@@ -259,6 +259,7 @@
     <string name="device_storage">Geräte-Storage</string>
     <string name="use_limetorrents">Benutze Limetorrents</string>
     <string name="use_magnetdl">Benutze MagnetDL</string>
+    <string name="use_torrent_paradise">Benutze TorrentParadise</string>
     <string name="error_no_internet_connection">Fehler: Überprüfen Internetverbindung</string>
     <string name="why_we_need_storage_permissions">Warum brauchen wir Speicherberechtigungen.</string>
     <string name="invalid_filename">Ungültiger Dateiname</string>

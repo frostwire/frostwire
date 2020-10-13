@@ -269,6 +269,7 @@
     <string name="select_option_below">Sélectionnez l\'option ci-dessous:</string>
     <string name="use_limetorrents">Utilisez Limetorrents</string>
     <string name="use_magnetdl">Utilisez MagnetDL</string>
+    <string name="use_torrent_paradise">Utilisez TorrentParadise</string>
     <string name="error_no_internet_connection">Erreur: Vérifiez la connexion Internet</string>
     <string name="why_we_need_storage_permissions">Pourquoi nous avons besoin des autorisations de stockage.</string>
     <string name="invalid_filename">Nom de fichier non valide</string>

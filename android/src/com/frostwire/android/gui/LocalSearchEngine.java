@@ -117,6 +117,10 @@ public final class LocalSearchEngine {
             if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
+                try {
+                    Thread.sleep(200);
+                    // breath a little between http requests
+                } catch (Throwable ignored) { }
             }
         }
     }

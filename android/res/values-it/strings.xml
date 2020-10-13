@@ -254,6 +254,7 @@
     <string name="device_storage">Archiviazione del dispositivo</string>
     <string name="use_limetorrents">Utilizzare Limetorrents</string>
     <string name="use_magnetdl">Utilizzare MagnetDL</string>
+    <string name="use_torrent_paradise">Utilizzare TorrentParadise</string>
     <string name="error_no_internet_connection">Errore: Controllare la connessione a Internet</string>
     <string name="why_we_need_storage_permissions">Perché abbiamo bisogno di permessi di stoccaggio.</string>
     <string name="invalid_filename">Nome del file non valido</string>

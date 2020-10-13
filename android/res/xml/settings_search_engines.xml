@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
@@ -20,8 +19,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
         android:key="frostwire.prefs.search.preference_category.select_all"
-        android:title="@string/select_all"
-        android:layout="@layout/view_preference_search_select_all" />
+        android:layout="@layout/view_preference_search_select_all"
+        android:title="@string/select_all" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_archiveorg"
         android:layout="@layout/view_preference_search_engine"
@@ -50,6 +49,10 @@
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_torrent_paradise"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_torrent_paradise" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentz2"
         android:layout="@layout/view_preference_search_engine"
