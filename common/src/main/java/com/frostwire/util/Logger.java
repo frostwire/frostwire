@@ -94,7 +94,7 @@ public final class Logger {
     }
 
     public void error(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        jul.logp(Level.SEVERE, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
     }
 
     public void error(String msg) {
