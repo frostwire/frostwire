@@ -20,11 +20,15 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.Fragment;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback;
 import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.offers.Offers;
 
 /**
@@ -33,7 +37,9 @@ import com.frostwire.android.offers.Offers;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class HomeActivity extends BaseActivity {
+public final class HomeActivity extends BaseActivity implements OnRequestPermissionsResultCallback {
+
+    private DangerousPermissionsChecker dangerousPermissionsChecker;
 
     public HomeActivity() {
         super(R.layout.activity_base);
@@ -47,6 +53,10 @@ public final class HomeActivity extends BaseActivity {
             getFragmentManager().beginTransaction()
                     .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment()).commit();
         }
+
+        dangerousPermissionsChecker = new DangerousPermissionsChecker(this,
+                DangerousPermissionsChecker.READ_EXTERNAL_STORAGE);
+        dangerousPermissionsChecker.requestPermissions();
     }
 
     @Override
@@ -61,5 +71,11 @@ public final class HomeActivity extends BaseActivity {
                 false,
                 false,
                 true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
