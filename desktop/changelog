@@ -1,3 +1,8 @@
+frostwire (6.8.8) stable; urgency=high
+ * New TorrentParadise search source
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 16 Oct 2020 13:07:00 -0600
+
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
  * OpenJDK 14.0.2 update for Windows and macOS
