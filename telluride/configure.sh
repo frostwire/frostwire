@@ -17,33 +17,31 @@
 # limitations under the License.
 ##########################################################################
 
+# Python3 by default for macOS (and Windows to be tested)
+PIP_CMD='python3 -m pip'
+PYINSTALLER_PACKAGE='pyinstaller'
+
 # Thank you Brian Fox, bash creator
 TRUE=0
 FALSE=1
 
-#Python3 by default for macOS (and Windows to be tested)
-PIP_CMD=pip3
-PYTHON_CMD=python3
-
 isubuntu() {
   if [ $(uname -a | grep -c Ubuntu) == 0 ]
   then
-    FALSE
+    return ${FALSE}
   else
-    TRUE
+    return ${TRUE}
   fi		 
 }
 
 if isubuntu
 then
-	# Ubuntu isn't getting along with Python3 or PIP3 when it comes to installing pyinstaller
-	echo "IN UBUNTU"
-  PIP_CMD=pip
-	PYTHON_CMD=python
-  sudo apt-get install python-pip
-	sudo apt-get install python
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+  sudo apt-get install python3 python3-pip
+  PYINSTALLER_PACKAGE='PyInstaller'
 fi
 
-${PYTHON_CMD} -m pip install --upgrade pip
-${PIP_CMD} install youtube_dl --upgrade
-${PIP_CMD} install pyinstaller --upgrade
+${PIP_CMD} install --upgrade pip
+${PIP_CMD} install --upgrade youtube_dl
+${PIP_CMD} install --upgrade pycryptodome
+${PIP_CMD} install --upgrade ${PYINSTALLER_PACKAGE}
