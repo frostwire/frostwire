@@ -30,6 +30,7 @@ import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
+import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
@@ -207,6 +208,11 @@ public abstract class SearchEngine {
             return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
+    private static final SearchEngine TORRENTPARADISE = new SearchEngine(SearchEngineID.TORRENTPARADISE_ID, "TorrentParadise", SearchEnginesSettings.TORRENTPARADISE_ENABLED, "torrent-paradise.ml") {
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new TorrentParadiseSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
 
     private final SearchEngineID _id;
     private final String _name;
@@ -231,6 +237,7 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine> candidates = Arrays.asList(
+                TORRENTPARADISE,
                 MAGNETDL,
                 TORRENTZ2,
                 ZOOQLE,
