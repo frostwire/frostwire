@@ -17,20 +17,23 @@ if __name__ == "__main__":
     print("Copyright FrostWire LLC 2020")
     print()
     print('Page URL: <' + args.page_url + '>')
-    if audio_only:
-        print("Audio only download.")
-    print()
-
     ydl_opts = {'nocheckcertificate' : True,
-                'format': 'bestaudio/best',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }],
                 'quiet': False,
                 'restrictfilenames': True
                 }
+
+    if audio_only:
+        print("Audio-only download.")
+        ydl_opts['format'] = 'bestaudio/best'
+        ydl_opts['postprocessors'] = [
+            {
+               'key': 'FFmpegExtractAudio',
+               'preferredcodec': 'mp3',
+               'preferredquality': '192',
+            }
+        ]
+    print()
+
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([page_url])
 
