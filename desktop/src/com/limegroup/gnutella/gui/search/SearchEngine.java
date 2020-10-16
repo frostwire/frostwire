@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -50,24 +50,30 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class SearchEngine {
-    private static final int DEFAULT_TIMEOUT = 5000;
-    private static final int TPB_ID = 6;
-    private static final int SOUNDCLOUD_ID = 10;
-    private static final int ARCHIVEORG_ID = 11;
-    private static final int FROSTCLICK_ID = 12;
-    private static final int TORLOCK_ID = 14;
-    private static final int EZTV_ID = 15;
-    private static final int YIFI_ID = 17;
-    private static final int ONE337X_ID = 26;
-    private static final int IDOPE_ID = 27;
-    private static final int TORRENTDOWNLOADS_ID = 19;
-    private static final int LIMETORRENTS_ID = 20;
-    private static final int ZOOQLE_ID = 21;
-    private static final int NYAA_ID = 23;
-    private static final int TORRENTZ2_ID = 24;
-    private static final int MAGNETDL_ID = 25;
 
-    private static final SearchEngine TPB = new SearchEngine(TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
+
+    private static final int DEFAULT_TIMEOUT = 5000;
+
+    enum SearchEngineID {
+        TPB_ID,
+        SOUNDCLOUD_ID,
+        ARCHIVEORG_ID,
+        FROSTCLICK_ID,
+        TORLOCK_ID,
+        EZTV_ID,
+        YIFI_ID,
+        ONE337X_ID,
+        IDOPE_ID,
+        TORRENTDOWNLOADS_ID,
+        LIMETORRENTS_ID,
+        ZOOQLE_ID,
+        NYAA_ID,
+        TORRENTZ2_ID,
+        MAGNETDL_ID,
+        TORRENTPARADISE_ID
+    }
+
+    private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
@@ -98,19 +104,19 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine SOUNDCLOUD = new SearchEngine(SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
+    private static final SearchEngine SOUNDCLOUD = new SearchEngine(SearchEngineID.SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api.sndcdn.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new SoundcloudSearchPerformer(SOUNDCLOUD.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine ARCHIVEORG = new SearchEngine(ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
+    private static final SearchEngine ARCHIVEORG = new SearchEngine(SearchEngineID.ARCHIVEORG_ID, "Archive.org", SearchEnginesSettings.ARCHIVEORG_SEARCH_ENABLED, "archive.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ArchiveorgSearchPerformer(ARCHIVEORG.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine FROSTCLICK = new SearchEngine(FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
+    private static final SearchEngine FROSTCLICK = new SearchEngine(SearchEngineID.FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
         private final UserAgent userAgent = new UserAgent(org.limewire.util.OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
 
         @Override
@@ -118,44 +124,44 @@ public abstract class SearchEngine {
             return new FrostClickSearchPerformer(FROSTCLICK.getDomainName(), token, keywords, DEFAULT_TIMEOUT, userAgent);
         }
     };
-    private static final SearchEngine TORLOCK = new SearchEngine(TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
+    private static final SearchEngine TORLOCK = new SearchEngine(SearchEngineID.TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorLockSearchPerformer(TORLOCK.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
+    private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(SearchEngineID.TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorrentDownloadsSearchPerformer(TORRENTDOWNLOADS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine LIMETORRENTS = new SearchEngine(LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.info") {
+    private static final SearchEngine LIMETORRENTS = new SearchEngine(SearchEngineID.LIMETORRENTS_ID, "LimeTorrents", SearchEnginesSettings.LIMETORRENTS_SEARCH_ENABLED, "www.limetorrents.info") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new LimeTorrentsSearchPerformer(LIMETORRENTS.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine NYAA = new SearchEngine(NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
+    private static final SearchEngine NYAA = new SearchEngine(SearchEngineID.NYAA_ID, "Nyaa", SearchEnginesSettings.NYAA_SEARCH_ENABLED, "nyaa.si") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine EZTV = new SearchEngine(EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.io") {
+    private static final SearchEngine EZTV = new SearchEngine(SearchEngineID.EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.io") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine YIFY = new SearchEngine(YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
+    private static final SearchEngine YIFY = new SearchEngine(SearchEngineID.YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    private static final SearchEngine ONE337X = new SearchEngine(ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
+    private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
         protected void postInitWork() {
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
@@ -176,39 +182,39 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine IDOPE = new SearchEngine(IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.se") {
+    private static final SearchEngine IDOPE = new SearchEngine(SearchEngineID.IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.se") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    private static final SearchEngine ZOOQLE = new SearchEngine(ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
+    private static final SearchEngine ZOOQLE = new SearchEngine(SearchEngineID.ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new ZooqleSearchPerformer(ZOOQLE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine TORRENTZ2 = new SearchEngine(TORRENTZ2_ID, "Torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.eu") {
+    private static final SearchEngine TORRENTZ2 = new SearchEngine(SearchEngineID.TORRENTZ2_ID, "Torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.eu") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine MAGNETDL = new SearchEngine(MAGNETDL_ID, "MagnetDL", SearchEnginesSettings.MAGNETDL_ENABLED, "www.magnetdl.com") {
+    private static final SearchEngine MAGNETDL = new SearchEngine(SearchEngineID.MAGNETDL_ID, "MagnetDL", SearchEnginesSettings.MAGNETDL_ENABLED, "www.magnetdl.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
-    private final int _id;
+    private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
     private String redirectUrl = null;
     private String _domainName;
 
-    private SearchEngine(int id, String name, BooleanSetting setting, String domainName) {
+    private SearchEngine(SearchEngineID id, String name, BooleanSetting setting, String domainName) {
         _id = id;
         _name = name;
         _setting = setting;
@@ -271,7 +277,7 @@ public abstract class SearchEngine {
         return null;
     }
 
-    public int getId() {
+    public SearchEngineID getId() {
         return _id;
     }
 
@@ -294,7 +300,7 @@ public abstract class SearchEngine {
 
     @Override
     public int hashCode() {
-        return _id;
+        return _id.ordinal();
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
