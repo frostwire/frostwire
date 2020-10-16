@@ -17,10 +17,9 @@
 
 package com.frostwire.search.torrentparadise;
 
+import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.util.Logger;
-import com.frostwire.util.UrlUtils;
 import com.google.gson.Gson;
 
 import java.util.Collections;
@@ -28,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class TorrentParadiseSearchPerformer extends PagedWebSearchPerformer {
-    private static Logger LOG = Logger.getLogger(TorrentParadiseSearchPerformer.class);
+    //private static final Logger LOG = Logger.getLogger(TorrentParadiseSearchPerformer.class);
     private final Gson gson;
 
     public TorrentParadiseSearchPerformer(long token, String keywords, int timeout) {
@@ -54,7 +53,7 @@ public class TorrentParadiseSearchPerformer extends PagedWebSearchPerformer {
         List<TorrentParadiseSearchResult> results = new LinkedList<>();
         for (TPSearchResult r : tpResults) {
             TPSearchResult r_torrent = new TPSearchResult(r);
-            r_torrent.text = r_torrent.text + ".torrent";
+            r_torrent.text += ".torrent";
 
             results.add(new TorrentParadiseSearchResult(r));
             results.add(new TorrentParadiseSearchResult(r_torrent));
@@ -77,5 +76,17 @@ public class TorrentParadiseSearchPerformer extends PagedWebSearchPerformer {
             s = orig.s;
             l = orig.l;
         }
+    }
+
+    @Override
+    public void crawl(CrawlableSearchResult sr) {
+        // avoid super() warning for not implementing crawl()
+        // SIGN: Bad design in class hierarchy.
+        //
+        // SearchResults which are not crawleable should not implement CrawleableSearchResult
+        // many do because they extend from AbstractTorrentSearchResult which for some reason implements that
+        // interface wrongly. Composition > Inheritance
+        // TODO: Break up SearchResult implementations to not extend from AbstractTorrentSearchResult blindly
+        //       and only implement CrawleableSearchResult for those that are actually crawleable.
     }
 }
