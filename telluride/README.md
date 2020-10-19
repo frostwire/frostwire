@@ -33,10 +33,11 @@ You should end up with a stand-alone executable for the platform you are on:
  - telluride_linux (linux)
 
 ## Requirements
- Aside from `bash` and `python3`, the rest should be installed by the `configure.sh` script.
+ Aside from `bash`,`python3` and `ffmpeg`, the rest should be installed by the `configure.sh` script.
     
  - `bash`
  - `python3`, `pip`, `pylint`
+ - `ffmpeg` (for audio-only downloads. audio is extracted from the downloaded video)
  - `youtube_dl`, `pycryptodome`, `pyinstaller`
 
 ## License
