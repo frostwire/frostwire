@@ -30,7 +30,7 @@ You should end up with a stand-alone executable for the platform you are on:
 
  - telluride.exe (Windows)
  - telluride_macos (macOS)
- - telluride_linux (linux)
+ - telluride_linux (Linux)
 
 ## Requirements
  Aside from `bash`,`python3` and `ffmpeg`, the rest should be installed by the `configure.sh` script.
