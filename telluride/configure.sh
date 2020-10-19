@@ -42,6 +42,7 @@ then
 fi
 
 ${PIP_CMD} install --upgrade pip
+${PIP_CMD} install --upgrade pylint
 ${PIP_CMD} install --upgrade youtube_dl
 ${PIP_CMD} install --upgrade pycryptodome
 ${PIP_CMD} install --upgrade ${PYINSTALLER_PACKAGE}
