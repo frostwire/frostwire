@@ -1,6 +1,7 @@
 '''
 Telluride Cloud Video Downloader.
 Copyright 2020 FrostWire LLC.
+Author: @gubatron
 
 A portable and easy to use youtube_dl wrapper by FrostWire.
 
