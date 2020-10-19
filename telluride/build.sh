@@ -29,6 +29,8 @@ fi
 }
 
 cleanup
+pylint telluride.py
+read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
 ${PYINSTALLER_CMD} --onefile telluride.py
 
 if [ -f dist/telluride ]
