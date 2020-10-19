@@ -1,9 +1,16 @@
 import argparse
 import youtube_dl
 
-BUILD=1
+BUILD=2
+
+def welcome():
+    print()
+    print("Telluride Cloud Downloader b" + str(BUILD))
+    print("Copyright FrostWire LLC 2020")
+    print()
 
 if __name__ == "__main__":
+    welcome()
     parser = argparse.ArgumentParser()
     parser.add_argument("--audio-only", "-a", action='store_true')
     parser.add_argument("page_url")
@@ -12,10 +19,6 @@ if __name__ == "__main__":
     audio_only = args.audio_only
     page_url = args.page_url
 
-    print()
-    print("Telluride Cloud Downloader b" + str(BUILD))
-    print("Copyright FrostWire LLC 2020")
-    print()
     print('Page URL: <' + args.page_url + '>')
     ydl_opts = {'nocheckcertificate' : True,
                 'quiet': False,
