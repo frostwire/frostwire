@@ -1,0 +1,6 @@
+build 3 - oct/20/2020
+ - configure.sh to setup and upgrade all build dependencies for windows, macos, linux
+ - build.sh builds telluride binaries for windows, macos, linux
+ - -a, --audio-only option flag to convert to mp3 if ffmpeg avaiable. strips video data from .webm if not
+ - -m, --meta-only option flag to print JSON with meta data about video found in URL
+ - Added Apache License 2.0
