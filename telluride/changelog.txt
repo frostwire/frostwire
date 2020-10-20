@@ -4,3 +4,8 @@ build 3 - oct/20/2020
  - -a, --audio-only option flag to convert to mp3 if ffmpeg avaiable. strips video data from .webm if not
  - -m, --meta-only option flag to print JSON with meta data about video found in URL
  - Added Apache License 2.0
+ - python: pip 20.2.4
+ - python: youtube-dl 2020.9.20
+ - python: pycryptodome 3.9.8
+ - python: pyinstaller 4.0
+ - python: pylint 2.6.0
