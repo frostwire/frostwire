@@ -34,11 +34,25 @@ isubuntu() {
   fi		 
 }
 
+iswindows() {
+  if [ $(uname -a | grep -c windows) == 0 ]
+  then
+    return ${FALSE}
+  else
+    return ${TRUE}
+  fi
+}
+
 if isubuntu
 then
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
   sudo apt-get install python3 python3-pip
   PYINSTALLER_PACKAGE='PyInstaller'
+fi
+
+if iswindows
+then
+  PIP_CMD='python -m pip'
 fi
 
 ${PIP_CMD} install --upgrade pip
