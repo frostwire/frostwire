@@ -155,7 +155,7 @@ public abstract class SearchEngine {
             return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine YIFY = new SearchEngine(SearchEngineID.YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "www.yify-torrent.org") {
+    private static final SearchEngine YIFY = new SearchEngine(SearchEngineID.YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "yify-torrent.cc") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
