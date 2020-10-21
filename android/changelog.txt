@@ -1,6 +1,7 @@
-FrostWire 2.2.5 build 658 - OCT/16/2020
+FrostWire 2.2.5 build 659 - OCT/20/2020
  - New: TorrentParadise search source
  - New: Firebase Crash Analytics support
+ - Yify search fixed
  - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
  - com.applovin:applovin-sdk:9.13.1 -> 9.14.5
  - com.mopub.mediation:applovin:9.13.1.0 -> 9.14.3.0
