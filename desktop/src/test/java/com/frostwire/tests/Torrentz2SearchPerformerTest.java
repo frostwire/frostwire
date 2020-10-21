@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Created by Angel Leon (@gubatron)
  * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
- *
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -104,7 +104,7 @@ public class Torrentz2SearchPerformerTest {
 
         @Override
         public void onError(long token, SearchError error) {
-            failedTests.add(error.toString());
+            failedTests.add(error.message());
         }
 
         @Override
@@ -115,7 +115,7 @@ public class Torrentz2SearchPerformerTest {
             if (failedTests.size() == 0) {
                 return "";
             }
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (String msg : failedTests) {
                 buffer.append(msg);
                 buffer.append("\n");
