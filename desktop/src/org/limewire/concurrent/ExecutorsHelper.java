@@ -93,7 +93,7 @@ public class ExecutorsHelper {
      */
     static ExecutorService newThreadPool(@SuppressWarnings("SameParameterValue") ThreadFactory factory) {
         return Executors.unconfigurableExecutorService(
-                new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                new ThreadPoolExecutor(0, 64,
                         5L, TimeUnit.SECONDS,
                         new SynchronousQueue<>(),
                         factory));
