@@ -16,7 +16,7 @@ public class ThreadExecutor {
      * The factory threads are created from.
      */
     private static final ThreadFactory FACTORY =
-            ExecutorsHelper.daemonThreadFactory("IdleThread");
+            ExecutorsHelper.daemonThreadFactory("ThreadExecutor.FACTORY");
     /**
      * The thread pool to use when running threads.
      */
