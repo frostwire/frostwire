@@ -34,6 +34,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * @author gubatron
@@ -167,12 +168,21 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void labelPartialDownload_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
+            MouseListener[] mouseListeners = labelPartialDownload.getMouseListeners();
+            for (MouseListener mouseListener : mouseListeners) {
+                labelPartialDownload.removeMouseListener(mouseListener);
+            }
+
             SearchResult sr = searchResult.getSearchResult();
             if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
                 searchResult.download(true);
                 if (sr instanceof ArchiveorgTorrentSearchResult) {
                     GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                 }
+            }
+
+            for (MouseListener mouseListener : mouseListeners) {
+                labelPartialDownload.addMouseListener(mouseListener);
             }
         }
     }
