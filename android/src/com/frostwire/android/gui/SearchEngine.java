@@ -246,7 +246,7 @@ public abstract class SearchEngine {
     public static final SearchEngine YIFY = new SearchEngine("Yify", Constants.PREF_KEY_SEARCH_USE_YIFY) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new YifySearchPerformer("www.yify-torrent.org", token, keywords, DEFAULT_TIMEOUT);
+            return new YifySearchPerformer("yify-torrent.cc", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

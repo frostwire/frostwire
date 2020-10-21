@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public final class YifySearchPerformerTest {
     @Test
     public void yifiSearchTest() {
+    //public static void main(String[] args) {
         String TEST_SEARCH_TERM = "one";
         HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = null;
@@ -74,14 +75,12 @@ public final class YifySearchPerformerTest {
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
                 System.out.println("displayname: [" + sm.group("displayName") + "]");
-                System.out.println("infohash: [" + sm.group("infohash") + "]");
                 System.out.println("size: [" + sm.group("size") + "]");
                 System.out.println("creationDate: [" + sm.group("creationDate") + "]");
                 System.out.println("seeds: [" + sm.group("seeds") + "]");
                 System.out.println("magnet: [" + sm.group("magnet") + "]");
 
                 assertTrue(!StringUtils.isNullOrEmpty(sm.group("displayName")),"displayName null or empty");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("infohash")),"infohash null or empty");
                 assertTrue(!StringUtils.isNullOrEmpty(sm.group("creationDate")),"creationDate null or empty");
                 assertTrue(!StringUtils.isNullOrEmpty(sm.group("seeds")),"seeds null or empty");
                 assertTrue(!StringUtils.isNullOrEmpty(sm.group("magnet")),"magnet null or empty");
