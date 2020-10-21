@@ -65,6 +65,7 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     @Override
     protected List<? extends Torrentz2SearchResult> searchPage(String page) {
         if (null == page || page.isEmpty()) {
+            stopped = true;
             return Collections.emptyList();
         }
         ArrayList<Torrentz2SearchResult> results = new ArrayList<>(0);

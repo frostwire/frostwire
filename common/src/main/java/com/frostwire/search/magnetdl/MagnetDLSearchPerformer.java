@@ -18,8 +18,8 @@
 package com.frostwire.search.magnetdl;
 
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.limetorrents.LimeTorrentsSearchResult;
 import com.frostwire.search.torrent.TorrentSearchPerformer;
 import com.frostwire.util.Logger;
 
@@ -77,10 +77,13 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
                 }
                 LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
             } else {
-                LOG.warn("LimeTorrentsSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
+                LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
                 LOG.warn("========");
                 LOG.warn(reducedHtml);
                 LOG.warn("========");
+                if (getListener() != null) {
+                    getListener().onError(getToken(),new SearchError(0, "Search Matcher Broken"));
+                }
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
         return results;

@@ -23,12 +23,18 @@ package com.frostwire.search;
  */
 public final class SearchError {
     private final int code;
+    private final String message;
 
-    public SearchError(int code) {
+    public SearchError(int code, String message) {
         this.code = code;
+        this.message = message;
     }
 
     public int code() {
         return code;
+    }
+
+    public String message() {
+        return message;
     }
 }
