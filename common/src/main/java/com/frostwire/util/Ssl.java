@@ -18,8 +18,6 @@
 package com.frostwire.util;
 
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -89,6 +87,7 @@ public final class Ssl {
     }
 
     private final static HashSet<String> unSeenDomains = new HashSet<>();
+
     private static final class FWHostnameVerifier implements HostnameVerifier {
 
         private static final String[] validDomains = {
@@ -139,6 +138,14 @@ public final class Ssl {
         @Override
         public boolean verify(String s, SSLSession sslSession) {
             if (!validDomainsSet.contains(s) && !unSeenDomains.contains(s)) {
+
+                // check if the s is a subdomain
+                for (String baseDomain : validDomainsSet) {
+                    if (s.contains(baseDomain)) {
+                        return true;
+                    }
+                }
+
                 logUnseenDomain(s);
             }
             return validDomainsSet.contains(s);
