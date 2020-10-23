@@ -18,6 +18,8 @@
 package com.frostwire.telluride;
 
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 
 import java.io.*;
 
@@ -111,6 +113,18 @@ public final class TellurideLauncher {
     }
 
     private final static class TellurideParser {
+        final static String DECIMAL_GROUP_FORMAT = "(?<%s>\\d{1,3}\\.\\d{1,3})";
+        final static String ETA_GROUP = "(?<eta>\\d{1,3}\\:\\d{1,3})";
+        // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
+        final static String REGEX_PROGRESS = "(?is)" +
+                String.format(DECIMAL_GROUP_FORMAT, "percentage") +
+                "\\% of " +
+                String.format(DECIMAL_GROUP_FORMAT, "size") +
+                "(?<unitSize>[KMGTP]iB) at.*?" +
+                String.format(DECIMAL_GROUP_FORMAT, "rate") +
+                "(?<unitRate>[KMGTP]iB/s) ETA " + ETA_GROUP;
+        final static Pattern downloadPattern = Pattern.compile(REGEX_PROGRESS);
+
         final TellurideListener processListener;
         final boolean metaOnly;
         boolean pageUrlRead;
@@ -132,11 +146,35 @@ public final class TellurideLauncher {
             }
             if (metaOnly) {
                 sb.append(line);
-            } else {
+            } else if (!line.isEmpty()) {
                 // reports on the file name we're about to download - onDestination
-                // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
+                if (line.startsWith("[download] Destination: ")) {
+                    processListener.onDestination(line.substring("[download] Destination: ".length()));
+                    return;
+                }
 
                 // reports on progress
+                Matcher progressMatcher = downloadPattern.matcher(line);
+                if (progressMatcher.find()) {
+                    String percentage = progressMatcher.group("percentage");
+                    String size = progressMatcher.group("size");
+                    String unitSize = progressMatcher.group("unitSize");
+                    String rate = progressMatcher.group("rate");
+                    String unitRate = progressMatcher.group("unitRate");
+                    String eta = progressMatcher.group("eta");
+
+                    processListener.onProgress(
+                            Float.parseFloat(percentage),
+                            Float.parseFloat(size),
+                            unitSize,
+                            Float.parseFloat(rate),
+                            // hardcoded for now, we should parse this, we'll see how it integrates with SearchResults
+                            unitRate,
+                            eta
+                    );
+                    return;
+                }
+
                 // reports on errors
             }
         }
