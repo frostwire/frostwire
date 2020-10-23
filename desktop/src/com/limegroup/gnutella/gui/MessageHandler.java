@@ -1,7 +1,7 @@
 package com.limegroup.gnutella.gui;
 
-import org.limewire.service.MessageCallback;
-import org.limewire.service.Switch;
+import com.frostwire.service.MessageCallback;
+import com.frostwire.service.Switch;
 
 import javax.swing.*;
 

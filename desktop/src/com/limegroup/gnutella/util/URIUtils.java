@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.util;
 
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;

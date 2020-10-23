@@ -1,4 +1,4 @@
-package org.limewire.service;
+package com.frostwire.service;
 
 import java.text.MessageFormat;
 

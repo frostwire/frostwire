@@ -4,7 +4,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 import org.limewire.setting.SettingsGroupManager;
 import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;

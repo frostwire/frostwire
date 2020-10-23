@@ -1,4 +1,4 @@
-package org.limewire.service;
+package com.frostwire.service;
 
 /**
  * Defines the interface for a class to receive generic and specific error

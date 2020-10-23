@@ -4,7 +4,7 @@
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 package com.limegroup.gnutella.util;
 
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

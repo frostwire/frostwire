@@ -1,6 +1,6 @@
 package org.limewire.setting;
 
-import org.limewire.service.Switch;
+import com.frostwire.service.Switch;
 
 /**
  * Provides a boolean setting value. As a subclass of

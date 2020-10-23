@@ -1,4 +1,4 @@
-package org.limewire.service;
+package com.frostwire.service;
 
 /**
  * Forwards messages to a {@link MessageCallback}. <code>MessageService</code>

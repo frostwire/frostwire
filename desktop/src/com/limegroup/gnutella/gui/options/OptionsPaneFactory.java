@@ -18,7 +18,7 @@
 package com.limegroup.gnutella.gui.options;
 
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 
 /**
  * Static factory class that creates the option panes based on their keys.

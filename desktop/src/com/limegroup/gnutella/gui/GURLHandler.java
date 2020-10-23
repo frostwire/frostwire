@@ -18,7 +18,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 
 /**
  * JNI based GetURL AppleEvent handler for Mac OS X

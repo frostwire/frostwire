@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui;
 
-import org.limewire.service.Switch;
+import com.frostwire.service.Switch;
 import org.limewire.setting.IntSetting;
 
 import javax.swing.*;

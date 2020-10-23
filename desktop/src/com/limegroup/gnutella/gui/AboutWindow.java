@@ -3,7 +3,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 import com.frostwire.util.OSUtils;
 import org.limewire.util.VersionUtils;
 
