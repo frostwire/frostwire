@@ -1,4 +1,4 @@
-package org.limewire.concurrent;
+package com.frostwire.concurrent.concurrent;
 
 import org.limewire.service.ErrorService;
 

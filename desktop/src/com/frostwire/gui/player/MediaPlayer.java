@@ -33,7 +33,7 @@ import com.limegroup.gnutella.gui.RefreshListener;
 import com.limegroup.gnutella.settings.PlayerSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
 import com.frostwire.util.OSUtils;
 

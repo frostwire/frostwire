@@ -17,7 +17,7 @@
 
 package com.limegroup.gnutella.gui.util;
 
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;

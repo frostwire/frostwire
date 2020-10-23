@@ -21,7 +21,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SharingSettings;
-import org.limewire.concurrent.ThreadExecutor;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

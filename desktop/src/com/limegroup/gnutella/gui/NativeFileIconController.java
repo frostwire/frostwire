@@ -5,7 +5,7 @@ import com.limegroup.gnutella.settings.UISettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.collection.FixedsizeForgetfulHashMap;
 import org.limewire.collection.FixedsizeForgetfulHashSet;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.OSUtils;
 
 import javax.swing.*;

@@ -23,7 +23,7 @@ import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.util.QueryUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 
 import java.awt.*;
 import java.awt.datatransfer.*;

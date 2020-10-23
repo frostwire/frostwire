@@ -7,7 +7,7 @@ import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.apache.commons.io.IOUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
 import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;

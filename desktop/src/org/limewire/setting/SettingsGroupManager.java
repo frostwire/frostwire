@@ -1,6 +1,6 @@
 package org.limewire.setting;
 
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;

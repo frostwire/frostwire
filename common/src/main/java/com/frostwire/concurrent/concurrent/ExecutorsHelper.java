@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.limewire.concurrent;
+package com.frostwire.concurrent.concurrent;
 
 import java.util.concurrent.*;
 

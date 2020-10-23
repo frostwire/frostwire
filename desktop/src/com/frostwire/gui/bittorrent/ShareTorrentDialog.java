@@ -30,7 +30,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import org.limewire.concurrent.ThreadExecutor;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;

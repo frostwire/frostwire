@@ -10,7 +10,7 @@
  * <http://www.nabble.com/ThreadPoolExecutor-with-corePoolSize-%3D-0-t2862650.html>
  */
 
-package org.limewire.concurrent;
+package com.frostwire.concurrent.concurrent;
 
 import java.util.*;
 import java.util.concurrent.*;

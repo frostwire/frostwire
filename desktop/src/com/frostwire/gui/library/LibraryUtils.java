@@ -33,7 +33,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
 

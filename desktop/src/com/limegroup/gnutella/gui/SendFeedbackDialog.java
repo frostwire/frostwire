@@ -26,7 +26,7 @@ import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.bugs.LocalClientInfo;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.concurrent.ThreadExecutor;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 
 import javax.swing.*;
 import java.awt.*;

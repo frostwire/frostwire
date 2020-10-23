@@ -3,7 +3,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.bugs.DeadlockBugManager;
 import com.limegroup.gnutella.gui.bugs.DeadlockException;
-import org.limewire.concurrent.ThreadExecutor;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import org.limewire.util.VersionUtils;
 
 import java.lang.management.ManagementFactory;

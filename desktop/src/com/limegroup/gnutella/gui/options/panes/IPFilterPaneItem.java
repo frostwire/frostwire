@@ -35,7 +35,7 @@ import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.CommonUtils;
 
 import javax.swing.*;

@@ -44,7 +44,7 @@ import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.LaunchException;
 import com.limegroup.gnutella.util.Launcher;
-import org.limewire.concurrent.ThreadExecutor;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import org.limewire.service.ErrorService;
 import org.limewire.service.Switch;
 import org.limewire.setting.IntSetting;
