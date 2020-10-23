@@ -1,8 +1,9 @@
 frostwire (6.8.8) stable; urgency=high
  * New TorrentParadise search source
  * Yify search fixed
+ * Fixed archive.org broken downloads
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 20 Oct 2020 23:54:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  The, 22 Oct 2020 19:12:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
