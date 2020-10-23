@@ -32,7 +32,7 @@ import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.File;
 import java.util.List;

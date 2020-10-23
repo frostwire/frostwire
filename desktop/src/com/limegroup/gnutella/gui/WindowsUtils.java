@@ -2,7 +2,7 @@ package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.File;
 

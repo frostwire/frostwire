@@ -24,7 +24,7 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.Setting;
 import org.limewire.setting.SettingsFactory;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.VersionUtils;
 
 import java.io.File;

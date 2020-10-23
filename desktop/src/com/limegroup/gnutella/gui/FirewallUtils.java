@@ -18,7 +18,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.LimeWireCore;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
 /**

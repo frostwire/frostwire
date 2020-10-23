@@ -18,7 +18,7 @@ package com.limegroup.gnutella.gui.shell;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
 import java.util.ArrayList;

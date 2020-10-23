@@ -19,7 +19,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.gui.GUIUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import java.io.*;

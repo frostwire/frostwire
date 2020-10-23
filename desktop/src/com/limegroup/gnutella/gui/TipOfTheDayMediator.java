@@ -17,7 +17,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.settings.StartupSettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;

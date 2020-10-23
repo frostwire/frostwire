@@ -1,6 +1,6 @@
 package com.limegroup.gnutella.gui.notify;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 /**
  * This class acts as a proxy for a platform-specific user notification class.

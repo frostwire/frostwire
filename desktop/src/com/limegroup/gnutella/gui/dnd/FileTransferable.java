@@ -18,7 +18,7 @@
 
 package com.limegroup.gnutella.gui.dnd;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

@@ -25,7 +25,7 @@ import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

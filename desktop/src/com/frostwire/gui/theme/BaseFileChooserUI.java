@@ -25,7 +25,7 @@
 
 package com.frostwire.gui.theme;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.accessibility.AccessibleContext;
 import javax.swing.*;

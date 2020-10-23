@@ -20,7 +20,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

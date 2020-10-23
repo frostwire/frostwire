@@ -4,7 +4,7 @@ import com.frostwire.jlibtorrent.LibTorrent;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import net.miginfocom.swing.MigLayout;
 import org.limewire.service.ErrorService;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.VersionUtils;
 
 import javax.swing.*;

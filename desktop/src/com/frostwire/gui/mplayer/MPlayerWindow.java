@@ -21,7 +21,7 @@ package com.frostwire.gui.mplayer;
 import com.frostwire.gui.player.*;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.LimeJFrame;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

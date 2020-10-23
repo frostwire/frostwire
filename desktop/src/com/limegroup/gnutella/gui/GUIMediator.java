@@ -48,7 +48,7 @@ import org.limewire.concurrent.ThreadExecutor;
 import org.limewire.service.ErrorService;
 import org.limewire.service.Switch;
 import org.limewire.setting.IntSetting;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;

@@ -27,7 +27,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.LCS;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;

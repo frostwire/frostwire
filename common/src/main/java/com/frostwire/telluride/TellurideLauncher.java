@@ -18,7 +18,6 @@
 package com.frostwire.telluride;
 
 import org.limewire.concurrent.ThreadExecutor;
-import org.limewire.util.OSUtils;
 
 import java.io.*;
 

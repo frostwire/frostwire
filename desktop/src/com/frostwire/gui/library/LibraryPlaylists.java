@@ -38,7 +38,7 @@ import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

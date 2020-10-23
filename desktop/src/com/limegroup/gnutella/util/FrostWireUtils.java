@@ -20,7 +20,7 @@ package com.limegroup.gnutella.util;
 import org.apache.commons.io.IOUtils;
 import org.limewire.setting.SettingsFactory;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 import org.limewire.util.SystemUtils.SpecialLocations;
 

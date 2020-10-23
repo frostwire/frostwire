@@ -19,7 +19,7 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.MultilineToolTip;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;

@@ -20,10 +20,8 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.jlibtorrent.EnumNet;
-import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
-import com.frostwire.platform.VPNMonitor;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.util.List;
 

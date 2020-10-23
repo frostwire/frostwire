@@ -20,7 +20,7 @@ import com.limegroup.gnutella.gui.LanguageFlagFactory;
 import com.limegroup.gnutella.gui.LanguageUtils;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.apache.commons.io.IOUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
 import javax.swing.*;

@@ -16,6 +16,7 @@
 package org.limewire.util;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 

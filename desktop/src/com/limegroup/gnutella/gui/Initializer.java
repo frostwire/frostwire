@@ -37,7 +37,7 @@ import org.limewire.service.ErrorService;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.NetworkUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicHTML;

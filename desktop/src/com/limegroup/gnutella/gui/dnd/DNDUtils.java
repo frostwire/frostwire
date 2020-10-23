@@ -17,7 +17,7 @@ package com.limegroup.gnutella.gui.dnd;
 
 import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.util.URIUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;

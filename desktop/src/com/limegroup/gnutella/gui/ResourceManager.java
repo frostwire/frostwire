@@ -17,7 +17,7 @@ package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;

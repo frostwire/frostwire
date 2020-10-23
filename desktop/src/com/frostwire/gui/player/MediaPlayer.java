@@ -35,7 +35,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

@@ -18,7 +18,7 @@
 package com.frostwire.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

@@ -15,6 +15,8 @@
 
 package org.limewire.util;
 
+import com.frostwire.util.OSUtils;
+
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.net.URL;

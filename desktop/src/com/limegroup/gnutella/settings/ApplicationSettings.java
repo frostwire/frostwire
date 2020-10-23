@@ -21,7 +21,7 @@ import org.limewire.setting.FileSetting;
 import org.limewire.setting.IntSetting;
 import org.limewire.setting.StringSetting;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.File;
 

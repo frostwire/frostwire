@@ -18,7 +18,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;

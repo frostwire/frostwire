@@ -19,7 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import net.miginfocom.swing.MigLayout;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

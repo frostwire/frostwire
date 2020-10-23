@@ -18,7 +18,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.awt.*;
 import java.io.File;

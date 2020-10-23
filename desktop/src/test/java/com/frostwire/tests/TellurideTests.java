@@ -20,7 +20,7 @@ package com.frostwire.tests;
 import com.frostwire.telluride.TellurideLauncher;
 import com.frostwire.telluride.TellurideListener;
 import org.junit.jupiter.api.Test;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.File;
 

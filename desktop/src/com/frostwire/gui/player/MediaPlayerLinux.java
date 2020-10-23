@@ -2,7 +2,7 @@ package com.frostwire.gui.player;
 
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.File;
 

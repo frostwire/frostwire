@@ -25,7 +25,7 @@ import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

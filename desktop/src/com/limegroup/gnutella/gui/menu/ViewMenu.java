@@ -24,7 +24,7 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.ToggleSettingAction;
 import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.setting.BooleanSetting;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -20,7 +20,7 @@
 
 package com.frostwire.util.filetypes;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.DataInputStream;
 import java.io.IOException;

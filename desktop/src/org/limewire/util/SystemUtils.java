@@ -18,6 +18,7 @@
 package org.limewire.util;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 
 import java.awt.*;
 import java.io.File;

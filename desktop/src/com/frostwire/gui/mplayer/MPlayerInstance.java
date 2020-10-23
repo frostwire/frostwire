@@ -25,7 +25,7 @@ import com.frostwire.mplayer.LanguageSource;
 import com.limegroup.gnutella.gui.MPlayerMediator;
 import org.gudy.azureus2.core3.util.*;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
 import java.io.*;

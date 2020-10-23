@@ -17,7 +17,7 @@ package com.limegroup.gnutella.gui.menu;
 
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.FileMenuActions;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 

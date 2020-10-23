@@ -21,13 +21,10 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.xml.sax.*;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;

@@ -17,7 +17,7 @@
 
 package com.limegroup.gnutella.gui;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

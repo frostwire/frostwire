@@ -22,7 +22,7 @@ import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.collection.AutoCompleteDictionary;
 import org.limewire.collection.StringTrieSet;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.text.Document;

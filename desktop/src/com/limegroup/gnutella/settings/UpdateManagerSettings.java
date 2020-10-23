@@ -21,7 +21,7 @@ import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 import org.limewire.setting.StringSetting;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 /**
  * @author gubatron

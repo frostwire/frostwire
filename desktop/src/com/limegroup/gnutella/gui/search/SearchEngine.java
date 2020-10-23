@@ -36,6 +36,7 @@ import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
@@ -118,7 +119,7 @@ public abstract class SearchEngine {
         }
     };
     private static final SearchEngine FROSTCLICK = new SearchEngine(SearchEngineID.FROSTCLICK_ID, "FrostClick", SearchEnginesSettings.FROSTCLICK_SEARCH_ENABLED, "api.frostclick.com") {
-        private final UserAgent userAgent = new UserAgent(org.limewire.util.OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
+        private final UserAgent userAgent = new UserAgent(OSUtils.getFullOS(), FrostWireUtils.getFrostWireVersion(), String.valueOf(FrostWireUtils.getBuildNumber()));
 
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {

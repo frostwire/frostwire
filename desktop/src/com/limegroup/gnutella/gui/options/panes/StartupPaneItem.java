@@ -5,7 +5,7 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.gui.WindowsUtils;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.MacOSXUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 

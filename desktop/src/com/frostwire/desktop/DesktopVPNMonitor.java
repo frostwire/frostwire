@@ -21,7 +21,7 @@ import com.frostwire.platform.VPNMonitor;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
 import org.apache.commons.io.IOUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.BufferedReader;
 import java.io.File;

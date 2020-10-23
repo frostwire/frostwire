@@ -18,7 +18,7 @@ package com.limegroup.gnutella.util;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.settings.URLHandlerSettings;
 import org.apache.commons.io.FilenameUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 import org.limewire.util.SystemUtils;
 

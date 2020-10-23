@@ -41,7 +41,7 @@ import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.QueryUtils;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;

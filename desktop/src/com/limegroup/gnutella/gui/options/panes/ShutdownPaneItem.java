@@ -19,7 +19,7 @@ import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 

@@ -24,7 +24,7 @@ import com.frostwire.gui.player.MediaPlayerListener;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.GUIMediator;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;

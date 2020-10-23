@@ -42,7 +42,7 @@ import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
