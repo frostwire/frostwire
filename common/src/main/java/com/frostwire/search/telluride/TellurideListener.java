@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.frostwire.telluride;
+package com.frostwire.search.telluride;
 
 public interface TellurideListener {
     // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29

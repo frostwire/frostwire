@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,12 +19,14 @@ package com.frostwire.gui.player;
 
 import com.frostwire.alexandria.Playlist;
 import com.frostwire.alexandria.PlaylistItem;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.tags.TagsReader;
 import com.frostwire.gui.mplayer.MPlayer;
 import com.frostwire.mp4.IsoFile;
 import com.frostwire.mp4.MovieHeaderBox;
 import com.frostwire.mplayer.MediaPlaybackState;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -33,9 +35,7 @@ import com.limegroup.gnutella.gui.RefreshListener;
 import com.limegroup.gnutella.settings.PlayerSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +82,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         playExecutor = ExecutorsHelper.newProcessingQueue("AudioPlayer-PlayExecutor");
         String playerPath;
         playerPath = getPlayerPath();
-        MPlayer.initialise(new File(playerPath));
+        MPlayer.initialize(new File(playerPath));
         mplayer = new MPlayer();
         mplayer.addPositionListener(this::notifyProgress);
         mplayer.addStateListener(newState -> {
@@ -556,7 +556,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             return false;
         }
         File currentMediaFile = currentMedia.getFile();
-        if (currentMediaFile != null && file.equals(currentMediaFile))
+        if (file.equals(currentMediaFile))
             return true;
         PlaylistItem playlistItem = currentMedia.getPlaylistItem();
         return playlistItem != null && new File(playlistItem.getFilePath()).equals(file);
@@ -583,7 +583,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             return false;
         }
         PlaylistItem currentMediaFile = currentMedia.getPlaylistItem();
-        return currentMediaFile != null && playlistItem.equals(currentMediaFile);
+        return playlistItem.equals(currentMediaFile);
     }
 
     private MediaSource getNextRandomSong(MediaSource currentMedia) {

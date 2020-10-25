@@ -43,7 +43,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author aldenml
  */
 public class HttpDownload extends HttpBTDownload {
-    private static final Executor HTTP_THREAD_POOL = new ThreadPool("HttpDownloaders", 1, 6, 5000, new LinkedBlockingQueue<>(), true); // daemon=true, doesn't hold VM from shutting down.
+    // IMPORTANT: Regardless of the Pools defined in HttpClientFactory, If you make this corePoolSize to one, you'll be able to do only 1 HTTP download at the time
+    private static final Executor HTTP_THREAD_POOL = new ThreadPool("HttpDownloaders", 4, 6, 60, new LinkedBlockingQueue<>(), true); // daemon=true, doesn't hold VM from shutting down.
     private static final Logger LOG = Logger.getLogger(HttpDownload.class);
     private final String url;
     private final String title;
@@ -163,9 +164,14 @@ public class HttpDownload extends HttpBTDownload {
                     }
                 }
                 httpClient.save(url, incompleteFile, resume);
-            } catch (IOException e) {
-                e.printStackTrace();
-                httpClientListener.onError(httpClient, e);
+            } catch (IOException | StackOverflowError e) {
+                LOG.error(url, e);
+                if (httpClientListener != null) {
+                    httpClientListener.onError(httpClient, e);
+                }
+                if (httpClient.getListener() != null) {
+                    httpClient.getListener().onError(httpClient, e);
+                }
             }
         });
     }

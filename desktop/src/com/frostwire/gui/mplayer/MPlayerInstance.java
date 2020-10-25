@@ -69,7 +69,7 @@ MPlayerInstance {
     }
 
     static void
-    initialise(
+    initialize(
             File binary_path) {
         BINARY_PATH = binary_path;
         killProcesses(false);

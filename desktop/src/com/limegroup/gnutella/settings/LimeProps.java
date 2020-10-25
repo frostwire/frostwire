@@ -27,7 +27,7 @@ public class LimeProps extends LimeWireSettings {
     private static final LimeProps INSTANCE = new LimeProps();
     // The FACTORY is used for subclasses of LimeProps, so they know
     // which factory to add classes to.
-    static final SettingsFactory FACTORY = INSTANCE.getFactory();
+    public static final SettingsFactory FACTORY = INSTANCE.getFactory();
 
     // This is protected so that subclasses can extend from it, but
     // subclasses should NEVER instantiate a copy themselves.

@@ -17,9 +17,10 @@
 
 package com.frostwire.tests;
 
-import com.frostwire.telluride.TellurideLauncher;
-import com.frostwire.telluride.TellurideListener;
+import com.frostwire.search.telluride.TellurideLauncher;
+import com.frostwire.search.telluride.TellurideListener;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.util.FrostWireUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -106,6 +107,7 @@ public class TellurideTests {
                 new File("/Users/gubatron/FrostWire/Torrent Data"),
                 false,
                 false,
+                true,
                 tellurideListener);
 
         System.out.println("[TellurideTests][testConnectionError] waiting...");
@@ -176,6 +178,7 @@ public class TellurideTests {
                 new File("/Users/gubatron/FrostWire/Torrent Data"),
                 false,
                 false,
+                true,
                 tellurideListener);
 
         System.out.println("[TellurideTests][testDownload] waiting...");
@@ -234,6 +237,7 @@ public class TellurideTests {
                 new File("/Users/gubatron/FrostWire/Torrent Data"),
                 false,
                 true,
+                true,
                 tellurideListener);
 
         System.out.println("[TellurideTests][testMetaOnly] waiting...");
@@ -242,5 +246,18 @@ public class TellurideTests {
             fail(failedTests.get(0));
         }
         System.out.println("[TellurideTests][testMetaOnly] finished.");
+    }
+
+    @Test
+    public void testGettingLauncherFile() {
+        File launcherBinary = FrostWireUtils.getTellurideLauncherFile();
+        if (launcherBinary == null) {
+            fail("[TellurideTests][testGettingLauncherFile] no launcher found");
+            return;
+        }
+        if (!launcherBinary.canExecute()) {
+            fail("[TellurideTests][testGettingLauncherFile] launcher is not executable (" + launcherBinary.getAbsolutePath() + ")");
+            return;
+        }
     }
 }

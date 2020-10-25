@@ -301,6 +301,15 @@ public final class SearchResultDisplayer implements RefreshListener {
         tabbedPane.setProgressActiveAt(resultPanelIndex, active);
     }
 
+    /** Update the Search Result Panel visible title. The inner SEARCH_INFO for the SearchResultMediator remains untouched */
+    public void updateSearchTitle(SearchResultMediator rp, String title) {
+        int resultPanelIndex = entries.indexOf(rp);
+        if (resultPanelIndex == -1) {
+            return;
+        }
+        tabbedPane.setTitleAt(resultPanelIndex, title);
+    }
+
     /**
      * Shows the popup menu that displays various options to the user.
      */
@@ -342,7 +351,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      * @return the ResultPanel that matches the specified GUID, or null
      * if none match.
      */
-    SearchResultMediator getResultPanelForGUID(long token) {
+    public SearchResultMediator getResultPanelForGUID(long token) {
         for (SearchResultMediator rp : entries) {
             if (rp.matches(token)) { //order matters: rp may be a dummy guid.
                 return rp;

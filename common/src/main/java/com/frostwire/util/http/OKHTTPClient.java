@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * @author aldenml
  */
 public class OKHTTPClient extends AbstractHttpClient {
-    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 10, TimeUnit.SECONDS);
+    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 30, TimeUnit.SECONDS);
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private final ThreadPool pool;
 

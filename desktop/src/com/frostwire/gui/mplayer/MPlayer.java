@@ -109,8 +109,8 @@ public class MPlayer extends BaseMediaPlayer {
         outputParser.start();
     }
 
-    public static void initialise(File path) {
-        MPlayerInstance.initialise(path);
+    public static void initialize(File path) {
+        MPlayerInstance.initialize(path);
     }
 
     private void parseOutput(String line) {
