@@ -344,7 +344,8 @@ public final class MainFrame {
         Component comp = getCurrentTabComponent();
         if (comp != null) {
             for (Tabs t : TABS.keySet()) {
-                if (TABS.get(t).getComponent().equals(comp)) {
+                JComponent tabComponent = TABS.get(t).getComponent();
+                if (comp.equals(tabComponent)) {
                     return t;
                 }
             }

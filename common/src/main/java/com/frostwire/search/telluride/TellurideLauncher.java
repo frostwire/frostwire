@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package com.frostwire.telluride;
+package com.frostwire.search.telluride;
 
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.regex.Matcher;
@@ -42,6 +42,7 @@ public final class TellurideLauncher {
                               final File saveDirectory,
                               final boolean audioOnly,
                               final boolean metaOnly,
+                              final boolean verboseOutput,
                               TellurideListener processListener) {
         if (executable == null) {
             throw new IllegalArgumentException("executable path is null, no telluride to launch");
@@ -52,7 +53,15 @@ public final class TellurideLauncher {
         if (!executable.canExecute()) {
             throw new IllegalArgumentException(executable + " is not executable");
         }
-        ThreadExecutor.startThread(launchRunnable(executable, downloadUrl, saveDirectory, audioOnly, metaOnly, processListener),
+        ThreadExecutor.startThread(
+                launchRunnable(
+                        executable,
+                        downloadUrl,
+                        saveDirectory,
+                        audioOnly,
+                        metaOnly,
+                        verboseOutput,
+                        processListener),
                 "telluride-process-adapter:" + downloadUrl);
     }
 
@@ -61,6 +70,7 @@ public final class TellurideLauncher {
                                            final File saveDirectory,
                                            final boolean audioOnly,
                                            final boolean metaOnly,
+                                           final boolean verboseOutput,
                                            TellurideListener processListener) {
         return () -> {
             ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), downloadUrl);
@@ -90,7 +100,9 @@ public final class TellurideLauncher {
                 }
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println("[" + executable.getName() + "] " + line);
+                    if (verboseOutput) {
+                        System.out.println("[" + executable.getName() + "] " + line);
+                    }
                     if (processListener != null && processListener.aborted()) {
                         process.destroyForcibly();
                         break;
@@ -100,7 +112,9 @@ public final class TellurideLauncher {
                     }
                 }
                 process.waitFor();
-                System.out.println("Exit-Code: " + process.exitValue());
+                if (verboseOutput) {
+                    System.out.println("Exit-Code: " + process.exitValue());
+                }
                 if (parser != null) {
                     parser.done();
                 }

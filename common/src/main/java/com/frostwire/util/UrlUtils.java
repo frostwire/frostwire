@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ package com.frostwire.util;
 import com.frostwire.util.http.HttpClient;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +35,7 @@ import java.util.Collections;
  * @author aldenml
  */
 public final class UrlUtils {
+
     public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
             "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
             "tr=udp://tracker.internetwarriors.net:1337/announce&" +
@@ -119,5 +122,15 @@ public final class UrlUtils {
         }
         System.out.println("UrlUtils.getFastestMirrorDomain() -> Falling back to: " + mirrors[0]);
         return mirrors[0];
+    }
+
+    public static String extractDomainName(String url) {
+        URI uri;
+        try {
+            uri = new URI(url);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+        return uri.getHost();
     }
 }

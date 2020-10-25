@@ -26,6 +26,7 @@ import com.frostwire.search.*;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -66,6 +67,7 @@ public final class SearchMediator {
     static final String TORRENT_DETAILS_STRING = I18n.tr("Torrent Details");
     static final String SOUNDCLOUD_DETAILS_STRING = I18n.tr("View in Soundcloud");
     static final String ARCHIVEORG_DETAILS_STRING = I18n.tr("View in Archive.org");
+    static final String TELLURIDE_DETAILS_STRING = I18n.tr("View in");
     static final String CLOSE_TAB_STRING = I18n.tr("Close Tab");
     static final String CLOSE_ALL_TABS = I18n.tr("Close All Tabs");
     static final String CLOSE_OTHER_TABS_STRING = I18n.tr("Close Other Tabs");
@@ -143,6 +145,21 @@ public final class SearchMediator {
     }
 
     /**
+     * Update the search title's tab given the token id and the new title
+     */
+    public void updateSearchPanelTitle(final long token, final String title) {
+        GUIMediator.safeInvokeLater(() ->
+        {
+            SearchResultMediator resultsPanel = getSearchResultDisplayer().getResultPanelForGUID(token);
+            if (resultsPanel == null) {
+                LOG.info("updateSearchPanelTitle: could not find SearchResultMediator for token " + token + ", closed prematurely perhaps");
+                return;
+            }
+            SearchMediator.getSearchResultDisplayer().updateSearchTitle(resultsPanel, title);
+        });
+    }
+
+    /**
      * Requests the search focus in the INPUT_MANAGER.
      */
     public static void requestSearchFocus() {
@@ -208,6 +225,8 @@ public final class SearchMediator {
                 ui = new TorrentUISearchResult((TorrentSearchResult) sr, engine, query);
             } else if (sr instanceof ArchiveorgCrawledSearchResult) {
                 ui = new ArchiveorgUISearchResult((ArchiveorgCrawledSearchResult) sr, engine, query);
+            } else if (sr instanceof TellurideSearchResult) {
+                ui = new TellurideUISearchResult((TellurideSearchResult) sr, engine, query);
             }
             if (ui != null) {
                 result.add(ui);
@@ -346,11 +365,9 @@ public final class SearchMediator {
             return;
         }
         stopSearch(rp.getToken());
-        long token = newSearchToken();
-        rp.setToken(token);
-        updateSearchIcon(token, true);
+        updateSearchIcon(rp.getToken(), true);
         rp.resetFiltersPanel();
-        performSearch(token, info.getQuery());
+        performSearch(rp.getToken(), info.getQuery());
     }
 
     /**
@@ -378,6 +395,12 @@ public final class SearchMediator {
             return;
         }
         manager.stop(token);
+
+        if (query.startsWith("http") && !query.endsWith(".torrent")) {
+            manager.perform(SearchEngine.getTellurideEngine().getPerformer(token, query));
+            return;
+        }
+
         for (SearchEngine se : SearchEngine.getEngines()) {
             if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(token, query);
@@ -507,7 +530,7 @@ public final class SearchMediator {
         SearchResultMediator rp = getResultPanelForGUID(token);
         if (rp != null) {
             updateSearchIcon(token, false);
-            rp.setToken(0); // to identify that the search is stopped (needs refactor)
+            rp.stop();
         }
     }
 

@@ -52,9 +52,9 @@ public class HttpClientFactory {
 
     private static Map<HttpContext, ThreadPool> buildThreadPools() {
         final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
-        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 1, 25, 30, new LinkedBlockingQueue<>(), true));
-        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<>(), true));
-        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 10, 30, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 4, 16, 60, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 4, 16, 30, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 4, 16, 30, new LinkedBlockingQueue<>(), true));
         return map;
     }
 

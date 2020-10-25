@@ -1,3 +1,7 @@
+build 4 - nov/03/2020
+ - python: youtube-dl 2020.11.1
+ - python: pycryptodome 3.9.9
+
 build 3 - oct/20/2020
  - configure.sh to setup and upgrade all build dependencies for windows, macos, linux
  - build.sh builds telluride binaries for windows, macos, linux

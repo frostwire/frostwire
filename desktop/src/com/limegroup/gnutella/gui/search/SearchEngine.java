@@ -36,6 +36,7 @@ import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
@@ -47,6 +48,8 @@ import org.limewire.setting.BooleanSetting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
 
 /**
  * @author gubatron
@@ -72,7 +75,8 @@ public abstract class SearchEngine {
         TORRENTZ2_ID,
         MAGNETDL_ID,
         TORRENTPARADISE_ID,
-        GLOTORRENTS_ID
+        GLOTORRENTS_ID,
+        TELLURIDE_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -216,6 +220,16 @@ public abstract class SearchEngine {
             return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
+
+    private static final BooleanSetting TELLURIDE_ENABLED = FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true);
+
+    private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", TELLURIDE_ENABLED, "*") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new TellurideSearchPerformer(token, keywords);
+        }
+    };
+
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -234,6 +248,10 @@ public abstract class SearchEngine {
      * Override for things like picking the fastest mirror domainName
      */
     protected void postInitWork() {
+    }
+
+    public static SearchEngine getTellurideEngine() {
+        return TELLURIDE;
     }
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
@@ -276,6 +294,9 @@ public abstract class SearchEngine {
     }
 
     static SearchEngine getSearchEngineByName(String name) {
+        if (name.startsWith("Cloud:")) {
+            return TELLURIDE;
+        }
         List<SearchEngine> searchEngines = getEngines();
         for (SearchEngine engine : searchEngines) {
             if (name.startsWith(engine.getName())) {

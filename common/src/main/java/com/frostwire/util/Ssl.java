@@ -23,6 +23,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashSet;
 
 /**
@@ -38,6 +39,10 @@ public final class Ssl {
     private static final SSLSocketFactory NULL_SOCKET_FACTORY = buildNullSSLSocketFactory();
 
     private Ssl() {
+    }
+
+    public static void addValidDomain(String domain) {
+        FWHostnameVerifier.addValidDomain(domain);
     }
 
     /**
@@ -88,7 +93,7 @@ public final class Ssl {
 
     private final static HashSet<String> unSeenDomains = new HashSet<>();
 
-    private static final class FWHostnameVerifier implements HostnameVerifier {
+    static final class FWHostnameVerifier implements HostnameVerifier {
 
         private static final String[] validDomains = {
                 "api-v2.soundcloud.com",
@@ -133,9 +138,11 @@ public final class Ssl {
         private static final HashSet<String> validDomainsSet = new HashSet<>();
 
         static {
-            for (String domain : validDomains) {
-                validDomainsSet.add(domain);
-            }
+            Collections.addAll(validDomainsSet, validDomains);
+        }
+
+        public static void addValidDomain(String domain) {
+            validDomainsSet.add(domain);
         }
 
         @Override

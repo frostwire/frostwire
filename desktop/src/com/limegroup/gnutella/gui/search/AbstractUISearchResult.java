@@ -23,6 +23,7 @@ import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
@@ -129,6 +130,8 @@ public abstract class AbstractUISearchResult implements UISearchResult {
             } else {
                 playStream(ssr.getStreamUrl());
             }
+        } else if (sr instanceof TellurideSearchResult) {
+            playStream(((TellurideSearchResult) sr).getDownloadUrl());
         }
     }
 

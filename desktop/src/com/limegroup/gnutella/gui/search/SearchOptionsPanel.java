@@ -67,6 +67,7 @@ final class SearchOptionsPanel extends JPanel {
     }
 
     void updateFiltersPanel() {
+        // Here we set all the delegate filters in the composed filter
         generalFilter = new GeneralResultFilter(resultPanel, sliderSeeds, sliderSize);
         updateCheckboxes(SearchEngine.getEngines());
         resultPanel.filterChanged(new SearchEngineFilter(engineCheckboxes), 0);

@@ -50,9 +50,15 @@ public final class FileMenuActions {
             String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
             GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null, true);
             return true;
-        } else if (userText.startsWith("http://") || (userText.startsWith("https://"))) {
+        } else if (userText.startsWith("http") && (userText.endsWith(".torrent"))) {
             GUIMediator.instance().openTorrentURI(userText, true);
             return true;
+            //}
+            // Cloud URL entered
+            //else if (userText.startsWith("http")) {
+            //SearchPerformer performer = SearchEngine.getTellurideEngine().getPerformer(userText.hashCode(), userText);
+            // probably on a background thread?
+            //performer.perform();
         } else {
             // See if it's a path to a file on the disk
             File file = new File(userText);

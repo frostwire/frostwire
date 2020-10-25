@@ -84,7 +84,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     /**
      * The search token of the last search. (Use this to match up results.)
      */
-    private long token;
+    private final long token;
     /**
      * The CompositeFilter for this ResultPanel.
      */
@@ -95,6 +95,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     private SchemaBox schemaBox;
     private SearchOptionsPanel searchOptionsPanel;
     private JScrollPane scrollPaneSearchOptions;
+    private boolean stopped;
 
     /**
      * Specialized constructor for creating a "dummy" result panel.
@@ -365,7 +366,11 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Determines whether or not this panel is stopped.
      */
     boolean isStopped() {
-        return token == 0;
+        return stopped;
+    }
+
+    public void stop() {
+        stopped = true;
     }
 
     /**
@@ -437,6 +442,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private void repeatSearch() {
+        stopped = false;
         clearTable();
         resetFilters();
         schemaBox.resetCounters();
@@ -463,10 +469,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      */
     long getToken() {
         return token;
-    }
-
-    void setToken(long token) {
-        this.token = token;
     }
 
     /**
@@ -665,7 +667,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     public void cleanup() {
     }
 
-    void updateSearchIcon(boolean active) {
+    public void updateSearchIcon(boolean active) {
         SearchMediator.getSearchResultDisplayer().updateSearchIcon(this, active);
         setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, active);
     }

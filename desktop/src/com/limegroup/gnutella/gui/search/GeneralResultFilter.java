@@ -115,7 +115,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         }
         String sourceName = getSourceName(node);
         boolean hasKeywords = hasKeywords(node.getDisplayName() + " " + node.getExtension() + " " + sourceName);
-        return inSeedRange && inSizeRange && hasKeywords;
+        return inSeedRange && inSizeRange && (hasKeywords || sourceName.contains("Cloud"));
     }
 
     private String getSourceName(SearchResultDataLine node) {
