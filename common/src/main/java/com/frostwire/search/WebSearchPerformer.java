@@ -67,7 +67,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         return keywords;
     }
 
-    public final String getEncodedKeywords() {
+    public String getEncodedKeywords() {
         return encodedKeywords;
     }
 

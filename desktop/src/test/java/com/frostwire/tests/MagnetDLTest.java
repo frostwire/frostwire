@@ -38,7 +38,7 @@ public class MagnetDLTest {
 
     @Test
     public void main() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
+        String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
         MagnetDLSearchPerformer magnetDLSearchPerformer = new MagnetDLSearchPerformer(1, TEST_SEARCH_TERM, 5000);
         MagnetDLSearchListener magnetDLSearchListener = new MagnetDLSearchListener();
         magnetDLSearchPerformer.setListener(magnetDLSearchListener);
@@ -97,7 +97,7 @@ public class MagnetDLTest {
                     failedTests.add("getHash was null or empty");
                 }
 
-                if (failedTests.size() > 0) {
+                if (failedTests.size() > 0 && results.size() < 10) {
                     return;
                 }
             }

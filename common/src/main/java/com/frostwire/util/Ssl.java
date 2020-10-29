@@ -115,6 +115,7 @@ public final class Ssl {
                 "update.frostwire.com",
                 "www.1377x.to",
                 "www.limetorrents.info",
+                "magnetdl.com",
                 "www.magnetdl.com",
                 "www.pirate-bay.net",
                 "www.torlock.com",
