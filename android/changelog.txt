@@ -1,7 +1,9 @@
-FrostWire 2.2.5 build 660 - OCT/28/2020
+FrostWire 2.2.5 build 661 - OCT/29/2020
  - New: TorrentParadise search source
  - New: Firebase Crash Analytics support
  - Yify search fixed
+ - Torrentz2 search fixed
+ - MagnetDL search fixed
  - Fixed archive.org connection dropped/timeout error
  - com.google.android.gms:play-services-ads 19.4.0 -> 19.5.0
  - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
