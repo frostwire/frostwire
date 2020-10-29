@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,18 +33,19 @@ import java.util.List;
 public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
     private final Pattern pattern;
+    private final String unencodedKeywords;
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
         //https://torrentz2.eu
         //https://torrentz2.unblockninja.com/
-        super("torrentz2.unblockninja.com/", token, keywords, timeout, 1, 0);
-        pattern = Pattern.compile("(?is)<dl><dt><a href='(?<infohash>[a-f0-9]{40})'>(?<filename>.*?)</a>.*?<span class='a'><span title='.*?'>(?<age>.*?)</span>.*?<span class='s'>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span> <span class='u'>(?<seeds>\\d+)</span><span class='d'>.*?");
+        super("torrentz2.unblockninja.com", token, keywords, timeout, 1, 0);
+        pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?<span title=([0-9]+)>(?<age>.*?)</span>.*?<span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span><span>(?<seeds>\\d+)</span>.*?</dd></dl>");
+        unencodedKeywords = keywords;
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        String transformedKeywords = encodedKeywords.replace("%20", "-");
-        return "https://" + getDomainName() + "/verified?f=" + transformedKeywords;
+        return "https://" + getDomainName() + "/verified?f=" + unencodedKeywords.replace(" ","+");
     }
 
     private Torrentz2SearchResult fromMatcher(SearchMatcher matcher) {
@@ -82,8 +83,8 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
             if (matcherFound) {
                 Torrentz2SearchResult sr = fromMatcher(matcher);
                 results.add(sr);
-                //System.out.println("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
-            } else {
+                LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+            } else if (results.size() < 5) {
                 LOG.warn("Torrentz2SearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);

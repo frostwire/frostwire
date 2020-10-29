@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class Torrentz2SearchPerformerTest {
     @Test
     public void torrentz2SearchTest() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
+        String TEST_SEARCH_TERM = UrlUtils.encode("public domain");
         Torrentz2SearchPerformer nyaa = new Torrentz2SearchPerformer(1, TEST_SEARCH_TERM, 5000);
         Torrentz2SearchListener torrentz2SearchListener = new Torrentz2SearchListener();
         nyaa.setListener(torrentz2SearchListener);
