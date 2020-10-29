@@ -65,16 +65,16 @@ public class TellurideTests {
 
             @Override
             public void onError(String errorMessage) {
-                failedTests.add("[TellurideTests][testConnectionError] onError(errorMessage=" + errorMessage + ")");
+                System.out.println("[TellurideTests][testConnectionError] (expected) onError(errorMessage=" + errorMessage + ")");
             }
 
             @Override
             public void onFinished(int exitCode) {
-                if (exitCode != 0) {
-                    failedTests.add("[TellurideTests][testConnectionError] onFinished(exitCode=" + exitCode + ")");
+                if (exitCode == 0) {
+                    failedTests.add("[TellurideTests][testConnectionError] onFinished(exitCode=" + exitCode + ") should've been an error code");
                 }
-                if (!progressWasReported) {
-                    failedTests.add("[TellurideTests][testConnectionError] Failed, did not receive onProgress call. onFinished(exitCode=" + exitCode + ")");
+                if (progressWasReported) {
+                    failedTests.add("[TellurideTests][testConnectionError] Failed, did receive onProgress call. onFinished(exitCode=" + exitCode + ")");
                 }
                 latch.countDown();
             }
@@ -111,7 +111,7 @@ public class TellurideTests {
         System.out.println("[TellurideTests][testConnectionError] waiting...");
         latch.await();
         if (failedTests.size() > 0) {
-            fail(failedTests.get(0));
+            fail("[TellurideTests][testConnectionError] isn't failing as expected ;)");
         }
         System.out.println("[TellurideTests][testConnectionError] finished.");
     }
@@ -171,7 +171,7 @@ public class TellurideTests {
         };
 
         TellurideLauncher.launch(new File("/Users/gubatron/workspace.frostwire/frostwire/telluride/telluride" + executableSuffix),
-                "https://www.youtube.com/watch?v=1kaQP9XL6L4", // Alone Together - Mona Wonderlick · [Free Copyright-safe Music]
+                "https://www.instagram.com/tv/CDC5ludJazw/", // Backing up an Instagram Live video: Bouldering Session at Movement Baker by Gubatron
                 new File("/Users/gubatron/FrostWire/Torrent Data"),
                 false,
                 false,
