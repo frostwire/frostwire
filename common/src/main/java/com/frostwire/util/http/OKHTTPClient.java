@@ -123,10 +123,10 @@ public class OKHTTPClient extends AbstractHttpClient {
     }
 
     @Override
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
+    public String get(String url, int timeoutMillis, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
         String result = null;
         final OkHttpClient.Builder okHttpClient = newOkHttpClient();
-        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, cookie);
+        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeoutMillis, userAgent, referrer, cookie);
         addCustomHeaders(customHeaders, builder);
         ResponseBody responseBody = null;
         try {

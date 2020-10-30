@@ -54,7 +54,7 @@ public interface HttpClient {
 
     String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
 
-    String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
+    String get(String url, int timeoutMillis, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
 
     byte[] getBytes(String url);
 
