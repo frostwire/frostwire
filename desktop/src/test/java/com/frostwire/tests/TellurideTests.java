@@ -39,7 +39,7 @@ public class TellurideTests {
             executableSuffix = "_linux";
         }
 
-        File data = new File("/Users/gubatron/FrostWire/Torrent Data", "Alone_Together_-_Mona_Wonderlick_Free_Copyright-safe_Music-1kaQP9XL6L4.mkv");
+        File data = new File("/Users/gubatron/FrostWire/Torrent Data", "Video_by_gubatron-CDC5ludJazw.mp4");
         if (data.exists()) {
             data.delete();
         }
@@ -118,6 +118,7 @@ public class TellurideTests {
 
     @Test
     public void testDownload() throws InterruptedException {
+        progressWasReported = false;
         CountDownLatch latch = new CountDownLatch(1);
         List<String> failedTests = new ArrayList<>();
         TellurideListener tellurideListener = new TellurideListener() {
