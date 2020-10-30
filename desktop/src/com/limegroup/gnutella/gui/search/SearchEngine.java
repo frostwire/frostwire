@@ -22,6 +22,7 @@ import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
@@ -52,8 +53,6 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class SearchEngine {
-
-
     private static final int DEFAULT_TIMEOUT = 5000;
 
     enum SearchEngineID {
@@ -72,7 +71,8 @@ public abstract class SearchEngine {
         NYAA_ID,
         TORRENTZ2_ID,
         MAGNETDL_ID,
-        TORRENTPARADISE_ID
+        TORRENTPARADISE_ID,
+        GLOTORRENTS_ID
     }
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
@@ -105,7 +105,6 @@ public abstract class SearchEngine {
             return new TPBSearchPerformer(TPB.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine SOUNDCLOUD = new SearchEngine(SearchEngineID.SOUNDCLOUD_ID, "Soundcloud", SearchEnginesSettings.SOUNDCLOUD_SEARCH_ENABLED, "api-v2.soundcloud.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -162,7 +161,6 @@ public abstract class SearchEngine {
             return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
         protected void postInitWork() {
             new Thread(() -> {
@@ -183,14 +181,12 @@ public abstract class SearchEngine {
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine IDOPE = new SearchEngine(SearchEngineID.IDOPE_ID, "Idope", SearchEnginesSettings.IDOPE_SEARCH_ENABLED, "idope.se") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
     private static final SearchEngine ZOOQLE = new SearchEngine(SearchEngineID.ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -214,7 +210,12 @@ public abstract class SearchEngine {
             return new TorrentParadiseSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-
+    private static final SearchEngine GLOTORRENTS = new SearchEngine(SearchEngineID.GLOTORRENTS_ID, "GloTorrents", SearchEnginesSettings.GLOTORRENTS_ENABLED, "gtdb.to") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -253,15 +254,14 @@ public abstract class SearchEngine {
                 ONE337X,
                 EZTV,
                 TORRENTDOWNLOADS,
-                LIMETORRENTS);
-
+                LIMETORRENTS,
+                GLOTORRENTS);
         List<SearchEngine> list = new ArrayList<>();
         for (SearchEngine candidate : candidates) {
             if (candidate.isReady()) {
                 list.add(candidate);
             }
         }
-
         // ensure that at least one is enabled
         boolean oneEnabled = false;
         for (SearchEngine se : list) {

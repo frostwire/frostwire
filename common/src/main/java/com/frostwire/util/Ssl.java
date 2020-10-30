@@ -98,6 +98,7 @@ public final class Ssl {
                 "clients1.google.com",
                 "dl.frostwire.com",
                 "eztv.io",
+                "gtdb.to",
                 "idope.se",
                 "nyaa.si",
                 "pirate-bay.info",
