@@ -21,6 +21,8 @@ targetCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSI
 
 compileJava {
     options.encoding = '8859_1'
+    options.fork = true
+    options.compilerArgs += ["-Xlint:deprecation"]
 }
 
 repositories {
