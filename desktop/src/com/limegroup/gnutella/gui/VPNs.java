@@ -91,6 +91,7 @@ public final class VPNs {
                     isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "NordVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "NordLynx Tunnel") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "SecureLine TAP") || // avast!
                     isWindowsVPNAdapterActive(interfaces, null, "TAP-Windows Adapter V9") || // IPVanish
