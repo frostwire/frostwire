@@ -41,7 +41,7 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
                     "<td class=\"s\">(?<seeds>.*?)</td>";//.*</td><tr><td class=\"d\" colspan=\"8\"></td></tr>";
 
     public MagnetDLSearchPerformer(long token, String keywords, int timeout) {
-        super("magnetdl.com", token, keywords, timeout, 1, 1);
+        super("magnetdl.com", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
         pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
     }

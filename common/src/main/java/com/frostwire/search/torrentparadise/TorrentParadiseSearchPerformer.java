@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ package com.frostwire.search.torrentparadise;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.google.gson.Gson;
 
 import java.util.Collections;

@@ -32,7 +32,7 @@ public class IdopeSearchPerformer extends TorrentSearchPerformer {
     private final Pattern pattern;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
-        super("idope.se", token, keywords, timeout, 1, 1);
+        super("idope.se", token, keywords, timeout, 1, 0);
         pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
                 "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
                 "<div  class=\"resultdivtopname\" >[\n][\\s|\t]+(?<filename>.*?)</div>.*?" +
@@ -60,6 +60,7 @@ public class IdopeSearchPerformer extends TorrentSearchPerformer {
     @Override
     protected List<? extends IdopeSearchResult> searchPage(String page) {
         if (null == page || page.isEmpty()) {
+            stopped = true;
             return Collections.emptyList();
         }
 

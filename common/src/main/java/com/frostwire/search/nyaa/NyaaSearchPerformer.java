@@ -31,7 +31,7 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
     private final Pattern pattern;
 
     public NyaaSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 1);
+        super(domainName, token, keywords, timeout, 1, 0);
         pattern = Pattern.compile(
                 "(?is)<tr class=\"default\">.*?" +
                         "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +

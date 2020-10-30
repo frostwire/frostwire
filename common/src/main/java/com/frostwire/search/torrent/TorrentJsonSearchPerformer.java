@@ -57,7 +57,7 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
         return result;
     }
 
-    abstract List<T> parseJson(String json);
+    protected abstract List<T> parseJson(String json);
 
     abstract R fromItem(T item);
 }
