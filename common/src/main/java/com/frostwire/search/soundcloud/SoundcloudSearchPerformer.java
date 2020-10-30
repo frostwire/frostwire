@@ -29,8 +29,8 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "2jUTjsICrENhnUCdVvlwCRuI6bAEGqAJ";
-    private static final String SOUNDCLOUD_APP_VERSION = "1598011448";
+    private static final String SOUNDCLOUD_CLIENTID = "koSuixzk25Cz0fDgsPfhkgeZcKBr7lpQ";
+    private static final String SOUNDCLOUD_APP_VERSION = "1603962664";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);

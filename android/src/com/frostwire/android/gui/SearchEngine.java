@@ -152,7 +152,7 @@ public abstract class SearchEngine {
     public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new SoundcloudSearchPerformer("api.sndcdn.com", token, keywords, DEFAULT_TIMEOUT);
+            return new SoundcloudSearchPerformer("api-v2.sndcdn.com", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

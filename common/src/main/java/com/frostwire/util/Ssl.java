@@ -92,6 +92,7 @@ public final class Ssl {
 
         private static final String[] validDomains = {
                 "api-v2.soundcloud.com",
+                "sndcdn.com",
                 "api.frostclick.com",
                 "archive.org",
                 "clients1.google.com",
