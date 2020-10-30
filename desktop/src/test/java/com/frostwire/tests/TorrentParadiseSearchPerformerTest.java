@@ -21,6 +21,7 @@ import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
+import com.frostwire.search.torrentparadise.TorrentParadiseSearchResult;
 import com.frostwire.search.torrentz2.Torrentz2SearchResult;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -60,7 +61,7 @@ public class TorrentParadiseSearchPerformerTest {
                 return;
             }
             for (SearchResult result : results) {
-                Torrentz2SearchResult sr = (Torrentz2SearchResult) result;
+                TorrentParadiseSearchResult sr = (TorrentParadiseSearchResult) result;
                 System.out.println("TorrentParadiseSearchListener.SearchListener.onResults:");
                 System.out.println("\t DisplayName: " + sr.getDisplayName());
                 System.out.println("\t Source: " + sr.getSource());
