@@ -23,8 +23,10 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.frostwire.util.OSUtils;
 import org.xml.sax.*;
+import org.xml.sax.helpers.XMLReaderAdapter;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.SAXParserFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashSet;
@@ -281,8 +283,12 @@ final class UpdateMessageReader implements ContentHandler {
                 return;
             }
             src = new InputSource(connection.getInputStream());
-            //XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader();
+            // XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader(); // Does not parse
+            // XMLReader rdr = SAXParserFactory.newInstance("com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl", ClassLoader.getPlatformClassLoader()).newSAXParser().getXMLReader(); // Does not parse
+
+            // This is the only one that actually parses
             XMLReader rdr = XMLReaderFactory.createXMLReader("com.sun.org.apache.xerces.internal.parsers.SAXParser");
+
             rdr.setContentHandler(this);
             LOG.info("readUpdateFile(): got update file, about to parse");
             rdr.parse(src);
