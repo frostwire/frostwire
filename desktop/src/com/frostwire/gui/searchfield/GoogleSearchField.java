@@ -138,7 +138,7 @@ public class GoogleSearchField extends SearchField {
                 String js = httpClient.get(url, HTTP_QUERY_TIMEOUT);
                 String json = stripJs(js);
                 if (!isCancelled()) {
-                    JsonArray arr = new JsonParser().parse(json).getAsJsonArray();
+                    JsonArray arr = JsonParser.parseString(json).getAsJsonArray();
                     final List<String> suggestions = readSuggestions(arr.get(1).getAsJsonArray());
                     GUIMediator.safeInvokeLater(() -> {
                         Iterator<String> it = suggestions.iterator();
