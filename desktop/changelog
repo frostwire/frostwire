@@ -1,12 +1,14 @@
 frostwire (6.8.8) stable; urgency=high
  * New TorrentParadise search source
+ * New GloTorrents search source
  * Yify search fixed
  * Torrentz2 search fixed
  * MagnetDL search fixed
  * Soundcloud search fixed
  * Fixed archive.org broken downloads
+ * All deprecation warnings fixed along with some optimizations
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 30 Oct 2020 00:51:35 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 31 Oct 2020 11:01:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
