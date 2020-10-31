@@ -207,7 +207,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         canceled = false;
         final OkHttpClient.Builder okHttpClient = newOkHttpClient();
         final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, null, null);
-        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), postData);
+        final RequestBody requestBody = RequestBody.create(postData, MediaType.parse(postContentType));
         prepareOkHttpClientForPost(okHttpClient, gzip);
         builder.post(requestBody);
         return getPostSyncResponse(builder);
