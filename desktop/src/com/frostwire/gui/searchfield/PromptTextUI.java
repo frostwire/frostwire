@@ -14,6 +14,7 @@ import java.awt.Component.BaselineResizeBehavior;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
 
 /**
@@ -191,25 +192,19 @@ public abstract class PromptTextUI extends TextUI {
      * important when the text is centered, so that the caret will not be
      * painted inside the label text)
      */
-    public Rectangle modelToView(JTextComponent t, int pos, Bias bias) throws BadLocationException {
+    @Override
+    public Rectangle2D modelToView2D(JTextComponent t, int pos, Bias bias) throws BadLocationException {
         if (shouldPaintPrompt(t)) {
             return getPromptComponent(t).getUI().modelToView2D(t, pos, bias).getBounds();
         } else {
             try {
                 return delegate.modelToView2D(t, pos, bias).getBounds();
             } catch (Throwable npe) {
-                return delegate.modelToView(t, pos, bias);
+                return delegate.modelToView2D(t, pos, bias);
             }
         }
     }
 
-    /**
-     * Calls {@link #modelToView(JTextComponent, int, Bias)} with
-     * {@link Bias#Forward}.
-     */
-    public Rectangle modelToView(JTextComponent t, int pos) throws BadLocationException {
-        return modelToView(t, pos, Position.Bias.Forward);
-    }
     // ********************* Delegate methods *************************///
     // ****************************************************************///
 
@@ -258,7 +253,7 @@ public abstract class PromptTextUI extends TextUI {
         return delegate.getRootView(t);
     }
 
-    public String getToolTipText(JTextComponent t, Point pt) {
+    public String getToolTipText2D(JTextComponent t, Point pt) {
         return delegate.getToolTipText2D(t, pt);
     }
 
@@ -270,11 +265,11 @@ public abstract class PromptTextUI extends TextUI {
         return String.format("%s (%s)", getClass().getName(), delegate.toString());
     }
 
-    public int viewToModel(JTextComponent t, Point pt, Bias[] biasReturn) {
+    public int viewToModel2D(JTextComponent t, Point pt, Bias[] biasReturn) {
         return delegate.viewToModel2D(t, pt, biasReturn);
     }
 
-    public int viewToModel(JTextComponent t, Point pt) {
+    public int viewToModel2D(JTextComponent t, Point pt) {
         return delegate.viewToModel2D(t, pt, discardBias);
     }
 

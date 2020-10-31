@@ -17,7 +17,11 @@ package com.frostwire.gui.searchfield;
 
 import javax.swing.*;
 import javax.swing.plaf.TextUI;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 /**
  * {@link PromptTextUI} implementation for rendering prompts on
@@ -66,6 +70,34 @@ public class PromptTextFieldUI extends PromptTextUI {
     protected JTextComponent createPromptComponent() {
         txt.updateUI();
         return txt;
+    }
+
+    @Override
+    @Deprecated
+    public Rectangle modelToView(JTextComponent t, int pos) throws BadLocationException {
+        return modelToView2D(t, pos, Position.Bias.Forward).getBounds();
+    }
+
+    @Override
+    @Deprecated
+    public Rectangle modelToView(JTextComponent t, int pos, Position.Bias bias) throws BadLocationException {
+        Rectangle2D rectangle2D = modelToView2D(t, pos, bias);
+        if (rectangle2D == null) {
+            return null;
+        }
+        return rectangle2D.getBounds();
+    }
+
+    @Override
+    @Deprecated
+    public int viewToModel(JTextComponent t, Point pt) {
+        return viewToModel2D(t, pt);
+    }
+
+    @Override
+    @Deprecated
+    public int viewToModel(JTextComponent t, Point pt, Position.Bias[] biasReturn) {
+        return viewToModel2D(t, pt, biasReturn);
     }
 
     private static final class LabelField extends JTextField {
