@@ -66,7 +66,7 @@ public class GloTorrentsSearchResult extends AbstractTorrentSearchResult {
 
     @Override
     public String getFilename() {
-        return filename;
+        return filename + ".torrent";
     }
 
     @Override

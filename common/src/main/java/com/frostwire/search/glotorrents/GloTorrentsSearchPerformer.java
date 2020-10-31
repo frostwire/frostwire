@@ -20,7 +20,6 @@ package com.frostwire.search.glotorrents;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.idope.IdopeSearchResult;
 import com.frostwire.search.torrent.TorrentSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
@@ -33,10 +32,10 @@ public class GloTorrentsSearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(GloTorrentsSearchPerformer.class);
     private final Pattern pattern;
     private static final String SEARCH_RESULT_PAGE_REGEX = "(?is)" +
-            "<td class=\"ttable_col2\" nowrap=\"nowrap\">.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>)\".*?<b>.*?" +
-            "<a rel=\"nofollow\" href=\"(?<magnet>.*?)\"><img src=\"/images/magnetdl.png\" alt=\"Magnet Download\".*?" +
-            "<td class=\"ttable_col1\" align=\"center\">(?<filesize>.*?)\\p{Z}(?<unit>[KMGTP]B)</td>.*?" +
-            "<font color=\"green\"><b>(?<seeds>.*?)</b></font>";
+            "<td class='ttable_col2' nowrap='nowrap'>.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>.*?)\"><b>.*?" +
+            "'nofollow' href=\"(?<magnet>.*?)\">.*?\"Magnet Download\".*?" +
+            "<td class='ttable_col1' align='center'>(?<filesize>\\d+\\.\\d+)\\p{Z}(?<unit>[KMGTP]B)</td>(.|\\n)*?" +
+            "<font color='green'><b>(?<seeds>.*?)</b></font>";
 
     public GloTorrentsSearchPerformer(long token, String keywords, int timeoutMillis) {
         super("gtdb.to", token, keywords, timeoutMillis, 1, 0);
@@ -56,7 +55,7 @@ public class GloTorrentsSearchPerformer extends TorrentSearchPerformer {
         String infoHash = magnetURL.substring(magnetStart, magnetStart + 40);
         String fileSizeMagnitude = matcher.group("filesize");
         String fileSizeUnit = matcher.group("unit");
-        int seeds = Integer.parseInt(matcher.group("seeds"));
+        int seeds = Integer.parseInt(matcher.group("seeds").replace(",",""));
         return new GloTorrentsSearchResult(magnetURL, detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
     }
 
@@ -66,7 +65,7 @@ public class GloTorrentsSearchPerformer extends TorrentSearchPerformer {
             stopped = true;
             return Collections.emptyList();
         }
-        final String HTML_PREFIX_MARKER = "<table class=\"ttable_headinner\"";
+        final String HTML_PREFIX_MARKER = "class=\"ttable_headinner\"";
         int htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER) + HTML_PREFIX_MARKER.length();
         final String HTML_SUFFIX_MARKER = "<div class=\"pagination\">";
         int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER);

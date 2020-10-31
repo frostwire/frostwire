@@ -1,4 +1,5 @@
 /*
+ * Created by Angel Leon (@gubatron)
  * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,13 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.tests;
 
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
-import com.frostwire.search.torrentparadise.TorrentParadiseSearchResult;
+import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
+import com.frostwire.search.glotorrents.GloTorrentsSearchResult;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
@@ -31,12 +31,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TorrentParadiseSearchPerformerTest {
+public class GloTorrentsSearchPerformerTest {
     @Test
-    public void testTorrentParadiseSearchPerformer() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
-        TorrentParadiseSearchPerformer searchPerformer = new TorrentParadiseSearchPerformer(1, TEST_SEARCH_TERM, 5000);
-        TorrentParadiseSearchListener searchListener = new TorrentParadiseSearchListener();
+    public void testGloTorrentsSearchPerformerTest() {
+        String TEST_SEARCH_TERM = UrlUtils.encode("new");
+        GloTorrentsSearchPerformer searchPerformer = new GloTorrentsSearchPerformer(1, TEST_SEARCH_TERM, 5000);
+        GloTorrentsSearchPerformerTest.GloTorrentsSearchListener searchListener = new GloTorrentsSearchPerformerTest.GloTorrentsSearchListener();
         searchPerformer.setListener(searchListener);
         try {
             searchPerformer.perform();
@@ -51,8 +51,9 @@ public class TorrentParadiseSearchPerformerTest {
         }
     }
 
-    private static class TorrentParadiseSearchListener implements SearchListener {
+    private static class GloTorrentsSearchListener implements SearchListener {
         final List<String> failedTests = new ArrayList<>();
+
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
             if (results == null || results.size() == 0) {
@@ -60,8 +61,8 @@ public class TorrentParadiseSearchPerformerTest {
                 return;
             }
             for (SearchResult result : results) {
-                TorrentParadiseSearchResult sr = (TorrentParadiseSearchResult) result;
-                System.out.println("TorrentParadiseSearchListener.SearchListener.onResults:");
+                GloTorrentsSearchResult sr = (GloTorrentsSearchResult) result;
+                System.out.println("GloTorrentsSearchListener.SearchListener.onResults:");
                 System.out.println("\t DisplayName: " + sr.getDisplayName());
                 System.out.println("\t Source: " + sr.getSource());
                 System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
