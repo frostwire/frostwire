@@ -30,6 +30,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_eztv" />
     <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_glotorrents"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_glotorrents" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_frostclick" />

@@ -96,9 +96,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_MAX_TORRENT_FILES_TO_INDEX, 100); // no ultra big torrents here
         defaultValues.put(Constants.PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT, 256);
 
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_VERTOR, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ZOOQLE, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YOUTUBE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_FROSTCLICK, true);
@@ -107,15 +105,14 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_NYAA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_APPIA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YIFY, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTSFM, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTZ2, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MAGNETDL, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENT_PARADISE, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);

@@ -26,6 +26,7 @@ import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
+import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
@@ -310,6 +311,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine GLOTORRENTS = new SearchEngine("GloTorrents", Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
             TORRENT_PARADISE,
             MAGNETDL,
@@ -326,5 +334,6 @@ public abstract class SearchEngine {
             TORRENTDOWNLOADS,
             LIMETORRENTS,
             NYAA,
-            EZTV);
+            EZTV,
+            GLOTORRENTS);
 }

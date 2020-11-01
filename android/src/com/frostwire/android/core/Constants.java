@@ -66,8 +66,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT = "frostwire.prefs.search.fulltext_search_results_limit";
 
     public static final String PREF_KEY_SEARCH_USE_ZOOQLE = "frostwire.prefs.search.use_zooqle";
-    public static final String PREF_KEY_SEARCH_USE_VERTOR = "frostwire.prefs.search.use_vertor";
-    public static final String PREF_KEY_SEARCH_USE_YOUTUBE = "frostwire.prefs.search.use_youtube";
     public static final String PREF_KEY_SEARCH_USE_SOUNDCLOUD = "frostwire.prefs.search.use_soundcloud";
     public static final String PREF_KEY_SEARCH_USE_ARCHIVEORG = "frostwire.prefs.search.use_archiveorg";
     public static final String PREF_KEY_SEARCH_USE_FROSTCLICK = "frostwire.prefs.search.use_frostclick";
@@ -76,15 +74,14 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_LIMETORRENTS = "frostwire.prefs.search.use_limetorrents";
     public static final String PREF_KEY_SEARCH_USE_NYAA = "frostwire.prefs.search.use_nyaa";
     public static final String PREF_KEY_SEARCH_USE_EZTV = "frostwire.prefs.search.use_eztv";
-    public static final String PREF_KEY_SEARCH_USE_APPIA = "frostwire.prefs.search.use_appia";
     public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
     public static final String PREF_KEY_SEARCH_USE_YIFY = "frostwire.prefs.search.use_yify";
     public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";
-    public static final String PREF_KEY_SEARCH_USE_TORRENTSFM = "frostwire.prefs.search.use_torrentsfm";
     public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
     public static final String PREF_KEY_SEARCH_USE_IDOPE = "frostwire.prefs.search.use_idope";
     public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
     public static final String PREF_KEY_SEARCH_USE_TORRENT_PARADISE = "frostwire.prefs.search.use_torrent_paradise";
+    public static final String PREF_KEY_SEARCH_USE_GLOTORRENTS = "frostwire.prefs.search.use_glotorrents";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";
