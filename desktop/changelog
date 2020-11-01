@@ -6,9 +6,10 @@ frostwire (6.8.8) stable; urgency=high
  * MagnetDL search fixed
  * Soundcloud search fixed
  * Fixed archive.org broken downloads
+ * Fixes false negative NordLynx/NordVPN detection
  * All deprecation warnings fixed along with some optimizations
 
- -- FrostWire Team <contact@frostwire.com>  Sat, 31 Oct 2020 11:01:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 01 Nov 2020 11:43:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
