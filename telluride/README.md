@@ -1,5 +1,7 @@
 # Telluride Cloud Video Downloader.
 
+![Telluride Logo](logo/1024X1024-white-telluride-logo.png)
+
 ### A portable and easy to use youtube_dl wrapper by FrostWire.    
 
 ## Usage
