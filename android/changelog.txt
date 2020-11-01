@@ -1,5 +1,6 @@
-FrostWire 2.2.5 build 661 - OCT/30/2020
+FrostWire 2.2.5 build 662 - NOV/01/2020
  - New: TorrentParadise search source
+ - New: GloTorrents search source
  - New: Firebase Crash Analytics support
  - Yify search fixed
  - Torrentz2 search fixed
