@@ -101,6 +101,12 @@ class MsgManager extends Handler {
         if (msgQueue.isEmpty()) {
             return;
         }
+        boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if (!onMainThread) {
+            new Handler(Looper.getMainLooper()).post(this::displayMsg);
+            return;
+        }
+
         // First peek whether the AppMsg is being displayed.
         final AppMsg appMsg = msgQueue.peek();
         // If the activity is null we throw away the AppMsg.
@@ -130,6 +136,12 @@ class MsgManager extends Handler {
      * @param appMsg The {@link AppMsg} added to a {@link ViewGroup} and should be removed.s
      */
     private void removeMsg(final AppMsg appMsg) {
+        boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if (!onMainThread) {
+            new Handler(Looper.getMainLooper()).post(() -> removeMsg(appMsg));
+            return;
+        }
+
         ViewGroup parent = ((ViewGroup) appMsg.getView().getParent());
         if (parent != null) {
             appMsg.getView().startAnimation(outAnimation);
@@ -141,6 +153,7 @@ class MsgManager extends Handler {
             }
             // Remove the AppMsg from the view's parent.
             parent.removeView(appMsg.getView());
+
             Message msg = obtainMessage(MESSAGE_DISPLAY);
             sendMessage(msg);
         }
