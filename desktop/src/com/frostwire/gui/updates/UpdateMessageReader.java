@@ -18,14 +18,13 @@
 package com.frostwire.gui.updates;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
-import com.frostwire.util.OSUtils;
 import org.xml.sax.*;
-import org.xml.sax.helpers.XMLReaderAdapter;
-import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -283,11 +282,11 @@ final class UpdateMessageReader implements ContentHandler {
                 return;
             }
             src = new InputSource(connection.getInputStream());
-            // XMLReader rdr = SAXParserFactory.newDefaultInstance().newSAXParser().getXMLReader(); // Does not parse
-            // XMLReader rdr = SAXParserFactory.newInstance("com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl", ClassLoader.getPlatformClassLoader()).newSAXParser().getXMLReader(); // Does not parse
 
-            // This is the only one that actually parses
-            XMLReader rdr = XMLReaderFactory.createXMLReader("com.sun.org.apache.xerces.internal.parsers.SAXParser");
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            spf.setNamespaceAware(true); // won't parse correctly without this
+            SAXParser saxParser = spf.newSAXParser();
+            XMLReader rdr = saxParser.getXMLReader();
 
             rdr.setContentHandler(this);
             LOG.info("readUpdateFile(): got update file, about to parse");
@@ -372,13 +371,12 @@ final class UpdateMessageReader implements ContentHandler {
             if (_bufferMessage.getMessageType().equalsIgnoreCase("overlay")) {
                 // System.out.println("UpdateMessageReader.startElement overlay msg found");
                 _bufferMessage.setSrc(src);
-                if (atts.getValue("intro") != null && (atts.getValue("intro").equals("1") || atts.getValue("intro").equalsIgnoreCase("true") || atts.getValue("intro").equalsIgnoreCase("yes"))) {
-                    _bufferMessage.setIntro(true);
-                    // System.out.println("UpdateMessageReader.startElement overlay intro=true");
-                } else {
-                    _bufferMessage.setIntro(false);
-                    // System.out.println("UpdateMessageReader.startElement overlay intro=false");
-                }
+                // System.out.println("UpdateMessageReader.startElement overlay intro=true");
+                // System.out.println("UpdateMessageReader.startElement overlay intro=false");
+                _bufferMessage.setIntro(atts.getValue("intro") != null &&
+                        (atts.getValue("intro").equals("1") ||
+                                atts.getValue("intro").equalsIgnoreCase("true") ||
+                                atts.getValue("intro").equalsIgnoreCase("yes")));
             } // overlays
         }
     }
