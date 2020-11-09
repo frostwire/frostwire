@@ -194,7 +194,8 @@ public final class FrostWireUtils {
         boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/desktop");
         if (isRelease) {
             if (OSUtils.isWindows()) {
-                throw new RuntimeException("FrostWireUtils.getTellurideLauncherFile() for release not implemented");
+                // Should be on the same folder as frostwire.exe
+                return new File("telluride.exe");
             } else if (OSUtils.isAnyMac()) {
                 String javaHome = System.getProperty("java.home");
 
@@ -207,7 +208,7 @@ public final class FrostWireUtils {
                 f = f.getParentFile(); // Contents
                 return new File(f, "MacOS" + File.separator + "telluride_macos"); //MacOS/telluride_macos
             } else if (OSUtils.isLinux()) {
-                throw new RuntimeException("FrostWireUtils.getTellurideLauncherFile() for release not implemented");
+                return new File("/usr/lib/frostwire", "telluride_linux");
             }
         } else {
             String pathPrefix = getDevelopmentFrostWireDesktopFolderPath() + "/../telluride";
