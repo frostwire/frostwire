@@ -17,8 +17,10 @@ package com.limegroup.gnutella.gui.actions;
 
 import com.frostwire.gui.bittorrent.CreateTorrentDialog;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
+import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
+import com.limegroup.gnutella.gui.search.SearchInformation;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -53,12 +55,6 @@ public final class FileMenuActions {
         } else if (userText.startsWith("http") && (userText.endsWith(".torrent"))) {
             GUIMediator.instance().openTorrentURI(userText, true);
             return true;
-            //}
-            // Cloud URL entered
-            //else if (userText.startsWith("http")) {
-            //SearchPerformer performer = SearchEngine.getTellurideEngine().getPerformer(userText.hashCode(), userText);
-            // probably on a background thread?
-            //performer.perform();
         } else {
             // See if it's a path to a file on the disk
             File file = new File(userText);
@@ -81,12 +77,12 @@ public final class FileMenuActions {
     /**
      * Shows the File, Open Magnet or Torrent dialog box to let the user enter a magnet or torrent.
      */
-    public static class OpenMagnetTorrentAction extends AbstractAction {
+    public static class OpenMagnetTorrentVideoUrlAction extends AbstractAction {
         private JDialog dialog = null;
         private final LimeTextField PATH_FIELD;
 
-        public OpenMagnetTorrentAction() {
-            super(I18n.tr("O&pen .Torrent or Magnet"));
+        public OpenMagnetTorrentVideoUrlAction() {
+            super(I18n.tr("O&pen .Torrent, Magnet or Video URL"));
             PATH_FIELD = new LimeTextField(34);
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Opens a magnet link or torrent file"));
         }
@@ -213,6 +209,15 @@ public final class FileMenuActions {
 
             public void actionPerformed(ActionEvent a) {
                 String str = PATH_FIELD.getText();
+                if (str.startsWith("http") && !str.endsWith(".torrent")) {
+                    // Cloud URL entered
+                    SearchInformation searchInfo = SearchInformation.createKeywordSearch
+                            (str, null, MediaType.getVideoMediaType());
+                    new SearchAction(searchInfo,str).actionPerformed(null);
+                    dismissDialog();
+                    return;
+                }
+
                 if (openMagnetOrTorrent(str)) {
                     dismissDialog();
                 } else {
