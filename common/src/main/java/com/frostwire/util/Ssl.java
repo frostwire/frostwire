@@ -97,7 +97,7 @@ public final class Ssl {
                 "archive.org",
                 "clients1.google.com",
                 "dl.frostwire.com",
-                "eztv.io",
+                "eztv.re",
                 "gtdb.to",
                 "idope.se",
                 "nyaa.si",

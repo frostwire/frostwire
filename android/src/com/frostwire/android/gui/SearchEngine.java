@@ -202,7 +202,7 @@ public abstract class SearchEngine {
     public static final SearchEngine EZTV = new SearchEngine("Eztv", Constants.PREF_KEY_SEARCH_USE_EZTV) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new EztvSearchPerformer("eztv.io", token, keywords, DEFAULT_TIMEOUT);
+            return new EztvSearchPerformer("eztv.re", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

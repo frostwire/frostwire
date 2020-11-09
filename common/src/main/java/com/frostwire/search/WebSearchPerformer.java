@@ -94,6 +94,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         try {
             return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
         } catch (IOException throwable) {
+            LOG.error(throwable.getMessage(), throwable);
             return null;
         }
     }
