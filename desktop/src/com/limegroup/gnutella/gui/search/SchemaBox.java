@@ -216,6 +216,13 @@ final class SchemaBox extends JPanel {
         return selectedButton;
     }
 
+    public void showOnlyAudioVideoSchemaBox() {
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getImageMediaType())).setVisible(false);
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getDocumentMediaType())).setVisible(false);
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getTorrentMediaType())).setVisible(false);
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getProgramMediaType())).setVisible(false);
+    }
+
     private static final class SchemaButtonBackgroundPainter extends AbstractSkinPainter {
         private static final Color STROKE = new Color(161, 195, 214);
         private static final Color LIGHT = new Color(203, 224, 236);

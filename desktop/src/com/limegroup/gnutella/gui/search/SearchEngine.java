@@ -29,6 +29,7 @@ import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
@@ -36,15 +37,17 @@ import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
-import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
+import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +59,11 @@ import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
  * @author aldenml
  */
 public abstract class SearchEngine {
+    private static final Logger LOG = Logger.getLogger(SearchEngine.class);
     private static final int DEFAULT_TIMEOUT = 5000;
+
+    private static final BooleanSetting TELLURIDE_ENABLED = FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true);
+    private static File TELLURIDE_LAUNCHER = null;
 
     enum SearchEngineID {
         TPB_ID,
@@ -221,12 +228,23 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final BooleanSetting TELLURIDE_ENABLED = FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true);
-
     private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", TELLURIDE_ENABLED, "*") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new TellurideSearchPerformer(token, keywords);
+            if (TELLURIDE_LAUNCHER == null) {
+                TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
+                if (TELLURIDE_LAUNCHER != null) {
+                    LOG.info("TELLURIDE_LAUNCHER:File -> " + TELLURIDE_LAUNCHER.getAbsolutePath());
+                } else {
+                    LOG.warn("TELLURIDE_LAUNCHER could not be found");
+                }
+            }
+
+            return new TellurideSearchPerformer(token,
+                    keywords,
+                    TELLURIDE_LAUNCHER,
+                    SharingSettings.TORRENTS_DIR_SETTING.getValue(),
+                    new TellurideSearchPerformerDesktopListener());
         }
     };
 
