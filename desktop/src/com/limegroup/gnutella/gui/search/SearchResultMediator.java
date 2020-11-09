@@ -237,12 +237,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             if (lines.length == 1 && lines[0] != null) {
                 final SearchResult sr = lines[0].getInitializeObject().getSearchResult();
                 if (sr instanceof TorrentSearchResult) {
-                    // GUIMediator gm = GUIMediator.instance();
-                    //if (sr instanceof ScrapedTorrentFileSearchResult) {
-                    //    gm.openTorrentSearchResult((ScrapedTorrentFileSearchResult) sr);
-                    //} else {
                     GUIMediator.instance().openTorrentSearchResult((TorrentSearchResult) sr, true);
-                    //}
                 }
             }
         };
@@ -567,6 +562,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         panel.add(sep);
         panel.add(buttonOptions);
         return panel;
+    }
+
+    public void showOnlyAudioVideoSchemaBox() {
+        schemaBox.showOnlyAudioVideoSchemaBox();
     }
 
     private JScrollPane createSearchOptionsPanel() {
