@@ -42,7 +42,7 @@ public final class SearchManager {
     private SearchListener listener;
 
     private SearchManager(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", 2, nThreads, 10000L, new PriorityBlockingQueue<>(), true);
+        this.executor = new ThreadPool("SearchManager", 4, nThreads, 10L, new PriorityBlockingQueue<>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<>());
         this.tables = Collections.synchronizedList(new LinkedList<>());
     }
