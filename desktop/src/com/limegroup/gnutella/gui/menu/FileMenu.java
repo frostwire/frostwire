@@ -35,7 +35,7 @@ final class FileMenu extends AbstractMenu {
         super(I18n.tr("&File"));
         MENU.add(createMenuItem(new FileMenuActions.SendFileAction()));
         MENU.addSeparator();
-        MENU.add(createMenuItem(new FileMenuActions.OpenMagnetTorrentAction()));
+        MENU.add(createMenuItem(new FileMenuActions.OpenMagnetTorrentVideoUrlAction()));
         MENU.add(createMenuItem(new FileMenuActions.CreateTorrentAction()));
         if (!OSUtils.isMacOSX()) {
             MENU.addSeparator();
