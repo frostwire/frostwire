@@ -49,7 +49,6 @@ final class TellurideSearchPerformerDesktopListener implements TellurideSearchPe
         GUIMediator.safeInvokeLater(() -> {
             SearchResultMediator resultPanelForGUID = SearchMediator.getSearchResultDisplayer().getResultPanelForGUID(token);
             if (resultPanelForGUID != null) {
-                //resultPanelForGUID.updateSearchIcon(false);
                 resultPanelForGUID.showOnlyAudioVideoSchemaBox();
             }
         });

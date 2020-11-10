@@ -17,10 +17,10 @@
 
 package com.limegroup.gnutella.util;
 
+import com.frostwire.util.OSUtils;
 import org.apache.commons.io.IOUtils;
 import org.limewire.setting.SettingsFactory;
 import org.limewire.util.CommonUtils;
-import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 import org.limewire.util.SystemUtils.SpecialLocations;
 
@@ -159,7 +159,7 @@ public final class FrostWireUtils {
     }
 
     /**
-     * @return 4 int array with { MAJOR.MINOR.REVISION.BUILD
+     * update the 4 int result array with { MAJOR, MINOR, REVISION, BUILD }
      */
     public static void getFrostWireVersionBuild(final int[] result) {
         String[] vStrArray = getFrostWireVersion().split("\\.");
@@ -171,7 +171,7 @@ public final class FrostWireUtils {
 
     public static String getDevelopmentFrostWireDesktopFolderPath() {
         File fwJarFolder = new File(FrostWireUtils.getFrostWireJarPath()).getParentFile();
-        String pathPrefix = "";
+        String pathPrefix;
         // From Command line:
         // fwJarFolder=.../frostwire/desktop/build
         // .../frostwire/desktop/lib/native/fwplayer_osx
