@@ -91,8 +91,6 @@ public final class Ssl {
         }
     }
 
-    private final static HashSet<String> unSeenDomains = new HashSet<>();
-
     static final class FWHostnameVerifier implements HostnameVerifier {
 
         private static final String[] validDomains = {
@@ -142,12 +140,20 @@ public final class Ssl {
         }
 
         public static void addValidDomain(String domain) {
+            LOG.info("addValidDomain: " + domain);
             validDomainsSet.add(domain);
+            int firstDotIndex = domain.indexOf(".");
+            int secondDotIndex = domain.indexOf(".", firstDotIndex);
+            if (secondDotIndex != -1) {
+                String baseDomain = domain.substring(firstDotIndex + 1);
+                LOG.info("addValidDomain: " + baseDomain);
+                validDomainsSet.add(baseDomain);
+            }
         }
 
         @Override
         public boolean verify(String s, SSLSession sslSession) {
-            if (!validDomainsSet.contains(s) && !unSeenDomains.contains(s)) {
+            if (!validDomainsSet.contains(s)) {
 
                 // check if the s is a subdomain
                 for (String baseDomain : validDomainsSet) {
@@ -155,15 +161,8 @@ public final class Ssl {
                         return true;
                     }
                 }
-
-                logUnseenDomain(s);
             }
             return validDomainsSet.contains(s);
-        }
-
-        private void logUnseenDomain(String s) {
-            LOG.warn("FWHostnameVerifier::logUnseenDomain(): " + s);
-            unSeenDomains.add(s);
         }
     }
 
