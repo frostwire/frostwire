@@ -191,7 +191,7 @@ public final class FrostWireUtils {
      * It should determine it regardless of running from source or from a binary distribution.
      */
     public static File getTellurideLauncherFile() {
-        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire/desktop");
+        boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire" + File.separatorChar + "desktop");
         if (isRelease) {
             if (OSUtils.isWindows()) {
                 // Should be on the same folder as frostwire.exe
@@ -211,7 +211,7 @@ public final class FrostWireUtils {
                 return new File("/usr/lib/frostwire", "telluride_linux");
             }
         } else {
-            String pathPrefix = getDevelopmentFrostWireDesktopFolderPath() + "/../telluride";
+            String pathPrefix = getDevelopmentFrostWireDesktopFolderPath() + File.separatorChar + ".." + File.separatorChar + "telluride";
             if (OSUtils.isWindows()) {
                 return new File(pathPrefix, "telluride.exe");
             } else if (OSUtils.isAnyMac()) {
