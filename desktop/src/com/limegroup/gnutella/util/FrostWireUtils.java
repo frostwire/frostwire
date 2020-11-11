@@ -208,7 +208,15 @@ public final class FrostWireUtils {
                 f = f.getParentFile(); // Contents
                 return new File(f, "MacOS" + File.separator + "telluride_macos"); //MacOS/telluride_macos
             } else if (OSUtils.isLinux()) {
-                return new File("/usr/lib/frostwire", "telluride_linux");
+                File candidate1 = new File("/usr/lib/frostwire", "telluride_linux");
+                if (candidate1.exists()) {
+                    return candidate1;
+                }
+                // maybe running from extracted .tar.gz installer
+                File candidate2 = new File("telluride_linux");
+                if (candidate2.exists()) {
+                    return candidate2;
+                }
             }
         } else {
             String pathPrefix = getDevelopmentFrostWireDesktopFolderPath() + File.separatorChar + ".." + File.separatorChar + "telluride";
