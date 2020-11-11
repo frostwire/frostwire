@@ -289,11 +289,7 @@ final class Initializer {
     private void startSetupManager(final SetupManager setupManager) {
         // Run through the initialization sequence -- this must always be
         // called before GUIMediator constructs the LibraryTree!
-        //stopwatch.resetAndLog("event evt queue");
-        // Then create the setup manager if needed.
-        //stopwatch.resetAndLog("create setupManager if needed");
         GUIMediator.safeInvokeAndWait(setupManager::createIfNeeded);
-        //stopwatch.resetAndLog("return from evt queue");
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.limegroup.gnutella.gui;
 
 class TipOfTheDayMessages {
-    private static final String FIRST_MESSAGE = I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher number in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!");
+    private static final String FIRST_MESSAGE = I18n.tr("<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire installer features no bundled offers or advertisement and you can download it for free. You can help support the continued development of FrostWire with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">BTC</a></li><li><a href=\"{3}\">ETH or ERC-20 tokens</a></li></ul><br>Thank you for your continued support.",
+            "https://www.frostwire.com/give",
+            "https://www.frostwire.com/?id=donate&amt=open",
+            "https://www.frostwire.com/bitcoin",
+            "https://www.frostwire.com/ethereum");
 
     /**
      * Determines whether or not the current locale language is English. Note
@@ -19,12 +23,18 @@ class TipOfTheDayMessages {
     public static String[] getGeneralMessages() {
         return new String[]{
                 I18n.tr(FIRST_MESSAGE),
+                I18n.tr("Use the search box to enter search keywords or to paste video urls so that you can backup your video content from social media posts or to archive and time-shift free and legal video content for offline use. Always make sure to respect your local copyright laws."),
+                I18n.tr("<h2><a href=\"https://www.frostwire.com/android\">Try FrostWire Plus for Android free today</a></h2>"),
+                I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher number in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!"),
+                I18n.tr("<h2>Follow us</h2> We are on <a href=\"{0}\">Twitter</a>, <a href=\"{1}\">Instagram</a> and <a href=\"{2}\">Facebook</a>", "https://twitter.com/frostwire", "https://instagram.com/frostwire", "https://www.facebook.com/FrostwireOfficial/"),
                 I18n.tr("You can change the look and feel of FrostWire by going to View &gt; Use Small Icons, Show Icon Text and Increase-Decrease the Font Size."),
+                I18n.tr("<h2>Join the FrostWire Community</h2><ul><li><a href=\"{0}\">Discord Chat</a></li><li><a href=\"{1}\">Reddit</a></li></ul>", "https://www.frostwire.com/chat", "https://reddit.com/r/frostwire"),
                 I18n.tr("You can sort your search results by clicking on a column. The most useful column to sort by is the 'Seeds' column if you are looking for a torrent, Seeds represents an approximate number of computers that have the entire file and are online."),
                 I18n.tr("It helps the network if you keep your FrostWire running. Others will connect to the network easier and searches will perform better."),
-                I18n.tr("Passionate about digital rights? Visit the <a href=\"{0}\">Electronic Frontier Foundation</a> and see what you can do to help."),
-                I18n.tr("FrostWire is translated into many different languages including Chinese, French, German, Japanese, Italian, Spanish and many more. Visit FrostWire's <a href=\"{0}\">internationalization page</a> for information on how you can help translation efforts!"),
+                I18n.tr("<h2><a href=\"{0}\">Use a VPN encrypted connection</a></h2>Ensure your privacy and anonymity to prevent any outside party from monitoring what you download", "https://www.frostwire.com/vpn"),
+                I18n.tr("Passionate about digital rights? Visit the <a href=\"{0}\">Electronic Frontier Foundation</a> and see what you can do to help.", "https://www.eff.org/"),
                 I18n.tr("Small variations in the search title will still work. For example, if your buddy is sharing 'Frosty' but you searched for 'My Frosty', your buddy's file will still be found."),
+                I18n.tr("<h2><a href=\"{0}\">Use a VPN encryption connection</a></h2>Make it harder for third parties to track your online activities and prevent them from charging you different prices and displaying intrusive advertising based on your IP address’ browsing history", "https://www.frostwire.com/vpn"),
                 I18n.tr("Are you behind a firewall? At the bottom of FrostWire in the status bar, look for the globe. If there is a brick wall in front of it, your Internet connection is firewalled."),
                 I18n.tr("The numbers next to the up and down arrows in the status bar at the bottom of FrostWire show how fast all of your files are downloading or uploading combined."),
                 I18n.tr("You can increase the text size via <font " +

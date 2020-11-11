@@ -104,6 +104,7 @@ public final class TipOfTheDayMediator {
         this.messages = new ArrayList<>();
         initializeMessages(this.messages);
         dialog.setResizable(true);
+        dialog.setSize(717,380);
         dialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
@@ -193,7 +194,7 @@ public final class TipOfTheDayMediator {
         }
         messages.addAll(Arrays.asList(TipOfTheDayMessages.getFrostWireMessages()));
         // randomize the list.
-        Collections.shuffle(messages);
+        //Collections.shuffle(messages);
         _currentTip = -1;
     }
 
@@ -285,7 +286,7 @@ public final class TipOfTheDayMediator {
         dialog.setContentPane(contentPanel);
         GUIUtils.addHideAction((JComponent) dialog.getContentPane());
         try {
-            dialog.pack();
+            //dialog.pack();
         } catch (OutOfMemoryError oome) {
             // who knows why it happens, but it's an internal error.
             _canDisplay = false;
