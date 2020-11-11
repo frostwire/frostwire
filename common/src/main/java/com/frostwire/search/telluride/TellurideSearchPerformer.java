@@ -172,7 +172,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     }
 
     private String sanitizeFilename(String filename) {
-        return filename.replaceAll("[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", "");
+        return filename.replaceAll("[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ\\!:]", "");
     }
 
     //20200324
