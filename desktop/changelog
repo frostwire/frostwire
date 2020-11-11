@@ -1,4 +1,6 @@
 frostwire (6.8.8) stable; urgency=high
+ * New Telluride cloud downloader technology
+ * OpenJDK 15 runtime (Windows, MacOS)
  * New TorrentParadise search source
  * New GloTorrents search source
  * Yify search fixed
@@ -9,8 +11,10 @@ frostwire (6.8.8) stable; urgency=high
  * Fixed archive.org broken downloads
  * Fixes false negative NordLynx/NordVPN detection
  * All deprecation warnings fixed along with some optimizations
+ * dev: built with openjdk 15
+ * dev: gradle-6.7
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 09 Nov 2020 10:14:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 10 Nov 2020 19:08:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
  * New jlibtorrent 1.2.10.0 update
