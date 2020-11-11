@@ -65,6 +65,7 @@ then
   elif [ $(uname -a | grep -c windows) == 1 ]
   then
     mv dist/telluride.exe .
+    ./sign.bat
   fi
   cleanup
   ls -lth
