@@ -1,5 +1,6 @@
 frostwire (6.8.8) stable; urgency=high
   * New Telluride cloud downloader technology
+  * Refreshed welcome screen with search textbox
   * OpenJDK 15 runtime (Windows, MacOS)
   * New TorrentParadise search source
   * New GloTorrents search source
@@ -14,7 +15,7 @@ frostwire (6.8.8) stable; urgency=high
   * dev: built with openjdk 15
   * dev: gradle-6.7
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 10 Nov 2020 19:08:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 12 Nov 2020 12:06:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
   * New jlibtorrent 1.2.10.0 update
