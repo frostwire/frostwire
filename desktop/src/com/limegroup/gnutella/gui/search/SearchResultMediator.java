@@ -620,7 +620,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         JPanel southButtonsPanel = new JPanel();
         southButtonsPanel.setLayout(new MigLayout("fill, gap 0 0, ins 0","[grow 161][shrink]"));
         southButtonsPanel.add(supportFrostWireButton(), "grow");
-        southButtonsPanel.add(frostwire4AndroidButton(), "w 200px!, wrap");
+        southButtonsPanel.add(frostwire4AndroidButton(), "w 250px!, wrap");
 
         centerPanel.add(southButtonsPanel, "south");
 
