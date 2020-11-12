@@ -118,4 +118,9 @@ Frostwire Desktop and Frostwire Android are offered under the [GNU General Publi
 [Main Website Frostwire.com](http://www.frostwire.com) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
 [Twitter @frostwire](https://twitter.com/frostwire) |
+[Discord Chatrooms](https://www.facebook.com/chat) |
 [Tumblr](http://tumblr.frostwire.com)
+
+
+### SourceForge Mirror
+[![Download FrostWire](https://img.shields.io/sourceforge/dt/frostwire.svg)](https://sourceforge.net/projects/frostwire/files/latest/download) [![Download FrostWire](https://img.shields.io/sourceforge/dd/frostwire.svg)](https://sourceforge.net/projects/frostwire/files/latest/download)
