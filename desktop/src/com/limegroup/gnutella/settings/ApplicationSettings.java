@@ -39,11 +39,11 @@ public class ApplicationSettings extends LimeProps {
     /**
      * The width that the application should be.
      */
-    public static final IntSetting APP_WIDTH = FACTORY.createIntSetting("APP_WIDTH", 1024);
+    public static final IntSetting APP_WIDTH = FACTORY.createIntSetting("APP_WIDTH", 1100);
     /**
      * The height that the application should be.
      */
-    public static final IntSetting APP_HEIGHT = FACTORY.createIntSetting("APP_HEIGHT", 600);
+    public static final IntSetting APP_HEIGHT = FACTORY.createIntSetting("APP_HEIGHT", 700);
     /**
      * A flag for whether or not the application has been run one
      * time before this.

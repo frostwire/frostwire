@@ -263,7 +263,7 @@ public abstract class AbstractSetting implements Setting {
     /**
      * Returns the default value
      */
-    Object getDefaultValue() {
-        return DEFAULT_PROPS.getProperty(KEY);
+    public <T> T getDefaultValue() {
+        return (T) DEFAULT_PROPS.getProperty(KEY);
     }
 }
