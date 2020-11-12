@@ -23,15 +23,24 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.actions.FileMenuActions;
+import com.limegroup.gnutella.gui.search.SearchInformation;
+import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.util.URLDecoder;
 import org.limewire.util.LCS;
 import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -46,11 +55,13 @@ public class GoogleSearchField extends SearchField {
     private static final String SUGGESTIONS_URL = buildSuggestionsUrl();
     private static final int HTTP_QUERY_TIMEOUT = 1000;
     private SuggestionsThread suggestionsThread;
+    public static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter target URL");
 
     public GoogleSearchField() {
         this.dict = createDefaultDictionary();
         setPrompt(I18n.tr("Hints by Google"));
         setSearchMode(SearchMode.REGULAR);
+        initCloudSearchField(this);
     }
 
     private static String buildSuggestionsUrl() {
@@ -88,6 +99,39 @@ public class GoogleSearchField extends SearchField {
         super.setText(t);
     }
 
+    public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
+        cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
+        cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
+        Font origFont = cloudSearchField.getFont();
+        Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
+        cloudSearchField.setFont(newFont);
+        cloudSearchField.setMargin(new Insets(0, 2, 0, 0));
+        cloudSearchField.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
+                    cloudSearchField.setText("");
+                }
+            }
+        });
+        cloudSearchField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                String s = GUIUtils.extractStringContentFromClipboard(systemClipboard);
+                if (s == null || "".equals(s)) {
+                    return;
+                }
+                if (s.startsWith("http") || s.startsWith("magnet")) {
+                    cloudSearchField.setText(s);
+                    StringSelection stringSelection = new StringSelection("");
+                    systemClipboard.setContents(stringSelection, null);
+                    cloudSearchField.getActionListeners()[0].actionPerformed(null);
+                    cloudSearchField.setText("");
+                }
+            }
+        });
+    }
     protected JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;
@@ -174,6 +218,45 @@ public class GoogleSearchField extends SearchField {
             js = js.replace("google.sbox.p50 && google.sbox.p50(", "");
             js = js.replace("}])", "}]");
             return js;
+        }
+    }
+
+    public static class SearchListener implements ActionListener {
+        private final GoogleSearchField cloudSearchField;
+        public SearchListener(GoogleSearchField searchField) {
+            cloudSearchField = searchField;
+        }
+        public void actionPerformed(ActionEvent e) {
+            // Keep the query if there was one before switching to the search tab.
+            String query = cloudSearchField.getText();
+            String queryTitle = query;
+            GUIMediator.instance().setWindow(GUIMediator.Tabs.SEARCH);
+            // Start a download from the search box by entering a URL.
+            if (FileMenuActions.openMagnetOrTorrent(query)) {
+                cloudSearchField.setText("");
+                cloudSearchField.hidePopup();
+                return;
+            }
+            if (query.contains("www.frostclick.com/cloudplayer/?type=yt") ||
+                    query.contains("frostwire-preview.com/?type=yt")) {
+                try {
+                    query = query.split("detailsUrl=")[1];
+                    query = URLDecoder.decode(query);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            final SearchInformation info = SearchInformation.createTitledKeywordSearch(query, null, MediaType.getTorrentMediaType(), queryTitle);
+            // If the search worked, store & clear it.
+            if (SearchMediator.instance().triggerSearch(info) != 0) {
+                if (info.isKeywordSearch()) {
+                    cloudSearchField.addToDictionary();
+                    // Clear the existing search.
+                    cloudSearchField.setText("");
+                    cloudSearchField.hidePopup();
+                }
+            }
         }
     }
 }

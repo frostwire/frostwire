@@ -590,11 +590,14 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     /**
-     * Adds the slideShowPanel panel into the table & converts the button
-     * to 'download'.
+     * Creates layout for when there are no searches happening.
+     * Ads Slide Show panel
+     * Search field
+     * Buttons at the bottom for support and android
      */
     private void setupFakeTable(MultimediaSlideshowPanel slideShowPanel) {
         MAIN_PANEL.removeAll();
+
         // fixes flickering!
         JPanel background = new JPanel() {
             public boolean isOptimizedDrawingEnabled() {
@@ -610,12 +613,16 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         // Search Box
         GoogleSearchField searchBox = new GoogleSearchField();
-        ApplicationHeader.initCloudSearchField(searchBox);
         searchBox.setPrompt(I18n.tr("Search or enter target URL. (Search hints provided by Google)"));
-        centerPanel.add(searchBox, "center, w 600px!, growx 0");
+        centerPanel.add(searchBox, "center, w 500px!, growx 0");
 
-        // Browse All Free Downloads Button
-        centerPanel.add(supportFrostWire(), "south");
+        // Support FrostWire / FrostWire for Android Buttons
+        JPanel southButtonsPanel = new JPanel();
+        southButtonsPanel.setLayout(new MigLayout("fill, gap 0 0, ins 0","[grow 161][shrink]"));
+        southButtonsPanel.add(supportFrostWireButton(), "grow");
+        southButtonsPanel.add(frostwire4AndroidButton(), "w 200px!, wrap");
+
+        centerPanel.add(southButtonsPanel, "south");
 
         JScrollPane scrollPane = new JScrollPane(centerPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
@@ -630,14 +637,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         addButtonRow();
     }
 
-    private void onSearchBoxActionPerformed(JTextField searchBox, ActionEvent e) {
-        System.out.println("onSearchBoxActionPerformed::searchBox.getText() -> " + searchBox.getText());
-        System.out.println("onSearchBoxActionPerformed::e.getActionCommand() -> " + e.getActionCommand());
-        System.out.println("onSearchBoxActionPerformed::e.getModifiers() -> " + e.getModifiers());
-        System.out.println("");
-    }
-
-    private Component supportFrostWire() {
+    private Component supportFrostWireButton() {
         Color blue = new Color(70, 179, 232);
         JLabel browseAll = new JLabel(tr("Support FrostWire"));
         browseAll.setBackground(blue);
@@ -649,6 +649,23 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             @Override
             public void mouseClicked(MouseEvent e) {
                 GUIMediator.openURL("https://www.frostwire.com/give");
+            }
+        });
+        return browseAll;
+    }
+
+    private Component frostwire4AndroidButton() {
+        Color blue = new Color(6, 76, 92);
+        JLabel browseAll = new JLabel(tr("FrostWire Plus for Android"));
+        browseAll.setBackground(blue);
+        browseAll.setForeground(Color.WHITE);
+        browseAll.setOpaque(true);
+        browseAll.setFont(new Font("Helvetica", Font.BOLD, 12));
+        browseAll.setBorder(new EmptyBorder(5, 20, 5, 20));
+        browseAll.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                GUIMediator.openURL("https://www.frostwire.com/android");
             }
         });
         return browseAll;
