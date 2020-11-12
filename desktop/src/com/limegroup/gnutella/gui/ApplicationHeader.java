@@ -39,6 +39,8 @@ import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.util.Map;
 
@@ -57,7 +59,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private static final String DESELECTED_ICON = "DESELECTED_ICON";
     private static final String CLOUD_SEARCH_FIELD = "cloud_search_field";
     private static final String LIBRARY_SEARCH_FIELD = "library_search_field";
-    private static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter a cloud sourced URL");
+    private static final String CLOUD_SEARCH_FIELD_HINT_TEXT = I18n.tr("Search or enter target URL");
     /**
      * The clicker forwarder.
      */
@@ -104,7 +106,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private JPanel createSearchPanel() {
         JPanel panel = new JPanel(new CardLayout());
-        initCloudSearchField();
+        initCloudSearchField(cloudSearchField);
         createLibrarySearchField();
         panel.add(cloudSearchField, CLOUD_SEARCH_FIELD);
         panel.add(librarySearchField, LIBRARY_SEARCH_FIELD);
@@ -115,12 +117,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         librarySearchField = LibraryMediator.instance().getLibrarySearch().getSearchField();
     }
 
-    private void initCloudSearchField() {
-        cloudSearchField.addActionListener(new SearchListener());
+    public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
+        cloudSearchField.addActionListener(new SearchListener(cloudSearchField));
         cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
-        cloudSearchField.setText(CLOUD_SEARCH_FIELD_HINT_TEXT);
-        cloudSearchField.selectAll();
-        cloudSearchField.requestFocus();
         Font origFont = cloudSearchField.getFont();
         Font newFont = origFont.deriveFont(origFont.getSize2D() + 2f);
         cloudSearchField.setFont(newFont);
@@ -129,6 +128,23 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (cloudSearchField.getText().equals(CLOUD_SEARCH_FIELD_HINT_TEXT)) {
+                    cloudSearchField.setText("");
+                }
+            }
+        });
+        cloudSearchField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                String s = GUIUtils.extractStringContentFromClipboard(systemClipboard);
+                if (s == null || "".equals(s)) {
+                    return;
+                }
+                if (s.startsWith("http") || s.startsWith("magnet")) {
+                    cloudSearchField.setText(s);
+                            StringSelection stringSelection = new StringSelection("");
+                    systemClipboard.setContents(stringSelection, null);
+                    cloudSearchField.getActionListeners()[0].actionPerformed(null);
                     cloudSearchField.setText("");
                 }
             }
@@ -394,7 +410,11 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         }
     }
 
-    private class SearchListener implements ActionListener {
+    public static class SearchListener implements ActionListener {
+        private final GoogleSearchField cloudSearchField;
+        public SearchListener(GoogleSearchField searchField) {
+            cloudSearchField = searchField;
+        }
         public void actionPerformed(ActionEvent e) {
             // Keep the query if there was one before switching to the search tab.
             String query = cloudSearchField.getText();

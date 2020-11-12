@@ -30,8 +30,13 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.*;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DateFormat;
@@ -584,5 +589,37 @@ public final class GUIUtils {
         public String toString() {
             return name;
         }
+    }
+
+    public static String extractStringContentFromClipboard(Clipboard clipboard) {
+        try {
+            Transferable data;
+            try {
+                //check if there's anything in the clipboard
+                data = clipboard.getContents(null);
+            } catch (IllegalStateException isx) {
+                //we can't use the clipboard, give up.
+                return null;
+            }
+            //is there anything in the clipboard?
+            if (data == null)
+                return null;
+            //then, check if the data in the clipboard is text
+            if (!data.isDataFlavorSupported(DataFlavor.stringFlavor))
+                return null;
+            //next, extract the content into a string
+            String contents = null;
+            try {
+                contents = (String) data.getTransferData(DataFlavor.stringFlavor);
+            } catch (IOException iox) {
+                LOG.info("problem occured while trying to parse clipboard, do nothing", iox);
+            } catch (UnsupportedFlavorException ufx) {
+                LOG.error("UnsupportedFlavor??", ufx);
+            }
+            return contents;
+        } catch (Throwable e) {
+            // X11 related error reported from bug manager
+        }
+        return "";
     }
 }

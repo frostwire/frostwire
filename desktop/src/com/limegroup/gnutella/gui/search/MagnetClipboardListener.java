@@ -17,19 +17,20 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MagnetOptions;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.util.QueryUtils;
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -88,44 +89,12 @@ public class MagnetClipboardListener extends WindowAdapter {
         GUIMediator.safeInvokeLater(r);
     }
 
-    private static String extractStringContentFromClipboard(Object requestor) {
-        try {
-            Transferable data;
-            try {
-                //check if there's anything in the clipboard
-                data = CLIPBOARD.getContents(requestor);
-            } catch (IllegalStateException isx) {
-                //we can't use the clipboard, give up.
-                return null;
-            }
-            //is there anything in the clipboard?
-            if (data == null)
-                return null;
-            //then, check if the data in the clipboard is text
-            if (!data.isDataFlavorSupported(DataFlavor.stringFlavor))
-                return null;
-            //next, extract the content into a string
-            String contents = null;
-            try {
-                contents = (String) data.getTransferData(DataFlavor.stringFlavor);
-            } catch (IOException iox) {
-                LOG.info("problem occured while trying to parse clipboard, do nothing", iox);
-            } catch (UnsupportedFlavorException ufx) {
-                LOG.error("UnsupportedFlavor??", ufx);
-            }
-            return contents;
-        } catch (Throwable e) {
-            // X11 related error reported from bug manager
-        }
-        return "";
-    }
-
     /**
      * @return A magnet link or torrent url. "" if the clipboard has something else.
      */
     public static String getMagnetOrTorrentURLFromClipboard() {
         try {
-            String clipboardText = extractStringContentFromClipboard(null);
+            String clipboardText = GUIUtils.extractStringContentFromClipboard(CLIPBOARD);
             if (clipboardText == null) {
                 return "";
             }
@@ -148,7 +117,7 @@ public class MagnetClipboardListener extends WindowAdapter {
      * parse the clipboard anymore.
      */
     private void parseAndLaunch() {
-        String contents = extractStringContentFromClipboard(this);
+        String contents = GUIUtils.extractStringContentFromClipboard(CLIPBOARD);
         //could not extract the clipboard as text.
         if (contents == null)
             return;

@@ -1,36 +1,37 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.bittorrent.TorrentUtil;
+import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
 import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.gui.searchfield.GoogleSearchField;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.GUIConstants;
-import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
@@ -41,7 +42,6 @@ import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.QueryUtils;
 import net.miginfocom.swing.MigLayout;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -64,7 +64,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * The TableSettings that all ResultPanels will use.
      */
     private static final TableSettings SEARCH_SETTINGS = new TableSettings("SEARCH_TABLE");
-    private static final String FROSTWIRE_FEATURED_DOWNLOADS_URL = "http://www.frostwire.com/featured-downloads/?from=desktop-" + UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
+    private static final String FROSTWIRE_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/?from=desktop-" + UrlUtils.encode(OSUtils.getFullOS() + "-" + FrostWireUtils.getFrostWireVersion() + "b" + FrostWireUtils.getBuildNumber());
     /**
      * The search info of this class.
      */
@@ -101,9 +101,9 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * Specialized constructor for creating a "dummy" result panel.
      * This should only be called once at search window creation-time.
      */
-    SearchResultMediator(JPanel overlay) {
+    SearchResultMediator(MultimediaSlideshowPanel slideshowPanel) {
         super(SEARCH_TABLE);
-        setupFakeTable(overlay);
+        setupFakeTable(slideshowPanel);
         SEARCH_INFO = SearchInformation.createKeywordSearch("", null, MediaType.getAnyTypeMediaType());
         FILTER = null;
         this.token = 0;
@@ -590,10 +590,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     /**
-     * Adds the overlay panel into the table & converts the button
+     * Adds the slideShowPanel panel into the table & converts the button
      * to 'download'.
      */
-    private void setupFakeTable(JPanel overlay) {
+    private void setupFakeTable(MultimediaSlideshowPanel slideShowPanel) {
         MAIN_PANEL.removeAll();
         // fixes flickering!
         JPanel background = new JPanel() {
@@ -602,14 +602,22 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
         };
         background.setLayout(new OverlayLayout(background));
-        //overlay.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        JPanel overlayPanel = new JPanel();
-        overlayPanel.setOpaque(false);
-        overlayPanel.setLayout(new MigLayout("fill, wrap"));
-        overlayPanel.add(overlay, "center");
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setOpaque(false);
+        centerPanel.setLayout(new MigLayout("fill, wrap"));
+        centerPanel.add(slideShowPanel, "center");
+
+        // Search Box
+        GoogleSearchField searchBox = new GoogleSearchField();
+        ApplicationHeader.initCloudSearchField(searchBox);
+        searchBox.setPrompt(I18n.tr("Search or enter target URL. (Search hints provided by Google)"));
+        centerPanel.add(searchBox, "center, w 600px!, growx 0");
+
         // Browse All Free Downloads Button
-        overlayPanel.add(getBrowseAllFeaturedDownloadsButton(), "center");
-        JScrollPane scrollPane = new JScrollPane(overlayPanel);
+        centerPanel.add(supportFrostWire(), "south");
+
+        JScrollPane scrollPane = new JScrollPane(centerPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getViewport().setBackground(Color.WHITE);
@@ -622,18 +630,25 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         addButtonRow();
     }
 
-    private Component getBrowseAllFeaturedDownloadsButton() {
+    private void onSearchBoxActionPerformed(JTextField searchBox, ActionEvent e) {
+        System.out.println("onSearchBoxActionPerformed::searchBox.getText() -> " + searchBox.getText());
+        System.out.println("onSearchBoxActionPerformed::e.getActionCommand() -> " + e.getActionCommand());
+        System.out.println("onSearchBoxActionPerformed::e.getModifiers() -> " + e.getModifiers());
+        System.out.println("");
+    }
+
+    private Component supportFrostWire() {
         Color blue = new Color(70, 179, 232);
-        JLabel browseAll = new JLabel(tr("All Free Downloads"));
+        JLabel browseAll = new JLabel(tr("Support FrostWire"));
         browseAll.setBackground(blue);
         browseAll.setForeground(Color.WHITE);
         browseAll.setOpaque(true);
-        browseAll.setFont(new Font("Helvetica", Font.BOLD, 24));
-        browseAll.setBorder(new EmptyBorder(20, 50, 20, 50));
+        browseAll.setFont(new Font("Helvetica", Font.BOLD, 12));
+        browseAll.setBorder(new EmptyBorder(5, 20, 5, 20));
         browseAll.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                GUIMediator.openURL(FROSTWIRE_FEATURED_DOWNLOADS_URL);
+                GUIMediator.openURL("https://www.frostwire.com/give");
             }
         });
         return browseAll;
