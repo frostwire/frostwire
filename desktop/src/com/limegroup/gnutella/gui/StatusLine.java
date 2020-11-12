@@ -125,6 +125,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private IconButton facebookButton;
     private IconButton instagramButton;
     private IconButton seedingStatusButton;
+    private IconButton discordButton;
     private DonationButtons donationButtons;
     /**
      * Variables for the center portion of the status bar, which can display
@@ -184,6 +185,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         GUIMediator.setSplashScreenString(I18n.tr("Learning to socialize on Twitter..."));
         createTwitterButton();
         createInstagramButton();
+        createDiscordButton();
         // male Seeding status label
         GUIMediator.setSplashScreenString(I18n.tr("Painting seeding sign..."));
         createSeedingStatusLabel();
@@ -229,6 +231,11 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private void createFacebookButton() {
         facebookButton = new IconButton("FACEBOOK");
         initSocialButton(facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
+    }
+
+    private void createDiscordButton() {
+        discordButton = new IconButton("DISCORD");
+        initSocialButton(discordButton, I18n.tr("Join the FrostWire community on Discord"), GUIConstants.FROSTWIRE_CHAT_URL);
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -295,6 +302,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             }
             //  then add firewall display if there's room
             if (StatusBarSettings.FIREWALL_DISPLAY_ENABLED.getValue()) {
+                BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
                 remainingWidth = addStatusIndicator(firewallStatus, sepWidth, remainingWidth, gbc);
                 updateFirewall();
             }
@@ -316,10 +324,17 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
             BAR.add(createSeparator(), gbc);
             updateSeedingStatus();
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             BAR.add(facebookButton, gbc);
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             BAR.add(twitterButton, gbc);
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             BAR.add(instagramButton, gbc);
-            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR / 2), gbc);
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            BAR.add(createSeparator(), gbc);
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
+            BAR.add(discordButton, gbc);
+            BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             //  make center panel stretchy
             gbc.weightx = 1;
             BAR.add(centerPanel, gbc);

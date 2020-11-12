@@ -32,6 +32,8 @@ public final class GUIConstants {
     public static final String TWITTER_FROSTWIRE_URL = "https://twitter.com/frostwire";
     public static final String FACEBOOK_FROSTWIRE_URL = "https://www.facebook.com/FrostwireOfficial";
     public static final String REDDIT_FROSTWIRE_URL = "https://www.reddit.com/r/frostwire";
+    public static final String FROSTWIRE_CHAT_URL = "https://www.frostwire.com/chat";
+
     static final String FROSTWIRE_64x64_ICON = "frostwire64x64";
     /**
      * Constant for the path to the LimeWire Windows launcher.
