@@ -33,7 +33,6 @@ import java.util.Map;
  * @author gubatron
  */
 public class BTInfoAdditionalMetadataHolder {
-
     private final CopyrightLicenseBroker license;
     private final PaymentOptions paymentOptions;
 
@@ -46,35 +45,22 @@ public class BTInfoAdditionalMetadataHolder {
     }
 
     public BTInfoAdditionalMetadataHolder(TorrentInfo tinfo, String paymentOptionsDisplayName) {
-
         final Map<String, Entry> additionalInfoProperties = getInfo(tinfo.toEntry().dictionary().get("info").swig());
-
         final Entry licenseEntry = additionalInfoProperties.get("license");
         final Entry paymentOptionsEntry = additionalInfoProperties.get("paymentOptions");
-
         boolean hasLicense = licenseEntry != null;
         boolean hasPaymentOptions = paymentOptionsEntry != null;
-
         if (hasLicense) {
             license = new CopyrightLicenseBroker(licenseEntry.dictionary());
         } else {
             license = null;
         }
-
         if (hasPaymentOptions) {
             paymentOptions = new PaymentOptions(paymentOptionsEntry.dictionary());
         } else {
             paymentOptions = new PaymentOptions(null, null);
         }
         paymentOptions.setItemName(paymentOptionsDisplayName);
-    }
-
-    public CopyrightLicenseBroker getLicenseBroker() {
-        return license;
-    }
-
-    public PaymentOptions getPaymentOptions() {
-        return paymentOptions;
     }
 
     private static Map<String, Entry> getInfo(entry e) {
@@ -87,5 +73,13 @@ public class BTInfoAdditionalMetadataHolder {
             return new Entry(e).dictionary();
         }
         return null;
+    }
+
+    public CopyrightLicenseBroker getLicenseBroker() {
+        return license;
+    }
+
+    public PaymentOptions getPaymentOptions() {
+        return paymentOptions;
     }
 }

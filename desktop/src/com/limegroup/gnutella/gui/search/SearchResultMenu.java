@@ -21,7 +21,6 @@ import javax.swing.*;
  * The search result menu.
  */
 final class SearchResultMenu {
-
     private final SearchResultMediator PANEL;
 
     /**
@@ -36,12 +35,10 @@ final class SearchResultMenu {
      * Adds search-result specific items to the JPopupMenu.
      */
     JPopupMenu addToMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines) {
-
         // Check if there are lines
         if (lines.length == 0) {
             return popupMenu;
         }
-
         // Now check to see if any of the table lines are different classes
         // In this case we need to show a message that only similar
         for (int i = 1; i < lines.length; i++) {
@@ -55,8 +52,6 @@ final class SearchResultMenu {
                 break;
             }
         }
-
         return lines[0].getSearchResult().createMenu(popupMenu, lines, PANEL);
-
     }
 }

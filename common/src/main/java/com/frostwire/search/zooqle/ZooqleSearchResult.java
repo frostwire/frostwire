@@ -19,29 +19,26 @@ package com.frostwire.search.zooqle;
 
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import static com.frostwire.search.PerformersHelper.parseInfoHash;
-
 /**
  * @author aldenml
  * @author gubatron
  */
 public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
-
     private static final String FILE_SIZE_REGEX = "title=\"File size\"></i>(?<size>[\\d\\.\\,]*) (?<sizeUnit>.{2}?)";
     private static final Pattern FILE_SIZE_PATTERN = Pattern.compile(FILE_SIZE_REGEX);
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
     private final String torrentUrl;
     private final String infoHash;
-    private final long size;
+    private final double size;
     private final long creationTime;
     private final int seeds;
 
@@ -49,20 +46,19 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
         this.detailsUrl = detailsUrl;
         this.filename = matcher.group("filename") + ".torrent";
         this.displayName = matcher.group("filename");
-        this.seeds = Integer.valueOf(matcher.group("seeds").trim());
-
+        this.seeds = Integer.parseInt(matcher.group("seeds").trim());
         String magnetUrl = "magnet:?xt=urn:btih:" + matcher.group("magnet");
         //if (matcher.group("torrent") != null) {
         //    this.torrentUrl = urlPrefix + "/download/" + matcher.group("torrent") + ".torrent";
         //} else {
-            this.torrentUrl = magnetUrl;
+        this.torrentUrl = magnetUrl;
         //}
-        this.infoHash = parseInfoHash(magnetUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(magnetUrl); //already comes in lowercase
         this.size = calculateSize(matcher.group("sizedata"));
         this.creationTime = parseCreationTime(matcher.group("year") + " " + matcher.group("month") + " " + matcher.group("day"));
     }
 
-    private long calculateSize(String sizedata) {
+    private double calculateSize(String sizedata) {
         if (sizedata.contains("Filesize yet unknown")) {
             return -1;
         }
@@ -95,7 +91,7 @@ public final class ZooqleSearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 

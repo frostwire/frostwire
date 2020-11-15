@@ -20,62 +20,45 @@ import com.limegroup.gnutella.gui.LimeTextField;
 import java.util.HashMap;
 import java.util.Set;
 
-public class CryptoCurrencyTextField extends LimeTextField {
-    
-    public static enum CurrencyURIPrefix {
-        BITCOIN("bitcoin:"),
-        LITECOIN("litecoin:"),
-        DOGECOIN("dogecoin:");
-
-        private final String prefix;
-        
-        private CurrencyURIPrefix(String p) {
-            prefix  = p;
-        }
-
-        public String toString() {
-            return prefix;
-        }
-    }
-
+class CryptoCurrencyTextField extends LimeTextField {
     private final String prefix;
-    
-    private final HashMap<String,String> firstValidCharsOnAddress;
-    
-    public CryptoCurrencyTextField(CurrencyURIPrefix p) {
+    private final HashMap<String, String> firstValidCharsOnAddress;
+
+    CryptoCurrencyTextField(CurrencyURIPrefix p) {
         prefix = p.toString();
-        
-        firstValidCharsOnAddress = new HashMap<String,String>();
+        firstValidCharsOnAddress = new HashMap<>();
         initFirstValidChars();
     }
 
     private void initFirstValidChars() {
-        if (prefix.equals("bitcoin:")) {
-            firstValidCharsOnAddress.put("1","1");
-            firstValidCharsOnAddress.put("3","3");
-        } else if (prefix.equals("litecoin:")) {
-            firstValidCharsOnAddress.put("L","L");
-        } else if (prefix.equals("dogecoin:")) {
-            firstValidCharsOnAddress.put("D","D");
+        switch (prefix) {
+            case "bitcoin:":
+                firstValidCharsOnAddress.put("1", "1");
+                firstValidCharsOnAddress.put("3", "3");
+                break;
+            case "litecoin:":
+                firstValidCharsOnAddress.put("L", "L");
+                break;
+            case "dogecoin:":
+                firstValidCharsOnAddress.put("D", "D");
+                break;
         }
     }
-    
-    public boolean hasValidPrefixOrNoPrefix() {
-        boolean hasPrefix = false;
+
+    boolean hasValidPrefixOrNoPrefix() {
+        boolean hasPrefix;
         boolean hasValidPrefix = false;
         String text = getText();
-        
         if (text.contains(":")) {
             hasPrefix = true;
             hasValidPrefix = text.startsWith(prefix);
         } else {
             hasPrefix = false;
         }
-        
-        return (hasPrefix && hasValidPrefix) || !hasPrefix;
+        return !hasPrefix || hasValidPrefix;
     }
-    
-    public boolean hasValidAddress() {
+
+    boolean hasValidAddress() {
         boolean result = false;
         String text = getText().trim();
         if (text != null && !text.isEmpty()) {
@@ -84,9 +67,9 @@ public class CryptoCurrencyTextField extends LimeTextField {
         }
         return result;
     }
-    
+
     //To be invoked only after hasValidAddress() has returned true.
-    public String normalizeValidAddress() {
+    String normalizeValidAddress() {
         String result = getText().trim();
         if (!result.startsWith(prefix)) {
             result = prefix + result;
@@ -110,7 +93,19 @@ public class CryptoCurrencyTextField extends LimeTextField {
                 }
             }
         }
-        
         return foundChar;
-    }    
+    }
+
+    public enum CurrencyURIPrefix {
+        BITCOIN("bitcoin:");
+        private final String prefix;
+
+        CurrencyURIPrefix(String p) {
+            prefix = p;
+        }
+
+        public String toString() {
+            return prefix;
+        }
+    }
 }

@@ -1,50 +1,38 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.limewire.setting;
 
 import java.util.Properties;
 
-
 /**
- * Provides a font name setting value. As a subclass of 
+ * Provides a font name setting value. As a subclass of
  * <code>Setting</code>, the setting has a key.
  * <p>
- * Create a <code>FontNameSetting</code> object with a 
+ * Create a <code>FontNameSetting</code> object with a
  * {@link SettingsFactory#createFontNameSetting(String, String)}.
  */
-
- /* TODO: look into creating a true 'FontSetting' that keeps a Font
- * object rather than just the name.  This will require changes
- * to the themes.txt format since right now it has three properties
- * (name, style, size) that define a single font.
- */
-public final class FontNameSetting extends AbstractSetting {
-   
-    private String _fontName;
-
+final class FontNameSetting extends AbstractSetting {
     FontNameSetting(Properties defaultProps, Properties props, String key,
-                                                           String defaultStr) {
+                    String defaultStr) {
         super(defaultProps, props, key, defaultStr);
-        _fontName = defaultStr;
-    }
-    /**
-      * @param fontName
-      */
-    public void setValue(String fontName) {
-        setValueInternal(fontName);
     }
 
-    public String getValue() {
-        return _fontName;
-    }
-    
-    /**
-     * Most of the theme files have a font (like Verdana)
-     * specified that can not display languages other than
-     * those using Roman alphabets. Therefore, if the locale 
-     * is determined not to be one that uses a Roman alphabet 
-     * then do not set _fontName.  The variable _fontName
-     * is set to the default (dialog) in the constructor.
-     */
+    @Override
     protected void loadValue(String sValue) {
-        _fontName = sValue;
     }
 }

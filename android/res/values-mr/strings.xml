@@ -24,7 +24,6 @@
     <string name="your_installation_is_complete">आपली स्थापना पूर्ण झाली आहे.</string>
     <string name="error_connection_timed_out">त्रुटी: कनेक्शन कालबाह्य/वगळले पुन्हा प्रयत्न करा.</string>
     <string name="azureus_manager_item_seeding">बीजन</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">सर्व बदल्यांची बीजारोणा थांबवा</string>
     <string name="cloud_download_aborted_on_mobile_data">वर्तमान सेटिंग जेव्हा Wi-Fi नेटवर्कवर नाही तेव्हा डाउनलोड करण्यास प्रतिबंधित करते</string>
     <string name="filter_ellipsis">फिल्टर…</string>
@@ -90,7 +89,7 @@
     <string name="share">सामायिक करा</string>
     <string name="accept">स्वीकार करा</string>
     <string name="torrent_max_download_speed_summary">कमाल डाउनलोड स्पीड (0 अमर्यादित म्हणजे)</string>
-    <string name="retry_search">पुन्हा प्रयत्न करा</string>
+    <string name="retry">पुन्हा प्रयत्न करा</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">फाइलची वर्गवारी करणे शक्य नाही. बिटटॉरंट डिस्कनेक्ट केलेले राहतील.</string>
     <string name="seed_all_finished">बीज सर्व पूर्ण</string>
     <string name="exclude">वगळा</string>
@@ -243,7 +242,6 @@
     <string name="settings">सेटिंग्ज</string>
     <string name="enable_seeding">बीजन सक्षम करा</string>
     <string name="data_saving_turn_off_transfers">कोणतेही Wi-Fi उपलब्ध नाही, सर्व हस्तांतरण थांबविले गेले आहेत</string>
-    <string name="use_pixabay">Pixabay वापरा</string>
     <string name="finishing">समाप्त</string>
     <string name="set_as_wallpaper">वॉलपेपर म्हणून सेट करा</string>
     <string name="available">उपलब्ध</string>
@@ -410,7 +408,7 @@
     <string name="add_tracker">ट्रॅकर जोडा</string>
     <string name="remove_ads">जाहिराती काढून</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n विनामूल्य 7-दिवसांची चाचणी</string>
-    <string name="play_store_out_of_sync">Google Play Store समक्रमित करण्याची आवश्यकता आहे, काही मिनिटे प्रतीक्षा करा</string>
     <string name="contact_us">आमच्याशी संपर्क साधा</string>
     <string name="use_nyaa">Nyaa वापरा</string>
+    <string name="use_torrentz2">Torrentz2 वापरा</string>
 </resources>

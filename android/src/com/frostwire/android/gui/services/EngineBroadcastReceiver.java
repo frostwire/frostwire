@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,8 +122,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //don't stop
             return;
         }
-
-        Engine.instance().getThreadPool().execute(() -> Engine.instance().stopServices(true));
+        async(Engine.instance()::stopServices, true);
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {

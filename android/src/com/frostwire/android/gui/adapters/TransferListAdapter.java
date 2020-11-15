@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
+
 package com.frostwire.android.gui.adapters;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
@@ -46,12 +48,14 @@ import com.frostwire.android.gui.adapters.menu.CopyToClipboardMenuAction;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.PauseDownloadMenuAction;
 import com.frostwire.android.gui.adapters.menu.ResumeDownloadMenuAction;
+import com.frostwire.android.gui.adapters.menu.RetryDownloadAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendBitcoinTipAction;
 import com.frostwire.android.gui.adapters.menu.SendFiatTipAction;
 import com.frostwire.android.gui.adapters.menu.StopSeedingAction;
 import com.frostwire.android.gui.adapters.menu.TransferDetailsMenuAction;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.transfers.InvalidTransfer;
+import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
@@ -160,6 +164,11 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         Object tag = view.getTag();
         String title = "";
         List<MenuAction> items = new ArrayList<>();
+        if (tag instanceof Transfer && ((Transfer) tag).getState().name().contains("ERROR")) {
+            if (tag instanceof InvalidTransfer || tag instanceof TorrentFetcherDownload) {
+               items.add(new RetryDownloadAction(contextRef.get(), (Transfer) tag));
+            }
+        }
         if (tag instanceof BittorrentDownload) {
             title = populateBittorrentDownloadMenuActions((BittorrentDownload) tag, items);
         } else if (tag instanceof Transfer) {
@@ -176,6 +185,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         if (finishedSuccessfully && Ref.alive(contextRef)) {
             final List<FileDescriptor> files = Librarian.instance().getFiles(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
             boolean singleFile = files != null && files.size() == 1;
+
             if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {
                 items.add(new SeedAction(contextRef.get(), files.get(0), download));
             }
@@ -416,6 +426,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 buttonDetails.setTag(download);
                 buttonDetails.setVisibility(View.VISIBLE);
                 buttonDetails.setOnClickListener(transferDetailsClickListener);
+                ((UIBittorrentDownload) download).checkSequentialDownload();
             } else {
                 buttonDetails.setVisibility(View.GONE);
                 buttonDetails.setOnClickListener(null);
@@ -520,7 +531,6 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         }
 
         public void onClick(Context ctx, View v) {
-            Engine.instance().hapticFeedback();
             Object tag = v.getTag();
             if (tag instanceof TransferItem) {
                 TransferItem item = (TransferItem) tag;

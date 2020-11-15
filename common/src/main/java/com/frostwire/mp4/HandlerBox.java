@@ -25,10 +25,9 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class HandlerBox extends FullBox {
-
+    protected final int[] reserved;
     protected int pre_defined;
     protected int handler_type;
-    protected final int[] reserved;
     protected byte[] name;
 
     HandlerBox() {
@@ -48,7 +47,6 @@ public final class HandlerBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 4);
         IO.read(ch, len, buf);
         pre_defined = buf.getInt();
@@ -62,7 +60,6 @@ public final class HandlerBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(pre_defined);
         buf.putInt(handler_type);
         IO.put(buf, reserved);

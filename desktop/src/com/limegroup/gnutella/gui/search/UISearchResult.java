@@ -27,24 +27,23 @@ import javax.swing.*;
  * {@link SearchResultDataLine}s to show search results.
  */
 public interface UISearchResult {
-
     /**
      * @return the file name
      */
     String getFilename();
-    
+
     /**
      * Gets the size of this SearchResult.
      */
-    long getSize();
-    
+    double getSize();
+
     /**
      * @return milliseconds since January 01, 1970 the artifact of t
      */
     long getCreationTime();
-    
+
     String getSource();
-    
+
     /**
      * Returns the extension of this result.
      */
@@ -53,21 +52,21 @@ public interface UISearchResult {
     void download(boolean partial);
 
     JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp);
-    
+
     String getHash();
 
     int getSeeds();
-    
+
     SearchEngine getSearchEngine();
-    
+
     SearchResult getSearchResult();
-    
+
     void showSearchResultWebPage(boolean now);
-    
+
     String getDetailsUrl();
-    
+
     String getDisplayName();
-    
+
     String getQuery();
 
     void play();

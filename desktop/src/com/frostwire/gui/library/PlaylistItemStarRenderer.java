@@ -27,16 +27,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- *  Creates both a renderer and an editor for cells in the playlist table that display the name
- *  of the file being played.
- *  
- *  @author gubatron
- *  @author aldenml
+ * Creates both a renderer and an editor for cells in the playlist table that display the name
+ * of the file being played.
+ *
+ * @author gubatron
+ * @author aldenml
  */
 class PlaylistItemStarRenderer extends DefaultTableBevelledCellRenderer {
-
     private static final long serialVersionUID = 6800146830099830381L;
-
     private static final Icon starOn;
     private static final Icon starOff;
     private static final Icon exclamation;
@@ -53,9 +51,7 @@ class PlaylistItemStarRenderer extends DefaultTableBevelledCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         final LibraryPlaylistsTableDataLine line = ((PlaylistItemProperty<?>) value).getLine();
         final PlaylistItemProperty<?> cell = (PlaylistItemProperty<?>) value;
-
         setIcon(line.getPlayListItem().isStarred(), cell.exists());
-
         final JLabel component = (JLabel) super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
         component.addMouseListener(new MouseAdapter() {
             @Override
@@ -68,7 +64,6 @@ class PlaylistItemStarRenderer extends DefaultTableBevelledCellRenderer {
                 setIcon(line.getPlayListItem().isStarred(), cell.exists());
             }
         });
-
         return component;
     }
 

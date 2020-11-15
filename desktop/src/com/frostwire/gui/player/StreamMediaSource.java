@@ -19,25 +19,19 @@
 package com.frostwire.gui.player;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class StreamMediaSource extends MediaSource {
-
     private final String title;
-    
     private final String detailsUrl;
-
     private final boolean showPlayerWindow;
-    
+
     public StreamMediaSource(String url, String title, String detailsUrl, boolean showPlayerWindow) {
         super(url);
         this.title = title;
         this.detailsUrl = detailsUrl;
         this.showPlayerWindow = showPlayerWindow;
-        
         // initialize display text
         titleText = this.title;
         toolTipText = "";
@@ -46,11 +40,11 @@ public class StreamMediaSource extends MediaSource {
     public String getTitle() {
         return title;
     }
-    
+
     public String getDetailsUrl() {
         return detailsUrl;
     }
-    
+
     boolean showPlayerWindow() {
         return showPlayerWindow;
     }

@@ -22,13 +22,15 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.mopub.common.MediationSettings;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
@@ -39,6 +41,7 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubRewardedVideos;
 import com.mopub.network.Networking;
 
 import java.lang.ref.WeakReference;
@@ -61,14 +64,29 @@ import static com.frostwire.android.util.Asyncs.async;
 public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusChangeListener {
     private static final Logger LOG = Logger.getLogger(MoPubAdNetwork.class);
     private static final boolean DEBUG_MODE = Offers.DEBUG_MODE;
-    public static final String UNIT_ID_AUDIO_PLAYER = "c737d8a55b2e41189aa1532ae0520ad1";
-    public static final String UNIT_ID_HOME = "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
-    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = "a8be0cad4ad0419dbb19601aef3a18d2";
-    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = "2fd0fafe3d3c4d668385a620caaa694e";
-    public static final String UNIT_ID_SEARCH_HEADER = "be0b959f15994fd5b56c997f63530bd0";
+
+    private static final String TEST_320X50_BANNER = "b195f8dd8ded45fe847ad89ed1d016da";
+    private static final String TEST_300X250_MEDIUM_RECTANGLE = "252412d5e9364a05ab77d9396346d73d";
+    private static final String TEST_UNIT_INTERSTITIAL = "24534e1901884e398f1253216226017e";
+    private static final String TEST_UNIT_REWARDED_VIDEO = "920b6145fb1546cf8b5cf2ac34638bb7";
+
+    // for documentation purposes, delete months later if unused
+    private static final String RETIRED_UNIT_ID_AUDIO_PLAYER_300x250 = "c737d8a55b2e41189aa1532ae0520ad1";
+
+    public static final String UNIT_ID_HOME = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "8174d0bcc3684259b3fdbc8e1310682e"; // aka 300×250 Search Screen
+    public static final String UNIT_ID_PREVIEW_PLAYER_VERTICAL = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "a8be0cad4ad0419dbb19601aef3a18d2";
+    static final String UNIT_ID_SEARCH_HEADER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "be0b959f15994fd5b56c997f63530bd0";
+
+    public static final String UNIT_ID_AUDIO_PLAYER = (Offers.DEBUG_MODE) ? TEST_320X50_BANNER : "e97ea70a9fdc483c9be39b39e5a51c3f";
+    public static final String UNIT_ID_PREVIEW_PLAYER_HORIZONTAL = (Offers.DEBUG_MODE) ? TEST_300X250_MEDIUM_RECTANGLE : "2fd0fafe3d3c4d668385a620caaa694e";
+
+    private static final String UNIT_ID_INTERSTITIAL_TABLET = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "cebdbc56b37c4d31ba79e861d1cb0de4";
+    private static final String UNIT_ID_INTERSTITIAL_MOBILE = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "399a20d69bdc449a8e0ca171f82179c8";
+    public static final String UNIT_ID_REWARDED_VIDEO = (Offers.DEBUG_MODE) ? TEST_UNIT_REWARDED_VIDEO : "4e4f31e5067049998664b5ec7b9451e1";
+
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;
-    private Map<String,String> placements;
+    private Map<String, String> placements;
     private Map<String, MoPubInterstitial> interstitials;
 
     @Override
@@ -88,11 +106,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         starting = true;
         initPlacementMappings(UIUtils.isTablet(activity.getResources()));
         SdkConfiguration.Builder builder = new SdkConfiguration.Builder(UNIT_ID_SEARCH_HEADER);
-//        if (BuildConfig.DEBUG) {
-//            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
-//        } else {
-//            builder.withLogLevel(MoPubLog.LogLevel.INFO);
-//        }
+        if (Offers.DEBUG_MODE) {
+            builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
+        }
         SdkConfiguration sdkConfiguration = builder.build();
         fixExecutor(true);
 
@@ -173,10 +189,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private void initPlacementMappings(boolean isTablet) {
         placements = new HashMap<>();
-        if (!isTablet) {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "399a20d69bdc449a8e0ca171f82179c8");
+        if (isTablet) {
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, MoPubAdNetwork.UNIT_ID_INTERSTITIAL_TABLET);
         } else {
-            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, "cebdbc56b37c4d31ba79e861d1cb0de4");
+            placements.put(Offers.PLACEMENT_INTERSTITIAL_MAIN, MoPubAdNetwork.UNIT_ID_INTERSTITIAL_MOBILE);
         }
     }
 
@@ -233,33 +249,34 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         }
     }
 
+    public void loadRewardedVideo() {
+        if (!started() || !enabled()) {
+            LOG.info("loadRewardedVideo() aborted. Network not started or not enabled");
+            return; //not ready
+        }
+        MoPubRewardedVideos.setRewardedVideoListener(MoPubRewardedVideoListener.instance());
+        MoPubRewardedVideos.loadRewardedVideo(UNIT_ID_REWARDED_VIDEO);
+        LOG.info("loadRewardedVideo() called");
+    }
+
     public void loadMoPubInterstitial(final Activity activity, final String placement) {
         if (activity == null) {
-            LOG.info("Aborted loading interstitial ("+placement+"), no Activity");
+            LOG.info("Aborted loading interstitial (" + placement + "), no Activity");
             return;
         }
         if (!started() || !enabled()) {
-            LOG.info("loadMoPubInterstitial(placement="+placement+") aborted. Network not started or not enabled");
+            LOG.info("loadMoPubInterstitial(placement=" + placement + ") aborted. Network not started or not enabled");
             return;
         }
-        LOG.info("Loading " + placement + " interstitial");
+        LOG.info("loadMoPubInterstitial: Loading " + placement + " interstitial");
         try {
             final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
             MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(this, placement);
             moPubInterstitial.setInterstitialAdListener(moPubListener);
             interstitials.put(placement, moPubInterstitial);
-            async(moPubInterstitial, MoPubAdNetwork::loadMoPubInterstitialAsync);
-        } catch (Throwable e) {
-            LOG.warn("loadMoPubInterstitial(activity, placement): Mopub Interstitial couldn't be loaded", e);
-        }
-    }
-
-    private static void loadMoPubInterstitialAsync(final MoPubInterstitial moPubInterstitial) {
-        try {
-            Looper.prepare();
             moPubInterstitial.load();
         } catch (Throwable e) {
-            LOG.warn("loadMoPubInterstitialAsync(moPubInterstitial): Mopub Interstitial couldn't be loaded", e);
+            LOG.warn("loadMoPubInterstitial(activity, placement): Mopub Interstitial couldn't be loaded", e);
         }
     }
 
@@ -293,7 +310,11 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         for (String key : placementKeys) {
             MoPubInterstitial interstitial = interstitials.get(key);
             if (interstitial != null) {
-                interstitial.destroy();
+                try {
+                    interstitial.destroy();
+                } catch (Throwable t) {
+                    LOG.warn(t.getMessage(), t);
+                }
             }
         }
     }
@@ -303,7 +324,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
                                      @NonNull ConsentStatus newConsentStatus,
                                      boolean canCollectPersonalInformation) {
         if (!canCollectPersonalInformation) {
-            npaBundle.putString("npa","1");
+            npaBundle.putString("npa", "1");
         } else {
             npaBundle.remove("npa");
         }

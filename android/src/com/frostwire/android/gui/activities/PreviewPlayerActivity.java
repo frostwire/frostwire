@@ -58,7 +58,6 @@ import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.Logger;
@@ -242,7 +241,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void onDownloadButtonClick() {
         if (Ref.alive(srRef)) {
-            Engine.instance().hapticFeedback();
             final FileSearchResult fileSearchResult = srRef.get();
             NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
             dlg.show(getFragmentManager());
@@ -325,7 +323,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
 
-            mopubBannerView.setVisible(MopubBannerView.Visibility.ALL,false);
+            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL,false);
 
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
@@ -350,12 +348,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (Offers.disabledAds()) {
                 hideAd();
-                mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+                mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
             } else {
                 if (mopubLoaded) {
-                    mopubBannerView.setVisible(MopubBannerView.Visibility.MOPUB, true);
+                    mopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
                 } else {
-                    mopubBannerView.setVisible(MopubBannerView.Visibility.FALLBACK, true);
+                    mopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
                 }
             }
             v.setRotation(0);
@@ -477,7 +475,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                     androidMediaPlayer.prepare();
                     androidMediaPlayer.start();
                     if (MusicUtils.isPlaying()) {
-                        MusicUtils.playOrPause();
+                        MusicUtils.playPauseOrResume();
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
@@ -559,13 +557,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 changeVideoSize();
                 startedPlayback = true;
                 break;
-            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-                break;
-            case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-                break;
-            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-                break;
             case MediaPlayer.MEDIA_INFO_UNKNOWN:
+            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+            case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
             default:
                 break;
         }
@@ -627,7 +622,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private void hideAd() {
         if (mopubBannerView != null) {
-            mopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
         }
         if (!isPortrait()) {
             LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);

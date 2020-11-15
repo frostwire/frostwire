@@ -4,7 +4,6 @@ import com.frostwire.bittorrent.BTDownload;
 
 import java.io.File;
 
-
 /**
  * Callback to notify the GUI of asynchronous backend events.
  * The methods in this fall into the following categories:
@@ -20,7 +19,6 @@ import java.io.File;
  * </ul>
  */
 public interface ActivityCallback {
-
     /**
      * Add a file to the download window
      */
@@ -31,19 +29,19 @@ public interface ActivityCallback {
     /**
      * Show active downloads
      */
-    public void showDownloads();
+    void showDownloads();
 
     /**
      * Tell the GUI to deiconify.
      */
-    public void restoreApplication();
+    void restoreApplication();
 
     /**
      * Try to download the torrent file
      */
-    public void handleTorrent(File torrentFile);
+    void handleTorrent(File torrentFile);
 
-    public void handleTorrentMagnet(String request, boolean partialDownload);
+    void handleTorrentMagnet(String request, boolean partialDownload);
 
-    public boolean isRemoteDownloadsAllowed();
+    boolean isRemoteDownloadsAllowed();
 }

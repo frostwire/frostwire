@@ -21,25 +21,17 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
+abstract class AERunnable implements Runnable {
+    public void
+    run() {
+        try {
+            runSupport();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
 
-public abstract class 
-AERunnable 
-	implements Runnable
-{
-	public void
-	run()
-	{
-		try{
-			runSupport();
-			
-		}catch( Throwable e ){
-			
-			DebugLight.printStackTrace(e);
-		}
-	}
-	
-	public abstract void
-	runSupport();
+    protected abstract void
+    runSupport();
 }

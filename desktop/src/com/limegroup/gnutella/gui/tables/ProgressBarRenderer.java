@@ -21,58 +21,32 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.theme.SkinProgressBarUI;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class handles rendering a <tt>JProgressBar</tt> for improved
  * performance in tables.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
-public class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
-
-    private Map<Color, Border> borders = new HashMap<Color, Border>();
+class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
     private boolean isSelected;
 
     /**
      * Sets the font, border, and colors for the progress bar.
-     *
      */
-    public ProgressBarRenderer() {
+    ProgressBarRenderer() {
         setUI(SkinProgressBarUI.createUI(this));
         setStringPainted(true);
-    }
-
-    /**
-     * Gets a new or old border for this color.
-     */
-    public Border getCachedOrNewBorder(Color c) {
-        if (c == null)
-            return null;
-        if (borders == null)
-            return null;
-
-        Border b = borders.get(c);
-        if (b == null) {
-            b = BorderFactory.createMatteBorder(2, 5, 2, 5, c);
-            borders.put(c, b);
-        }
-        return b;
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSel, boolean hasFocus, int row, int column) {
         this.isSelected = isSel;
         setValue(Math.min(100, getBarStatus(value)));
         setString(getDescription(value));
-
         syncFont(table, this);
-
         return this;
     }
 
@@ -80,38 +54,37 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
      * @param value the same value that initializes the cell
      * @return the String that should be displayed
      */
-    protected String getDescription(Object value) {
-        return Integer.toString(getBarStatus(value)) + " %";
+    private String getDescription(Object value) {
+        return getBarStatus(value) + " %";
     }
 
     /**
      * @param value the same value that initializes the cell
      * @return what the progress bar component should be set to
      */
-    protected int getBarStatus(Object value) {
-        return value == null ? 0 : ((Integer) value).intValue();
+    private int getBarStatus(Object value) {
+        return value == null ? 0 : (Integer) value;
     }
 
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
-
         if (!isSelected) {
             BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
         }
     }
-    
+
     /*
-     * The following methods are overridden as a performance measure to 
+     * The following methods are overridden as a performance measure to
      * to prune code-paths are often called in the case of renders
      * but which we know are unnecessary.  Great care should be taken
-     * when writing your own renderer to weigh the benefits and 
+     * when writing your own renderer to weigh the benefits and
      * drawbacks of overriding methods like these.
      */
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public boolean isOpaque() {
@@ -128,7 +101,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void validate() {
@@ -136,7 +109,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void revalidate() {
@@ -144,7 +117,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void repaint(long tm, int x, int y, int width, int height) {
@@ -152,7 +125,7 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     public void repaint(Rectangle r) {
@@ -160,12 +133,12 @@ public class ProgressBarRenderer extends JProgressBar implements TableCellRender
 
     /**
      * Overridden for performance reasons.
-     * See the <a href="#override">Implementation Note</a> 
+     * See the <a href="#override">Implementation Note</a>
      * for more information.
      */
     protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         // Strings get interned...
-        if (propertyName == "text") {
+        if (propertyName.equals("text")) {
             super.firePropertyChange(propertyName, oldValue, newValue);
         }
     }

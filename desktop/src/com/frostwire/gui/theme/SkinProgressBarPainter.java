@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinProgressBarPainter extends AbstractSkinPainter {
-
     private final State state;
     private final int padding;
 
@@ -40,30 +37,26 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
         switch (state) {
-        case Enabled:
-        case Disabled:
-            paintBar(g, c, width, height);
-            break;
-        case EnabledIndeterminate:
-        case DisabledIndeterminate:
-            paintIndeterminateBar(g, width, height);
-            break;
+            case Enabled:
+            case Disabled:
+                paintBar(g, c, width, height);
+                break;
+            case EnabledIndeterminate:
+            case DisabledIndeterminate:
+                paintIndeterminateBar(g, width, height);
+                break;
         }
     }
 
     private void paintBar(Graphics2D g, JComponent c, int width, int height) {
         int d = padding - 1;
         int d2 = 2 * d;
-        int x = d;
-        int y = d;
         width = width - d2;
         height = height - d2 - 1;
-        
-        if (testValid(x, y, width, height)) {
-            Shape s = shapeGenerator.createRectangle(x, y, width, height);
+        if (testValid(d, d, width, height)) {
+            Shape s = shapeGenerator.createRectangle(d, d, width, height);
             g.setPaint(getProgressBarPaint(s));
             g.fill(s);
-            
             g.setPaint(getProgressBarBorderPaint());
             g.draw(s);
         }
@@ -81,7 +74,7 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
         Color[] colors = state == State.Enabled ? SkinColors.PROGRESS_BAR_ENABLED_GRADIENT_COLORS : SkinColors.PROGRESS_BAR_DISABLED_GRADIENT_COLORS;
         return createVerticalGradient(s, colors);
     }
-    
+
     private Paint getProgressBarBorderPaint() {
         return state == State.Enabled ? SkinColors.PROGRESS_BAR_ENABLED_BORDER_COLOR : SkinColors.PROGRESS_BAR_DISABLED_BORDER_COLOR;
     }
@@ -91,7 +84,7 @@ public final class SkinProgressBarPainter extends AbstractSkinPainter {
         return createVerticalGradient(s, colors);
     }
 
-    public static enum State {
+    public enum State {
         Enabled, Disabled, EnabledIndeterminate, DisabledIndeterminate
     }
 }

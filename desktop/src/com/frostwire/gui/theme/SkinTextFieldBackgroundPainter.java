@@ -24,13 +24,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinTextFieldBackgroundPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinTextFieldBackgroundPainter(State state) {
@@ -40,14 +37,14 @@ public final class SkinTextFieldBackgroundPainter extends AbstractSkinPainter {
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
         switch (state) {
-        case Disabled:
-            paintDisabledBackground(g, width, height);
-            break;
-        case Enabled:
-        case Focused:
-        default:
-            paintDefaultBackground(g, width, height);
-            break;
+            case Disabled:
+                paintDisabledBackground(g, width, height);
+                break;
+            case Enabled:
+            case Focused:
+            default:
+                paintDefaultBackground(g, width, height);
+                break;
         }
     }
 
@@ -71,7 +68,7 @@ public final class SkinTextFieldBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled, Focused
     }
 }

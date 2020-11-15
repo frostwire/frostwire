@@ -22,7 +22,6 @@ package com.frostwire.platform;
  * @author aldenml
  */
 public interface VPNMonitor {
-
     /**
      * This indicate if the OS networking is under active VPN or not.
      * It's based on routing heuristics, and not 100% reliable, but it's usable.

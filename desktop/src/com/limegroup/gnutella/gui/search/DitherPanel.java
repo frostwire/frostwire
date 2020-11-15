@@ -1,52 +1,48 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui.search;
 
 import javax.swing.*;
 import java.awt.*;
 
-/** Simple extension of JPanel that makes a FlowLayout.LEADING JPanel that
- *  has a background image which is painted.
+/**
+ * Simple extension of JPanel that makes a FlowLayout.LEADING JPanel that
+ * has a background image which is painted.
  */
 public class DitherPanel extends JPanel {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6998596665800341964L;
     private final Ditherer DITHERER;
-    private boolean isDithering = true;
-    private Color nonDitherBackgroundColor;
 
     /**
      * Creates a FlowLayout.LEADING layout.
      *
-     * @param ditherer the <tt>Ditherer</tt> that paints the dithered 
-     *  background
+     * @param ditherer the <tt>Ditherer</tt> that paints the dithered
+     *                 background
      */
-    public DitherPanel(Ditherer ditherer, Color nonDitherBackgroundColor) {
+    public DitherPanel(Ditherer ditherer) {
         super();
         DITHERER = ditherer;
-        this.nonDitherBackgroundColor = nonDitherBackgroundColor;
     }
 
-    /** Does the actual placement of the background image.
+    /**
+     * Does the actual placement of the background image.
      */
     public void paintComponent(java.awt.Graphics g) {
-        if (isDithering) { // && !DITHERER.getFromColor().equals(DITHERER.getToColor())) {
-            Dimension size = getSize();
-            DITHERER.draw(g, size.height, size.width);
-        } else {
-            if (nonDitherBackgroundColor!=null) {
-                Dimension size = getSize();
-                g.setColor(nonDitherBackgroundColor);
-                g.fillRect(0, 0, size.width, size.height);
-            } else {
-                super.paintComponent(g);
-            }
-        }
+        Dimension size = getSize();
+        DITHERER.draw(g, size.height, size.width);
     }
-
-    public void setDithering(boolean dither) {
-        isDithering = dither;
-    }
-
 }

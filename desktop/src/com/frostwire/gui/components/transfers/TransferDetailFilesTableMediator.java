@@ -26,7 +26,6 @@ import com.limegroup.gnutella.gui.tables.LimeJTable;
 import javax.swing.*;
 
 public class TransferDetailFilesTableMediator extends AbstractTableMediator<TransferDetailFilesModel, TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
-
     TransferDetailFilesTableMediator() {
         super("TRANSFER_DETAIL_FILES_TABLE_MEDIATOR");
     }
@@ -51,17 +50,14 @@ public class TransferDetailFilesTableMediator extends AbstractTableMediator<Tran
 
     @Override
     public void handleActionKey() {
-
     }
 
     @Override
     public void handleSelection(int row) {
-
     }
 
     @Override
     public void handleNoSelection() {
-
     }
 
     @Override

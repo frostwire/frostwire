@@ -14,28 +14,32 @@ version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+import org.gradle.internal.os.OperatingSystem
+
+sourceCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_12 : JavaVersion.VERSION_11
+targetCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_12 : JavaVersion.VERSION_11
 
 compileJava {
     options.encoding = '8859_1'
+    options.fork = true
+    options.compilerArgs += ["-Xlint:deprecation"]
 }
 
 repositories {
     mavenCentral()
-
-    maven { url  "http://dl.bintray.com/ijabz/maven" }
+    maven { url "https://dl.bintray.com/ijabz/maven" }
 }
 
 dependencies {
-    compile 'com.google.re2j:re2j:1.2'
-    compile 'com.google.code.gson:gson:2.8.5'
-    compile 'com.squareup.okhttp3:okhttp:3.14.0'
-    compile 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    compile "com.h2database:h2:1.4.199"
-    compile 'net.jthink:jaudiotagger:2.2.5'
+    implementation 'com.google.re2j:re2j:1.4'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.okhttp3:okhttp:4.8.1'
+    implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
+    implementation 'com.h2database:h2:1.4.200'
+    implementation 'net.jthink:jaudiotagger:2.2.5'
 
-    compile fileTree(dir: 'lib/jars', include: ['*.jar'])
+    implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
+    implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
 }
 
 sourceSets {
@@ -62,11 +66,11 @@ sourceSets {
 }
 
 jar {
-    archiveName = 'frostwire.jar'
+    archiveFileName = 'frostwire.jar'
 
     exclude('META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF')
 
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes 'Main-Class': 'com.limegroup.gnutella.gui.Main'
@@ -149,3 +153,23 @@ task gettextBundle {
 
 gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
+
+test {
+    enabled = gradle.startParameter.taskNames.contains("test")
+    useJUnitPlatform()
+
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
+
+    filter {
+        //include specific method in any of the tests
+        includeTestsMatching "com.frostwire.tests.*"
+    }
+
+    testLogging {
+        events "passed", "failed", "standardError"
+        showExceptions true
+        showCauses true
+        showStackTraces false
+        exceptionFormat "full"
+    }
+}

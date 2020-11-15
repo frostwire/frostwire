@@ -9,7 +9,6 @@ import java.awt.*;
  * Simple renderer for speeds.
  */
 public final class SpeedRenderer extends DefaultTableBevelledCellRenderer {
-
     /**
      *
      */

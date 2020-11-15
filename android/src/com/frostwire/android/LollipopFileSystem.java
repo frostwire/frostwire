@@ -24,11 +24,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.os.storage.StorageManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.provider.DocumentFile;
 import android.util.LruCache;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.FileFilter;
@@ -50,6 +49,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron
@@ -272,7 +274,7 @@ public final class LollipopFileSystem implements FileSystem {
 
                     @Override
                     public void file(File file) {
-                        if (!file.isDirectory()) {
+                        if (!file.isDirectory() && !file.getName().contains(".parts")) {
                             paths.add(file.getPath());
                         }
                     }
@@ -282,8 +284,11 @@ public final class LollipopFileSystem implements FileSystem {
             }
 
             if (paths.size() > 0) {
-                MediaScanner.scanFiles(app, paths);
-                UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+                // We're usually called from SessionManager-alertsLoop, don't hug that loop
+                Librarian.instance().safePost(() -> {
+                    MediaScanner.scanFiles(app, paths);
+                    UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
+                });
             }
         } catch (Throwable e) {
             LOG.error("Error scanning file/directory: " + file, e);

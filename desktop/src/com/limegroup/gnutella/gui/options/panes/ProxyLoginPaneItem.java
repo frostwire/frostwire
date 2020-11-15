@@ -27,52 +27,24 @@ import com.limegroup.gnutella.settings.ConnectionSettings;
 import javax.swing.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user to
  * set the login data for the proxy.
  */
 public final class ProxyLoginPaneItem extends AbstractPaneItem {
-
-    public final static String TITLE = I18n.tr("Login Details");
-
-    public final static String LABEL = I18n.tr("Configure username and password to be used for the proxy.");
-
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for the
-     * check box that enables / disables password authentification at the
-     * proxy.
-     */
-    private final String PROXY_AUTHENTICATE_CHECK_BOX_LABEL =
-            I18n.tr("Enable Authentication:");
-
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for the
-     * label on the username field.
-     */
-    private final String PROXY_USERNAME_LABEL_KEY =
-            I18n.tr("Username:");
-
-    /**
-     * Constant for the key of the locale-specific <tt>String</tt> for the
-     * label on the password field.
-     */
-    private final String PROXY_PASSWORD_LABEL_KEY =
-            I18n.tr("Password:");
-
+    private final static String TITLE = I18n.tr("Login Details");
+    private final static String LABEL = I18n.tr("Configure username and password to be used for the proxy.");
     /**
      * Constant <tt>JTextField</tt> instance that holds the username.
      */
     private final JTextField PROXY_USERNAME_FIELD =
             new SizedTextField(12, SizePolicy.RESTRICT_BOTH);
-
     /**
      * Constant <tt>JTextField</tt> instance that holds the pasword.
      */
     private final JTextField PROXY_PASSWORD_FIELD =
             new SizedTextField(12, SizePolicy.RESTRICT_BOTH);
-
     /**
      * Constant for the check box that determines whether or not to
      * authenticate at proxy settings
@@ -85,19 +57,32 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
      */
     public ProxyLoginPaneItem() {
         super(TITLE, LABEL);
-
         CHECK_BOX.addItemListener(new LocalAuthenticateListener());
-
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          check box that enables / disables password authentification at the
+          proxy.
+         */
+        String PROXY_AUTHENTICATE_CHECK_BOX_LABEL = I18n.tr("Enable Authentication:");
         LabeledComponent checkBox = new LabeledComponent(
                 PROXY_AUTHENTICATE_CHECK_BOX_LABEL, CHECK_BOX,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the username field.
+         */
+        String PROXY_USERNAME_LABEL_KEY = I18n.tr("Username:");
         LabeledComponent username = new LabeledComponent(
                 PROXY_USERNAME_LABEL_KEY, PROXY_USERNAME_FIELD,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          label on the password field.
+         */
+        String PROXY_PASSWORD_LABEL_KEY = I18n.tr("Password:");
         LabeledComponent password = new LabeledComponent(
                 PROXY_PASSWORD_LABEL_KEY, PROXY_PASSWORD_FIELD,
                 LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
-
         add(checkBox.getComponent());
         add(getVerticalSeparator());
         add(username.getComponent());
@@ -116,10 +101,8 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         String username = ConnectionSettings.PROXY_USERNAME.getValue();
         String password = ConnectionSettings.PROXY_PASS.getValue();
         boolean authenticate = ConnectionSettings.PROXY_AUTHENTICATE.getValue();
-
         PROXY_USERNAME_FIELD.setText(username);
         PROXY_PASSWORD_FIELD.setText(password);
-
         CHECK_BOX.setSelected(authenticate);
         updateState();
     }
@@ -131,21 +114,17 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an error
      * message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         final String username = PROXY_USERNAME_FIELD.getText();
         final String password = PROXY_PASSWORD_FIELD.getText();
         final boolean authenticate = CHECK_BOX.isSelected();
-
         ConnectionSettings.PROXY_USERNAME.setValue(username);
         ConnectionSettings.PROXY_PASS.setValue(password);
         ConnectionSettings.PROXY_AUTHENTICATE.setValue(authenticate);
-
         SettingsPack settings = new SettingsPack();
         if (authenticate) {
             int connectionMethod = ConnectionSettings.CONNECTION_METHOD.getValue();
-
             settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.http_pw.swigValue());
             if (connectionMethod == ConnectionSettings.C_HTTP_PROXY) {
                 settings.setInteger(settings_pack.int_types.proxy_type.swigValue(), settings_pack.proxy_type_t.http_pw.swigValue());
@@ -156,7 +135,6 @@ public final class ProxyLoginPaneItem extends AbstractPaneItem {
         settings.setString(settings_pack.string_types.proxy_username.swigValue(), username);
         settings.setString(settings_pack.string_types.proxy_password.swigValue(), password);
         BTEngine.getInstance().applySettings(settings);
-
         return false;
     }
 

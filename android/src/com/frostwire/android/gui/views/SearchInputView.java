@@ -19,7 +19,7 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.support.design.widget.TabLayout;
+import com.google.android.material.tabs.TabLayout;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -46,7 +46,6 @@ public class SearchInputView extends LinearLayout {
     private ClearableEditTextView textInput;
     private View dummyFocusView;
     private OnSearchListener onSearchListener;
-    private int mediaTypeId;
     private TabLayout tabLayout;
     private final SparseArray<FileTypeTab> toFileTypeTab;
 
@@ -166,7 +165,7 @@ public class SearchInputView extends LinearLayout {
         adapter.discardLastResult();
         String query = textInput.getText().trim();
         if (query.length() > 0) {
-            mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
+            int mediaTypeId = ConfigurationManager.instance().getLastMediaTypeFilter();
             tabItemFileTypeClick(mediaTypeId);
             onSearch(query, mediaTypeId);
         }

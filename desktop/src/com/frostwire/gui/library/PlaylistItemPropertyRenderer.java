@@ -24,14 +24,13 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- *  Creates both a renderer and an editor for cells in the playlist table that display the name
- *  of the file being played.
- *  
- *  @author gubatron
- *  @author aldenml
+ * Creates both a renderer and an editor for cells in the playlist table that display the name
+ * of the file being played.
+ *
+ * @author gubatron
+ * @author aldenml
  */
 class PlaylistItemPropertyRenderer extends DefaultTableBevelledCellRenderer {
-
     public PlaylistItemPropertyRenderer() {
     }
 

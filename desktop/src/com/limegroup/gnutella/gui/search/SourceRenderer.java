@@ -35,7 +35,6 @@ import java.util.Map;
  * @author aldenml
  */
 public class SourceRenderer extends DefaultTableBevelledCellRenderer implements TableCellRenderer {
-
     private static final Map<String, ImageIcon> sourceIcons = new HashMap<>();
 
     static {
@@ -45,10 +44,11 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             sourceIcons.put("tpb", GUIMediator.getThemeImage("tpb_source"));
             sourceIcons.put("torlock", GUIMediator.getThemeImage("torlock_off"));
             sourceIcons.put("torrentdownloads", GUIMediator.getThemeImage("torrentdownloads_source"));
-            sourceIcons.put("limetorrents", GUIMediator.getThemeImage("torrentdownloads_source")); // TO-DO: @Marcelina
+            sourceIcons.put("limetorrents", GUIMediator.getThemeImage("limetorrent")); // Thank you trollmad3 for the icon
             sourceIcons.put("eztv", GUIMediator.getThemeImage("eztv_off"));
             sourceIcons.put("zooqle", GUIMediator.getThemeImage("zooqle_source"));
             sourceIcons.put("default", GUIMediator.getThemeImage("seeding_small_source"));
+            //TODO icon for torrentz2
         } catch (Throwable e) {
             // just print it
             e.printStackTrace();
@@ -71,8 +71,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
         } else {
             setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
         }
-        updateUI((SourceHolder) value, table, row);
-
+        updateUI((SourceHolder) value, table);
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
     }
 
@@ -86,11 +85,10 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
                 }
             }
         };
-
         addMouseListener(mouseAdapter);
     }
 
-    private void updateUI(SourceHolder value, JTable table, int row) {
+    private void updateUI(SourceHolder value, JTable table) {
         sourceHolder = value;
         updateIcon();
         updateLinkLabel(table);
@@ -102,7 +100,6 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             if (sourceName.contains("-")) {
                 sourceName = sourceName.substring(0, sourceName.indexOf("-")).trim();
             }
-
             ImageIcon icon = sourceIcons.get(sourceName);
             if (icon != null) {
                 setIcon(icon);

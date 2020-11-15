@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinSplitPaneDividerBackgroundPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinSplitPaneDividerBackgroundPainter(State state) {
@@ -38,14 +35,14 @@ public final class SkinSplitPaneDividerBackgroundPainter extends AbstractSkinPai
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
         switch (state) {
-        case Enabled:
-        case Focused:
-            // nothing for now
-            break;
+            case Enabled:
+            case Focused:
+                // nothing for now
+                break;
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled, Focused
     }
 }

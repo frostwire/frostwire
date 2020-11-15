@@ -20,8 +20,6 @@ package com.frostwire.android.gui.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +29,13 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -43,6 +45,8 @@ import com.frostwire.transfers.TransferItem;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -77,6 +81,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         if (uiBittorrentDownload == null) {
             return;
         }
+
         List<TransferItem> items = uiBittorrentDownload.getItems();
         if (items == null) {
             return;
@@ -97,7 +102,12 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         fileNumberTextView = findView(rootView, R.id.fragment_transfer_detail_files_file_number);
         totalSizeTextView = findView(rootView, R.id.fragment_transfer_detail_files_size_all);
         recyclerView = findView(rootView, R.id.fragment_transfer_detail_files_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (recyclerView != null) {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            if (recyclerView.getItemAnimator() instanceof SimpleItemAnimator) {
+                ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+            }
+        }
     }
 
     @Override
@@ -126,25 +136,26 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         private TextView fileSizeTextView;
         private ImageButton playButtonImageView;
 
-        public TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
+        TransferDetailFilesTransferItemViewHolder(RelativeLayout itemView) {
             super(itemView);
         }
 
-        public void updateTransferItem(TransferItem transferItem) {
+        void updateTransferItem(TransferItem transferItem) {
             if (fileNameTextView == null) {
                 initComponents();
             }
             final Bundle bundle = new Bundle();
             async(this,
-                  TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
-                  transferItem,
-                  bundle,
-                  TransferDetailFilesTransferItemViewHolder::updateTransferDataPost );
+                    TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
+                    transferItem,
+                    bundle,
+                    TransferDetailFilesTransferItemViewHolder::updateTransferDataPost);
         }
 
         private static void updateTransferDataTask(TransferDetailFilesTransferItemViewHolder holder,
                                                    final TransferItem transferItem,
                                                    final Bundle bundleResult) {
+            Thread.currentThread().setName("updateTransferDataTask");
             bundleResult.putInt("fileTypeIconId", MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
             bundleResult.putInt("progress", transferItem.getProgress());
             bundleResult.putString("downloadedPercentage", UIUtils.getBytesInHuman(transferItem.getDownloaded()) + "/" + UIUtils.getBytesInHuman(transferItem.getSize()));
@@ -159,7 +170,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             holder.fileNameTextView.setText(transferItem.getName());
             int progress = bundle.getInt("progress");
             holder.fileProgressBar.setProgress(progress);
-            holder.fileProgressTextView.setText(progress + "%");
+            holder.fileProgressTextView.setText(MessageFormat.format("{0}%", progress));
             holder.fileSizeTextView.setText(bundle.getString("downloadedPercentage"));
             holder.playButtonImageView.setTag(transferItem);
             holder.updatePlayButtonVisibility(bundle.getBoolean("isComplete"), (File) bundle.getSerializable("previewFile"));
@@ -189,7 +200,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
 
         private final List<TransferItem> items;
 
-        public TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
+        TransferDetailFilesRecyclerViewAdapter(List<TransferItem> items) {
             this.items = new LinkedList<>(items);
         }
 
@@ -200,7 +211,7 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
         }
 
         @Override
-        public void onBindViewHolder(TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
+        public void onBindViewHolder(@NonNull TransferDetailFilesTransferItemViewHolder viewHolder, int i) {
             if (items.isEmpty()) {
                 return;
             }
@@ -215,23 +226,34 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
             return items.isEmpty() ? 0 : items.size();
         }
 
-        public void updateTransferItems(List<TransferItem> freshItems) {
-            items.clear();
-            if (freshItems != null && freshItems.size() > 0) {
-                items.addAll(freshItems);
+        void updateTransferItems(List<TransferItem> freshItems) {
+            try {
+                if (items != null && items.size() > 1) {
+                    Collections.sort(items, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                }
+            } catch (Throwable ignored) {
+                //Fatal Exception: java.lang.IllegalArgumentException
+                //Comparison method violates its general contract!
             }
-            notifyDataSetChanged();
+            try {
+                if (freshItems != null && freshItems.size() > 1) {
+                    Collections.sort(freshItems, (o1, o2) -> -Integer.compare(o1.getProgress(), o2.getProgress()));
+                }
+            } catch (Throwable ignored) {
+                //Fatal Exception: java.lang.IllegalArgumentException
+                //Comparison method violates its general contract!
+            }
+            AbstractTransferDetailFragment.updateAdapterItems(this, items, freshItems);
         }
     }
 
     private static final class OpenOnClickListener extends ClickAdapter<Context> {
 
-        public OpenOnClickListener(Context ctx) {
+        OpenOnClickListener(Context ctx) {
             super(ctx);
         }
 
         public void onClick(Context ctx, View v) {
-            Engine.instance().hapticFeedback();
             Object tag = v.getTag();
             if (tag instanceof TransferItem) {
                 TransferItem item = (TransferItem) tag;

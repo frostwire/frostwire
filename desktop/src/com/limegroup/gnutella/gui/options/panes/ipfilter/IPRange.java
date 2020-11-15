@@ -44,33 +44,6 @@ public class IPRange {
         this.endAddress = endAddress;
     }
 
-    public String description() {
-        return description;
-    }
-
-    public String startAddress() {
-        return startAddress;
-    }
-
-    public String endAddress() {
-        return endAddress;
-    }
-
-    public void writeObjectTo(OutputStream os) throws IOException {
-        os.write(description.length());     // DESCRIPTION LENGTH
-        os.write(description.getBytes(StandardCharsets.UTF_8)); // DESCRIPTION
-        InetAddress bufferRange = InetAddress.getByName(startAddress);
-        boolean isIPv4 = bufferRange instanceof Inet4Address;
-        os.write(isIPv4 ? 4 : 6);           // START RANGE IP VERSION TYPE <4 | 6>
-        os.write(bufferRange.getAddress()); // START RANGE IP <4 bytes (32bits)>|[ 16 bytes (128bits)]
-
-        bufferRange = InetAddress.getByName(endAddress);
-        isIPv4 = bufferRange instanceof Inet4Address;
-        os.write(isIPv4 ? 4 : 6);           // END RANGE IP VERSION TYPE <4 | 6>
-        os.write(bufferRange.getAddress()); // END RANGE IP <4 bytes (32bits)>|[ 16 bytes (128bits)]
-        os.flush();
-    }
-
     public static IPRange readObjectFrom(InputStream is) throws IOException {
         int descriptionLength = is.read(); // DESCRIPTION LENGTH
         byte[] descBuffer = new byte[descriptionLength];
@@ -99,6 +72,32 @@ public class IPRange {
             endAddress = InetAddress.getByAddress(address).getHostAddress();
         }
         return new IPRange(description, startAddress, endAddress);
+    }
+
+    public String description() {
+        return description;
+    }
+
+    public String startAddress() {
+        return startAddress;
+    }
+
+    public String endAddress() {
+        return endAddress;
+    }
+
+    public void writeObjectTo(OutputStream os) throws IOException {
+        os.write(description.length());     // DESCRIPTION LENGTH
+        os.write(description.getBytes(StandardCharsets.UTF_8)); // DESCRIPTION
+        InetAddress bufferRange = InetAddress.getByName(startAddress);
+        boolean isIPv4 = bufferRange instanceof Inet4Address;
+        os.write(isIPv4 ? 4 : 6);           // START RANGE IP VERSION TYPE <4 | 6>
+        os.write(bufferRange.getAddress()); // START RANGE IP <4 bytes (32bits)>|[ 16 bytes (128bits)]
+        bufferRange = InetAddress.getByName(endAddress);
+        isIPv4 = bufferRange instanceof Inet4Address;
+        os.write(isIPv4 ? 4 : 6);           // END RANGE IP VERSION TYPE <4 | 6>
+        os.write(bufferRange.getAddress()); // END RANGE IP <4 bytes (32bits)>|[ 16 bytes (128bits)]
+        os.flush();
     }
 
     @Override

@@ -1,43 +1,34 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.gui.player.StreamMediaSource;
-import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.StringUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 class SlidePanelController {
+    private final Slide slide;
 
-    private static Logger LOG = Logger.getLogger(SlidePanelController.class);
-
-    private Slide slide;
-
-    private String cachedVideoStreamURL;
-
-    public SlidePanelController(Slide slide) {
+    SlidePanelController(Slide slide) {
         this.slide = slide;
     }
 
@@ -45,26 +36,23 @@ class SlidePanelController {
         return slide;
     }
 
-    public void downloadSlide() {
-
+    void downloadSlide() {
         switch (slide.method) {
-        case Slide.SLIDE_DOWNLOAD_METHOD_HTTP:
-            if (slide.httpDownloadURL != null) {
-                GUIMediator.instance().openSlide(slide);
-            }
-            break;
-
-        case Slide.SLIDE_DOWNLOAD_METHOD_TORRENT:
-            if (slide.torrent != null) {
-                if (slide.torrent.toLowerCase().startsWith("http")) {
-                    GUIMediator.instance().openTorrentURI(slide.torrent, false);
-                } else if (slide.torrent.toLowerCase().startsWith("magnet:?")) {
-                    GUIMediator.instance().openTorrentURI(slide.torrent, false);
+            case Slide.SLIDE_DOWNLOAD_METHOD_HTTP:
+                if (slide.httpDownloadURL != null) {
+                    GUIMediator.instance().openSlide(slide);
                 }
-            }
-            break;
+                break;
+            case Slide.SLIDE_DOWNLOAD_METHOD_TORRENT:
+                if (slide.torrent != null) {
+                    if (slide.torrent.toLowerCase().startsWith("http")) {
+                        GUIMediator.instance().openTorrentURI(slide.torrent, false);
+                    } else if (slide.torrent.toLowerCase().startsWith("magnet:?")) {
+                        GUIMediator.instance().openTorrentURI(slide.torrent, false);
+                    }
+                }
+                break;
         }
-
         if (slide.hasFlag(Slide.OPEN_CLICK_URL_ON_DOWNLOAD) && slide.clickURL != null) {
             GUIMediator.openURL(slide.clickURL);
         }
@@ -83,24 +71,6 @@ class SlidePanelController {
         final String mediaURL = slide.videoURL;
         if (mediaURL != null && mediaURL.contains("youtube.com")) {
             GUIMediator.openURL(slide.videoURL);
-            /*
-            if (slide.hasFlag(Slide.PREVIEW_VIDEO_USING_BROWSER)) {
-                GUIMediator.openURL(slide.videoURL);
-            } else {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            if (cachedVideoStreamURL == null) {
-                                cachedVideoStreamURL = new YouTubeStreamURLExtractor(mediaURL).getYoutubeStreamURL();
-                            }
-                            previewMedia(cachedVideoStreamURL, true, Slide.PREVIEW_VIDEO_USING_FWPLAYER);
-                        } catch (Exception e) {
-                            LOG.error("Could not extract/play youtube stream.", e);
-                        }
-                    }
-                }.start();
-            }*/
         } else {
             previewMedia(mediaURL, true, Slide.PREVIEW_VIDEO_USING_FWPLAYER);
         }

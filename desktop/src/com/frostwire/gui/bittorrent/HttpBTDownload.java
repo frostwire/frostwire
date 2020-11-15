@@ -32,36 +32,59 @@ import java.util.Date;
 
 /**
  * Created on 12/8/16.
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 abstract class HttpBTDownload implements BTDownload {
     private static final Logger LOG = Logger.getLogger(HttpBTDownload.class);
     private static final int SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS = 1000;
-
     final File completeFile;
+    final HttpClient httpClient;
     private final Date dateCreated;
-
-    long size;
+    double size;
     TransferState state;
-    private long averageSpeed; // in bytes
     long bytesReceived;
+    HttpClient.HttpClientListener httpClientListener;
+    private long averageSpeed; // in bytes
     private boolean deleteDataWhenRemoved;
     private long speedMarkTimestamp;
     private long totalReceivedSinceLastSpeedStamp;
 
-
-    final HttpClient httpClient;
-    HttpClient.HttpClientListener httpClientListener;
-
-    HttpBTDownload(String filename, long size) {
+    HttpBTDownload(String filename, double size) {
         completeFile = org.limewire.util.FileUtils.buildFile(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), filename);
         this.size = size;
         dateCreated = new Date();
         bytesReceived = 0;
         httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
         httpClient.setListener(createHttpClientListener());
+    }
+
+    static boolean copyPlayingTemp(File temp, File dest) {
+        boolean r;
+        System.out.println(temp);
+        try {
+            FileUtils.copyFile(temp, dest);
+            r = true;
+        } catch (Throwable e) {
+            e.printStackTrace();
+            r = false;
+        }
+        return r;
+    }
+
+    static File getIncompleteFolder() {
+        File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
+        if (!incompleteFolder.exists()) {
+            if (!incompleteFolder.mkdirs()) {
+                LOG.warn("BTDownloadUtils.getIncompleteFolder(): could not mkdirs for [" + incompleteFolder.getAbsolutePath() + "]");
+            }
+        }
+        return incompleteFolder;
+    }
+
+    static File buildTempFile(String name, String ext) {
+        return new File(HttpBTDownload.getIncompleteFolder(), name + "." + ext);
     }
 
     abstract HttpClient.HttpClientListener createHttpClientListener();
@@ -100,7 +123,7 @@ abstract class HttpBTDownload implements BTDownload {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -205,7 +228,7 @@ abstract class HttpBTDownload implements BTDownload {
     public long getETA() {
         if (size > 0) {
             long speed = averageSpeed;
-            return speed > 0 ? (size - getBytesReceived()) / speed : -1;
+            return speed > 0 ? (long) ((size - getBytesReceived()) / speed) : -1;
         } else {
             return -1;
         }
@@ -268,34 +291,6 @@ abstract class HttpBTDownload implements BTDownload {
         return true;
     }
 
-
     @Override
     abstract public File getPreviewFile();
-
-    static boolean copyPlayingTemp(File temp, File dest) {
-        boolean r;
-        System.out.println(temp);
-        try {
-            FileUtils.copyFile(temp, dest);
-            r = true;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            r = false;
-        }
-        return r;
-    }
-
-    static File getIncompleteFolder() {
-        File incompleteFolder = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue().getParentFile(), "Incomplete");
-        if (!incompleteFolder.exists()) {
-            if (!incompleteFolder.mkdirs()) {
-                LOG.warn("BTDownloadUtils.getIncompleteFolder(): could not mkdirs for [" + incompleteFolder.getAbsolutePath() + "]");
-            }
-        }
-        return incompleteFolder;
-    }
-
-    static File buildTempFile(String name, String ext) {
-        return new File(HttpBTDownload.getIncompleteFolder(), name + "." + ext);
-    }
 }

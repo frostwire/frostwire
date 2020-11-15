@@ -21,26 +21,24 @@ package com.frostwire.gui.components.slides;
 import javax.swing.*;
 
 /**
- * 
+ * The panel that displays <SlidePanel></SlidePanel> slide show
  * @author gubatron
  * @author aldenml
- *
  */
 public interface SlideshowPanel {
+    void setListener(SlideshowListener listener);
 
-    public void setListener(SlideshowListener listener);
+    int getCurrentSlideIndex();
 
-    public int getCurrentSlideIndex();
+    void switchToSlide(int slideIndex);
 
-    public void switchToSlide(int slideIndex);
+    int getNumSlides();
 
-    public int getNumSlides();
+    void setVisible(boolean visible);
 
-    public void setVisible(boolean visible);
+    void setupContainerAndControls(JPanel container, boolean useControls);
 
-    public void setupContainerAndControls(JPanel container, boolean useControls);
-
-    public interface SlideshowListener {
-        public void onSlideChanged();
+    interface SlideshowListener {
+        void onSlideChanged();
     }
 }

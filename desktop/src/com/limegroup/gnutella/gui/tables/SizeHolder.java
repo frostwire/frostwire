@@ -18,20 +18,18 @@ package com.limegroup.gnutella.gui.tables;
 import com.limegroup.gnutella.gui.GUIUtils;
 
 /**
- * Wrapper class that holds on to the size integer for a file so that 
+ * Wrapper class that holds on to the size integer for a file so that
  * we don't have to read it from disk every time while sorting.
  */
 public final class SizeHolder implements Comparable<SizeHolder> {
-
     /**
      * Variable for the string representation of the file size.
      */
     private final String _string;
-
     /**
      * Variable for the size of the file in kilobytes.
      */
-    private final long _size;
+    private final double _size;
 
     /**
      * The constructor sets the size and string variables, creating a
@@ -39,7 +37,7 @@ public final class SizeHolder implements Comparable<SizeHolder> {
      *
      * @param size the size of the file in kilobytes
      */
-    public SizeHolder(long size, String moreInfo) {
+    public SizeHolder(double size, String moreInfo) {
         if (size >= 0) {
             _string = GUIUtils.getBytesInHuman(size) + moreInfo;
             _size = size;
@@ -49,12 +47,12 @@ public final class SizeHolder implements Comparable<SizeHolder> {
         }
     }
 
-    public SizeHolder(long size) {
+    public SizeHolder(double size) {
         this(size, "");
     }
 
     public int compareTo(SizeHolder o) {
-        long otherSize = o.getSize();
+        double otherSize = o.getSize();
         if (_size > otherSize)
             return 1;
         else if (_size < otherSize)
@@ -78,7 +76,7 @@ public final class SizeHolder implements Comparable<SizeHolder> {
      *
      * @return the size of the file in kilobytes
      */
-    public long getSize() {
+    public double getSize() {
         return _size;
     }
 }

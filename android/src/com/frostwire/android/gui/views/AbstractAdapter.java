@@ -19,13 +19,14 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+
+import androidx.annotation.NonNull;
 
 /**
  * 

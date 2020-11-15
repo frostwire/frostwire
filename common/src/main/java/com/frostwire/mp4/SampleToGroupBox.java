@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class SampleToGroupBox extends FullBox {
-
     protected int grouping_type;
     protected int entry_count;
     protected Entry[] entries;
@@ -37,7 +36,6 @@ public final class SampleToGroupBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 8, buf);
         grouping_type = buf.getInt();
         entry_count = buf.getInt();
@@ -53,7 +51,6 @@ public final class SampleToGroupBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(grouping_type);
         buf.putInt(entry_count);
         IO.write(ch, 8, buf);
@@ -70,7 +67,6 @@ public final class SampleToGroupBox extends FullBox {
     }
 
     public static final class Entry extends BoxEntry {
-
         public int sample_count;
         public int group_description_index;
 

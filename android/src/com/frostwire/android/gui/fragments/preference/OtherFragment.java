@@ -19,8 +19,6 @@ package com.frostwire.android.gui.fragments.preference;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -31,6 +29,9 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
 import com.frostwire.android.util.Asyncs;
+
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
 
 /**
  * @author gubatron
@@ -45,7 +46,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     @Override
     protected void initComponents() {
         setupPermanentStatusNotificationOption();
-        setupHapticFeedback();
         setupClearIndex();
     }
 
@@ -68,21 +68,6 @@ public final class OtherFragment extends AbstractPreferenceFragment {
                 return true;
             });
         }
-    }
-
-    private void setupHapticFeedback() {
-        final CheckBoxPreference cb = findPreference(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
-        if (cb != null) {
-            cb.setOnPreferenceClickListener(preference -> {
-                Asyncs.async(OtherFragment::onHapticFeedbackPreferenceChangedTask, cb.isChecked());
-                return true;
-            });
-        }
-    }
-
-    private static void onHapticFeedbackPreferenceChangedTask(boolean checked) {
-        ConfigurationManager.instance().setBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, checked);
-        Engine.instance().onHapticFeedbackPreferenceChanged();
     }
 
     private void setupClearIndex() {

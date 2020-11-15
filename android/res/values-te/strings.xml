@@ -23,7 +23,6 @@
     <string name="your_installation_is_complete">మీ సంస్థాపన పూర్తయింది.</string>
     <string name="error_connection_timed_out">లోపం: కనెక్షన్ సమయం ముగిసింది/పడిపోయింది. మళ్ళీ ప్రయత్నించండి.</string>
     <string name="azureus_manager_item_seeding">నాట్లు</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">అన్ని బదిలీలు నాటడం ఆపండి</string>
     <string name="cloud_download_aborted_on_mobile_data">ప్రస్తుత సెట్టింగ్ Wi-Fi నెట్వర్క్లో లేనప్పుడు డౌన్లోడ్ చేయడాన్ని నిరోధిస్తుంది</string>
     <string name="filter_ellipsis">వడపోత…</string>
@@ -88,7 +87,7 @@
     <string name="share">భాగస్వామ్యం</string>
     <string name="accept">అంగీకరించు</string>
     <string name="torrent_max_download_speed_summary">మాక్స్ డౌన్లోడ్ వేగం (0 అర్థం అపరిమిత)</string>
-    <string name="retry_search">మళ్ళీ ప్రయత్నించు</string>
+    <string name="retry">మళ్ళీ ప్రయత్నించు</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ఫైల్ సీడ్ చేయబడలేదు. BitTorrent డిస్కనెక్ట్ చేయబడి ఉంటుంది.</string>
     <string name="seed_all_finished">సీడ్ అన్నీ పూర్తయ్యాయి</string>
     <string name="exclude">మినహాయించాలని</string>
@@ -240,7 +239,6 @@
     <string name="settings">సెట్టింగులు</string>
     <string name="enable_seeding">నాటడం ప్రారంభించు</string>
     <string name="data_saving_turn_off_transfers">Wi-fi అందుబాటులో లేదు, అన్ని బదిలీలు నిలిపివేయబడ్డాయి</string>
-    <string name="use_pixabay">Pixabay ఉపయోగించండి</string>
     <string name="finishing">పూర్తి</string>
     <string name="set_as_wallpaper">వాల్పేపర్గా సెట్ చేయండి</string>
     <string name="available">అందుబాటులో</string>
@@ -407,7 +405,7 @@
     <string name="add_tracker">ట్రాకర్ని జోడించండి</string>
     <string name="remove_ads">ప్రకటనలు తొలగించండి</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ఉచిత 7 రోజుల ట్రయల్</string>
-    <string name="play_store_out_of_sync">Play Store సమకాలీకరించాల్సిన అవసరం ఉంది, కొన్ని నిమిషాలు వేచి ఉండండి</string>
     <string name="contact_us">మమ్మల్ని సంప్రదించండి</string>
     <string name="use_nyaa">Nyaa ఉపయోగించండి</string>
+    <string name="use_torrentz2">Torrentz2 ఉపయోగించండి</string>
 </resources>

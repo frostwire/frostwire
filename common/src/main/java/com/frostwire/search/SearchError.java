@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,14 +22,19 @@ package com.frostwire.search;
  * @author aldenml
  */
 public final class SearchError {
-
     private final int code;
+    private final String message;
 
-    public SearchError(int code) {
+    public SearchError(int code, String message) {
         this.code = code;
+        this.message = message;
     }
 
     public int code() {
         return code;
+    }
+
+    public String message() {
+        return message;
     }
 }

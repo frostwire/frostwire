@@ -20,17 +20,18 @@ package com.frostwire.gui.theme;
 
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * A non blocking InputDialog meant to replace JOptionPane.showInputDialog() which's
  * mouse event handling breaks under MacOSX (ESC key and mouse clicks don't work for mac)
- *
- *
  *
  * @author gubatron
  * @author aldenml
@@ -42,6 +43,23 @@ public final class FrostwireInputDialog extends JDialog {
     private final JTextField textView;
     private final DialogFinishedListener listener;
     private JButton buttonCancel;
+
+    private FrostwireInputDialog(Frame parentFrame,
+                                 String windowTitle,
+                                 String message,
+                                 String textViewText,
+                                 Icon icon,
+                                 boolean modal,
+                                 DialogFinishedListener listener) {
+        super(parentFrame, windowTitle, modal);
+        this.message = message;
+        this.textViewText = textViewText;
+        textView = new JTextField(textViewText != null ? textViewText : "");
+        this.icon = icon;
+        this.listener = listener;
+        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        initContentPane();
+    }
 
     public static void showInputDialog(Frame parentComponent,
                                        String message,
@@ -60,40 +78,20 @@ public final class FrostwireInputDialog extends JDialog {
         dialog.setVisible(true);
     }
 
-    private FrostwireInputDialog(Frame parentFrame,
-                                String windowTitle,
-                                String message,
-                                String textViewText,
-                                Icon icon,
-                                boolean modal,
-                                DialogFinishedListener listener) {
-        super(parentFrame, windowTitle, modal);
-        this.message=message;
-        this.textViewText= textViewText;
-        textView = new JTextField(textViewText != null ? textViewText : "");
-        this.icon = icon;
-        this.listener = listener;
-        this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        initContentPane();
-    }
-
     private void initContentPane() {
-        Dimension defaultDimension = new Dimension(500,140);
+        Dimension defaultDimension = new Dimension(500, 140);
         setMinimumSize(defaultDimension);
         setPreferredSize(defaultDimension);
         setResizable(false);
         Container contentPane = getContentPane();
         MigLayout layout = new MigLayout("insets 0, gap 5, fillx");
         contentPane.setLayout(layout);
-
-        if (textViewText!=null) {
+        if (textViewText != null) {
             textView.selectAll();
         }
-
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton buttonOk = new JButton(I18n.tr("Ok"));
         buttonCancel = new JButton(I18n.tr("Cancel"));
-
         if (OSUtils.isAnyMac()) {
             buttonPanel.add(buttonCancel);
             buttonPanel.add(buttonOk);
@@ -101,27 +99,23 @@ public final class FrostwireInputDialog extends JDialog {
             buttonPanel.add(buttonOk);
             buttonPanel.add(buttonCancel);
         }
-
         textView.addKeyListener(getKeyListener());
         initButtonListeners(buttonOk, false);
         initButtonListeners(buttonCancel, true);
-
         JLabel messageLabel = new JLabel(message);
-        messageLabel.setBounds(10,10,defaultDimension.width-40,24);
+        messageLabel.setBounds(10, 10, defaultDimension.width - 40, 24);
         if (icon != null) {
             messageLabel.setIcon(icon);
             messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
         }
-
         contentPane.add(messageLabel, "growx, gap 10 10 15 5, wrap");
         contentPane.add(textView, "growx, gap 10 10 0 5, wrap, height 24!");
         contentPane.add(buttonPanel, "gapright 5, align right");
         pack();
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds((screenSize.width-defaultDimension.width)/2,
-                (screenSize.height-defaultDimension.height)/2,
-                defaultDimension.width,defaultDimension.height);
+        setBounds((screenSize.width - defaultDimension.width) / 2,
+                (screenSize.height - defaultDimension.height) / 2,
+                defaultDimension.width, defaultDimension.height);
     }
 
     private void initButtonListeners(JButton button, final boolean cancelled) {
@@ -136,19 +130,14 @@ public final class FrostwireInputDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     onButtonClicked(true);
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    onButtonClicked(e.getComponent()==buttonCancel);
+                    onButtonClicked(e.getComponent() == buttonCancel);
                 }
             }
         };
     }
 
     private ActionListener getActionListener(final boolean cancelled) {
-        return new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onButtonClicked(cancelled);
-            }
-        };
+        return e -> onButtonClicked(cancelled);
     }
 
     private void onButtonClicked(boolean cancelled) {

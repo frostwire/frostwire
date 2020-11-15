@@ -25,6 +25,7 @@ import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -42,12 +43,12 @@ import java.util.List;
  * @author aldenml
  */
 final class BTDownloadActions {
-
     static final ExploreAction EXPLORE_ACTION = new ExploreAction();
     static final ShowInLibraryAction SHOW_IN_LIBRARY_ACTION = new ShowInLibraryAction();
     static final ResumeAction RESUME_ACTION = new ResumeAction();
     static final PauseAction PAUSE_ACTION = new PauseAction();
     static final ClearInactiveAction CLEAR_INACTIVE_ACTION = new ClearInactiveAction();
+    static final RetryAction RETRY_ACTION = new RetryAction();
     static final RemoveAction REMOVE_ACTION = new RemoveAction(false, false);
     static final RemoveAction REMOVE_YOUTUBE_ACTION = new RemoveYouTubeAction();
     static final RemoveAction REMOVE_TORRENT_ACTION = new RemoveAction(true, false);
@@ -59,7 +60,6 @@ final class BTDownloadActions {
     static final PlaySingleMediaFileAction PLAY_SINGLE_AUDIO_FILE_ACTION = new PlaySingleMediaFileAction();
 
     private static class SendBTDownloaderAudioFilesToiTunes extends AbstractAction {
-
         SendBTDownloaderAudioFilesToiTunes() {
             putValue(Action.NAME, I18n.tr("Send to iTunes"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send files to iTunes"));
@@ -68,39 +68,31 @@ final class BTDownloadActions {
         @Override
         public void actionPerformed(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-
             if (downloaders != null && downloaders.length > 0) {
                 try {
                     final BTDownload downloader = downloaders[0];
                     File saveLocation = downloader.getSaveLocation();
-
                     if (downloader instanceof BittorrentDownload) {
                         BittorrentDownload btDownload = (BittorrentDownload) downloader;
                         saveLocation = new File(btDownload.getSaveLocation(), btDownload.getName());
                     }
-
                     System.out.println("Sending to iTunes " + saveLocation.getAbsolutePath());
-
                     iTunesMediator.instance().scanForSongs(saveLocation);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
         }
-
     }
 
     private static abstract class RefreshingAction extends AbstractAction {
-
         public final void actionPerformed(ActionEvent e) {
-            performAction(e);
+            performAction();
             BTDownloadMediator.instance().doRefresh();
         }
 
-        protected abstract void performAction(ActionEvent e);
-
+        protected abstract void performAction();
     }
-
 
     private static class ExploreAction extends RefreshingAction {
         /**
@@ -115,13 +107,12 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length > 0) {
                 // when the downloader is a single file, this is appending a folder to the actual file path
                 // treating it like a bittorrent download.
                 File toExplore = new File(downloaders[0].getSaveLocation(), downloaders[0].getDisplayName());
-
                 if (toExplore != null) {
                     // but perhaps it's a single file, make sure it is then... (Re: Issue #366)
                     if (!toExplore.exists() &&
@@ -130,7 +121,6 @@ final class BTDownloadActions {
                         // (made this if very explicit and dumb on purpose to make logic clear, reverse logic is shorter)
                         toExplore = downloaders[0].getSaveLocation();
                     }
-
                     if (toExplore.exists()) {
                         GUIMediator.launchExplorer(toExplore);
                     }
@@ -149,15 +139,13 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_SHOW_IN_LIBRARY");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length > 0) {
                 final String toExplore = downloaders[0].getDisplayName();
-
                 if (toExplore == null) {
                     return;
                 }
-
                 LibraryMediator.instance().getLibrarySearch().searchFor(toExplore.replace("_", " ").replace("-", " ").replace(".", " "), false);
             }
         }
@@ -171,7 +159,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_FILE_MORE_SOURCES");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             BTDownload lastSelectedDownload = null;
             if (downloaders.length == 1) {
@@ -193,7 +181,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_PAUSE");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             BTDownload lastSelectedDownload = null;
             if (downloaders.length == 1) {
@@ -203,24 +191,53 @@ final class BTDownloadActions {
                 downloader.pause();
             }
             BTDownloadMediator.instance().updateTableFilters();
-
             if (lastSelectedDownload != null) {
                 BTDownloadMediator.instance().selectBTDownload(lastSelectedDownload);
             }
         }
     }
 
+    public static class RetryAction extends com.limegroup.gnutella.gui.actions.AbstractAction {
+        private static Logger LOG = Logger.getLogger(RetryAction.class);
+
+        RetryAction() {
+            putValue(Action.NAME, I18n.tr("Retry Transfer"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Retry Transfer"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Retry Transfer"));
+            putValue(LimeAction.ICON_NAME, "MAGNET");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
+            if (downloaders == null) {
+                LOG.info("actionPerformed() aborted. No selected transfers to retry");
+                return;
+            }
+            new RemoveAction(true, true, false).performAction();
+            BTDownloadMediator.instance().refresh();
+
+            for (BTDownload download : downloaders) {
+                LOG.info("actionPerformed() retry " + download.getClass().getCanonicalName());
+                if (download instanceof TorrentFetcherDownload) {
+                    GUIMediator.instance().openTorrentURI(((TorrentFetcherDownload) download).getUri(),false);
+                }
+            }
+
+
+        }
+    }
+
     public static class RemoveAction extends RefreshingAction {
-
-        /**
-         *
-         */
-        private static final long serialVersionUID = -1742554445891016991L;
-
         private final boolean _deleteTorrent;
         private final boolean _deleteData;
+        private final boolean _showDialogIfDeleteData;
 
         RemoveAction(boolean deleteTorrent, boolean deleteData) {
+            this(deleteTorrent, deleteData, true);
+        }
+
+        RemoveAction(boolean deleteTorrent, boolean deleteData, boolean showDialogIfDeleteData) {
             if (deleteTorrent && deleteData) {
                 putValue(Action.NAME, I18n.tr("Remove Torrent and Data"));
                 putValue(LimeAction.SHORT_NAME, I18n.tr("Remove Torrent and Data"));
@@ -235,20 +252,17 @@ final class BTDownloadActions {
                 putValue(Action.SHORT_DESCRIPTION, I18n.tr("Remove Selected Downloads"));
             }
             putValue(LimeAction.ICON_NAME, "DOWNLOAD_KILL");
-
             _deleteTorrent = deleteTorrent;
             _deleteData = deleteData;
+            _showDialogIfDeleteData = showDialogIfDeleteData;
         }
 
-        public void performAction(ActionEvent e) {
-            if (_deleteData) {
-
+        public void performAction() {
+            if (_deleteData && _showDialogIfDeleteData) {
                 DialogOption result = GUIMediator.showYesNoMessage(I18n.tr("Are you sure you want to remove the data files from your computer?\n\nYou won't be able to recover the files."), I18n.tr("Are you sure?"), JOptionPane.QUESTION_MESSAGE);
-
                 if (result != DialogOption.YES)
                     return;
             }
-
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             for (BTDownload downloader : downloaders) {
                 downloader.setDeleteTorrentWhenRemove(_deleteTorrent);
@@ -260,7 +274,6 @@ final class BTDownloadActions {
     }
 
     public static class RemoveYouTubeAction extends RemoveAction {
-
         private static final long serialVersionUID = 4101890173830827703L;
 
         RemoveYouTubeAction() {
@@ -272,7 +285,6 @@ final class BTDownloadActions {
     }
 
     private static class ClearInactiveAction extends RefreshingAction {
-
         ClearInactiveAction() {
             putValue(Action.NAME, I18n.tr("Clear Inactive"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Clear Inactive"));
@@ -281,13 +293,12 @@ final class BTDownloadActions {
         }
 
         @Override
-        protected void performAction(ActionEvent e) {
+        protected void performAction() {
             BTDownloadMediator.instance().removeCompleted();
         }
     }
 
     private static class CopyMagnetAction extends RefreshingAction {
-
         CopyMagnetAction() {
             putValue(Action.NAME, I18n.tr("Copy Magnet"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Copy Magnet"));
@@ -295,18 +306,16 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "COPY_MAGNET");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < downloaders.length; i++) {
                 BTDownload d = downloaders[i];
                 if (d instanceof BittorrentDownload) {
                     BittorrentDownload btDownload = (BittorrentDownload) d;
-
                     String magnetUri = btDownload.makeMagnetUri();
                     str.append(magnetUri);
                     str.append(BTEngine.getInstance().magnetPeers());
-
                     if (i < downloaders.length - 1) {
                         str.append(System.lineSeparator());
                     }
@@ -317,13 +326,11 @@ final class BTDownloadActions {
                     }
                 }
             }
-
             GUIMediator.setClipboardContent(str.toString());
         }
     }
 
     private static class CopyInfoHashAction extends RefreshingAction {
-
         CopyInfoHashAction() {
             putValue(Action.NAME, I18n.tr("Copy Infohash"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Copy Infohash"));
@@ -331,7 +338,7 @@ final class BTDownloadActions {
             putValue(LimeAction.ICON_NAME, "COPY_HASH");
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < downloaders.length; i++) {
@@ -345,7 +352,6 @@ final class BTDownloadActions {
     }
 
     private static class ShareTorrentAction extends RefreshingAction {
-
         ShareTorrentAction() {
             putValue(Action.NAME, I18n.tr("Send to friend"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Send to friend"));
@@ -354,14 +360,12 @@ final class BTDownloadActions {
             //putValue(Action.SMALL_ICON, GUIMediator.getThemeImage("share"));
         }
 
-        public void performAction(ActionEvent e) {
+        public void performAction() {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
             if (downloaders.length != 1) {
                 return;
             }
-
             BTDownload btDownload = downloaders[0];
-
             if (btDownload instanceof BittorrentDownload) {
                 TorrentInfo t = ((BittorrentDownload) btDownload).getTorrentInfo();
                 if (t != null) { // avoid NPE due to an invalid torrent handle
@@ -372,7 +376,6 @@ final class BTDownloadActions {
     }
 
     static class CreateNewPlaylistAction extends AbstractAction {
-
         CreateNewPlaylistAction() {
             super(I18n.tr("Create New Playlist"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create and add to a new playlist"));
@@ -381,27 +384,21 @@ final class BTDownloadActions {
         @Override
         public void actionPerformed(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-
             List<File> playlistFiles = new ArrayList<>(downloaders.length);
-
             for (BTDownload d : downloaders) {
                 if (!d.isCompleted()) {
                     return;
                 }
-
                 File downloadFolder = new File(d.getSaveLocation(), d.getDisplayName());
                 if (downloadFolder.exists()) {
                     playlistFiles.add(downloadFolder);
                 }
             }
-
             LibraryUtils.createNewPlaylist(playlistFiles.toArray(new File[0]));
-
         }
     }
 
     static final class PlaySingleMediaFileAction extends AbstractAction {
-
         PlaySingleMediaFileAction() {
             super(I18n.tr("Play file"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Play media file"));
@@ -410,7 +407,6 @@ final class BTDownloadActions {
         @Override
         public void actionPerformed(ActionEvent e) {
             File file = BTDownloadMediator.instance().getSelectedDownloaders()[0].getSaveLocation();
-
             if (file.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(file)) {
                 try {
                     file = file.listFiles()[0];
@@ -418,7 +414,6 @@ final class BTDownloadActions {
                     file = null;
                 }
             }
-
             if (file != null && MediaPlayer.isPlayableFile(file)) {
                 MediaPlayer.instance().loadMedia(new MediaSource(file), false, false);
             }
@@ -432,7 +427,7 @@ final class BTDownloadActions {
      */
     static class AddToPlaylistAction extends AbstractAction {
         private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
-        private Playlist playlist;
+        private final Playlist playlist;
 
         AddToPlaylistAction(Playlist playlist) {
             super(getTruncatedString(playlist.getName()));
@@ -448,17 +443,13 @@ final class BTDownloadActions {
         @Override
         public void actionPerformed(ActionEvent e) {
             BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-
             List<File> playlistFiles = new ArrayList<>(downloaders.length);
-
             for (BTDownload d : downloaders) {
                 if (!d.isCompleted()) {
                     return;
                 }
-
                 playlistFiles.add(d.getSaveLocation());
             }
-
             LibraryUtils.asyncAddToPlaylist(playlist, playlistFiles.toArray(new File[0]));
             GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
         }

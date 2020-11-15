@@ -25,13 +25,12 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class MediaHeaderBox extends FullBox {
-
     protected long creation_time;
     protected long modification_time;
     protected int timescale;
     protected long duration;
-    private byte[] language;
     protected short pre_defined;
+    private byte[] language;
 
     MediaHeaderBox() {
         super(mdhd);
@@ -49,7 +48,6 @@ public final class MediaHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, (version == 1 ? 28 : 16) + 4, buf);
         if (version == 1) {
             creation_time = buf.getLong();
@@ -62,7 +60,6 @@ public final class MediaHeaderBox extends FullBox {
             timescale = buf.getInt();
             duration = buf.getInt();
         }
-
         buf.get(language);
         pre_defined = buf.getShort();
     }
@@ -70,7 +67,6 @@ public final class MediaHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (version == 1) {
             buf.putLong(creation_time);
             buf.putLong(modification_time);
@@ -82,7 +78,6 @@ public final class MediaHeaderBox extends FullBox {
             buf.putInt(timescale);
             buf.putInt((int) duration);
         }
-
         buf.put(language);
         buf.putShort(pre_defined);
         IO.write(ch, (version == 1 ? 28 : 16) + 4, buf);

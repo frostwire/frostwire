@@ -18,17 +18,15 @@ package com.frostwire.database.sqlite;
 
 import com.frostwire.database.Cursor;
 
-
 /**
  * Static utility methods for dealing with databases and {@link Cursor}s.
  */
-public class DatabaseUtils {
-
+class DatabaseUtils {
     /**
      * Appends an SQL string to the given StringBuilder, including the opening
      * and closing single quotes. Any single quotes internal to sqlString will
      * be escaped.
-     *
+     * <p>
      * This method is deprecated because we want to encourage everyone
      * to use the "?" binding form.  However, when implementing a
      * ContentProvider, one may want to add WHERE clauses that were
@@ -39,7 +37,7 @@ public class DatabaseUtils {
      * construct a WHERE clause manually.  This method is useful for
      * those cases.
      *
-     * @param sb the StringBuilder that the SQL string will be appended to
+     * @param sb        the StringBuilder that the SQL string will be appended to
      * @param sqlString the raw string to be appended, which may contain single
      *                  quotes
      */

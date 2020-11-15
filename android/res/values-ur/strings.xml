@@ -67,7 +67,6 @@
     <string name="azureus_peer_manager_status_finished">ختم</string>
     <string name="your_installation_is_complete">آپ کی تنصیب مکمل ہو گیا ہے.</string>
     <string name="error_connection_timed_out">غلطی: کنکشن / وقت ختم گرا. دوبارہ کوشش کریں.</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">تمام مفت ڈاؤن لوڈ</string>
     <string name="request_again">درخواست دوبارہ</string>
     <string name="use_zooqle">استعمال Zooqle.com</string>
@@ -103,7 +102,7 @@
     <string name="my_filetype">میرا %s</string>
     <string name="share">سیکنڈ اور</string>
     <string name="accept">قبول کریں</string>
-    <string name="retry_search">دوبارہ کوشش کریں</string>
+    <string name="retry">دوبارہ کوشش کریں</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">فائل کو ترجیح نہیں ہوسکی. BitTorrent کے منقطع رہے گا.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">اگر FrostWire ان انسٹال کیا جاتا ہے لوڈ، اتارنا Android ڈاؤن لوڈ فائلوں کو مٹا دے گا.</string>
     <string name="protected_connection">VPN کے ذریعہ محفوظ</string>
@@ -355,7 +354,6 @@
     <string name="or">یا</string>
     <string name="file_names">فائل نام</string>
     <string name="no_data_check_internet_connection">نیٹ ورک دستیاب نہیں، براہ مہربانی اپنے انٹرنیٹ کنکشن کی جانچ پڑتالکریں.</string>
-    <string name="use_pixabay">استعمال Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">تمام ٹرانسفروں کو بنو بند کرو</string>
     <string name="seed_stop">بیجنگ بند کرو</string>
     <string name="transfers_select_seeding">بوائ</string>
@@ -407,7 +405,7 @@
     <string name="frostwire_start_engine_service_security_exception">اجازت کی کمی کی وجہ سے FrostWire مناسب طریقے سے شروع نہیں کیا جا سکا. براہ کرم ضروری اجازتوں کی درخواست کریں اور درخواست کو دوبارہ شروع کریں</string>
     <string name="vpn_find_out_more">مزید تلاش کرو</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n مفت 7 دن کی آزمائش</string>
-    <string name="play_store_out_of_sync">Google Play Store کو مطابقت پذیر کرنے کی ضرورت ہے، چند منٹ انتظار کریں</string>
     <string name="contact_us">ہم سے رابطہ کریں</string>
     <string name="use_nyaa">استعمال Nyaa</string>
+    <string name="use_torrentz2">Torrentz2 استعمال</string>
 </resources>

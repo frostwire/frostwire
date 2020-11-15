@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, 2013, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,24 +18,21 @@
 package com.frostwire.alexandria.db;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class LibraryDatabaseEntity {
-
     protected LibraryDatabase db;
 
-    public LibraryDatabaseEntity(LibraryDatabase db) {
-        this.db = db;
-    }
-
-    protected void setLibraryDatabase(LibraryDatabase db) {
+    protected LibraryDatabaseEntity(LibraryDatabase db) {
         this.db = db;
     }
 
     public LibraryDatabase getLibraryDatabase() {
         return db;
+    }
+
+    protected void setLibraryDatabase(LibraryDatabase db) {
+        this.db = db;
     }
 }

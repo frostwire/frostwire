@@ -25,7 +25,6 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlPagedWebSearchPerformer<T> implements RegexSearchPerformer<T> {
-
     private final int regexMaxResults;
 
     public CrawlRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults) {

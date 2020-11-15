@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,24 @@
 
 package com.frostwire.android.gui.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.text.Html;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.android.util.Asyncs;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.StringUtils;
 
@@ -52,10 +57,13 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     }
 
     public static SoftwareUpdaterDialog newInstance(
-            Map<String, String> updateMessages, List<String> changelog) {
+            final String apkDownloadURL,
+            final Map<String, String> updateMessages,
+            final List<String> changelog) {
         SoftwareUpdaterDialog dlg = new SoftwareUpdaterDialog();
 
         Bundle args = new Bundle();
+        args.putString("apkDownloadURL", apkDownloadURL);
         args.putSerializable("updateMessages", new HashMap<>(updateMessages));
         args.putStringArrayList("changelog", new ArrayList<>(changelog));
         dlg.setArguments(args);
@@ -63,10 +71,11 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         return dlg;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") final String apkDownloadURL = args.getString("apkDownloadURL");
         HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
@@ -99,16 +108,25 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
         yesButton.setText(android.R.string.ok);
         yesButton.setOnClickListener(v -> {
-            Engine.instance().stopServices(false);
-            // since Nougat, a naked file path can't be put directly inside
-            // an intent
-            boolean useFileProvider = hasNougatOrNewer();
-            UIUtils.openFile(getActivity(), getUpdateApk().getAbsolutePath(),
-                    Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE, useFileProvider);
+            UIUtils.openURL(getActivity(),Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
+            //Asyncs.async(this, SoftwareUpdaterDialog::onUpdateAcceptedTask, apkDownloadURL);
             dismiss();
         });
         noButton.setOnClickListener(v -> dismiss());
     }
+
+////// START OF PACKAGE INSTALLER LOGIC SECTION
+//    private void onUpdateAcceptedTask(final String apkDownloadURL) {
+//        // since Nougat, a naked file path can't be put directly inside
+//        // an intent
+//        boolean useFileProvider = hasNougatOrNewer();
+//        // this will talk to the PackageManager and MainActivity should get Intent callbacks
+//        //boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
+//        if (error) {
+//            UIUtils.openURL(getActivity(), apkDownloadURL);
+//        }
+//    }
+////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private static File getUpdateApk() {
         return Platforms.get().systemPaths().update();

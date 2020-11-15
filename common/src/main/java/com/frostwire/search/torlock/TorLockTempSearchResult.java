@@ -26,7 +26,6 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author aldenml
  */
 public class TorLockTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String itemId;
     private final String detailsUrl;
 
@@ -51,7 +50,7 @@ public class TorLockTempSearchResult extends AbstractSearchResult implements Cra
 
     @Override
     public String getSource() {
-        return null;
+        return "TorLock";
     }
 
     @Override

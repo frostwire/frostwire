@@ -27,7 +27,6 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.util.HashMap;
 
@@ -36,44 +35,34 @@ import java.util.HashMap;
  * all the different torrent transfer details.
  */
 public final class TransferDetailComponent extends JPanel implements RefreshListener {
-    //private static final Logger LOG = Logger.getLogger(TransferDetailComponent.class);
-
-    private JToggleButton filesButton;
-    private JToggleButton piecesButton;
-    private JToggleButton generalButton;
-    private JToggleButton trackersButton;
-    private JToggleButton peersButton;
-
-    private JPanel detailComponentHolder;
-
     // inner use strings, no need to translate, just to switch cards layout
     private final String GENERAL_CARD = "G";
     private final String FILES_CARD = "F";
     private final String PIECES_CARD = "P";
     private final String TRACKERS_CARD = "T";
     private final String PEERS_CARD = "p";
-
+    //private static final Logger LOG = Logger.getLogger(TransferDetailComponent.class);
+    private JToggleButton filesButton;
+    private JToggleButton piecesButton;
+    private JToggleButton generalButton;
+    private JToggleButton trackersButton;
+    private JToggleButton peersButton;
+    private JPanel detailComponentHolder;
     private HashMap<String, TransferDetailPanel> cardPanelMap;
     private TransferDetailPanel currentComponent;
     private BittorrentDownload selectedBittorrentDownload;
-
-    interface TransferDetailPanel {
-        void updateData(BittorrentDownload btDownload);
-    }
 
     public TransferDetailComponent(MouseAdapter hideDetailsActionListener) {
         super(new MigLayout("fill, insets 0 0 0 0",
                 "",
                 "[top][grow]"));
-
         JPanel labelAndLink = new JPanel(new FlowLayout());
         JLabel hideLink = new JLabel("<html><a href='#'>" + I18n.tr("hide") + "</a></html>");
-        hideLink.setBorder(BorderFactory.createEmptyBorder(2,0,0,0));
+        hideLink.setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
         hideLink.setFont(new Font("Helvetica", Font.PLAIN, 13));
         hideLink.addMouseListener(hideDetailsActionListener);
         labelAndLink.add(new JLabel(I18n.tr("Transfer Detail")));
         labelAndLink.add(hideLink, "left, gapleft 10px, growx");
-
         add(labelAndLink, "left, gapleft 10px, growx");
         add(createDetailSwitcherButtons(), "push, right, wrap");
         add(createDetailComponentHolder(), "hmin 0px, span 2, grow");
@@ -92,21 +81,18 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         detailComponentHolder.add(trackersComponent = new TransferDetailTrackers(), TRACKERS_CARD);
         TransferDetailPeers peersComponent;
         detailComponentHolder.add(peersComponent = new TransferDetailPeers(), PEERS_CARD);
-
         cardPanelMap = new HashMap<>();
         cardPanelMap.put(GENERAL_CARD, generalComponent);
         cardPanelMap.put(FILES_CARD, filesComponent);
         cardPanelMap.put(PIECES_CARD, piecesComponent);
         cardPanelMap.put(TRACKERS_CARD, trackersComponent);
         cardPanelMap.put(PEERS_CARD, peersComponent);
-
         HashMap<String, JToggleButton> cardButtonMap = new HashMap<>();
         cardButtonMap.put(GENERAL_CARD, generalButton);
         cardButtonMap.put(FILES_CARD, filesButton);
         cardButtonMap.put(PIECES_CARD, piecesButton);
         cardButtonMap.put(TRACKERS_CARD, trackersButton);
         cardButtonMap.put(PEERS_CARD, peersButton);
-
         // Auto click on the last shown JPanel button selector
         String lastTransferSelected = UISettings.LAST_SELECTED_TRANSFER_DETAIL_JPANEL.getValue();
         if (cardButtonMap.containsKey(lastTransferSelected)) {
@@ -123,13 +109,11 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         piecesButton = new JToggleButton(I18n.tr("Pieces"), false);
         trackersButton = new JToggleButton(I18n.tr("Trackers"), false);
         peersButton = new JToggleButton(I18n.tr("Peers"), false);
-
         generalButton.addActionListener(e -> showDetailComponent(GENERAL_CARD));
         filesButton.addActionListener(e -> showDetailComponent(FILES_CARD));
         piecesButton.addActionListener(e -> showDetailComponent(PIECES_CARD));
         trackersButton.addActionListener(e -> showDetailComponent(TRACKERS_CARD));
         peersButton.addActionListener(e -> showDetailComponent(PEERS_CARD));
-
         final Font smallHelvetica = new Font("Helvetica", Font.PLAIN, 11);
         final Dimension buttonDimension = new Dimension(80, 24);
         applyFontAndDimensionToFilterToggleButtons(
@@ -140,19 +124,16 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
                 piecesButton,
                 trackersButton,
                 peersButton);
-
         switcherButtonsGroup.add(generalButton);
         switcherButtonsGroup.add(filesButton);
         switcherButtonsGroup.add(piecesButton);
         switcherButtonsGroup.add(trackersButton);
         switcherButtonsGroup.add(peersButton);
-
         detailSwitcherButtonsPanel.add(generalButton);
         detailSwitcherButtonsPanel.add(filesButton);
         detailSwitcherButtonsPanel.add(piecesButton);
         detailSwitcherButtonsPanel.add(trackersButton);
         detailSwitcherButtonsPanel.add(peersButton);
-
         return detailSwitcherButtonsPanel;
     }
 
@@ -191,5 +172,9 @@ public final class TransferDetailComponent extends JPanel implements RefreshList
         if (currentComponent != null && isVisible()) {
             currentComponent.updateData(btDownload);
         }
+    }
+
+    interface TransferDetailPanel {
+        void updateData(BittorrentDownload btDownload);
     }
 }

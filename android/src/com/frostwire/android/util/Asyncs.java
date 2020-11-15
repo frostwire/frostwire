@@ -17,14 +17,20 @@
 
 package com.frostwire.android.util;
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 
+import androidx.annotation.NonNull;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 /**
  * Utility class for asynchronous task in the background.
@@ -34,6 +40,7 @@ import java.lang.ref.WeakReference;
  */
 @SuppressWarnings("unchecked")
 public final class Asyncs {
+    private final static Logger LOG = Logger.getLogger(Asyncs.class);
 
     private Asyncs() {
     }
@@ -46,8 +53,8 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c),
-            (c, args, r) -> post.run(c, r));
+                (c, args) -> task.run(c),
+                (c, args, r) -> post.run(c, r));
     }
 
     public static <C, T1, R> void async(@NonNull C context,
@@ -57,9 +64,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0]),
-            (c, args, r) -> post.run(c, (T1)args[0], r),
-            arg1);
+                (c, args) -> task.run(c, (T1) args[0]),
+                (c, args, r) -> post.run(c, (T1) args[0], r),
+                arg1);
     }
 
     public static <C, T1, T2, R> void async(@NonNull C context,
@@ -69,9 +76,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0], (T2)args[1]),
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], r),
-            arg1, arg2);
+                (c, args) -> task.run(c, (T1) args[0], (T2) args[1]),
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], r),
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3, R> void async(@NonNull C context,
@@ -81,9 +88,9 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2], r),
-            arg1, arg2, arg3);
+                (c, args) -> task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]),
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], (T3) args[2], r),
+                arg1, arg2, arg3);
     }
 
     public interface ContextResultTask<C, R> {
@@ -123,8 +130,11 @@ public final class Asyncs {
     public static <C> void async(@NonNull C context, ContextTask<C> task) {
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c); return null;},
-            null);
+                (c, args) -> {
+                    task.run(c);
+                    return null;
+                },
+                null);
     }
 
     public static <C, T1> void async(C context,
@@ -133,9 +143,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0]); return null;},
-            null,
-            arg1);
+                (c, args) -> {
+                    task.run(c, (T1) args[0]);
+                    return null;
+                },
+                null,
+                arg1);
     }
 
     public static <C, T1, T2> void async(@NonNull C context,
@@ -144,9 +157,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
-            null,
-            arg1, arg2);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                null,
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3> void async(@NonNull C context,
@@ -155,20 +171,26 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            null,
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3);
     }
 
     public static <C, T1, T2, T3, T4> void async(@NonNull C context,
-                                             ContextTask4<C, T1, T2, T3, T4> task,
-                                             T1 arg1, T2 arg2, T3 arg3, T4 arg4) {
+                                                 ContextTask4<C, T1, T2, T3, T4> task,
+                                                 T1 arg1, T2 arg2, T3 arg3, T4 arg4) {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args) -> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]); return null;},
-            null,
-            arg1, arg2, arg3, arg4);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2], (T4) args[3]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3, arg4);
     }
 
     public static <C, T1> void async(@NonNull C context,
@@ -178,9 +200,55 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0]),
-            arg1);
+                (c, args) -> {
+                    task.run(c, (T1) args[0]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0]),
+                arg1);
+    }
+
+    /**
+     * Example:
+     * <code>Asyncs.async(MusicUtils::isShuffleEnabled, ShuffleButton::isShuffleEnabledPost, this);</code>
+     *
+     * @param task    A background ResultTask that requires no arguments, usually a slow (IO/IPC) static method elsewhere, e.g. MusicUtils.isPlaying()
+     * @param post    The UI/Context post task that will use the result from the background task
+     * @param context The Context, usually the class that owns the post method
+     * @param <R>     Result type for task, which is passed as the argument for the post task
+     * @param <C>
+     */
+    public static <R, C> void async(@NonNull ResultTask<R> task,
+                                    @NonNull ContextPostTask1<C, R> post,
+                                    @NonNull C context) {
+        requireContext(context);
+        invokeAsyncSupport(context,
+                (c, args) -> task.run(),
+                (c, args, result) -> post.run(c, result)
+        );
+    }
+
+    /**
+     * Example:
+     * <code>Asyncs.async(this, ActivityFoo.staticMethodThatTakesContext, ActivityFoo::postMethodWithNoParametersToUpdateUIFromMemberVariables)</code>
+     *
+     * @param context
+     * @param contextTask1    A background context task that returns nothing but takes 1 parameter
+     * @param contextPostTask A foreground context task that takes no parameters
+     * @param <C>             Context type
+     * @param <T1>            Argument type
+     */
+    public static <C, T1> void async(@NonNull C context,
+                                     ContextTask1<C, T1> contextTask1,
+                                     T1 arg1,
+                                     ContextPostTask<C> contextPostTask) {
+        requireContext(context);
+        invokeAsyncSupport(context,
+                (context1, args) -> {
+                    contextTask1.run(context1, arg1);
+                    return null;
+                },
+                (context2, args, result) -> contextPostTask.run(context2));
     }
 
     public static <C, T1, T2> void async(@NonNull C context,
@@ -190,9 +258,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0], (T2)args[1]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1]),
-            arg1, arg2);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1]),
+                arg1, arg2);
     }
 
     public static <C, T1, T2, T3> void async(@NonNull C context,
@@ -202,9 +273,12 @@ public final class Asyncs {
 
         requireContext(context);
         invokeAsyncSupport(context,
-            (c, args)-> {task.run(c, (T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            (c, args, r) -> post.run(c, (T1)args[0], (T2)args[1], (T3)args[2]),
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run(c, (T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                (c, args, r) -> post.run(c, (T1) args[0], (T2) args[1], (T3) args[2]),
+                arg1, arg2, arg3);
     }
 
     public interface ContextTask<C> {
@@ -227,6 +301,10 @@ public final class Asyncs {
         void run(C context, T1 arg1, T2 arg2, T3 arg3, T4 arg4);
     }
 
+    public interface ContextPostTask<C> {
+        void run(C context);
+    }
+
     public interface ContextPostTask1<C, T1> {
         void run(C context, T1 arg1);
     }
@@ -245,8 +323,8 @@ public final class Asyncs {
                                  ResultPostTask<R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run(),
-            (c, args, r) -> post.run(r));
+                (c, args) -> task.run(),
+                (c, args, r) -> post.run(r));
     }
 
     public static <T1, R> void async(ResultTask1<T1, R> task,
@@ -254,9 +332,9 @@ public final class Asyncs {
                                      ResultPostTask1<T1, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0]),
-            (c, args, r) -> post.run((T1)args[0], r),
-            arg1);
+                (c, args) -> task.run((T1) args[0]),
+                (c, args, r) -> post.run((T1) args[0], r),
+                arg1);
     }
 
     public static <T1, T2, R> void async(ResultTask2<T1, T2, R> task,
@@ -264,9 +342,9 @@ public final class Asyncs {
                                          ResultPostTask2<T1, T2, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0], (T2)args[1]),
-            (c, args, r) -> post.run((T1)args[0], (T2)args[1], r),
-            arg1, arg2);
+                (c, args) -> task.run((T1) args[0], (T2) args[1]),
+                (c, args, r) -> post.run((T1) args[0], (T2) args[1], r),
+                arg1, arg2);
     }
 
     public static <T1, T2, T3, R> void async(ResultTask3<T1, T2, T3, R> task,
@@ -274,9 +352,9 @@ public final class Asyncs {
                                              ResultPostTask3<T1, T2, T3, R> post) {
 
         invokeAsyncSupport(null,
-            (c, args)-> task.run((T1)args[0], (T2)args[1], (T3)args[2]),
-            (c, args, r) -> post.run((T1)args[0], (T2)args[1], (T3)args[2], r),
-            arg1, arg2, arg3);
+                (c, args) -> task.run((T1) args[0], (T2) args[1], (T3) args[2]),
+                (c, args, r) -> post.run((T1) args[0], (T2) args[1], (T3) args[2], r),
+                arg1, arg2, arg3);
     }
 
     public interface ResultTask<R> {
@@ -315,34 +393,46 @@ public final class Asyncs {
 
     public static void async(Task task) {
         invokeAsyncSupport(null,
-            (c, args)-> {task.run(); return null;},
-            null);
+                (c, args) -> {
+                    task.run();
+                    return null;
+                },
+                null);
     }
 
     public static <T1> void async(Task1<T1> task,
                                   T1 arg1) {
 
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0]); return null;},
-            null,
-            arg1);
+                (c, args) -> {
+                    task.run((T1) args[0]);
+                    return null;
+                },
+                null,
+                arg1);
     }
 
     public static <T1, T2> void async(Task2<T1, T2> task,
                                       T1 arg1, T2 arg2) {
 
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0], (T2)args[1]); return null;},
-            null,
-            arg1, arg2);
+                (c, args) -> {
+                    task.run((T1) args[0], (T2) args[1]);
+                    return null;
+                },
+                null,
+                arg1, arg2);
     }
 
     public static <T1, T2, T3> void async(Task3<T1, T2, T3> task,
                                           T1 arg1, T2 arg2, T3 arg3) {
         invokeAsyncSupport(null,
-            (c, args)-> {task.run((T1)args[0], (T2)args[1], (T3)args[2]); return null;},
-            null,
-            arg1, arg2, arg3);
+                (c, args) -> {
+                    task.run((T1) args[0], (T2) args[1], (T3) args[2]);
+                    return null;
+                },
+                null,
+                arg1, arg2, arg3);
     }
 
     public interface Task {
@@ -362,24 +452,44 @@ public final class Asyncs {
     }
 
     // private helper methods
-
     private static <C, R> void invokeAsyncSupport(C context,
-        TaskSupport<C, R> task,
-        PostSupport<C, R> post,
-        Object... args) {
-
+                                                  TaskSupport<C, R> task,
+                                                  PostSupport<C, R> post,
+                                                  Object... args) {
         WeakReference<C> ctx = context != null ? Ref.weak(context) : null;
-
         Engine.instance().getThreadPool().execute(() -> {
             if (ctx != null && !Ref.alive(ctx)) {
                 return;
             }
 
             C c = ctx != null ? ctx.get() : null;
-            R r = task.run(c, args);
+            R r = null;
+
+            try {
+                r = task.run(c, args);
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("invokeAsyncSupport(task.run()) exception: " + t.getMessage(), t);
+            }
+
+            final R rCopy = r;
 
             if (post != null) {
-                new Handler(Looper.getMainLooper()).post(() -> post.run(c, args, r));
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    try {
+                        post.run(c, args, rCopy);
+                    } catch (Throwable t) {
+                        if (BuildConfig.DEBUG) {
+                            throw t;
+                        }
+                        LOG.error("invokeAsyncSupport(post) exception: " + t.getMessage(), t);
+                    }
+                    if (Ref.alive(ctx)) {
+                        Ref.free(ctx);
+                    }
+                });
             }
         });
     }
@@ -397,4 +507,5 @@ public final class Asyncs {
     private interface PostSupport<C, R> {
         void run(C context, Object[] args, R result);
     }
+
 }

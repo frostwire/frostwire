@@ -23,7 +23,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Afsløring:</b> Selvom anbefalet til dine downloads, især når du downloader eller udveksler følsomme oplysninger (f.eks. bank) og samtidig bruger offentlige Wi-Fi- eller mobildata, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du er forbundet til internettet ved hjælp af en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge en af nedenstående tjenester til at kryptere din forbindelse og <b>beskytte dit privatliv</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Dit privatliv er en grundlæggende menneskerettighed</b>. En ubeskyttet forbindelse betyder alt, hvad du gør online, herunder <b>downloads, søgninger, meddelelser</b>, kan overvåges og opfanges af alle på dit netværk, f.eks. Internetudbydere, hackere, regeringer.<br><br><b>Vi anbefaler stærkt at bruge en VPN-tjeneste</b>. <br> Her er nogle muligheder, der giver pålidelig service og fungerer godt med FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Indstillinger</string>
     <string name="exit">Afslut</string>
     <string name="search_label">Søg</string>
@@ -164,7 +163,7 @@
     <string name="saving_to_internal_memory">Lagring til intern hukommelse</string>
     <string name="choose_email_app">Vælg en e-mail app…</string>
     <string name="my_filetype">Mit %s</string>
-    <string name="retry_search">Prøv igen</string>
+    <string name="retry">Prøv igen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunne ikke seedet. BitTorrent forbliver afbrudt.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vil slette downloadede filer, hvis FrostWire afinstalleres.</string>
     <string name="protected_connection">VPN-beskyttet</string>
@@ -357,7 +356,6 @@
     <string name="or">eller</string>
     <string name="file_names">Filnavne</string>
     <string name="no_data_check_internet_connection">Netværk utilgængeligt, tjek din internetforbindelse.</string>
-    <string name="use_pixabay">Brug Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stop såning alle overførsler</string>
     <string name="seed_stop">Stop såning</string>
     <string name="transfers_select_seeding">såning</string>
@@ -409,7 +407,7 @@
     <string name="piece_size_header">Stykke Størrelse:</string>
     <string name="add_tracker">Tilføj tracker</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dages prøveperiode</string>
-    <string name="play_store_out_of_sync">Google Play Butik skal synkronisere, vent et par minutter</string>
     <string name="contact_us">Kontakt os</string>
     <string name="use_nyaa">Brug Nyaa</string>
+    <string name="use_torrentz2">Brug Torrentz2</string>
 </resources>

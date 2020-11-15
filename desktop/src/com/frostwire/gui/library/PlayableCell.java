@@ -21,19 +21,14 @@ package com.frostwire.gui.library;
 import com.frostwire.gui.LocaleLabel.LocaleString;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class PlayableCell implements Comparable<PlayableCell> {
-
+class PlayableCell implements Comparable<PlayableCell> {
     private final Object dataLine;
     private final Object wrappedObject;
-
     private final String strValue;
     private final LocaleString localeString;
-
     private boolean playing;
     private int column;
 
@@ -44,7 +39,6 @@ public class PlayableCell implements Comparable<PlayableCell> {
     public PlayableCell(Object dataLine, Object wrapMe, String strValue, boolean isPlaying, int columnIndex) {
         this.dataLine = dataLine;
         this.wrappedObject = wrapMe;
-
         this.strValue = strValue;
         this.localeString = new LocaleString(strValue);
     }
@@ -74,13 +68,12 @@ public class PlayableCell implements Comparable<PlayableCell> {
         return strValue;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public int compareTo(PlayableCell o) {
         if (wrappedObject instanceof Comparable && wrappedObject != null && o.wrappedObject != null && wrappedObject.getClass().equals(o.wrappedObject.getClass())) {
             return ((Comparable) wrappedObject).compareTo(o.wrappedObject);
         }
-
         return toString().compareTo(o.toString());
     }
 

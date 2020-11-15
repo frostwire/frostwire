@@ -22,8 +22,7 @@ package com.frostwire.gui.bittorrent;
  * @author gubatron
  * @author aldenml
  */
-public final class TransferHolder {
-
+final class TransferHolder {
     private final BTDownload dl;
     private final String displayName;
 

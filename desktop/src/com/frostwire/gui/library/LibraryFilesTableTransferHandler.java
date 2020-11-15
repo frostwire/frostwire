@@ -31,10 +31,10 @@ import java.util.List;
 
 /**
  * The Transfer Handler for any of the File tables in the library.
- * @see LibraryFilesTransferHandler for the handler on the left hand side tree.
+ *
  * @author gubatron
  * @author aldenml
- *
+ * @see LibraryFilesTransferHandler for the handler on the left hand side tree.
  */
 class LibraryFilesTableTransferHandler extends TransferHandler {
     private final LibraryFilesTableMediator mediator;
@@ -55,7 +55,6 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
         if (!canImport(support, false)) {
             return fallbackTransferHandler.importData(support);
         }
-
         try {
             Transferable transferable = support.getTransferable();
             if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
@@ -73,7 +72,6 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
         } catch (Throwable e) {
             return fallbackTransferHandler.importData(support);
         }
-
         return false;
     }
 
@@ -95,7 +93,7 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
     private boolean canImport(TransferSupport support, boolean fallback) {
         support.setShowDropLocation(false);
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
-            return fallback ? fallbackTransferHandler.canImport(support) : false;
+            return fallback && fallbackTransferHandler.canImport(support);
         }
         return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, fallback);
     }

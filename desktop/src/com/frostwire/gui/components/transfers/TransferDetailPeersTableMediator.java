@@ -26,15 +26,12 @@ import javax.swing.*;
 
 public class TransferDetailPeersTableMediator extends
         AbstractTableMediator<TransferDetailPeersModel, TransferDetailPeersDataLine, TransferDetailPeers.PeerItemHolder> {
-
     TransferDetailPeersTableMediator() {
         super("TRANSFER_DETAIL_PEERS_TABLE_MEDIATOR");
     }
 
-
     @Override
     protected void updateSplashScreen() {
-
     }
 
     @Override
@@ -52,16 +49,13 @@ public class TransferDetailPeersTableMediator extends
 
     @Override
     public void handleActionKey() {
-
     }
 
     @Override
     public void handleSelection(int row) {
-
     }
 
     @Override
     public void handleNoSelection() {
-
     }
 }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.frostwire.android.util.Debug;
 import com.frostwire.util.ThreadPool;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -33,18 +34,20 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author gubatron
  * @author aldenml
  */
-final class EngineThreadPool extends ThreadPool {
+final public class EngineThreadPool extends ThreadPool {
 
     // look at AsyncTask for a more dynamic calculation, but it yields
     // 17 in a medium hardware phone
-    private static final int MAXIMUM_POOL_SIZE = 4;
+    private static final int CORE_POOL_SIZE = 1;
+    private static final int MAXIMUM_POOL_SIZE = 8;
+    private static final int KEEP_ALIVE_TIME_IN_SECS = 2;
+    private static final int MAX_DEBUG_QUEUED_TASKS = 100;
 
     private final WeakHashMap<Object, String> taskStack;
     private final WeakHashMap<Thread, TaskInfo> taskInfo;
 
     EngineThreadPool() {
-        super("Engine", MAXIMUM_POOL_SIZE, new LinkedBlockingQueue<>(), false);
-
+        super("Engine", CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE_TIME_IN_SECS, new LinkedBlockingQueue<>(), false);
         taskStack = new WeakHashMap<>();
         taskInfo = new WeakHashMap<>();
     }
@@ -92,16 +95,25 @@ final class EngineThreadPool extends ThreadPool {
 
         if (Debug.isEnabled()) {
             taskStack.put(task, getStack());
+            if (getQueue().size() > 0) {
+                System.out.println("EngineThreadPool::verifyTask - " + getQueue().size() + " tasks queued");
+            }
         }
 
-        // if debug/development, allow only 20 tasks in the queue
-        if (Debug.isEnabled() && getQueue().size() > 20) {
+        // if debug/development, allow only MAX_DEBUG_QUEUED_TASKS tasks in the queue
+        if (Debug.isEnabled() && getQueue().size() > MAX_DEBUG_QUEUED_TASKS) {
             dumpTasks();
-            throw new RuntimeException("Too many tasks in the queue");
+            throw new RuntimeException("Too many tasks (" + getQueue().size() + "/" + MAX_DEBUG_QUEUED_TASKS + ") in the queue");
         }
+        String threadName = Thread.currentThread().getStackTrace()[6].toString();
+        Thread.currentThread().setName(threadName);
+        //System.out.println("Thread renamed to -> "+ threadName);
     }
 
     private void dumpTasks() {
+        System.out.println("==============================================");
+        System.out.println("EngineThreadPool::dumpTasks()");
+        System.out.println("Active threads: " + getActiveCount());
         System.out.println("Running threads in engine pool");
         long now = System.nanoTime();
         for (Map.Entry<Thread, TaskInfo> e : taskInfo.entrySet()) {
@@ -114,6 +126,15 @@ final class EngineThreadPool extends ThreadPool {
             System.out.println("\tStack trace:");
             System.out.println(e.getValue().stack);
         }
+        System.out.println("==============================================");
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+        System.out.println("All threads in the JVM (" + threads.size() +"):");
+        int i=1;
+        for (Thread t : threads) {
+            System.out.println(i + ": " + t.getName());
+            i++;
+        }
+        System.out.println("==============================================");
     }
 
     private static String getStack() {

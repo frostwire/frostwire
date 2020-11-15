@@ -18,7 +18,6 @@
 package com.frostwire.android.gui;
 
 import android.content.Context;
-import android.support.multidex.MultiDexApplication;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -46,6 +45,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
+
+import androidx.multidex.MultiDexApplication;
 
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;
@@ -152,9 +153,9 @@ public class MainApplication extends MultiDexApplication {
 //            } catch (InterruptedException e) {
 //            }
             String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
-            ctx.version[0] = Integer.valueOf(vStrArray[0]);
-            ctx.version[1] = Integer.valueOf(vStrArray[1]);
-            ctx.version[2] = Integer.valueOf(vStrArray[2]);
+            ctx.version[0] = Integer.parseInt(vStrArray[0]);
+            ctx.version[1] = Integer.parseInt(vStrArray[1]);
+            ctx.version[2] = Integer.parseInt(vStrArray[2]);
             ctx.version[3] = BuildConfig.VERSION_CODE;
 
             BTEngine.ctx = ctx;

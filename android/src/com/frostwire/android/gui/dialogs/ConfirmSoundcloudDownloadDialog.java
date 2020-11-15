@@ -128,7 +128,7 @@ public class ConfirmSoundcloudDownloadDialog extends AbstractConfirmListDialog<S
         }
 
         @Override
-        public long getItemSize(SoundcloudSearchResult data) {
+        public double getItemSize(SoundcloudSearchResult data) {
             return data.getSize();
         }
 

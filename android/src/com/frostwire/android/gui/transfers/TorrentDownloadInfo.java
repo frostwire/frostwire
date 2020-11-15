@@ -23,7 +23,7 @@ package com.frostwire.android.gui.transfers;
  * @author aldenml
  * 
  */
-interface TorrentDownloadInfo {
+public interface TorrentDownloadInfo {
 
     String makeMagnetUri();
 
@@ -33,7 +33,7 @@ interface TorrentDownloadInfo {
 
     String getDisplayName();
 
-    long getSize();
+    double getSize();
 
     String getHash();
 

@@ -29,12 +29,15 @@ import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import net.miginfocom.swing.MigLayout;
 import org.limewire.setting.SettingsGroupManager;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.dnd.DropTarget;
-import java.awt.event.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,41 +49,34 @@ import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPL
  */
 public final class MainFrame {
     /**
+     * The main <tt>JFrame</tt> for the application.
+     */
+    private final JFrame FRAME;
+    /**
      * Handle to the <tt>JTabbedPane</tt> instance.
      */
-    private JPanel TABBED_PANE;
-
+    private final JPanel TABBED_PANE;
     private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
-
     /**
      * Constant handle to the <tt>LibraryView</tt> class that is
      * responsible for displaying files in the user's repository.
      */
     private LibraryMediator LIBRARY_MEDIATOR;
-
     /**
      * Constant handle to the <tt>OptionsMediator</tt> class that is
      * responsible for displaying customizable options to the user.
      */
     private OptionsMediator OPTIONS_MEDIATOR;
-
     /**
      * Constant handle to the <tt>StatusLine</tt> class that is
      * responsible for displaying the status of the network and
      * connectivity to the user.
      */
     private StatusLine STATUS_LINE;
-
-    /**
-     * The main <tt>JFrame</tt> for the application.
-     */
-    private final JFrame FRAME;
-
     /**
      * The array of tabs in the main application window.
      */
-    private Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
-
+    private final Map<GUIMediator.Tabs, Tab> TABS = new HashMap<>(3);
     /**
      * The last state of the X/Y location and the time it was set.
      * This is necessary to preserve the maximize size & prior size,
@@ -88,23 +84,7 @@ public final class MainFrame {
      * maximizing, prior to the state actually becoming maximized.
      */
     private WindowState lastState = null;
-
-    private ApplicationHeader APPLICATION_HEADER;
-
-    /**
-     * simple state.
-     */
-    private static class WindowState {
-        private final int x;
-        private final int y;
-        private final long time;
-
-        WindowState() {
-            x = ApplicationSettings.WINDOW_X.getValue();
-            y = ApplicationSettings.WINDOW_Y.getValue();
-            time = System.currentTimeMillis();
-        }
-    }
+    private final ApplicationHeader APPLICATION_HEADER;
 
     /**
      * Initializes the primary components of the main application window,
@@ -115,17 +95,12 @@ public final class MainFrame {
         //starts the Frostwire update manager, and will trigger a task in 5 seconds.
         // RELEASE
         UpdateManager.scheduleUpdateCheckTask(0);
-
         // DEBUG
         //UpdateManager.scheduleUpdateCheckTask(0,"http://update1.frostwire.com/example.php");
-
         FRAME = frame;
-
         new DropTarget(FRAME, new TransferHandlerDropTargetListener(DNDUtils.DEFAULT_TRANSFER_HANDLER));
-
         TABBED_PANE = new JPanel(new CardLayout());
         TABBED_PANE.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ThemeMediator.LIGHT_BORDER_COLOR));
-
         // Add a listener for saving the dimensions of the window &
         // position the search icon overlay correctly.
         FRAME.addComponentListener(new ComponentListener() {
@@ -144,14 +119,8 @@ public final class MainFrame {
                 saveWindowState();
             }
         });
-
         // Listen for the size/state changing.
-        FRAME.addWindowStateListener(new WindowStateListener() {
-            public void windowStateChanged(WindowEvent e) {
-                saveWindowState();
-            }
-        });
-
+        FRAME.addWindowStateListener(e -> saveWindowState());
         // Listen for the window closing, to save settings.
         FRAME.addWindowListener(new WindowAdapter() {
             public void windowDeiconified(WindowEvent e) {
@@ -170,31 +139,22 @@ public final class MainFrame {
                 SettingsGroupManager.instance().save();
                 GUIMediator.close(true);
             }
-
         });
-
         FRAME.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.setFrameDimensions();
-
         FRAME.setJMenuBar(MenuMediator.instance().getMenuBar());
         JPanel contentPane = new JPanel();
-
         FRAME.setContentPane(contentPane);
         contentPane.setLayout(new MigLayout("insets 0, gap 0"));
-
         buildTabs();
         APPLICATION_HEADER = new ApplicationHeader(TABS);
-
         contentPane.add(APPLICATION_HEADER, "growx, dock north");
         contentPane.add(TABBED_PANE, "wrap");
         contentPane.add(getStatusLine().getComponent(), "dock south, shrink 0");
-
         setMinimalSize(FRAME, APPLICATION_HEADER, APPLICATION_HEADER, TABBED_PANE, getStatusLine().getComponent());
-
         if (ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.getValue()) {
             FRAME.addWindowListener(MagnetClipboardListener.getInstance());
         }
-
         if (OSUtils.isMacOSX()) {
             FRAME.getRootPane().putClientProperty("apple.awt.fullscreenable", true);
         }
@@ -203,17 +163,14 @@ public final class MainFrame {
     private void setMinimalSize(JFrame frame, JComponent horizontal, JComponent... verticals) {
         int width = horizontal.getMinimumSize().width;
         int height = 0;
-
         for (JComponent c : verticals) {
             height += c.getMinimumSize().height;
         }
-
         // for some reason I can pack the frame
         // this disallow me of getting the right size of the title bar
         // and in general the insets's frame
         // lets add some fixed value for now
         height += 50;
-
         frame.setMinimumSize(new Dimension(width, height));
     }
 
@@ -227,16 +184,39 @@ public final class MainFrame {
     private void saveWindowState() {
         int state = FRAME.getExtendedState();
         if (state == Frame.NORMAL) {
-            // save the screen size and location 
+            // save the screen size and location
             Dimension dim = GUIMediator.getAppSize();
-            if ((dim.height > 100) && (dim.width > 100)) {
-                Point loc = GUIMediator.getAppLocation();
-                ApplicationSettings.APP_WIDTH.setValue(dim.width);
-                ApplicationSettings.APP_HEIGHT.setValue(dim.height);
-                ApplicationSettings.WINDOW_X.setValue(loc.x);
-                ApplicationSettings.WINDOW_Y.setValue(loc.y);
-                ApplicationSettings.MAXIMIZE_WINDOW.setValue(false);
+
+            int minAppWidth = ApplicationSettings.APP_WIDTH.getDefaultValue();
+            int minAppHeight = ApplicationSettings.APP_HEIGHT.getDefaultValue();
+            int appWidth = dim.width;
+            int appHeight = dim.height;
+
+            boolean forceMinimumDimensions = false;
+
+            if (appWidth < minAppWidth) {
+                appWidth = minAppWidth;
+                forceMinimumDimensions = true;
             }
+
+            if (appHeight < minAppHeight) {
+                appHeight = minAppHeight;
+                forceMinimumDimensions = true;
+            }
+
+            if (forceMinimumDimensions) {
+                FRAME.setSize(new Dimension(appWidth, appHeight));
+                FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
+                FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
+            }
+
+            Point loc = GUIMediator.getAppLocation();
+            ApplicationSettings.APP_WIDTH.setValue(appWidth);
+            ApplicationSettings.APP_HEIGHT.setValue(appHeight);
+            ApplicationSettings.WINDOW_X.setValue(loc.x);
+            ApplicationSettings.WINDOW_Y.setValue(loc.y);
+            ApplicationSettings.MAXIMIZE_WINDOW.setValue(false);
+
         } else if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
             ApplicationSettings.MAXIMIZE_WINDOW.setValue(true);
             if (lastState != null && lastState.time == System.currentTimeMillis()) {
@@ -254,15 +234,12 @@ public final class MainFrame {
         SearchTab searchTab = new SearchTab();
         TransfersTab transfersTab = new TransfersTab(getBTDownloadMediator());
         LibraryTab libraryTab = new LibraryTab(getLibraryMediator());
-
         // keep references to the tab objects.
         TABS.put(Tabs.SEARCH, searchTab);
         TABS.put(Tabs.TRANSFERS, transfersTab);
         TABS.put(Tabs.LIBRARY, libraryTab);
-
         SearchTransfersTab searchTransfers = new SearchTransfersTab(searchTab, transfersTab);
         TABS.put(Tabs.SEARCH_TRANSFERS, searchTransfers);
-
         TABBED_PANE.setPreferredSize(new Dimension(10000, 10000));
         addTabs(UI_SEARCH_TRANSFERS_SPLIT_VIEW.getValue());
         TABBED_PANE.setRequestFocusEnabled(false);
@@ -302,18 +279,6 @@ public final class MainFrame {
     }
 
     /**
-     * Sets the selected index in the wrapped <tt>JTabbedPane</tt>.
-     *
-     * @param tab index to select
-     */
-    final void setSelectedTab(GUIMediator.Tabs tab) {
-        CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
-        Tab t = TABS.get(tab);
-        cl.show(TABBED_PANE, t.getTitle());
-        APPLICATION_HEADER.selectTab(t);
-    }
-
-    /**
      * Sets the x,y location as well as the height and width of the main
      * application <tt>Frame</tt>.
      */
@@ -322,17 +287,13 @@ public final class MainFrame {
         GraphicsDevice gd = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gd.getDefaultConfiguration();
         Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
         int locX;
         int locY;
-
         int appWidth = Math.min(screenSize.width - insets.left - insets.right, ApplicationSettings.APP_WIDTH.getValue());
         int appHeight = Math.min(screenSize.height - insets.top - insets.bottom, ApplicationSettings.APP_HEIGHT.getValue());
-
         // Set the location of our window based on whether or not
-        // the user has run the program before, and therefore may have 
+        // the user has run the program before, and therefore may have
         // modified the location of the main window.
         if (ApplicationSettings.RUN_ONCE.getValue()) {
             locX = Math.max(insets.left, ApplicationSettings.WINDOW_X.getValue());
@@ -341,22 +302,18 @@ public final class MainFrame {
             locX = (screenSize.width - appWidth) / 2;
             locY = (screenSize.height - appHeight) / 2;
         }
-
-        // Make sure the Window is visible and not for example 
+        // Make sure the Window is visible and not for example
         // somewhere in the very bottom right corner.
         if (locX + appWidth > screenSize.width) {
             locX = Math.max(insets.left, screenSize.width - insets.left - insets.right - appWidth);
         }
-
         if (locY + appHeight > screenSize.height) {
             locY = Math.max(insets.top, screenSize.height - insets.top - insets.bottom - appHeight);
         }
-
         FRAME.setLocation(locX, locY);
         FRAME.setSize(new Dimension(appWidth, appHeight));
         FRAME.getContentPane().setSize(new Dimension(appWidth, appHeight));
         FRAME.getContentPane().setPreferredSize(new Dimension(appWidth, appHeight));
-
         //re-maximize if we shutdown while maximized.
         if (ApplicationSettings.MAXIMIZE_WINDOW.getValue() && Toolkit.getDefaultToolkit().isFrameStateSupported(Frame.MAXIMIZED_BOTH)) {
             FRAME.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -410,18 +367,29 @@ public final class MainFrame {
         Component comp = getCurrentTabComponent();
         if (comp != null) {
             for (Tabs t : TABS.keySet()) {
-                if (TABS.get(t).getComponent().equals(comp)) {
+                JComponent tabComponent = TABS.get(t).getComponent();
+                if (comp.equals(tabComponent)) {
                     return t;
                 }
             }
         }
-
         return null;
+    }
+
+    /**
+     * Sets the selected index in the wrapped <tt>JTabbedPane</tt>.
+     *
+     * @param tab index to select
+     */
+    final void setSelectedTab(GUIMediator.Tabs tab) {
+        CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
+        Tab t = TABS.get(tab);
+        cl.show(TABBED_PANE, t.getTitle());
+        APPLICATION_HEADER.selectTab(t);
     }
 
     private Component getCurrentTabComponent() {
         Component currentPanel = null;
-
         for (Component component : TABBED_PANE.getComponents()) {
             if (component.isVisible()) {
                 if (component instanceof JPanel)
@@ -430,7 +398,6 @@ public final class MainFrame {
                     currentPanel = ((JScrollPane) component).getViewport().getComponent(0);
             }
         }
-
         return currentPanel;
     }
 
@@ -441,5 +408,20 @@ public final class MainFrame {
     public void resizeSearchTransferDivider(int newLocation) {
         SearchTransfersTab searchTab = (SearchTransfersTab) TABS.get(Tabs.SEARCH_TRANSFERS);
         searchTab.setDividerLocation(newLocation);
+    }
+
+    /**
+     * simple state.
+     */
+    private static class WindowState {
+        private final int x;
+        private final int y;
+        private final long time;
+
+        WindowState() {
+            x = ApplicationSettings.WINDOW_X.getValue();
+            y = ApplicationSettings.WINDOW_Y.getValue();
+            time = System.currentTimeMillis();
+        }
     }
 }

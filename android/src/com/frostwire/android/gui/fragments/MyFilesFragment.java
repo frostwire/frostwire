@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,6 @@ import android.content.IntentFilter;
 import android.content.Loader;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.design.widget.TabLayout;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.SearchView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,12 +65,17 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.util.Logger;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -235,7 +236,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.fragment_my_files_menu_filter:
-                return true;
             case R.id.fragment_my_files_menu_checkbox:
                 return true;
             default:
@@ -283,7 +283,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         filter.addAction(MusicPlaybackService.META_CHANGED);
         filter.addAction(MusicPlaybackService.PLAYSTATE_CHANGED);
         filter.addAction(MusicPlaybackService.SIMPLE_PLAYSTATE_STOPPED);
-        getActivity().registerReceiver(broadcastReceiver, filter);
+        try {
+            getActivity().registerReceiver(broadcastReceiver, filter);
+        } catch (Throwable ignored) {}
     }
 
     @Override
@@ -291,7 +293,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         super.onPause();
         savePreviouslyCheckedFileDescriptors();
         MusicUtils.stopSimplePlayer();
-        getActivity().unregisterReceiver(broadcastReceiver);
+        try {
+            getActivity().unregisterReceiver(broadcastReceiver);
+        } catch (Throwable ignored) {}
     }
 
     @Override
@@ -447,7 +451,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
     private void updateHeaderPostTask(byte fileType, int numFiles) {
         if (header != null && fileType == lastFileType) {
-            headerTotal.setText("(" + String.valueOf(numFiles) + ")");
+            headerTotal.setText("(" + numFiles + ")");
         }
         if (adapter == null) {
             clickFileTypeTab(lastFileType);
@@ -640,7 +644,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
-    private class MyFilesActionModeCallback implements android.support.v7.view.ActionMode.Callback {
+    private class MyFilesActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
         private ActionMode mode;
         private Menu menu;
         private int numChecked;

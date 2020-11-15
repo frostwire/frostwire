@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,9 +31,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
-import android.support.annotation.StringRes;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.FileProvider;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -42,6 +40,10 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.StringRes;
+import androidx.core.content.FileProvider;
+
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -49,19 +51,24 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
+import com.frostwire.util.Ref;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -89,17 +96,18 @@ public final class UIUtils {
 
     // put "support" pitches at the beginning and play with the offset
     private static final int[] PITCHES = {
-            R.string.support_frostwire,
-            R.string.support_free_software,
-            R.string.support_frostwire,
-            R.string.support_free_software,
-            R.string.save_bandwidth,
-            R.string.cheaper_than_drinks,
-            R.string.cheaper_than_lattes,
-            R.string.cheaper_than_parking,
-            R.string.cheaper_than_beer,
-            R.string.cheaper_than_cigarettes,
-            R.string.cheaper_than_gas,
+            R.string.support_frostwire, //0
+            R.string.support_free_software, //1
+            R.string.support_frostwire, //2
+            R.string.support_free_software, //3
+            R.string.save_bandwidth, //4
+            R.string.cheaper_than_drinks, //5
+            R.string.cheaper_than_lattes, //6
+            R.string.cheaper_than_parking, //7
+            R.string.cheaper_than_beer, //8
+            R.string.cheaper_than_cigarettes, //9
+            R.string.cheaper_than_gas, //10
+            R.string.try_it_free_for_a_half_hour,
             R.string.keep_the_project_alive
     };
 
@@ -126,6 +134,10 @@ public final class UIUtils {
 
     public static void showLongMessage(View view, int resourceId) {
         Snackbar.make(view, resourceId, Snackbar.LENGTH_LONG).show();
+    }
+
+    public static void showLongMessage(Context context, int resourceId, Object... formatArgs) {
+        showLongMessage(context, context.getResources().getString(resourceId, formatArgs));
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
@@ -207,7 +219,7 @@ public final class UIUtils {
                         callback).show(fragmentManager);
     }
 
-    public static String getBytesInHuman(long size) {
+    public static String getBytesInHuman(double size) {
         int i;
         float sizeFloat = (float) size;
         for (i = 0; sizeFloat > 1024; i++) {
@@ -244,31 +256,119 @@ public final class UIUtils {
         }
     }
 
+////// START OF PACKAGE INSTALLER LOGIC SECTION
+//    If you found this in Google, I could not make it work in 2 days, I really tried, I got response
+//    from the package installer session and all, but I couldn't start the android screen to ask for
+//    permissions
+//
+//    Leaving this as an example in case they enable the use of PackageInstaller for non-system apps.
+//    or that sometime in the future I figure out what the hell was missing in order to ask the user
+//    for permission to install apks.
+//
+//    This code currently ends up sending an intent from the PackageInstaller to MainActivity
+//    the intent has an extra intent to ask for permissions, but it doesn't work when you do start an
+//    activity with it.  Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
+//    Also commenting out code in MainActivity::onPackageInstalledCallback()
+//    which would handle the intent :_(
+//
+//    Code commented out in MainActivity, and also SoftwareUpdater::notifyUserAboutUpdate() checking if apk is there.
+//
+//    public static boolean openAPK(Context context, File updateApk) {
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
+//            try {
+//                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
+//                Intent intent = new Intent("android.content.pm.PackageInstaller");
+//                intent.setData(uri);
+//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                //intent.setDataAndType(uri, "application/vnd.android.package-archive");
+//                context.startActivity(intent);
+//                return true;
+//            } catch (Throwable t) {
+//                Uri apkUri = null;
+//                // We usually end up here
+//                //LOG.error("openAPK() error - " + t.getMessage(), t);
+//                PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
+//                PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+//                sessionParams.setAppPackageName("com.frostwire.android");
+//                try {
+//                    apkUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
+//                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, apkUri);
+//                    int sessionID = packageInstaller.createSession(sessionParams);
+//                    PackageInstaller.Session session = packageInstaller.openSession(sessionID);
+//                    OutputStream sessionOutputStream = session.openWrite("Package", 0, -1);
+//
+//                    InputStream apkInputStream = context.getContentResolver().openInputStream(apkUri);
+//                    byte[] buffer = new byte[65536];
+//                    int n;
+//                    while ((n = apkInputStream.read(buffer)) >= 0) {
+//                        sessionOutputStream.write(buffer, 0, n);
+//                    }
+//                    apkInputStream.close();
+//                    session.fsync(sessionOutputStream);
+//                    sessionOutputStream.close();
+//
+//                    // could exit the app for instance
+//                    Intent intent = new Intent(context, MainActivity.class);
+//                    intent.setAction(Constants.ACTION_PACKAGE_INSTALLED);
+//                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+//                    IntentSender statusReceiver = pendingIntent.getIntentSender();
+//                    session.commit(statusReceiver);
+//                    LOG.info("openAPK() success!");
+//                    return true;
+//                } catch (Throwable e) {
+//                    LOG.error("openAPK (using FileProvider) failed with filePath=" + apkUri, e);
+//                    return false;
+//                }
+//            }
+//        } else {
+//            Uri uri = null;
+//            try {
+//                uri = Uri.fromFile(updateApk);
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(uri, "application/vnd.android.package-archive");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                context.startActivity(intent);
+//                return true;
+//            } catch (Throwable t) {
+//                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + uri, t);
+//                return false;
+//            }
+//        }
+//    }
+////// END OF PACKAGE INSTALLER LOGIC SECTION
+
+    public static boolean openFile(Context context, String filePath, String mime) {
+        return openFile(context, filePath, mime, SystemUtils.hasNougatOrNewer());
+    }
+
     /**
      * Opens the given file with the default Android activity for that File and
      * mime type.
      */
-    public static void openFile(Context context, String filePath, String mime, boolean useFileProvider) {
+    public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             if (filePath != null && !openAudioInternal(context, filePath)) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
+                Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ? Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
                 i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 if (mime != null && mime.contains("video")) {
                     if (MusicUtils.isPlaying()) {
-                        MusicUtils.playOrPause();
+                        MusicUtils.playPauseOrResume();
                     }
                 }
                 context.startActivity(i);
             }
+            return true;
         } catch (Throwable e) {
             UIUtils.showShortMessage(context, R.string.cant_open_file);
             LOG.error("Failed to open file: " + filePath, e);
+            return false;
         }
     }
 
     /**
      * Takes a screenshot of the given view
+     *
      * @return File with jpeg of the screenshot taken. null if there was a problem.
      */
     public static File takeScreenshot(View view) {
@@ -313,14 +413,18 @@ public final class UIUtils {
         return screenshotFile;
     }
 
+    public static Uri getFileUri(Context context, String filePath) {
+        return getFileUri(context, filePath, SystemUtils.hasNougatOrNewer());
+    }
+
     public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {
         return useFileProvider ?
                 FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
                 Uri.fromFile(new File(filePath));
     }
 
-    public static void openFile(Context context, File file) {
-        openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), true);
+    public static boolean openFile(Context context, File file) {
+        return openFile(context, file.getAbsolutePath(), getMimeType(file.getAbsolutePath()), SystemUtils.hasNougatOrNewer());
     }
 
     public static void openFile(Context context, File file, boolean useFileProvider) {
@@ -337,6 +441,10 @@ public final class UIUtils {
             // ignore
             // yes, it happens
         }
+    }
+
+    public static void setupClickUrl(View v, final String url) {
+        v.setOnClickListener(view -> UIUtils.openURL(view.getContext(), url));
     }
 
     public static String getMimeType(String filePath) {
@@ -447,7 +555,7 @@ public final class UIUtils {
         socialLinksDialog.show();
     }
 
-    // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over enginner.
+    // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over engineer.
     public static class IntentByteExtra {
         public final String name;
         public final byte value;
@@ -472,6 +580,14 @@ public final class UIUtils {
     }
 
     public static int randomPitchResId(boolean avoidSupportPitches) {
+        if ((!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && PITCHES[5] != R.string.try_it_free_for_a_half_hour) {
+            PITCHES[5] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[6] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[7] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[8] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[9] = R.string.try_it_free_for_a_half_hour;
+            PITCHES[10] = R.string.try_it_free_for_a_half_hour;
+        }
         int offsetRemoveAds = 4;
         int offset = !avoidSupportPitches ? 0 : offsetRemoveAds;
         return PITCHES[offset + new Random().nextInt(PITCHES.length - offset)];
@@ -482,7 +598,7 @@ public final class UIUtils {
         activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
         double x_sq = Math.pow(dm.widthPixels / dm.xdpi, 2);
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
-        // pitagoras
+        // Thank you Pitagoras
         return Math.sqrt(x_sq + y_sq);
     }
 
@@ -516,13 +632,51 @@ public final class UIUtils {
     }
 
     private static void playEphemeralPlaylistTask(Context context, FileDescriptor fd) {
-        try {
-            CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
-            if (mediaPlayer != null) {
-                mediaPlayer.play(Librarian.instance().createEphemeralPlaylist(context, fd));
+        LOG.info("playEphemeralPlaylistTask() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning());
+        final CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
+        final WeakReference<Context> contextRef = Ref.weak(context);
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
+            Runnable playEphemeralPlaylistOfOneCallback = () -> {
+                try {
+                    if (mediaPlayer != null && Ref.alive(contextRef)) {
+                        EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(contextRef.get(), fd);
+                        mediaPlayer.play(ephemeralPlaylist);
+                    }
+                } catch (Throwable ignored) {
+                    // possible Runtime error thrown by Librarian.instance()
+                } finally {
+                    Ref.free(contextRef);
+                }
+            };
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                //LOG.info("playEphemeralPlaylistTask() service is not there, and it's null");
+                MusicUtils.startMusicPlaybackService(context, new Intent(context, MusicPlaybackService.class), playEphemeralPlaylistOfOneCallback);
+            } else {
+                //LOG.info("playEphemeralPlaylistTask() calling playEphemeralPlaylistOfOneCallback directly, had music service already");
+                playEphemeralPlaylistOfOneCallback.run();
             }
-        } catch (Throwable ignored) {
-            // possible Runtime error thrown by Librarian.instance()
+
+        } else {
+            try {
+                if (mediaPlayer != null) {
+                    EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(context, fd);
+                    mediaPlayer.play(ephemeralPlaylist);
+                }
+            } catch (Throwable ignored) {
+                // possible Runtime error thrown by Librarian.instance()
+            }
         }
+    }
+
+    public static boolean isScreenLocked(final Context context) {
+        if (context == null) {
+            return true;
+        }
+        KeyguardManager km = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        if (km == null) {
+            return true;
+        }
+        return km.isKeyguardLocked();
     }
 }

@@ -6,95 +6,52 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Stores a fixed size of elements as a <code>Set</code> and removes elements 
- * when that size is reached. <code>FixedsizeForgetfulHashSet</code> is a 
- * <code>Set</code> version of {@link FixedsizeForgetfulHashMap}. Like 
- * <code>ForgetfulHashMap</code>, values are "forgotten" using a FIFO replacement 
- * policy.   
+ * Stores a fixed size of elements as a <code>Set</code> and removes elements
+ * when that size is reached. <code>FixedsizeForgetfulHashSet</code> is a
+ * <code>Set</code> version of {@link FixedsizeForgetfulHashMap}. Like
+ * <code>ForgetfulHashMap</code>, values are "forgotten" using a FIFO replacement
+ * policy.
  * <p>
  * <code>FixedsizeForgetfulHashSet</code> works in constant time.
- * 
-<pre>
-    FixedsizeForgetfulHashSet&lt;String&gt; ffhs = new FixedsizeForgetfulHashSet&lt;String&gt;(4);
-
-    ffhs.add("Abby");
-    System.out.println(ffhs);
-    if(!ffhs.add("Abby"))
-        System.out.println("The set already contained that item; Set contents: " + ffhs);
-
-    ffhs.add("Bob");
-    ffhs.add("Bob");
-    ffhs.add("Chris");
-
-    ffhs.add("Dan");
-    System.out.println(ffhs);   
-    ffhs.add("Eric");
-    System.out.println(ffhs);   
-
-    Output:
-        [Abby]
-        The set already contained that item; Set contents: [Abby]
-        [Abby, Bob, Chris, Dan]
-        [Bob, Chris, Dan, Eric]
-
-</pre>
-* 
-*/
+ *
+ * <pre>
+ * FixedsizeForgetfulHashSet&lt;String&gt; ffhs = new FixedsizeForgetfulHashSet&lt;String&gt;(4);
+ *
+ * ffhs.add("Abby");
+ * System.out.println(ffhs);
+ * if(!ffhs.add("Abby"))
+ * System.out.println("The set already contained that item; Set contents: " + ffhs);
+ *
+ * ffhs.add("Bob");
+ * ffhs.add("Bob");
+ * ffhs.add("Chris");
+ *
+ * ffhs.add("Dan");
+ * System.out.println(ffhs);
+ * ffhs.add("Eric");
+ * System.out.println(ffhs);
+ *
+ * Output:
+ * [Abby]
+ * The set already contained that item; Set contents: [Abby]
+ * [Abby, Bob, Chris, Dan]
+ * [Bob, Chris, Dan, Eric]
+ *
+ * </pre>
+ */
 public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<E>, Cloneable {
-
+    // Dummy value to associate with an Object in the backing Map
+    private static final Object PRESENT = new Object();
     /**
      * Backing map which the set delegates.
      */
-    private transient FixedsizeForgetfulHashMap<E,Object> map;
+    private transient FixedsizeForgetfulHashMap<E, Object> map;
 
-    // Dummy value to associate with an Object in the backing Map
-    private static final Object PRESENT = new Object();
-
-    /**
-     * Constructs a new, empty set.
-     */
-    public FixedsizeForgetfulHashSet(int size) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size);
-    }
-    
     /**
      * Constructs a new, empty set, using the given initialCapacity.
      */
     public FixedsizeForgetfulHashSet(int size, int initialCapacity) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size, initialCapacity);
-    }
-    
-    /**
-     * Constructs a new, empty set, using the given initialCapacity & loadFactor.
-     */
-    public FixedsizeForgetfulHashSet(int size, int initialCapacity, float loadFactor) {
-        map = new FixedsizeForgetfulHashMap<E,Object>(size, initialCapacity, loadFactor);
-    }
-    
-    /**
-     * Tests if the set is full
-     * 
-     * @return true, if the set is full (ie if adding any other entry will
-     * lead to removal of some other entry to maintain the fixed-size property
-     * of the set). Returns false, otherwise
-     */
-    public boolean isFull() {
-        return map.isFull();
-    }
-    
-    /**
-     * Removes the least recently used entry from the set
-     * @return The least recently used value from the set.
-     * @modifies this.
-     */
-    public E removeLRUEntry() {
-        if(isEmpty())
-            return null;
-        
-        Iterator<E> i = iterator();
-        E value = i.next();
-        i.remove();
-        return value;
+        map = new FixedsizeForgetfulHashMap<>(size, initialCapacity);
     }
 
     /**
@@ -145,7 +102,7 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      * element.
      */
     public boolean add(E o) {
-        return map.put(o, PRESENT)==null;
+        return map.put(o, PRESENT) == null;
     }
 
     /**
@@ -155,7 +112,7 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      * @return <tt>true</tt> if the set contained the specified element.
      */
     public boolean remove(Object o) {
-        return map.remove(o)==PRESENT;
+        return map.remove(o) == PRESENT;
     }
 
     /**
@@ -173,13 +130,12 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      */
     @SuppressWarnings("unchecked")
     public FixedsizeForgetfulHashSet<E> clone() {
-        try { 
-            FixedsizeForgetfulHashSet<E> newSet = (FixedsizeForgetfulHashSet<E>)super.clone();
+        try {
+            FixedsizeForgetfulHashSet<E> newSet = (FixedsizeForgetfulHashSet<E>) super.clone();
             newSet.map = map.clone();
             return newSet;
         } catch (CloneNotSupportedException e) {
             throw new InternalError();
         }
     }
-
 }

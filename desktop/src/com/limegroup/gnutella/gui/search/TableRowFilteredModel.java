@@ -29,27 +29,22 @@ import java.util.Map;
  * @author Sumeet Thadani, Sam Berlin
  */
 public class TableRowFilteredModel extends ResultPanelModel {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -7810977044778830969L;
-
+    /**
+     * A list of all filtered results.
+     */
+    private final List<SearchResultDataLine> HIDDEN;
     /**
      * The filter to use in this row filter.
      */
     private final TableLineFilter<SearchResultDataLine> FILTER;
-
     /**
      * The Junk Filter
      */
     private TableLineFilter<SearchResultDataLine> junkFilter = AllowFilter.instance();
-
-    /**
-     * A list of all filtered results.
-     */
-    protected final List<SearchResultDataLine> HIDDEN;
-
     private int _numResults;
 
     /**
@@ -57,11 +52,9 @@ public class TableRowFilteredModel extends ResultPanelModel {
      */
     public TableRowFilteredModel(TableLineFilter<SearchResultDataLine> f) {
         super();
-
         if (f == null) {
             throw new NullPointerException("null filter");
         }
-
         FILTER = f;
         HIDDEN = new ArrayList<>();
         _numResults = 0;
@@ -82,7 +75,6 @@ public class TableRowFilteredModel extends ResultPanelModel {
     public int add(SearchResultDataLine tl, int row) {
         boolean isNotJunk = junkFilter.allow(tl);
         boolean allow = allow(tl);
-
         if (isNotJunk || !SearchSettings.hideJunk()) {
             if (allow) {
                 return super.add(tl, row);
@@ -104,7 +96,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         HIDDEN.clear();
         super.simpleClear();
     }
-    
+
     @Override
     public void clear() {
         _numResults = 0;
@@ -145,31 +137,26 @@ public class TableRowFilteredModel extends ResultPanelModel {
         List<SearchResultDataLine> existing = new ArrayList<>(_list);
         List<SearchResultDataLine> hidden = new ArrayList<>(HIDDEN);
         simpleClear();
-
         // For stuff in _list, we can just re-add the DataLines as-is.
         if (isSorted()) {
-            for (int i = 0; i < existing.size(); i++) {
-                addSorted(existing.get(i));
+            for (SearchResultDataLine searchResultDataLine : existing) {
+                addSorted(searchResultDataLine);
             }
         } else {
-            for (int i = 0; i < existing.size(); i++) {
-                add(existing.get(i));
+            for (SearchResultDataLine searchResultDataLine : existing) {
+                add(searchResultDataLine);
             }
         }
-
         // Merge the hidden TableLines
         Map<String, SearchResultDataLine> mergeMap = new HashMap<>();
-        for (int i = 0; i < hidden.size(); i++) {
-            SearchResultDataLine tl = hidden.get(i);
+        for (SearchResultDataLine tl : hidden) {
             //SearchResult sr = tl.getInitializeObject();
             //String urn = sr.getHash();
-
             if (isSorted()) {
                 addSorted(tl);
             } else {
                 add(tl);
             }
-
             //            TableLine tableLine = mergeMap.get(urn);
             //            if (tableLine == null) {
             //                mergeMap.put(urn, tl); // re-use TableLines
@@ -177,7 +164,6 @@ public class TableRowFilteredModel extends ResultPanelModel {
             //                tableLine.addNewResult(sr, METADATA);
             //            }
         }
-
         // And add them
         if (isSorted()) {
             for (SearchResultDataLine line : mergeMap.values())
@@ -188,7 +174,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         }
     }
 
-    public int getFilteredResults() {
+    private int getFilteredResults() {
         return super.getTotalResults();
     }
 

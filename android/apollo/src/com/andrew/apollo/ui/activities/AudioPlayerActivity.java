@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
+ * Copyright (c) 2012-2020, FrostWire(R)
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.andrew.apollo.ui.activities;
 
 import android.animation.ObjectAnimator;
@@ -23,27 +22,19 @@ import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.SystemClock;
 import android.provider.MediaStore.Audio.Albums;
 import android.provider.MediaStore.Audio.Artists;
 import android.provider.MediaStore.Audio.Playlists;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,7 +50,13 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.andrew.apollo.IApolloService;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
+import androidx.viewpager.widget.ViewPager;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -67,18 +64,15 @@ import com.andrew.apollo.menu.DeleteDialog;
 import com.andrew.apollo.ui.fragments.QueueFragment;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
@@ -86,14 +80,14 @@ import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.TaskThrottle;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -102,7 +96,6 @@ import static com.frostwire.android.util.Asyncs.async;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class AudioPlayerActivity extends AbstractActivity implements
-        ServiceConnection,
         OnSeekBarChangeListener,
         DeleteDialog.DeleteDialogCallback,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -110,10 +103,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private static final Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
     // Message to refresh the time
-    private static final int REFRESH_TIME = 1;
+    private static final int REFRESH_TIME = 500;
+    private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 150;
+    private static final long UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS = 200;
 
-    // The service token
-    private ServiceToken mToken;
+    private static AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();
 
     // Play and pause button
     private PlayPauseButton mPlayPauseButton;
@@ -190,6 +184,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private long lastKnownPosition = 0;
     private long lastKnownDuration = 0;
     private boolean lastKnownIsPlaying = false;
+    private String lastTrackName;
+    private String lastArtistName;
+    private String lastAlbumName;
+    private String lastArtistAndAlbumNames;
+    private long lastTrackId = -1;
 
     public AudioPlayerActivity() {
         super(R.layout.activity_player_base);
@@ -198,13 +197,14 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        try {
+            super.onCreate(savedInstanceState);
+        } catch (Throwable t) {
+            LOG.error("onCreate() (handled) " + t.getMessage(), t);
+        }
 
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
 
         // Initialize the image fetcher/cache
         mImageFetcher = ApolloUtils.getImageFetcher(this);
@@ -217,48 +217,37 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Cache all the items
         initPlaybackControls();
+        initMopubBannerView();
 
         // Album Art Ad Controls
-        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
-        initAlbumArtBanner();
-
-        mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+        if (mPlayPauseButton != null) {
+            mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+        }
 
         PlayerGestureListener gestureListener = new PlayerGestureListener();
         gestureDetector = new GestureDetector(this, gestureListener);
         gestureDetector.setOnDoubleTapListener(gestureListener);
-        mAlbumArt.setOnTouchListener(gestureListener);
+        if (mAlbumArt != null) {
+            mAlbumArt.setOnTouchListener(gestureListener);
+        }
 
         writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
+
+        waitingToInitAlbumArtBanner.set(false);
+
+        loadCurrentAlbumArt();
     }
 
     @Override
     public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         setIntent(intent);
         startPlayback();
     }
 
     @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
-        // Check whether we were asked to start any playback
-        startPlayback();
-        // Set the playback drawables
-        updatePlaybackControls();
-        // Current info
-        updateNowPlayingInfo();
-        // Update the favorites icon
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
-    }
-
-    @Override
-    public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromuser) {
-        if (!fromuser || musicPlaybackService == null) {
+    public void onProgressChanged(final SeekBar bar, final int progress, final boolean fromUser) {
+        if (!fromUser || MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         final long now = SystemClock.elapsedRealtime();
@@ -355,18 +344,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        // hide ads in case of a share call
-        if (!Offers.disabledAds() && mAlbumArt.getVisibility() == View.GONE) {
-            mAlbumArt.setVisibility(View.VISIBLE);
-            if (mMopubBannerView != null) {
-                mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
-            }
-        }
-        return super.onMenuOpened(featureId, menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_player_shuffle:
@@ -394,7 +371,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 return true;
             case R.id.menu_player_audio_player_stop:
                 try {
-                    MusicUtils.musicPlaybackService.stop();
+                    MusicUtils.getMusicPlaybackService().stop();
                 } catch (Throwable e) {
                     // ignore
                 }
@@ -431,6 +408,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
+            if (mMopubBannerView != null) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            }
+            showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
         } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
@@ -439,43 +420,18 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onBackPressed() {
-        Engine.instance().hapticFeedback();
-        try {
-            super.onBackPressed();
-        } catch (Throwable ignored) {}
-
-        Asyncs.async(this,
-                AudioPlayerActivity::isMusicPlayingAsync,
-                AudioPlayerActivity::tryShowingInterstitialAndFinish);
-    }
-
-    private static boolean isMusicPlayingAsync(AudioPlayerActivity activity) {
-        return MusicUtils.isPlaying();
-    }
-
-    private static void tryShowingInterstitialAndFinish(AudioPlayerActivity activity, boolean isMusicPlaying) {
-        if (!isMusicPlaying) {
-            Offers.showInterstitialOfferIfNecessary(
-                    activity,
-                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                    false,
-                    false,
-                    true);
-        }
-        activity.finish();
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
+        waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
         // Current info
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-        initAlbumArtBanner();
+        initPlaybackControls();
+        initMopubBannerView();
+        loadCurrentAlbumArt();
     }
 
     @Override
@@ -518,6 +474,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
+    @SuppressWarnings("CatchMayIgnoreException")
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -538,10 +495,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             LOG.error(ignored.getMessage(), ignored);
         }
 
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
         try {
             unregisterReceiver(mPlaybackStatus);
         } catch (final Throwable ignored) {
@@ -556,16 +509,22 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // ViewPager container
         mPageContainer = findView(R.id.audio_player_pager_container);
         // Theme the pager container background
-        mPageContainer.setBackgroundResource(R.drawable.audio_player_pager_container);
+        if (mPageContainer != null) {
+            mPageContainer.setBackgroundResource(R.drawable.audio_player_pager_container);
+        }
 
         // Now playing header
         mAudioPlayerHeader = findView(R.id.audio_player_header);
-        // Opens the currently playing album profile
-        mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
+        if (mAudioPlayerHeader != null) {
+            // Opens the currently playing album profile
+            mAudioPlayerHeader.setOnClickListener(mOpenAlbumProfile);
+        }
 
         // Used to hide the artwork and show the queue
         final FrameLayout mSwitch = findView(R.id.audio_player_switch);
-        mSwitch.setOnClickListener(mToggleHiddenPanel);
+        if (mSwitch != null) {
+            mSwitch.setOnClickListener(mToggleHiddenPanel);
+        }
 
         // Initialize the pager adapter
         mPagerAdapter = new PagerAdapter(this);
@@ -574,22 +533,36 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Initialize the ViewPager
         ViewPager mViewPager = findView(R.id.audio_player_pager);
-        // Attach the adapter
-        mViewPager.setAdapter(mPagerAdapter);
-        // Offscreen pager loading limit
-        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+        if (mViewPager != null) {
+            // Attach the adapter
+            mViewPager.setAdapter(mPagerAdapter);
+            // Offscreen pager loading limit
+            mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount() - 1);
+        }
         // Play and pause button
         mPlayPauseButton = findView(R.id.action_button_play);
         // Shuffle button
         mShuffleButton = findView(R.id.action_button_shuffle);
         // Repeat button
         mRepeatButton = findView(R.id.action_button_repeat);
-        mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
-        mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
+        if (mShuffleButton != null) {
+            mShuffleButton.setOnClickedCallback(() -> mRepeatButton.updateRepeatState());
+        }
+        if (mRepeatButton != null) {
+            mRepeatButton.setOnClickedCallback(() -> mShuffleButton.updateShuffleState());
+        }
         // Previous button
         RepeatingImageButton mPreviousButton = findView(R.id.action_button_previous);
         // Next button
         RepeatingImageButton mNextButton = findView(R.id.action_button_next);
+        if (mPreviousButton != null) {
+            // Set the repeat listener for the previous button
+            mPreviousButton.setRepeatListener(mRewindListener);
+        }
+        if (mNextButton != null) {
+            // Set the repeat listener for the next button
+            mNextButton.setRepeatListener(mFastForwardListener);
+        }
         // Track name
         mTrackName = findView(R.id.audio_player_track_name);
         // Artist name
@@ -597,7 +570,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Album art
         mAlbumArt = findView(R.id.audio_player_album_art);
         // MoPubBannerView
-        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
+        initMopubBannerView();
         // Small album art
         mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
@@ -607,70 +580,193 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Used to show and hide the queue fragment
         mQueueSwitch = findView(R.id.audio_player_switch_queue);
         // Theme the queue switch icon
-        mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+        if (mQueueSwitch != null) {
+            mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+        }
         // Progress
         mProgress = findView(android.R.id.progress);
-
-        // Set the repeat listener for the previous button
-        mPreviousButton.setRepeatListener(mRewindListener);
-        // Set the repeat listener for the next button
-        mNextButton.setRepeatListener(mFastForwardListener);
-        // Update the progress
-        mProgress.setOnSeekBarChangeListener(this);
+        if (mProgress != null) {
+            // Update the progress
+            mProgress.setOnSeekBarChangeListener(this);
+        }
+        showAlbumArt();
+        if (mMopubBannerView != null && !Offers.disabledAds()) {
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+        }
     }
 
+    private void initMopubBannerView() {
+        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
+        if (mMopubBannerView != null) {
+            if (Offers.disabledAds()) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+                return;
+            }
+            mMopubBannerView.setShowDismissButton(false);
+            mMopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            mMopubBannerView.setShowFallbackBannerOnDismiss(false);
+            mMopubBannerView.setOnBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true));
+            mMopubBannerView.setOnFallbackBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true));
+            deferredInitAlbumArtBanner();
+        }
+    }
+
+    private void deferredInitAlbumArtBanner() {
+        if (mMopubBannerView == null) {
+            LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready or available for this layout (mMopubBannerView == null)");
+            return;
+        }
+
+        if (Offers.disabledAds()) {
+            LOG.info("deferredInitAlbumArtBanner() aborted, ads are disabled");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
+        }
+        if (!getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+            LOG.info("deferredInitAlbumArtBanner() aborted, activity is not visible to user");
+            return;
+        }
+        if (UIUtils.isScreenLocked(this)) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, screen is locked");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
+        }
+
+        updateLastKnown(MusicServiceRequestType.TRACK_ID, false); // throttled async call
+
+        if (lastTrackId == -1) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, lastTrackId=-1");
+            waitingToInitAlbumArtBanner.set(false);
+            return;
+        }
+
+        if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
+            return;
+        }
+
+        if (waitingToInitAlbumArtBanner.get()) {
+
+            if (!mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
+                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            }
+
+            LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
+            return;
+        }
+
+        // let's not leak ourselves
+        waitingToInitAlbumArtBanner.set(true);
+
+        //final WeakReference<IApolloService> musicPlaybackServiceWeakReference = Ref.weak(musicPlaybackService);
+        final WeakReference<AudioPlayerActivity> activityRef = Ref.weak(this);
+
+        final long trackIdWeAreMonitoring = lastTrackId;
+        updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
+        LOG.info("deferredInitAlbumArtBanner() about to postDelayed waiting for track " + trackIdWeAreMonitoring);
+        mTimeHandler.postDelayed(() -> {
+
+            LOG.info("deferredInitAlbumArtBanner() callback invoked!");
+
+            // activity not there anymore, abort
+            if (!Ref.alive(activityRef)) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, audio player activity gone");
+                waitingToInitAlbumArtBanner.set(false);
+                Ref.free(activityRef);
+            }
+
+            // current track is different, maybe call deferredInitAlbumArtBanner again? careful with stack overflow
+
+            if (lastTrackId != trackIdWeAreMonitoring) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, on a different track. trackIdWeAreMonitoring=" + trackIdWeAreMonitoring + " currentTrack=" + lastTrackId);
+                waitingToInitAlbumArtBanner.set(false);
+                return;
+            }
+
+            // ads got disabled in the meantime
+            if (Offers.disabledAds()) {
+                LOG.info("deferredInitAlbumArtBanner() callback aborted, ads got disabled in between");
+                waitingToInitAlbumArtBanner.set(false);
+                return;
+            }
+
+            long position = activityRef.get().lastKnownPosition;
+            final long minPassedPosition = 3000;
+            if (lastKnownIsPlaying && position < minPassedPosition) {
+                LOG.error("deferredInitAlbumArtBanner() callback failed: Position@" +
+                        position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN");
+                return;
+            }
+            waitingToInitAlbumArtBanner.set(false);
+            activityRef.get().initAlbumArtBanner();
+        }, 8000);
+    }
+
+
     private void initAlbumArtBanner() {
+        if (UIUtils.isScreenLocked(this)) {
+            LOG.info("initAlbumArtBanner() aborted, screen locked");
+            return;
+        }
+        LOG.info("initAlbumArtBanner() invoked");
         if (mAlbumArt != null) {
             mAlbumArt.setVisibility(View.VISIBLE);
         }
-        if (mMopubBannerView ==  null) {
+        if (mMopubBannerView == null) {
+            LOG.info("initAlbumArtBanner() aborted: mMopubBannerView == null");
             return;
         }
         if (Offers.disabledAds()) {
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            LOG.info("initAlbumArtBanner() aborted: Ads are disabled");
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
             return;
         }
-        mMopubBannerView.setShowFallbackBannerOnDismiss(false);
-        mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
-        mMopubBannerView.setOnBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
-        mMopubBannerView.setOnBannerLoadedListener(() -> mAlbumArt.setVisibility(View.GONE));
-        mMopubBannerView.setOnFallbackBannerDismissedListener(() -> mAlbumArt.setVisibility(View.VISIBLE));
-
-        Asyncs.async(
-                mMopubBannerView,
-                (unused) -> UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD),
-                (mopubBanner, passed) -> {
-                    if (passed)
-                        mopubBanner.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
-                });
+        mMopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
     }
 
     /**
      * Sets the track name, album name, and album art.
      */
     private void updateNowPlayingInfo() {
-        // Set the track name
-        mTrackName.setText(MusicUtils.getTrackName());
-        // Set the artist name
-        mArtistName.setText(getArtistAndAlbumName());//MusicUtils.getArtistName());
-        // Set the total time
-        mTotalTime.setText(MusicUtils.makeTimeString(this, MusicUtils.duration() / 1000));
+        LOG.info("updateNowPlayingInfo() invoked", true);
+        updateLastKnown(MusicServiceRequestType.TRACK_ID, true);
+        updateLastKnown(MusicServiceRequestType.TRACK_NAME, true);
+        updateLastKnown(MusicServiceRequestType.DURATION, true);
+        updateLastKnown(MusicServiceRequestType.POSITION, true);
+        updateLastKnown(MusicServiceRequestType.ARTIST_AND_ALBUM_NAMES, true);
 
-        if (mImageFetcher != null) {
-            // Set the album art
-            mImageFetcher.loadCurrentArtwork(mAlbumArt);
-            // Set the small artwork
-            mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
-        }
         // Update the current time
-        queueNextRefresh(1);
+        queueNextRefresh(UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS);
     }
 
-    private String getArtistAndAlbumName() {
-        String str = "";
+    private void onLastKnownUpdatePostTask() {
+        // Set the track name
+        mTrackName.setText(lastTrackName);
+        // Set the artist name
+        mArtistName.setText(lastArtistAndAlbumNames);
+        // Set the total time
+        mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
 
-        String artist = MusicUtils.getArtistName();
-        String album = MusicUtils.getAlbumName();
+        loadCurrentAlbumArt();
+        updateQueueFragmentCurrentSong();
+    }
+
+    private void loadCurrentAlbumArt() {
+        if (mImageFetcher != null) {
+            // Set the album art
+            if (mAlbumArt != null) {
+                mImageFetcher.loadCurrentArtwork(mAlbumArt);
+            }
+            // Set the small artwork
+            if (mAlbumArtSmall != null) {
+                mImageFetcher.loadCurrentArtwork(mAlbumArtSmall);
+            }
+        }
+    }
+
+    private String getArtistAndAlbumName(String artist, String album) {
+        String str = "";
 
         if (artist != null && album != null) {
             str = artist + " - " + album;
@@ -704,7 +800,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private void startPlayback() {
         Intent intent = getIntent();
 
-        if (intent == null || musicPlaybackService == null) {
+        if (intent == null || MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
 
@@ -750,11 +846,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void updatePlaybackControls() {
         // Set the repeat image
-        mRepeatButton.updateRepeatState();
+        if (mRepeatButton != null) {
+            mRepeatButton.updateRepeatState();
+        }
         // Set the play and pause image
-        mPlayPauseButton.updateState();
+        if (mPlayPauseButton != null) {
+            if (mPlaybackStatus != null && !mPlayPauseButton.hasOnLongClickListener()) {
+                mPlayPauseButton.setOnLongClickListener(new StopListener(this, true));
+            }
+            mPlayPauseButton.updateState();
+        }
         // Set the shuffle image
-        mShuffleButton.updateShuffleState();
+        if (mShuffleButton != null) {
+            mShuffleButton.updateShuffleState();
+        }
     }
 
     private void updateQueueFragmentCurrentSong() {
@@ -780,7 +885,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * @param delta    The long press duration
      */
     private void scanBackward(final int repcount, long delta) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         if (repcount == 0) {
@@ -796,9 +901,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 delta = 50000 + (delta - 5000) * 40;
             }
             long newpos = mStartSeekPos - delta;
-            if (newpos < 0) {
+            if (newpos <= 0) {
                 // move to previous track
-                MusicUtils.previous(this);
+                MusicUtils.previous();
                 final long duration = MusicUtils.duration();
                 mStartSeekPos += duration;
                 newpos += duration;
@@ -823,7 +928,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * @param delta    The long press duration
      */
     private void scanForward(final int repcount, long delta) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return;
         }
         if (repcount == 0) {
@@ -868,10 +973,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     enum MusicServiceRequestType {
         POSITION,
         DURATION,
-        IS_PLAYING
+        IS_PLAYING,
+        TRACK_ID,
+        TRACK_NAME,
+        ARTIST_NAME,
+        ALBUM_NAME,
+        ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void musicServiceRequestTask(AudioPlayerActivity activity, MusicServiceRequestType requestType) {
+    private static void musicServiceRequestTask(AudioPlayerActivity activity,
+                                                MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:
                 activity.lastKnownPosition = MusicUtils.position();
@@ -882,18 +993,41 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             case IS_PLAYING:
                 activity.lastKnownIsPlaying = MusicUtils.isPlaying();
                 break;
+            case TRACK_NAME:
+                activity.lastTrackName = MusicUtils.getTrackName();
+                break;
+            case ARTIST_NAME:
+                activity.lastArtistName = MusicUtils.getArtistName();
+                break;
+            case ALBUM_NAME:
+                activity.lastAlbumName = MusicUtils.getAlbumName();
+                break;
+            case ARTIST_AND_ALBUM_NAMES:
+                activity.lastArtistName = MusicUtils.getArtistName();
+                activity.lastAlbumName = MusicUtils.getAlbumName();
+                activity.lastArtistAndAlbumNames = activity.getArtistAndAlbumName(activity.lastArtistName, activity.lastAlbumName);
+                break;
+            case TRACK_ID:
+                activity.lastTrackId = MusicUtils.getCurrentAudioId();
+                break;
             default:
                 break;
         }
     }
 
-    private void updateLastKnown(MusicServiceRequestType requestType) {
-        async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
+    private void updateLastKnown(MusicServiceRequestType requestType, boolean callOnLastKnownUpdatePostTaskAfter) {
+        if (TaskThrottle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
+            if (callOnLastKnownUpdatePostTaskAfter) {
+                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType, AudioPlayerActivity::onLastKnownUpdatePostTask);
+            } else {
+                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
+            }
+        }
     }
 
     private long lastKnownPosition(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.POSITION);
+            updateLastKnown(MusicServiceRequestType.POSITION, false);
         } else {
             lastKnownPosition = MusicUtils.position();
         }
@@ -902,7 +1036,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private long lastKnownDuration(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.DURATION);
+            updateLastKnown(MusicServiceRequestType.DURATION, false);
         } else {
             lastKnownDuration = MusicUtils.duration();
         }
@@ -911,7 +1045,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private boolean lastKnownIsPlaying(boolean blockingMusicServiceRequest) {
         if (!blockingMusicServiceRequest) {
-            updateLastKnown(MusicServiceRequestType.IS_PLAYING);
+            updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
         } else {
             lastKnownIsPlaying = MusicUtils.isPlaying();
         }
@@ -919,10 +1053,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     /* Used to update the current time string
-    *  @return the delay on which this method call should be posted again
-    * */
+     *  @return the delay on which this method call should be posted again
+     * */
+    @SuppressWarnings("CatchMayIgnoreException")
     private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
-        if (musicPlaybackService == null) {
+        if (MusicUtils.getMusicPlaybackService() == null) {
             return 500L;
         }
 
@@ -988,13 +1123,23 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Called to show the album art and hide the queue
      */
     private void showAlbumArt() {
-        mPageContainer.setVisibility(View.INVISIBLE);
-        mAlbumArtSmall.setVisibility(View.GONE);
-        mQueueSwitch.setVisibility(View.VISIBLE);
-        // Fade out the pager container
-        fade(mPageContainer, 0f);
-        // Fade in the album art
-        fade(mAlbumArt, 1f);
+        if (mPageContainer != null) {
+            mPageContainer.setVisibility(View.INVISIBLE);
+        }
+        if (mAlbumArtSmall != null) {
+            mAlbumArtSmall.setVisibility(View.GONE);
+        }
+        if (mQueueSwitch != null) {
+            mQueueSwitch.setVisibility(View.VISIBLE);
+        }
+        if (mPageContainer != null) {
+            // Fade out the pager container
+            fade(mPageContainer, 0f);
+        }
+        if (mAlbumArt != null) {
+            // Fade in the album art
+            fade(mAlbumArt, 1f);
+        }
     }
 
     /**
@@ -1015,9 +1160,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      */
     private void shareCurrentTrack() {
         if (mMopubBannerView != null) {
-            mMopubBannerView.setVisible(MopubBannerView.Visibility.ALL, false);
+            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
         }
-        mAlbumArt.setVisibility(View.VISIBLE);
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
     }
 
@@ -1037,8 +1181,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         File screenshotFile = UIUtils.takeScreenshot(rootView);
         if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
             shareIntent.setType("image/jpg");
-            boolean userFileProvider = Build.VERSION.SDK_INT >= 24;
-            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath(), userFileProvider));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, UIUtils.getFileUri(activity, screenshotFile.getAbsolutePath()));
         } else {
             shareIntent.setType("text/plain");
         }
@@ -1084,6 +1227,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     /**
      * Opens to the current album profile
      */
+    @SuppressWarnings("CatchMayIgnoreException")
     private final OnClickListener mOpenAlbumProfile = v -> {
         long albumId = MusicUtils.getCurrentAlbumId();
         try {
@@ -1123,35 +1267,30 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
 
         @Override
-        public void handleMessage(final Message msg) {
+        public void handleMessage(@NonNull final Message msg) {
             if (!Ref.alive(mAudioPlayer)) {
                 return;
             }
             AudioPlayerActivity audioPlayerActivity = mAudioPlayer.get();
-            switch (msg.what) {
-                case REFRESH_TIME:
-                    // we only refresh synchronously when the progress bar has been moved
-                    // by the user, to avoid the progress bar from jumping back and forth
-                    // otherwise, no need to wait for MusicService in the main thread to update
-                    // the UI.
-                    boolean blockingRefresh =
-                            (SystemClock.elapsedRealtime() -
-                                    audioPlayerActivity.lastProgressBarTouched) < 500;
-                    long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
+            if (msg.what == REFRESH_TIME) {// we only refresh synchronously when the progress bar has been moved
+                // by the user, to avoid the progress bar from jumping back and forth
+                // otherwise, no need to wait for MusicService in the main thread to update
+                // the UI.
+                boolean blockingRefresh =
+                        (SystemClock.elapsedRealtime() -
+                                audioPlayerActivity.lastProgressBarTouched) < 500;
+                long next = audioPlayerActivity.refreshCurrentTime(blockingRefresh);
 
-                    // a blocking refresh could take long and screen could rotate, or activity go away
-                    if (blockingRefresh && Ref.alive(mAudioPlayer)) {
-                        audioPlayerActivity = mAudioPlayer.get();
-                    }
-                    if (!Ref.alive(mAudioPlayer)) {
-                        return;
-                    }
-                    if (audioPlayerActivity != null) {
-                        audioPlayerActivity.queueNextRefresh(next);
-                    }
-                    break;
-                default:
-                    break;
+                // a blocking refresh could take long and screen could rotate, or activity go away
+                if (blockingRefresh && Ref.alive(mAudioPlayer)) {
+                    audioPlayerActivity = mAudioPlayer.get();
+                }
+                if (!Ref.alive(mAudioPlayer)) {
+                    return;
+                }
+                if (audioPlayerActivity != null) {
+                    audioPlayerActivity.queueNextRefresh(next);
+                }
             }
         }
     }
@@ -1176,6 +1315,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 return;
             }
             AudioPlayerActivity activity = mReference.get();
+            if (activity == null) {
+                return;
+            }
             final String action = intent.getAction();
             if (action == null) {
                 return;
@@ -1183,24 +1325,30 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             switch (action) {
                 case MusicPlaybackService.META_CHANGED:
                     // Current info
+                    LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.META_CHANGED)");
                     activity.updateNowPlayingInfo();
                     // Update the favorites icon
                     activity.invalidateOptionsMenu();
                     activity.updateQueueFragmentCurrentSong();
-                    activity.initAlbumArtBanner();
+                    activity.deferredInitAlbumArtBanner();
                     break;
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
+                    LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.PLAYSTATE_CHANGED)");
                     // Set the play and pause image
-                    activity.mPlayPauseButton.updateState();
-                    activity.initAlbumArtBanner();
+                    if (activity.mPlayPauseButton != null) {
+                        activity.mPlayPauseButton.updateState();
+                    }
                     break;
                 case MusicPlaybackService.REPEATMODE_CHANGED:
                 case MusicPlaybackService.SHUFFLEMODE_CHANGED:
                     // Set the repeat image
-                    activity.mRepeatButton.updateRepeatState();
+                    if (activity.mRepeatButton != null) {
+                        activity.mRepeatButton.updateRepeatState();
+                    }
                     // Set the shuffle image
-                    activity.mShuffleButton.updateShuffleState();
-                    activity.initAlbumArtBanner();
+                    if (activity.mShuffleButton != null) {
+                        activity.mShuffleButton.updateShuffleState();
+                    }
                     break;
             }
         }
@@ -1234,18 +1382,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         @Override
         public void onSwipeLeft() {
             try {
-                MusicUtils.musicPlaybackService.next();
-            } catch (Throwable e) {
-                // ignore
+                MusicUtils.next();
+            } catch (Throwable ignored) {
             }
         }
 
         @Override
         public void onSwipeRight() {
             try {
-                MusicUtils.musicPlaybackService.prev();
-            } catch (Throwable e) {
-                // ignore
+                MusicUtils.previous();
+            } catch (Throwable ignored) {
             }
         }
 
@@ -1261,7 +1407,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         private void onMultiTouchEvent() {
             try {
-                MusicUtils.playOrPause();
+                MusicUtils.playPauseOrResume();
             } catch (Throwable e) {
                 // ignore
             }

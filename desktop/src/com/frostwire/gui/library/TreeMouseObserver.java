@@ -24,7 +24,6 @@ import javax.swing.tree.TreePath;
 import java.awt.event.MouseEvent;
 
 final class TreeMouseObserver implements MouseObserver {
-
     private final JTree tree;
     private final JPopupMenu popup;
 
@@ -39,7 +38,7 @@ final class TreeMouseObserver implements MouseObserver {
     /**
      * Handles when the mouse is double-clicked.
      */
-    public void handleMouseDoubleClick(MouseEvent e) {
+    public void handleMouseDoubleClick() {
     }
 
     /**

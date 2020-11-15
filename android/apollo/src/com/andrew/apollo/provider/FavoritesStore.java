@@ -59,10 +59,12 @@ public class FavoritesStore extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(final SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + FavoriteColumns.NAME + " (" + FavoriteColumns.ID
-                + " LONG NOT NULL," + FavoriteColumns.SONGNAME + " TEXT NOT NULL,"
-                + FavoriteColumns.ALBUMNAME + " TEXT NOT NULL," + FavoriteColumns.ARTISTNAME
-                + " TEXT NOT NULL," + FavoriteColumns.PLAYCOUNT + " LONG NOT NULL);");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + FavoriteColumns.NAME + " ("
+                + FavoriteColumns.ID + " LONG NOT NULL,"
+                + FavoriteColumns.SONGNAME + " TEXT NOT NULL,"
+                + FavoriteColumns.ALBUMNAME + " TEXT NOT NULL,"
+                + FavoriteColumns.ARTISTNAME + " TEXT NOT NULL,"
+                + FavoriteColumns.PLAYCOUNT + " LONG NOT NULL);");
     }
 
     /**

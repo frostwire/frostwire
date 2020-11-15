@@ -19,7 +19,7 @@
 package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaPopupMenuSeparatorUI;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
@@ -27,13 +27,10 @@ import javax.swing.plaf.basic.BasicPopupMenuSeparatorUI;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuSeparatorUI extends BasicPopupMenuSeparatorUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         if (OSUtils.isMacOSX() && !(comp instanceof SkinPopupMenu.Separator)) {

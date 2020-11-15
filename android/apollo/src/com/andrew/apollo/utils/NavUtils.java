@@ -22,6 +22,7 @@ import com.andrew.apollo.Config;
 import com.andrew.apollo.ui.activities.*;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.util.Logger;
 
 /**
  * Various navigation helpers.
@@ -29,6 +30,7 @@ import com.frostwire.android.R;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class NavUtils {
+    private static Logger LOG = Logger.getLogger(NavUtils.class);
 
     /**
      * Opens the profile of an artist.
@@ -109,6 +111,7 @@ public final class NavUtils {
      * @param activity The {@link Activity} to use.
      */
     public static void openAudioPlayer(final Activity activity) {
+        LOG.info("openAudioPlayer() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning());
         final Intent intent = new Intent(activity, AudioPlayerActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);

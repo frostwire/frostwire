@@ -115,7 +115,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     }
 
     public abstract CharSequence getItemTitle(T data);
-    public abstract long getItemSize(T data);
+    public abstract double getItemSize(T data);
     public abstract CharSequence getItemThumbnailUrl(T data);
     public abstract int getItemThumbnailResourceId(T data);
 
@@ -126,7 +126,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         TextView trackTitle = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
         trackTitle.setText(getItemTitle(item));
 
-        final long itemSize = getItemSize(item);
+        final double itemSize = getItemSize(item);
         TextView trackSizeInHuman = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
         if (itemSize != -1) {
             trackSizeInHuman.setText(UIUtils.getBytesInHuman(itemSize));

@@ -90,7 +90,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
     public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
         // ad failed to load, excellent place to load more ads.
         this.interstitial = null;
-//        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
+        LOG.warn("MoPub onInterstitialFailed - errorCode: " + errorCode.toString());
         mopubAdNetwork.loadMoPubInterstitial(interstitial.getActivity(), placement);
     }
 
@@ -120,7 +120,7 @@ public class MoPubInterstitialListener implements InterstitialListener, MoPubInt
             }
         }
 
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(mopubAdNetwork, activity, finishAfterDismiss, shutDownAfter, true, activity.getApplication());
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activity, finishAfterDismiss, shutDownAfter, true, activity.getApplication());
         if (!shutDownAfter && !finishAfterDismiss) {
             mopubAdNetwork.loadMoPubInterstitial(activity, placement);
         }

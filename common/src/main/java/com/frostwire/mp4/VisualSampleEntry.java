@@ -25,17 +25,16 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class VisualSampleEntry extends SampleEntry {
-
+    protected final int[] pre_defined2;
+    protected final byte[] compressorname;
     protected short pre_defined1;
     protected short reserved1;
-    protected final int[] pre_defined2;
     protected short width;
     protected short height;
     protected int horizresolution;
     protected int vertresolution;
     protected int reserved2;
     protected short frame_count;
-    protected final byte[] compressorname;
     protected short depth;
     protected short pre_defined3;
 
@@ -53,7 +52,6 @@ public final class VisualSampleEntry extends SampleEntry {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 70, buf);
         pre_defined1 = buf.getShort();
         reserved1 = buf.getShort();
@@ -72,7 +70,6 @@ public final class VisualSampleEntry extends SampleEntry {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putShort(pre_defined1);
         buf.putShort(reserved1);
         IO.put(buf, pre_defined2);

@@ -48,6 +48,14 @@
         style="@style/BuyNoAdsCardPrice"
         android:layout_below="@+id/view_product_card_title_bold_portion" />
 
+    <TextView android:id="@+id/view_product_card_subscription_period"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dummy_period"
+        style="@style/BuyNoAdsCardPrice"
+        android:layout_alignBaseline="@+id/view_product_card_price"
+        android:layout_toRightOf="@+id/view_product_card_price" />
+
     <TextView android:id="@+id/view_product_card_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

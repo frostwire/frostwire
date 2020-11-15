@@ -31,8 +31,27 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public class DefaultFileSystem implements FileSystem {
-
     private static final Logger LOG = Logger.getLogger(DefaultFileSystem.class);
+
+    public static void walkFiles(FileSystem fs, File file, FileFilter filter) {
+        File[] arr = fs.listFiles(file, filter);
+        if (arr == null) {
+            return;
+        }
+        Deque<File> q = new LinkedList<>(Arrays.asList(arr));
+        while (!q.isEmpty()) {
+            File child = q.pollFirst();
+            filter.file(child);
+            if (fs.isDirectory(child)) {
+                arr = fs.listFiles(child, filter);
+                if (arr != null) {
+                    for (int i = arr.length - 1; i >= 0; i--) {
+                        q.addFirst(arr[i]);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public boolean isDirectory(File file) {
@@ -92,7 +111,6 @@ public class DefaultFileSystem implements FileSystem {
         } catch (Throwable e) {
             LOG.error("Error in copy file: " + src + " -> " + dest, e);
         }
-
         return false;
     }
 
@@ -104,7 +122,6 @@ public class DefaultFileSystem implements FileSystem {
         } catch (Throwable e) {
             LOG.error("Error in writing to file: " + file, e);
         }
-
         return false;
     }
 
@@ -116,26 +133,5 @@ public class DefaultFileSystem implements FileSystem {
     @Override
     public void walk(File file, FileFilter filter) {
         walkFiles(Platforms.fileSystem(), file, filter);
-    }
-
-    public static void walkFiles(FileSystem fs, File file, FileFilter filter) {
-        File[] arr = fs.listFiles(file, filter);
-        if (arr == null) {
-            return;
-        }
-        Deque<File> q = new LinkedList<>(Arrays.asList(arr));
-
-        while (!q.isEmpty()) {
-            File child = q.pollFirst();
-            filter.file(child);
-            if (fs.isDirectory(child)) {
-                arr = fs.listFiles(child, filter);
-                if (arr != null) {
-                    for (int i = arr.length - 1; i >= 0; i--) {
-                        q.addFirst(arr[i]);
-                    }
-                }
-            }
-        }
     }
 }

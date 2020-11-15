@@ -27,17 +27,13 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJsonItem, R extends TorrentSearchResult> extends TorrentSearchPerformer {
-
     private static final int DEFAULT_NUM_CRAWLS = 10;
-
     private final Comparator<T> itemComparator;
 
     private TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages, numCrawls);
-        
         this.itemComparator = (a, b) -> b.getSeeds() - a.getSeeds();
     }
 
@@ -48,12 +44,9 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
     @Override
     protected final List<? extends SearchResult> searchPage(String page) {
         List<SearchResult> result = new LinkedList<>();
-
         List<T> items = parseJson(page);
-
         if (items != null) {
             items.sort(itemComparator);
-
             for (T item : items) {
                 if (!isStopped()) {
                     SearchResult sr = fromItem(item);
@@ -61,11 +54,10 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
                 }
             }
         }
-
         return result;
     }
 
-    abstract List<T> parseJson(String json);
+    protected abstract List<T> parseJson(String json);
 
     abstract R fromItem(T item);
 }

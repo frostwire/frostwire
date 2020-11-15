@@ -23,13 +23,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthTextFieldUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinTextFieldUI extends SynthTextFieldUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinTextFieldUI();

@@ -17,7 +17,6 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.util.Logger;
 
-import java.awt.*;
 import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -33,28 +32,14 @@ import java.util.List;
  * expected to handle in some way.
  */
 public class MacEventHandler {
-
     private static final Logger LOG = Logger.getLogger(MacEventHandler.class);
-
     private static MacEventHandler INSTANCE;
 
-    public static synchronized MacEventHandler instance() {
-        if (INSTANCE == null)
-            INSTANCE = new MacEventHandler();
-
-        return INSTANCE;
-    }
-
     private MacEventHandler() {
-
         MacOSHandler.setAboutHandler(args -> handleAbout());
-
         MacOSHandler.setQuitHandler(args -> handleQuit());
-
         MacOSHandler.setAppReopenedListener(args -> handleReopen());
-
         MacOSHandler.setPreferencesHandler(args -> handlePreferences());
-
         MacOSHandler.setOpenFileHandler(args -> {
             List<File> files = MacOSHandler.getFiles(args[0]);
             if (files != null && files.size() > 0) {
@@ -65,7 +50,6 @@ public class MacEventHandler {
                 }
             }
         });
-
         MacOSHandler.setOpenURIHandler(args -> {
             String uri = MacOSHandler.getURI(args[0]).toString();
             LOG.debug("URI: " + uri);
@@ -73,6 +57,12 @@ public class MacEventHandler {
                 GUIMediator.instance().openTorrentURI(uri, false);
             }
         });
+    }
+
+    public static synchronized MacEventHandler instance() {
+        if (INSTANCE == null)
+            INSTANCE = new MacEventHandler();
+        return INSTANCE;
     }
 
     /**
@@ -106,29 +96,15 @@ public class MacEventHandler {
     }
 
     private static final class MacOSHandler implements InvocationHandler {
-
         private static final int javaVersion = javaVersion();
         private static final Class<?> applicationClass = applicationClass();
         private static final Object application = applicationObject();
-
         private final String handlerMethod;
         private final EventHandler handler;
 
         private MacOSHandler(String handlerMethod, EventHandler handler) {
             this.handlerMethod = handlerMethod;
             this.handler = handler;
-        }
-
-        @Override
-        public final Object invoke(Object proxy, Method method, Object[] args) {
-            try {
-                if (handlerMethod.equals(method.getName()) && args.length > 0) {
-                    handler.handle(args);
-                }
-            } catch (Throwable e) {
-                LOG.error("Error invoking handler", e);
-            }
-            return null;
         }
 
         private static int javaVersion() {
@@ -145,6 +121,18 @@ public class MacEventHandler {
             if (versionStr.startsWith("12")) {
                 return 12;
             }
+            if (versionStr.startsWith("13")) {
+                return 13;
+            }
+            if (versionStr.startsWith("14")) {
+                return 14;
+            }
+            if (versionStr.startsWith("15")) {
+                return 15;
+            }
+            if (versionStr.startsWith("16")) {
+                return 16;
+            }
             throw new RuntimeException("Java version " + versionStr + " not supported");
         }
 
@@ -159,26 +147,22 @@ public class MacEventHandler {
             } catch (Throwable e) {
                 LOG.error("Error getting application class", e);
             }
-
             return null;
         }
 
         private static Object applicationObject() {
             try {
                 Method m = null;
-
                 if (javaVersion == 8) {
                     m = applicationClass.getDeclaredMethod("getApplication");
                 }
                 if (javaVersion >= 9) {
                     m = applicationClass.getDeclaredMethod("getDesktop");
                 }
-
                 return m.invoke(null);
             } catch (Throwable e) {
                 LOG.error("Error creating application instance", e);
             }
-
             return null;
         }
 
@@ -187,26 +171,24 @@ public class MacEventHandler {
             try {
                 Class<?> handlerClass = Class.forName(handlerName);
                 Method setMethod = null;
-
                 try {
                     setMethod = applicationClass.getDeclaredMethod(methodName,
-                            new Class<?>[]{handlerClass});
+                            handlerClass);
                 } catch (NoSuchMethodException ignore) {
                     // try first interface
                     setMethod = applicationClass.getDeclaredMethod(methodName,
-                            new Class<?>[]{handlerClass.getInterfaces()[0]});
+                            handlerClass.getInterfaces()[0]);
                 }
-
                 MacOSHandler adapter = new MacOSHandler(handlerMethod, handler);
                 Object proxy = Proxy.newProxyInstance(MacOSHandler.class.getClassLoader(),
                         new Class<?>[]{handlerClass}, adapter);
-                setMethod.invoke(application, new Object[]{proxy});
+                setMethod.invoke(application, proxy);
             } catch (Throwable e) {
                 LOG.error("Error setting application handler", e);
             }
         }
 
-        public static void setAboutHandler(EventHandler handler) {
+        static void setAboutHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setAboutHandler", "com.apple.eawt.AboutHandler",
                         "handleAbout", handler);
@@ -217,7 +199,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setQuitHandler(EventHandler handler) {
+        static void setQuitHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setQuitHandler", "com.apple.eawt.QuitHandler",
                         "handleQuitRequestWith", handler);
@@ -228,7 +210,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setAppReopenedListener(EventHandler handler) {
+        static void setAppReopenedListener(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("addAppEventListener", "com.apple.eawt.AppReOpenedListener",
                         "appReOpened", handler);
@@ -239,7 +221,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setPreferencesHandler(EventHandler handler) {
+        static void setPreferencesHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setPreferencesHandler", "com.apple.eawt.PreferencesHandler",
                         "handlePreferences", handler);
@@ -250,7 +232,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setOpenFileHandler(EventHandler handler) {
+        static void setOpenFileHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setOpenFileHandler", "com.apple.eawt.OpenFilesHandler",
                         "openFiles", handler);
@@ -261,7 +243,7 @@ public class MacEventHandler {
             }
         }
 
-        public static void setOpenURIHandler(EventHandler handler) {
+        static void setOpenURIHandler(EventHandler handler) {
             if (javaVersion == 8) {
                 setEventHandler("setOpenURIHandler", "com.apple.eawt.OpenURIHandler",
                         "openURI", handler);
@@ -273,7 +255,7 @@ public class MacEventHandler {
         }
 
         @SuppressWarnings("unchecked")
-        public static List<File> getFiles(Object event) {
+        static List<File> getFiles(Object event) {
             try {
                 Method m = event.getClass().getMethod("getFiles");
                 return (List<File>) m.invoke(event);
@@ -283,7 +265,7 @@ public class MacEventHandler {
             return null;
         }
 
-        public static URI getURI(Object event) {
+        static URI getURI(Object event) {
             try {
                 Method m = event.getClass().getDeclaredMethod("getURI");
                 return (URI) m.invoke(event);
@@ -293,8 +275,19 @@ public class MacEventHandler {
             return null;
         }
 
-        public interface EventHandler {
+        @Override
+        public final Object invoke(Object proxy, Method method, Object[] args) {
+            try {
+                if (handlerMethod.equals(method.getName()) && args.length > 0) {
+                    handler.handle(args);
+                }
+            } catch (Throwable e) {
+                LOG.error("Error invoking handler", e);
+            }
+            return null;
+        }
 
+        interface EventHandler {
             void handle(Object[] args);
         }
     }

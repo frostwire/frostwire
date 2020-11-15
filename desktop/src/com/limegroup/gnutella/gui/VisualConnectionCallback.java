@@ -31,8 +31,10 @@ import java.io.File;
  * to make it easy to swap UIs.
  */
 public final class VisualConnectionCallback implements ActivityCallback {
-
     private static VisualConnectionCallback INSTANCE;
+
+    private VisualConnectionCallback() {
+    }
 
     public static VisualConnectionCallback instance() {
         if (INSTANCE == null) {
@@ -41,41 +43,18 @@ public final class VisualConnectionCallback implements ActivityCallback {
         return INSTANCE;
     }
 
-    private VisualConnectionCallback() {
-    }
-
     /**
      * Show active downloads
      */
     public void showDownloads() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-            }
-        });
-    }
-
-    private class AddDownload implements Runnable {
-        private BTDownload mgr;
-
-        AddDownload(BTDownload mgr) {
-            this.mgr = mgr;
-        }
-
-        public void run() {
-            mf().getBTDownloadMediator().addDownload(mgr);
-        }
+        SwingUtilities.invokeLater(() -> GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL));
     }
 
     /**
      * Tell the GUI to deiconify.
      */
     public void restoreApplication() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.restoreView();
-            }
-        });
+        SwingUtilities.invokeLater(GUIMediator::restoreView);
     }
 
     /**
@@ -85,23 +64,16 @@ public final class VisualConnectionCallback implements ActivityCallback {
         return GUIMediator.instance().getMainFrame();
     }
 
-
     public void handleTorrent(final File torrentFile) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().openTorrentFile(torrentFile, false);
-            }
-        });
+        SwingUtilities.invokeLater(() -> GUIMediator.instance().openTorrentFile(torrentFile, false));
     }
 
     public void handleTorrentMagnet(final String request, final boolean partialDownload) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                GUIMediator.instance().setRemoteDownloadsAllowed(partialDownload);
-                System.out.println("VisualConnectionCallback about to call openTorrentURI of request.");
-                System.out.println(request);
-                GUIMediator.instance().openTorrentURI(request, partialDownload);
-            }
+        SwingUtilities.invokeLater(() -> {
+            GUIMediator.instance().setRemoteDownloadsAllowed(partialDownload);
+            System.out.println("VisualConnectionCallback about to call openTorrentURI of request.");
+            System.out.println(request);
+            GUIMediator.instance().openTorrentURI(request, partialDownload);
         });
     }
 
@@ -119,16 +91,23 @@ public final class VisualConnectionCallback implements ActivityCallback {
 
     public boolean isRemoteDownloadsAllowed() {
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    GUIMediator.instance();
-                }
-            });
+            SwingUtilities.invokeAndWait(GUIMediator::instance);
         } catch (Exception e) {
             System.out.println("Failed to create GUIMediator");
             e.printStackTrace();
         }
-
         return GUIMediator.instance().isRemoteDownloadsAllowed();
+    }
+
+    private class AddDownload implements Runnable {
+        private final BTDownload mgr;
+
+        AddDownload(BTDownload mgr) {
+            this.mgr = mgr;
+        }
+
+        public void run() {
+            mf().getBTDownloadMediator().addDownload(mgr);
+        }
     }
 }

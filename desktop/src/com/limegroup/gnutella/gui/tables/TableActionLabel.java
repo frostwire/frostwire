@@ -25,25 +25,21 @@ import javax.swing.*;
 /**
  * Use these Label buttons next time you need to add a button on a custom
  * cell renderer. They will show solid on mouse over and semi transparent on mouse out.
- * 
+ * <p>
  * Note: when we invoke updateAction and we pass the 'enabled' state for the label
  * we don't use JLabel's "setEnabled" as it makes the label look too dark,
  * so we update another internal variable to represent the enablement state.
  * Use isActionEnabled() on your mouse listener implementation to know wether to act or not.
  * (Do not use isEnabled())
- * 
- * @author gubatron
  *
+ * @author gubatron
  */
 public class TableActionLabel extends JLabel {
     private final static float BUTTONS_TRANSPARENCY = 0.85f;
-
     private final ImageIcon enabledSolid;
     private final AlphaIcon enabledTransparent;
-
     private final ImageIcon disabledSolid;
     private final AlphaIcon disabledTransparent;
-
     private boolean actionEnabled;
 
     public TableActionLabel(ImageIcon enabledSolidIcon, ImageIcon disabledSolidIcon) {
@@ -69,10 +65,9 @@ public class TableActionLabel extends JLabel {
                 icon = disabledTransparent;
             }
         }
-        
         setIcon(icon);
     }
-    
+
     public boolean isActionEnabled() {
         return actionEnabled;
     }

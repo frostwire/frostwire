@@ -25,23 +25,18 @@ import java.io.File;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class Context {
-
     public Context() {
     }
 
     /**
      * Returns the absolute path on the filesystem where a database created with
-     * {@link #openOrCreateDatabase} is stored.
+     *  is stored.
      *
      * @param name The name of the database for which you would like to get
-     *          its path.
-     *
+     *             its path.
      * @return Returns an absolute path to the given database.
-     *
-     * @see #openOrCreateDatabase
      */
     public File getDatabasePath(String name) {
         return new File(ApplicationSettings.APP_DATABASES_PATH.getValue(), name);

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,13 +26,10 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class AbstractSearchPerformer implements SearchPerformer {
-
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
-
     private final long token;
-
+    protected boolean stopped;
     private SearchListener listener;
-    private boolean stopped;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;

@@ -25,9 +25,8 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class VideoMediaHeaderBox extends FullBox {
-
-    protected short graphicsmode;
     protected final short[] opcolor;
+    protected short graphicsmode;
 
     VideoMediaHeaderBox() {
         super(vmhd);
@@ -37,7 +36,6 @@ public final class VideoMediaHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 8, buf);
         graphicsmode = buf.getShort();
         IO.get(buf, opcolor);
@@ -46,7 +44,6 @@ public final class VideoMediaHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putShort(graphicsmode);
         IO.put(buf, opcolor);
         IO.write(ch, 8, buf);

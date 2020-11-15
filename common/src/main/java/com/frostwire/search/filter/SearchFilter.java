@@ -26,15 +26,7 @@ import java.util.Comparator;
  * @author aldenml
  */
 public interface SearchFilter {
-
-    FilterKey key(SearchResult sr);
-
-    boolean accept(SearchResult sr);
-
-    Comparator<SearchResult> comparator();
-
     SearchFilter NONE = new SearchFilter() {
-
         private Comparator<SearchResult> CMP = (o1, o2) -> 0;
 
         @Override
@@ -52,4 +44,10 @@ public interface SearchFilter {
             return CMP;
         }
     };
+
+    FilterKey key(SearchResult sr);
+
+    boolean accept(SearchResult sr);
+
+    Comparator<SearchResult> comparator();
 }

@@ -19,26 +19,23 @@
 package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaMenuUI;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthMenuUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinMenuUI extends SynthMenuUI {
-
-	public static ComponentUI createUI(JComponent comp) {
-	    ThemeMediator.testComponentCreationThreadingViolation();
-		if (OSUtils.isMacOSX() && !(comp instanceof SkinMenu)) {
-			return AquaMenuUI.createUI(comp);
-		} else {
-			return new SkinMenuUI();
-		}
-	}
+    public static ComponentUI createUI(JComponent comp) {
+        ThemeMediator.testComponentCreationThreadingViolation();
+        if (OSUtils.isMacOSX() && !(comp instanceof SkinMenu)) {
+            return AquaMenuUI.createUI(comp);
+        } else {
+            return new SkinMenuUI();
+        }
+    }
 }

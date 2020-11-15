@@ -3,52 +3,33 @@ package com.frostwire.mplayer;
 import java.util.Map;
 
 public interface MediaPlayer {
+    void open(String fileOrUrl, int initialVolume);
 
-    public void open(String fileOrUrl, int initialVolume);
+    void seek(float time);
 
-    public void seek(float time);
+    void pause();
 
-    public void setVolume(int volume);
+    void play();
 
-    public void pause();
+    void stop();
 
-    public void play();
+    void togglePause();
 
-    public void stop();
+    void addStateListener(StateListener listener);
 
-    public void togglePause();
+    void addPositionListener(PositionListener listener);
 
-    public void mute(boolean on);
+    String getOpenedFile();
 
-    public void addMetaDataListener(MetaDataListener listener);
+    int getVolume();
 
-    public void removeMetaDataListener(MetaDataListener listener);
+    void setVolume(int volume);
 
-    public void addStateListener(StateListener listener);
+    float getPositionInSecs();
 
-    public void removeStateListener(StateListener listener);
+    float getDurationInSecs();
 
-    public void addVolumeListener(VolumeListener listener);
+    MediaPlaybackState getCurrentState();
 
-    public void removeVolumeListener(VolumeListener listener);
-
-    public void addPositionListener(PositionListener listener);
-
-    public void removePositionListener(PositionListener listener);
-
-    public void addTaskListener(TaskListener listener);
-
-    public void removeTaskListener(TaskListener listener);
-
-    public String getOpenedFile();
-
-    public int getVolume();
-
-    public float getPositionInSecs();
-
-    public float getDurationInSecs();
-
-    public MediaPlaybackState getCurrentState();
-
-    public Map<String, String> getProperties(String fileOrUrl);
+    Map<String, String> getProperties(String fileOrUrl);
 }

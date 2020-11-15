@@ -22,25 +22,27 @@ import com.frostwire.gui.player.StreamMediaSource;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 
+import javax.swing.*;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractUISearchResult implements UISearchResult {
-
     private final FileSearchResult sr;
     private final SearchEngine se;
     private final String query;
     private final String extension;
 
-    public AbstractUISearchResult(FileSearchResult sr, SearchEngine se, String query) {
+    AbstractUISearchResult(FileSearchResult sr, SearchEngine se, String query) {
         this.sr = sr;
         this.se = se;
         this.query = query;
@@ -58,7 +60,7 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return sr.getSize();
     }
 
@@ -113,15 +115,34 @@ public abstract class AbstractUISearchResult implements UISearchResult {
         // this gets invoked when clicking on a search result play preview button.
         if (sr instanceof StreamableSearchResult) {
             StreamableSearchResult ssr = (StreamableSearchResult) sr;
-            String streamUrl = ssr.getStreamUrl();
-            MediaType mediaType = MediaType.getMediaTypeForExtension(extension);
-            if (mediaType != null) {
-                boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
-                if (isVideo) {
-                    GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
+
+            String streamUrl;
+            if (SwingUtilities.isEventDispatchThread() && sr instanceof SoundcloudSearchResult) {
+                SoundcloudSearchResult scsr = (SoundcloudSearchResult) sr;
+                if (scsr.fetchedDownloadUrl()) {
+                    playStream(ssr.getStreamUrl());
                 } else {
-                    GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
+                    BackgroundExecutorService.schedule(() -> {
+                        String url = ssr.getStreamUrl();
+                        GUIMediator.safeInvokeLater(() -> playStream(url));
+                    });
                 }
+            } else {
+                playStream(ssr.getStreamUrl());
+            }
+        } else if (sr instanceof TellurideSearchResult) {
+            playStream(((TellurideSearchResult) sr).getDownloadUrl());
+        }
+    }
+
+    private void playStream(String streamUrl) {
+        MediaType mediaType = MediaType.getMediaTypeForExtension(extension);
+        if (mediaType != null) {
+            boolean isVideo = mediaType.equals(MediaType.getVideoMediaType());
+            if (isVideo) {
+                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), true), true);
+            } else {
+                GUIMediator.instance().launchMedia(new StreamMediaSource(streamUrl, sr.getDisplayName(), sr.getDetailsUrl(), false), true);
             }
         }
     }

@@ -25,10 +25,8 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class AppleCoverBox extends AppleDataBox {
-
     private static final int IMAGE_TYPE_JPG = 13;
     private static final int IMAGE_TYPE_PNG = 14;
-
     private byte[] value;
 
     AppleCoverBox() {
@@ -58,7 +56,6 @@ public final class AppleCoverBox extends AppleDataBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 16);
         if (len != 0) {
             value = new byte[len];
@@ -70,7 +67,6 @@ public final class AppleCoverBox extends AppleDataBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (value != null) {
             buf = ByteBuffer.wrap(value);
             IO.write(ch, value.length, buf);

@@ -18,7 +18,7 @@
 
 package com.limegroup.gnutella.gui.tables;
 
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -28,9 +28,8 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public final class SortHeaderRenderer extends DefaultTableCellRenderer {
-
-    public static Icon ASCENDING;
-    public static Icon DESCENDING;
+    private static Icon ASCENDING;
+    private static Icon DESCENDING;
 
     static {
         setupIcons();
@@ -38,14 +37,24 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
 
     private boolean allowIcon = true;
 
-    public SortHeaderRenderer() {
+    SortHeaderRenderer() {
         setHorizontalAlignment(CENTER);
         setIconTextGap(2); // reduce from the default of 4 pixels
         setHorizontalTextPosition(LEFT);
     }
 
-    public void setAllowIcon(boolean allow) {
-        allowIcon = allow;
+    private static void setupIcons() {
+        if (OSUtils.isMacOSX()) {
+            ASCENDING = AquaSortArrowIcon.getAscendingIcon();
+            DESCENDING = AquaSortArrowIcon.getDescendingIcon();
+        } else {
+            ASCENDING = SortArrowIcon.getAscendingIcon();
+            DESCENDING = SortArrowIcon.getDescendingIcon();
+        }
+    }
+
+    void setAllowIcon() {
+        allowIcon = false;
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
@@ -58,9 +67,7 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
             ascending = sortTable.isSortedColumnAscending();
             isPressed = (sortTable.getPressedColumnIndex() == col);
         }
-
         JLabel renderer = this;
-
         if (table != null) {
             JTableHeader header = table.getTableHeader();
             try {
@@ -78,7 +85,6 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
                 // happens occasionally, ignore.
             }
         }
-
         if (value instanceof Icon) {
             renderer.setIcon((Icon) value);
             renderer.setText(null);
@@ -87,13 +93,11 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
             renderer.setIcon(icon);
             renderer.setText((value == null) ? null : value.toString());
         }
-
         if (renderer != this) {
             renderer.setHorizontalAlignment(CENTER);
             renderer.setIconTextGap(2); // reduce from the default of 4 pixels
             renderer.setHorizontalTextPosition(LEFT);
         }
-
         // Update the borders to simulate pressing, but only if the actual
         // renderer didn't put its own borders on.
         Border pressed, normal, active;
@@ -109,17 +113,6 @@ public final class SortHeaderRenderer extends DefaultTableCellRenderer {
                 renderer.setBorder(normal);
             }
         }
-
         return renderer;
-    }
-
-    private static void setupIcons() {
-        if (OSUtils.isMacOSX()) {
-            ASCENDING = AquaSortArrowIcon.getAscendingIcon();
-            DESCENDING = AquaSortArrowIcon.getDescendingIcon();
-        } else {
-            ASCENDING = SortArrowIcon.getAscendingIcon();
-            DESCENDING = SortArrowIcon.getDescendingIcon();
-        }
     }
 }

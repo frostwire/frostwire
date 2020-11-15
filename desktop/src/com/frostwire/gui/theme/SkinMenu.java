@@ -4,14 +4,12 @@ import javax.swing.*;
 import java.lang.reflect.Field;
 
 public class SkinMenu extends JMenu {
-
     public SkinMenu() {
         ensurePopupMenuCreated();
     }
 
     public SkinMenu(String s) {
         super(s);
-
         ensurePopupMenuCreated();
     }
 
@@ -19,7 +17,6 @@ public class SkinMenu extends JMenu {
         SkinPopupMenu popupMenu = new SkinPopupMenu();
         popupMenu.setInvoker(this);
         popupListener = createWinListener(popupMenu);
-
         try {
             Field f = JMenu.class.getDeclaredField("popupMenu");
             f.setAccessible(true);

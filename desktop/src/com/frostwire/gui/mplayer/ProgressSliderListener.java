@@ -18,10 +18,11 @@
 
 package com.frostwire.gui.mplayer;
 
-public interface ProgressSliderListener {
+interface ProgressSliderListener {
+    void onProgressSliderTimeValueChange(float seconds);
 
-	public void onProgressSliderTimeValueChange( float seconds );
-	public void onProgressSliderMouseDown();
-	public void onProgressSliderMouseUp();
+    void onProgressSliderMouseDown();
+
+    void onProgressSliderMouseUp();
 }
 

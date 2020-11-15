@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class FileTypeBox extends Box {
-
     protected int major_brand;
     protected int minor_version;
     protected int[] compatible_brands;

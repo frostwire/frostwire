@@ -23,11 +23,10 @@ import com.limegroup.gnutella.gui.ButtonRow;
  * indexes in the row.
  */
 final class BTDownloadButtons {
-
     /**
      * The row of buttons for the download window.
      */
-    private ButtonRow BUTTONS;
+    private final ButtonRow BUTTONS;
 
     BTDownloadButtons(final BTDownloadMediator dm) {
         BUTTONS = new ButtonRow(dm.getActions(), ButtonRow.X_AXIS, ButtonRow.NO_GLUE);

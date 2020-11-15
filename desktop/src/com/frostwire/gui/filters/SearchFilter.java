@@ -20,6 +20,5 @@ package com.frostwire.gui.filters;
 import com.limegroup.gnutella.gui.search.UISearchResult;
 
 public interface SearchFilter {
-
-    public boolean allow(UISearchResult result);
+    boolean allow(UISearchResult result);
 }

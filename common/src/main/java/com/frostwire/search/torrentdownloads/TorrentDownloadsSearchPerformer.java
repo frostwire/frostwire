@@ -26,13 +26,12 @@ import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
  * @author alejandroarturom
  */
 public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer<TorrentDownloadsSearchResult> {
-
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"/torrent/([0-9]*?/.*?)\">*?";
-    private static final String HTML_REGEX = "(?is).*?<li><a rel=\"nofollow\" href=\"http://itorrents.org/torrent/(?<torrentid>.*?).torrent?(.*?)\">.*?"  +
-            "<span>Name:.?</span>(?<filename>.*?)(<a.*>)?</a></p></div>.*?"   +
-            "<span>Total Size:.?</span>(?<filesize>.*?)&nbsp;(?<unit>[A-Z]+)</p></div>.*?"  +
-            "<span>Magnet:.*?</span>.*?<a href=\"(?<magnet>.*?)\".*?"  +
+    private static final String HTML_REGEX = "(?is).*?<li><a rel=\"nofollow\" href=\"http://itorrents.org/torrent/(?<torrentid>.*?).torrent?(.*?)\">.*?" +
+            "<span>Name:.?</span>(?<filename>.*?)(<a.*>)?</a></p></div>.*?" +
+            "<span>Total Size:.?</span>(?<filesize>.*?)&nbsp;(?<unit>[A-Z]+)</p></div>.*?" +
+            "<span>Magnet:.*?</span>.*?<a href=\"(?<magnet>.*?)\".*?" +
             "<span>Seeds:.?</span>.?(?<seeds>\\d*?)</p></div>.*?" +
             "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
 
@@ -42,7 +41,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        String transformedKeywords = encodedKeywords.replace("0%20", "+");
+        String transformedKeywords = encodedKeywords.replace("%20", "+");
         return "https://" + getDomainName() + "/search/?search=" + transformedKeywords;
     }
 
@@ -73,37 +72,5 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
     protected boolean isValidHtml(String html) {
         return html != null && !html.contains("Cloudflare");
     }
-
-
-/**
- public static void main(String[] args) throws Exception {
- //SEARCH_RESULTS_REGEX TEST CODE
-
- //         String resultsHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/torrentdownloads-results.html"));
- //         final Pattern resultsPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
- //
- //         final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
- //         while (matcher.find()) {
- //         System.out.println(matcher.group(1));
- //         }
-
-
- String resultHTML = FileUtils.readFileToString(new File("/Users/alejandroarturom/Desktop/testa.html"));
- final Pattern detailPattern = Pattern.compile(TORRENT_DETAILS_PAGE_REGEX);
- final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(resultHTML));
-
- if (detailMatcher.find()) {
- System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
- System.out.println("File name: " + detailMatcher.group("filename"));
- System.out.println("Size: " + detailMatcher.group("filesize"));
- System.out.println("Unit: " + detailMatcher.group("unit"));
- System.out.println("Date: " + detailMatcher.group("time"));
- System.out.println("Seeds: " + detailMatcher.group("seeds"));
- } else {
- System.out.println("No detail matched.");
- }
-
- }
- */
 }
 

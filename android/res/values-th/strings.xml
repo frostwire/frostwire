@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">การติดตั้งเสร็จสมบูรณ์</string>
     <string name="error_connection_timed_out">ข้อผิดพลาด: หมดเวลาเชื่อมต่อ/ลดลง ลองอีกครั้ง.</string>
     <string name="azureus_manager_item_seeding">การเพาะ</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">ดาวน์โหลดฟรีทั้งหมด</string>
     <string name="torrent_max_download_speed">แม็กซ์ความเร็วในการดาวน์โหลด</string>
     <string name="torrent_max_peers">ทำเนียบแม็กซ์</string>
@@ -74,7 +73,7 @@
     <string name="share">หุ้น</string>
     <string name="accept">ยอมรับ</string>
     <string name="torrent_max_download_speed_summary">แม็กซ์ความเร็วในการดาวน์โหลด (0 หมายถึงไม่ จำกัด)</string>
-    <string name="retry_search">ลองใหม่อีกครั้ง</string>
+    <string name="retry">ลองใหม่อีกครั้ง</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ไฟล์ที่ไม่สามารถเมล็ด BitTorrent จะยังคงตัดการเชื่อมต่อ</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android จะลบไฟล์ที่ดาวน์โหลด FrostWire ถ้ายกเลิกการติดตั้ง</string>
     <string name="protected_connection">VPN ที่มีการป้องกัน</string>
@@ -357,7 +356,6 @@
     <string name="or">หรือ</string>
     <string name="file_names">ชื่อไฟล์</string>
     <string name="no_data_check_internet_connection">ไม่สามารถใช้งานเครือข่ายได้โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณ</string>
-    <string name="use_pixabay">ใช้ Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">หยุดการถ่ายโอนทั้งหมด</string>
     <string name="seed_stop">หยุดการเพาะ</string>
     <string name="transfers_select_seeding">การเพาะ</string>
@@ -373,7 +371,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire ไม่สามารถเริ่มต้นได้อย่างถูกต้องเนื่องจากไม่มีสิทธิ์ โปรดให้สิทธิ์ที่จำเป็นและรีสตาร์ทแอ็พพลิเคชัน</string>
     <string name="vpn_find_out_more">หาข้อมูลเพิ่มเติม</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n การทดลองใช้ฟรี 7 วัน</string>
-    <string name="play_store_out_of_sync">Google Play สโตร์ต้องซิงโครไนซ์รอสักครู่</string>
     <string name="contact_us">ติดต่อเรา</string>
     <string name="uploaded">ที่อัปโหลด</string>
     <string name="trackers">ติดตาม</string>
@@ -412,4 +409,5 @@
     <string name="piece_size_header">ชิ้นขนาด:</string>
     <string name="add_tracker">เพิ่มตัวติดตาม</string>
     <string name="use_nyaa">ใช้ Nyaa</string>
+    <string name="use_torrentz2">ใช้ Torrentz2</string>
 </resources>

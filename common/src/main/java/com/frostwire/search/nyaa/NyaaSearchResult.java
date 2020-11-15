@@ -1,6 +1,5 @@
-
 /*
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,13 +21,24 @@ import com.frostwire.licenses.License;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
+import org.apache.commons.io.FilenameUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class NyaaSearchResult implements TorrentCrawlableSearchResult {
+    private static final Map<String, Double> UNIT_TO_BYTES;
+
+    static {
+        UNIT_TO_BYTES = new HashMap<>();
+        UNIT_TO_BYTES.put("bytes", (double) 1);
+        UNIT_TO_BYTES.put("B", (double) 1);
+        UNIT_TO_BYTES.put("KiB", (double) 1024);
+        UNIT_TO_BYTES.put("MiB", (double) (1024 * 1024));
+        UNIT_TO_BYTES.put("GiB", (double) (1024 * 1024 * 1024));
+        UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024L));
+        UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024L * 1024L));
+    }
 
     private final String detailsUrl;
     private final String thumbnailUrl;
@@ -38,28 +48,16 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     private final String torrentUrl;
     private final String fileName;
     private final int seeds;
-    private final long fileSize;
-
-    private static final Map<String, Integer> UNIT_TO_BYTES;
-
-    static {
-        UNIT_TO_BYTES = new HashMap<>();
-        UNIT_TO_BYTES.put("bytes", 1);
-        UNIT_TO_BYTES.put("B", 1);
-        UNIT_TO_BYTES.put("KiB", 1024);
-        UNIT_TO_BYTES.put("MiB", 1024 * 1024);
-        UNIT_TO_BYTES.put("GiB", 1024 * 1024 * 1024);
-        UNIT_TO_BYTES.put("TiB", 1024 * 1024 * 1024 * 1024);
-        UNIT_TO_BYTES.put("PiB", 1024 * 1024 * 1024 * 1024 * 1024);
-    }
+    private final double fileSize;
 
     NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {
         detailsUrl = urlPrefix + matcher.group("detailsurl");
         thumbnailUrl = urlPrefix + matcher.group("thumbnailurl");
         displayName = matcher.group("displayname");
         hash = parseHash(matcher.group("magneturl"));
-        creationTime = Long.valueOf(matcher.group("timestamp"));
-        fileName = matcher.group("displayname");
+        creationTime = Long.parseLong(matcher.group("timestamp"));
+        String extension = FilenameUtils.getExtension(displayName);
+        fileName = displayName + "." + ((extension.isEmpty()) ? "torrent" : extension);
         torrentUrl = urlPrefix + matcher.group("torrenturl");
         seeds = Integer.parseInt(matcher.group("seeds"));
         fileSize = parseSize(matcher.group("filesize"));
@@ -126,7 +124,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return fileSize;
     }
 
@@ -137,23 +135,21 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         return "";
     }
 
-    private long parseSize(String size) {
+    private double parseSize(String size) {
         String[] sizearr = size.trim().split(" ");
         String amount = sizearr[0].trim();
         String unit = sizearr[1].trim();
         return calculateSize(amount, unit);
     }
 
-    private long calculateSize(String amount, String unit) {
+    private double calculateSize(String amount, String unit) {
         if (amount == null || unit == null) {
             return -1;
         }
-
-        Integer unitMultiplier = UNIT_TO_BYTES.get(unit);
+        Double unitMultiplier = UNIT_TO_BYTES.get(unit);
         if (unitMultiplier == null) {
             unitMultiplier = UNIT_TO_BYTES.get("bytes");
         }
-
         //fractional size
         if (amount.indexOf(".") > 0) {
             float floatAmount = Float.parseFloat(amount);
@@ -165,15 +161,4 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
             return intAmount * unitMultiplier;
         }
     }
-
-//    private long parseCreationTime(String dateString) {
-//        long result = System.currentTimeMillis();
-//        try {
-//            //dateString = dateString.replaceAll("(st|nd|rd|th)", "");
-//            SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-//            result = myFormat.parse(dateString).getTime();
-//        } catch (Throwable ignored) {
-//        }
-//        return result;
-//    }
 }

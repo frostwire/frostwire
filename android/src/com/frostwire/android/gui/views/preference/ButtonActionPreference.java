@@ -19,13 +19,14 @@ package com.frostwire.android.gui.views.preference;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import com.frostwire.android.R;
+
+import androidx.preference.Preference;
+import androidx.preference.PreferenceViewHolder;
 
 /**
  * @author gubatron

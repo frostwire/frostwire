@@ -18,7 +18,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 -->
-<android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.tabs.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/view_search_input_tab_layout_file_type"
     style="@style/AppTabLayout"
@@ -27,33 +27,33 @@
     app:tabGravity="fill"
     app:tabMode="fixed">
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_audio_icon_tab_selector" />
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_video_icon_tab_selector" />
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_picture_icon_tab_selector" />
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_application_icon_tab_selector" />
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_document_icon_tab_selector" />
 
-    <android.support.design.widget.TabItem
+    <com.google.android.material.tabs.TabItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:icon="@drawable/my_files_torrent_icon_tab_selector" />
-</android.support.design.widget.TabLayout>
+</com.google.android.material.tabs.TabLayout>

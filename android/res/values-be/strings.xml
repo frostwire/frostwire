@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Ваша ўстаноўка завершана.</string>
     <string name="error_connection_timed_out">Памылка: тайм-аўт падключэння/ўпаў. Паспрабуй яшчэ.</string>
     <string name="azureus_manager_item_seeding">Пасеў</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Усе свабодныя запампоўкі</string>
     <string name="torrent_max_download_speed">Максімальная хуткасць запампоўкі</string>
     <string name="torrent_max_peers">Максімум аднагодкі</string>
@@ -74,7 +73,7 @@
     <string name="share">Доля</string>
     <string name="accept">Прыняць</string>
     <string name="torrent_max_download_speed_summary">Максімальная хуткасць загрузкі (0 азначае неабмежаваную)</string>
-    <string name="retry_search">Паспрабуйце яшчэ раз</string>
+    <string name="retry">Паспрабуйце яшчэ раз</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файл не можа быць пасеяны. BitTorrent будзе заставацца адключаны.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android будзе сцерці загружаныя файлы, калі FrostWire выдаляецца.</string>
     <string name="protected_connection">VPN-абаронены</string>
@@ -357,7 +356,6 @@
     <string name="or">або</string>
     <string name="file_names">імёны файлаў</string>
     <string name="no_data_check_internet_connection">Сетка недаступная, калі ласка, праверце падлучэнне да Інтэрнэту.</string>
-    <string name="use_pixabay">выкарыстанне Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Стоп высеву усе трансферы</string>
     <string name="seed_stop">стоп высеву</string>
     <string name="transfers_select_seeding">засеивание</string>
@@ -409,7 +407,7 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire не можа запусціцца з-за адсутнасці дазволаў. Калі ласка, падайце неабходныя дазволы і перазапусціць прыкладанне</string>
     <string name="vpn_find_out_more">Даведайцеся больш</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Бясплатная 7-дзённая пробная версія</string>
-    <string name="play_store_out_of_sync">Google Play Маркета неабходна сінхранізаваць, пачакайце некалькі хвілін</string>
     <string name="contact_us">Звяжыцеся з намі</string>
     <string name="use_nyaa">выкарыстанне Nyaa</string>
+    <string name="use_torrentz2">выкарыстанне Torrentz2</string>
 </resources>

@@ -11,44 +11,29 @@ import com.limegroup.gnutella.settings.BugSettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows
  * the user to handle bugs.
  */
 public final class BugsPaneItem extends AbstractPaneItem {
-
     private final LocalClientInfoFactory localClientInfoFactory;
-
-    /**
-     * The 'View Example Bug' string
-     */
-    private final String VIEW_EXAMPLE =
-            I18n.tr("View Example");
-
     /**
      * Checkbox for deadlock.
      */
     private final JCheckBox DEADLOCK_OPTION = new JCheckBox();
-
     /**
      * Radiobutton for sending
      */
     private final JRadioButton SEND_BOX = new JRadioButton();
-
     /**
      * Radiobutton for reviewing
      */
     private final JRadioButton REVIEW_BOX = new JRadioButton();
-
     /**
      * Radiobutton for discarding
      */
     private final JRadioButton DISCARD_BOX = new JRadioButton();
-
     /**
      * Buttongroup for radiobuttons.
      */
@@ -64,36 +49,30 @@ public final class BugsPaneItem extends AbstractPaneItem {
                 I18n
                         .tr("You can choose how bug reports should be sent. To view an example bug report, click \'View Example\'. Choosing \'Always Send Immediately\' will immediately contact the bug server when FrostWire encounters an internal error. Choosing \'Always Ask for Review\' will tell FrostWire to ask for your approval before sending a bug to the bug server. Choosing \'Always Discard All Errors\' will cause FrostWire to ignore all bugs (this is not recommended)."));
         localClientInfoFactory = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
-
-
+        /*
+          The 'View Example Bug' string
+         */
+        String VIEW_EXAMPLE = I18n.tr("View Example");
         JButton example = new JButton(VIEW_EXAMPLE);
-        example.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                Exception e = new Exception("Example Bug");
-                LocalClientInfo info = localClientInfoFactory.
-                        createLocalClientInfo(e, Thread.currentThread().getName(), "Example", false);
-                BugManager.instance().handleBug(e, "test-bug-report-thread", info.toBugReport());
-            }
+        example.addActionListener(ae -> {
+            Exception e = new Exception("Example Bug");
+            LocalClientInfo info = localClientInfoFactory.
+                    createLocalClientInfo(e, Thread.currentThread().getName(), "Example", false);
+            BugManager.instance().handleBug(e, "test-bug-report-thread", info.toBugReport());
         });
-
         SEND_BOX.setText(I18n.tr("Always Send Immediately"));
         REVIEW_BOX.setText(I18n.tr("Always Ask For Review"));
         DISCARD_BOX.setText(I18n.tr("Always Discard All Errors"));
         DEADLOCK_OPTION.setText(I18n.tr("Send Errors Automatically if FrostWire is Frozen"));
-
         BGROUP.add(SEND_BOX);
         BGROUP.add(REVIEW_BOX);
         BGROUP.add(DISCARD_BOX);
-
         add(SEND_BOX);
         add(REVIEW_BOX);
         add(DISCARD_BOX);
-
         add(DEADLOCK_OPTION);
-
         add(getVerticalSeparator());
         add(getVerticalSeparator());
-
         JPanel examplePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         examplePanel.add(example);
         GUIUtils.restrictSize(examplePanel, SizePolicy.RESTRICT_HEIGHT);
@@ -113,7 +92,6 @@ public final class BugsPaneItem extends AbstractPaneItem {
             BGROUP.setSelected(SEND_BOX.getModel(), true);
         else
             BGROUP.setSelected(REVIEW_BOX.getModel(), true);
-
         DEADLOCK_OPTION.setSelected(BugSettings.SEND_DEADLOCK_BUGS.getValue());
     }
 
@@ -123,9 +101,8 @@ public final class BugsPaneItem extends AbstractPaneItem {
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.
      *
-     * @throws IOException if the options could not be applied for some reason
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         ButtonModel bm = BGROUP.getSelection();
         if (bm.equals(SEND_BOX.getModel())) {
             BugSettings.IGNORE_ALL_BUGS.setValue(false);
@@ -137,7 +114,6 @@ public final class BugsPaneItem extends AbstractPaneItem {
             BugSettings.IGNORE_ALL_BUGS.setValue(false);
             BugSettings.USE_AUTOMATIC_BUG.setValue(false);
         }
-
         BugSettings.SEND_DEADLOCK_BUGS.setValue(DEADLOCK_OPTION.isSelected());
         return false;
     }
@@ -145,7 +121,6 @@ public final class BugsPaneItem extends AbstractPaneItem {
     public boolean isDirty() {
         if (DEADLOCK_OPTION.isSelected() != BugSettings.SEND_DEADLOCK_BUGS.getValue())
             return true;
-
         if (BGROUP.getSelection().equals(DISCARD_BOX.getModel()))
             return !BugSettings.IGNORE_ALL_BUGS.getValue();
         if (BGROUP.getSelection().equals(SEND_BOX.getModel()))

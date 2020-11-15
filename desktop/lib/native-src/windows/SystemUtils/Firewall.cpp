@@ -7,53 +7,6 @@
 #include "SystemUtilities.h"
 #include "Firewall.h"
 
-// Determines if this copy of Windows has Windows Firewall
-// Returns true if it does, false if not or there was an error
-JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_firewallPresentNative(JNIEnv *e, jclass c) {
-	return WindowsFirewallPresent();
-}
-bool WindowsFirewallPresent() {
-
-	// Make a Windows Firewall object and have it access the COM interfaces of Windows Firewall
-	CWindowsFirewall firewall;
-	if (!firewall.Access()) return false;
-	return true;
-}
-
-// Determines if Windows Firewall is off or on
-// Returns true if the firewall is on, false if it's off or there was an error
-JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_firewallEnabledNative(JNIEnv *e, jclass c) {
-	return WindowsFirewallEnabled();
-}
-bool WindowsFirewallEnabled() {
-
-	// Make a Windows Firewall object and have it access the COM interfaces of Windows Firewall
-	CWindowsFirewall firewall;
-	if (!firewall.Access()) return false;
-
-	// Determine if Windows Firewall is off or on
-	bool enabled = false;
-	if (!firewall.FirewallEnabled(&enabled)) return false;
-	return enabled;
-}
-
-// Determines if the Exceptions not allowed check box in Windows Firewall is checked
-// Returns true if the exceptions not allowed box is checked, false if it's not checked or there was an error
-JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_firewallExceptionsNotAllowedNative(JNIEnv *e, jclass c) {
-	return WindowsFirewallExceptionsNotAllowed();
-}
-bool WindowsFirewallExceptionsNotAllowed() {
-
-	// Make a Windows Firewall object and have it access the COM interfaces of Windows Firewall
-	CWindowsFirewall firewall;
-	if (!firewall.Access()) return false;
-
-	// Determine if the Exceptions not allowed box is checked
-	bool notallowed = false;
-	if (!firewall.ExceptionsNotAllowed(&notallowed)) return false;
-	return notallowed;
-}
-
 // Takes a program path and file name, like "C:\Folder\Program.exe"
 // Determines if it's listed in Windows Firewall
 // Returns true if is listed, false if it's not or there was an error
@@ -70,24 +23,6 @@ bool WindowsFirewallIsProgramListed(LPCTSTR path) {
 	bool listed = false;
 	if (!firewall.IsProgramListed(path, &listed)) return false;
 	return listed;
-}
-
-// Takes a program path and file name like "C:\Folder\Program.exe"
-// Determines if the listing for that program in Windows Firewall is checked or unchecked
-// Returns true if it is enabled, false if it's not or there was an error
-JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_firewallIsProgramEnabledNative(JNIEnv *e, jclass c, jstring path) {
-	return WindowsFirewallIsProgramEnabled(GetJavaString(e, path));
-}
-bool WindowsFirewallIsProgramEnabled(LPCTSTR path) {
-
-	// Make a Windows Firewall object and have it access the COM interfaces of Windows Firewall
-	CWindowsFirewall firewall;
-	if (!firewall.Access()) return false;
-
-	// Determine if the program has a listing on the Exceptions tab, and that listing is checked
-	bool enabled = false;
-	if (!firewall.IsProgramEnabled(path, &enabled)) return false;
-	return enabled;
 }
 
 // Takes a path like "C:\Folder\Program.exe" and a name like "My Program"
@@ -152,50 +87,6 @@ bool CWindowsFirewall::Access() {
 	return true;
 }
 
-// Determines if Windows Firewall is off or on
-// Returns true if it works, and writes the answer in enabled
-bool CWindowsFirewall::FirewallEnabled(bool *enabled) {
-
-	// Find out if the firewall is enabled
-	VARIANT_BOOL v;
-	HRESULT result = Profile->get_FirewallEnabled(&v);
-	if (FAILED(result)) return false;
-	if (v == VARIANT_FALSE) {
-
-		// The Windows Firewall setting is "Off (not recommended)"
-		*enabled = false;
-		return true;
-
-	} else {
-
-		// The Windows Firewall setting is "On (recommended)"
-		*enabled = true;
-		return true;
-	}
-}
-
-// Determines if the Exceptions not allowed check box is checked
-// Returns true if it works, and writes the answer in enabled
-bool CWindowsFirewall::ExceptionsNotAllowed(bool *notallowed) {
-
-	// Find out if the exceptions box is checked
-	VARIANT_BOOL v;
-	HRESULT result = Profile->get_ExceptionsNotAllowed(&v);
-	if (FAILED(result)) return false;
-	if (v == VARIANT_FALSE) {
-
-		// The "Don't allow exceptions" box is checked
-		*notallowed = false;
-		return true;
-
-	} else {
-
-		// The "Don't allow exceptions" box is not checked
-		*notallowed = true;
-		return true;
-	}
-}
-
 // Takes a program path and file name, like "C:\Folder\Program.exe"
 // Determines if it's listed in Windows Firewall
 // Returns true if it works, and writes the answer in listed
@@ -227,34 +118,6 @@ bool CWindowsFirewall::IsProgramListed(LPCTSTR path, bool *listed) {
 			// Report it
 			return false;
 		}
-	}
-}
-
-// Takes a program path and file name like "C:\Folder\Program.exe"
-// Determines if the listing for that program in Windows Firewall is checked or unchecked
-// Returns true if it works, and writes the answer in enabled
-bool CWindowsFirewall::IsProgramEnabled(LPCTSTR path, bool *enabled) {
-
-	// First, make sure the program is listed
-	bool listed;
-	if (!IsProgramListed(path, &listed)) return false; // This sets the Program interface we can use here
-	if (!listed) return false; // The program isn't in the list at all
-
-	// Find out if the program is enabled
-	VARIANT_BOOL v;
-	HRESULT result = Program->get_Enabled(&v);
-	if (FAILED(result)) return false;
-	if (v == VARIANT_FALSE) {
-
-		// The program is on the list, but the checkbox next to it is cleared
-		*enabled = false;
-		return true;
-
-	} else {
-
-		// The program is on the list and the checkbox is checked
-		*enabled = true;
-		return true;
 	}
 }
 

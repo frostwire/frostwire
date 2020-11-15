@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 public final class UserDataBox extends ContainerBox {
-
     UserDataBox() {
         super(udta);
     }

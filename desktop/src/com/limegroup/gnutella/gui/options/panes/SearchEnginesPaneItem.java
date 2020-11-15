@@ -27,39 +27,38 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public final class SearchEnginesPaneItem extends AbstractPaneItem {
-    public final static String TITLE = I18n.tr("Search Engines");
-    public final static String LABEL = I18n.tr("Select which search engines you want FrostWire to use.");
+    private final static String TITLE = I18n.tr("Search Engines");
+    private final static String LABEL = I18n.tr("Select which search engines you want FrostWire to use.");
     private final Map<JCheckBox, BooleanSetting> cBoxes;
     private final List<JCheckBox> searchEngineCheckboxes;
-    private SearchEngineCheckboxListener searchEnginesCheckboxListener;
+    private final SearchEngineCheckboxListener searchEnginesCheckboxListener;
     private JCheckBox allCheckbox;
 
-	public SearchEnginesPaneItem() {
-	    super(TITLE, LABEL);
-        searchEngineCheckboxes = new LinkedList<JCheckBox>();
-        cBoxes = new HashMap<JCheckBox, BooleanSetting>();
+    public SearchEnginesPaneItem() {
+        super(TITLE, LABEL);
+        searchEngineCheckboxes = new LinkedList<>();
+        cBoxes = new HashMap<>();
         searchEnginesCheckboxListener = new SearchEngineCheckboxListener(cBoxes);
-		add(createSearchEnginesCheckboxPanel());
+        add(createSearchEnginesCheckboxPanel());
         add(createToggleAllCheckbox());
-	}
+    }
 
     /**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
-	 * Sets the options for the fields in this <tt>PaneItem</tt> when the 
-	 * window is shown.
-	 */
-	public void initOptions() {
-	}
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
+     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * window is shown.
+     */
+    public void initOptions() {
+    }
 
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         return false;
     }
 
@@ -70,25 +69,21 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
     private Component createToggleAllCheckbox() {
         JPanel panel = new JPanel();
         panel.setMinimumSize(new Dimension(300, 60));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE,60));
-        BoxLayout layout = new BoxLayout(panel,BoxLayout.PAGE_AXIS);
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        BoxLayout layout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
         panel.setLayout(layout);
         panel.add(Box.createHorizontalGlue());
         panel.add(new JSeparator());
-        panel.add(Box.createRigidArea(new Dimension(0,10)));
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
         allCheckbox = new JCheckBox(I18n.tr("Check/Uncheck all"));
         panel.add(allCheckbox);
         allCheckbox.setSelected(areAll(true));
-        allCheckbox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                JCheckBox cBox = (JCheckBox) e.getItemSelectable();
-                checkAll(cBox.isSelected());
-            }
+        allCheckbox.addItemListener(e -> {
+            JCheckBox cBox = (JCheckBox) e.getItemSelectable();
+            checkAll(cBox.isSelected());
         });
         return panel;
     }
-
 
     private JComponent createSearchEnginesCheckboxPanel() {
         JPanel panel = new JPanel();
@@ -110,33 +105,6 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         }
     }
 
-    private class SearchEngineCheckboxListener implements ItemListener {
-        final Map<JCheckBox, BooleanSetting> cBoxes;
-        private boolean enabled;
-
-        public SearchEngineCheckboxListener(final Map<JCheckBox, BooleanSetting> cBoxes) {
-            this.cBoxes = cBoxes;
-            this.enabled = true;
-        }
-
-        public void enable(boolean e) {
-            enabled = e;
-        }
-
-        public void itemStateChanged(ItemEvent e) {
-            if (enabled) {
-                JCheckBox cBox = (JCheckBox) e.getItemSelectable();
-                if (areAll(false)) {
-                    cBox.setSelected(true);
-                    return;
-                }
-                cBoxes.get(cBox).setValue(cBox.isSelected());
-            }
-
-            autoSelectAllCheckbox(areAll(true));
-        }
-    }
-
     private boolean areAll(boolean selected) {
         for (JCheckBox cBox : searchEngineCheckboxes) {
             if (selected && !cBox.isSelected() || !selected && cBox.isSelected()) {
@@ -153,7 +121,6 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
             cBoxes.get(cBox).setValue(cBox.isSelected());
         }
         searchEnginesCheckboxListener.enable(true);
-
         // Check the first if all unchecked.
         if (!checked) {
             searchEngineCheckboxes.get(0).setSelected(true);
@@ -168,6 +135,32 @@ public final class SearchEnginesPaneItem extends AbstractPaneItem {
         allCheckbox.setSelected(allSelected);
         for (ItemListener l : itemListeners) {
             allCheckbox.addItemListener(l);
+        }
+    }
+
+    private class SearchEngineCheckboxListener implements ItemListener {
+        final Map<JCheckBox, BooleanSetting> cBoxes;
+        private boolean enabled;
+
+        SearchEngineCheckboxListener(final Map<JCheckBox, BooleanSetting> cBoxes) {
+            this.cBoxes = cBoxes;
+            this.enabled = true;
+        }
+
+        void enable(boolean e) {
+            enabled = e;
+        }
+
+        public void itemStateChanged(ItemEvent e) {
+            if (enabled) {
+                JCheckBox cBox = (JCheckBox) e.getItemSelectable();
+                if (areAll(false)) {
+                    cBox.setSelected(true);
+                    return;
+                }
+                cBoxes.get(cBox).setValue(cBox.isSelected());
+            }
+            autoSelectAllCheckbox(areAll(true));
         }
     }
 }

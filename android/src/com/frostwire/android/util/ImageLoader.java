@@ -28,12 +28,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Process;
 import android.os.StatFs;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -55,13 +58,15 @@ import java.util.HashSet;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class ImageLoader {
+
+    private static final HandlerThread imageLoaderThread = new HandlerThread("ImageLoader-Thread", Process.THREAD_PRIORITY_DISPLAY);
+
+    private static Handler handler;
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
 
@@ -79,11 +84,11 @@ public final class ImageLoader {
 
     private static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
 
-    private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ALBUM_AUTHORITY);
+    private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
-    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + ARTIST_AUTHORITY);
+    private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/artists");
 
-    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
+    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/metadata");//Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
     private static final boolean DEBUG_ERRORS = false;
 
@@ -115,23 +120,17 @@ public final class ImageLoader {
         Bitmap bitmap = null;
         try {
             Uri albumUri = Uri.withAppendedPath(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, albumId);
-            Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null);
-            try {
-                LOG.info("Using album_art path for uri: " + albumUri);
+            try (Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null)) {
+                LOG.info("getAlbumArt(albumId=" + albumId + ") Using album_art path for uri: " + albumUri, true);
                 if (cursor != null && cursor.moveToFirst()) {
                     String albumArt = cursor.getString(0);
                     if (albumArt != null) {
                         bitmap = BitmapFactory.decodeFile(albumArt);
                     }
                 }
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
             }
-
         } catch (Throwable e) {
-            LOG.error("Error getting album art", e);
+            LOG.error("getAlbumArt(albumId=" + albumId + ")Error getting album art", e, true);
         }
         return bitmap;
     }
@@ -142,6 +141,7 @@ public final class ImageLoader {
 
     public static Uri getAlbumArtUri(long albumId) {
         return ContentUris.withAppendedId(ALBUM_THUMBNAILS_URI, albumId);
+        //return ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),albumId);
     }
 
     public static Uri getArtistArtUri(String artistName) {
@@ -268,7 +268,7 @@ public final class ImageLoader {
                 p,
                 shutdown,
                 Ref.weak(picasso));
-        Asyncs.async(asyncLoader::run);
+        handler.post(asyncLoader);
     }
 
     private static class AsyncLoader implements Runnable {
@@ -280,7 +280,7 @@ public final class ImageLoader {
         private final boolean shutdown;
         private final WeakReference<Picasso> picasso;
 
-        public <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
+        <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
             this.resourceId = resourceId;
             this.uri = uri;
             this.targetRef = targetRef;
@@ -305,11 +305,11 @@ public final class ImageLoader {
             if (p == null) {
                 throw new IllegalArgumentException("Params to load image can't be null");
             }
-            if (!(p.callback instanceof RetryCallback) && // don't ask this recursively
+            if (p.callback != null && !(p.callback instanceof RetryCallback) && // don't ask this recursively
                     Debug.hasContext(p.callback)) {
                 throw new RuntimeException("Possible context leak");
             }
-            if (Debug.hasContext(p.filter)) {
+            if (p.filter != null && Debug.hasContext(p.filter)) {
                 throw new RuntimeException("Possible context leak");
             }
             RequestCreator rc;
@@ -334,14 +334,21 @@ public final class ImageLoader {
             }
             new Handler(Looper.getMainLooper()).post(
                     () -> {
-                        if (!Ref.alive(targetRef)) {
-                            LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
-                            return;
-                        }
-                        if (p.callback != null) {
-                            rc.into(targetRef.get(), new CallbackWrapper(p.callback));
-                        } else {
-                            rc.into(targetRef.get());
+                        try {
+                            if (!Ref.alive(targetRef)) {
+                                LOG.info("ImageLoader.load() main thread update cancelled, ImageView target reference lost.");
+                                return;
+                            }
+                            if (p.callback != null) {
+                                rc.into(targetRef.get(), new CallbackWrapper(p.callback));
+                            } else {
+                                rc.into(targetRef.get());
+                            }
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("ImageLoader::AsyncLoader::run() error posted caught posting to main looper: " + t.getMessage(), t);
                         }
                     });
         }
@@ -365,8 +372,12 @@ public final class ImageLoader {
         picasso.shutdown();
     }
 
-    public static void start(MainApplication mainApplication) {
-        async(mainApplication, ImageLoader::startImageLoaderBackground);
+    public static void start(final MainApplication mainApplication) {
+        if (!imageLoaderThread.isAlive()) {
+            imageLoaderThread.start();
+            handler = new Handler(imageLoaderThread.getLooper());
+        }
+        handler.postAtFrontOfQueue(() -> startImageLoaderBackground(mainApplication));
     }
 
     private static void startImageLoaderBackground(MainApplication mainApplication) {
@@ -442,6 +453,7 @@ public final class ImageLoader {
             this.uri = uri;
             this.target = Ref.weak(target);
             this.params = params;
+            this.params.callback = null; // avoid infinite recursion
         }
 
         @Override
@@ -451,7 +463,6 @@ public final class ImageLoader {
         @Override
         public void onError(Exception e) {
             if (Ref.alive(target) && Ref.alive(loader)) {
-                params.callback = null; // avoid recursion
                 loader.get().load(uri, target.get(), params);
             }
         }
@@ -511,6 +522,9 @@ public final class ImageLoader {
         private Result loadApplication(Uri uri) {
             Result result;
             String packageName = uri.getLastPathSegment();
+            if (packageName == null) {
+                return null;
+            }
             PackageManager pm = context.getPackageManager();
             try {
                 BitmapDrawable icon = (BitmapDrawable) pm.getApplicationIcon(packageName);
@@ -640,8 +654,7 @@ public final class ImageLoader {
             long available = blockCount * blockSize;
             // Target 2% of the total space.
             size = available / 50;
-        } catch (IllegalArgumentException ignored) {
-        } catch (NoSuchMethodError ignored) {
+        } catch (IllegalArgumentException | NoSuchMethodError ignored) {
         }
 
         // Bound inside min/max size for disk cache.

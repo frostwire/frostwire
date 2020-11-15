@@ -27,23 +27,21 @@ import java.util.Collections;
 import java.util.List;
 
 public class NyaaSearchPerformer extends TorrentSearchPerformer {
-    private final int MAX_RESULTS = 75;
-    private final Pattern pattern;
     private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
+    private final Pattern pattern;
 
     public NyaaSearchPerformer(String domainName, long token, String keywords, int timeout) {
-       super(domainName, token, keywords, timeout, 1, 1);
-       pattern = Pattern.compile(
-               "(?is)<tr class=\"default\">.*?" +
-               "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
-               "<a href=\".*?\" class=\"comments\" title=\".*?\">.*?<i class=\"fa fa-comments-o\"></i>.*?" +
-               "<a href=\"(?<detailsurl>.*?)\" title=\"(?<displayname>.*?)\">.*?<td class=\"text-center\" style=\"white-space: nowrap;\">.*?" +
-               "<a href=\"(?<torrenturl>.*?)\"><i class=\"fa fa-fw fa-download\"></i></a>.*?" +
-               "<a href=\"(?<magneturl>.*?)\"><i class=\"fa fa-fw fa-magnet\"></i></a>.*?" +
-               "<td class=\"text-center\">(?<filesize>.*?)</td>.*?" +
-               "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
-               "<td class=\"text-center\" style=\"color: green;\">(?<seeds>.*?)</td>");
-
+        super(domainName, token, keywords, timeout, 1, 0);
+        pattern = Pattern.compile(
+                "(?is)<tr class=\"default\">.*?" +
+                        "<img src=\"(?<thumbnailurl>.*?)\" alt=.*?" +
+                        "<a href=\".*?\" class=\"comments\" title=\".*?\">.*?<i class=\"fa fa-comments-o\"></i>.*?" +
+                        "<a href=\"(?<detailsurl>.*?)\" title=\"(?<displayname>.*?)\">.*?<td class=\"text-center\">.*?" +
+                        "<a href=\"(?<torrenturl>.*?)\"><i class=\"fa fa-fw fa-download\"></i></a>.*?" +
+                        "<a href=\"(?<magneturl>.*?)\"><i class=\"fa fa-fw fa-magnet\"></i></a>.*?" +
+                        "<td class=\"text-center\">(?<filesize>.*?)</td>.*?" +
+                        "<td class=\"text-center\" data-timestamp=\"(?<timestamp>.*?)\">.*?" +
+                        "<td class=\"text-center\">(?<seeds>.*?)</td>");
     }
 
     @Override
@@ -60,10 +58,10 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
         if (offset == -1) {
             offset = 0;
         }
-
         ArrayList<NyaaSearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page)));
+        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page.substring(offset))));
         boolean matcherFound;
+        int MAX_RESULTS = 75;
         do {
             try {
                 matcherFound = matcher.find();
@@ -71,14 +69,16 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
                 matcherFound = false;
                 LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
             }
-
             if (matcherFound) {
-                NyaaSearchResult sr = new NyaaSearchResult("https://" + getDomainName(),matcher);
+                NyaaSearchResult sr = new NyaaSearchResult("https://" + getDomainName(), matcher);
                 if (sr != null) {
                     results.add(sr);
                 }
+            } else {
+                LOG.warn("NyaaSearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
+        LOG.info("searchPage() got " + results.size() + " results");
         return results;
     }
 }

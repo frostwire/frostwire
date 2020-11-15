@@ -21,16 +21,13 @@ package com.frostwire.search.archiveorg;
 import com.frostwire.search.torrent.TorrentSearchResult;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgTorrentSearchResult extends ArchiveorgCrawledSearchResult implements TorrentSearchResult {
+    private final double size;
 
-    private final long size;
-
-    public ArchiveorgTorrentSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file, long size) {
+    public ArchiveorgTorrentSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file, double size) {
         super(sr, file);
         this.size = size;
     }
@@ -56,7 +53,7 @@ public class ArchiveorgTorrentSearchResult extends ArchiveorgCrawledSearchResult
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 }

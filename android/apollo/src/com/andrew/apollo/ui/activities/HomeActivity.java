@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,14 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
+
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
+import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.offers.Offers;
 
 /**
@@ -33,6 +37,8 @@ import com.frostwire.android.offers.Offers;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class HomeActivity extends BaseActivity {
+
+    private DangerousPermissionsChecker dangerousPermissionsChecker;
 
     public HomeActivity() {
         super(R.layout.activity_base);
@@ -46,16 +52,29 @@ public final class HomeActivity extends BaseActivity {
             getFragmentManager().beginTransaction()
                     .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment()).commit();
         }
+
+        dangerousPermissionsChecker = new DangerousPermissionsChecker(this,
+                DangerousPermissionsChecker.READ_EXTERNAL_STORAGE);
+        dangerousPermissionsChecker.requestPermissions();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (MusicUtils.isPlaying()) {
+            return;
+        }
         Offers.showInterstitialOfferIfNecessary(
                 this,
                 Offers.PLACEMENT_INTERSTITIAL_MAIN,
                 false,
                 false,
                 true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

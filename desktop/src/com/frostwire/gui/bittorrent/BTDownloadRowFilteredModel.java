@@ -11,14 +11,12 @@ import java.util.List;
  * Filters out certain rows from the data model.
  *
  * @author Sumeet Thadani, Sam Berlin, Gubatron
- * 
  */
 public class BTDownloadRowFilteredModel extends BTDownloadModel {
     /**
      * The filter to use in this row filter.
      */
     private final TableLineFilter<BTDownloadDataLine> FILTER;
-
     /**
      * A list of all filtered results.
      */
@@ -73,14 +71,11 @@ public class BTDownloadRowFilteredModel extends BTDownloadModel {
     private void rebuild() {
         List<BTDownloadDataLine> existing = new ArrayList<>(_list);
         List<BTDownloadDataLine> hidden = new ArrayList<>(HIDDEN);
-
         clear();
-
         // For stuff in _list, we can just re-add the DataLines as-is.
         for (BTDownloadDataLine anExisting : existing) {
             addSorted(anExisting);
         }
-
         // Merge the hidden TableLines
         for (BTDownloadDataLine tl : hidden) {
             addSorted(tl);

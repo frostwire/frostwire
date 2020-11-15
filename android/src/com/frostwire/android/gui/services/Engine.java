@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,6 @@
 package com.frostwire.android.gui.services;
 
 import android.app.Application;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -29,28 +25,27 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 
+import androidx.core.app.JobIntentService;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 
+import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -59,13 +54,13 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public final class Engine implements IEngineService {
 
+    private static final Logger LOG = Logger.getLogger(Engine.class);
+
     private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
     private EngineService service;
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
-
-    private FWVibrator vibrator;
 
     // the startServices call is a special call that can be made
     // to early (relatively speaking) during the application startup
@@ -136,7 +131,7 @@ public final class Engine implements IEngineService {
             }
             if (wasShutdown) {
                 async(new EngineApplicationRefsHolder(this, getApplication()),
-                      Engine::engineServiceStarter);
+                        Engine::engineServiceStarter);
             }
             wasShutdown = false;
         } else {
@@ -195,7 +190,7 @@ public final class Engine implements IEngineService {
         Intent i = new Intent();
         i.setClass(context, EngineService.class);
         try {
-            Engine.startService(context, i);
+            Engine.enqueueServiceJob(context, i);
             context.bindService(i, connection = new ServiceConnection() {
                 public void onServiceDisconnected(ComponentName name) {
                 }
@@ -214,7 +209,19 @@ public final class Engine implements IEngineService {
             }, 0);
         } catch (SecurityException execution) {
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(()->UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception));
+            WeakReference<Context> contextRef = Ref.weak(context);
+            handler.post(() -> {
+                try {
+                    if (Ref.alive(contextRef)) {
+                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);
+                    }
+                } catch (Throwable t) {
+                    if (BuildConfig.DEBUG) {
+                        throw t;
+                    }
+                    LOG.error("Engine::startEngineService() failed posting UIUtils.showLongMessage error to main looper: " + t.getMessage(), t);
+                }
+            });
             execution.printStackTrace();
         }
     }
@@ -236,10 +243,29 @@ public final class Engine implements IEngineService {
 
         IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
-        context.registerReceiver(receiver, fileFilter);
-        context.registerReceiver(receiver, connectivityFilter);
-        context.registerReceiver(receiver, audioFilter);
-        context.registerReceiver(receiver, telephonyFilter);
+        try {
+            context.registerReceiver(receiver, fileFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, connectivityFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, audioFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
+
+        try {
+            context.registerReceiver(receiver, telephonyFilter);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
@@ -251,90 +277,14 @@ public final class Engine implements IEngineService {
         return r;
     }
 
-    public void onHapticFeedbackPreferenceChanged() {
-        if (vibrator != null) {
-            vibrator.onPreferenceChanged();
-        }
-    }
-
-    public void hapticFeedback() {
-        if (vibrator != null) {
-            vibrator.hapticFeedback();
-        }
-    }
-
-    public static void startService(final Context context, final Intent intent) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            ContextCompat.startForegroundService(context, intent);
-        } else {
-            context.startService(intent);
-        }
-    }
-
-    /**
-     * Whenever there's a call to ContextCompat.startForegroundService(context, intent)
-     * the service that's supposed to be started in the foreground is expected to perform
-     * a service.startForeground() call along with a notification within the next 5 seconds,
-     * otherwise you get an IllegalState exception crash for not following the 'contract'
-     * @param service
-     */
-    public static void foregroundServiceStartForAndroidO(Service service) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            NotificationManager notificationService = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            NotificationChannel channel = new NotificationChannel(
-                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID,
-                    "FrostWire",
-                    NotificationManager.IMPORTANCE_NONE);
-
-            if (notificationService != null) {
-                notificationService.createNotificationChannel(channel);
-            }
-
-            Notification notification = new NotificationCompat.Builder(
-                    service,
-                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID).
-                    setContentTitle("").
-                    setContentText("").
-                    build();
-            service.startForeground(1337, notification);
-        }
-    }
-
-    private static class FWVibrator {
-        private final Vibrator vibrator;
-        private boolean enabled;
-
-        public FWVibrator(Application context) {
-            vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            enabled = isActive();
-        }
-
-        public void hapticFeedback() {
-            if (!enabled) return;
-            try {
-                vibrator.vibrate(50);
-            } catch (Throwable ignored) {
-            }
-        }
-
-        public void onPreferenceChanged() {
-            enabled = isActive();
-        }
-
-        public boolean isActive() {
-            boolean hapticFeedback = false;
-            ConfigurationManager cm = ConfigurationManager.instance();
-            if (cm != null) {
-                hapticFeedback = cm.getBoolean(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON);
-            }
-            return vibrator != null && hapticFeedback;
-        }
+    public static void enqueueServiceJob(final Context context, final Intent intent) {
+        JobIntentService.enqueueWork(context, EngineService.class, JOB_ID_ENGINE_SERVICE, intent);
     }
 
     private class EngineApplicationRefsHolder {
         WeakReference<Engine> engineRef;
         WeakReference<Application> appRef;
+
         EngineApplicationRefsHolder(Engine engine, Application application) {
             engineRef = Ref.weak(engine);
             appRef = Ref.weak(application);
@@ -351,7 +301,6 @@ public final class Engine implements IEngineService {
         Engine engine = refsHolder.engineRef.get();
         Application application = refsHolder.appRef.get();
         if (application != null) {
-            engine.vibrator = new FWVibrator(application);
             engine.startEngineService(application);
         }
     }

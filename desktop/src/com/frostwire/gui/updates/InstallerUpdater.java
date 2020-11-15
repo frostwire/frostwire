@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 package com.frostwire.gui.updates;
 
 import com.frostwire.bittorrent.BTEngine;
@@ -47,19 +46,15 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  * @author gubatron
  * @author aldenml
  */
-public class InstallerUpdater implements Runnable {
-
+class InstallerUpdater implements Runnable {
     private static final Logger LOG = Logger.getLogger(InstallerUpdater.class);
-
-    private TorrentHandle torrentHandle = null;
-    private final UpdateMessage updateMessage;
-    private File executableFile;
-
     private static String lastMD5;
     private static boolean isDownloadingUpdate = false;
     private static int downloadProgress = 0;
-
+    private final UpdateMessage updateMessage;
     private final boolean forceUpdate;
+    private TorrentHandle torrentHandle = null;
+    private File executableFile;
 
     InstallerUpdater(UpdateMessage um, boolean force) {
         updateMessage = um;
@@ -71,12 +66,65 @@ public class InstallerUpdater implements Runnable {
         return downloadProgress;
     }
 
-    public void start() {
-        new Thread(this, "InstallerUpdater").start();
-    }
-
     static boolean isDownloadingUpdate() {
         return isDownloadingUpdate;
+    }
+
+    private static void printTorrentHandleStatus(TorrentHandle th) {
+        if (th == null) {
+            return;
+        }
+        StringBuilder buf = new StringBuilder();
+        buf.append("Infohash: ");
+        buf.append(th.infoHash().toHex());
+        buf.append(" Completed:");
+        TorrentStatus stats = th.status();
+        buf.append(stats.progress());
+        buf.append('%');
+        buf.append(" Seeds:");
+        buf.append(stats.numSeeds());
+        buf.append(" Peers:");
+        buf.append(stats.numPeers());
+        buf.append(" Downloaded:");
+        buf.append(stats.totalDone());
+        buf.append(" Uploaded:");
+        buf.append(stats.totalUpload());
+        buf.append(" DSpeed:");
+        buf.append(stats.downloadRate());
+        buf.append(" USpeed:");
+        buf.append(stats.uploadRate());
+        while (buf.length() < 80) {
+            buf.append(' ');
+        }
+        buf.append(" TO:");
+        buf.append(th.savePath());
+        System.out.println(buf.toString());
+    }
+
+    static String getLastMD5() {
+        return lastMD5;
+    }
+
+    private static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException {
+        byte[] contents = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).getBytes(torrentURL);
+        // save the torrent locally if you have to
+        if (saveLocation != null && contents != null && contents.length > 0) {
+            if (saveLocation.exists()) {
+                saveLocation.delete();
+            }
+            //Create all the route necessary to save the .torrent file if it does not exit.
+            saveLocation.getParentFile().mkdirs();
+            saveLocation.createNewFile();
+            saveLocation.setWritable(true);
+            FileOutputStream fos = new FileOutputStream(saveLocation, false);
+            fos.write(contents);
+            fos.flush();
+            fos.close();
+        }
+    } //downloadTorrentFile
+
+    public void start() {
+        new Thread(this, "InstallerUpdater").start();
     }
 
     public void run() {
@@ -84,12 +132,10 @@ public class InstallerUpdater implements Runnable {
             return;
         }
         cleanupInvalidUpdates();
-
         if (checkIfDownloaded()) {
             showUpdateMessage();
         } else {
             isDownloadingUpdate = true;
-
             if (updateMessage.getTorrent() != null) {
                 handleTorrentDownload();
             } else if (updateMessage.getInstallerUrl() != null) {
@@ -102,7 +148,6 @@ public class InstallerUpdater implements Runnable {
 
     private void handleTorrentDownload() {
         File torrentFileLocation = downloadDotTorrent();
-
         try {
             // workaround to java issue
             // http://bugs.sun.com/bugdatabase/view_bug.do;:YfiG?bug_id=4483097
@@ -112,7 +157,6 @@ public class InstallerUpdater implements Runnable {
             } else {
                 isDownloadingUpdate = false;
             }
-
         } catch (Throwable e) {
             isDownloadingUpdate = false;
             LOG.error("Error starting update torrent download", e);
@@ -126,12 +170,9 @@ public class InstallerUpdater implements Runnable {
 
     private void handleHttpDownload() {
         File updateFolder = UpdateSettings.UPDATES_DIR;
-
         String fileName = updateMessage.getSaveAs() != null ?
                 updateMessage.getSaveAs() : getFileNameFromHttpUrl();
-
         File installerFileLocation = new File(updateFolder, fileName);
-
         if (!updateFolder.exists()) {
             updateFolder.mkdir();
             updateFolder.setWritable(true);
@@ -159,13 +200,12 @@ public class InstallerUpdater implements Runnable {
 
                 @Override
                 public void onCancel(HttpClient client) {
-
                 }
 
                 @Override
                 public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
                     if (headerFields.containsKey("Content-Length")) {
-                        contentLength = Long.valueOf(headerFields.get("Content-Length").get(0));
+                        contentLength = Long.parseLong(headerFields.get("Content-Length").get(0));
                     }
                 }
             });
@@ -190,10 +230,8 @@ public class InstallerUpdater implements Runnable {
     }
 
     private void startTorrentDownload(String torrentFile, String saveDataPath) {
-
         TorrentInfo tinfo = new TorrentInfo(new File(torrentFile));
         final Sha1Hash updateInfoHash = tinfo.infoHash();
-
         AlertListener updateTorrentListener = new AlertListener() {
             TorrentHandle th = null;
 
@@ -214,27 +252,22 @@ public class InstallerUpdater implements Runnable {
                         BTEngine.getInstance().removeListener(this);
                         showUpdateMessage();
                     }
-
                     if (!(alert instanceof TorrentAlert<?>)) {
                         //check manually for the md5 every time as jlibtorrent is failing to report the finished download.
                         return;
                     }
                     Sha1Hash alertSha1Hash = ((TorrentAlert) alert).handle().infoHash();
-
                     if (!alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
                         return;
                     }
-
                     if (alert.type().equals(ADD_TORRENT) && alertSha1Hash.toHex().equals(updateInfoHash.toHex())) {
                         Sha1Hash sha1 = ((TorrentAlert<?>) alert).handle().infoHash();
                         th = BTEngine.getInstance().find(sha1);
                         torrentHandle = th;
                         th.resume();
-
                         // Sleep for a bit, sometimes the added torrent is from the last session and it is finished but this is so
                         // early that we only see progress of 100% when we debug and step thru.
                         Thread.sleep(2000);
-
                         // it can happen that the file is finished at this moment and no update message has been shown before.
                         int progress = (int) (torrentHandle.status().progress() * 100);
                         if (progress == 100) {
@@ -244,15 +277,12 @@ public class InstallerUpdater implements Runnable {
                             return;
                         }
                     }
-
                     if (th == null) {
                         return;
                     }
-
                     AlertType type = alert.type();
                     System.out.println("InstallerUpdater.AlertListener: " + type);
                     printTorrentHandleStatus(th);
-
                     switch (type) {
                         case TORRENT_RESUMED:
                             printTorrentHandleStatus(th);
@@ -279,7 +309,6 @@ public class InstallerUpdater implements Runnable {
                 }
             }
         };
-
         try {
             BTEngine.getInstance().addListener(updateTorrentListener);
             BTEngine.getInstance().download(tinfo, new File(saveDataPath), null, null, null);
@@ -293,11 +322,8 @@ public class InstallerUpdater implements Runnable {
             if (executableFile == null) {
                 return;
             }
-
             String buildsMissedMessage = getBuildsMissedMessage();
-
             DialogOption result = GUIMediator.showYesNoMessage(buildsMissedMessage + updateMessage.getMessageInstallerReady(), I18n.tr("Update"), JOptionPane.INFORMATION_MESSAGE);
-
             if (result == DialogOption.YES) {
                 UpdateMediator.openInstallerAndShutdown(executableFile);
             }
@@ -309,7 +335,6 @@ public class InstallerUpdater implements Runnable {
             try {
                 int newBuildNumber = Integer.parseInt(updateMessage.getBuild());
                 int buildDelta = newBuildNumber - FrostWireUtils.getBuildNumber();
-
                 if (buildDelta > 1) {
                     return "<html>" + I18n.tr("Time flies! You have missed the last {0} updates.", buildDelta) + "<br><br>&nbsp;";
                 }
@@ -321,23 +346,18 @@ public class InstallerUpdater implements Runnable {
     }
 
     private File downloadDotTorrent() {
-
         File appSpecialShareFolder = UpdateSettings.UPDATES_DIR;
-
         int index = updateMessage.getTorrent().lastIndexOf('/');
         File torrentFileLocation = new File(appSpecialShareFolder, updateMessage.getTorrent().substring(index + 1));
-
         if (!appSpecialShareFolder.exists() && appSpecialShareFolder.mkdir()) {
             appSpecialShareFolder.setWritable(true);
         }
-
         //We always re-download the torrent just in case.
         try {
             downloadTorrentFile(updateMessage.getTorrent(), torrentFileLocation);
         } catch (Throwable e) {
             LOG.error("Error downloading update torrent file", e);
         }
-
         return torrentFileLocation;
     }
 
@@ -347,19 +367,16 @@ public class InstallerUpdater implements Runnable {
         }
         torrentHandle = th;
         printTorrentHandleStatus(th);
-
         if (torrentDataDownloadedToDisk()) {
             isDownloadingUpdate = false;
             return;
         }
         System.out.println("InstallerUpdater.stateChanged() - " + state + " completed: " + torrentHandle.status().isFinished());
-
         if (state == TorrentStatus.State.SEEDING) {
             isDownloadingUpdate = false;
             System.out.println("InstallerUpdater.stateChanged() - SEEDING!");
             return;
         }
-
         ErrorCode error = null;
         TorrentStatus status = th.status();
         if (status != null) {
@@ -371,7 +388,6 @@ public class InstallerUpdater implements Runnable {
             System.out.println(error);
             System.out.println("InstallerUpdater: ERROR - stopIt, startDownload!");
             System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-
             //try to restart the download. delete torrent and data
             //manager.stopIt(DownloadManager.STATE_READY, false, true);
             try {
@@ -380,7 +396,6 @@ public class InstallerUpdater implements Runnable {
             } catch (Throwable e) {
                 LOG.error("Error removing download manager on error", e);
             }
-
         } else if (state == TorrentStatus.State.DOWNLOADING) {
             System.out.println("stateChanged(STATE_DOWNLOADING)");
             downloadProgress = (int) (torrentHandle.status().progress() * 100);
@@ -391,7 +406,6 @@ public class InstallerUpdater implements Runnable {
         System.out.println("InstallerUpdater.downloadComplete()!!!!");
         printTorrentHandleStatus(torrentHandle);
         cleanupInvalidUpdates();
-
         if (checkIfDownloaded()) {
             showUpdateMessage();
         }
@@ -399,16 +413,14 @@ public class InstallerUpdater implements Runnable {
 
     private void cleanupInvalidUpdates() {
         if (!UpdateSettings.UPDATES_DIR.exists() ||
-            !UpdateSettings.UPDATES_DIR.isDirectory()) {
+                !UpdateSettings.UPDATES_DIR.isDirectory()) {
             return;
         }
         File[] files = UpdateSettings.UPDATES_DIR.listFiles();
         if (files == null || files.length == 0) {
             return;
         }
-
         String currentMD5 = updateMessage.getRemoteMD5();
-
         for (File file : files) {
             try {
                 String fileMD5 = DigestUtils.getMD5(file);
@@ -453,61 +465,4 @@ public class InstallerUpdater implements Runnable {
     private boolean torrentDataDownloadedToDisk() {
         return torrentHandle != null && torrentHandle.isValid() && (torrentHandle.status().isFinished() || torrentHandle.status().isSeeding());
     }
-
-    private static void printTorrentHandleStatus(TorrentHandle th) {
-        if (th == null) {
-            return;
-        }
-        StringBuilder buf = new StringBuilder();
-        buf.append("Infohash: ");
-        buf.append(th.infoHash().toHex());
-        buf.append(" Completed:");
-        TorrentStatus stats = th.status();
-        buf.append(stats.progress());
-        buf.append('%');
-        buf.append(" Seeds:");
-        buf.append(stats.numSeeds());
-        buf.append(" Peers:");
-        buf.append(stats.numPeers());
-        buf.append(" Downloaded:");
-        buf.append(stats.totalDone());
-        buf.append(" Uploaded:");
-        buf.append(stats.totalUpload());
-        buf.append(" DSpeed:");
-        buf.append(stats.downloadRate());
-        buf.append(" USpeed:");
-        buf.append(stats.uploadRate());
-        while (buf.length() < 80) {
-            buf.append(' ');
-        }
-        buf.append(" TO:");
-        buf.append(th.savePath());
-        System.out.println(buf.toString());
-    }
-
-    static String getLastMD5() {
-        return lastMD5;
-    }
-
-    private static void downloadTorrentFile(String torrentURL, File saveLocation) throws IOException {
-        byte[] contents = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).getBytes(torrentURL);
-
-        // save the torrent locally if you have to
-        if (saveLocation != null && contents != null && contents.length > 0) {
-
-            if (saveLocation.exists()) {
-                saveLocation.delete();
-            }
-
-            //Create all the route necessary to save the .torrent file if it does not exit.
-            saveLocation.getParentFile().mkdirs();
-            saveLocation.createNewFile();
-            saveLocation.setWritable(true);
-
-            FileOutputStream fos = new FileOutputStream(saveLocation, false);
-            fos.write(contents);
-            fos.flush();
-            fos.close();
-        }
-    } //downloadTorrentFile
 }

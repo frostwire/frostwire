@@ -21,23 +21,22 @@ import com.limegroup.gnutella.gui.I18n;
 import javax.swing.*;
 
 /**
- * This class acts as a mediator among all of the various items of the 
+ * This class acts as a mediator among all of the various items of the
  * application's menus.
  */
 public final class MenuMediator {
-
     /**
-     * We call this so that the menu won't be covered by the SWT Browser.
+     * Constant handle to the instance of this class for following
+     * the singleton pattern.
+     */
+    private static MenuMediator INSTANCE;
+
+    /*
+      We call this so that the menu won't be covered by the SWT Browser.
      */
     static {
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     }
-
-    /**
-     * Constant handle to the instance of this class for following 
-     * the singleton pattern.
-     */
-    private static MenuMediator INSTANCE;
 
     /**
      * Constant handle to the <tt>JMenuBar</tt> instance that holds all
@@ -46,28 +45,37 @@ public final class MenuMediator {
     private final JMenuBar MENU_BAR = new JMenuBar();
 
     /**
-     * Constant handle to the single <tt>FileMenu</tt> instance for
-     * the application.
+     * Private constructor that ensures that a <tt>MenuMediator</tt>
+     * cannot be constructed from outside this class.  It adds all of
+     * the menus.
      */
-    private final FileMenu FILE_MENU = new FileMenu();
-
-    /**
-     * Constant handle to the single <tt>ToolsMenu</tt> instance for
-     * the application.
-     */
-    private final Menu TOOLS_MENU = new ToolsMenu();
-
-    /**
-     * Constant handle to the single <tt>HelpMenu</tt> instance for
-     * the application.
-     */
-    private final Menu HELP_MENU = new HelpMenu();
-
-    /**
-     * Constant handle to the single <tt>ViewMenu</tt> instance for
-     * the application.
-     */
-    private final Menu VIEW_MENU = new ViewMenu();
+    private MenuMediator() {
+        GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
+        /*
+          Constant handle to the single <tt>FileMenu</tt> instance for
+          the application.
+         */
+        FileMenu FILE_MENU = new FileMenu();
+        addMenu(FILE_MENU);
+        /*
+          Constant handle to the single <tt>ViewMenu</tt> instance for
+          the application.
+         */
+        Menu VIEW_MENU = new ViewMenu();
+        addMenu(VIEW_MENU);
+        /*
+          Constant handle to the single <tt>ToolsMenu</tt> instance for
+          the application.
+         */
+        Menu TOOLS_MENU = new ToolsMenu();
+        addMenu(TOOLS_MENU);
+        /*
+          Constant handle to the single <tt>HelpMenu</tt> instance for
+          the application.
+         */
+        Menu HELP_MENU = new HelpMenu();
+        addMenu(HELP_MENU);
+    }
 
     /**
      * Singleton accessor method for obtaining the <tt>MenuMediator</tt>
@@ -75,25 +83,11 @@ public final class MenuMediator {
      *
      * @return the <tt>MenuMediator</tt> instance
      */
-    public static final MenuMediator instance() {
+    public static MenuMediator instance() {
         if (INSTANCE == null) {
             INSTANCE = new MenuMediator();
         }
         return INSTANCE;
-    }
-
-    /**
-     * Private constructor that ensures that a <tt>MenuMediator</tt> 
-     * cannot be constructed from outside this class.  It adds all of 
-     * the menus.
-     */
-    private MenuMediator() {
-        GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
-
-        addMenu(FILE_MENU);
-        addMenu(VIEW_MENU);
-        addMenu(TOOLS_MENU);
-        addMenu(HELP_MENU);
     }
 
     /**
@@ -108,19 +102,10 @@ public final class MenuMediator {
     /**
      * Adds a <tt>Menu</tt> to the next position on the menu bar.
      *
-     * @param menu to the <tt>Menu</tt> instance that allows access to 
+     * @param menu to the <tt>Menu</tt> instance that allows access to
      *             its wrapped <tt>JMenu</tt> instance
      */
     private void addMenu(Menu menu) {
         MENU_BAR.add(menu.getMenu());
-    }
-
-    /**
-     * Returns the height of the main menu bar.
-     *
-     * @return the height of the main menu bar
-     */
-    public int getMenuBarHeight() {
-        return MENU_BAR.getHeight();
     }
 }

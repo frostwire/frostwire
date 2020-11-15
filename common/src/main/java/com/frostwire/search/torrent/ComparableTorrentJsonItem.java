@@ -21,7 +21,6 @@ package com.frostwire.search.torrent;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public interface ComparableTorrentJsonItem {
     int getSeeds();

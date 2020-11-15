@@ -26,6 +26,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -33,13 +34,12 @@ import java.util.Locale;
  * @author alejandroarturom
  */
 public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchResult {
-
     private final String filename;
     private final String displayName;
     private final String detailsUrl;
     private final String torrentUrl;
     private final String infoHash;
-    private final long size;
+    private final double size;
     private final long creationTime;
     private final int seeds;
 
@@ -55,7 +55,7 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -101,12 +101,13 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
 
     private String parseFileName(String urlEncodedFileName, String fallbackName) {
         String decodedFileName = fallbackName;
-        try {
-            if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, "UTF-8");
-                decodedFileName.replace("&amp;", "and");
+        if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
+            try {
+                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        } catch (UnsupportedEncodingException e) {
+            decodedFileName.replace("&amp;", "and");
         }
         return decodedFileName + ".torrent";
     }

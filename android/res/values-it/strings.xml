@@ -23,7 +23,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informazione:</b> Anche se consigliata per i download, soprattutto quando si scaricano o si scambiano informazioni riservate (ad esempio servizi bancari) e mentre si utilizzano dati pubblici Wi-Fi o mobili, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>La tua vita privata è un diritto umano fondamentale</b>. Una connessione non protetta, tutto ciò che fai online <b>ricerche, messaggistica e download</b>, può essere monitorato e intercettato da chiunque sulla tua rete, ad es. Provider di servizi Internet, hacker, governi.<br><br><b>Raccomandiamo VIVAMENTE di utilizzare un servizio VPN</b>. <br> Ecco alcune opzioni che forniscono un servizio affidabile e funzionano bene con FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Sei connesso a Internet tramite una rete VPN. <br><br> Se non lo sei già, ti consigliamo di utilizzare uno dei seguenti servizi per crittografare la tua connessione e <b>salvaguardare la vostra vita privata</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Impostazioni</string>
     <string name="exit">Esci</string>
     <string name="search_label">Cerca</string>
@@ -161,10 +160,11 @@
     <string name="app_shutdown_dlg_message">Questo si spegnerà tutti i trasferimenti e servizi in background. Sei sicuro?</string>
     <string name="send_feedback">Invia feedback</string>
     <string name="use_torrentdownloads">Utilizzare TorrentDownloads</string>
+    <string name="use_torrentz2">Utilizzare Torrentz2</string>
     <string name="saving_to_internal_memory">Salvataggio di memoria interna</string>
     <string name="choose_email_app">Scegliere un Email app…</string>
     <string name="my_filetype">Mio %s</string>
-    <string name="retry_search">Riprova</string>
+    <string name="retry">Riprova</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Il archivio non può essere seminato. BitTorrent rimarrà scollegato.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android cancellerà archivio scaricati se FrostWire viene disinstallato.</string>
     <string name="protected_connection">VPN protetto</string>
@@ -253,6 +253,9 @@
     <string name="select_option_below">Selezionare l\'opzione di seguito:</string>
     <string name="device_storage">Archiviazione del dispositivo</string>
     <string name="use_limetorrents">Utilizzare Limetorrents</string>
+    <string name="use_magnetdl">Utilizzare MagnetDL</string>
+    <string name="use_torrent_paradise">Utilizzare TorrentParadise</string>
+    <string name="use_glotorrents">Utilizzare GloTorrents</string>
     <string name="error_no_internet_connection">Errore: Controllare la connessione a Internet</string>
     <string name="why_we_need_storage_permissions">Perché abbiamo bisogno di permessi di stoccaggio.</string>
     <string name="invalid_filename">Nome del file non valido</string>
@@ -357,7 +360,6 @@
     <string name="or">o</string>
     <string name="file_names">Nomi dei file</string>
     <string name="no_data_check_internet_connection">La rete non è disponibile, controllare la connessione a Internet.</string>
-    <string name="use_pixabay">Utilizzare Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Smettere di seminare tutti i trasferimenti</string>
     <string name="seed_stop">Smettere di seminare</string>
     <string name="transfers_select_seeding">semina</string>
@@ -409,7 +411,7 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
     <string name="vpn_find_out_more">Scopri di più</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prova gratuita di 7 giorni</string>
-    <string name="play_store_out_of_sync">Google Play Store deve essere sincronizzato, attendere alcuni minuti</string>
     <string name="contact_us">Contattaci</string>
     <string name="use_nyaa">Utilizzare Nyaa</string>
+    <string name="free">Gratuito</string>
 </resources>

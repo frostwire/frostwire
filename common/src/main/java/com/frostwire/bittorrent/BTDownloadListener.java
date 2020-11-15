@@ -26,7 +26,6 @@ import java.util.Set;
  * @author aldenml
  */
 public interface BTDownloadListener {
-
     void finished(BTDownload dl);
 
     void removed(BTDownload dl, Set<File> incompleteFiles);

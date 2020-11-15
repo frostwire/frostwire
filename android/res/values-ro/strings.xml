@@ -25,7 +25,6 @@
     <string name="your_installation_is_complete">Instalarea este completă.</string>
     <string name="error_connection_timed_out">Eroare: conexiunea a expirat / a scăzut. Încearcă din nou.</string>
     <string name="azureus_manager_item_seeding">Însămânțarea</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Toate descărcările gratuite</string>
     <string name="torrent_max_download_speed">Maxima viteza de descărcare</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -72,7 +71,7 @@
     <string name="share">Împărtăşi</string>
     <string name="accept">Accept</string>
     <string name="torrent_max_download_speed_summary">Maxima Viteza de descărcare (0 înseamnă nelimitat)</string>
-    <string name="retry_search">Reîncerca</string>
+    <string name="retry">Reîncerca</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fișierul nu a putut fi însămânțate. BitTorrent va rămâne deconectat.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va șterge fișierele descărcate în cazul în care FrostWire este dezinstalat.</string>
     <string name="protected_connection">Protejat printr-un VPN</string>
@@ -355,7 +354,6 @@
     <string name="or">sau</string>
     <string name="file_names">Numele fișierelor</string>
     <string name="no_data_check_internet_connection">Rețeaua nu este disponibilă, verificați conexiunea la Internet.</string>
-    <string name="use_pixabay">Utilizați Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Opriți însămânțarea tuturor transferurilor</string>
     <string name="seed_stop">Opriți însămânțarea</string>
     <string name="transfers_select_seeding">însămânțare</string>
@@ -409,7 +407,7 @@
     <string name="title_activity_transfer_detail">Detaliul transferului</string>
     <string name="piece_size_header">Dimensiune piesă:</string>
     <string name="add_tracker">Adaugă tracker</string>
-    <string name="play_store_out_of_sync">Magazinul Google Play trebuie sincronizat, așteptați câteva minute</string>
     <string name="contact_us">Contacteaza-ne</string>
     <string name="use_nyaa">Utilizați Nyaa</string>
+    <string name="use_torrentz2">Utilizați Torrentz2</string>
 </resources>

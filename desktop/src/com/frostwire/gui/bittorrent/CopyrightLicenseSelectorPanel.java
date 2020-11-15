@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,39 +31,32 @@ import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class CopyrightLicenseSelectorPanel extends JPanel {
-
+class CopyrightLicenseSelectorPanel extends JPanel {
     private static final String CREATIVE_COMMONS_CARD_NAME = I18n.tr("Creative Commons");
     private static final String OPEN_SOURCE_CARD_NAME = I18n.tr("Open Source");
     private static final String PUBLIC_DOMAIN_CARD_NAME = I18n.tr("Public Domain");
-
     private final JCheckBox confirmRightfulUseOfLicense;
-
     private final JLabel authorsNameLabel;
     private final LimeTextField authorsName;
     private final JLabel titleLabel;
     private final LimeTextField title;
     private final JLabel attributionUrlLabel;
     private final LimeTextField attributionUrl;
-    
     private final JPanel licenseTypesCardLayoutContainer;
     private final JRadioButton licenseTypeCC;
     private final JRadioButton licenseTypeOpenSource;
     private final JRadioButton licenseTypePublicDomain;
-
     //CC License modifiers.
     private final LicenseToggleButton ccButton;
     private final LicenseToggleButton byButton;
     private final LicenseToggleButton ncButton;
     private final LicenseToggleButton ndButton;
     private final LicenseToggleButton saButton;
-    
     //OpenSource License buttons
     private final LicenseToggleButton apacheButton;
     private final LicenseToggleButton bsd2ClauseButton;
@@ -75,41 +68,32 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     private final LicenseToggleButton cddlButton;
     private final LicenseToggleButton eclipseButton;
     private final List<LicenseToggleButton> openSourceLicenseButtons;
-    
     //Public Domain License Buttons
     private final LicenseToggleButton cc0Button;
     private final LicenseToggleButton publicDomainButton;
-
     private final JButton pickedLicenseLabel;
     private CopyrightLicenseBroker licenseBroker;
 
-    public CopyrightLicenseSelectorPanel() {
+    CopyrightLicenseSelectorPanel() {
         setLayout(new MigLayout("fill"));
         GUIUtils.setTitledBorderOnPanel(this, I18n.tr("Choose a Copyright License for this work"));
-
         confirmRightfulUseOfLicense = new JCheckBox("<html><strong>"
                 + I18n.tr("I am the Content Creator of this work or I have been granted the rights to share this content under the following license by the Content Creator(s).") + "</strong></html>");
-
         authorsNameLabel = new JLabel("<html>" + I18n.tr("Author's Name") + "</html>");
         authorsName = new LimeTextField();
         authorsName.setToolTipText(I18n.tr("The name of the creator or creators of this work."));
-
         titleLabel = new JLabel("<html>" + I18n.tr("Work's Title") + "</html>");
         title = new LimeTextField();
         title.setToolTipText(I18n.tr("The name of this work, i.e. the titleLabel of a music album, the titleLabel of a book, the titleLabel of a movie, etc."));
         title.setPrompt(I18n.tr("album name, movie title, book title, game title."));
-        
         attributionUrlLabel = new JLabel("<html>" + I18n.tr("Attribution URL") + "</html>");
         attributionUrl = new LimeTextField();
         attributionUrl.setToolTipText(I18n.tr("The Content Creator's website to give attribution about this work if shared by others."));
         attributionUrl.setPrompt("http://www.contentcreator.com/website/here");
-
         licenseTypesCardLayoutContainer = new JPanel(new CardLayout());
-        
         licenseTypeCC = new JRadioButton(I18n.tr(CREATIVE_COMMONS_CARD_NAME));
         licenseTypeOpenSource = new JRadioButton(I18n.tr(OPEN_SOURCE_CARD_NAME));
         licenseTypePublicDomain = new JRadioButton(I18n.tr(PUBLIC_DOMAIN_CARD_NAME));
-        
         ccButton = new LicenseToggleButton(
                 LicenseToggleButton.LicenseIcon.CC,
                 CREATIVE_COMMONS_CARD_NAME,
@@ -122,8 +106,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
                 I18n.tr("<strong>No remixing allowed.</strong><br>You let others copy, distribute, display, and perform only verbatim copies of your work, not derivative works based upon it."), false, true);
         saButton = new LicenseToggleButton(LicenseIcon.SA, "Share-Alike",
                 I18n.tr("You allow others to distribute derivative works only under a license identical to the license that governs your work."), true, true);
-
-        apacheButton = new LicenseToggleButton(LicenseIcon.APACHE,"Apache 2.0","Apache License 2.0",false,true);
+        apacheButton = new LicenseToggleButton(LicenseIcon.APACHE, "Apache 2.0", "Apache License 2.0", false, true);
         bsd2ClauseButton = new LicenseToggleButton(LicenseIcon.BSD, "BSD 2-Clause", "BSD 2-Clause \"Simplified\" or \"FreeBSD\" license.", false, true);
         bsd3ClauseButton = new LicenseToggleButton(LicenseIcon.BSD, "BSD 3-Clause", "BSD 3-Clause \"New\" or \"Revised\" license.", false, true);
         gpl3Button = new LicenseToggleButton(LicenseIcon.GPL3, "GPLv3", "GNU General Public License (GPL) version 3", false, true);
@@ -132,25 +115,21 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         mitButton = new LicenseToggleButton(LicenseIcon.OPENSOURCE, "MIT", "MIT license", false, true);
         cddlButton = new LicenseToggleButton(LicenseIcon.OPENSOURCE, "CDDL-1.0", "Common Development and Distribution License (CDDL-1.0)", false, true);
         eclipseButton = new LicenseToggleButton(LicenseIcon.OPENSOURCE, "EPL-1.0", "Eclipse Public License, Vesion 1.0 (EPL-1.0)", false, true);
-
         openSourceLicenseButtons = new LinkedList<>();
         initOpenSourceButtonList();
-        
-        publicDomainButton = new LicenseToggleButton(LicenseIcon.PUBLICDOMAIN, "Public Domain Mark 1.0", I18n.tr("This work has been identified as being free of known restrictions under copyright law, including all related and neighboring rights."),true,true);
+        publicDomainButton = new LicenseToggleButton(LicenseIcon.PUBLICDOMAIN, "Public Domain Mark 1.0", I18n.tr("This work has been identified as being free of known restrictions under copyright law, including all related and neighboring rights."), true, true);
         cc0Button = new LicenseToggleButton(LicenseIcon.CC0, "CC0 1.0", I18n.tr("The person who associated a work with this deed has dedicated the work to the public domain by waiving all of his or her rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law."), false, true);
-        
         pickedLicenseLabel = new JButton();
-        
         initListeners();
         initComponents();
     }
-    
-    public boolean hasConfirmedRightfulUseOfLicense() {
-        return confirmRightfulUseOfLicense.isSelected();
+
+    CopyrightLicenseBroker getLicenseBroker() {
+        return licenseBroker;
     }
 
-    public CopyrightLicenseBroker getLicenseBroker() {
-        return licenseBroker;
+    boolean hasConfirmedRightfulUseOfLicense() {
+        return confirmRightfulUseOfLicense.isSelected();
     }
 
     private void initOpenSourceButtonList() {
@@ -175,7 +154,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
             updatePickedLicenseLabel();
         }
     }
-    
+
     private void onOpenSourceButtonToggled(LicenseToggleButton button) {
         for (LicenseToggleButton b : openSourceLicenseButtons) {
             if (b != button) {
@@ -185,7 +164,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         button.setSelected(true);
         updatePickedLicenseLabel();
     }
-    
+
     private void onPublicDomainButtonToggled(LicenseToggleButton button) {
         if (button == cc0Button) {
             publicDomainButton.setSelected(false);
@@ -206,18 +185,17 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         }
     }
 
-
     private void updateCreativeCommonsPickedLicenseLabel() {
         updateLicenseBrokerWithCreativeCommonsLicense();
         updateLicenseLabel();
     }
-    
+
     private void updateLicenseBroker(License license, CopyrightLicenseBroker.LicenseCategory category) {
         if (license != null) {
             licenseBroker = new CopyrightLicenseBroker(category,
                     license,
-                    title.getText(), 
-                    authorsName.getText(), 
+                    title.getText(),
+                    authorsName.getText(),
                     attributionUrl.getText());
         }
     }
@@ -232,17 +210,12 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
                     pickedLicenseLabel.removeActionListener(listener);
                 }
             }
-            pickedLicenseLabel.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    GUIMediator.openURL(licenseBroker.license.getUrl());
-                }
-            });
+            pickedLicenseLabel.addActionListener(e -> GUIMediator.openURL(licenseBroker.license.getUrl()));
         } else {
             pickedLicenseLabel.setText("");
         }
     }
-    
+
     private void updateOpenSourcePickedLicenseLabel() {
         licenseBroker = null;
         License license = null;
@@ -265,7 +238,6 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         } else if (eclipseButton.isSelected()) {
             license = Licenses.ECLIPSE;
         }
-        
         updateLicenseBroker(license, LicenseCategory.OpenSource);
         updateLicenseLabel();
     }
@@ -278,27 +250,19 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         } else if (cc0Button.isSelected()) {
             license = Licenses.PUBLIC_DOMAIN_CC0;
         }
-        
         updateLicenseBroker(license, LicenseCategory.PublicDomain);
         updateLicenseLabel();
     }
 
     private void updateLicenseBrokerWithCreativeCommonsLicense() {
         licenseBroker = null;
-
         if (hasConfirmedRightfulUseOfLicense() && licenseTypeCC.isSelected()) {
             licenseBroker = new CopyrightLicenseBroker(saButton.isSelected(), ncButton.isSelected(), ndButton.isSelected(), title.getText(), authorsName.getText(), attributionUrl.getText());
         }
     }
 
     private void initListeners() {
-        confirmRightfulUseOfLicense.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onConfirmRightfulUseOfLicenseAction();
-            }
-        });
-
+        confirmRightfulUseOfLicense.addActionListener(e -> onConfirmRightfulUseOfLicenseAction());
         initLicenseTypeRadioButtonsListener();
         initCreativeCommonsLicenseToggleListeners();
         initOpenSourceLicensesToggleListeners();
@@ -306,14 +270,7 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
     }
 
     private void initOpenSourceLicensesToggleListeners() {
-        LicenseToggleButtonOnToggleListener openSourceToggleListener = new LicenseToggleButtonOnToggleListener() {
-            
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onOpenSourceButtonToggled(button);
-            }
-        };
-        
+        LicenseToggleButtonOnToggleListener openSourceToggleListener = this::onOpenSourceButtonToggled;
         apacheButton.setOnToggleListener(openSourceToggleListener);
         bsd2ClauseButton.setOnToggleListener(openSourceToggleListener);
         bsd3ClauseButton.setOnToggleListener(openSourceToggleListener);
@@ -323,42 +280,24 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         lgplButton.setOnToggleListener(openSourceToggleListener);
         mitButton.setOnToggleListener(openSourceToggleListener);
         mozillaButton.setOnToggleListener(openSourceToggleListener);
-        
         updatePickedLicenseLabel();
     }
 
     private void initCreativeCommonsLicenseToggleListeners() {
-        LicenseToggleButtonOnToggleListener ccToggleListener = new LicenseToggleButtonOnToggleListener() {
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onCreativeCommonsButtonToggled(button);                
-            }
-        };
-        
+        LicenseToggleButtonOnToggleListener ccToggleListener = this::onCreativeCommonsButtonToggled;
         ncButton.setOnToggleListener(ccToggleListener);
         ndButton.setOnToggleListener(ccToggleListener);
         saButton.setOnToggleListener(ccToggleListener);
     }
-    
+
     private void initPublicDomainToggleListeners() {
-        LicenseToggleButtonOnToggleListener pdToggleListener = new LicenseToggleButtonOnToggleListener() {
-            @Override
-            public void onButtonToggled(LicenseToggleButton button) {
-                onPublicDomainButtonToggled(button);                
-            }
-        };
+        LicenseToggleButtonOnToggleListener pdToggleListener = this::onPublicDomainButtonToggled;
         cc0Button.setOnToggleListener(pdToggleListener);
         publicDomainButton.setOnToggleListener(pdToggleListener);
     }
 
     private void initLicenseTypeRadioButtonsListener() {
-        ActionListener licenseTypeChangeListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onLicenseTypeChanged();
-            }
-        };
-
+        ActionListener licenseTypeChangeListener = e -> onLicenseTypeChanged();
         licenseTypeCC.addActionListener(licenseTypeChangeListener);
         licenseTypeOpenSource.addActionListener(licenseTypeChangeListener);
         licenseTypePublicDomain.addActionListener(licenseTypeChangeListener);
@@ -366,19 +305,16 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
 
     private void initComponents() {
         initCommonComponents();
-        
         initCreativeCommonsLicensePanel();
         initOpenSourceLicensesPanel();
         initPublicDomainLicensePanel();
-        
-        add(licenseTypesCardLayoutContainer,"aligny top, span 2, grow, pushy, gapbottom 5px, wrap");
-
+        add(licenseTypesCardLayoutContainer, "aligny top, span 2, grow, pushy, gapbottom 5px, wrap");
         pickedLicenseLabel.setHorizontalAlignment(SwingConstants.LEFT);
         pickedLicenseLabel.setBorderPainted(false);
         pickedLicenseLabel.setOpaque(false);
         pickedLicenseLabel.setContentAreaFilled(false);
         pickedLicenseLabel.setFocusPainted(false);
-        add(pickedLicenseLabel,"alignx center, growx, span 2, pushx");
+        add(pickedLicenseLabel, "alignx center, growx, span 2, pushx");
     }
 
     private void initCreativeCommonsLicensePanel() {
@@ -405,7 +341,6 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         licenseButtonsPanel.add(mozillaButton, "wmin 130px, aligny top, pushy, grow, gap 2 2 2 2");
         licenseButtonsPanel.add(cddlButton, "wmin 130px, aligny top, pushy, grow, gap 2 2 2 2");
         licenseButtonsPanel.add(eclipseButton, "wmin 130px, aligny top, pushy, grow, gap 2 2 2 2");
-
         JScrollPane scrollPane = new JScrollPane(licenseButtonsPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -416,40 +351,33 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         JPanel publicDomainLicensePanel = new JPanel(new MigLayout("fill, insets 0 0 0 0, alignx center"));
         JLabel label = new JLabel(I18n.tr("You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission."));
         label.setEnabled(false);
-        publicDomainLicensePanel.add(label,"gaptop 10px, aligny center, push, alignx center, span 2, wrap");
-        publicDomainLicensePanel.add(publicDomainButton,"wmin 400px, aligny top, push, grow, gap 2 2 2 2");
-        publicDomainLicensePanel.add(cc0Button,"wmin 400px, aligny top, push, grow, gap 2 2 2 2");
+        publicDomainLicensePanel.add(label, "gaptop 10px, aligny center, push, alignx center, span 2, wrap");
+        publicDomainLicensePanel.add(publicDomainButton, "wmin 400px, aligny top, push, grow, gap 2 2 2 2");
+        publicDomainLicensePanel.add(cc0Button, "wmin 400px, aligny top, push, grow, gap 2 2 2 2");
         licenseTypesCardLayoutContainer.add(publicDomainLicensePanel, PUBLIC_DOMAIN_CARD_NAME);
     }
 
     private void initCommonComponents() {
         confirmRightfulUseOfLicense.setSelected(false);
-
         add(confirmRightfulUseOfLicense, "growx, north, gapbottom 8, wrap");
         confirmRightfulUseOfLicense.setSelected(false);
         onConfirmRightfulUseOfLicenseAction();
-
         add(authorsNameLabel, "gapbottom 5px, pushx, wmin 215px");
         add(titleLabel, "gapbottom 5px, wmin 215px, pushx, wrap");
-
         add(authorsName, "gapbottom 5px, growx 50, aligny top, pushy, wmin 215px, height 30px, span 1");
         add(title, "gapbottom 5px, growx 50, aligny top, pushy, wmin 215px, span 1, height 30px, wrap");
-
         JPanel attribPanel = new JPanel(new MigLayout("fillx, insets 0 0 0 0"));
         attribPanel.add(attributionUrlLabel, "width 110px!, alignx left");
         attribPanel.add(attributionUrl, "alignx left, growx, pushx");
         add(attribPanel, "aligny top, pushy, growx, gapbottom 10px, span 2, wrap");
-        
         JPanel licenseRadioButtonsContainer = new JPanel(new MigLayout("fillx, insets 0 0 0 0"));
         ButtonGroup group = new ButtonGroup();
         licenseTypeCC.setSelected(true);
         licenseTypeOpenSource.setSelected(false);
         licenseTypePublicDomain.setSelected(false);
-        
         licenseTypeCC.setEnabled(false);
         licenseTypeOpenSource.setEnabled(false);
         licenseTypePublicDomain.setEnabled(false);
-        
         group.add(licenseTypeCC);
         group.add(licenseTypeOpenSource);
         group.add(licenseTypePublicDomain);
@@ -457,9 +385,9 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         licenseRadioButtonsContainer.add(licenseTypeOpenSource);
         licenseRadioButtonsContainer.add(licenseTypePublicDomain);
         add(new JLabel(I18n.tr("License type:")));
-        add(licenseRadioButtonsContainer,"growx, span 2, wrap");
+        add(licenseRadioButtonsContainer, "growx, span 2, wrap");
     }
-    
+
     private void onLicenseTypeChanged() {
         if (confirmRightfulUseOfLicense.isSelected()) {
             System.out.println("onLicenseTypeChanged()");
@@ -477,38 +405,30 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
         }
     }
 
-    protected void onConfirmRightfulUseOfLicenseAction() {
+    private void onConfirmRightfulUseOfLicenseAction() {
         boolean rightfulUseConfirmed = hasConfirmedRightfulUseOfLicense();
-
         authorsNameLabel.setEnabled(rightfulUseConfirmed);
         authorsName.setEnabled(rightfulUseConfirmed);
         titleLabel.setEnabled(rightfulUseConfirmed);
         title.setEnabled(rightfulUseConfirmed);
         attributionUrlLabel.setEnabled(rightfulUseConfirmed);
         attributionUrl.setEnabled(rightfulUseConfirmed);
-
         ccButton.setSelected(rightfulUseConfirmed);
         byButton.setSelected(rightfulUseConfirmed);
         ncButton.setSelected(rightfulUseConfirmed);
-        
         ncButton.setToggleable(rightfulUseConfirmed);
         ndButton.setToggleable(rightfulUseConfirmed);
         saButton.setToggleable(rightfulUseConfirmed);
-        
         licenseTypeCC.setEnabled(rightfulUseConfirmed);
         licenseTypeOpenSource.setEnabled(rightfulUseConfirmed);
         licenseTypePublicDomain.setEnabled(rightfulUseConfirmed);
-
         licenseTypesCardLayoutContainer.setEnabled(rightfulUseConfirmed);
         updateOpenSourceLicensesToggleability(rightfulUseConfirmed);
-
         publicDomainButton.setSelected(rightfulUseConfirmed);
         cc0Button.setSelected(rightfulUseConfirmed);
         publicDomainButton.setToggleable(rightfulUseConfirmed);
         cc0Button.setToggleable(rightfulUseConfirmed);
-        
         pickedLicenseLabel.setVisible(rightfulUseConfirmed);
-        
         if (rightfulUseConfirmed) {
             //reset
             apacheButton.setSelected(true);
@@ -520,7 +440,6 @@ public class CopyrightLicenseSelectorPanel extends JPanel {
             saButton.setSelected(false);
             publicDomainButton.setSelected(false);
             cc0Button.setSelected(false);
-
             for (LicenseToggleButton licenseToggleButton : openSourceLicenseButtons) {
                 licenseToggleButton.setSelected(false);
             }

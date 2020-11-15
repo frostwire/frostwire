@@ -2,7 +2,7 @@
 <!--
 /*
  * Criado por Angel Leon (@gubatron), Alden Torres (aldenml)
- * Direitos Autorais (c) 2011-2016, FrostWire(R). Todos os direitos reservados.
+ * Direitos Autorais (c) 2011-2020, FrostWire(R). Todos os direitos reservados.
  *
  * Este programa é um software gratuito: você pode redistribui-lo e/ou modifica-lo
  * sob os termos de GNU General Public License como publicado por 
@@ -21,7 +21,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Divulgação: Apesar de recomendado para seus downloads, <b>você não precisa de uma VPN para usar FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Sua privacidade é um direito humano fundamental</b>. Uma conexão desprotegida significa que tudo que você faz online <b>buscas, mensagens e downloads</b>, pode ser monitorado e interceptado por qualquer pessoa em sua rede, por exemplo, provedores de serviços de Internet, hackers, governos.<br><br><b>Recomendamos ALTAMENTE o uso de um serviço VPN</b> especialmente ao baixar ou trocar informações confidenciais (por exemplo, bancos) e ao usar Wi-Fi público ou dados móveis. <br><br> Aqui estão algumas opções que fornecem um serviço confiável e funcionam bem com o FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Você está conectado à Internet usando uma VPN. <br><br> Se você ainda não estiver, recomendamos o uso de um dos serviços abaixo para criptografar sua conexão e <b>salvaguardar a sua privacidade</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configurações</string>
     <string name="exit">Sair</string>
     <string name="search_label">Pesquisar</string>
@@ -141,7 +140,7 @@
     <string name="my_filetype">Meu %s</string>
     <string name="use_soundcloud">"Usar Soundcloud.com"</string>
     <string name="torrent_scheme_download_not_supported">"O download não é suportado"</string>
-    <string name="retry_search">"Tentar novamente"</string>
+    <string name="retry">"Tentar novamente"</string>
     <string name="use_archiveorg">"Usat Archive.org</string>
     <string name="crawl_cache_size">Crawl Cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">"Excluír crawl cache"</string>
@@ -156,6 +155,9 @@
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
+    <string name="use_magnetdl">Use MagnetDL</string>
+    <string name="use_torrent_paradise">Use TorrentParadise</string>
+    <string name="use_glotorrents">Use GloTorrents</string>
     <string name="transfer_status_demuxing">Demuxeando</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vai deletar arquivos baixados se FrostWire é desinstalado.</string>
     <string name="use_eztv">Use Eztv</string>
@@ -355,7 +357,6 @@
     <string name="or">ou</string>
     <string name="file_names">Nomes do arquivo</string>
     <string name="no_data_check_internet_connection">Rede indisponível, verifique sua conexão com a Internet.</string>
-    <string name="use_pixabay">Usar Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Pare de semear todas as transferências</string>
     <string name="seed_stop">Pare de semear</string>
     <string name="transfers_select_seeding">semeadura</string>
@@ -407,7 +408,9 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire não pôde iniciar corretamente devido à falta de permissões. Por favor, conceda as permissões necessárias e reinicie o aplicativo</string>
     <string name="vpn_find_out_more">Descubra mais</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Julgamento gratuito de 7 dias</string>
-    <string name="play_store_out_of_sync">Play Store precisa sincronizar, espere alguns minutos</string>
     <string name="contact_us">Contate-nos</string>
+    <string name="community">Comunidade</string>
     <string name="use_nyaa">Usar Nyaa</string>
+    <string name="use_torrentz2">Usar Torrentz2</string>
+    <string name="free">Livre</string>
 </resources>

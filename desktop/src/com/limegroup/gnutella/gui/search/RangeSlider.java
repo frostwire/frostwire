@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,16 +22,12 @@ import com.frostwire.gui.theme.SkinRangeSliderUI;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class RangeSlider extends JSlider {
-
-    protected int thumbNum;
-
-    protected BoundedRangeModel[] sliderModels;
+    private int thumbNum;
+    private BoundedRangeModel[] sliderModels;
 
     public RangeSlider() {
         createThumbs(2);
@@ -70,7 +66,6 @@ public class RangeSlider extends JSlider {
             newValue = Math.max(getValueAt(0) + 1, newValue);
         }
         getModelAt(index).setValue(newValue);
-
         getModelAt(index).setRangeProperties(newValue, getExtent(), getMinimum(), getMaximum(), getValueIsAdjusting());
     }
 
@@ -80,17 +75,17 @@ public class RangeSlider extends JSlider {
     }
 
     @Override
-    public int getMaximum() {
-        return getModelAt(0).getMaximum();
-    }
-
-    @Override
     public void setMinimum(int minimum) {
         int oldMin = getModelAt(0).getMinimum();
         for (BoundedRangeModel model : sliderModels) {
             model.setMinimum(minimum);
         }
         firePropertyChange("minimum", Integer.valueOf(oldMin), Integer.valueOf(minimum));
+    }
+
+    @Override
+    public int getMaximum() {
+        return getModelAt(0).getMaximum();
     }
 
     @Override
@@ -121,7 +116,7 @@ public class RangeSlider extends JSlider {
         super.setUI(new SkinRangeSliderUI(this));
     }
 
-    protected void createThumbs(int n) {
+    private void createThumbs(int n) {
         thumbNum = n;
         sliderModels = new BoundedRangeModel[n];
         for (int i = 0; i < n; i++) {

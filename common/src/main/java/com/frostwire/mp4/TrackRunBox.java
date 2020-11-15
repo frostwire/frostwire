@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class TrackRunBox extends FullBox {
-
     protected int sample_count;
     protected int data_offset;
     protected int first_sample_flags;
@@ -62,10 +61,8 @@ public final class TrackRunBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         sample_count = buf.getInt();
-
         if ((flags & 0x1) == 0x1) { // data-offset-present
             IO.read(ch, 4, buf);
             data_offset = buf.getInt();
@@ -74,7 +71,6 @@ public final class TrackRunBox extends FullBox {
             IO.read(ch, 4, buf);
             first_sample_flags = buf.getInt();
         }
-
         entries = new Entry[sample_count];
         for (int i = 0; i < sample_count; i++) {
             Entry e = new Entry();
@@ -101,10 +97,8 @@ public final class TrackRunBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(sample_count);
         IO.write(ch, 4, buf);
-
         if ((flags & 0x1) == 0x1) { // data-offset-present
             buf.putInt(data_offset);
             IO.write(ch, 4, buf);
@@ -113,7 +107,6 @@ public final class TrackRunBox extends FullBox {
             buf.putInt(first_sample_flags);
             IO.write(ch, 4, buf);
         }
-
         for (int i = 0; i < sample_count; i++) {
             Entry e = entries[i];
             if ((flags & 0x100) == 0x100) { // sample-duration-present

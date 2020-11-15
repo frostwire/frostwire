@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
@@ -21,19 +20,16 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SoundcloudUISearchResult extends AbstractUISearchResult {
-
     private final SoundcloudSearchResult sr;
 
     SoundcloudUISearchResult(SoundcloudSearchResult sr, SearchEngine se, String query) {
@@ -43,16 +39,20 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
 
     @Override
     public void download(boolean partial) {
-        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-        GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr);
-        showSearchResultWebPage(false);
+        BackgroundExecutorService.schedule(() -> {
+            sr.getDownloadUrl();
+            GUIMediator.instance().safeInvokeLater(() -> {
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+                GUIMediator.instance().openSoundcloudTrackUrl(sr.getDetailsUrl(), sr, false);
+                showSearchResultWebPage(false);
+            });
+        });
     }
 
     @Override
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator rp) {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.SOUNDCLOUD_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 2);
-
         return popupMenu;
     }
 
@@ -64,17 +64,5 @@ public final class SoundcloudUISearchResult extends AbstractUISearchResult {
     @Override
     public int getSeeds() {
         return 200;
-    }
-
-    public String getThumbnailUrl() {
-        return sr.getThumbnailUrl();
-    }
-
-    public String getUsername() {
-        return sr.getUsername();
-    }
-
-    public String getDownloadUrl() {
-        return sr.getDownloadUrl();
     }
 }

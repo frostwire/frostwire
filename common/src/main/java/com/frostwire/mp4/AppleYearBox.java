@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 public final class AppleYearBox extends AppleUtf8Box {
-
     AppleYearBox() {
         super(Cday);
     }

@@ -20,30 +20,21 @@ package com.frostwire.gui.library;
 
 import com.limegroup.gnutella.gui.tables.HashBasedDataLineModel;
 
-import javax.swing.*;
 import java.io.File;
 
 /**
  * Library specific DataLineModel.
  * Uses HashBasedDataLineModel instead of BasicDataLineModel
  * for quicker access to row's based on the file.
- * 
+ *
  * @author gubatron
  * @author aldenml
  */
 final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTableDataLine, File> {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2859783399965055446L;
-
-    /**
-     * The table this model is used for.
-     * (Needed to make sure isCellEditable
-     *  is only true when a single thing is selected.)
-     */
-    //private JTable _table;
 
     LibraryFilesTableModel() {
         super(LibraryFilesTableDataLine.class);
@@ -54,14 +45,6 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      */
     public LibraryFilesTableDataLine createDataLine() {
         return new LibraryFilesTableDataLine(this);
-    }
-
-    /**
-     * Set the table this model is used for
-     * Needed for isCellEditable to work
-     */
-    void setTable(JTable table) {
-        //_table = table;
     }
 
     /**
@@ -103,9 +86,8 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
     /**
      * Returns the file object stored in the given row.
      *
-     * @param row  The row of the file
-     *
-     * @return  The <code>File</code> object stored at the specified row
+     * @param row The row of the file
+     * @return The <code>File</code> object stored at the specified row
      */
     File getFile(int row) {
         return get(row).getInitializeObject();
@@ -116,11 +98,9 @@ final class LibraryFilesTableModel extends HashBasedDataLineModel<LibraryFilesTa
      * is editable.
      *
      * @param row the row of the table to access
-     *
      * @param col the column of the table to access
-     *
      * @return <code>true</code> if the specified cell is editable,
-     *         <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public boolean isCellEditable(int row, int col) {
         return col == LibraryFilesTableDataLine.ACTIONS_IDX || /*col == LibraryFilesTableDataLine.SHARE_IDX || */ col == LibraryFilesTableDataLine.PAYMENT_OPTIONS_IDX;

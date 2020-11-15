@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.transfers;
@@ -22,19 +21,16 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.MediaStore;
 
-import com.frostwire.android.core.ConfigurationManager;
+import androidx.annotation.Nullable;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.NetworkManager;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
-import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -42,12 +38,10 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author gubatron
@@ -56,12 +50,13 @@ import java.util.Set;
 public final class UIBittorrentDownload implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(UIBittorrentDownload.class);
+    public static boolean SEQUENTIAL_DOWNLOADS = false;
 
     private final TransferManager manager;
     private final BTDownload dl;
 
     private String displayName;
-    private long size;
+    private double size;
     private List<TransferItem> items;
 
     private boolean noSpaceAvailableInCurrentMount;
@@ -69,7 +64,9 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     public UIBittorrentDownload(TransferManager manager, BTDownload dl) {
         this.manager = manager;
         this.dl = dl;
-        this.dl.setListener(new StatusListener());
+        if (dl.getListener() == null) {
+            this.dl.setListener(new UIBTDownloadListener());
+        }
 
         this.displayName = dl.getDisplayName();
         this.size = calculateSize(dl);
@@ -83,6 +80,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             noSpaceAvailableInCurrentMount = TransferManager.getCurrentMountAvailableBytes() < size;
         } catch (Throwable ignored) {
         }
+        checkSequentialDownload();
     }
 
     public BTDownload getDl() {
@@ -242,7 +240,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     @Override
     public int getProgress() {
         try {
-            checkSequentialDownload();
+            // TODO: Bring back with a setting
+            //checkSequentialDownload();
         } catch (Throwable e) {
             LOG.error("Error checking sequential download");
         }
@@ -251,7 +250,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -309,93 +308,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         displayName = dl.getDisplayName();
         size = calculateSize(dl);
         items = calculateItems(dl);
+        checkSequentialDownload();
     }
 
-    private class StatusListener implements BTDownloadListener {
-
-        @Override
-        public void finished(BTDownload dl) {
-            // this method will be called for all finished transfers even right after the app has been opened the first
-            // time, right after it's done resuming transfers
-
-            pauseSeedingIfNecessary(dl);
-            TransferManager.instance().incrementDownloadsToReview();
-            File savePath = getSavePath().getAbsoluteFile(); // e.g. "Torrent Data"
-            Engine engine = Engine.instance();
-            engine.notifyDownloadFinished(getDisplayName(), savePath, dl.getInfoHash());
-            File torrentSaveFolder = dl.getContentSavePath();
-            Platforms.fileSystem().scan(torrentSaveFolder);
-        }
-
-        private void pauseSeedingIfNecessary(BTDownload dl) {
-            ConfigurationManager CM = ConfigurationManager.instance();
-            boolean seedFinishedTorrents = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
-            boolean seedFinishedTorrentsOnWifiOnly = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
-            boolean isDataWIFIUp = NetworkManager.instance().isDataWIFIUp();
-            if (!seedFinishedTorrents || (!isDataWIFIUp && seedFinishedTorrentsOnWifiOnly)) {
-                dl.pause();
-            }
-        }
-
-        @Override
-        public void removed(BTDownload dl, Set<File> incompleteFiles) {
-            finalCleanup(incompleteFiles);
-        }
-    }
-
-    private void finalCleanup(Set<File> incompleteFiles) {
-        for (File f : incompleteFiles) {
-            try {
-                if (f.exists() && !f.delete()) {
-                    LOG.info("Can't delete file: " + f);
-                }
-            } catch (Throwable e) {
-                LOG.info("Can't delete file: " + f);
-            }
-        }
-
-        deleteEmptyDirectoryRecursive(dl.getSavePath());
-    }
-
-    private static boolean deleteEmptyDirectoryRecursive(File directory) {
-        // make sure we only delete canonical children of the parent file we
-        // wish to delete. I have a hunch this might be an issue on OSX and
-        // Linux under certain circumstances.
-        // If anyone can test whether this really happens (possibly related to
-        // symlinks), I would much appreciate it.
-        String canonicalParent;
-        try {
-            canonicalParent = directory.getCanonicalPath();
-        } catch (IOException ioe) {
-            return false;
-        }
-
-        if (!directory.isDirectory()) {
-            return false;
-        }
-
-        boolean canDelete = true;
-
-        File[] files = directory.listFiles();
-        if (files != null && files.length > 0) {
-            for (File file : files) {
-                try {
-                    if (!file.getCanonicalPath().startsWith(canonicalParent))
-                        continue;
-                } catch (IOException ioe) {
-                    canDelete = false;
-                }
-                if (!deleteEmptyDirectoryRecursive(file)) {
-                    canDelete = false;
-                }
-            }
-        }
-
-        return canDelete && directory.delete();
-    }
-
-    private long calculateSize(BTDownload dl) {
-        long size = dl.getSize();
+    private double calculateSize(BTDownload dl) {
+        double size = dl.getSize();
 
         boolean partial = dl.isPartial();
         if (partial) {
@@ -428,34 +345,11 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         return l;
     }
 
-    private void checkSequentialDownload() {
-        BTDownloadItem item = getFirstBiggestItem();
-
-        if (item != null) {
-            long downloaded = item.getSequentialDownloaded();
-            long size = item.getSize();
-
-            if (size > 0) {
-
-                long percent = (100 * downloaded) / size;
-
-                if (percent > 30 || downloaded > 10 * 1024 * 1024) {
-                    if (dl.isSequentialDownload()) {
-                        dl.setSequentialDownload(false);
-                    }
-                } else {
-                    if (!dl.isSequentialDownload()) {
-                        dl.setSequentialDownload(true);
-                    }
-                }
-
-                //LOG.debug("Seq: " + dl.isSequentialDownload() + " Downloaded: " + downloaded);
-            }
-        } else {
-            if (dl.isSequentialDownload()) {
-                dl.setSequentialDownload(false);
-            }
-        }
+    /**
+     * Makes sure download follows the value of the global sequential downloads setting
+     */
+    public void checkSequentialDownload() {
+        dl.setSequentialDownload(SEQUENTIAL_DOWNLOADS);
     }
 
     private BTDownloadItem getFirstBiggestItem() {
@@ -475,5 +369,13 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         }
 
         return item;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object other) {
+        if (!(other instanceof UIBittorrentDownload)) {
+            return false;
+        }
+        return getInfoHash().equals(((UIBittorrentDownload) other).getInfoHash());
     }
 }

@@ -21,7 +21,7 @@ import com.frostwire.platform.VPNMonitor;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.Logger;
 import org.apache.commons.io.IOUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,19 +32,69 @@ import java.io.InputStreamReader;
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopVPNMonitor implements VPNMonitor {
-
+final class DesktopVPNMonitor implements VPNMonitor {
     private static final Logger LOG = Logger.getLogger(DesktopVPNMonitor.class);
-
     // PIA with kill switch after a restart adds 0.0.0.0 0.0.0.0 10.x.x.x.x 10.x.x.x.x NN as the first route
     // when VPN is active
-    private static Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
+    private static final Pattern PIA_KILL_SWITCH_ROUTE_PATTERN =
             Pattern.compile(".*?(0\\.0\\.0\\.0).*?(0\\.0\\.0\\.0).*?(10\\.\\d*\\.\\d*\\.\\d*).*(10\\.\\d*\\.\\d*\\.\\d*).*?(\\d\\d)");
-
     private boolean active;
 
     DesktopVPNMonitor() {
         this.active = false;
+    }
+
+    private static boolean isWindowsVPNActive() {
+        try {
+            String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
+            for (String line : output) {
+                if (line.contains("128.0.0.0") || piaVPNWithKillSwitchOn(line)) {
+                    return true;
+                }
+            }
+        } catch (Throwable e) {
+            LOG.error("Error detecting VPN", e);
+        }
+        return false;
+    }
+
+    private static String readProcessOutput(String command, String arguments) {
+        String result = "";
+        ProcessBuilder pb = new ProcessBuilder(command, arguments);
+        pb.redirectErrorStream(true);
+        try {
+            Process process = pb.start();
+            InputStream stdout = process.getInputStream();
+            final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
+            String line;
+            try {
+                StringBuilder sb = new StringBuilder();
+                while ((line = brstdout.readLine()) != null) {
+                    sb.append(line).append("\r\n");
+                }
+                result = sb.toString();
+            } catch (Throwable e) {
+                LOG.error("Error reading routing table command output", e);
+            } finally {
+                IOUtils.closeQuietly(brstdout);
+                IOUtils.closeQuietly(stdout);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error executing routing table command", e);
+        }
+        return result;
+    }
+
+    private static boolean piaVPNWithKillSwitchOn(String line) {
+        return PIA_KILL_SWITCH_ROUTE_PATTERN.matcher(line).matches();
+    }
+
+    private static String netstatCmd() {
+        String cmd = "netstat";
+        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
+            cmd = "/usr/sbin/netstat";
+        }
+        return cmd;
     }
 
     @Override
@@ -80,71 +130,15 @@ public final class DesktopVPNMonitor implements VPNMonitor {
         try {
             String[] output = readProcessOutput(netstatCmd(), "-nr").split("\r\n");
             for (String line : output) {
-                if (line.startsWith("0") && line.contains("tun")) {
+                boolean _0_0_0_0_tunnel_check = line.startsWith("0") && line.contains("tun");
+                boolean default_ipsec0_check = line.startsWith("default") && line.contains("ipsec");
+                if (_0_0_0_0_tunnel_check || default_ipsec0_check) {
                     return true;
                 }
             }
         } catch (Throwable e) {
             LOG.error("Error detecting VPN", e);
         }
-
         return false;
-    }
-
-    private static boolean isWindowsVPNActive() {
-        try {
-            String[] output = readProcessOutput("netstat", "-nr").split("\r\n");
-            for (String line : output) {
-                if (line.contains("128.0.0.0") || piaVPNWithKillSwitchOn(line)) {
-                    return true;
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("Error detecting VPN", e);
-        }
-
-        return false;
-    }
-
-    private static String readProcessOutput(String command, String arguments) {
-        String result = "";
-        ProcessBuilder pb = new ProcessBuilder(command, arguments);
-        pb.redirectErrorStream(true);
-        try {
-            Process process = pb.start();
-            InputStream stdout = process.getInputStream();
-            final BufferedReader brstdout = new BufferedReader(new InputStreamReader(stdout));
-            String line;
-
-            try {
-                StringBuilder sb = new StringBuilder();
-                while ((line = brstdout.readLine()) != null) {
-                    sb.append(line + "\r\n");
-                }
-
-                result = sb.toString();
-            } catch (Throwable e) {
-                LOG.error("Error reading routing table command output", e);
-            } finally {
-                IOUtils.closeQuietly(brstdout);
-                IOUtils.closeQuietly(stdout);
-            }
-
-        } catch (Throwable e) {
-            LOG.error("Error executing routing table command", e);
-        }
-        return result;
-    }
-
-    private static boolean piaVPNWithKillSwitchOn(String line) {
-        return PIA_KILL_SWITCH_ROUTE_PATTERN.matcher(line).matches();
-    }
-
-    private static String netstatCmd() {
-        String cmd = "netstat";
-        if (OSUtils.isMacOSX() && new File("/usr/sbin/netstat").exists()) {
-            cmd = "/usr/sbin/netstat";
-        }
-        return cmd;
     }
 }

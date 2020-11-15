@@ -32,6 +32,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.frostclick.Slide;
 
 import java.util.Iterator;
@@ -101,7 +102,7 @@ public class PromotionsView extends LinearLayout {
                 return;
             }
             PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) {
+            if ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || PlayStore.available()) && position == 0) {
                 promoAdapter.onSpecialOfferClick();
                 return;
             }

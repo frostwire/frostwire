@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Pemasangan anda selesai.</string>
     <string name="error_connection_timed_out">Ralat: sambungan tamat masa/gugur. Cuba lagi.</string>
     <string name="azureus_manager_item_seeding">Pembenihan</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Semua muat turun percuma</string>
     <string name="torrent_max_download_speed">Maksimum Muat turun Speed</string>
     <string name="torrent_max_peers">Negara setara maksimum</string>
@@ -74,7 +73,7 @@
     <string name="share">Kongsi</string>
     <string name="accept">Menerimanya</string>
     <string name="torrent_max_download_speed_summary">Maksimum Muat turun kelajuan (0 bermakna tidak terhad)</string>
-    <string name="retry_search">Cuba semula</string>
+    <string name="retry">Cuba semula</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fail tidak boleh diletakkan sebagai pilihan. BitTorrent akan kekal diputuskan.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan memadam fail yang dimuat turun jika FrostWire adalah pemasangan.</string>
     <string name="protected_connection">VPN yang dilindungi</string>
@@ -357,7 +356,6 @@
     <string name="or">atau</string>
     <string name="file_names">Nama fail</string>
     <string name="no_data_check_internet_connection">Rangkaian tidak tersedia, sila periksa sambungan Internet anda.</string>
-    <string name="use_pixabay">Gunakan Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Hentikan pembenihan semua pindahan</string>
     <string name="seed_stop">Hentikan penanaman</string>
     <string name="transfers_select_seeding">pembenihan</string>
@@ -371,8 +369,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire tidak dapat dimulakan dengan betul kerana kurang mendapat kebenaran. Sila berikan kebenaran yang diperlukan dan mulakan semula aplikasi</string>
     <string name="vpn_find_out_more">Ketahui lebih lanjut</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Percubaan 7 hari percuma</string>
-    <string name="play_store_out_of_sync">Gedung Google Play perlu disegerakkan, tunggu beberapa minit</string>
-
     <string name="uploaded">Dimuat naik</string>
     <string name="trackers">Penjejak</string>
     <string name="source_type">Sumber: %1$s</string>
@@ -413,4 +409,5 @@
     <string name="add_tracker">Tambah tracker</string>
     <string name="contact_us">Hubungi Kami</string>
     <string name="use_nyaa">Gunakan Nyaa</string>
+    <string name="use_torrentz2">Gunakan Torrentz2</string>
 </resources>

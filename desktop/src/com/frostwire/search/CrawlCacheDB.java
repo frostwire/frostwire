@@ -34,11 +34,14 @@ import java.io.IOException;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class CrawlCacheDB {
-
     private static final Logger LOG = Logger.getLogger(CrawlCacheDB.class);
+    private static final String DATABASE_NAME = "crawldb";
+    private static final int DATABASE_VERSION = 1;
+    private static final String TABLE_NAME = "CacheData";
+    private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
+    private final static CrawlCacheDB instance = new CrawlCacheDB();
 
     static {
         try {
@@ -48,69 +51,48 @@ public final class CrawlCacheDB {
         }
     }
 
-    private static final String DATABASE_NAME = "crawldb";
-
-    private static final int DATABASE_VERSION = 1;
-
-    private static final String TABLE_NAME = "CacheData";
-
-    private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
-
-    private final static CrawlCacheDB instance = new CrawlCacheDB();
-
     private DatabaseHelper databaseHelper;
-
-    public static CrawlCacheDB instance() {
-        return instance;
-    }
 
     private CrawlCacheDB() {
         databaseHelper = new DatabaseHelper(new Context());
     }
 
+    public static CrawlCacheDB instance() {
+        return instance;
+    }
+
     public Cursor query(String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-
         qb.setTables(TABLE_NAME);
-
         // If no sort order is specified use the default
         String orderBy;
-
         if (StringUtils.isEmpty(sortOrder)) {
             orderBy = DEFAULT_SORT_ORDER;
         } else {
             orderBy = sortOrder;
         }
-
         // Get the database and run the query
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
         return qb.query(db, projection, selection, selectionArgs, null, null, orderBy);
     }
 
     public long insert(ContentValues initialValues) {
         ContentValues values;
-
         if (initialValues != null) {
             values = new ContentValues(initialValues);
         } else {
             values = new ContentValues();
         }
-
         Long now = System.currentTimeMillis() / 1000;
-
         if (!values.containsKey(Columns.DATE_ADDED)) {
             values.put(Columns.DATE_ADDED, now);
         }
-
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         return db.insert(TABLE_NAME, "", values);
     }
 
     public int delete(String where, String[] whereArgs) {
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         return db.delete(TABLE_NAME, where, whereArgs);
     }
 
@@ -119,11 +101,9 @@ public final class CrawlCacheDB {
         db.execSQL("TRUNCATE TABLE " + TABLE_NAME);
     }
 
-
+    @SuppressWarnings("unused")
     public int update(ContentValues values, String where, String[] whereArgs) {
-
         SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
         return db.update(TABLE_NAME, values, where, whereArgs);
     }
 
@@ -132,24 +112,21 @@ public final class CrawlCacheDB {
     }
 
     public static final class Columns {
-
+        public static final String ID = "id";
+        public static final String DATA = "data";
+        static final String KEY = "key";
+        static final String DATE_ADDED = "dateAdded";
         private Columns() {
         }
-
-        public static final String ID = "id";
-        static final String KEY = "key";
-        public static final String DATA = "data";
-        static final String DATE_ADDED = "dateAdded";
     }
 
     /**
      * This class helps open, create, and upgrade the database file.
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
-
         // 4MB cache size and scan-resistant cache algorithm "Two Queue" (2Q) with second level soft reference
         DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION, "CACHE_SIZE=4096;CACHE_TYPE=SOFT_TQ");
+            super(context, DATABASE_NAME, DATABASE_VERSION, "CACHE_SIZE=4096;CACHE_TYPE=SOFT_TQ");
         }
 
         @Override
@@ -161,11 +138,8 @@ public final class CrawlCacheDB {
                     LOG.warn("Unable to delete old smart search database");
                 }
             }
-
             db.execSQL("SET IGNORECASE TRUE");
-
             db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + Columns.ID + " INTEGER IDENTITY," + Columns.KEY + " VARCHAR," + Columns.DATA + " BINARY," + Columns.DATE_ADDED + " BIGINT" + ");");
-
             db.execSQL("CREATE INDEX idx_" + TABLE_NAME + "_" + Columns.ID + " ON " + TABLE_NAME + " (" + Columns.ID + ")");
             db.execSQL("CREATE INDEX idx_" + TABLE_NAME + "_" + Columns.KEY + " ON " + TABLE_NAME + " (" + Columns.KEY + ")");
         }

@@ -25,7 +25,6 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author aldenml
  */
 final class YifyTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
-
     private final String detailsUrl;
 
     YifyTempSearchResult(String domainName, String itemId, String htmlFilename) {

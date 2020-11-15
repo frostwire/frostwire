@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class HintMediaHeaderBox extends FullBox {
-
     protected short maxPDUsize;
     protected short avgPDUsize;
     protected int maxbitrate;
@@ -39,7 +38,6 @@ public final class HintMediaHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 16, buf);
         maxPDUsize = buf.getShort();
         avgPDUsize = buf.getShort();
@@ -51,7 +49,6 @@ public final class HintMediaHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putShort(maxPDUsize);
         buf.putShort(avgPDUsize);
         buf.putInt(maxbitrate);

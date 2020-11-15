@@ -25,8 +25,6 @@ import com.limegroup.gnutella.gui.I18n;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -34,93 +32,74 @@ import java.io.File;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SendFileProgressDialog extends JDialog {
-    
     private static final Logger LOG = Logger.getLogger(SendFileProgressDialog.class);
-
-	private JProgressBar _progressBar;
-	private JButton _cancelButton;
-	
-    private Container _container;
-	private File _preselectedFile;
     private final TorrentMakerListener torrentMakerListener;
+    private JProgressBar _progressBar;
+    private Container _container;
+    private File _preselectedFile;
 
-	public SendFileProgressDialog(JFrame frame, File file) {
-		this(frame);
-		_preselectedFile = file;
-	}
+    public SendFileProgressDialog(JFrame frame, File file) {
+        this(frame);
+        _preselectedFile = file;
+    }
 
     public SendFileProgressDialog(JFrame frame) {
         super(frame);
-
         setupUI();
         setLocationRelativeTo(frame);
         torrentMakerListener = new TorrentMakerListener();
     }
 
-    protected void setupUI() {
+    private void setupUI() {
         setupWindow();
-        initProgressBar();      
+        initProgressBar();
         initCancelButton();
     }
 
-	private void setupWindow() {
-		String itemType = I18n.tr("Preparing selection");
-		setTitle(itemType+", "+I18n.tr("please wait..."));
-		
-		Dimension prefDimension = new Dimension(512, 100);
-        
-		setSize(prefDimension);
+    private void setupWindow() {
+        String itemType = I18n.tr("Preparing selection");
+        setTitle(itemType + ", " + I18n.tr("please wait..."));
+        Dimension prefDimension = new Dimension(512, 100);
+        setSize(prefDimension);
         setMinimumSize(prefDimension);
         setPreferredSize(prefDimension);
         setResizable(false);
-        
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
                 this_windowOpened();
             }
-            
+
             @Override
             public void windowClosing(WindowEvent e) {
             }
         });
-        
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         GUIUtils.addHideAction((JComponent) getContentPane());
-        
         _container = getContentPane();
         _container.setLayout(new GridBagLayout());
-	}
+    }
 
     private void initCancelButton() {
-		_cancelButton = new JButton(I18n.tr("Cancel"));
-		_cancelButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onCancelButton();
-			}
-		});
-
+        JButton _cancelButton = new JButton(I18n.tr("Cancel"));
+        _cancelButton.addActionListener(e -> onCancelButton());
         GridBagConstraints c;
         c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_END;
-        c.insets = new Insets(10,0,10,10);
-        _container.add(_cancelButton,c);
-	}
+        c.insets = new Insets(10, 0, 10, 10);
+        _container.add(_cancelButton, c);
+    }
 
-	protected void onCancelButton() {
-		dispose();
-	}
+    private void onCancelButton() {
+        dispose();
+    }
 
-	private void initProgressBar() {
-		_progressBar = new JProgressBar(0,100);
-		_progressBar.setStringPainted(true);
-
+    private void initProgressBar() {
+        _progressBar = new JProgressBar(0, 100);
+        _progressBar.setStringPainted(true);
         GridBagConstraints c;
         c = new GridBagConstraints();
         c.weightx = 1.0;
@@ -129,22 +108,18 @@ public class SendFileProgressDialog extends JDialog {
         c.insets = new Insets(10, 10, 10, 10);
         c.gridwidth = GridBagConstraints.RELATIVE;
         _container.add(_progressBar, c);
-	}
-
-	protected void this_windowOpened() {
-		if (_preselectedFile == null) {
-			chooseFile();
-        } else {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-                    onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile());
-				}}).start();
-		}
     }
 
-	public void chooseFile() {
-		JFileChooser fileChooser = new JFileChooser();
+    private void this_windowOpened() {
+        if (_preselectedFile == null) {
+            chooseFile();
+        } else {
+            new Thread(() -> onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile())).start();
+        }
+    }
+
+    private void chooseFile() {
+        JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setDialogTitle(I18n.tr("Select the content you want to send"));
@@ -152,18 +127,13 @@ public class SendFileProgressDialog extends JDialog {
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             final File selectedFile = fileChooser.getSelectedFile();
-            new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile());
-				}}).start();
+            new Thread(() -> onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile())).start();
         } else if (result == JFileChooser.CANCEL_OPTION) {
             onCancelButton();
         } else if (result == JFileChooser.ERROR_OPTION) {
             LOG.error("Error selecting the file");
         }
-	}
+    }
 
     private void onApprovedFileSelectionToSend(File absoluteFile) {
         TorrentUtil.makeTorrentAndDownload(absoluteFile, torrentMakerListener, true);
@@ -172,12 +142,7 @@ public class SendFileProgressDialog extends JDialog {
     private class TorrentMakerListener implements TorrentUtil.UITorrentMakerListener {
         @Override
         public void onCreateTorrentError(final error_code ec) {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    _progressBar.setString("Error: " + ec.message());
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> _progressBar.setString("Error: " + ec.message()));
         }
 
         @Override
@@ -187,12 +152,7 @@ public class SendFileProgressDialog extends JDialog {
 
         @Override
         public void onException() {
-            GUIMediator.safeInvokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    _progressBar.setString("There was an error. Make sure the file/folder is not empty.");
-                }
-            });
+            GUIMediator.safeInvokeLater(() -> _progressBar.setString("There was an error. Make sure the file/folder is not empty."));
         }
     }
 }

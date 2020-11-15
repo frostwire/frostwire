@@ -25,14 +25,11 @@ import com.limegroup.gnutella.gui.util.PopupUtils;
 import javax.swing.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class TorrentUISearchResult extends AbstractUISearchResult {
-
-    private TorrentSearchResult sr;
+    private final TorrentSearchResult sr;
 
     TorrentUISearchResult(TorrentSearchResult sr, SearchEngine se, String query) {
         super(sr, se, query);
@@ -60,7 +57,6 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_PARTIAL_FILES_STRING, resultPanel.DOWNLOAD_PARTIAL_FILES_LISTENER, popupMenu, lines.length == 1, 2);
         PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 3);
-
         return popupMenu;
     }
 

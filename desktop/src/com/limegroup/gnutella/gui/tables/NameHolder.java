@@ -21,15 +21,11 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.LocaleLabel.LocaleString;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public class NameHolder implements Comparable<NameHolder> {
-
     private final String displayName;
-
     private final LocaleString localeString;
 
     public NameHolder(String str) {

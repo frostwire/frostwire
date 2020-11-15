@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class MovieFragmentHeaderBox extends FullBox {
-
     protected int sequence_number;
 
     MovieFragmentHeaderBox() {
@@ -35,7 +34,6 @@ public final class MovieFragmentHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         sequence_number = buf.getInt();
     }
@@ -43,7 +41,6 @@ public final class MovieFragmentHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(sequence_number);
         IO.write(ch, 4, buf);
     }

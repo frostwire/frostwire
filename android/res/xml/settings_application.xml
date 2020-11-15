@@ -1,8 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,50 +16,12 @@
  * limitations under the License.
  */
 -->
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.v7.preference.PreferenceCategory
+<!-- see ApplicationPreferencesFragment -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
         android:key="frostwire.prefs.general"
         android:title="@string/general_settings">
-        <SwitchPreference
-            android:key="frostwire.prefs.internal.connect_disconnect"
-            android:summary="@string/bittorrent_network_summary"
-            android:title="@string/bittorrent"/>
-        <SwitchPreference
-            android:key="frostwire.prefs.network.use_wifi_only"
-            android:summary="@string/wifi_networks_only_summary"
-            android:title="@string/wifi_networks_only"/>
-        <SwitchPreference
-            android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
-            android:summary="@string/vpn_drop_protection_summary"
-            android:title="@string/vpn_drop_protection_title"/>
-        <com.frostwire.android.gui.views.preference.KitKatStoragePreference
-            android:key="frostwire.prefs.storage.path"
-            android:summary="@string/storage_preference_summary"
-            android:title="@string/storage_preference_title"/>
-        <android.support.v7.preference.Preference
-            android:key="frostwire.prefs.storage.path_asf"
-            android:summary="@string/storage_preference_summary"
-            android:title="@string/storage_preference_title">
-            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE"/>
-        </android.support.v7.preference.Preference>
-    </android.support.v7.preference.PreferenceCategory>
-
-    <android.support.v7.preference.PreferenceCategory android:title="@string/search_torrent_settings">
-        <android.support.v7.preference.Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
-            android:title="@string/search_header"/>
-        <android.support.v7.preference.Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
-            android:title="@string/torrent_preferences_header"/>
-    </android.support.v7.preference.PreferenceCategory>
-
-    <android.support.v7.preference.PreferenceCategory
-        android:key="frostwire.prefs.other_settings"
-        android:title="@string/other_settings">
-        <android.support.v7.preference.Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
-            android:title="@string/notification_other_header"/>
-        <android.support.v7.preference.Preference
+        <Preference
             android:key="frostwire.prefs.offers.buy_no_ads"
             android:layout="@layout/view_preference_buy_ads"
             android:summary="@string/remove_ads_description"
@@ -68,24 +29,71 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
-                android:targetPackage="com.frostwire.android"/>
-        </android.support.v7.preference.Preference>
-        <android.support.v7.preference.Preference android:title="@string/about">
+                android:targetPackage="com.frostwire.android" />
+        </Preference>
+        <SwitchPreference
+            android:key="frostwire.prefs.internal.connect_disconnect"
+            android:summary="@string/bittorrent_network_summary"
+            android:title="@string/bittorrent" />
+        <SwitchPreference
+            android:key="frostwire.prefs.network.use_wifi_only"
+            android:summary="@string/wifi_networks_only_summary"
+            android:title="@string/wifi_networks_only" />
+        <SwitchPreference
+            android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
+            android:summary="@string/vpn_drop_protection_summary"
+            android:title="@string/vpn_drop_protection_title" />
+        <com.frostwire.android.gui.views.preference.KitKatStoragePreference
+            android:key="frostwire.prefs.storage.path"
+            android:summary="@string/storage_preference_summary"
+            android:title="@string/storage_preference_title" />
+        <Preference
+            android:key="frostwire.prefs.storage.path_asf"
+            android:summary="@string/storage_preference_summary"
+            android:title="@string/storage_preference_title">
+            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/search_torrent_settings">
+        <Preference
+            android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
+            android:title="@string/search_header" />
+        <Preference
+            android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
+            android:title="@string/torrent_preferences_header" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="frostwire.prefs.community_buttons_category"
+        android:title="@string/community">
+        <com.frostwire.android.gui.views.preference.CommunityButtonsPreference
+            android:key="frostwire.prefs.community_buttons"
+            android:title="" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="frostwire.prefs.other_settings"
+        android:title="@string/other_settings">
+        <Preference
+            android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
+            android:title="@string/notification_other_header" />
+        <Preference android:title="@string/about">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
-                android:targetPackage="com.frostwire.android"/>
-        </android.support.v7.preference.Preference>
-        <!--<android.support.v7.preference.Preference android:title="@string/send_feedback">-->
+                android:targetPackage="com.frostwire.android" />
+        </Preference>
+        <!--<Preference android:title="@string/send_feedback">-->
         <!--<intent-->
         <!--android:action="android.intent.action.VIEW"-->
         <!--android:data="https://support.frostwire.com/hc/en-us/requests/new"/>-->
-        <!--</android.support.v7.preference.Preference>-->
+        <!--</Preference>-->
 
-        <!--<android.support.v7.preference.Preference android:title="@string/join_frostwire_chat">-->
+        <!--<Preference android:title="@string/join_frostwire_chat">-->
         <!--<intent-->
         <!--android:action="android.intent.action.VIEW"-->
         <!--android:data="http://www.frostwire.com/chat"/>-->
-        <!--</android.support.v7.preference.Preference>-->
-    </android.support.v7.preference.PreferenceCategory>
-</android.support.v7.preference.PreferenceScreen>
+        <!--</Preference>-->
+    </PreferenceCategory>
+</PreferenceScreen>

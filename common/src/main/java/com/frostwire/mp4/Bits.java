@@ -17,14 +17,13 @@
 
 package com.frostwire.mp4;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 final class Bits {
-
     private Bits() {
     }
 
@@ -53,22 +52,12 @@ final class Bits {
 
     public static String make4cc(int c) {
         byte[] code = new byte[]{int3(c), int2(c), int1(c), int0(c)};
-
-        try {
-            return new String(code, "ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return new String(code, StandardCharsets.ISO_8859_1);
     }
 
     public static int make4cc(String c) {
         byte[] code;
-        try {
-            code = c.getBytes("ISO-8859-1");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
+        code = c.getBytes(StandardCharsets.ISO_8859_1);
         return int32(code[0], code[1], code[2], code[3]);
     }
 
@@ -84,7 +73,6 @@ final class Bits {
         }
         return sb.toString();
     }
-
 
     public static byte[] iso639(String s) {
         byte[] arr = Utf8.convert(s);

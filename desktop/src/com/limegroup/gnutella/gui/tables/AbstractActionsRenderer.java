@@ -29,7 +29,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
 /**
  * @author gubatron
  * @author aldenml
@@ -42,11 +41,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private final static AlphaIcon download_transparent;
     private static final ImageIcon share_solid;
 
-    private JLabel labelPlay;
-    private JLabel labelDownload;
-    private boolean showSolid;
-    protected AbstractActionsHolder actionsHolder;
-
     static {
         play_solid = GUIMediator.getThemeImage("search_result_play_over");
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
@@ -55,7 +49,12 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
         share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
     }
 
-    public AbstractActionsRenderer() {
+    protected AbstractActionsHolder actionsHolder;
+    private JLabel labelPlay;
+    private JLabel labelDownload;
+    private boolean showSolid;
+
+    protected AbstractActionsRenderer() {
         setupUI();
     }
 
@@ -66,10 +65,8 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
         actionsHolder = (AbstractActionsHolder) dataHolder;
-
         showSolid = mouseIsOverRow(table, row);
         updatePlayButton();
-
         labelPlay.setVisible(actionsHolder.isPlayable());
         labelDownload.setIcon(showSolid ? download_solid : download_transparent);
         labelDownload.setVisible(actionsHolder.isDownloadable());
@@ -78,7 +75,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private void setupUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints c;
-
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
         labelPlay.addMouseListener(new MouseAdapter() {
@@ -91,7 +87,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPlay, c);
-
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
         labelDownload.addMouseListener(new MouseAdapter() {
@@ -104,7 +99,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
-
         JLabel labelShare = new JLabel(share_solid);
         labelShare.setToolTipText(I18n.tr("SHARE the download-url or magnet-url of this file with a friend"));
         labelShare.addMouseListener(new MouseAdapter() {
@@ -117,7 +111,6 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelShare, c);
-
         setEnabled(true);
     }
 

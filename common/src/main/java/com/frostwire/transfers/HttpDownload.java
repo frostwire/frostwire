@@ -23,7 +23,6 @@ package com.frostwire.transfers;
  * @author aldenml
  */
 public class HttpDownload extends BaseHttpDownload {
-
     public HttpDownload(Info info) {
         super(info);
     }
@@ -35,5 +34,9 @@ public class HttpDownload extends BaseHttpDownload {
     @Override
     protected void onFinishing() {
         moveAndComplete(tempPath, savePath);
+    }
+
+    public String getDownloadUrl() {
+        return info.url();
     }
 }

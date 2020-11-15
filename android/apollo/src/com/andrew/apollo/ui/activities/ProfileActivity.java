@@ -20,10 +20,13 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,6 +35,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.andrew.apollo.Config;
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.FragmentMenuItems;
@@ -51,8 +55,16 @@ import com.andrew.apollo.utils.SortOrder;
 import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -463,6 +475,11 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         mViewPager.setCurrentItem(position);
     }
 
+
+    private static class SongListHolder {
+        long[] tracks;
+    }
+
     /**
      * Finishes the activity and overrides the default animation.
      */
@@ -470,17 +487,39 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
         // If an album profile, go up to the artist profile
         if (isAlbum()) {
             final Long artistId = mArguments.getLong(Config.ID);
-            long[] tracks = MusicUtils.getSongListForArtist(this, artistId);
-            NavUtils.openArtistProfile(this, mArtistName, tracks);
-        }
+            WeakReference<ProfileActivity> profileActivityRef = Ref.weak(this);
+            Future<SongListHolder> songListHolder = Engine.instance().getThreadPool().submit(() -> {
+                if (Ref.alive(profileActivityRef)) {
+                    long[] tracks = MusicUtils.getSongListForArtist(profileActivityRef.get(), artistId);
+                    SongListHolder slh = new SongListHolder();
+                    slh.tracks = tracks;
+                    Ref.free(profileActivityRef);
+                    return slh;
+                }
+                Ref.free(profileActivityRef);
+                return null;
+            });
 
-        Offers.showInterstitialOfferIfNecessary(
-                this,
-                Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                false,
-                false,
-                true);
-        finish();
+            SongListHolder tracksHolder = null;
+            try {
+                // can't wait for long closing a screen
+                tracksHolder = songListHolder.get(500, TimeUnit.MILLISECONDS);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            if (tracksHolder != null) {
+                NavUtils.openArtistProfile(this, mArtistName, tracksHolder.tracks);
+            }
+            finish();
+        }
+        else if (!MusicUtils.isPlaying()) {
+            Offers.showInterstitialOfferIfNecessary(
+                    this,
+                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
+                    false,
+                    true
+            );
+        }
     }
 
     /**

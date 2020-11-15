@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,19 +35,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.andrew.apollo.IApolloService;
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.StoragePicker;
@@ -92,7 +91,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 import static com.frostwire.android.util.Asyncs.async;
 
 /**
@@ -116,7 +114,6 @@ public class MainActivity extends AbstractActivity implements
     private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
     private final Stack<Integer> fragmentsStack;
     private final MainController controller;
-    private ServiceToken mToken;
     private NavigationMenu navigationMenu;
     private Fragment currentFragment;
     private SearchFragment search;
@@ -124,7 +121,7 @@ public class MainActivity extends AbstractActivity implements
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
     private final LocalBroadcastReceiver localBroadcastReceiver;
-    private TimerSubscription playerSubscription;
+    private static TimerSubscription playerSubscription;
 
     private boolean shuttingdown = false;
 
@@ -181,7 +178,7 @@ public class MainActivity extends AbstractActivity implements
                     this,
                     Offers.PLACEMENT_INTERSTITIAL_MAIN,
                     false,
-                    true,
+                    false,
                     true);
         }
     }
@@ -195,11 +192,11 @@ public class MainActivity extends AbstractActivity implements
             return;
         }
         shuttingdown = true;
+        SearchFragment.freeInstance();
         LocalSearchEngine.instance().cancelSearch();
-        //UXStats.instance().flush(true); // sends data and ends 3rd party APIs sessions.
+        MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
         Engine.instance().shutdown();
-        MusicUtils.requestMusicPlaybackServiceShutdown(this);
     }
 
     @Override
@@ -254,7 +251,15 @@ public class MainActivity extends AbstractActivity implements
         updateNavigationMenu();
         setupFragments();
         setupInitialFragment(savedInstanceState);
-        playerSubscription = TimerService.subscribe(((MiniPlayerView) findView(R.id.activity_main_player_notifier)).getRefresher(), 1);
+        MiniPlayerView miniPlayerView = findView(R.id.activity_main_player_notifier);
+        if (playerSubscription != null) {
+            if (playerSubscription.isSubscribed()) {
+                playerSubscription.unsubscribe();
+            }
+            TimerService.reSubscribe(miniPlayerView.getRefresher(), playerSubscription, MiniPlayerView.REFRESHER_INTERVAL_IN_SECS);
+        } else {
+            playerSubscription = TimerService.subscribe(miniPlayerView.getRefresher(), MiniPlayerView.REFRESHER_INTERVAL_IN_SECS);
+        }
         onNewIntent(getIntent());
         setupActionBar();
     }
@@ -305,6 +310,13 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_REQUEST_SHUTDOWN:
                     showShutdownDialog();
                     break;
+////// START OF PACKAGE INSTALLER LOGIC SECTION
+//    Leaving this code in case I find a solution later.
+//                case Constants.ACTION_PACKAGE_INSTALLED:
+//                    // see UIUtils.openAPK()
+//                    onPackageInstalledCallback(intent.getExtras());
+//                    break;
+////// END OF PACKAGE INSTALLER LOGIC SECTION
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -314,6 +326,46 @@ public class MainActivity extends AbstractActivity implements
             finish();
         }
     }
+
+////// START OF PACKAGE INSTALLER LOGIC SECTION
+//    Leaving this code in case I find a solution later.
+//    See the commented code in UIUtils.openAPK for details.
+//    private void onPackageInstalledCallback(Bundle extras) {
+//        int status = extras.getInt(PackageInstaller.EXTRA_STATUS);
+//        String message = extras.getString(PackageInstaller.EXTRA_STATUS_MESSAGE);
+//        switch (status) {
+//            case PackageInstaller.STATUS_PENDING_USER_ACTION:
+//                // This test app isn't privileged, so the user has to confirm the install.
+//                Intent confirmIntent = (Intent) extras.get(Intent.EXTRA_INTENT);
+//                //Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
+//                startActivity(confirmIntent); // <-- this call isn't really launching the screen to ask for permissions to install apks
+//                                              // setting <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> on AndroidManifest.xml doesn't work either
+//                break;
+//            case PackageInstaller.STATUS_SUCCESS:
+//                Engine.instance().stopServices(false);
+//                try {
+//                    MusicUtils.getMusicPlaybackService().stop();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+//                UIUtils.showToastMessage(this, "Install succeeded", Toast.LENGTH_SHORT);
+//                break;
+//            case PackageInstaller.STATUS_FAILURE:
+//            case PackageInstaller.STATUS_FAILURE_ABORTED:
+//            case PackageInstaller.STATUS_FAILURE_BLOCKED:
+//            case PackageInstaller.STATUS_FAILURE_CONFLICT:
+//            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
+//            case PackageInstaller.STATUS_FAILURE_INVALID:
+//            case PackageInstaller.STATUS_FAILURE_STORAGE:
+//                UIUtils.showToastMessage(this, "Install failed! " + status + ", " + message,
+//                        Toast.LENGTH_SHORT);
+//                break;
+//            default:
+//                UIUtils.showToastMessage(this, "Unrecognized status received from installer: " + status,
+//                        Toast.LENGTH_SHORT);
+//        }
+//    }
+////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private void openTorrentUrl(Intent intent) {
         try {
@@ -331,11 +383,11 @@ public class MainActivity extends AbstractActivity implements
                         uri.startsWith("http") ||
                         uri.startsWith("https") ||
                         uri.startsWith("magnet")) {
-                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                    TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                 } else if (uri.startsWith("content")) {
                     String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
                     if (newUri != null) {
-                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this));
+                        TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                     }
                 }
             } else {
@@ -366,7 +418,8 @@ public class MainActivity extends AbstractActivity implements
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            checkExternalStoragePermissionsOrBindMusicService();
+            //checkExternalStoragePermissionsOrBindMusicService();
+            checkExternalStoragePermissions();
         }
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
     }
@@ -403,7 +456,11 @@ public class MainActivity extends AbstractActivity implements
     private void registerMainBroadcastReceiver() {
         mainBroadcastReceiver = new MainBroadcastReceiver(this);
         IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-        registerReceiver(mainBroadcastReceiver, bf);
+        try {
+            registerReceiver(mainBroadcastReceiver, bf);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
@@ -428,7 +485,7 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
-        checkExternalStoragePermissionsOrBindMusicService();
+        checkExternalStoragePermissions();//OrBindMusicService();
         checkAccessCoarseLocationPermissions();
     }
 
@@ -442,13 +499,11 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkExternalStoragePermissionsOrBindMusicService() {
+    private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
-        } else if (mToken == null && checker != null && !checker.noAccess()) {
-            mToken = MusicUtils.bindToService(this, this);
         }
     }
 
@@ -470,10 +525,6 @@ public class MainActivity extends AbstractActivity implements
         }
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
-        }
-        if (mToken != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
         }
         // necessary unregisters broadcast its internal receivers, avoids leaks.
         Offers.destroyMopubInterstitials();
@@ -782,11 +833,11 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
+        //musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
+        //musicPlaybackService = null;
     }
 
     //@Override commented override since we are in API 16, but it will in API 23
@@ -795,7 +846,6 @@ public class MainActivity extends AbstractActivity implements
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        //Offers.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void performYTSearch(String ytUrl) {

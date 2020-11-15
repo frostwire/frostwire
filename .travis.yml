@@ -1,0 +1,28 @@
+matrix:
+  include:
+    - language: android
+      dist: xenial
+      android:
+        components:
+          - build-tools 29.0.3
+          - android-29
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - extra-android-m2repository
+      licenses:
+        - 'android-sdk-preview-license-52d11cd2'
+        - 'android-sdk-license-.+'
+        - 'google-gdk-license-.+'
+      script:
+        - yes | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;29.0.2"
+        - cd android
+        - pwd
+        - ./gradlew assembleDebug
+
+    - language: java
+      jdk:
+        - openjdk11
+      script:
+        - cd desktop
+        - gradle build
+

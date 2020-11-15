@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class CompactSampleSizeBox extends FullBox {
-
     protected final byte[] reserved;
     protected byte field_size;
     protected int sample_count;
@@ -39,7 +38,6 @@ public final class CompactSampleSizeBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 8, buf);
         buf.get(reserved);
         field_size = buf.get();
@@ -66,7 +64,6 @@ public final class CompactSampleSizeBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.put(reserved);
         buf.put(field_size);
         buf.putInt(sample_count);

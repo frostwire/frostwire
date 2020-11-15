@@ -24,21 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** 
- * A spam filter that removes certain "bad" keywords. 
+/**
+ * A spam filter that removes certain "bad" keywords.
  * If <i>any</i> words in a query are in the banned set, the
  * query is disallowed.
- * 
+ *
  * @author gubatron
  * @author aldenml
- * 
  */
 public class KeywordFilter implements SearchFilter {
+    /**
+     * INVARIANT: strings in ban contain only lowercase
+     */
+    private final List<String> ban = new ArrayList<>();
 
-    /** INVARIANT: strings in ban contain only lowercase */
-    private List<String> ban = new ArrayList<String>();
-
-    /** 
+    /**
      * @modifies this
      * @effects bans the given phrase.  Capitalization does not matter.
      */
@@ -49,7 +49,7 @@ public class KeywordFilter implements SearchFilter {
         }
     }
 
-    /** 
+    /**
      * @modifies this
      * @effects bans several well-known "adult" words.
      */
@@ -118,14 +118,13 @@ public class KeywordFilter implements SearchFilter {
         return !matches(m.getDisplayName());
     }
 
-    /** 
+    /**
      * Returns true if phrase matches any of the entries in ban.
      */
-    protected boolean matches(String phrase) {
+    private boolean matches(String phrase) {
         String canonical = phrase.toLowerCase(Locale.US);
-        for (int i = 0; i < ban.size(); i++) {
-            String badWord = ban.get(i);
-            if (canonical.indexOf(badWord) != -1)
+        for (String badWord : ban) {
+            if (canonical.contains(badWord))
                 return true;
         }
         return false;

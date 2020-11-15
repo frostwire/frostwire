@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,9 +32,7 @@ import java.util.List;
  * @author aldenml
  */
 public final class PerformersHelper {
-
     private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
-
     private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]{40})");
 
     private PerformersHelper() {
@@ -42,25 +40,20 @@ public final class PerformersHelper {
 
     public static List<? extends SearchResult> searchPageHelper(RegexSearchPerformer<?> performer, String page, int regexMaxResults) {
         List<SearchResult> result = new LinkedList<>();
-
         if (page == null) {
             LOG.warn(performer.getClass().getSimpleName() + " returning null page. Issue fetching page or issue getting page prefix/suffix offsets. Notify developers at contact@frostwire.com");
             return result;
         }
-
         SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(page));
-        int max = regexMaxResults;
         int i = 0;
         boolean matcherFound;
-
         do {
             try {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 matcherFound = false;
-                LOG.error(performer.getPattern().toString() + " has failed.\n" + t.getMessage(), t);
+                LOG.error("searchPageHelper(...): " + performer.getPattern().toString() + " has failed.\n" + t.getMessage(), t);
             }
-
             if (matcherFound) {
                 SearchResult sr = performer.fromMatcher(matcher);
                 if (sr != null) {
@@ -68,8 +61,7 @@ public final class PerformersHelper {
                     i++;
                 }
             }
-        } while (matcherFound && i < max && !performer.isStopped());
-
+        } while (matcherFound && i < regexMaxResults && !performer.isStopped());
         return result;
     }
 
@@ -78,11 +70,9 @@ public final class PerformersHelper {
      */
     public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
         List<TorrentCrawledSearchResult> list = new LinkedList<>();
-
         if (data == null) {
             return list;
         }
-
         TorrentInfo ti;
         try {
             ti = TorrentInfo.bdecode(data);
@@ -90,19 +80,15 @@ public final class PerformersHelper {
             //LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
             throw t;
         }
-
         int numFiles = ti.numFiles();
         FileStorage fs = ti.files();
-
         for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
             // TODO: Check for the hidden attribute
             if (fs.padFileAt(i)) {
                 continue;
             }
-
             list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.filePath(i), fs.fileSize(i)));
         }
-
         if (detectAlbums) {
             List<SearchResult> temp = new LinkedList<>();
             temp.addAll(list);
@@ -122,7 +108,7 @@ public final class PerformersHelper {
         final SearchMatcher matcher = SearchMatcher.from(MAGNET_HASH_PATTERN.matcher(url));
         try {
             if (matcher.find()) {
-                result = matcher.group(1);
+                result = matcher.group(1).toLowerCase();
             }
         } catch (Throwable t) {
             LOG.error("Could not parse magnet out of " + url, t);
@@ -131,18 +117,15 @@ public final class PerformersHelper {
     }
 
     public static String reduceHtml(String html, int prefixOffset, int suffixOffset) {
-        int preOffset = prefixOffset;
-        int sufOffset = suffixOffset;
-        if (preOffset == -1 || sufOffset == -1) {
+        if (prefixOffset == -1 || suffixOffset == -1) {
             html = null;
-        } else if ((preOffset > 0 || sufOffset < html.length())) {
-            if (preOffset > suffixOffset) {
+        } else if ((prefixOffset > 0 || suffixOffset < html.length())) {
+            if (prefixOffset > suffixOffset) {
                 LOG.warn("PerformersHelper.reduceHtml() Check your logic: prefixOffset:" + prefixOffset + " > suffixOffset:" + suffixOffset);
                 LOG.info(html);
                 return null;
             }
-
-            html = new String(html.substring(preOffset, sufOffset).toCharArray());
+            html = new String(html.substring(prefixOffset, suffixOffset).toCharArray());
         }
         return html;
     }

@@ -78,20 +78,13 @@ public:
 
 	// Methods to adjust the settings of Windows Firewall
 	bool Access();
-	bool FirewallEnabled(bool *enabled);
-	bool ExceptionsNotAllowed(bool *notallowed);
 	bool IsProgramListed(LPCTSTR path, bool *listed);
-	bool IsProgramEnabled(LPCTSTR path, bool *enabled);
 	bool AddProgram(LPCTSTR path, LPCTSTR name);
 	bool EnableProgram(LPCTSTR path);
 	bool RemoveProgram(LPCTSTR path);
 };
 
 // Functions in Firewall.cpp
-bool WindowsFirewallPresent();
-bool WindowsFirewallEnabled();
-bool WindowsFirewallExceptionsNotAllowed();
 bool WindowsFirewallIsProgramListed(LPCTSTR path);
-bool WindowsFirewallIsProgramEnabled(LPCTSTR path);
 bool WindowsFirewallAdd(LPCTSTR path, LPCTSTR name);
 bool WindowsFirewallRemove(LPCTSTR path);

@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Ваша установка завершена.</string>
     <string name="error_connection_timed_out">Помилка: тайм-аут підключення/впав. Спробуйте ще раз.</string>
     <string name="azureus_manager_item_seeding">посів</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Всі вільні скачування</string>
     <string name="torrent_max_download_speed">Максимальна швидкість скачування</string>
     <string name="torrent_max_peers">максимум Однолітки</string>
@@ -74,7 +73,7 @@
     <string name="share">ділитися</string>
     <string name="accept">Прийняти</string>
     <string name="torrent_max_download_speed_summary">Максимальна швидкість завантаження (0 означає необмежену)</string>
-    <string name="retry_search">Будь ласка, спробуйте</string>
+    <string name="retry">Будь ласка, спробуйте</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файл не може бути посіяні. BitTorrent залишатиметься відключений.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android буде стерти завантажені файли, якщо FrostWire видаляється.</string>
     <string name="protected_connection">VPN-захищений</string>
@@ -357,7 +356,6 @@
     <string name="or">Або</string>
     <string name="file_names">Імена файлів</string>
     <string name="no_data_check_internet_connection">Мережа недоступна, будь ласка, перевірте підключення доІнтернету.</string>
-    <string name="use_pixabay">користування Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Зупинити посіву всіх переказів</string>
     <string name="seed_stop">Зупинити посіву</string>
     <string name="transfers_select_seeding">посів</string>
@@ -409,7 +407,6 @@
     <string name="title_activity_transfer_detail">Переказ деталей</string>
     <string name="piece_size_header">Розмір шрифту:</string>
     <string name="add_tracker">Додати трекер</string>
-    <string name="play_store_out_of_sync">Google Play Маркет потрібно синхронізувати, зачекайте декілька хвилин</string>
     <string name="contact_us">Зв\'яжіться з нами</string>
     <string name="use_nyaa">користування Nyaa</string>
 </resources>

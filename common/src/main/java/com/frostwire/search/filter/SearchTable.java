@@ -28,17 +28,14 @@ import java.util.*;
  * @author aldenml
  */
 public final class SearchTable {
-
     private final long token;
     private final LinkedList<SearchResult> data;
-
     private final LinkedList<WeakReference<SearchView>> views;
     private final Object lock;
 
     public SearchTable(long token) {
         this.token = token;
         this.data = new LinkedList<>();
-
         this.views = new LinkedList<>();
         this.lock = new Object();
     }

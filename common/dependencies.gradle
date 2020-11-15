@@ -1,5 +1,5 @@
 dependencies {
-    compile 'com.google.re2j:re2j:1.2'
-    compile 'com.google.code.gson:gson:2.8.5'
-    compile 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.google.re2j:re2j:1.3'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.0'
 }

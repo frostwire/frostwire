@@ -25,8 +25,13 @@ import com.limegroup.gnutella.gui.tables.*;
 import javax.swing.*;
 
 public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMediator.IPFilterModel, IPFilterTableMediator.IPFilterDataLine, IPRange> {
-
     private static IPFilterTableMediator INSTANCE = null;
+
+    // AbstractTableMediator instances are meant to be singleton, otherwise issues with duplicate settings are raised upon the
+    // second instantiations.
+    private IPFilterTableMediator() {
+        super("IP_FILTER_TABLE_MEDIATOR_ID");
+    }
 
     public static IPFilterTableMediator getInstance() {
         if (INSTANCE == null) {
@@ -38,15 +43,8 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         return INSTANCE;
     }
 
-    // AbstractTableMediator instances are meant to be singleton, otherwise issues with duplicate settings are raised upon the
-    // second instantiations.
-    private IPFilterTableMediator() {
-        super("IP_FILTER_TABLE_MEDIATOR_ID");
-    }
-
     @Override
     protected void updateSplashScreen() {
-
     }
 
     @Override
@@ -64,23 +62,14 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
 
     @Override
     public void handleActionKey() {
-
     }
 
     @Override
     public void handleSelection(int row) {
-
     }
 
     @Override
     public void handleNoSelection() {
-
-    }
-
-    class IPFilterModel extends BasicDataLineModel<IPFilterDataLine, IPRange> {
-        IPFilterModel() {
-            super(IPFilterDataLine.class);
-        }
     }
 
     public static class IPFilterDataLine extends AbstractDataLine<IPRange> {
@@ -92,7 +81,7 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
                 new LimeTableColumn(START, "START", I18n.tr("Start"), 180, true, true, true, String.class),
                 new LimeTableColumn(END, "END", I18n.tr("End"), 180, true, true, true, String.class)};
 
-        public IPFilterDataLine() {
+        IPFilterDataLine() {
         }
 
         @Override
@@ -134,6 +123,11 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         public int getTypeAheadColumn() {
             return 0;
         }
+    }
 
+    class IPFilterModel extends BasicDataLineModel<IPFilterDataLine, IPRange> {
+        IPFilterModel() {
+            super(IPFilterDataLine.class);
+        }
     }
 }

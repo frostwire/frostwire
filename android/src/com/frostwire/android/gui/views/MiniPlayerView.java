@@ -35,6 +35,7 @@ import com.frostwire.android.core.FileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.util.TaskThrottle;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -48,6 +49,7 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public class MiniPlayerView extends LinearLayout {
 
+    public static final int REFRESHER_INTERVAL_IN_SECS = 1; // See MainActivity.initComponents(), that's where the subscription to the timer service happens
     private TextView titleText;
     private TextView artistText;
     private ImageView coverImage;
@@ -83,10 +85,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void initEventHandlers() {
-        OnClickListener goToAudioPlayerActivityListener = v -> {
-            openAudioPlayerActivity();
-            NavUtils.openAudioPlayer((Activity) getContext());
-        };
+        OnClickListener goToAudioPlayerActivityListener = v -> NavUtils.openAudioPlayer((Activity) getContext());
         coverImage.setOnClickListener(goToAudioPlayerActivityListener);
 
         LinearLayout statusContainer = findViewById(R.id.view_miniplayer_status_container);
@@ -107,7 +106,7 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     private void onPreviousClick() {
-        MusicUtils.previous(getContext());
+        MusicUtils.previous();
         refreshComponents();
     }
 
@@ -130,16 +129,19 @@ public class MiniPlayerView extends LinearLayout {
         if (mediaPlayer == null) {
             return;
         }
-        MusicUtils.playOrPause();
+        MusicUtils.playPauseOrResume();
         refreshComponents();
     }
 
     private void refreshComponents() {
         refreshPlayPauseIcon();
-        refreshAlbumCover();
     }
 
     private void refreshAlbumCover() {
+        if (!TaskThrottle.isReadyToSubmitTask("MiniPlayerView::refreshAlbumCover", 5000)) {
+            return;
+        }
+
         if (currentAlbumId != -1) {
             Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
             ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
@@ -159,6 +161,10 @@ public class MiniPlayerView extends LinearLayout {
     }
 
     public void refresherOnTime() {
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
+            // rest :)
+            return;
+        }
         async(this, MiniPlayerView::refreshOnTimerResultTask, MiniPlayerView::refreshOnTimerPostTask);
     }
 

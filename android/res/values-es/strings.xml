@@ -26,7 +26,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si aún no lo has hecho, te recomendamos que uses uno de estos servicios para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
 
     <!-- NON HTML TAGS -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Configuración</string>
     <string name="exit">Salir</string>
     <string name="search_label">Buscar</string>
@@ -148,7 +147,7 @@
     <string name="my_filetype">Mis %s</string>
     <string name="use_soundcloud">Usar Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Descarga no suportada</string>
-    <string name="retry_search">Reintentar</string>
+    <string name="retry">Reintentar</string>
     <string name="use_archiveorg">Usar Archive.org</string>
     <string name="crawl_cache_size">Arrastrar Cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">Borrar arrastre de cache</string>
@@ -158,7 +157,11 @@
     <string name="use_frostclick">Usa FrostClick.com</string>
     <string name="use_torlock">Usar TorLock</string>
     <string name="use_torrentdownloads">Usar TorrentDownloads</string>
+    <string name="use_torrentz2">Usar Torrentz2</string>
     <string name="use_limetorrents">Usar Limetorrents</string>
+    <string name="use_magnetdl">Usar MagnetDL</string>
+    <string name="use_torrent_paradise">Usar TorrentParadise</string>
+    <string name="use_glotorrents">Usar GloTorrents</string>
     <string name="use_nyaa">Usar Nyaa</string>
     <string name="use_eztv">Usar Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
@@ -177,6 +180,8 @@
     <string name="torrent_url_added">URL de Torrent añadida a las transferencias.</string>
     <string name="please_enter_valid_url">Por favor, ingresa una URL válida</string>
     <string name="use_yify">Usar Yify</string>
+    <string name="use_one337x">Usar 1337x</string>
+    <string name="use_idope">Usar Idope</string>
     <string name="torrent_transfer_consuming_mobile_data">Advertencia: Esta transferencia de torrent está usando tu data 3G/4G (Revisa tus preferencias de red si deseas usar BitTorrent solo con Wi-Fi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Reanudar todas las transferencias Torrent</string>
     <string name="cant_open_file_does_not_exist">No puedo abrir %1$s, el archivo no existe.</string>
@@ -361,7 +366,6 @@
     <string name="or">o</string>
     <string name="file_names">Nombres de archivo</string>
     <string name="no_data_check_internet_connection">Red no disponible, compruebe su conexión a Internet.</string>
-    <string name="use_pixabay">Usar Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Dejar de compartir todas las transferencias</string>
     <string name="seed_stop">Dejar de compartir</string>
     <string name="transfers_select_seeding">compartiendo</string>
@@ -412,6 +416,27 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire no pudo iniciarse correctamente por falta de permisos. Por favor ceda los permisos necesarios y reinicie la aplicación</string>
     <string name="vpn_find_out_more">Saber más</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Prueba gratuita de 7 días</string>
-    <string name="play_store_out_of_sync">Play Store necesita sincronizarse, espera unos minutos</string>
     <string name="contact_us">Contáctanos</string>
+    <string name="community">Comunidad</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d minutos restan sin publicidad</string>
+    <string name="minute_left_ad_free">Un minuto más sin publicidad</string>
+    <string name="reward_product_title">%d minutos</string>
+    <string name="reward_product_price">Gratis, Toca 1 Video Ad</string>
+    <string name="temporary_ad_removal">Sin Publicidad Temporal</string>
+    <string name="temporary_ad_removal_description">Sin publicidad por %d minutos tras tocar un video</string>
+    <string name="looking_For_rewarded_video">Buscando video con recompensa…</string>
+    <string name="no_reward_videos_available">No pude encontrar un video con recompensa. Intenta de nuevo</string>
+    <string name="free">Gratis</string>
+    <string name="one_second">1 segundo</string>
+    <string name="n_seconds">%s segundos</string>
+    <string name="one_minute">1 minuto</string>
+    <string name="n_minutes">%s minutos</string>
+    <string name="one_hour">1 hora</string>
+    <string name="n_hours">%s horas</string>
+    <string name="one_day">1 día</string>
+    <string name="n_days">%s días</string>
+    <string name="one_month">1 mes</string>
+    <string name="n_months">%s meses</string>
+    <string name="n_years">%s años</string>
 </resources>

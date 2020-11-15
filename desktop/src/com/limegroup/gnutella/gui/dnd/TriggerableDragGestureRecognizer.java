@@ -10,9 +10,8 @@ import java.awt.event.MouseEvent;
  * A simple DragGestureRecognizer that can be immediately triggered to start a drag.
  */
 public class TriggerableDragGestureRecognizer extends DragGestureRecognizer {
-    
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 514682570826668981L;
 
@@ -22,11 +21,11 @@ public class TriggerableDragGestureRecognizer extends DragGestureRecognizer {
 
     /**
      * Immediately starts a drag from the given component.
-     * 
-     * @param c The component to initiate the drag
-     * @param e The MouseEvent that sparked the drag.
+     *
+     * @param c          The component to initiate the drag
+     * @param e          The MouseEvent that sparked the drag.
      * @param srcActions The actions allowed from the source.
-     * @param action The action that began the drag.
+     * @param action     The action that began the drag.
      */
     void trigger(JComponent c, MouseEvent e, int srcActions, int action) {
         setComponent(c);
@@ -34,8 +33,10 @@ public class TriggerableDragGestureRecognizer extends DragGestureRecognizer {
         appendEvent(e);
         fireDragGestureRecognized(action, e.getPoint());
     }
-    
-    protected void registerListeners() {}
 
-    protected void unregisterListeners() {}
+    protected void registerListeners() {
+    }
+
+    protected void unregisterListeners() {
+    }
 }

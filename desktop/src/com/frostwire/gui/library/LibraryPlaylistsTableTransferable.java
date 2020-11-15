@@ -32,13 +32,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public final class LibraryPlaylistsTableTransferable implements Transferable {
-    static final DataFlavor ITEM_ARRAY          = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
+final class LibraryPlaylistsTableTransferable implements Transferable {
+    static final DataFlavor ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.Item Array");
     static final DataFlavor PLAYLIST_ITEM_ARRAY = new DataFlavor(LibraryPlaylistsTableTransferable.Item[].class, "LibraryPlaylistTransferable.PlaylistItemArray");
     private final List<LibraryPlaylistsTableTransferable.Item> items;
     private final int playlistID;
@@ -73,8 +71,7 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        List<DataFlavor> list = new ArrayList<>();
-        list.addAll(Arrays.asList(fileTransferable.getTransferDataFlavors()));
+        List<DataFlavor> list = new ArrayList<>(Arrays.asList(fileTransferable.getTransferDataFlavors()));
         list.add(ITEM_ARRAY);
         if (selectedIndexes != null) {
             list.add(PLAYLIST_ITEM_ARRAY);
@@ -103,9 +100,10 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
     }
 
     public static final class PlaylistItemContainer implements Serializable {
+        public final List<Item> items;
         final int playlistID;
         final int[] selectedIndexes;
-        public final List<Item> items;
+
         PlaylistItemContainer(int playlistID, int[] selectedIndexes, List<Item> items) {
             this.playlistID = playlistID;
             this.selectedIndexes = selectedIndexes;
@@ -114,14 +112,13 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
     }
 
     public static final class Item implements Serializable {
-        Item() {
-        }
         public int id;
         public String filePath;
         public String fileName;
         public long fileSize;
-        String fileExtension;
         public String trackTitle;
+        public boolean starred;
+        String fileExtension;
         float trackDurationInSecs;
         String trackArtist;
         String trackAlbum;
@@ -131,6 +128,8 @@ public final class LibraryPlaylistsTableTransferable implements Transferable {
         String trackGenre;
         String trackNumber;
         String trackYear;
-        public boolean starred;
+
+        Item() {
+        }
     }
 }

@@ -13,55 +13,46 @@ import com.limegroup.gnutella.gui.SizedTextField;
 import com.limegroup.gnutella.settings.URLHandlerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options
  * window that allows the user to select the
  * default image behavior.
  */
-public class ImageViewerPaneItem extends AbstractPaneItem { 
-    
-    public final static String TITLE = I18n.tr("Image Options");
-    
-    public final static String LABEL = I18n.tr("You can choose which image viewer to use.");
-
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Image Viewer");
-    
-    /** 
-     * Handle to the <tt>JTextField</tt> that displays the viewer name
-     */    
-    private JTextField _viewerField;
-    
+public class ImageViewerPaneItem extends AbstractPaneItem {
+    private final static String TITLE = I18n.tr("Image Options");
+    private final static String LABEL = I18n.tr("You can choose which image viewer to use.");
     /**
-	 * Creates new ImageViewerOptionsPaneItem
-	 * 
-	 * @param key the key for this <tt>AbstractPaneItem</tt> that the
-	 *        superclass uses to generate locale-specific keys
-	 */
-	public ImageViewerPaneItem() {
-	    super(TITLE, LABEL);
-	    
-		_viewerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _viewerField);
-		add(comp.getComponent());
-	}
-    
+     * Handle to the <tt>JTextField</tt> that displays the viewer name
+     */
+    private final JTextField _viewerField;
+
+    /**
+     * Creates new ImageViewerOptionsPaneItem
+     *
+     */
+    public ImageViewerPaneItem() {
+        super(TITLE, LABEL);
+        _viewerField = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          label on the component that allows to user to change the setting for
+          this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Image Viewer");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL, _viewerField);
+        add(comp.getComponent());
+    }
+
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
-     * @throws IOException if the options could not be fully applied
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         URLHandlerSettings.IMAGE_VIEWER.setValue(_viewerField.getText());
         return false;
     }
-    
+
     public boolean isDirty() {
         return !URLHandlerSettings.IMAGE_VIEWER.getValue().equals(_viewerField.getText());
     }
@@ -73,5 +64,4 @@ public class ImageViewerPaneItem extends AbstractPaneItem {
     public void initOptions() {
         _viewerField.setText(URLHandlerSettings.IMAGE_VIEWER.getValue());
     }
-    
 }

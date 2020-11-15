@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class MediaDataBox extends Box {
-
     MediaDataBox() {
         super(mdat);
     }

@@ -7,16 +7,14 @@ import javax.swing.*;
  * specified interval.
  */
 final class RefreshTimer {
-
     /**
      * The interval between statistics updates in milliseconds.
      */
     private static final int UPDATE_TIME = 1000;
-
     /**
      * variable for timer that updates the gui.
      */
-    private Timer timer;
+    private final Timer timer;
 
     /**
      * Creates the timer and the ActionListener associated with it.

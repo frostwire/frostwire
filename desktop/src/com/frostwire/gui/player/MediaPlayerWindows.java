@@ -21,31 +21,24 @@ package com.frostwire.gui.player;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class MediaPlayerWindows extends MediaPlayer {
+    private static String decode(String s) {
+        if (s == null) {
+            return "";
+        }
+        return (URLDecoder.decode(s, StandardCharsets.UTF_8));
+    }
 
     protected String getPlayerPath() {
         boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("desktop\\build\\libs");
         String playerPath = (isRelease) ? FrostWireUtils.getFrostWireJarPath() + File.separator + "fwplayer.exe" : "lib/native/fwplayer.exe";
         playerPath = decode(playerPath);
-
         if (!new File(playerPath).exists()) {
             playerPath = decode("lib/native/fwplayer.exe");
         }
-        
         return playerPath;
-	}
-	
-    private static String decode(String s) {
-        if (s == null) {
-            return "";
-        }
-        try {
-            return (URLDecoder.decode(s, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            return s;
-        }
     }
 }

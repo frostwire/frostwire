@@ -20,7 +20,10 @@ package com.frostwire.util;
 
 import org.apache.commons.io.FileUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -30,7 +33,6 @@ import java.util.zip.ZipInputStream;
  * @author aldenml
  */
 public final class ZipUtils {
-
     private static final Logger LOG = Logger.getLogger(ZipUtils.class);
 
     public static boolean unzip(File zipFile, File outputDir) {
@@ -39,70 +41,49 @@ public final class ZipUtils {
 
     public static boolean unzip(File zipFile, File outputDir, ZipListener listener) {
         boolean result = false;
-
         try {
-
             FileUtils.deleteDirectory(outputDir);
-
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-            try {
+            try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
                 unzipEntries(outputDir, zis, getItemCount(zipFile), System.currentTimeMillis(), listener);
-            } finally {
-                zis.close();
             }
-
             result = true;
-
         } catch (IOException e) {
             LOG.error("Unable to uncompress " + zipFile + " to " + outputDir, e);
             result = false;
         }
-
         return result;
     }
 
     private static void unzipEntries(File folder, ZipInputStream zis, int itemCount, long time, ZipListener listener) throws IOException {
         ZipEntry ze = null;
-
         int item = 0;
-
         while ((ze = zis.getNextEntry()) != null) {
             item++;
-
             String fileName = ze.getName();
             File newFile = new File(folder, fileName);
-
             LOG.debug("unzip: " + newFile.getAbsoluteFile());
-
             if (ze.isDirectory()) {
                 if (!newFile.mkdirs()) {
                     break;
                 }
                 continue;
             }
-
             if (listener != null) {
                 int progress = (item == itemCount) ? 100 : (int) (((double) (item * 100)) / (double) (itemCount));
                 listener.onUnzipping(fileName, progress);
             }
-
-            FileOutputStream fos = new FileOutputStream(newFile);
-
-            try {
+            try (FileOutputStream fos = new FileOutputStream(newFile)) {
                 int n;
                 byte[] buffer = new byte[1024];
                 while ((n = zis.read(buffer)) > 0) {
                     fos.write(buffer, 0, n);
-
                     if (listener != null && listener.isCanceled()) { // not the best way
                         throw new IOException("Uncompress operation cancelled");
                     }
                 }
             } finally {
-                fos.close();
                 zis.closeEntry();
             }
-
             newFile.setLastModified(time);
         }
     }

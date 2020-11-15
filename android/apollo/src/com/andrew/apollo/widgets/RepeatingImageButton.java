@@ -36,7 +36,7 @@ import com.frostwire.android.R;
  * as the button is pressed, otherwise functions like a typecal
  * {@link ImageButton}
  */
-public final class RepeatingImageButton extends ImageButton
+public final class RepeatingImageButton extends androidx.appcompat.widget.AppCompatImageButton
         implements OnClickListener {
 
     private static final long sInterval = 400;
@@ -70,7 +70,7 @@ public final class RepeatingImageButton extends ImageButton
     public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.action_button_previous:
-                MusicUtils.previous(getContext());
+                MusicUtils.previous();
                 break;
             case R.id.action_button_next:
                 MusicUtils.next();

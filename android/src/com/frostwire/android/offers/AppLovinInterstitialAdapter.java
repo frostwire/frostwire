@@ -28,6 +28,7 @@ import com.applovin.sdk.AppLovinAd;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -79,18 +80,9 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         if (ad != null && activity != null) {
             try {
                 final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activity), activity);
-
-                if (adDialog.isShowing()) {
-                    // this could happen because a previous ad failed to be properly dismissed
-                    // since the code is obfuscated there is no realistic possibility to detect where
-                    // the error is, then it needs to be discussed with the provider or change
-                    // our usage patter of the framework.
-                    LOG.warn("Review the applovin ad framework");
-                    adDialog.dismiss();
-                    return false;
-                }
                 adDialog.setAdDisplayListener(this);
-                adDialog.showAndRender(ad, placement);
+                adDialog.showAndRender(ad);
+
                 result = true;
             } catch (Throwable t) {
                 result = false;
@@ -122,7 +114,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
 
     @Override
     public void adHidden(AppLovinAd appLovinAd) {
-        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(appLovinAdNetwork, activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
+        Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
         reloadInterstitial(appLovinAd);
     }
 
@@ -131,7 +123,7 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
         if (!shutdownAfter && appLovinAd != null) {
             ad = null;
             if (Ref.alive(activityRef)) {
-                Offers.THREAD_POOL.execute(() -> {
+                Engine.instance().getThreadPool().execute(() -> {
                     if (appLovinAdNetwork.enabled() && appLovinAdNetwork.started()) {
                         try {
                             appLovinAdNetwork.loadNewInterstitial(activityRef.get());

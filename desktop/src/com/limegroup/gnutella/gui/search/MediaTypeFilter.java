@@ -21,21 +21,14 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.gui.filters.TableLineFilter;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 final class MediaTypeFilter implements TableLineFilter<SearchResultDataLine> {
-
     private final NamedMediaType nmt;
 
-    public MediaTypeFilter(NamedMediaType nmt) {
+    MediaTypeFilter(NamedMediaType nmt) {
         this.nmt = nmt;
-    }
-
-    public NamedMediaType getMediaType() {
-        return nmt;
     }
 
     @Override

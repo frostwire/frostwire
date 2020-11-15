@@ -32,7 +32,6 @@ public class TransferDetailTrackersTableMediator extends
 
     @Override
     protected void updateSplashScreen() {
-
     }
 
     @Override
@@ -50,17 +49,14 @@ public class TransferDetailTrackersTableMediator extends
 
     @Override
     public void handleActionKey() {
-
     }
 
     @Override
     public void handleSelection(int row) {
-
     }
 
     @Override
     public void handleNoSelection() {
-
     }
 }
 

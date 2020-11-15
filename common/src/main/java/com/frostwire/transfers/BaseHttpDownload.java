@@ -24,9 +24,9 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
-
 import org.apache.commons.io.FilenameUtils;
 
+import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,35 +40,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
-import javax.net.ssl.SSLException;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public abstract class BaseHttpDownload implements Transfer {
-
     private static final Logger LOG = Logger.getLogger(BaseHttpDownload.class);
-
     // is 20 concurrent downloads enough?
     private static final ExecutorService THREAD_POOL = ThreadPool.newThreadPool("HttpDownload", 20, true);
-
     protected final Info info;
-
     protected final File savePath;
     protected final File tempPath;
     protected final Date created;
-
     protected TransferState state;
     protected SpeedStat stat;
     protected boolean complete;
 
     protected BaseHttpDownload(Info info) {
         this.info = info;
-
         File saveDir = Platforms.data();
         File tempDir = Platforms.temp();
-
         FileSystem fs = Platforms.fileSystem();
         if (!fs.isDirectory(saveDir) && !fs.mkdirs(saveDir)) {
             complete(TransferState.ERROR_SAVE_DIR);
@@ -76,15 +67,60 @@ public abstract class BaseHttpDownload implements Transfer {
         if (!fs.isDirectory(tempDir) && !fs.mkdirs(tempDir)) {
             complete(TransferState.ERROR_TEMP_DIR);
         }
-
         String filename = cleanupFilename(info.filename());
         this.savePath = buildFile(fs, saveDir, filename);
         this.tempPath = buildFile(fs, tempDir, filename);
         this.created = new Date();
-
         this.stat = new SpeedStat();
         this.state = TransferState.WAITING;
         this.complete = false;
+    }
+
+    static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
+        URL u = new URL(url);
+        URLConnection con = u.openConnection();
+        con.setConnectTimeout(timeout);
+        con.setReadTimeout(timeout);
+        InputStream in = con.getInputStream();
+        try {
+            byte[] b = new byte[1024];
+            int n = 0;
+            while ((n = in.read(b, 0, b.length)) != -1) {
+                out.write(b, 0, n);
+            }
+        } finally {
+            try {
+                out.close();
+            } catch (Throwable e) {
+                // ignore
+            }
+            try {
+                in.close();
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
+    }
+
+    static File buildFile(FileSystem fs, File saveDir, String name) {
+        String baseName = FilenameUtils.getBaseName(name);
+        if (baseName.length() > 127) { // the goal is 255, but unsafe after 127 in some systems
+            baseName = baseName.substring(0, 127); // end index is exclusive
+        }
+        String ext = FilenameUtils.getExtension(name);
+        File f = new File(saveDir, baseName + "." + ext);
+        int i = 1;
+        while (fs.exists(f) && i < 30) {
+            f = new File(saveDir, baseName + " (" + i + ")." + ext);
+            i++;
+        }
+        return f;
+    }
+
+    static String cleanupFilename(String filename) {
+        filename = filename.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
+        // put here more replaces if necessary
+        return filename;
     }
 
     @Override
@@ -108,7 +144,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return info.size();
     }
 
@@ -172,11 +208,8 @@ public abstract class BaseHttpDownload implements Transfer {
         if (complete) {
             return;
         }
-
         complete(state = TransferState.CANCELED);
-
         FileSystem fs = Platforms.fileSystem();
-
         if (fs.delete(tempPath)) {
             LOG.warn("Error deleting temporary file: " + tempPath);
         }
@@ -191,14 +224,12 @@ public abstract class BaseHttpDownload implements Transfer {
         if (complete) {
             return;
         }
-
         THREAD_POOL.execute(new Thread(getDisplayName()) {
             public void run() {
                 try {
                     if (complete) {
                         return;
                     }
-
                     state = TransferState.DOWNLOADING;
                     HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
                     client.setListener(new DownloadListener());
@@ -228,14 +259,12 @@ public abstract class BaseHttpDownload implements Transfer {
         if (complete) {
             return;
         }
-
         state = TransferState.FINISHING;
         THREAD_POOL.execute(() -> {
             try {
                 if (complete) {
                     return;
                 }
-
                 onFinishing();
             } catch (Throwable e) {
                 error(e);
@@ -247,15 +276,12 @@ public abstract class BaseHttpDownload implements Transfer {
         if (state != TransferState.CANCELED) {
             complete(TransferState.ERROR);
             LOG.error("General error in download " + info, e);
-
             if (e.getMessage() != null && e.getMessage().contains("No space left on device")) {
                 complete(TransferState.ERROR_DISK_FULL);
             }
-
             if (e instanceof SSLException || e instanceof SocketTimeoutException) {
                 complete(TransferState.ERROR_CONNECTION_TIMED_OUT);
             }
-
             if (e instanceof UnknownHostException) {
                 complete(TransferState.ERROR_NO_INTERNET);
             }
@@ -265,15 +291,11 @@ public abstract class BaseHttpDownload implements Transfer {
     protected void moveAndComplete(File src, File dst) {
         FileSystem fs = Platforms.fileSystem();
         if (fs.copy(src, dst)) {
-
             if (!fs.delete(src)) {
                 LOG.warn("Error deleting source file while moving: " + src);
             }
-
             state = TransferState.SCANNING;
-
             fs.scan(dst);
-
             complete(TransferState.COMPLETE);
         } else {
             complete(TransferState.ERROR_MOVING_INCOMPLETE);
@@ -290,57 +312,42 @@ public abstract class BaseHttpDownload implements Transfer {
     protected void onComplete() {
     }
 
-    static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
-        URL u = new URL(url);
-        URLConnection con = u.openConnection();
-        con.setConnectTimeout(timeout);
-        con.setReadTimeout(timeout);
-        InputStream in = con.getInputStream();
-        try {
+    public static final class Info {
+        private final String url;
+        private final String filename;
+        private final String displayName;
+        private final double size;
 
-            byte[] b = new byte[1024];
-            int n = 0;
-            while ((n = in.read(b, 0, b.length)) != -1) {
-                out.write(b, 0, n);
-            }
-        } finally {
-            try {
-                out.close();
-            } catch (Throwable e) {
-                // ignore
-            }
-            try {
-                in.close();
-            } catch (Throwable e) {
-                // ignore
-            }
+        public Info(String url, String filename, String displayName, double size) {
+            this.url = url;
+            this.filename = filename;
+            this.displayName = displayName;
+            this.size = size;
         }
-    }
 
-    static File buildFile(FileSystem fs, File saveDir, String name) {
-        String baseName = FilenameUtils.getBaseName(name);
-        if (baseName.length() > 127) { // the goal is 255, but unsafe after 127 in some systems
-            baseName = baseName.substring(0,127); // end index is exclusive
+        public String url() {
+            return url;
         }
-        String ext = FilenameUtils.getExtension(name);
 
-        File f = new File(saveDir, baseName + "." + ext);
-        int i = 1;
-        while (fs.exists(f) && i < 30) {
-            f = new File(saveDir, baseName + " (" + i + ")." + ext);
-            i++;
+        public String filename() {
+            return filename;
         }
-        return f;
-    }
 
-    static String cleanupFilename(String filename) {
-        filename = filename.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
-        // put here more replaces if necessary
-        return filename;
+        public String displayName() {
+            return displayName;
+        }
+
+        public double size() {
+            return size;
+        }
+
+        @Override
+        public String toString() {
+            return "{BaseHttpDownload.Info@" + hashCode() + " url=" + url + " filename=" + filename + " displayname=" + displayName + " size=" + size + "}";
+        }
     }
 
     private final class DownloadListener extends HttpClient.HttpClientListenerAdapter {
-
         @Override
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
         }
@@ -367,42 +374,6 @@ public abstract class BaseHttpDownload implements Transfer {
             } catch (Throwable e) {
                 error(e);
             }
-        }
-    }
-
-    public static final class Info {
-
-        private final String url;
-        private final String filename;
-        private final String displayName;
-        private final long size;
-
-        public Info(String url, String filename, String displayName, long size) {
-            this.url = url;
-            this.filename = filename;
-            this.displayName = displayName;
-            this.size = size;
-        }
-
-        public String url() {
-            return url;
-        }
-
-        public String filename() {
-            return filename;
-        }
-
-        public String displayName() {
-            return displayName;
-        }
-
-        public long size() {
-            return size;
-        }
-
-        @Override
-        public String toString() {
-            return "{BaseHttpDownload.Info@" + hashCode() + " url=" + url + " filename=" + filename + " displayname=" + displayName + " size=" + size + "}";
         }
     }
 }

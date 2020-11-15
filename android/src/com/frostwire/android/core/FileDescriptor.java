@@ -140,7 +140,6 @@ public class FileDescriptor implements Cloneable {
         return this.id * 1000 + this.fileType;
     }
 
-    @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public FileDescriptor clone() {
         return new FileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);

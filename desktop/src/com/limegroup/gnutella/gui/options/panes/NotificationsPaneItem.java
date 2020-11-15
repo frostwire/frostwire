@@ -5,7 +5,6 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user
@@ -13,34 +12,30 @@ import java.io.IOException;
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class NotificationsPaneItem extends AbstractPaneItem {
+    private final static String TITLE = I18n.tr("Notifications");
+    private final static String LABEL = I18n.tr("FrostWire can display popups to notify you when certain things happen, such as a download completing.");
+    private final JCheckBox SHOW_NOTIFICATIONS_CHECK_BOX = new JCheckBox();
 
-  public final static String TITLE = I18n.tr("Notifications");
+    public NotificationsPaneItem() {
+        super(TITLE, LABEL);
+        String SHOW_NOTIFICATIONS_LABEL = I18n.tr("Show Notifications:");
+        LabeledComponent comp = new LabeledComponent(SHOW_NOTIFICATIONS_LABEL,
+                SHOW_NOTIFICATIONS_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+        add(comp.getComponent());
+    }
 
-  public final static String LABEL = I18n.tr("FrostWire can display popups to notify you when certain things happen, such as a download completing.");
+    @Override
+    public void initOptions() {
+        SHOW_NOTIFICATIONS_CHECK_BOX.setSelected(UISettings.SHOW_NOTIFICATIONS.getValue());
+    }
 
-  private final String SHOW_NOTIFICATIONS_LABEL =
-    I18n.tr("Show Notifications:");
+    public boolean applyOptions() {
+        UISettings.SHOW_NOTIFICATIONS.setValue(SHOW_NOTIFICATIONS_CHECK_BOX.isSelected());
+        return false;
+    }
 
-  private final JCheckBox SHOW_NOTIFICATIONS_CHECK_BOX = new JCheckBox();
-
-  public NotificationsPaneItem() {
-    super(TITLE, LABEL);
-
-    LabeledComponent comp = new LabeledComponent(SHOW_NOTIFICATIONS_LABEL,
-        SHOW_NOTIFICATIONS_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
-    add(comp.getComponent());
-  }
-
-  public void initOptions() {
-    SHOW_NOTIFICATIONS_CHECK_BOX.setSelected(UISettings.SHOW_NOTIFICATIONS.getValue());
-  }
-
-  public boolean applyOptions() throws IOException {
-    UISettings.SHOW_NOTIFICATIONS.setValue(SHOW_NOTIFICATIONS_CHECK_BOX.isSelected());
-    return false;
-  }
-
-  public boolean isDirty() {
-    return SHOW_NOTIFICATIONS_CHECK_BOX.isSelected() != UISettings.SHOW_NOTIFICATIONS.getValue();
-  }
+    @Override
+    public boolean isDirty() {
+        return SHOW_NOTIFICATIONS_CHECK_BOX.isSelected() != UISettings.SHOW_NOTIFICATIONS.getValue();
+    }
 }

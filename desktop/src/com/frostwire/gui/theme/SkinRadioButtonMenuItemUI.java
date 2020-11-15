@@ -19,26 +19,23 @@
 package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaMenuItemUI;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthRadioButtonMenuItemUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinRadioButtonMenuItemUI extends SynthRadioButtonMenuItemUI {
-
-	public static ComponentUI createUI(JComponent comp) {
-	    ThemeMediator.testComponentCreationThreadingViolation();
-		if (OSUtils.isMacOSX() && !(comp instanceof SkinRadioButtonMenuItem)) {
-			return AquaMenuItemUI.createUI(comp);
-		} else {
-			return new SkinRadioButtonMenuItemUI();
-		}
-	}
+    public static ComponentUI createUI(JComponent comp) {
+        ThemeMediator.testComponentCreationThreadingViolation();
+        if (OSUtils.isMacOSX() && !(comp instanceof SkinRadioButtonMenuItem)) {
+            return AquaMenuItemUI.createUI(comp);
+        } else {
+            return new SkinRadioButtonMenuItemUI();
+        }
+    }
 }

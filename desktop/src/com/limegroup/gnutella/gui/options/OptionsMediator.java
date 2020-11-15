@@ -27,53 +27,39 @@ import java.io.IOException;
 
 /**
  * This class acts as a mediator for the different components of the options
- * window.  This class maintains references to the 
+ * window.  This class maintains references to the
  * <tt>OptionsTreeManager</tt> and <tt>OptionsPaneManager</tt>, the two
  * primary classes that it delegates to.
  */
 public final class OptionsMediator {
-
     /**
      * Constant for the key for the root node in the tree.
      */
     final static String ROOT_NODE_KEY = "OPTIONS_ROOT_NODE";
-
     /**
      * Singleton constant for easy access to the options mediator.
      */
     private final static OptionsMediator INSTANCE = new OptionsMediator();
-
     /**
-     * Constant for the class that manages the current options pane 
-     * displayed to the user.  (It is fine to construct this here since 
+     * Constant for the class that manages the current options pane
+     * displayed to the user.  (It is fine to construct this here since
      * they do not reference this class.)
      */
     private static OptionsPaneManager _paneManager = null;
-
     /**
-     * Constant for the class that manages the current options tree 
-     * displayed to the user.  (It is fine to construct this here since 
+     * Constant for the class that manages the current options tree
+     * displayed to the user.  (It is fine to construct this here since
      * they do not reference this class.)
      */
     private static OptionsTreeManager _treeManager = null;
-
     /**
-     * Class that handles constructing all of the elements of the options 
+     * Class that handles constructing all of the elements of the options
      * windows.
      */
     private static OptionsConstructor _constructor = null;
 
-    /** 
-     * Singleton accessor for this class. 
-     *
-     * @return the <tt>OptionsMediator</tt> instance
-     */
-    public static synchronized OptionsMediator instance() {
-        return INSTANCE;
-    }
-
-    /** 
-     * Private constructor to ensure that this class cannot be constructed 
+    /**
+     * Private constructor to ensure that this class cannot be constructed
      * from another class.  The constructor does very little to alleviate
      * construction conflicts with classes that may use the mediator.
      */
@@ -82,23 +68,21 @@ public final class OptionsMediator {
     }
 
     /**
-     * Makes the options window either visible or not visible depending 
-     * on the boolean argument.
+     * Singleton accessor for this class.
      *
-     * @param visible <tt>boolean</tt> value specifying whether the 
-     *  options window should be made visible or not visible
+     * @return the <tt>OptionsMediator</tt> instance
      */
-    public final void setOptionsVisible(boolean visible) {
-        setOptionsVisible(visible, null);
+    public static synchronized OptionsMediator instance() {
+        return INSTANCE;
     }
 
     /**
-     * Makes the options window either visible or not visible depending 
+     * Makes the options window either visible or not visible depending
      * on the boolean argument.
      *
-     * @param visible <tt>boolean</tt> value specifying whether the 
-     *  options window should be made visible or not visible
-     * @param key the unique identifying key of the panel to show
+     * @param visible <tt>boolean</tt> value specifying whether the
+     *                options window should be made visible or not visible
+     * @param key     the unique identifying key of the panel to show
      */
     public final void setOptionsVisible(boolean visible, final String key) {
         if (_constructor == null) {
@@ -114,7 +98,6 @@ public final class OptionsMediator {
      * Basically the inverse operation to {@link #updateTheme()}.
      * <p>
      * Is called from OptionsConstructor when the dialog is disposed.
-     *
      */
     final void disposeOptions() {
         _constructor = null;
@@ -122,13 +105,26 @@ public final class OptionsMediator {
         _treeManager = null;
     }
 
-    /** Returns true if the Options Box is visible.
-     *  @return true if the Options Box is visible.
+    /**
+     * Returns true if the Options Box is visible.
+     *
+     * @return true if the Options Box is visible.
      */
     public final boolean isOptionsVisible() {
         if (_constructor == null)
             return false;
         return _constructor.isOptionsVisible();
+    }
+
+    /**
+     * Makes the options window either visible or not visible depending
+     * on the boolean argument.
+     *
+     * @param visible <tt>boolean</tt> value specifying whether the
+     *                options window should be made visible or not visible
+     */
+    public final void setOptionsVisible(boolean visible) {
+        setOptionsVisible(visible, null);
     }
 
     /**
@@ -138,18 +134,9 @@ public final class OptionsMediator {
      */
     public final void handleSelection(final OptionsTreeNode node) {
         _paneManager.show(node);
-
         if (_constructor.isOptionsVisible()) {
             ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.setValue(node.getTitleKey());
         }
-    }
-
-    /**
-     * Sets the Options selection to the given key.
-     */
-    public final void setSelection(final String key) {
-        //  set value in tree
-        _treeManager.setSelection(key);
     }
 
     /**

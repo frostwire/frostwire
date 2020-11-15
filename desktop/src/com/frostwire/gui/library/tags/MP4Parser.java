@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,121 +34,7 @@ import java.util.LinkedList;
  * @author aldenml
  */
 class MP4Parser extends AbstractTagParser {
-
     private static final Logger LOG = Logger.getLogger(MP4Parser.class);
-
-    public MP4Parser(File file) {
-        super(file);
-    }
-
-    @Override
-    public TagsData parse() {
-        TagsData data = null;
-
-        try {
-            RandomAccessFile iso = new RandomAccessFile(file, "r");
-            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
-
-            try {
-
-                int duration = getDuration(boxes);
-                String bitrate = getBitRate(boxes);
-
-                AppleItemListBox ilst = Box.findFirst(boxes, Box.ilst);
-
-                String title = getBoxValue(ilst, Box.Cnam);
-                String artist = getBoxValue(ilst, Box.CART);
-                String album = getBoxValue(ilst, Box.Calb);
-                String comment = getBoxValue(ilst, Box.Ccmt);
-                String genre = getGenre(ilst);
-                String track = ""; //getTrackNumberValue(ilst);
-                String year = "";// getBoxValue(ilst, AppleRecordingYear2Box.class);
-                String lyrics = "";
-
-                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
-
-            } finally {
-                IOUtils.closeQuietly(iso);
-            }
-
-        } catch (Exception e) {
-            LOG.warn("Unable to parse file using mp4parser: " + file);
-        }
-
-        return data;
-    }
-
-    @Override
-    public BufferedImage getArtwork() {
-        return getArtworkFromMP4(file);
-    }
-
-    static BufferedImage getArtworkFromMP4(File file) {
-        BufferedImage image = null;
-
-        try {
-            RandomAccessFile iso = new RandomAccessFile(file, "r");
-            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
-
-            try {
-
-                AppleCoverBox data = Box.findFirst(boxes, Box.covr);
-                if (data != null) {
-                    byte[] imageData = data.value();
-                    if (data.dataType() == 13) { // jpg
-                        image = imageFromData(imageData);
-                    } else if (data.dataType() == 14) { // png
-                        try {
-                            image = ImageIO.read(new ByteArrayInputStream(imageData, 0, imageData.length));
-                        } catch (IIOException e) {
-                            LOG.warn("Unable to decode png image from data tag");
-                        }
-                    }
-                }
-            } finally {
-                IOUtils.closeQuietly(iso);
-            }
-        } catch (Throwable e) {
-            //LOG.error("Unable to read cover art from mp4 file: " + file);
-        }
-
-        return image;
-    }
-
-    private int getDuration(LinkedList<Box> boxes) {
-        MovieHeaderBox mvhd = Box.findFirst(boxes, Box.mvhd);
-        return (int) (mvhd.duration() / mvhd.timescale());
-    }
-
-    private String getBitRate(LinkedList<Box> boxes) {
-        return ""; // TODO: deep research of atoms per codec
-    }
-
-    private <T extends AppleUtf8Box> String getBoxValue(AppleItemListBox ilst, int type) {
-        T b = ilst.findFirst(type);
-        return b != null ? b.value() : "";
-    }
-
-    private <T extends AppleIntegerBox> long getBoxLongValue(AppleItemListBox ilst, int type) {
-        AppleIntegerBox b = ilst.findFirst(type);
-        return b != null ? b.value() : -1;
-    }
-
-    private String getGenre(AppleItemListBox ilst) {
-        String value = null;
-
-        long valueId = getBoxLongValue(ilst, Box.gnre);
-
-        if (0 <= valueId && valueId < ID3_GENRES.length) {
-            value = ID3_GENRES[(int) valueId];
-        }
-
-        if (value == null || value.equals("")) {
-            value = getBoxValue(ilst, Box.Cgen);
-        }
-        return value;
-    }
-
     private static final String[] ID3_GENRES = {
             // ID3v1 Genres
             "Blues",
@@ -303,4 +189,96 @@ class MP4Parser extends AbstractTagParser {
             "Synthpop",
             // 148 and up don't seem to have been defined yet.
     };
+
+    MP4Parser(File file) {
+        super(file);
+    }
+
+    private static BufferedImage getArtworkFromMP4(File file) {
+        BufferedImage image = null;
+        try {
+            RandomAccessFile iso = new RandomAccessFile(file, "r");
+            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
+            try {
+                AppleCoverBox data = Box.findFirst(boxes, Box.covr);
+                if (data != null) {
+                    byte[] imageData = data.value();
+                    if (data.dataType() == 13) { // jpg
+                        image = imageFromData(imageData);
+                    } else if (data.dataType() == 14) { // png
+                        try {
+                            image = ImageIO.read(new ByteArrayInputStream(imageData, 0, imageData.length));
+                        } catch (IIOException e) {
+                            LOG.warn("Unable to decode png image from data tag");
+                        }
+                    }
+                }
+            } finally {
+                IOUtils.closeQuietly(iso);
+            }
+        } catch (Throwable e) {
+            //LOG.error("Unable to read cover art from mp4 file: " + file);
+        }
+        return image;
+    }
+
+    @Override
+    public TagsData parse() {
+        TagsData data = null;
+        try {
+            RandomAccessFile iso = new RandomAccessFile(file, "r");
+            LinkedList<Box> boxes = IsoFile.head(iso, ByteBuffer.allocate(100 * 1024));
+            try {
+                int duration = getDuration(boxes);
+                String bitrate = "";
+                AppleItemListBox ilst = Box.findFirst(boxes, Box.ilst);
+                String title = getBoxValue(ilst, Box.Cnam);
+                String artist = getBoxValue(ilst, Box.CART);
+                String album = getBoxValue(ilst, Box.Calb);
+                String comment = getBoxValue(ilst, Box.Ccmt);
+                String genre = getGenre(ilst);
+                String track = ""; //getTrackNumberValue(ilst);
+                String year = "";// getBoxValue(ilst, AppleRecordingYear2Box.class);
+                String lyrics = "";
+                data = sanitize(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
+            } finally {
+                IOUtils.closeQuietly(iso);
+            }
+        } catch (Exception e) {
+            LOG.warn("Unable to parse file using mp4parser: " + file);
+        }
+        return data;
+    }
+
+    @Override
+    public BufferedImage getArtwork() {
+        return getArtworkFromMP4(file);
+    }
+
+    private int getDuration(LinkedList<Box> boxes) {
+        MovieHeaderBox mvhd = Box.findFirst(boxes, Box.mvhd);
+        return (int) (mvhd.duration() / mvhd.timescale());
+    }
+
+    private <T extends AppleUtf8Box> String getBoxValue(AppleItemListBox ilst, int type) {
+        T b = ilst.findFirst(type);
+        return b != null ? b.value() : "";
+    }
+
+    private long getBoxLongValue(AppleItemListBox ilst) {
+        AppleIntegerBox b = ilst.findFirst(Box.gnre);
+        return b != null ? b.value() : -1;
+    }
+
+    private String getGenre(AppleItemListBox ilst) {
+        String value = null;
+        long valueId = getBoxLongValue(ilst);
+        if (0 <= valueId && valueId < ID3_GENRES.length) {
+            value = ID3_GENRES[(int) valueId];
+        }
+        if (value == null || value.equals("")) {
+            value = getBoxValue(ilst, Box.Cgen);
+        }
+        return value;
+    }
 }

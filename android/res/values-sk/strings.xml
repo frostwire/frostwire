@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Vaša inštalácia je dokončená.</string>
     <string name="error_connection_timed_out">Chyba: Pripojenie vypršal/poklesla. Skúste to znova.</string>
     <string name="azureus_manager_item_seeding">Siatie</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Všetci na stiahnutie zadarmo</string>
     <string name="torrent_max_download_speed">Maximálna rýchlosť sťahovania</string>
     <string name="torrent_max_peers">Maximálna rovesníkmi</string>
@@ -74,7 +73,7 @@
     <string name="share">Zdieľam</string>
     <string name="accept">Súhlasiť</string>
     <string name="torrent_max_download_speed_summary">Maximálna rýchlosť sťahovania (0 znamená neobmedzené)</string>
-    <string name="retry_search">Opakovať</string>
+    <string name="retry">Opakovať</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Súbor nemohol byť nasadená. BitTorrent zostane odpojený.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android zmaže stiahnuté súbory, ak FrostWire odinštalovanie.</string>
     <string name="protected_connection">VPN-chránené</string>
@@ -357,7 +356,6 @@
     <string name="or">alebo</string>
     <string name="file_names">Názvy súborov</string>
     <string name="no_data_check_internet_connection">Sieť nie je k dispozícii, skontrolujte pripojenie k internetu.</string>
-    <string name="use_pixabay">Použiť Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Zastavte zasievanie všetkých prenosov</string>
     <string name="seed_stop">Zastaviť zasievanie</string>
     <string name="transfers_select_seeding">siatie</string>
@@ -372,7 +370,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire sa nemohol správne spustiť kvôli nedostatku povolení. Zadajte požadované povolenia a reštartujte aplikáciu</string>
     <string name="vpn_find_out_more">Dozvedieť sa viac</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Voľná 7-dňová skúška</string>
-    <string name="play_store_out_of_sync">Obchod Google Play potrebuje synchronizáciu, počkajte niekoľko minút</string>
     <string name="uploaded">Nahraný</string>
     <string name="trackers">Trackery</string>
     <string name="source_type">Zdroj: %1$s</string>
@@ -412,4 +409,5 @@
     <string name="add_tracker">Pridať sledovač</string>
     <string name="contact_us">Kontaktuj nás</string>
     <string name="use_nyaa">Použiť Nyaa</string>
+    <string name="use_torrentz2">Použiť Torrentz2</string>
 </resources>

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public final class Products {
     public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.subs.disable_ads.1_month");
     public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.subs.disable_ads.6_months");
     public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
+    public static final String REWARDS_DISABLE_ADS_MINUTES_SKU = "com.frostwire.reward.disable_ads_minutes";
 
     // inapp/subs product duration in days
     private static final int DISABLE_ADS_1_MONTH_DAYS = 31;
@@ -106,10 +107,7 @@ public final class Products {
     }
 
     private static String getSKU(String skuId) {
-        //if (!BuildConfig.DEBUG) {
         return skuId;
-        //}
-        //return skuId + ".test";
     }
 
     /**

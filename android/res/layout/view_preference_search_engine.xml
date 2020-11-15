@@ -24,7 +24,8 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall" >
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:orientation="vertical">
 
 
     <LinearLayout
@@ -36,9 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:paddingBottom="16dp"
             android:paddingLeft="@dimen/settings_list_item_inner_horizontal_padding"
-            android:paddingTop="16dp">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:id="@android:id/title"
@@ -52,8 +53,8 @@
                 android:id="@android:id/summary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignLeft="@android:id/title"
                 android:layout_below="@android:id/title"
+                android:layout_alignLeft="@android:id/title"
                 android:maxLines="10"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="?android:attr/textColorSecondary" />

@@ -31,9 +31,7 @@ import java.io.File;
  * @author Michael Martak
  * @since 1.4
  */
-
 class DefaultShellFolder extends ShellFolder {
-
     /**
      * Create a file system shell folder from a file
      */
@@ -49,7 +47,7 @@ class DefaultShellFolder extends ShellFolder {
      *
      * @returns a <code>java.io.File</code> replacement object.
      */
-    protected Object writeReplace() throws java.io.ObjectStreamException {
+    protected Object writeReplace() {
         return new File(getPath());
     }
 
@@ -86,35 +84,9 @@ class DefaultShellFolder extends ShellFolder {
     }
 
     /**
-     * @return The shell folder linked to by this shell folder, or null
-     * if this shell folder is not a link
-     */
-    public ShellFolder getLinkLocation() {
-        return null; // Not supported by default
-    }
-
-    /**
      * @return The name used to display this shell folder
      */
     public String getDisplayName() {
         return getName();
-    }
-
-    /**
-     * @return The type of shell folder as a string
-     */
-    public String getFolderType() {
-        if (isDirectory()) {
-            return "File Folder"; // TODO : LOCALIZE THIS STRING!!!
-        } else {
-            return "File"; // TODO : LOCALIZE THIS STRING!!!
-        }
-    }
-
-    /**
-     * @return The executable type as a string
-     */
-    public String getExecutableType() {
-        return null; // Not supported by default
     }
 }

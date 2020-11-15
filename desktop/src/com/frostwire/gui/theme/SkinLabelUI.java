@@ -24,24 +24,20 @@ import javax.swing.plaf.synth.SynthLabelUI;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SkinLabelUI extends SynthLabelUI {
+    private Font oldFont;
 
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinLabelUI();
     }
 
-    private Font oldFont;
-
     @Override
     public void installUI(JComponent c) {
         super.installUI(c);
-
         if (c instanceof JLabel) {
             oldFont = ThemeMediator.fixLabelFont((JLabel) c);
         }
@@ -50,7 +46,6 @@ public class SkinLabelUI extends SynthLabelUI {
     @Override
     public void uninstallUI(JComponent c) {
         super.uninstallUI(c);
-
         if (oldFont != null && c instanceof JLabel) {
             c.setFont(oldFont);
         }

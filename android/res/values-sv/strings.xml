@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Installationen är klar.</string>
     <string name="error_connection_timed_out">Fel: anslutningen har avbrutits/sjunkit. Försök igen.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Alla gratis nedladdningar</string>
     <string name="torrent_max_download_speed">Max Totalt nedladdningshastighet</string>
     <string name="torrent_max_peers">Max Totalt Peers</string>
@@ -76,7 +75,7 @@
     <string name="share">Dela med sig</string>
     <string name="accept">Acceptera</string>
     <string name="torrent_max_download_speed_summary">Max nedladdningshastighet (0 betyder obegränsat)</string>
-    <string name="retry_search">Försök igen</string>
+    <string name="retry">Försök igen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunde inte seedas. BitTorrent förblir frånkopplad.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android kommer att radera nedladdade filer om FrostWire avinstalleras .</string>
     <string name="protected_connection">VPN-skyddad</string>
@@ -357,7 +356,6 @@
     <string name="or">eller</string>
     <string name="file_names">Filnamn</string>
     <string name="no_data_check_internet_connection">Nätverk otillgängligt, kolla din Internetanslutning.</string>
-    <string name="use_pixabay">Använda Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Sluta såga alla överföringar</string>
     <string name="seed_stop">Sluta sådd</string>
     <string name="transfers_select_seeding">sådd</string>
@@ -409,7 +407,7 @@
     <string name="piece_size_header">Styckstorlek:</string>
     <string name="add_tracker">Lägg till tracker</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dagars prov</string>
-    <string name="play_store_out_of_sync">Google Play Butik behöver synkronisera, vänta några minuter</string>
     <string name="contact_us">Kontakta oss</string>
     <string name="use_nyaa">Använda Nyaa</string>
+    <string name="use_torrentz2">Använda Torrentz2</string>
 </resources>

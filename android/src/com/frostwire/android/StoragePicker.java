@@ -23,13 +23,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.provider.DocumentFile;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron

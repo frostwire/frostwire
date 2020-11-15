@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.eztv;
@@ -32,10 +31,7 @@ import java.util.Map;
  * @author aldenml
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-
-    private static final int MAX_RESULTS = 20;
     public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-
     // This is a good example of optional regex groups when a page might have different possible formats to parse.
     public static final String TORRENT_DETAILS_PAGE_REGEX =
             "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
@@ -48,6 +44,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
                     "<b>Filesize:</b>\\s+(?<filesize>.*?)<br.*?" +
                     "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
+    private static final int MAX_RESULTS = 20;
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
@@ -66,7 +63,6 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         formData.put("SearchString", "");
         formData.put("search", "Search");
         String page = post(url, formData);
-
         return page != null && isValidHtml(page) ? page : null;
     }
 
@@ -104,9 +100,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         if (k == null) {
             k = keywords[0];
         }
-
         int count = StringUtils.countMatches(html.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
-
         return count > 9;
     }
 }

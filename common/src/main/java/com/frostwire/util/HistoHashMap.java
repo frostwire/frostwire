@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 public final class HistoHashMap<K> {
-
     private final HashMap<K, Integer> map = new HashMap<>();
-
     // creates the comparator as a field to avoid GC pressure every
     // time histogram is called, but still not static (no need)
     private final Comparator<Entry<K, Integer>> cmp = (o1, o2) -> o2.getValue().compareTo(o1.getValue());
@@ -62,7 +60,12 @@ public final class HistoHashMap<K> {
     }
 
     public int get(K key) {
-        return map.get(key);
+        try {
+            //noinspection ConstantConditions
+            return map.get(key);
+        } catch (NullPointerException npe) {
+            return 0;
+        }
     }
 
     /**

@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>信息:</b> 触摸应用的标签]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>您的隐私是一项基本人权</b>. 不受保护的连接意味着您在线进行的所有操作（包括<b>下载，搜索，消息传递</b>）都可以被网络上的任何人监控和拦截，例如： 互联网服务提供商，黑客，政府。<br><br><b>我们强烈建议您使用VPN服务</b>. <br> 以下是一些提供可靠服务并与FrostWire配合良好的选项：]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到Internet。 <br><br> 如果您尚未使用，我们建议您使用以下服务之一加密您的连接并<b>保护您的隐私</b>。 ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">设置</string>
     <string name="exit">退出</string>
     <string name="search_label">搜索</string>
@@ -149,7 +148,7 @@
     <string name="saving_to_internal_memory">儲存到內置記憶體</string>
     <string name="my_filetype">我的%s</string>
     <string name="accept">接受</string>
-    <string name="retry_search">重試</string>
+    <string name="retry">重試</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">如果卸載 FrostWire，Android 將會清除所下載的檔案。</string>
     <string name="use_eztv">使用 Eztv</string>
     <string name="please_check_connection_status_before_resuming_download">請檢查網絡連接狀態再重新開始。</string>
@@ -356,7 +355,6 @@
     <string name="or">要么</string>
     <string name="file_names">文件名</string>
     <string name="no_data_check_internet_connection">网络不可用，请检查您的Internet连接。</string>
-    <string name="use_pixabay">使用 Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">停止分享所有转帐</string>
     <string name="seed_stop">停止分享</string>
     <string name="transfers_select_seeding">播种</string>
@@ -373,7 +371,6 @@
     <string name="connection_header_title">VPN连接状态：</string>
     <string name="vpn_find_out_more">了解更多</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 免费试用7天</string>
-    <string name="play_store_out_of_sync">Google Play商店需要同步，请等待几分钟</string>
     <string name="uploaded">上传的</string>
     <string name="trackers">跟踪器</string>
     <string name="source_type">资源： %1$s</string>
@@ -412,4 +409,5 @@
     <string name="add_tracker">添加跟踪器</string>
     <string name="contact_us">联系我们</string>
     <string name="use_nyaa">使用 Nyaa</string>
+    <string name="use_torrentz2">使用 Torrentz2</string>
 </resources>

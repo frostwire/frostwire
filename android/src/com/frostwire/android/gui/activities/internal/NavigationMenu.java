@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -42,10 +42,12 @@ import com.frostwire.android.gui.activities.AboutActivity;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
+import com.frostwire.util.Logger;
+import com.google.android.material.navigation.NavigationView;
 
 /**
  * @author aldenml
@@ -56,6 +58,7 @@ import com.frostwire.android.offers.Offers;
  */
 
 public final class NavigationMenu {
+    private final static Logger LOG = Logger.getLogger(NavigationMenu.class);
     private final MainController controller;
     private final NavigationView navView;
     private final DrawerLayout drawerLayout;
@@ -70,7 +73,7 @@ public final class NavigationMenu {
         drawerToggle = new MenuDrawerToggle(controller, drawerLayout, toolbar);
         this.drawerLayout.addDrawerListener(drawerToggle);
         navView = initNavigationView(mainActivity);
-        menuRemoveAdsItem = initAdMenuItemListener(mainActivity);
+        menuRemoveAdsItem = initAdRemovalMenuItemListener(mainActivity);
         refreshMenuRemoveAdsItem();
     }
 
@@ -145,7 +148,6 @@ public final class NavigationMenu {
             return;
         }
         checkedNavViewMenuItemId = menuItem.getItemId();
-        Engine.instance().hapticFeedback();
         controller.syncNavigationMenu();
         menuItem.setChecked(true);
         controller.setTitle(menuItem.getTitle());
@@ -199,7 +201,7 @@ public final class NavigationMenu {
         SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
     }
 
-    private AdMenuItemView initAdMenuItemListener(final Activity activity) {
+    private AdMenuItemView initAdRemovalMenuItemListener(final Activity activity) {
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(v -> {
@@ -211,13 +213,22 @@ public final class NavigationMenu {
 
     private void refreshMenuRemoveAdsItem() {
         // only visible for basic or debug build and if ads have not been disabled.
-        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) && !Offers.disabledAds()) ?
+        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
         Handler handler = new Handler(Looper.getMainLooper());
         // TODO: review why calling this directly was causing ANR
         // there is some lifecycle issue here
-        handler.post(() -> menuRemoveAdsItem.setVisibility(visibility) );
+        handler.post(() -> {
+            try {
+                menuRemoveAdsItem.setVisibility(visibility);
+            } catch (Throwable t) {
+                if (BuildConfig.DEBUG) {
+                    throw t;
+                }
+                LOG.error("NavigationMenu::refreshMenuRemoveAdsItem() error posting menuRemoveAdsItem.setVisibility(...) to main looper: " + t.getMessage(), t);
+            }
+        } );
     }
 
     public void onUpdateAvailable() {
@@ -252,6 +263,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerOpened(View drawerView) {
+            refreshMenuRemoveAdsItem();
             if (controller.getActivity() != null) {
                 UIUtils.hideKeyboardFromActivity(controller.getActivity());
             }

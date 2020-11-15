@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Sentuh tag yang diterapkan ke]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda terhubung ke Internet menggunakan VPN. <br><br> Jika Anda belum melakukannya, kami sarankan menggunakan salah satu layanan di bawah ini untuk mengenkripsi koneksi Anda dan <b>menjaga privasi Anda</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Privasi Anda adalah hak asasi manusia yang fundamental</b>. Sambungan tidak terlindungi artinya semua yang Anda lakukan secara online termasuk <b>unduhan, penelusuran, perpesanan</b>, dapat dipantau dan disadap oleh siapa saja di jaringan Anda, mis. Penyedia Layanan Internet, peretas, pemerintah.<br><br><b>Kami SANGAT merekomendasikan menggunakan layanan VPN</b>. <br> Berikut adalah beberapa opsi yang menyediakan layanan andal dan berfungsi baik dengan FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Pengaturan</string>
     <string name="exit">Keluar</string>
     <string name="search_label">Pencarian</string>
@@ -162,7 +161,7 @@
     <string name="choose_email_app">Pilih Email App…</string>
     <string name="my_filetype">Saya %s</string>
     <string name="accept">Menerima</string>
-    <string name="retry_search">Mencoba kembali</string>
+    <string name="retry">Mencoba kembali</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">File tidak bisa diunggulkan. BitTorrent akan tetap terputus.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan menghapus file yang didownload jika FrostWire dihapus.</string>
     <string name="protected_connection">VPN-dilindungi</string>
@@ -357,7 +356,6 @@
     <string name="or">atau</string>
     <string name="file_names">Nama file</string>
     <string name="no_data_check_internet_connection">Jaringan tidak tersedia, periksa koneksi internet Anda.</string>
-    <string name="use_pixabay">Gunakan Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Hentikan penyemaian semua transfer</string>
     <string name="seed_stop">Hentikan penyemaian</string>
     <string name="transfers_select_seeding">penyemaian</string>
@@ -370,7 +368,6 @@
     <string name="seeding_is_currently_disabled">Berbagi saat ini dinonaktifkan</string>
     <string name="vpn_find_out_more">Temukan lebih banyak lagi</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Uji coba 7 hari gratis</string>
-    <string name="play_store_out_of_sync">Play Store perlu melakukan sinkronisasi, tunggu beberapa menit</string>
     <string name="contact_us">Hubungi kami</string>
     <string name="uploaded">Diunggah</string>
     <string name="trackers">Pelacak</string>
@@ -412,4 +409,5 @@
     <string name="piece_size_header">Ukuran potongan:</string>
     <string name="add_tracker">Tambahkan pelacak</string>
     <string name="use_nyaa">Gunakan Nyaa</string>
+    <string name="use_torrentz2">Gunakan Torrentz2</string>
 </resources>

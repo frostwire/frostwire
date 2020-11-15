@@ -61,8 +61,8 @@ class RemoveAdsNetwork extends AbstractAdNetwork {
         boolean enabled = false;
         try {
             //noinspection SimplifiableIfStatement (done like this on purpose for readability)
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-                enabled = false;
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION | PlayStore.available()) {
+                enabled = true;
             } else {
                 enabled = super.enabled();
             }

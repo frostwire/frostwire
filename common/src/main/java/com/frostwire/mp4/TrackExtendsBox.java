@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class TrackExtendsBox extends FullBox {
-
     protected int track_ID;
     protected int default_sample_description_index;
     protected int default_sample_duration;
@@ -39,7 +38,6 @@ public final class TrackExtendsBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 20, buf);
         track_ID = buf.getInt();
         default_sample_description_index = buf.getInt();
@@ -51,7 +49,6 @@ public final class TrackExtendsBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(track_ID);
         buf.putInt(default_sample_description_index);
         buf.putInt(default_sample_duration);

@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinTabbedPaneTabAreaBackgroundPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinTabbedPaneTabAreaBackgroundPainter(State state) {
@@ -38,12 +35,12 @@ public final class SkinTabbedPaneTabAreaBackgroundPainter extends AbstractSkinPa
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
         switch (state) {
-        case Disabled:
-        case EnableMouseOver:
-        case EnablePressed:
-        case Enable:
-            paintBorder(g, width, height);
-            break;
+            case Disabled:
+            case EnableMouseOver:
+            case EnablePressed:
+            case Enable:
+                paintBorder(g, width, height);
+                break;
         }
     }
 
@@ -53,7 +50,7 @@ public final class SkinTabbedPaneTabAreaBackgroundPainter extends AbstractSkinPa
         g.drawLine(0, y, width, y);
     }
 
-    public static enum State {
+    public enum State {
         Disabled, EnableMouseOver, EnablePressed, Enable
     }
 }

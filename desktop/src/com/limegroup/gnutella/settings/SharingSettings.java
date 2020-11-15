@@ -26,16 +26,16 @@ import java.io.File;
  * Settings for sharing
  */
 public class SharingSettings extends LimeProps {
-
+    public static final BooleanSetting SEED_FINISHED_TORRENTS = FACTORY.createBooleanSetting("SEED_FINISHED_TORRENTS", true);
+    public static final BooleanSetting ENABLE_DISTRIBUTED_HASH_TABLE = FACTORY.createBooleanSetting("ENABLE_DISTRIBUTED_HASH_TABLE", true);
+    public static final File IMAGE_CACHE_DIR = new File(CommonUtils.getUserSettingsDir(), "image_cache");
+    /**
+     * Setting for whether or not to allow partial files to be shared.
+     */
+    public static final BooleanSetting ALLOW_PARTIAL_SHARING = FACTORY.createBooleanSetting("ALLOW_PARTIAL_SHARING", false);
     private static final File PORTABLE_ROOT_FOLDER = CommonUtils.getPortableRootFolder();
-
-    private SharingSettings() {
-    }
-
     public static final File DEFAULT_TORRENTS_DIR = new File((PORTABLE_ROOT_FOLDER == null) ? FrostWireUtils.getFrostWireRootFolder() : PORTABLE_ROOT_FOLDER, "Torrents");
-
     public static final FileSetting TORRENTS_DIR_SETTING = FACTORY.createFileSetting("TORRENTS_DIR_SETTING", DEFAULT_TORRENTS_DIR).setAlwaysSave(true);
-
     /**
      * The default folder where Torrent Data will be saved. This folder CANNOT BE SHARED
      * to avoid sharing inconsistencies.
@@ -44,20 +44,16 @@ public class SharingSettings extends LimeProps {
      * In regular frostwire it's "Torrent Data"
      */
     public static final File DEFAULT_TORRENT_DATA_DIR = (PORTABLE_ROOT_FOLDER == null) ? new File(FrostWireUtils.getFrostWireRootFolder(), "Torrent Data") : new File(PORTABLE_ROOT_FOLDER, "Downloads");
-
     /**
      * The folder value where Torrent Data will be saved. This folder CANNOT BE SHARED
      * to avoid sharing inconsistencies.
      */
     public static final FileSetting TORRENT_DATA_DIR_SETTING = FACTORY.createFileSetting("DEFAULT_TORRENT_DATA_DIR_SETTING", DEFAULT_TORRENT_DATA_DIR).setAlwaysSave(true);
 
-    public static final BooleanSetting SEED_FINISHED_TORRENTS = FACTORY.createBooleanSetting("SEED_FINISHED_TORRENTS", true);
+    private SharingSettings() {
+    }
 
-    public static final BooleanSetting ENABLE_DISTRIBUTED_HASH_TABLE = FACTORY.createBooleanSetting("ENABLE_DISTRIBUTED_HASH_TABLE", true);
-
-    public static final File IMAGE_CACHE_DIR = new File(CommonUtils.getUserSettingsDir(), "image_cache");
-
-    public static final File getImageCacheDirectory() {
+    public static File getImageCacheDirectory() {
         if (!IMAGE_CACHE_DIR.exists()) {
             IMAGE_CACHE_DIR.mkdirs();
         }
@@ -75,15 +71,9 @@ public class SharingSettings extends LimeProps {
         if (CommonUtils.isPortable()) {
             SharingSettings.TORRENTS_DIR_SETTING.setValue(SharingSettings.DEFAULT_TORRENTS_DIR);
         }
-
         //in case it's first time
         if (!SharingSettings.TORRENTS_DIR_SETTING.getValue().exists()) {
             SharingSettings.TORRENTS_DIR_SETTING.getValue().mkdirs();
         }
     }
-
-    /**
-     * Setting for whether or not to allow partial files to be shared.
-     */
-    public static final BooleanSetting ALLOW_PARTIAL_SHARING = FACTORY.createBooleanSetting("ALLOW_PARTIAL_SHARING", false);
 }

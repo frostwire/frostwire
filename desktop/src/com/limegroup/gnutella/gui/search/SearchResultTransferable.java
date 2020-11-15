@@ -18,18 +18,15 @@ package com.limegroup.gnutella.gui.search;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 /**
  * A Search Result transferable.  Contains the ResultPanel & TableLines
  * that are being transferred.
  */
 public class SearchResultTransferable implements Transferable {
-
     public static final DataFlavor dataFlavor = new DataFlavor(SearchResultTransferable.class, "FrostWire Search Result");
-
-    private SearchResultMediator panel;
-    private SearchResultDataLine[] lines;
+    private final SearchResultMediator panel;
+    private final SearchResultDataLine[] lines;
 
     public SearchResultTransferable(SearchResultMediator panel, SearchResultDataLine[] lines) {
         this.panel = panel;
@@ -45,14 +42,14 @@ public class SearchResultTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] { dataFlavor };
+        return new DataFlavor[]{dataFlavor};
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return flavor.equals(dataFlavor);
     }
 
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
         if (!isDataFlavorSupported(flavor))
             throw new UnsupportedFlavorException(flavor);
         else

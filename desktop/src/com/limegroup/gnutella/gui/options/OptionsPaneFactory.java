@@ -1,22 +1,24 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.options;
 
 import com.limegroup.gnutella.gui.options.panes.AbstractPaneItem;
-import org.limewire.service.ErrorService;
+import com.frostwire.service.ErrorService;
 
 /**
  * Static factory class that creates the option panes based on their keys.
@@ -30,34 +32,32 @@ import org.limewire.service.ErrorService;
  * <tt>AbstractPaneItem</tt>.
  */
 class OptionsPaneFactory {
-    
     /**
      * Constructs a new OptionsPaneFactory.
-     *
+     * <p>
      * Due to intermixing within Saved & Shared pane items, these two need special
      * setups.
      */
     OptionsPaneFactory() {
     }
-    
-	/**
-	 * Creates the options pane for a key.
-	 */
-	OptionsPane createOptionsPane(OptionsTreeNode node) {
-	    Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
-	    if (clazzes != null) {
+
+    /**
+     * Creates the options pane for a key.
+     */
+    OptionsPane createOptionsPane(OptionsTreeNode node) {
+        Class<? extends AbstractPaneItem>[] clazzes = node.getClasses();
+        if (clazzes != null) {
             final OptionsPane pane = new OptionsPaneImpl(node.getTitleKey());
-	        for (Class<? extends AbstractPaneItem> clazz : clazzes) {
+            for (Class<? extends AbstractPaneItem> clazz : clazzes) {
                 try {
-                    pane.add(clazz.newInstance());
+                    pane.add(clazz.getDeclaredConstructor().newInstance());
                 } catch (Exception e) {
                     ErrorService.error(e);
                 }
-	        }
-	        return pane;
-	    } else {
-	        throw new IllegalArgumentException("no options pane for this key: " + node.getTitleKey());
-		}
-	}
-
+            }
+            return pane;
+        } else {
+            throw new IllegalArgumentException("no options pane for this key: " + node.getTitleKey());
+        }
+    }
 }

@@ -21,12 +21,13 @@ import com.frostwire.platform.AbstractPlatform;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.VPNMonitor;
 
+import javax.swing.*;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public final class DesktopPlatform extends AbstractPlatform {
-
     private final DesktopVPNMonitor vpn;
 
     public DesktopPlatform() {
@@ -37,5 +38,10 @@ public final class DesktopPlatform extends AbstractPlatform {
     @Override
     public VPNMonitor vpn() {
         return vpn;
+    }
+
+    @Override
+    public boolean isUIThread() {
+        return SwingUtilities.isEventDispatchThread();
     }
 }

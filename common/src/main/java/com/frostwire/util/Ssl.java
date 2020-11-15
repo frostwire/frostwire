@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * Util class to provide SSL/TLS specific features.
@@ -31,25 +33,27 @@ import java.security.cert.X509Certificate;
  * @author aldenml
  */
 public final class Ssl {
-
-    private static final HostnameVerifier NULL_HOSTNAME_VERIFIER = new NullHostnameVerifier();
+    private static final Logger LOG = Logger.getLogger(Ssl.class);
+    private static final HostnameVerifier FW_HOSTNAME_VERIFIER = new FWHostnameVerifier();
     private static final X509TrustManager NULL_TRUST_MANAGER = new NullTrustManager();
-
     private static final SSLSocketFactory NULL_SOCKET_FACTORY = buildNullSSLSocketFactory();
 
     private Ssl() {
     }
 
+    public static void addValidDomain(String domain) {
+        FWHostnameVerifier.addValidDomain(domain);
+    }
+
     /**
-     * Returns a hostname verifier instance that simply accepts all hostnames
-     * as valid.
+     * Returns a hostname verifier instance that accepts only domain names that we trust for our operation
      * <p>
      * The instance returned is always the same and it's thread safe.
      *
      * @return the hostname verifier.
      */
-    public static HostnameVerifier nullHostnameVerifier() {
-        return NULL_HOSTNAME_VERIFIER;
+    public static HostnameVerifier fwHostnameVerifier() {
+        return FW_HOSTNAME_VERIFIER;
     }
 
     /**
@@ -87,16 +91,82 @@ public final class Ssl {
         }
     }
 
-    private static final class NullHostnameVerifier implements HostnameVerifier {
+    static final class FWHostnameVerifier implements HostnameVerifier {
+
+        private static final String[] validDomains = {
+                "api-v2.soundcloud.com",
+                "sndcdn.com",
+                "api.frostclick.com",
+                "archive.org",
+                "clients1.google.com",
+                "dl.frostwire.com",
+                "eztv.re",
+                "gtdb.to",
+                "idope.se",
+                "nyaa.si",
+                "pirate-bay.info",
+                "pirate-bays.net",
+                "piratebay.live",
+                "static.frostclick.com",
+                "static.frostwire.com",
+                "www.frostwire.com",
+                "thepiratebay0.org",
+                "thepiratebay-unblocked.org",
+                "thepiratebay.org",
+                "thepiratebay.vip",
+                "thepiratebay.zone",
+                "torrent-paradise.ml",
+                "torrentz2.unblockninja.com",
+                "update.frostwire.com",
+                "www.1377x.to",
+                "www.limetorrents.info",
+                "magnetdl.com",
+                "www.magnetdl.com",
+                "www.pirate-bay.net",
+                "www.torlock.com",
+                "www.torrentdownloads.me",
+                "www.yify-torrent.org",
+                "www.youtube.com",
+                "yify-torrent.cc",
+                "youtu.be",
+                "zoink.ch",
+                "zooqle.com",
+        };
+
+        private static final HashSet<String> validDomainsSet = new HashSet<>();
+
+        static {
+            Collections.addAll(validDomainsSet, validDomains);
+        }
+
+        public static void addValidDomain(String domain) {
+            LOG.info("addValidDomain: " + domain);
+            validDomainsSet.add(domain);
+            int firstDotIndex = domain.indexOf(".");
+            int secondDotIndex = domain.indexOf(".", firstDotIndex);
+            if (secondDotIndex != -1) {
+                String baseDomain = domain.substring(firstDotIndex + 1);
+                LOG.info("addValidDomain: " + baseDomain);
+                validDomainsSet.add(baseDomain);
+            }
+        }
 
         @Override
         public boolean verify(String s, SSLSession sslSession) {
-            return true;
+            if (!validDomainsSet.contains(s)) {
+
+                // check if the s is a subdomain
+                for (String baseDomain : validDomainsSet) {
+                    if (s.contains(baseDomain)) {
+                        return true;
+                    }
+                }
+            }
+            return validDomainsSet.contains(s);
         }
     }
 
     private static final class NullTrustManager implements X509TrustManager {
-
         public X509Certificate[] getAcceptedIssuers() {
             return new X509Certificate[0];
         }
@@ -113,7 +183,6 @@ public final class Ssl {
      * workaround to a bug in android
      */
     private static final class WrapSSLSocketFactory extends SSLSocketFactory {
-
         private final SSLSocketFactory d;
 
         WrapSSLSocketFactory(SSLSocketFactory d) {

@@ -37,14 +37,15 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     private static final ImageIcon seed_solid;
     private static final AlphaIcon seed_faded;
     private static final ImageIcon loading;
-    private JLabel labelSeed;
-    private BTDownload dl;
 
     static {
         seed_solid = GUIMediator.getThemeImage("transfers_seeding_over");
         seed_faded = new AlphaIcon(seed_solid, 0.5f);
         loading = GUIMediator.getThemeImage("indeterminate_small_progress");
     }
+
+    private JLabel labelSeed;
+    private BTDownload dl;
 
     public TransferSeedingRenderer() {
         setupUI();
@@ -57,8 +58,7 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
         c.anchor = GridBagConstraints.LINE_START;
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
-        c.insets = new Insets(2,5,2,5);
-
+        c.insets = new Insets(2, 5, 2, 5);
         labelSeed = new JLabel(seed_faded);
         labelSeed.setOpaque(false);
         labelSeed.setDoubleBuffered(true);
@@ -70,23 +70,21 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
                     if (dl.getState().equals(TransferState.DOWNLOADING)) {
                         return;
                     }
-
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
                     labelSeed.setIcon(loading);
                 }
             }
         });
         add(labelSeed, c);
-
         setEnabled(true);
     }
 
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
-        updateUIData((SeedingHolder) dataHolder, table, row, column);
+        updateUIData((SeedingHolder) dataHolder);
     }
 
-    private void updateUIData(SeedingHolder actionsHolder, JTable table, int row, int column) {
+    private void updateUIData(SeedingHolder actionsHolder) {
         if (actionsHolder != null) {
             dl = actionsHolder.getDl();
             boolean canShareNow = BittorrentDownload.RendererHelper.canShareNow(dl);

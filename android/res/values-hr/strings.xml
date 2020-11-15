@@ -21,7 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Razotkrivanje:</b> Iako je preporučeno za download, osobito pri svakom preuzimanju ili razmjeni osjetljivih informacija (npr. bankarstva) i tijekom korištenja javnih Wi-Fi ili mobilnih podataka, <b>ne morate VPN koristiti FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dodirnite dodijeljene oznake u]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Postavke</string>
     <string name="exit">Izađi</string>
     <string name="search_label">Traži</string>
@@ -97,7 +96,7 @@
     <string name="support_frostwire">Podrži FrostWire</string>
     <string name="loading">Učitavam</string>
     <string name="stop">Zaustavi</string>
-    <string name="retry_search">Ponovno pokušaj</string>
+    <string name="retry">Ponovno pokušaj</string>
     <string name="use_archiveorg">Koristi Archive.org</string>
     <string name="use_frostclick">Koristi FrostClick</string>
     <string name="use_torlock">Koristi TorLock</string>
@@ -355,7 +354,6 @@
     <string name="or">ili</string>
     <string name="file_names">Nazivi datoteka</string>
     <string name="no_data_check_internet_connection">Mreža nije dostupna, provjerite internetsku vezu.</string>
-    <string name="use_pixabay">Koristi Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Zaustavite sjetvu svih prijenosa</string>
     <string name="seed_stop">Zaustavite zasijavanje</string>
     <string name="transfers_select_seeding">sijanje</string>
@@ -371,7 +369,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire nije mogao pravilno pokrenuti zbog nedostatka dozvola. Dopustite potrebnim dozvolama i ponovo pokrenite aplikaciju</string>
     <string name="vpn_find_out_more">Saznaj više</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Besplatno 7-dnevno probno razdoblje</string>
-    <string name="play_store_out_of_sync">Trgovina Google Play treba sinkronizirati, pričekajte nekoliko minuta</string>
     <string name="uploaded">Preneseni</string>
     <string name="trackers">Trackers</string>
     <string name="source_type">Izvor: %1$s</string>
@@ -412,4 +409,5 @@
     <string name="add_tracker">Dodaj tracker</string>
     <string name="contact_us">Kontaktirajte nas</string>
     <string name="use_nyaa">Koristi Nyaa</string>
+    <string name="use_torrentz2">Koristi Torrentz2</string>
 </resources>

@@ -77,7 +77,7 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
         if (offset == -1) {
             return super.htmlPrefixOffset(html);
         }
-        return offset-20;
+        return offset - 20;
     }
 
     @Override
@@ -93,7 +93,6 @@ public final class ZooqleSearchPerformer extends TorrentRegexSearchPerformer<Zoo
     protected boolean isValidHtml(String html) {
         return html != null && !html.contains("Cloudflare");
     }
-
 //    public static void main(String[] args) throws Throwable {
 ////        String TEST_QUERY_TERM = "foobar";
 ////        String URL_PREFIX = "https://zooqle.com/";

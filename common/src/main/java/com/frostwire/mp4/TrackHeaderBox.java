@@ -25,20 +25,19 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class TrackHeaderBox extends FullBox {
-
+    protected final int[] reserved2;
+    protected final int[] matrix;
     protected long creation_time;
     protected long modification_time;
-    private int track_ID;
     protected int reserved1;
     protected long duration;
-    protected final int[] reserved2;
     protected short layer;
     protected short alternate_group;
     protected short volume;
     protected short reserved3;
-    protected final int[] matrix;
     protected int width;
     protected int height;
+    private int track_ID;
 
     TrackHeaderBox() {
         super(tkhd);
@@ -105,7 +104,6 @@ public final class TrackHeaderBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, (version == 1 ? 32 : 20) + 60, buf);
         if (version == 1) {
             creation_time = buf.getLong();
@@ -120,7 +118,6 @@ public final class TrackHeaderBox extends FullBox {
             reserved1 = buf.getInt();
             duration = buf.getInt();
         }
-
         IO.get(buf, reserved2);
         layer = buf.getShort();
         alternate_group = buf.getShort();
@@ -134,7 +131,6 @@ public final class TrackHeaderBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         if (version == 1) {
             buf.putLong(creation_time);
             buf.putLong(modification_time);
@@ -148,7 +144,6 @@ public final class TrackHeaderBox extends FullBox {
             buf.putInt(reserved1);
             buf.putInt((int) duration);
         }
-
         IO.put(buf, reserved2);
         buf.putShort(layer);
         buf.putShort(alternate_group);

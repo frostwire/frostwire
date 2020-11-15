@@ -75,7 +75,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -140,8 +139,11 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private View getListItemView(int position, View view, ViewGroup parent) {
         view = super.getView(position, view, parent);
         final FileDescriptorItem item = getItem(position);
-        if (item.fd.fileType == Constants.FILE_TYPE_AUDIO || item.fd.fileType == Constants.FILE_TYPE_RINGTONES) {
-            initPlaybackStatusOverlayTouchFeedback(view, item);
+        if (item != null && item.fd != null) {
+            if (item.fd.fileType == Constants.FILE_TYPE_AUDIO ||
+                item.fd.fileType == Constants.FILE_TYPE_RINGTONES) {
+                initPlaybackStatusOverlayTouchFeedback(view, item);
+            }
         }
         ImageView thumbnailView = findView(view, R.id.view_my_files_thumbnail_list_item_browse_thumbnail_image_button);
         if (thumbnailView != null) {
@@ -217,7 +219,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         });
     }
 
-    protected void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) {
+    private void initCheckableGridImageView(ViewGroup view, final FileDescriptorItem item) {
         boolean isChecked = getChecked().contains(item);
         boolean showFileSize = false;
 
@@ -377,8 +379,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         onLocalPlay();
         Context ctx = getContext();
         if (fd.mime != null && fd.mime.contains("audio")) {
-            if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
-                Engine.instance().getMediaPlayer().stop();
+            CoreMediaPlayer coreMediaPlayer = Engine.instance().getMediaPlayer();
+            if (coreMediaPlayer != null && fd.equals(coreMediaPlayer.getCurrentFD(getContext()))) {
+                coreMediaPlayer.stop();
             } else {
                 try {
                     UIUtils.playEphemeralPlaylist(ctx, fd);
@@ -419,7 +422,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private void playRingtone(FileDescriptor fileDescriptor) {
         //pause real music if any
         if (MusicUtils.isPlaying()) {
-            MusicUtils.playOrPause();
+            MusicUtils.playPauseOrResume();
         }
         MusicUtils.playSimple(fileDescriptor.filePath);
         notifyDataSetChanged();
@@ -447,14 +450,15 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             Uri uri = ImageLoader.getApplicationArtUri(fd.album);
             thumbnailLoader.load(uri, fileThumbnail, thumbnailDimensions, thumbnailDimensions);
         } else {
+            CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
             if (in(fileType, Constants.FILE_TYPE_AUDIO, Constants.FILE_TYPE_VIDEOS)) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getCurrentFD(getContext()))) {
+                if (mediaPlayer != null && fd.equals(mediaPlayer.getCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
                 }
             } else if (fileType == Constants.FILE_TYPE_RINGTONES) {
-                if (fd.equals(Engine.instance().getMediaPlayer().getSimplePlayerCurrentFD(getContext()))) {
+                if (mediaPlayer != null && fd.equals(mediaPlayer.getSimplePlayerCurrentFD(getContext()))) {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.STOP);
                 } else {
                     mediaOverlayView.setPlaybackState(MediaPlaybackOverlayPainter.MediaPlaybackState.PLAY);
@@ -683,7 +687,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (!f.exists()) {
             if (SystemUtils.isSecondaryExternalStorageMounted(f.getAbsoluteFile())) {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_mounted);
-                Librarian.instance().deleteFiles(getContext(), fileType, Arrays.asList(fd));
+                Librarian.instance().deleteFiles(getContext(), fileType, Collections.singletonList(fd));
                 deleteItem(fd);
             } else {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_unmounted);
@@ -697,6 +701,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     // Moved here to cleanup base code.
     // Functional abstractions should be used instead
+    @SafeVarargs
     private static <T> boolean in(T needle, T... args) {
         if (args == null) {
             throw new IllegalArgumentException("args on in operation can't be null");

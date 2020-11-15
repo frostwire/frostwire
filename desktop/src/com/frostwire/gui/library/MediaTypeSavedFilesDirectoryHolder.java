@@ -29,34 +29,30 @@ import java.util.List;
 import java.util.Set;
 
 /**
- *
  * @author gubatron
  * @author aldenml
- *
  */
 public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
+    private final MediaType type;
+    private final Set<File> cache;
 
-	private MediaType type;
+    public MediaTypeSavedFilesDirectoryHolder(MediaType type) {
+        this.type = type;
+        cache = new HashSet<>();
+    }
 
-	private Set<File> cache;
+    public MediaType getMediaType() {
+        return type;
+    }
 
-	public MediaTypeSavedFilesDirectoryHolder(MediaType type) {
-		this.type = type;
-		cache = new HashSet<File>();
-	}
+    public boolean accept(File file) {
+        return type.matches(file.getName());
+    }
 
-	public MediaType getMediaType() {
-	    return type;
-	}
-
-	public boolean accept(File file) {
-		return type.matches(file.getName());
-	}
-
-	public Icon getIcon() {
-		NamedMediaType nmt = NamedMediaType.getFromMediaType(type);
-		return nmt.getIcon();
-	}
+    public Icon getIcon() {
+        NamedMediaType nmt = NamedMediaType.getFromMediaType(type);
+        return nmt.getIcon();
+    }
 
     public String getName() {
         return NamedMediaType.getFromMediaType(type).getName();
@@ -76,10 +72,6 @@ public class MediaTypeSavedFilesDirectoryHolder implements DirectoryHolder {
 
     public int size() {
         return 0;
-    }
-
-    public boolean isEmpty() {
-        return true;
     }
 
     public Set<File> getCache() {

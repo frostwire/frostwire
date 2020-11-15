@@ -38,7 +38,6 @@ import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
-import com.frostwire.jlibtorrent.swig.torrent_flags_t;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
@@ -62,11 +61,8 @@ import java.util.Set;
  * @author aldenml
  */
 public final class BTDownload implements BittorrentDownload {
-
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
-
     private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
-
     private static final int[] ALERT_TYPES = {
             AlertType.TORRENT_FINISHED.swig(),
             AlertType.TORRENT_REMOVED.swig(),
@@ -74,28 +70,20 @@ public final class BTDownload implements BittorrentDownload {
             AlertType.SAVE_RESUME_DATA.swig(),
             AlertType.PIECE_FINISHED.swig(),
             AlertType.STORAGE_MOVED.swig()};
-
     private static final String EXTRA_DATA_KEY = "extra_data";
     private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
-
     private final BTEngine engine;
     private final TorrentHandle th;
     private final File savePath;
     private final Date created;
     private final PiecesTracker piecesTracker;
     private final File parts;
-
     private final Map<String, String> extra;
-
-    private BTDownloadListener listener;
-
-    private Set<File> incompleteFilesToRemove;
-
-    private long lastSaveResumeTime;
     private final PaymentOptions paymentOptions;
-
     private final InnerListener innerListener;
-
+    private BTDownloadListener listener;
+    private Set<File> incompleteFilesToRemove;
+    private long lastSaveResumeTime;
     private String predominantFileExtension;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
@@ -110,6 +98,10 @@ public final class BTDownload implements BittorrentDownload {
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();
         engine.addListener(innerListener);
+    }
+
+    private static boolean isPaused(TorrentStatus s) {
+        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
     }
 
     public Map<String, String> getExtra() {
@@ -127,7 +119,6 @@ public final class BTDownload implements BittorrentDownload {
     @Override
     public String getDisplayName() {
         Priority[] priorities = th.filePriorities();
-
         int count = 0;
         int index = 0;
         for (int i = 0; i < priorities.length; i++) {
@@ -136,11 +127,11 @@ public final class BTDownload implements BittorrentDownload {
                 index = i;
             }
         }
-
         return count != 1 ? th.name() : FilenameUtils.getName(th.torrentFile().files().filePath(index));
     }
 
-    public long getSize() {
+    public double getSize() {
+        // TODO: jlibtorrent's TorrentInfo is returning a long, should be a double (int_64)
         TorrentInfo ti = th.torrentFile();
         return ti != null ? ti.totalSize() : 0;
     }
@@ -169,32 +160,24 @@ public final class BTDownload implements BittorrentDownload {
         if (!engine.isRunning()) {
             return TransferState.STOPPED;
         }
-
         if (engine.isPaused()) {
             return TransferState.PAUSED;
         }
-
         if (!th.isValid()) {
             return TransferState.ERROR;
         }
-
         final TorrentStatus status = th.status();
         final boolean isPaused = isPaused(status);
-
         if (isPaused && status.isFinished()) {
             return TransferState.FINISHED;
         }
-
         if (isPaused && !status.isFinished()) {
             return TransferState.PAUSED;
         }
-
         if (!isPaused && status.isFinished()) { // see the docs of isFinished
             return TransferState.SEEDING;
         }
-
         final TorrentStatus.State state = status.state();
-
         switch (state) {
             case CHECKING_FILES:
                 return TransferState.CHECKING;
@@ -239,25 +222,19 @@ public final class BTDownload implements BittorrentDownload {
         if (th == null || !th.isValid()) {
             return 0;
         }
-
         TorrentStatus ts = th.status();
-
         if (ts == null) { // this can't never happens
             return 0;
         }
-
         float fp = ts.progress();
         TorrentStatus.State state = ts.state();
-
         if (Float.compare(fp, 1f) == 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return 100;
         }
-
         int p = (int) (fp * 100);
         if (p > 0 && state != TorrentStatus.State.CHECKING_FILES) {
             return Math.min(p, 100);
         }
-
         return 0;
     }
 
@@ -321,7 +298,6 @@ public final class BTDownload implements BittorrentDownload {
             if (!th.isValid()) {
                 return null;
             }
-
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.swig() != null) {
                 return new File(savePath.getAbsolutePath(), ti.numFiles() > 1 ? th.name() : ti.files().filePath(0));
@@ -329,12 +305,11 @@ public final class BTDownload implements BittorrentDownload {
         } catch (Throwable e) {
             LOG.warn("Could not retrieve download content save path", e);
         }
-
         return null;
     }
 
     public String getInfoHash() {
-        return th.infoHash().toString();
+        return th.infoHash().toString().toLowerCase();
     }
 
     @Override
@@ -342,6 +317,7 @@ public final class BTDownload implements BittorrentDownload {
         return created;
     }
 
+    @Override
     public long getETA() {
         if (!th.isValid()) {
             return 0;
@@ -366,12 +342,9 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return;
         }
-
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
-
         th.unsetFlags(TorrentFlags.AUTO_MANAGED);
         th.pause();
-
         doResumeData(true);
     }
 
@@ -379,12 +352,9 @@ public final class BTDownload implements BittorrentDownload {
         if (!th.isValid()) {
             return;
         }
-
         extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
-
         th.setFlags(TorrentFlags.AUTO_MANAGED);
         th.resume();
-
         doResumeData(true);
     }
 
@@ -399,9 +369,7 @@ public final class BTDownload implements BittorrentDownload {
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
-
         incompleteFilesToRemove = getIncompleteFiles();
-
         if (th.isValid()) {
             if (deleteData) {
                 engine.remove(th, SessionHandle.DELETE_FILES);
@@ -409,14 +377,12 @@ public final class BTDownload implements BittorrentDownload {
                 engine.remove(th);
             }
         }
-
         if (deleteTorrent) {
             File torrent = engine.readTorrentPath(infoHash);
             if (torrent != null) {
                 Platforms.get().fileSystem().delete(torrent);
             }
         }
-
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
     }
@@ -429,34 +395,35 @@ public final class BTDownload implements BittorrentDownload {
                 FileStorage files = torrentInfo.files();
                 Map<String, Long> extensionByteSums = new HashMap<>();
                 int numFiles = files.numFiles();
-                if (files.paths() != null) {
-                    for (int i = 0; i < numFiles; i++) {
-                        String path = files.filePath(i);
-                        String extension = FilenameUtils.getExtension(path);
-                        if ("".equals(extension)) {
-                            // skip folders
-                            continue;
-                        }
-                        if (extensionByteSums.containsKey(extension)) {
-                            Long bytes = extensionByteSums.get(extension);
-                            extensionByteSums.put(extension, bytes + files.fileSize(i));
-                        } else {
-                            extensionByteSums.put(extension, files.fileSize(i));
-                        }
+                files.paths();
+                for (int i = 0; i < numFiles; i++) {
+                    String path = files.filePath(i);
+                    String extension = FilenameUtils.getExtension(path);
+                    if ("".equals(extension)) {
+                        // skip folders
+                        continue;
                     }
-                    String extensionCandidate = null;
-                    Set<String> exts = extensionByteSums.keySet();
-                    for (String ext : exts) {
-                        if (extensionCandidate == null) {
-                            extensionCandidate = ext;
-                        } else {
-                            if (extensionByteSums.get(ext) > extensionByteSums.get(extensionCandidate)) {
-                                extensionCandidate = ext;
-                            }
-                        }
+                    if (extensionByteSums.containsKey(extension)) {
+                        Long bytes = extensionByteSums.get(extension);
+                        extensionByteSums.put(extension, bytes + files.fileSize(i));
+                    } else {
+                        extensionByteSums.put(extension, files.fileSize(i));
                     }
-                    predominantFileExtension = extensionCandidate;
                 }
+                String extensionCandidate = null;
+                Set<String> exts = extensionByteSums.keySet();
+                for (String ext : exts) {
+                    if (extensionCandidate == null) {
+                        extensionCandidate = ext;
+                    } else {
+                        Long extSum = extensionByteSums.get(ext);
+                        Long extSumCandidate = extensionByteSums.get(extensionCandidate);
+                        if (extSum != null && extSumCandidate != null && extSum > extSumCandidate) {
+                            extensionCandidate = ext;
+                        }
+                    }
+                }
+                predominantFileExtension = extensionCandidate;
             }
         }
         return predominantFileExtension;
@@ -483,11 +450,10 @@ public final class BTDownload implements BittorrentDownload {
 
     private void torrentRemoved() {
         engine.removeListener(innerListener);
-
         if (parts != null) {
+            //noinspection ResultOfMethodCallIgnored
             parts.delete();
         }
-
         if (listener != null) {
             try {
                 listener.removed(this, incompleteFilesToRemove);
@@ -583,7 +549,7 @@ public final class BTDownload implements BittorrentDownload {
     @Override
     public List<TransferItem> getItems() {
         ArrayList<TransferItem> items = new ArrayList<>();
-        if (th.isValid()) {
+        if (th != null && th.isValid()) {
             TorrentInfo ti = th.torrentFile();
             if (ti != null && ti.isValid()) {
                 FileStorage fs = ti.files();
@@ -647,19 +613,14 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isSequentialDownload() {
-        if (!th.isValid()) {
-            return false;
-        }
-
-        torrent_flags_t flags = th.status().flags();
-        return flags.and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).nonZero();
+        return th.isValid() && th.status().flags().and_(TorrentFlags.SEQUENTIAL_DOWNLOAD).eq(TorrentFlags.SEQUENTIAL_DOWNLOAD);
     }
 
     public void setSequentialDownload(boolean sequential) {
         if (!th.isValid()) {
+            System.out.println("BTDownload::setSequentialDownload( " +  sequential + ") aborted. Torrent Handle Invalid.");
             return;
         }
-
         if (sequential) {
             th.setFlags(TorrentFlags.SEQUENTIAL_DOWNLOAD);
         } else {
@@ -724,7 +685,6 @@ public final class BTDownload implements BittorrentDownload {
                     readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
                 }
             }
-
         } catch (Throwable e) {
             LOG.error("Error reading extra data from resume file", e);
         }
@@ -755,12 +715,7 @@ public final class BTDownload implements BittorrentDownload {
         return flag;
     }
 
-    private static boolean isPaused(TorrentStatus s) {
-        return s.flags().and_(TorrentFlags.PAUSED).nonZero();
-    }
-
     private final class InnerListener implements AlertListener {
-
         @Override
         public int[] types() {
             return ALERT_TYPES;

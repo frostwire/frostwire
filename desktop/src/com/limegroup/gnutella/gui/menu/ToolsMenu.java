@@ -21,7 +21,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.iTunesMediator;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -30,7 +30,6 @@ import java.awt.event.ActionEvent;
  * Contains all of the menu items for the tools menu.
  */
 final class ToolsMenu extends AbstractMenu {
-
     private final UpdateAction updateAction;
 
     /**
@@ -40,13 +39,10 @@ final class ToolsMenu extends AbstractMenu {
      */
     ToolsMenu() {
         super(I18n.tr("&Tools"));
-
         this.updateAction = new UpdateAction();
-
         if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
             addMenuItem(new RebuildiTunesPlaylist());
         }
-
         addMenuItem(new ShowOptionsAction());
         addMenuItem(updateAction);
     }
@@ -57,26 +53,39 @@ final class ToolsMenu extends AbstractMenu {
     }
 
     private static class RebuildiTunesPlaylist extends AbstractAction {
-
         private static final long serialVersionUID = 8348355619323878579L;
 
+        private static final String actionTitle = OSUtils.isMacOSCatalina105OrNewer() ?
+                I18n.tr("Rebuild Apple Music \"FrostWire\" Playlist") :
+                I18n.tr("Rebuild iTunes \"FrostWire\" Playlist");
+        private static final String description = OSUtils.isMacOSCatalina105OrNewer() ?
+                I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on Apple Music with all the audio files found on your Torrent Data Folder.") :
+                I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder.");
+
         RebuildiTunesPlaylist() {
-            super(I18n.tr("Rebuild iTunes \"FrostWire\" Playlist"));
-            putValue(LONG_DESCRIPTION, I18n.tr("Deletes and re-builds the \"FrostWire\" playlist on iTunes with all the audio files found on your Torrent Data Folder."));
+            super(actionTitle);
+            putValue(LONG_DESCRIPTION, description);
         }
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-
-            DialogOption result = GUIMediator.showYesNoMessage(I18n.tr(
-                    "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
-                            + "it with one containing all the iTunes compatible files in your \n"
-                            + "Frostwire \"Torrent Data Folder\"\n\n"
-                            + "Please note that it will add the files to the iTunes library as well\n"
-                            + "and this could result in duplicate files on your iTunes library\n\n"
-                            + "Are you sure you want to continue?"),
+            String yesNoMessage = OSUtils.isMacOSCatalina105OrNewer() ?
+                    I18n.tr(
+                            "This will remove your \"FrostWire\" playlist in Apple Music and replace\n"
+                                    + "it with one containing all the Apple Music compatible files in your \n"
+                                    + "Frostwire \"Torrent Data Folder\"\n\n"
+                                    + "Please note that it will add the files to the Apple Music library as well\n"
+                                    + "and this could result in duplicate files on your Apple Music library\n\n"
+                                    + "Are you sure you want to continue?") :
+                    I18n.tr(
+                            "This will remove your \"FrostWire\" playlist in iTunes and replace\n"
+                                    + "it with one containing all the iTunes compatible files in your \n"
+                                    + "Frostwire \"Torrent Data Folder\"\n\n"
+                                    + "Please note that it will add the files to the iTunes library as well\n"
+                                    + "and this could result in duplicate files on your iTunes library\n\n"
+                                    + "Are you sure you want to continue?");
+            DialogOption result = GUIMediator.showYesNoMessage(yesNoMessage,
                     I18n.tr("Warning"), JOptionPane.WARNING_MESSAGE);
-
             if (result == DialogOption.YES) {
                 iTunesMediator.instance().resetFrostWirePlaylist();
             }
@@ -97,7 +106,6 @@ final class ToolsMenu extends AbstractMenu {
     }
 
     private static class UpdateAction extends AbstractAction {
-
         private static final long serialVersionUID = 2915214339056016808L;
 
         UpdateAction() {
@@ -113,10 +121,9 @@ final class ToolsMenu extends AbstractMenu {
             }
         }
 
-        public void refresh() {
+        void refresh() {
             String text;
             boolean enabled = true;
-
             if (UpdateMediator.instance().isUpdated()) {
                 text = I18n.tr("You are up to date with FrostWire") + " v." + UpdateMediator.instance().getLatestVersion();
             } else if (UpdateMediator.instance().isUpdateDownloading()) {
@@ -127,7 +134,6 @@ final class ToolsMenu extends AbstractMenu {
             } else {
                 text = I18n.tr("Check for update");
             }
-
             putValue(NAME, text);
             putValue(LONG_DESCRIPTION, text);
             setEnabled(enabled);

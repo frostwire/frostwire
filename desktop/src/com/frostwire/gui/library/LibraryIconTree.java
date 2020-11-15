@@ -34,18 +34,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class LibraryIconTree extends JTree {
-
+class LibraryIconTree extends JTree {
     private static final Logger LOG = Logger.getLogger(LibraryIconTree.class.getName());
-
     private Image speaker;
 
-    public LibraryIconTree() {
+    private LibraryIconTree() {
         loadIcons();
     }
 
@@ -57,13 +53,12 @@ public class LibraryIconTree extends JTree {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         try {
             MediaPlayer player = MediaPlayer.instance();
             MediaPlaybackState playerState = player.getState();
             if (playerState != MediaPlaybackState.Stopped &&
-                playerState != MediaPlaybackState.Closed  &&
-                playerState != MediaPlaybackState.Failed) {
+                    playerState != MediaPlaybackState.Closed &&
+                    playerState != MediaPlaybackState.Failed) {
                 if (player.getCurrentMedia() != null && player.getCurrentPlaylist() == null && player.getPlaylistFilesView() != null) {
                     TreePath path = getAudioPath();
                     if (path != null) {
@@ -121,7 +116,6 @@ public class LibraryIconTree extends JTree {
                 }
             }
         }
-
         return null;
     }
 }

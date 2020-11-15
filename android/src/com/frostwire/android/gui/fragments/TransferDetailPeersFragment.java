@@ -19,12 +19,14 @@
 package com.frostwire.android.gui.fragments;
 
 import android.content.res.Resources;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
@@ -32,6 +34,7 @@ import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.jlibtorrent.PeerInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -72,6 +75,9 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
         peerNumberTextView = findView(rootView, R.id.fragment_transfer_detail_peers_number);
         recyclerView = findView(rootView, R.id.fragment_transfer_detail_peers_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        if (recyclerView.getItemAnimator() instanceof SimpleItemAnimator) {
+            ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
+        }
     }
 
     @Override
@@ -178,9 +184,12 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
 
     private static String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
         switch (t) {
-            case WEB_SEED: return "web_seed";
-            case HTTP_SEED: return "http_seed";
-            default: return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
+            case WEB_SEED:
+                return "web_seed";
+            case HTTP_SEED:
+                return "http_seed";
+            default:
+                return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
         }
     }
 
@@ -194,11 +203,17 @@ public class TransferDetailPeersFragment extends AbstractTransferDetailFragment 
         }
 
         public void updatePeers(List<PeerInfo> peerInfos) {
-            this.peers.clear();
-            if (peerInfos != null) {
-                this.peers.addAll(peerInfos);
-            }
-            notifyDataSetChanged();
+            Collections.sort(peers, (o1, o2) ->
+                    -Long.compare(
+                            o1.totalDownload() + o1.totalUpload(),
+                            o2.totalDownload() + o2.totalUpload())
+            );
+            Collections.sort(peerInfos, (o1, o2) ->
+                    -Long.compare(
+                            o1.totalDownload() + o1.totalUpload(),
+                            o2.totalDownload() + o2.totalUpload())
+            );
+            AbstractTransferDetailFragment.updateAdapterItems(this, peers, peerInfos);
         }
 
         @Override

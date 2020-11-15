@@ -24,18 +24,14 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractSkinPainter extends AbstractRegionPainter {
-
     private static final String IMAGES_PATH = "org/limewire/gui/images/skin_";
-
     protected final ShapeGenerator shapeGenerator;
 
-    public AbstractSkinPainter() {
+    protected AbstractSkinPainter() {
         this.shapeGenerator = new ShapeGenerator();
     }
 
@@ -48,9 +44,8 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
      * Creates a simple vertical gradient using the shape for bounds and the
      * colors for top and bottom colors.
      *
-     * @param  s      the shape to use for bounds.
-     * @param  colors the colors to use for the gradient.
-     *
+     * @param s      the shape to use for bounds.
+     * @param colors the colors to use for the gradient.
      * @return the gradient.
      */
     protected final Paint createVerticalGradient(Shape s, Color[] colors) {
@@ -58,26 +53,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
         float xCenter = (float) bounds.getCenterX();
         float yMin = (float) bounds.getMinY();
         float yMax = (float) bounds.getMaxY();
-
-        return createGradient(xCenter, yMin, xCenter, yMax, new float[] { 0f, 1f }, colors);
-    }
-
-    /**
-     * Creates a simple horizontal gradient using the shape for bounds and the
-     * colors for top and bottom colors.
-     *
-     * @param  s      the shape to use for bounds.
-     * @param  colors the colors to use for the gradient.
-     *
-     * @return the gradient.
-     */
-    protected Paint createHorizontalGradient(Shape s, Color[] colors) {
-        Rectangle2D bounds = s.getBounds2D();
-        float xMin = (float) bounds.getMinX();
-        float xMax = (float) bounds.getMaxX();
-        float yCenter = (float) bounds.getCenterY();
-
-        return createGradient(xMin, yCenter, xMax, yCenter, new float[] { 0f, 1f }, colors);
+        return createGradient(xCenter, yMin, xCenter, yMax, new float[]{0f, 1f}, colors);
     }
 
     /**
@@ -87,20 +63,18 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
      * points are equal. In such a case, the end y point is slightly increased
      * to avoid the overlap.
      *
-     * @param  x1
-     * @param  y1
-     * @param  x2
-     * @param  y2
-     * @param  midpoints
-     * @param  colors
-     *
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @param midpoints
+     * @param colors
      * @return a valid LinearGradientPaint. This method never returns null.
      */
-    protected final LinearGradientPaint createGradient(float x1, float y1, float x2, float y2, float[] midpoints, Color[] colors) {
+    private LinearGradientPaint createGradient(float x1, float y1, float x2, float y2, float[] midpoints, Color[] colors) {
         if (x1 == x2 && y1 == y2) {
             y2 += .00001f;
         }
-
         return new LinearGradientPaint(x1, y1, x2, y2, midpoints, colors);
     }
 
@@ -108,7 +82,7 @@ public abstract class AbstractSkinPainter extends AbstractRegionPainter {
         return x >= 0 && y >= 0 && (w - x) > 0 && (h - y) > 0;
     }
 
-    protected final Image getImage(String name) {
+    final Image getImage(String name) {
         String imagePath = IMAGES_PATH + name + ".png";
         try {
             return ImageIO.read(ClassLoader.getSystemResource(imagePath));

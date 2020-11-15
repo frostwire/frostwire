@@ -7,7 +7,6 @@ import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 public class DeadlockBugManager {
-
     private static final Logger LOG = Logger.getLogger(DeadlockBugManager.class);
 
     private DeadlockBugManager() {
@@ -19,7 +18,6 @@ public class DeadlockBugManager {
     public static void handleDeadlock(DeadlockException bug, String threadName, String message) {
         bug.printStackTrace();
         System.err.println("Detail: " + message);
-
         LocalClientInfo info = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory().createLocalClientInfo(bug, threadName, message, false);
         // If it's a sendable version & we're either a beta or the user said to send it, send it
         if (BugSettings.SEND_DEADLOCK_BUGS.getValue()) {

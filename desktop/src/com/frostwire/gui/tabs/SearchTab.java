@@ -26,8 +26,8 @@ import javax.swing.*;
 public final class SearchTab extends AbstractTab {
     public SearchTab() {
         super(I18n.tr("Search"),
-              I18n.tr("Search and Download Files from the Internet."),
-              "search_tab");
+                I18n.tr("Search and Download Files from the Internet."),
+                "search_tab");
     }
 
     public JComponent getComponent() {

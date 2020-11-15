@@ -32,9 +32,20 @@ import java.io.File;
 
 /**
  * @author aldenml
- *
  */
 public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, MediaPlayerListener {
+    private static final int JMPlayer_addNotify = 1;
+    private static final int JMPlayer_dispose = 2;
+    // ui events
+    private static final int JMPlayer_volumeChanged = 3;
+    private static final int JMPlayer_timeInitialized = 4;
+    private static final int JMPlayer_progressChanged = 5;
+    private static final int JMPlayer_stateChanged = 6;
+    private static final int JMPlayer_toggleFS = 7;
+    // states
+    private static final int JMPlayer_statePlaying = 1;
+    private static final int JMPlayer_statePaused = 2;
+    private static final int JMPlayer_stateClosed = 3;
 
     static {
         try {
@@ -45,22 +56,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     private long view;
-
-    private static final int JMPlayer_addNotify = 1;
-    private static final int JMPlayer_dispose = 2;
-
-    // ui events
-    private static final int JMPlayer_volumeChanged = 3;
-    private static final int JMPlayer_timeInitialized = 4;
-    private static final int JMPlayer_progressChanged = 5;
-    private static final int JMPlayer_stateChanged = 6;
-    private static final int JMPlayer_toggleFS = 7;
-
-    // states
-    private static final int JMPlayer_statePlaying = 1;
-    private static final int JMPlayer_statePaused = 2;
-    private static final int JMPlayer_stateClosed = 3;
-
     private boolean refreshPlayTime = false;
 
     public MPlayerComponentOSX2() {
@@ -85,20 +80,10 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     @Override
     public void addNotify() {
         super.addNotify();
-
-        com.apple.concurrent.Dispatch.getInstance().getBlockingMainQueueExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                view = createNSView(getImagesPath());
-                sendMsg(JMPlayer_addNotify);
-            }
+        com.apple.concurrent.Dispatch.getInstance().getBlockingMainQueueExecutor().execute(() -> {
+            view = createNSView(getImagesPath());
+            sendMsg(JMPlayer_addNotify);
         });
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
     }
 
     @Override
@@ -115,175 +100,104 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
      * JNI Hook methods - forward all to the UIEventHandler
      */
     public void onVolumeChanged(final float volume) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeChanged(volume);
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeChanged(volume));
     }
 
     public void onIncrementVolumePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeIncremented();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeIncremented());
     }
 
     public void onDecrementVolumePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onVolumeDecremented();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onVolumeDecremented());
     }
 
     public void onSeekToTime(final float seconds) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onSeekToTime(seconds);
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onSeekToTime(seconds));
     }
 
     public void onPlayPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onPlayPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onPlayPressed());
     }
 
     public void onPausePressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onPausePressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onPausePressed());
     }
 
     public void onFastForwardPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onFastForwardPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onFastForwardPressed());
     }
 
     public void onRewindPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onRewindPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onRewindPressed());
     }
 
     public void onToggleFullscreenPressed() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onToggleFullscreenPressed();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onToggleFullscreenPressed());
     }
 
     public void onProgressSliderStarted() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onProgressSlideStart();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onProgressSlideStart());
     }
 
     public void onProgressSliderEnded() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerUIEventHandler.instance().onProgressSlideEnd();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerUIEventHandler.instance().onProgressSlideEnd());
     }
-    
+
     public void onMouseMoved() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerMediator.instance().getMPlayerWindow().showOverlayControls();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().showOverlayControls());
     }
-    
+
     public void onMouseDoubleClick() {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                MPlayerMediator.instance().getMPlayerWindow().toggleFullScreen();
-            }
-        });
+        SwingUtilities.invokeLater(() -> MPlayerMediator.instance().getMPlayerWindow().toggleFullScreen());
     }
 
     @Override
     public void mediaOpened(MediaPlayer mediaPlayer, MediaSource mediaSource) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void progressChange(MediaPlayer mediaPlayer, float currentTimeInSecs) {
-        sendMsg(JMPlayer_progressChanged, Float.valueOf(currentTimeInSecs));
+        sendMsg(JMPlayer_progressChanged, currentTimeInSecs);
     }
 
     @Override
     public void volumeChange(MediaPlayer mediaPlayer, double currentVolume) {
-        sendMsg(JMPlayer_volumeChanged, Float.valueOf((float) currentVolume));
+        sendMsg(JMPlayer_volumeChanged, (float) currentVolume);
     }
 
     @Override
     public void stateChange(MediaPlayer mediaPlayer, MediaPlaybackState state) {
         int s;
-
         switch (state) {
-        case Playing:
-            s = JMPlayer_statePlaying;
-            break;
-        case Paused:
-            s = JMPlayer_statePaused;
-            break;
-        case Closed:
-            s = JMPlayer_stateClosed;
-            break;
-        default:
-            s = -1;
-            break;
+            case Playing:
+                s = JMPlayer_statePlaying;
+                break;
+            case Paused:
+                s = JMPlayer_statePaused;
+                break;
+            case Closed:
+                s = JMPlayer_stateClosed;
+                break;
+            default:
+                s = -1;
+                break;
         }
-
         if (state == MediaPlaybackState.Playing && refreshPlayTime) {
             refreshPlayTime = false;
-            sendMsg(JMPlayer_timeInitialized, Float.valueOf(MediaPlayer.instance().getDurationInSecs()));
+            sendMsg(JMPlayer_timeInitialized, MediaPlayer.instance().getDurationInSecs());
         }
-
         if (state != MediaPlaybackState.Playing) {
             refreshPlayTime = true;
         }
-
         if (s != -1) {
-            sendMsg(JMPlayer_stateChanged, Integer.valueOf(s));
+            sendMsg(JMPlayer_stateChanged, s);
         }
     }
 
     @Override
-    public void icyInfo(MediaPlayer mediaPlayer, String data) {
+    public void icyInfo(String data) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -296,15 +210,10 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
     }
 
     private void sendMsg(final int messageID, final Object message) {
-        com.apple.concurrent.Dispatch.getInstance().getNonBlockingMainQueueExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                awtMessage(view, messageID, message);
-            }
-        });
+        com.apple.concurrent.Dispatch.getInstance().getNonBlockingMainQueueExecutor().execute(() -> awtMessage(view, messageID, message));
     }
 
-    protected String getImagesPath() {
+    private String getImagesPath() {
         boolean isRelease = !FrostWireUtils.getFrostWireJarPath().contains("frostwire-desktop");
         return (isRelease) ? getReleaseImagesPath() : "components/resources/src/main/resources/org/limewire/gui/images/";
     }
@@ -317,7 +226,6 @@ public class MPlayerComponentOSX2 extends Canvas implements MPlayerComponent, Me
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
         f = new File(f, "Resources");
-
         return f.getAbsolutePath() + File.separator;
     }
 

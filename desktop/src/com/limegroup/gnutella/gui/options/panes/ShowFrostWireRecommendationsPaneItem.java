@@ -23,71 +23,61 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.UpdateManagerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Pane to let the user decide wether or not to see the FrostWire recommended software.
  */
 public final class ShowFrostWireRecommendationsPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("FrostWire Recommendations");
-    
     public final static String LABEL = I18n.tr("By enabling this feature you become eligible to receive FrostWire sponsored offers and software recommendations to complement your experience.");
-
-	/**
-	 * Constant for the key of the locale-specific <tt>String</tt> for the 
-	 * frostclick promotions enabled check box label..
-	 */
-    private final String SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL = 
-        I18n.tr("Enable FrostWire Recommendations (highly recommended):");
-    
     /**
-	 * Constant for the check box that specifies whether to enable or 
-	 * disable frostclick promos
-	 */
+     * Constant for the check box that specifies whether to enable or
+     * disable frostclick promos
+     */
     private final JCheckBox CHECK_BOX = new JCheckBox();
-    
-    /**
-	 * The constructor constructs all of the elements of this
-	 * <tt>AbstractPaneItem</tt>.
-	 * 
-	 * @param key the key for this <tt>AbstractPaneItem</tt> that the
-	 *        superclass uses to generate locale-specific keys
-	 */
-	public ShowFrostWireRecommendationsPaneItem() {
-		super(TITLE, LABEL);
-		
-		LabeledComponent c = new LabeledComponent(SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL,
-				CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
-		add(c.getComponent());
-	}
 
     /**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
-	 * Sets the options for the fields in this <tt>PaneItem</tt> when the 
-	 * window is shown.
-	 */
+     * The constructor constructs all of the elements of this
+     * <tt>AbstractPaneItem</tt>.
+     *
+     */
+    public ShowFrostWireRecommendationsPaneItem() {
+        super(TITLE, LABEL);
+        /*
+          Constant for the key of the locale-specific <tt>String</tt> for the
+          frostclick promotions enabled check box label..
+         */
+        String SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL = I18n.tr("Enable FrostWire Recommendations (highly recommended):");
+        LabeledComponent c = new LabeledComponent(SHOW_FROSTWIRE_RECOMMENDATIONS_LABEL,
+                CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+        add(c.getComponent());
+    }
+
+    /**
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
+     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * window is shown.
+     */
     public void initOptions() {
         CHECK_BOX.setSelected(UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.getValue());
     }
 
     /**
-	 * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
-	 *
-	 * Applies the options currently set in this window, displaying an
-	 * error message to the user if a setting could not be applied.
-	 *
-	 * @throws IOException if the options could not be applied for some reason
-	 */
-    public boolean applyOptions() throws IOException {
-    	UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.setValue(CHECK_BOX.isSelected());
+     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * <p>
+     * Applies the options currently set in this window, displaying an
+     * error message to the user if a setting could not be applied.
+     *
+     */
+    public boolean applyOptions() {
+        UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.setValue(CHECK_BOX.isSelected());
         return false;
     }
-    
+
     public boolean isDirty() {
-        return UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.getValue() != CHECK_BOX.isSelected();   
-    }    
+        return UpdateManagerSettings.SHOW_FROSTWIRE_RECOMMENDATIONS.getValue() != CHECK_BOX.isSelected();
+    }
 }
 
 

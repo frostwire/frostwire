@@ -23,6 +23,5 @@ package com.frostwire.search;
  * @author aldenml
  */
 public interface CrawledSearchResult extends SearchResult {
-
     CrawlableSearchResult getParent();
 }

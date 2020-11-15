@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.SimpleCursorAdapter;
 
 import com.frostwire.android.R;
 import com.frostwire.util.HttpClientFactory;
@@ -30,7 +29,10 @@ import com.frostwire.util.http.HttpClient;
 import org.json.JSONArray;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 
 /**
  * @author gubatron
@@ -53,7 +55,7 @@ class SuggestionsAdapter extends SimpleCursorAdapter {
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
         try {
-            String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint.toString(), "UTF-8"));
+            String url = String.format(SUGGESTIONS_URL, URLEncoder.encode(constraint.toString(), StandardCharsets.UTF_8.name()));
 
             String js = client.get(url, HTTP_QUERY_TIMEOUT);
             String json = stripJs(js);

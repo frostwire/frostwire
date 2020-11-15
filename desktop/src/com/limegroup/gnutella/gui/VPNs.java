@@ -18,8 +18,10 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.jlibtorrent.EnumNet;
-import org.limewire.util.OSUtils;
+import com.frostwire.platform.Platforms;
+import com.frostwire.util.OSUtils;
 
 import java.util.List;
 
@@ -28,21 +30,24 @@ import java.util.List;
  * @author aldenml
  */
 public final class VPNs {
-
     public static boolean isVPNActive() {
         boolean result = false;
-
         if (BTEngine.getInstance().swig() == null) {
             // still not started or already stopped
             return false;
         }
-
         if (OSUtils.isMacOSX() || OSUtils.isLinux()) {
+            DesktopPlatform platform = (DesktopPlatform) Platforms.get();
+
             result = isPosixVPNActive();
+            if (!result) {
+                // not returning all the interfaces on macos, could be a false positive
+                platform.vpn().refresh();
+                result = result || platform.vpn().active();
+            }
         } else if (OSUtils.isWindows()) {
             result = isWindowsVPNActive();
         }
-
         return result;
     }
 
@@ -73,7 +78,6 @@ public final class VPNs {
             }
         } catch (Throwable ignored) {
         }
-
         return result;
     }
 
@@ -86,11 +90,14 @@ public final class VPNs {
                     isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN Tap Adapter") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "NordVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "NordLynx Tunnel") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "AVG TAP") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "SecureLine TAP") || // avast!
                     isWindowsVPNAdapterActive(interfaces, null, "TAP-Windows Adapter V9") || // IPVanish
                     isWindowsVPNAdapterActive(interfaces, routes, "CyberGhost") || // CyberGhost
-                    isWindowsVPNAdapterActive(interfaces, routes, "Windscribe VPN") || isWindowsVPNAdapterActive(interfaces, routes, "Windscribe IKEv2") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "Windscribe VPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "Windscribe IKEv2") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "PureVPN");
         } catch (Throwable t2) {
             t2.printStackTrace();
@@ -107,15 +114,12 @@ public final class VPNs {
                 break;
             }
         }
-
         if (adapter == null) {
             return false;
         }
-
         if (routes == null) { // don't lookup at routes
             return true;
         }
-
         for (EnumNet.IpRoute route : routes) {
             if (route.name().contains(adapter.name())) {
                 return true;

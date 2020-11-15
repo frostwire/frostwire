@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,30 +17,24 @@
 
 package com.frostwire.search;
 
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UserAgentGenerator;
+import com.frostwire.util.http.HttpClient;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class WebSearchPerformer extends AbstractSearchPerformer {
-
     private static final Logger LOG = Logger.getLogger(WebSearchPerformer.class);
-
     private static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
-
-    private static final String[] STREAMABLE_EXTENSIONS = new String[] { "mp3", "ogg", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "mov", "mpg", "mpeg", "3gp", "m4v", "webm" };
-
+    private static final String[] STREAMABLE_EXTENSIONS = new String[]{"mp3", "ogg", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "mov", "mpg", "mpeg", "3gp", "m4v", "webm"};
     private final String domainName;
     private final String keywords;
     private final String encodedKeywords;
@@ -49,11 +43,9 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     WebSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(token);
-
         if (domainName == null) {
             throw new IllegalArgumentException("domainName can't be null");
         }
-
         this.domainName = domainName;
         this.keywords = keywords;
         this.encodedKeywords = UrlUtils.encode(keywords);
@@ -61,11 +53,21 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
     }
 
+    public static boolean isStreamable(String filename) {
+        String ext = FilenameUtils.getExtension(filename);
+        for (String s : STREAMABLE_EXTENSIONS) {
+            if (s.equals(ext)) {
+                return true; // fast return
+            }
+        }
+        return false;
+    }
+
     public final String getKeywords() {
         return keywords;
     }
 
-    public final String getEncodedKeywords() {
+    public String getEncodedKeywords() {
         return encodedKeywords;
     }
 
@@ -76,7 +78,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     /**
      * Allow to perform the HTTP operation using the same internal http client.
-     * 
+     *
      * @param url
      * @return the web page (html)
      */
@@ -92,13 +94,14 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         try {
             return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
         } catch (IOException throwable) {
+            LOG.error(throwable.getMessage(), throwable);
             return null;
         }
     }
 
     /**
      * Allow to perform the HTTP operation using the same internal http client.
-     * 
+     *
      * @param url
      * @return the raw bytes from the http connection
      */
@@ -112,17 +115,6 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         } else {
             return null;
         }
-    }
-
-    public static boolean isStreamable(String filename) {
-        String ext = FilenameUtils.getExtension(filename);
-        for (String s : STREAMABLE_EXTENSIONS) {
-            if (s.equals(ext)) {
-                return true; // fast return
-            }
-        }
-
-        return false;
     }
 
     public String getDomainName() {

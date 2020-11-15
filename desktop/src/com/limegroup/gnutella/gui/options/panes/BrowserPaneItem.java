@@ -13,53 +13,42 @@ import com.limegroup.gnutella.gui.SizedTextField;
 import com.limegroup.gnutella.settings.URLHandlerSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options
  * window that allows the user to select the
  * default browser behavior.
  */
-public class BrowserPaneItem extends AbstractPaneItem { 
-
-    public final static String TITLE = I18n.tr("Browser Options");
-    
-    public final static String LABEL = I18n.tr("You can choose which browser to use.");
-
-	/**
-	 * Constant for the key of the locale-specific <code>String</code> for the 
-	 * label on the component that allows to user to change the setting for
-	 * this <tt>PaneItem</tt>.
-	 */
-	private final String OPTION_LABEL = I18n.tr("Browser");
-    
-    /** 
+public class BrowserPaneItem extends AbstractPaneItem {
+    private final static String TITLE = I18n.tr("Browser Options");
+    private final static String LABEL = I18n.tr("You can choose which browser to use.");
+    /**
      * Handle to the <tt>JTextField</tt> that displays the browser name
-     */    
-    private JTextField BROWSER;
-    
-    /**
-	 * Creates new BrowserOptionsPaneItem
-	 * 
-	 * @param key
-	 *            the key for this <tt>AbstractPaneItem</tt> that the
-	 *            superclass uses to generate locale-specific keys
-	 */
-	public BrowserPaneItem() {
-		super(TITLE, LABEL);
-		
-		BROWSER = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
-		LabeledComponent comp = new LabeledComponent(OPTION_LABEL, BROWSER);
-		add(comp.getComponent());
-	}
+     */
+    private final JTextField BROWSER;
 
     /**
-	 * Applies the options currently set in this <tt>PaneItem</tt>.
-	 * 
-	 * @throws IOException
-	 *             if the options could not be fully applied
-	 */
-    public boolean applyOptions() throws IOException {
+     * Creates new BrowserOptionsPaneItem
+     *
+     */
+    public BrowserPaneItem() {
+        super(TITLE, LABEL);
+        BROWSER = new SizedTextField(25, SizePolicy.RESTRICT_HEIGHT);
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          label on the component that allows to user to change the setting for
+          this <tt>PaneItem</tt>.
+         */
+        String OPTION_LABEL = I18n.tr("Browser");
+        LabeledComponent comp = new LabeledComponent(OPTION_LABEL, BROWSER);
+        add(comp.getComponent());
+    }
+
+    /**
+     * Applies the options currently set in this <tt>PaneItem</tt>.
+     *
+     */
+    public boolean applyOptions() {
         URLHandlerSettings.BROWSER.setValue(BROWSER.getText());
         return false;
     }
@@ -67,7 +56,7 @@ public class BrowserPaneItem extends AbstractPaneItem {
     public boolean isDirty() {
         return !URLHandlerSettings.BROWSER.getValue().equals(BROWSER.getText());
     }
-    
+
     /**
      * Sets the options for the fields in this <tt>PaneItem</tt> when the
      * window is shown.
@@ -75,5 +64,4 @@ public class BrowserPaneItem extends AbstractPaneItem {
     public void initOptions() {
         BROWSER.setText(URLHandlerSettings.BROWSER.getValue());
     }
-    
 }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,63 +28,47 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class LicenseToggleButton extends JPanel {
-    private boolean selected;
-    private boolean toggleable;
-
     private final ImageIcon selectedIcon;
     private final AlphaIcon unselectedIcon;
-
     private final String title;
     private final JLabel iconLabel;
     private final JLabel titleLabel;
     private final JLabel descriptionLabel;
-
-    private LicenseIcon licenseIcon;
-
+    private boolean selected;
+    private boolean toggleable;
+    private final LicenseIcon licenseIcon;
     private LicenseToggleButtonOnToggleListener listener;
 
-    public enum LicenseIcon {
-        CC, BY, SA, ND, NC,
-        APACHE,
-        BSD,
-        GPL3,
-        LGPL3,
-        MOZILLA,
-        OPENSOURCE, 
-        CC0,
-        PUBLICDOMAIN
-    }
-
-    public LicenseToggleButton(LicenseIcon iconName, String text, String description, boolean selected, boolean toggleable) {
+    LicenseToggleButton(LicenseIcon iconName, String text, String description, boolean selected, boolean toggleable) {
         this.toggleable = toggleable;
         setMeUp();
-
         licenseIcon = iconName;
         selectedIcon = getIcon(iconName);
         unselectedIcon = new AlphaIcon(selectedIcon, 0.2f);
-
         iconLabel = new JLabel((selected) ? selectedIcon : unselectedIcon);
         title = text;
         titleLabel = new JLabel("<html><b>" + text + "</b></html>");
         descriptionLabel = new JLabel("<html><small>" + description + "</small></html>");
-
         setLayout(new MigLayout("fill, wrap 1"));
         add(iconLabel, "top, aligny top, alignx center, wrap");
         add(titleLabel, "top, aligny top, alignx center, wrap");
         add(descriptionLabel, "top, aligny top, pushy, alignx center");
-
         initEventListeners();
     }
-    
+
+    private static ImageIcon getIcon(LicenseIcon iconName) {
+        return GUIMediator.getThemeImage(iconName.toString() + ".png");
+    }
+
     public String getTitle() {
         return title;
     }
-    
-    public void setToggleable(boolean t) {
+
+    void setToggleable(boolean t) {
         toggleable = t;
     }
 
-    public LicenseIcon getLicenseIcon() {
+    LicenseIcon getLicenseIcon() {
         return licenseIcon;
     }
 
@@ -97,16 +81,16 @@ public class LicenseToggleButton extends JPanel {
         updateComponents();
     }
 
-    public void setOnToggleListener(LicenseToggleButtonOnToggleListener listener) {
+    void setOnToggleListener(LicenseToggleButtonOnToggleListener listener) {
         this.listener = listener;
     }
-    
+
     private void onMouseEntered() {
         if (toggleable) {
             setOpaque(true);
             setBackground(Color.WHITE);
             BasicStroke stroke = new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-            setBorder(BorderFactory.createStrokeBorder(stroke,Color.GRAY));
+            setBorder(BorderFactory.createStrokeBorder(stroke, Color.GRAY));
             updateComponents();
         }
     }
@@ -122,25 +106,24 @@ public class LicenseToggleButton extends JPanel {
         if (toggleable) {
             selected = !selected;
             updateComponents();
-
             if (listener != null) {
                 listener.onButtonToggled(this);
             }
         }
     }
-    
+
     private void initEventListeners() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 onToggle();
             }
-            
+
             @Override
             public void mouseEntered(MouseEvent e) {
                 onMouseEntered();
             }
-            
+
             @Override
             public void mouseExited(MouseEvent e) {
                 onMouseExited();
@@ -152,11 +135,9 @@ public class LicenseToggleButton extends JPanel {
         if (iconLabel != null && selectedIcon != null && unselectedIcon != null) {
             iconLabel.setIcon((selected) ? selectedIcon : unselectedIcon);
         }
-
         if (titleLabel != null) {
             titleLabel.setEnabled(selected);
         }
-
         if (descriptionLabel != null) {
             descriptionLabel.setEnabled(selected);
         }
@@ -167,8 +148,16 @@ public class LicenseToggleButton extends JPanel {
         setOpaque(false);
         setBorder(null);
     }
-    
-    private static ImageIcon getIcon(LicenseIcon iconName) {
-        return GUIMediator.getThemeImage(iconName.toString() + ".png");
+
+    public enum LicenseIcon {
+        CC, BY, SA, ND, NC,
+        APACHE,
+        BSD,
+        GPL3,
+        LGPL3,
+        MOZILLA,
+        OPENSOURCE,
+        CC0,
+        PUBLICDOMAIN
     }
 }

@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">שההתקנה הושלמה.</string>
     <string name="error_connection_timed_out">שגיאה: חיבור הופסק/ירד. נסה שוב.</string>
     <string name="azureus_manager_item_seeding">מתזמן</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">כל ההורדות בחינם</string>
     <string name="torrent_max_download_speed">מהירות הורדה מקסימלית</string>
     <string name="torrent_max_peers">Peers המקסימלי</string>
@@ -76,7 +75,7 @@
     <string name="share">לַחֲלוֹק</string>
     <string name="accept">לְקַבֵּל</string>
     <string name="torrent_max_download_speed_summary">מקס מהירות הורדה (0 פירושו ללא הגבלה)</string>
-    <string name="retry_search">נסה שוב</string>
+    <string name="retry">נסה שוב</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">הקובץ לא להיות זרע. ביטורנט יישאר מנותק.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ימחק קבצים שהורדו אם FrostWire יוסר.</string>
     <string name="protected_connection">VPN-מוגן</string>
@@ -357,7 +356,6 @@
     <string name="or">אוֹ</string>
     <string name="file_names">שמות קבצים</string>
     <string name="no_data_check_internet_connection">הרשת אינה זמינה, בדוק את חיבור האינטרנט שלך.</string>
-    <string name="use_pixabay">השתמש Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">להפסיק זריעת כל העברות</string>
     <string name="seed_stop">להפסיק זריעה</string>
     <string name="transfers_select_seeding">זריעה</string>
@@ -371,7 +369,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire לא יכול להתחיל כראוי בשל היעדר הרשאות. אנא הענק את ההרשאות הדרושות והפעל מחדש את היישום</string>
     <string name="vpn_find_out_more">למידע נוסף</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n ניסיון חינם ל -7 ימים</string>
-    <string name="play_store_out_of_sync">חנות Google Play צריכה לסנכרן, המתן מספר דקות</string>
     <string name="uploaded">הועלה</string>
     <string name="trackers">עוקבים</string>
     <string name="source_type">מָקוֹר: %1$s</string>
@@ -411,4 +408,5 @@
     <string name="add_tracker">הוסף גשש</string>
     <string name="contact_us">צור קשר</string>
     <string name="use_nyaa">השתמש Nyaa</string>
+    <string name="use_torrentz2">Torrentz2 השתמש</string>
 </resources>

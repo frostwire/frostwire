@@ -24,5 +24,6 @@ package com.frostwire.gui.theme;
  */
 public interface DialogFinishedListener {
     void onDialogCancelled();
+
     void onDialogOk(String inputValue);
 }

@@ -25,7 +25,6 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Повезани сте на Интернет помоћу ВПН-а. <br><br> Ако нисте већ, препоручујемо вам да користите једну од услуга испод да бисте шифровали везу и <b>заштитили своју приватност </b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ваша приватност је основно људско право</b>. Незаштићена веза значи све што радите на мрежи, укључујући <b>преузимање, претраживање, размену порука</b>, може се пратити и пресретнути од стране било кога на вашој мрежи, нпр. Интернет провајдери, хакери, владе.<br><br><b>Стално препоручујемо коришћење ВПН сервиса</b>. <br> Ево неких опција које пружају поуздан сервис и добро функционишу са ФростВире:]]></string>
     <!-- non HTML tags. -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Подешавања</string>
     <string name="activity_VPN">веза</string>
     <string name="exit">Exit</string>
@@ -159,7 +158,7 @@
     <string name="my_filetype">Moja %s</string>
     <string name="use_soundcloud">Користе Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Довнлоад није подржан</string>
-    <string name="retry_search">Покушајте поново</string>
+    <string name="retry">Покушајте поново</string>
     <string name="use_archiveorg">Користе Archive.org</string>
     <string name="crawl_cache_size">цравл кеш %1$.2fMB</string>
     <string name="deleted_crawl_cache">Делетед краул кеш</string>
@@ -359,7 +358,6 @@
     <string name="or">Или</string>
     <string name="file_names">Имена датотека</string>
     <string name="no_data_check_internet_connection">Мрежа недоступна, молимо проверите вашу интернетску везу.</string>
-    <string name="use_pixabay">Користе Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Престани сјести све преносе</string>
     <string name="seed_stop">Престани сјеме</string>
     <string name="transfers_select_seeding">сјеме</string>
@@ -411,7 +409,7 @@
     <string name="title_activity_transfer_detail">Детаљи преноса</string>
     <string name="piece_size_header">Величина комада:</string>
     <string name="add_tracker">Додај траку</string>
-    <string name="play_store_out_of_sync">Гоогле Плаи продавница мора да се синхронизује, сачекајте неколико минута</string>
     <string name="contact_us">Контактирајте нас</string>
     <string name="use_nyaa">Користе Nyaa</string>
+    <string name="use_torrentz2">Користе Torrentz2</string>
 </resources>

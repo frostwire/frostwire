@@ -39,7 +39,6 @@ import java.util.Set;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 final class BTDownloadTransferHandler extends LimeTransferHandler {
     private static final Logger LOG = Logger.getLogger(BTDownloadTransferHandler.class);
@@ -50,7 +49,7 @@ final class BTDownloadTransferHandler extends LimeTransferHandler {
 
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
         return DNDUtils.contains(transferFlavors, SearchResultTransferable.dataFlavor) ||
-               DNDUtils.DEFAULT_TRANSFER_HANDLER.canImport(comp, transferFlavors);
+                DNDUtils.DEFAULT_TRANSFER_HANDLER.canImport(comp, transferFlavors);
     }
 
     @Override

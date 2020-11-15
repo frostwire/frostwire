@@ -26,18 +26,14 @@
 package com.apple.concurrent;
 
 class LibDispatchRetainedResource {
-        protected long ptr;
+    long ptr;
 
-        protected LibDispatchRetainedResource(final long ptr) {
-                this.ptr = ptr;
-        }
+    LibDispatchRetainedResource(final long ptr) {
+        this.ptr = ptr;
+    }
 
-        protected synchronized void dispose() {
-                if (ptr != 0) LibDispatchNative.nativeReleaseQueue(ptr);
-                ptr = 0;
-        }
-
-        protected void finalize() throws Throwable {
-                dispose();
-        }
+    protected synchronized void dispose() {
+        if (ptr != 0) LibDispatchNative.nativeReleaseQueue(ptr);
+        ptr = 0;
+    }
 }

@@ -22,6 +22,18 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- styles for elements -->
+    <style name="Preference_TextAppearanceMaterialBody2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+    <style name="Preference_TextAppearanceMaterialSubhead">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 
     <style name="PreferencesBlueButton">
         <item name="android:background">@drawable/blue_light_button_background_selector</item>

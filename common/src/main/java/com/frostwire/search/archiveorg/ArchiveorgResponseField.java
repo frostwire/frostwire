@@ -20,10 +20,8 @@ package com.frostwire.search.archiveorg;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgResponseField {
     public int start;

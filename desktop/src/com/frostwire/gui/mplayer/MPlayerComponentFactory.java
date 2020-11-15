@@ -22,18 +22,18 @@ import java.awt.*;
 
 /**
  * @author aldenml
- *
  */
 public final class MPlayerComponentFactory {
-
     private static final String JMPLAYER_LIBRARY = "JMPlayer";
     private static final String OS_NAME = System.getProperty("os.name");
     private static final boolean IS_OS_WINDOWS = isCurrentOS("Windows");
     private static final boolean IS_OS_LINUX = isCurrentOS("Linux");
     private static final boolean IS_OS_MAC = isCurrentOS("Mac");
-
     private static boolean nativeLibLoaded = false;
     private static MPlayerComponentFactory instance;
+
+    private MPlayerComponentFactory() {
+    }
 
     public static synchronized MPlayerComponentFactory instance() {
         if (instance == null) {
@@ -42,7 +42,17 @@ public final class MPlayerComponentFactory {
         return instance;
     }
 
-    private MPlayerComponentFactory() {
+    /**
+     * Used to check whether the current operating system matches a operating
+     * system name (osName).
+     *
+     * @param osName Name of an operating system we are looking for as being part
+     *               of the System property os.name
+     * @return true, if osName matches the current operating system,false if not
+     * and if osName is null
+     */
+    private static boolean isCurrentOS(String osName) {
+        return osName != null && (OS_NAME.contains(osName));
     }
 
     MPlayerComponent createPlayerComponent() {
@@ -52,10 +62,9 @@ public final class MPlayerComponentFactory {
             } else if (IS_OS_MAC) {
                 return new MPlayerComponentOSX2();
             } else if (IS_OS_LINUX) {
-            	return new MPlayerComponentJava();
+                return new MPlayerComponentJava();
             }
         }
-
         return null;
     }
 
@@ -64,31 +73,14 @@ public final class MPlayerComponentFactory {
             try {
                 //force loading of libjawt.so/jawt.dll
                 Toolkit.getDefaultToolkit();
-
                 if (IS_OS_MAC) {
                     System.loadLibrary(JMPLAYER_LIBRARY);
                 }
-
                 nativeLibLoaded = true;
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
-
         return nativeLibLoaded;
-    }
-
-    /**
-     * Used to check whether the current operating system matches a operating
-     * system name (osName).
-     * 
-     * @param osName
-     *            Name of an operating system we are looking for as being part
-     *            of the System property os.name
-     * @return true, if osName matches the current operating system,false if not
-     *         and if osName is null
-     */
-    private static boolean isCurrentOS(String osName) {
-        return osName != null && (OS_NAME.contains(osName));
     }
 }

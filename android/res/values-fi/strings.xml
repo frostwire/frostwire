@@ -25,7 +25,6 @@
     <string name="your_installation_is_complete">Asennus on valmis.</string>
     <string name="error_connection_timed_out">Virhe: yhteyden aikakatkaisu/laski. Yritä uudelleen.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Kaikki ilmaiseksi ladattavia</string>
     <string name="torrent_max_download_speed">Suurin Latausnopeus</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -74,7 +73,7 @@
     <string name="share">Jakaa</string>
     <string name="accept">Hyväksy</string>
     <string name="torrent_max_download_speed_summary">Enimmäismäärä Latausnopeus (0 tarkoittaa rajoittamatonta)</string>
-    <string name="retry_search">Yritä uudelleen</string>
+    <string name="retry">Yritä uudelleen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Tiedostoa ei kylvetään. BitTorrent pysyy irti.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android poistaa ladattuja tiedostoja, jos FrostWire on poistettu.</string>
     <string name="protected_connection">VPN-suojattu</string>
@@ -355,7 +354,6 @@
     <string name="or">tai</string>
     <string name="file_names">Tiedostonimet</string>
     <string name="no_data_check_internet_connection">Verkko ei ole käytettävissä, tarkista Internet-yhteys.</string>
-    <string name="use_pixabay">Käytä Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Lopeta kaikkien siirtojen kylvetys</string>
     <string name="seed_stop">Lopeta kylväminen</string>
     <string name="transfers_select_seeding">kylvö</string>
@@ -409,7 +407,7 @@
     <string name="title_activity_transfer_detail">Yksityiskohtainen siirto</string>
     <string name="piece_size_header">Piece Koko:</string>
     <string name="add_tracker">Lisää seuranta</string>
-    <string name="play_store_out_of_sync">Google Play Kaupan on synkronoitava, odota muutama minuutti</string>
     <string name="contact_us">Ota meihin yhteyttä</string>
     <string name="use_nyaa">Käytä Nyaa</string>
+    <string name="use_torrentz2">Käytä Torrentz2</string>
 </resources>

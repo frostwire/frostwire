@@ -21,13 +21,10 @@ package com.frostwire.search.archiveorg;
 import com.frostwire.search.StreamableSearchResult;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgCrawledStreamableSearchResult extends ArchiveorgCrawledSearchResult implements StreamableSearchResult {
-
     public ArchiveorgCrawledStreamableSearchResult(ArchiveorgSearchResult sr, ArchiveorgFile file) {
         super(sr, file);
     }

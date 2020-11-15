@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,13 +23,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class UserAgentGenerator {
-
     private static final List<String> USER_AGENTS = Arrays
             .asList("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.85 Safari/537.36",
                     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:59.0) Gecko/20100101 Firefox/59.0",
@@ -72,7 +69,7 @@ public class UserAgentGenerator {
     static {
         Collections.shuffle(USER_AGENTS);
     }
-    
+
     public static String getUserAgent() {
         return USER_AGENTS.get(new Random(System.currentTimeMillis()).nextInt(USER_AGENTS.size()));
     }

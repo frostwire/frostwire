@@ -28,21 +28,14 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class LibraryIconList extends JList<Object> {
-
+class LibraryIconList extends JList<Object> {
     private Image speaker;
     private Image loading;
 
-    public LibraryIconList() {
-        loadIcons();
-    }
-
-    public LibraryIconList(ListModel<Object> dataModel) {
+    LibraryIconList(ListModel<Object> dataModel) {
         super(dataModel);
         loadIcons();
     }
@@ -51,10 +44,9 @@ public class LibraryIconList extends JList<Object> {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         MediaPlayer player = MediaPlayer.instance();
-
-        if (player.getState() != MediaPlaybackState.Stopped && 
-            player.getState() != MediaPlaybackState.Closed &&
-            player.getState() != MediaPlaybackState.Failed) {
+        if (player.getState() != MediaPlaybackState.Stopped &&
+                player.getState() != MediaPlaybackState.Closed &&
+                player.getState() != MediaPlaybackState.Failed) {
             if (player.getCurrentMedia() != null && player.getCurrentPlaylist() != null && player.getPlaylistFilesView() != null) {
                 int index = getPlaylistIndex(player.getCurrentPlaylist());
                 if (index != -1) {
@@ -62,7 +54,6 @@ public class LibraryIconList extends JList<Object> {
                 }
             }
         }
-
         paintImportingIcons(g);
     }
 
@@ -79,7 +70,6 @@ public class LibraryIconList extends JList<Object> {
     }
 
     private int getPlaylistIndex(Playlist playlist) {
-
         int n = getModel().getSize();
         for (int i = 0; i < n; i++) {
             Object value = getModel().getElementAt(i);
@@ -90,7 +80,6 @@ public class LibraryIconList extends JList<Object> {
                 }
             }
         }
-
         return -1;
     }
 

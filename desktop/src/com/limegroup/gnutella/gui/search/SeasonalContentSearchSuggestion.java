@@ -31,24 +31,18 @@ import java.util.List;
 
 /**
  * Created on 5/5/16.
+ *
  * @author gubatron
  * @author aldenml
  */
 final class SeasonalContentSearchSuggestion extends AbstractAction {
-
-    private static Pattern SEA_EPI_PATTERN = Pattern.compile("s(\\d+)e(\\d+)");
-
+    private static final Pattern SEA_EPI_PATTERN = Pattern.compile("s(\\d+)e(\\d+)");
     private final String query;
 
     private SeasonalContentSearchSuggestion(String query) {
         this.query = query;
         setEnabled(true);
         putValue(Action.NAME, MessageFormat.format(SearchMediator.SEARCH_FOR_KEYWORDS, query));
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        GUIMediator.instance().startSearch(query);
     }
 
     static void attemptToAddSeasonalContentSearchSuggestion(JMenu menu, JPopupMenu popupMenu, List<String> searchTokens) {
@@ -61,14 +55,13 @@ final class SeasonalContentSearchSuggestion extends AbstractAction {
                 String episodeStr = matcher.group(2);
                 int nextEpisode = Integer.parseInt(episodeStr) + 1;
                 String nextEpisodeStr = (nextEpisode < 10) ?
-                        "0" + String.valueOf(nextEpisode) :
+                        "0" + nextEpisode :
                         String.valueOf(nextEpisode);
                 nextEpisodeSearchToken = "s" + season + "e" + nextEpisodeStr;
                 break;
             }
             i++;
         }
-
         if (nextEpisodeSearchToken != null) {
             StringBuilder buffer = new StringBuilder();
             for (int j = 0; j < searchTokens.size(); j++) {
@@ -81,7 +74,6 @@ final class SeasonalContentSearchSuggestion extends AbstractAction {
                 }
             }
             String suggestedSearch = buffer.toString().trim();
-
             if (menu != null) {
                 menu.add(new SkinMenuItem(new SeasonalContentSearchSuggestion(suggestedSearch)));
             }
@@ -89,5 +81,10 @@ final class SeasonalContentSearchSuggestion extends AbstractAction {
                 popupMenu.add(new SeasonalContentSearchSuggestion(suggestedSearch));
             }
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        GUIMediator.instance().startSearch(query);
     }
 }

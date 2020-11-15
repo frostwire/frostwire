@@ -20,7 +20,7 @@ package com.frostwire.android;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Build;
-import android.support.v4.provider.DocumentFile;
+import android.os.Looper;
 
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.jlibtorrent.swig.libtorrent;
@@ -35,6 +35,8 @@ import com.frostwire.platform.VPNMonitor;
 import com.frostwire.util.Logger;
 
 import java.io.File;
+
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron
@@ -53,6 +55,11 @@ public final class AndroidPlatform extends AbstractPlatform {
     @Override
     public VPNMonitor vpn() {
         return null;
+    }
+
+    @Override
+    public boolean isUIThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
     public static boolean saf() {

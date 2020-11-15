@@ -34,21 +34,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
-
     private final MediaType type;
-
     private Set<File> cache;
 
     public SavedFilesDirectoryHolder(FileSetting saveDir, String name) {
         super(saveDir, name);
         type = MediaType.getAnyTypeMediaType();
-        cache = new HashSet<File>();
+        cache = new HashSet<>();
     }
 
     public Icon getIcon() {
@@ -60,19 +56,14 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
     }
 
     private Set<File> getFilesRecursively(File folder, Set<File> excludeFolders) {
-
         if (folder.isDirectory() && excludeFolders.contains(folder)) {
             return Collections.emptySet();
         }
-
         File[] listFiles = FileUtils.listFiles(folder);//folder.listFiles();
-
         if (listFiles == null || listFiles.length == 0) {
             return Collections.emptySet();
         }
-
         Set<File> results = new HashSet<>();
-
         for (File f : listFiles) {
             if (f.exists()) {
                 if (!f.isDirectory() && !_hideFiles.contains(f) && !f.getName().toLowerCase().contains(".ds_store")
@@ -83,7 +74,6 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
                 }
             }
         }
-
         return results;
     }
 
@@ -99,24 +89,17 @@ public class SavedFilesDirectoryHolder extends FileSettingDirectoryHolder {
 
     @Override
     public File[] getFiles() {
-
         if (cache != null && cache.size() > 0) {
             return cache.toArray(new File[0]);
         }
-
         _hideFiles = TorrentUtil.getIgnorableFiles();
-
         Set<File> directoriesToNotInclude = LibrarySettings.DIRECTORIES_NOT_TO_INCLUDE.getValue();
         Set<File> directoriesToInclude = new HashSet<>(Collections.singletonList(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue()));//LibrarySettings.DIRECTORIES_TO_INCLUDE.getValue();
-
         Set<File> files = new HashSet<>();
-
         for (File directory : directoriesToInclude) {
             files.addAll(getFilesRecursively(directory, directoriesToNotInclude));
         }
-
-        cache = new HashSet<File>(files);
-
+        cache = new HashSet<>(files);
         return cache.toArray(new File[0]);
     }
 

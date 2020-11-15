@@ -31,14 +31,14 @@ import java.io.File;
 
 /**
  * Transfer Handler for the left hand side playlist tree.
- * @see LibraryPlaylistsTableTransferHandler to see how drags and drops on the playlists tables are handled.
  *
  * @author gubatron
  * @author aldenml
- *
+ * @see LibraryPlaylistsTableTransferHandler to see how drags and drops on the playlists tables are handled.
  */
 class LibraryPlaylistsTransferHandler extends TransferHandler {
     private final JList<Object> list;
+
     LibraryPlaylistsTransferHandler(JList<Object> list) {
         this.list = list;
     }
@@ -58,7 +58,6 @@ class LibraryPlaylistsTransferHandler extends TransferHandler {
         if (index != -1) {
             // depending on the mouse position detect which playlist item the drop was done
             Playlist playlist = getTargetPlaylist(location, index);
-
             if (playlist == null) {
                 if (createNewPlaylist(support)) {
                     return false;

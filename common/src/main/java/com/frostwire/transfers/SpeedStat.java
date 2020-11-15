@@ -23,31 +23,41 @@ package com.frostwire.transfers;
  * @author aldenml
  */
 final class SpeedStat {
-
     private static final int INTERVAL_MILLISECONDS = 1000;
-
     private long totalBytes;
     private long averageSpeed; // in bytes
-
     private long speedMarkTimestamp;
     private long lastTotalBytes;
 
-    public SpeedStat() {
+    SpeedStat() {
     }
 
-    public long totalBytes() {
+    private static long eta(double size, double total, double speed) {
+        double left = size - total;
+        if (left <= 0) {
+            return 0;
+        }
+        if (speed <= 0) {
+            return -1;
+        }
+        return (long) (left / speed);
+    }
+
+    private static int progress(double size, double total) {
+        return size > 0 ? (int) ((total * 100) / size) : 0;
+    }
+
+    long totalBytes() {
         return totalBytes;
     }
 
-    public long averageSpeed() {
+    long averageSpeed() {
         return averageSpeed;
     }
 
     public void update(long numBytes) {
         long now = System.currentTimeMillis();
-
         totalBytes += numBytes;
-
         if (now - speedMarkTimestamp > INTERVAL_MILLISECONDS) {
             averageSpeed = ((totalBytes - lastTotalBytes) * 1000) / (now - speedMarkTimestamp);
             speedMarkTimestamp = now;
@@ -55,30 +65,11 @@ final class SpeedStat {
         }
     }
 
-    public long eta(long size) {
+    long eta(double size) {
         return eta(size, totalBytes, averageSpeed);
     }
 
-    public int progress(long size) {
+    public int progress(double size) {
         return progress(size, totalBytes);
-    }
-
-    static long eta(long size, long total, long speed) {
-        long left = size - total;
-        long rate = speed;
-
-        if (left <= 0) {
-            return 0;
-        }
-
-        if (rate <= 0) {
-            return -1;
-        }
-
-        return left / rate;
-    }
-
-    static int progress(long size, long total) {
-        return size > 0 ? (int) ((total * 100) / size) : 0;
     }
 }

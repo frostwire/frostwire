@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,22 +22,14 @@ import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SearchView.OnQueryTextListener;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -53,21 +45,23 @@ import android.widget.GridView;
 import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
-import com.andrew.apollo.IApolloService;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.appcompat.widget.Toolbar;
+
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.format.PrefixHighlighter;
+import com.andrew.apollo.loaders.SearchLoader;
 import com.andrew.apollo.recycler.RecycleHolder;
 import com.andrew.apollo.ui.MusicViewHolder;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
 
 import java.util.Locale;
-
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * Provides the search interface for Apollo.
@@ -75,16 +69,11 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public final class SearchActivity extends AbstractActivity implements LoaderCallbacks<Cursor>,
-        OnScrollListener, OnQueryTextListener, OnItemClickListener, ServiceConnection {
+        OnScrollListener, OnQueryTextListener, OnItemClickListener {
     /**
      * Grid view column count. ONE - list, TWO - normal grid
      */
     private static final int ONE = 1, TWO = 2;
-
-    /**
-     * The service token
-     */
-    private ServiceToken mToken;
 
     /**
      * The query
@@ -126,7 +115,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
 
         // Get the query
         final String query = getIntent().getStringExtra(SearchManager.QUERY);
@@ -199,22 +188,18 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Unbind from the service
-        if (musicPlaybackService != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
-        final Uri uri = Uri.parse("content://media/external/audio/search/fancy/"
-                + Uri.encode(mFilterString));
-        final String[] projection = new String[]{
-                BaseColumns._ID, MediaStore.Audio.Media.MIME_TYPE, MediaStore.Audio.Artists.ARTIST,
-                MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Media.TITLE, "data1", "data2"
-        };
-        return new CursorLoader(this, uri, projection, null, null, null);
+        SearchLoader.SearchCursorParameters searchCursorParameters =
+                SearchLoader.SearchCursorParameters.buildSearchCursorParameters(mFilterString);
+        return new CursorLoader(this,
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                searchCursorParameters.projection,
+                searchCursorParameters.selection,
+                searchCursorParameters.selectionArgs,
+                null);
     }
 
     @Override
@@ -315,23 +300,21 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
             final long[] list = new long[]{
                     id
             };
-            MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+            if (MusicPlaybackService.getInstance() == null) {
+                Context context = parent.getContext();
+                MusicUtils.startMusicPlaybackService(
+                        context,
+                        new Intent(context, MusicPlaybackService.class),
+                        () -> MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled()));
+            } else {
+                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+            }
         }
 
         // Close it up
         cursor.close();
         // All done
         finish();
-    }
-
-    @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
     }
 
     /**
@@ -394,14 +377,14 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
                 holder.mLineOne.get().setText(artist);
 
                 // Get the album count
-                final int albumCount = cursor.getInt(cursor.getColumnIndexOrThrow("data1"));
-                holder.mLineTwo.get().setText(
-                        MusicUtils.makeLabel(context, R.plurals.Nalbums, albumCount));
+                //final int albumCount = cursor.getInt(cursor.getColumnIndexOrThrow("data1"));
+                holder.mLineTwo.get().setVisibility(View.INVISIBLE);//setText(
+                //MusicUtils.makeLabel(context, R.plurals.Nalbums, albumCount));
 
                 // Get the song count
-                final int songCount = cursor.getInt(cursor.getColumnIndexOrThrow("data2"));
-                holder.mLineThree.get().setText(
-                        MusicUtils.makeLabel(context, R.plurals.Nsongs, songCount));
+                //final int songCount = cursor.getInt(cursor.getColumnIndexOrThrow("data2"));
+                holder.mLineThree.get().setVisibility(View.INVISIBLE); //setText(
+                //MusicUtils.makeLabel(context, R.plurals.Nsongs, songCount));
 
                 // Asynchronously load the artist image into the adapter
                 mImageFetcher.loadArtistImage(artist, holder.mImage.get());

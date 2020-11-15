@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Library extends LibraryDatabaseEntity {
-
     private int _id;
     private String _name;
     private int _version;
@@ -73,19 +72,6 @@ public class Library extends LibraryDatabaseEntity {
 
     public Playlist newPlaylist(String name, String description) {
         return new Playlist(db, LibraryDatabase.OBJECT_NOT_SAVED_ID, name, description);
-    }
-
-//    public void dump() {
-//        db.dump();
-//    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            close();
-        } finally {
-            super.finalize();
-        }
     }
 
     public Playlist getStarredPlaylist() {

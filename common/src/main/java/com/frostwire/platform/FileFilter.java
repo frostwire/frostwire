@@ -25,7 +25,6 @@ import java.io.File;
  * @author aldenml
  */
 public interface FileFilter extends java.io.FileFilter {
-
     boolean accept(File file);
 
     void file(File file);

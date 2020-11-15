@@ -23,13 +23,10 @@ import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.synth.SynthRadioButtonUI;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinRadioButtonUI extends SynthRadioButtonUI {
-
     public static ComponentUI createUI(JComponent comp) {
         ThemeMediator.testComponentCreationThreadingViolation();
         return new SkinRadioButtonUI();

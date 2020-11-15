@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020 FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
-import android.support.v4.app.NotificationCompat;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.player.CoreMediaPlayer;
-import com.frostwire.android.gui.NotificationUpdateDemon;
+import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.util.SystemUtils;
@@ -46,6 +48,7 @@ import com.frostwire.jlibtorrent.swig.byte_vector;
 import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OKHTTPClient;
 
 import java.io.File;
@@ -65,27 +68,25 @@ public class EngineService extends JobIntentService implements IEngineService {
     private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
     private final IBinder binder;
     private final CoreMediaPlayer mediaPlayer;
-    private byte state;
-    private NotificationUpdateDemon notificationUpdateDemon;
+    private final Object stateLock = new Object();
+    private static volatile byte state;
+    private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
 
     // public:
 
     public EngineService() {
         binder = new EngineServiceBinder();
-
         mediaPlayer = new ApolloMediaPlayer();
-
-        state = STATE_DISCONNECTED;
+        updateState(STATE_DISCONNECTED);
     }
 
     @Override
     public void onCreate() {
         notifiedStorage = new NotifiedStorage(this);
         super.onCreate();
-        async(this, EngineService::cancelAllNotificationsTask); // maybe?
-        Engine.foregroundServiceStartForAndroidO(this);
-
+        async(this, EngineService::cancelAllNotificationsTask);
+        async(this, EngineService::startPermanentNotificationUpdatesTask);
     }
 
     @Override
@@ -95,12 +96,7 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        async(this, EngineService::cancelAllNotificationsTask);
-        Engine.foregroundServiceStartForAndroidO(this);
-        if (intent == null) {
-            return START_NOT_STICKY;
-        }
-        if (SHUTDOWN_ACTION.equals(intent.getAction())) {
+        if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
             LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
             new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
                 @Override
@@ -108,6 +104,12 @@ public class EngineService extends JobIntentService implements IEngineService {
                     shutdownSupport();
                 }
             }.start();
+            return START_NOT_STICKY;
+        }
+
+        async(this, EngineService::cancelAllNotificationsTask);
+
+        if (intent == null) {
             return START_NOT_STICKY;
         }
         LOG.info("FrostWire's EngineService started by this intent:");
@@ -155,6 +157,7 @@ public class EngineService extends JobIntentService implements IEngineService {
     }
 
     public synchronized void startServices(boolean wasShutdown) {
+        LOG.info("startServices(wasShutdown=" + wasShutdown + ")", true);
         // hard check for TOS
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             return;
@@ -164,27 +167,33 @@ public class EngineService extends JobIntentService implements IEngineService {
             return;
         }
 
-        if (isStarted() || isStarting()) {
+        if (isStarted()) {
+            LOG.info("startServices() - aborting, it's already started", true);
             return;
         }
 
+        if (isStarting()) {
+            LOG.info("startServices() - aborting, it's already starting", true);
+            return;
+        }
+
+        LOG.info("startServices() - invoking resumeBTEngineTask, wasShutdown=" + wasShutdown);
+        TaskThrottle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
         async(this, EngineService::resumeBTEngineTask, wasShutdown);
     }
 
     public synchronized void stopServices(boolean disconnected) {
         if (isStopped() || isStopping() || isDisconnected()) {
+            LOG.info("stopServices() aborted - state:" + getStateString());
             return;
         }
-
-        state = STATE_STOPPING;
-
-        LOG.info("Pausing BTEngine...");
+        updateState(STATE_STOPPING);
+        LOG.info("stopServices() Pausing BTEngine...");
         TransferManager.instance().onShutdown(disconnected);
         BTEngine.getInstance().pause();
-        LOG.info("Pausing BTEngine paused");
-
-        state = disconnected ? STATE_DISCONNECTED : STATE_STOPPED;
-        LOG.info("Engine stopped, state: " + state);
+        LOG.info("stopServices() Pausing BTEngine paused");
+        updateState(disconnected ? STATE_DISCONNECTED : STATE_STOPPED);
+        LOG.info("stopServices() Engine stopped, state:" + getStateString());
     }
 
     public void notifyDownloadFinished(String displayName, File file, String infoHash) {
@@ -232,7 +241,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         Context ctx = getApplication();
         Intent i = new Intent(ctx, EngineService.class);
         i.setAction(SHUTDOWN_ACTION);
-        Engine.startService(ctx, i);
+        ctx.startService(i);
     }
 
     public class EngineServiceBinder extends Binder {
@@ -241,31 +250,41 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
     }
 
-    // protected:
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         onStartCommand(intent, 0, 1);
     }
 
+    @Override
+    public boolean onStopCurrentWork() {
+        //shutdown();
+        return true;
+    }
+
+    public void updateState(byte newState) {
+        synchronized (stateLock) {
+            LOG.info("updateState(old=" + getStateString() + " => new=" + getStateString(newState), true);
+            state = newState;
+        }
+    }
+
     // private:
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
-        //enableComponentsTask(this, false); // we're already on a shutdown thread
+        Librarian.instance().shutdownHandler();
         stopPermanentNotificationUpdates();
         cancelAllNotificationsTask(this);
         stopServices(false);
-
         if (BTEngine.ctx != null) {
-            LOG.debug("onDestroy, stopping BTEngine...");
+            LOG.debug("shutdownSupport(), stopping BTEngine...");
             BTEngine.getInstance().stop();
-            LOG.debug("onDestroy, BTEngine stopped");
+            LOG.debug("shutdownSupport(), BTEngine stopped");
         } else {
-            LOG.debug("onDestroy, BTEngine didn't have a chance to start, no need to stop it");
+            LOG.debug("shutdownSupport(), BTEngine didn't have a chance to start, no need to stop it");
         }
-
-        //ImageLoader.getInstance(this).shutdown();
         stopOkHttp();
-        stopForeground(true);
+        updateState(STATE_STOPPED);
+        stopSelf();
     }
 
     private int getNotificationIcon() {
@@ -273,8 +292,8 @@ public class EngineService extends JobIntentService implements IEngineService {
     }
 
     private void stopPermanentNotificationUpdates() {
-        if (notificationUpdateDemon != null) {
-            notificationUpdateDemon.stop();
+        if (notificationUpdateDaemon != null) {
+            notificationUpdateDaemon.stop();
         }
     }
 
@@ -296,11 +315,36 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
     }
 
+    private String getStateString() {
+        return getStateString(state);
+    }
+
+    private String getStateString(byte _state) {
+        switch (_state) {
+            case STATE_UNSTARTED:
+                return "STATE_UNSTARTED";
+            case STATE_INVALID:
+                return "STATE_INVALID";
+            case STATE_STARTED:
+                return "STATE_STARTED";
+            case STATE_STARTING:
+                return "STATE_STARTING";
+            case STATE_STOPPED:
+                return "STATE_STOPPED";
+            case STATE_STOPPING:
+                return "STATE_STOPPING";
+            case STATE_DISCONNECTED:
+                return "STATE_DISCONNECTED";
+        }
+        return "<UNKNOWN_STATE:" + _state + " - Check your logic!>";
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // STATIC SECTION
     ////////////////////////////////////////////////////////////////////////////////////////////////
     private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
-        engineService.state = STATE_STARTING;
+        LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
+        engineService.updateState(STATE_STARTING);
         BTEngine btEngine = BTEngine.getInstance();
         if (!wasShutdown) {
             btEngine.resume();
@@ -310,7 +354,7 @@ public class EngineService extends JobIntentService implements IEngineService {
             TransferManager.instance().reset();
             btEngine.resume();
         }
-        engineService.state = STATE_STARTED;
+        engineService.updateState(STATE_STARTED);
         LOG.info("resumeBTEngineTask(): Engine started", true);
     }
 
@@ -411,10 +455,10 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     private static void startPermanentNotificationUpdatesTask(EngineService engineService) {
         try {
-            if (engineService.notificationUpdateDemon == null) {
-                engineService.notificationUpdateDemon = new NotificationUpdateDemon(engineService.getApplicationContext());
+            if (engineService.notificationUpdateDaemon == null) {
+                engineService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineService.getApplicationContext());
             }
-            engineService.notificationUpdateDemon.start();
+            engineService.notificationUpdateDaemon.start();
         } catch (Throwable t) {
             LOG.warn(t.getMessage(), t);
         }

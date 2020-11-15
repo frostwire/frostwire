@@ -20,10 +20,11 @@ import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.InstallSettings;
+import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.CommonUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,53 +40,35 @@ import java.util.List;
  * setup windows.
  */
 public final class SetupManager {
-
+    static final int ACTION_PREVIOUS = 1;
+    static final int ACTION_NEXT = 2;
+    static final int ACTION_FINISH = 4;
+    static final int ACTION_CANCEL = 8;
     /**
      * the dialog window that holds all other gui elements for the setup.
      */
     private FramedDialog dialogFrame;
-
     /**
      * the holder for the setup windows
      */
     private SetupWindowHolder _setupWindowHolder;
-
     /**
      * holder for the current setup window.
      */
     private SetupWindow _currentWindow;
-
     private Dimension holderPreferredSize;
-
-    static final int ACTION_PREVIOUS = 1;
-
-    static final int ACTION_NEXT = 2;
-
-    static final int ACTION_FINISH = 4;
-
-    static final int ACTION_CANCEL = 8;
-
-    private PreviousAction previousAction = new PreviousAction();
-
-    private NextAction nextAction = new NextAction();
-
-    private FinishAction finishAction = new FinishAction();
-
-    private CancelAction cancelAction = new CancelAction();
-
-    private LanguageAwareAction[] actions = new LanguageAwareAction[]{previousAction, nextAction, finishAction, cancelAction};
+    private final PreviousAction previousAction = new PreviousAction();
+    private final NextAction nextAction = new NextAction();
+    private final FinishAction finishAction = new FinishAction();
+    private final CancelAction cancelAction = new CancelAction();
+    private final LanguageAwareAction[] actions = new LanguageAwareAction[]{previousAction, nextAction, finishAction, cancelAction};
 
     private boolean shouldShowAssociationsWindow() {
         if (CommonUtils.isPortable() || (InstallSettings.ASSOCIATION_OPTION.getValue() == FrostAssociations.CURRENT_ASSOCIATIONS)) {
             return false;
         }
-
-        // display a window if silent grab failed. 
+        // display a window if silent grab failed.
         return !GUIMediator.getAssociationManager().checkAndGrab(false);
-    }
-
-    private enum SaveStatus {
-        NO, NEEDS
     }
 
     private SaveStatus shouldShowSaveDirectoryWindow() {
@@ -93,11 +76,9 @@ public final class SetupManager {
         if (!InstallSettings.SAVE_DIRECTORY.getValue()) {
             return SaveStatus.NEEDS;
         }
-
         if (!InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.getValue().equals(String.valueOf(FrostWireUtils.getBuildNumber()))) {
             return SaveStatus.NEEDS;
         }
-
         return SaveStatus.NO;
     }
 
@@ -106,26 +87,20 @@ public final class SetupManager {
      */
     public void createIfNeeded() {
         _setupWindowHolder = new SetupWindowHolder();
-
         List<SetupWindow> windows = new LinkedList<>();
-
         SaveStatus saveDirectoryStatus = shouldShowSaveDirectoryWindow();
         if (saveDirectoryStatus != SaveStatus.NO) {
             windows.add(new BitTorrentSettingsWindow(this));
         }
-
         if (!InstallSettings.SPEED.getValue() || !InstallSettings.START_STARTUP.getValue() && GUIUtils.shouldShowStartOnStartupWindow()) {
             windows.add(new MiscWindow(this));
         }
-
         if (shouldShowAssociationsWindow()) {
             windows.add(new AssociationsWindow(this));
         }
-
         if (windows.size() > 0) {
             windows.add(new SocialRecommendationsWindow(this));
         }
-
         //THIS HAS TO GO LAST
         IntentWindow intentWindow = new IntentWindow(this);
         if (!intentWindow.isConfirmedWillNot()) {
@@ -136,10 +111,12 @@ public final class SetupManager {
             return;
         }
 
+        // Reset Tips of the Day on an update
+        StartupSettings.SHOW_TOTD.setValue(true);
+
         // If the INSTALLED value is set, that means that a previous
         // installer has already been run.
         boolean partial = ApplicationSettings.INSTALLED.getValue();
-
         // We need to ask the user's language very very first,
         // so make sure that if the LanguageWindow is the first item,
         // that the WelcomeWindow is inserted second.
@@ -149,26 +126,21 @@ public final class SetupManager {
         // insert the WelcomeWindow & FinishWindow at all.
         //if(partial && !(windows.size() == 1 && windows.get(0) instanceof IntentWindow))
         windows.add(0, new WelcomeWindow(this, partial));
-
         holderPreferredSize = new Dimension(0, 0);
-
         // Iterate through each displayed window and set them up correctly.
         SetupWindow prior = null;
         for (SetupWindow current : windows) {
             _setupWindowHolder.add(current);
-
+            //noinspection ReplaceNullCheck
             if (prior == null) {
                 current.setPrevious(current);
             } else {
                 current.setPrevious(prior);
             }
-
             if (prior != null) {
                 prior.setNext(current);
             }
-
             prior = current;
-
             Dimension d = current.calculatePreferredSize();
             if (d.width > holderPreferredSize.width) {
                 holderPreferredSize.width = d.width;
@@ -177,20 +149,16 @@ public final class SetupManager {
                 holderPreferredSize.height = d.height;
             }
         }
-
         holderPreferredSize.width += 20;
         holderPreferredSize.height += 20;
-
         if (holderPreferredSize.width > 900) {
             holderPreferredSize.width = 900;
         }
         if (holderPreferredSize.height > 750) {
             holderPreferredSize.height = 750;
         }
-
         assert prior != null;
         prior.setNext(prior);
-
         // Actually display the setup dialog.
         createDialog(windows.get(0));
     }
@@ -200,49 +168,37 @@ public final class SetupManager {
      * creates all of the setup window classes, buttons, etc.
      */
     private void createDialog(SetupWindow firstWindow) {
-
         dialogFrame = new FramedDialog();
         dialogFrame.setTitle("FrostWire Setup");
-
         WindowAdapter onCloseAdapter = new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 cancelSetup();
             }
         };
-
         dialogFrame.addWindowListener(onCloseAdapter);
-
         JDialog dialog = dialogFrame.getDialog();
         dialog.setModal(true);
         dialog.setTitle(I18n.tr("FrostWire Setup Wizard"));
         dialog.addWindowListener(onCloseAdapter);
-
         // set the layout of the content pane
         Container container = dialog.getContentPane();
         GUIUtils.addHideAction((JComponent) container);
-
         BoxLayout containerLayout = new BoxLayout(container, BoxLayout.Y_AXIS);
         container.setLayout(containerLayout);
-
         JPanel setupPanel = new JPanel();
         setupPanel.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
         BoxLayout layout = new BoxLayout(setupPanel, BoxLayout.Y_AXIS);
         setupPanel.setLayout(layout);
-
         Dimension d = new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT);
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         dialog.setLocation((screenSize.width - d.width) / 2, (screenSize.height - d.height) / 2);
         dialog.setSize((int) d.getWidth(), (int) d.getHeight());
-
         // create the setup buttons panel
         if (OSUtils.isGoodWindows()) {
             _setupWindowHolder.setPreferredSize(holderPreferredSize);
         }
-
         setupPanel.add(_setupWindowHolder);
         setupPanel.add(Box.createVerticalStrut(17));
-
         JPanel bottomRow = new JPanel();
         bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.X_AXIS));
         ButtonRow buttons = new ButtonRow(actions, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
@@ -253,18 +209,13 @@ public final class SetupManager {
         bottomRow.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
         setupPanel.add(new Line());
         setupPanel.add(bottomRow);
-
         show(firstWindow);
-
         // add the panel and make it visible
         container.add(setupPanel);
-
         if (!OSUtils.isGoodWindows()) {
             container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
         }
-
         dialog.pack();
-
         SplashWindow.instance().setVisible(false);
         dialogFrame.showDialog();
         SplashWindow.instance().setVisible(true);
@@ -284,14 +235,14 @@ public final class SetupManager {
     /**
      * Displays the next window in the setup sequence.
      */
-    public void next() {
+    private void next() {
         SetupWindow newWindow = _currentWindow.getNext();
         try {
             _currentWindow.applySettings(true);
             show(newWindow);
         } catch (ApplySettingsException ase) {
             // there was a problem applying the settings from
-            // the current window, so display the error message 
+            // the current window, so display the error message
             // to the user.
             if (ase.getMessage() != null && ase.getMessage().length() > 0)
                 GUIMediator.showError(ase.getMessage());
@@ -301,14 +252,13 @@ public final class SetupManager {
     /**
      * Displays the previous window in the setup sequence.
      */
-    public void previous() {
+    private void previous() {
         SetupWindow newWindow = _currentWindow.getPrevious();
         try {
             _currentWindow.applySettings(false);
         } catch (ApplySettingsException ase) {
             // ignore errors when going backwards
         }
-
         show(newWindow);
     }
 
@@ -324,13 +274,12 @@ public final class SetupManager {
      * Completes the setup.
      */
     private void finishSetup() {
-
         if (_currentWindow != null) {
             try {
                 _currentWindow.applySettings(true);
             } catch (ApplySettingsException e) {
                 // there was a problem applying the settings from
-                // the current window, so display the error message 
+                // the current window, so display the error message
                 // to the user.
                 if (e.getMessage() != null && e.getMessage().length() > 0) {
                     GUIMediator.showError(e.getMessage());
@@ -338,29 +287,20 @@ public final class SetupManager {
                 return;
             }
         }
-
         dialogFrame.getDialog().dispose();
-
         ApplicationSettings.INSTALLED.setValue(true);
-
         InstallSettings.SAVE_DIRECTORY.setValue(true);
         InstallSettings.SPEED.setValue(true);
         InstallSettings.SCAN_FILES.setValue(true);
         InstallSettings.LANGUAGE_CHOICE.setValue(true);
         InstallSettings.EXTENSION_OPTION.setValue(true);
-
         if (GUIUtils.shouldShowStartOnStartupWindow())
             InstallSettings.START_STARTUP.setValue(true);
         if (OSUtils.isWindows())
             InstallSettings.FIREWALL_WARNING.setValue(true);
         InstallSettings.ASSOCIATION_OPTION.setValue(FrostAssociations.CURRENT_ASSOCIATIONS);
-
         InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(String.valueOf(FrostWireUtils.getBuildNumber()));
-
-        BackgroundExecutorService.schedule(() -> {
-            SettingsGroupManager.instance().save();
-        });
-
+        BackgroundExecutorService.schedule(() -> SettingsGroupManager.instance().save());
         if (_currentWindow instanceof IntentWindow) {
             IntentWindow intent = (IntentWindow) _currentWindow;
             if (!intent.isConfirmedWillNot()) {
@@ -369,7 +309,6 @@ public final class SetupManager {
             }
             intent.applySettings(true);
         }
-
         dialogFrame.getDialog().dispose();
     }
 
@@ -396,12 +335,11 @@ public final class SetupManager {
         _currentWindow = window;
     }
 
-    void add(SetupWindow window) {
-        _setupWindowHolder.add(window, window.getKey());
+    private enum SaveStatus {
+        NO, NEEDS
     }
 
     private abstract class LanguageAwareAction extends AbstractAction {
-
         private final String nameKey;
 
         LanguageAwareAction(String nameKey) {
@@ -415,7 +353,6 @@ public final class SetupManager {
     }
 
     private class CancelAction extends LanguageAwareAction {
-
         CancelAction() {
             super(I18n.tr("Cancel"));
         }
@@ -426,7 +363,6 @@ public final class SetupManager {
     }
 
     private class NextAction extends LanguageAwareAction {
-
         NextAction() {
             super(I18n.tr("Next >>"));
         }
@@ -437,7 +373,6 @@ public final class SetupManager {
     }
 
     private class PreviousAction extends LanguageAwareAction {
-
         PreviousAction() {
             super(I18n.tr("<< Back"));
         }
@@ -448,7 +383,6 @@ public final class SetupManager {
     }
 
     private class FinishAction extends LanguageAwareAction {
-
         FinishAction() {
             super(I18n.tr("Finish"));
         }
@@ -456,6 +390,5 @@ public final class SetupManager {
         public void actionPerformed(ActionEvent e) {
             finishSetup();
         }
-
     }
 }

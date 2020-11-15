@@ -30,13 +30,11 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
     // -> Creating a new torrent out of that file
     // -> The button only shows when the file is complete
     // -> A custom cell renderer for that column that displays a button and it's action listener
-
     static LimeTableColumn ACTIONS_COLUMN;
-
-    private static LimeTableColumn[] columns = new LimeTableColumn[]{
+    private static final LimeTableColumn[] columns = new LimeTableColumn[]{
             ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 80, true, true, true, TransferDetailFiles.TransferItemHolder.class),
             new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
-            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 400, true,true, true, String.class),
+            new LimeTableColumn(2, "NAME", I18n.tr("Name"), 400, true, true, true, String.class),
             new LimeTableColumn(3, "PROGRESS", I18n.tr("Progress"), 150, true, ProgressBarHolder.class),
             new LimeTableColumn(4, "SIZE", I18n.tr("Size"), 80, true, true, true, SizeHolder.class),
             new LimeTableColumn(5, "TYPE", I18n.tr("Type"), 80, true, true, true, String.class),
@@ -77,7 +75,6 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
         final int PROGRESS = 3;
         final int SIZE = 4;
         final int TYPE = 5;
-
         switch (col) {
             case NUMBER:
                 return holder.fileOffset + 1; // humans...
@@ -97,7 +94,6 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
 
     @Override
     public void setValueAt(Object o, int col) {
-
     }
 
     @Override
@@ -107,12 +103,10 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
 
     @Override
     public void cleanup() {
-
     }
 
     @Override
     public void update() {
-
     }
 
     @Override

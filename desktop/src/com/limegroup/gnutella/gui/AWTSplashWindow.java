@@ -16,7 +16,7 @@ import java.awt.*;
 
 /**
  * Splash Window to show an image during startup of an application.<p>
- *
+ * <p>
  * Usage:
  * <pre>
  * // open the splash window
@@ -36,7 +36,7 @@ import java.awt.*;
  *      getToolkit().createImage(getClass().getResource("splash.png"))
  * ).show();
  * </pre>
- *
+ * <p>
  * The splash window disposes itself when the user clicks on it.
  *
  * @author Werner Randelshofer, Staldenmattweg 2, Immensee, CH-6405, Switzerland.
@@ -44,14 +44,10 @@ import java.awt.*;
  */
 public class AWTSplashWindow extends Window {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 720067738309164784L;
-
-
-    private Image splashImage;
-
-
+    private final Image splashImage;
     /**
      * This attribute indicates whether the method
      * paint(Graphics) has been called at least once since the
@@ -71,27 +67,56 @@ public class AWTSplashWindow extends Window {
      * Constructs a splash window and centers it on the
      * screen. The user can click on the window to dispose it.
      *
-     * @param   owner       The frame owning the splash window.
-     * @param   splashImage The splashImage to be displayed.
+     * @param owner       The frame owning the splash window.
+     * @param splashImage The splashImage to be displayed.
      */
-    public AWTSplashWindow(Frame owner, Image splashImage) {
+    private AWTSplashWindow(Frame owner, Image splashImage) {
         super(owner);
         this.splashImage = splashImage;
-
         // Center the window on the screen, and force the image to have a size,
         // otherwise paint will never be called.
         int imgWidth = splashImage.getWidth(this);
-        if(imgWidth < 1)
+        if (imgWidth < 1)
             imgWidth = 1;
         int imgHeight = splashImage.getHeight(this);
-        if(imgHeight < 1)
+        if (imgHeight < 1)
             imgHeight = 1;
         setSize(imgWidth, imgHeight);
         Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(
-            (screenDim.width - imgWidth) / 2,
-            (screenDim.height - imgHeight) / 2
+                (screenDim.width - imgWidth) / 2,
+                (screenDim.height - imgHeight) / 2
         );
+    }
+
+    /**
+     * Constructs and displays a AWTSplashWindow.<p>
+     * This method is useful for startup splashs.
+     * Dispose the return frame to get rid of the splash window.<p>
+     *
+     * @param splashImage The image to be displayed.
+     * @return Returns the frame that owns the AWTSplashWindow.
+     */
+    public static Frame splash(Image splashImage) {
+        Frame f = new Frame();
+        AWTSplashWindow w = new AWTSplashWindow(f, splashImage);
+        // Show the window.
+        w.toFront();
+        w.setVisible(true);
+        // Note: To make sure the user gets a chance to see the
+        // splash window we wait until its paint method has been
+        // called at least by the AWT event dispatcher thread.
+        if (!EventQueue.isDispatchThread()) {
+            synchronized (w) {
+                while (!w.paintCalled) {
+                    try {
+                        w.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }
+        return f;
     }
 
     /**
@@ -111,44 +136,15 @@ public class AWTSplashWindow extends Window {
      */
     public void paint(Graphics g) {
         g.drawImage(splashImage, 0, 0, this);
-
         // Notify method splash that the window
         // has been painted.
         // Note: To improve performance we do not enter
         // the synchronized block unless we have to.
-        if (! paintCalled) {
+        if (!paintCalled) {
             paintCalled = true;
-            synchronized (this) { notifyAll(); }
-        }
-    }
-
-    /**
-     * Constructs and displays a AWTSplashWindow.<p>
-     * This method is useful for startup splashs.
-     * Dispose the return frame to get rid of the splash window.<p>
-     *
-     * @param   splashImage The image to be displayed.
-     * @return  Returns the frame that owns the AWTSplashWindow.
-     */
-    public static Frame splash(Image splashImage) {
-        Frame f = new Frame();
-        AWTSplashWindow w = new AWTSplashWindow(f, splashImage);
-
-        // Show the window.
-        w.toFront();
-        w.setVisible(true);
-
-
-        // Note: To make sure the user gets a chance to see the
-        // splash window we wait until its paint method has been
-        // called at least by the AWT event dispatcher thread.
-        if (! EventQueue.isDispatchThread()) {
-            synchronized (w) {
-                while (! w.paintCalled) {
-                    try { w.wait(); } catch (InterruptedException e) {}
-                }
+            synchronized (this) {
+                notifyAll();
             }
         }
-        return f;
     }
 }

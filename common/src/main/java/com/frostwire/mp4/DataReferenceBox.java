@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class DataReferenceBox extends FullBox {
-
     protected int entry_count;
     protected Box[] entries;
 
@@ -36,7 +35,6 @@ public final class DataReferenceBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 4, buf);
         entry_count = buf.getInt();
         entries = new Box[entry_count];
@@ -44,19 +42,15 @@ public final class DataReferenceBox extends FullBox {
             IO.read(ch, 8, buf);
             int size = buf.getInt();
             int type = buf.getInt();
-
             Long largesize = null;
             if (size == 1) {
                 IO.read(ch, 8, buf);
                 largesize = buf.getLong();
             }
-
             Box b = Box.empty(type);
             b.size = size;
             b.largesize = largesize;
-
             b.read(ch, buf);
-
             entries[i] = b;
         }
     }
@@ -64,21 +58,17 @@ public final class DataReferenceBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.putInt(entry_count);
         IO.write(ch, 4, buf);
         for (int i = 0; i < entry_count; i++) {
             Box b = entries[i];
-
             buf.putInt(b.size);
             buf.putInt(b.type);
             IO.write(ch, 8, buf);
-
             if (b.largesize != null) {
                 buf.putLong(b.largesize);
                 IO.write(ch, 8, buf);
             }
-
             b.write(ch, buf);
         }
     }

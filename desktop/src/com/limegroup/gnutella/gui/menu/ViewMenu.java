@@ -24,7 +24,7 @@ import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.ToggleSettingAction;
 import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.setting.BooleanSetting;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -37,15 +37,14 @@ import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPL
  * which tabs should be viewable at runtime & themes to use.
  */
 final class ViewMenu extends AbstractMenu {
-
     ViewMenu() {
         super(I18n.tr("&View"));
         addToggleMenuItem(new SearchTransfersSplitTabsAction(UI_SEARCH_TRANSFERS_SPLIT_VIEW, I18n.tr("&Search/Transfers split screen")));
         addToggleMenuItem(new ToggleIconSettingAction(UISettings.SMALL_ICONS, I18n.tr("Use &Small Icons"), I18n.tr("Use Small Icons")));
         addToggleMenuItem(new ToggleIconSettingAction(UISettings.TEXT_WITH_ICONS, I18n.tr("Show Icon &Text"), I18n.tr("Show Text Below Icons")));
         MENU.addSeparator();
-        addMenuItem(new ChangeFontSizeAction(1, I18n.tr("&Increase Font Size"), I18n.tr("Increases the Table Font Size")), KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, (OSUtils.isMacOSX() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK)));
-        addMenuItem(new ChangeFontSizeAction(-1, I18n.tr("&Decrease Font Size"), I18n.tr("Decreases the Table Font Size")), KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, (OSUtils.isMacOSX() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK)));
+        addMenuItem(new ChangeFontSizeAction(1, I18n.tr("&Increase Font Size"), I18n.tr("Increases the Table Font Size")), KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, (OSUtils.isMacOSX() ? KeyEvent.META_DOWN_MASK : KeyEvent.CTRL_DOWN_MASK)));
+        addMenuItem(new ChangeFontSizeAction(-1, I18n.tr("&Decrease Font Size"), I18n.tr("Decreases the Table Font Size")), KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, (OSUtils.isMacOSX() ? KeyEvent.META_DOWN_MASK : KeyEvent.CTRL_DOWN_MASK)));
         MENU.addSeparator();
         addMenuItem(new ShowLanguageWindowAction());
     }
@@ -67,6 +66,7 @@ final class ViewMenu extends AbstractMenu {
         ToggleIconSettingAction(BooleanSetting setting, String name, String description) {
             super(setting, name, description);
         }
+
         public void actionPerformed(ActionEvent e) {
             super.actionPerformed(e);
             GUIMediator.instance().buttonViewChanged();
@@ -75,11 +75,13 @@ final class ViewMenu extends AbstractMenu {
 
     private static class ChangeFontSizeAction extends AbstractAction {
         private final int increment;
+
         ChangeFontSizeAction(int inc, String name, String description) {
             super(name);
             putValue(LONG_DESCRIPTION, description);
             increment = inc;
         }
+
         public void actionPerformed(ActionEvent e) {
             ThemeMediator.modifyTablesFont(increment);
         }

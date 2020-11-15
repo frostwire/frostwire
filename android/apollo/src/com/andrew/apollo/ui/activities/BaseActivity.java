@@ -22,17 +22,11 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.SearchView.OnQueryTextListener;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,14 +35,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.SearchView.OnQueryTextListener;
+import androidx.appcompat.widget.Toolbar;
+
 import com.andrew.apollo.Config;
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
-import com.andrew.apollo.utils.MusicUtils.ServiceToken;
 import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.widgets.PlayPauseButton;
 import com.andrew.apollo.widgets.RepeatButton;
@@ -60,11 +56,10 @@ import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.util.Asyncs;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-
-import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
 
 /**
  * A base {@link Activity} used to update the bottom bar and
@@ -74,17 +69,11 @@ import static com.andrew.apollo.utils.MusicUtils.musicPlaybackService;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public abstract class BaseActivity extends AbstractActivity
-        implements ServiceConnection {
+public abstract class BaseActivity extends AbstractActivity {
     /**
      * Play state and meta change listener
      */
     private final ArrayList<MusicStateListener> mMusicStateListener = new ArrayList<>();
-
-    /**
-     * The service token
-     */
-    private ServiceToken mToken;
 
     /**
      * Play and pause button (BAB)
@@ -142,7 +131,7 @@ public abstract class BaseActivity extends AbstractActivity
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         // Bind Apollo's service
-        mToken = MusicUtils.bindToService(this, this);
+        //mToken = MusicUtils.bindToService(this, this);
         // Initialize the broadcast receiver
         mPlaybackStatus = new PlaybackStatus(this);
         // Initialize the bottom action bar
@@ -162,22 +151,6 @@ public abstract class BaseActivity extends AbstractActivity
     }
 
     @Override
-    public void onServiceConnected(final ComponentName name, final IBinder service) {
-        musicPlaybackService = IApolloService.Stub.asInterface(service);
-        // Set the playback drawables
-        updatePlaybackControls();
-        // Current info
-        updateBottomActionBarInfo();
-        // Update the favorites icon
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public void onServiceDisconnected(final ComponentName name) {
-        musicPlaybackService = null;
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Search view
         getMenuInflater().inflate(R.menu.player_search, menu);
@@ -194,7 +167,7 @@ public abstract class BaseActivity extends AbstractActivity
 
                 @Override
                 public boolean onQueryTextSubmit(final String query) {
-                    // Open the search activity
+                    // Open the search activity - This is invoked when searching inside the My Music section
                     NavUtils.openSearch(BaseActivity.this, query);
                     return true;
                 }
@@ -257,8 +230,19 @@ public abstract class BaseActivity extends AbstractActivity
         filter.addAction(MusicPlaybackService.META_CHANGED);
         // Update a list, probably the playlist fragment's
         filter.addAction(MusicPlaybackService.REFRESH);
-        registerReceiver(mPlaybackStatus, filter);
-        MusicUtils.notifyForegroundStateChanged(this, true);
+
+        try {
+            registerReceiver(mPlaybackStatus, filter);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+        // We ask here because we don't yet need to ask for the music service to be started.
+        // On AudioPlayerActivity, it's another story, if we get there, it's because
+        // we're playing a track.
+        if (MusicUtils.isPlaying()) {
+            MusicUtils.notifyForegroundStateChanged(this, true);
+        }
     }
 
     @Override
@@ -270,12 +254,6 @@ public abstract class BaseActivity extends AbstractActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Unbind from the service
-        if (mToken != null) {
-            MusicUtils.unbindFromService(mToken);
-            mToken = null;
-        }
-
         // Unregister the receiver
         try {
             unregisterReceiver(mPlaybackStatus);
@@ -291,12 +269,16 @@ public abstract class BaseActivity extends AbstractActivity
      * Initializes the items in the bottom action bar.
      */
     private void initBottomActionBar() {
-        boolean isPlaying = !MusicUtils.isStopped();
-        if (isPlaying) {
+        Asyncs.async(MusicUtils::isStopped, BaseActivity::initBottomActionBarPost, this);
+    }
+
+    private void initBottomActionBarPost(Boolean isStopped) {
+        if (!isStopped) {
             // Play and pause button
             mPlayPauseButton = findViewById(R.id.action_button_play);
             mPlayPauseButton.setPlayDrawable(R.drawable.btn_playback_play_bottom);
             mPlayPauseButton.setPauseDrawable(R.drawable.btn_playback_pause_bottom);
+            mPlayPauseButton.updateState();
 
             RepeatingImageButton prevButton = findViewById(R.id.action_button_previous);
             RepeatingImageButton nextButton = findViewById(R.id.action_button_next);
@@ -323,7 +305,7 @@ public abstract class BaseActivity extends AbstractActivity
 
             mPlayPauseButton.setOnLongClickListener(new StopAndHideBottomActionBarListener(this, false));
         }
-        setBottomActionBarVisible(isPlaying);
+        setBottomActionBarVisible(!isStopped);
     }
 
     /**

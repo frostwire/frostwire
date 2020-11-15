@@ -25,24 +25,31 @@
 
 package com.apple.concurrent;
 
+import java.security.PrivilegedAction;
+
 final class LibDispatchNative {
     static {
         java.security.AccessController.doPrivileged(
-            new java.security.PrivilegedAction<Void>() {
-                public Void run() {
-                    System.loadLibrary("osx_jdk8");
+                (PrivilegedAction<Void>) () -> {
+                    System.loadLibrary("dispatch");
                     return null;
-                }
-            });
+                });
+    }
+
+    private LibDispatchNative() {
     }
 
     static native boolean nativeIsDispatchSupported();
-    static native long nativeGetMainQueue();
-    static native long nativeCreateConcurrentQueue(int priority);
-    static native long nativeCreateSerialQueue(String name);
-    static native void nativeReleaseQueue(long nativeQueue);
-    static native void nativeExecuteAsync(long nativeQueue, Runnable task);
-    static native void nativeExecuteSync(long nativeQueue, Runnable task);
 
-    private LibDispatchNative() { }
+    static native long nativeGetMainQueue();
+
+    static native long nativeCreateConcurrentQueue(int priority);
+
+    static native long nativeCreateSerialQueue(String name);
+
+    static native void nativeReleaseQueue(long nativeQueue);
+
+    static native void nativeExecuteAsync(long nativeQueue, Runnable task);
+
+    static native void nativeExecuteSync(long nativeQueue, Runnable task);
 }

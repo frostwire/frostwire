@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 public final class AppleGenreBox extends AppleUtf8Box {
-
     AppleGenreBox() {
         super(Cgen);
     }

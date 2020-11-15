@@ -60,6 +60,13 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         this.tokenId = new Random(System.currentTimeMillis()).nextLong();
         state = TransferState.DOWNLOADING_TORRENT;
 
+        //TODO stop creating threads for each download, use HandlerThread with looper
+        //  private static final Handler handler;
+        //  static {
+        //    HandlerThread HT = new HandlerThread("AsyncStartDownload-HandlerThread");
+        //    HT.start();
+        //    handler = new Handler(HT.getLooper());
+        //  }
         Thread t = new Thread(new FetcherRunnable(), "Torrent-Fetcher - " + info.getTorrentUrl());
         t.setDaemon(true);
         t.start();
@@ -73,6 +80,14 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return info.getDisplayName();
     }
 
+    public TorrentDownloadInfo getTorrentDownloadInfo() {
+        return info;
+    }
+
+    public TorrentFetcherListener getTorrentFetcherListener() {
+        return fetcherListener;
+    }
+
     @Override
     public TransferState getState() {
         return state;
@@ -82,7 +97,7 @@ public class TorrentFetcherDownload implements BittorrentDownload {
         return 0;
     }
 
-    public long getSize() {
+    public double getSize() {
         return info.getSize();
     }
 
@@ -210,7 +225,10 @@ public class TorrentFetcherDownload implements BittorrentDownload {
 
     @Override
     public String getName() {
-        return info.getDetailsUrl();
+        if (info.getDisplayName() == null || info.getDisplayName().isEmpty()) {
+            return info.getDetailsUrl();
+        }
+        return info.getDisplayName();
     }
 
     @Override

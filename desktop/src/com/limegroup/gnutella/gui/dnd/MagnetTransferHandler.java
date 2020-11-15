@@ -32,57 +32,39 @@ import java.io.IOException;
  * ExternalControl#handleMagnetRequest(String)}.
  */
 public class MagnetTransferHandler extends LimeTransferHandler {
-
-	/**
-     * 
-     */
-    private static final long serialVersionUID = 5866840096804306495L;
+    @Override
+    public boolean canImport(JComponent c, DataFlavor[] flavors, DropInfo ddi) {
+        return canImport(c, flavors);
+    }
 
     @Override
-	public boolean canImport(JComponent c, DataFlavor[] flavors, DropInfo ddi) {
-		return canImport(c, flavors);
-	}
-	
-	@Override
-	public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-		if (DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor)) {
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean importData(JComponent c, Transferable t, DropInfo ddi) {
-		return importData(c, t);
-	}
-	
-	@Override
-	public boolean importData(JComponent comp, Transferable t) {
-		if (!canImport(comp, t.getTransferDataFlavors()))
-			return false;
-		
-		try {
-			
-			String request = (String) t.getTransferData(FileTransferable.URIFlavor);
-			
-			if (request.contains("xt=urn:btih")) {
-				GUIMediator.instance().openTorrentURI(request, true);
-				return true;
-			}
-			
-			
-			MagnetOptions[] magnets =
-				MagnetOptions.parseMagnets((String)t.getTransferData(FileTransferable.URIFlavor));
-			
-			
-			if (magnets.length > 0) {
-				MagnetClipboardListener.handleMagnets(magnets, false);
-				return true;
-			}
-		} catch (UnsupportedFlavorException e) {
-		} catch (IOException e) {
-		}
-		return false;
-	}
-	
+    public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
+        return DNDUtils.contains(transferFlavors, FileTransferable.URIFlavor);
+    }
+
+    @Override
+    public boolean importData(JComponent c, Transferable t, DropInfo ddi) {
+        return importData(c, t);
+    }
+
+    @Override
+    public boolean importData(JComponent comp, Transferable t) {
+        if (!canImport(comp, t.getTransferDataFlavors()))
+            return false;
+        try {
+            String request = (String) t.getTransferData(FileTransferable.URIFlavor);
+            if (request.contains("xt=urn:btih")) {
+                GUIMediator.instance().openTorrentURI(request, true);
+                return true;
+            }
+            MagnetOptions[] magnets =
+                    MagnetOptions.parseMagnets((String) t.getTransferData(FileTransferable.URIFlavor));
+            if (magnets.length > 0) {
+                MagnetClipboardListener.handleMagnets(magnets);
+                return true;
+            }
+        } catch (UnsupportedFlavorException | IOException ignored) {
+        }
+        return false;
+    }
 }

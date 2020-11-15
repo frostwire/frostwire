@@ -23,13 +23,10 @@ import java.awt.*;
 import java.awt.geom.Path2D;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinTableHeaderPainter extends AbstractSkinPainter {
-
     private final State state;
 
     public SkinTableHeaderPainter(State state) {
@@ -42,7 +39,6 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
             Shape s = shapeGenerator.createRectangle(0, 0, width, height);
             g.setPaint(getTableHeaderPaint(s));
             g.fill(s);
-
             paintBorder(g, width, height);
         }
     }
@@ -53,25 +49,23 @@ public final class SkinTableHeaderPainter extends AbstractSkinPainter {
         path.moveTo(0, height - 1);
         path.lineTo(width - 1, height - 1);
         path.lineTo(width - 1, 0);
-
         g.setPaint(SkinColors.TABLE_HEADER_BORDER_COLOR);
         g.draw(path);
     }
 
     private Paint getTableHeaderPaint(Shape s) {
         switch (state) {
-        case Enabled:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_ENABLED_COLORS);
-        case MouseOver:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS); // not an error, neede to check deep in nimbus
-        case Pressed:
-            return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS);
-        default:
-            throw new IllegalArgumentException("Not supported state");
+            case Enabled:
+                return createVerticalGradient(s, SkinColors.TABLE_HEADER_ENABLED_COLORS);
+            case MouseOver:
+            case Pressed:
+                return createVerticalGradient(s, SkinColors.TABLE_HEADER_PRESSED_COLORS); // not an error, neede to check deep in nimbus
+            default:
+                throw new IllegalArgumentException("Not supported state");
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled, MouseOver, Pressed
     }
 }

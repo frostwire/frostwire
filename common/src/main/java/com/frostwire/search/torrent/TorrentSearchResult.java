@@ -25,7 +25,7 @@ import com.frostwire.search.FileSearchResult;
  * @author aldenml
  */
 public interface TorrentSearchResult extends FileSearchResult {
-
+    /** Creation time, in milliseconds */
     long getCreationTime();
 
     /**
@@ -40,6 +40,7 @@ public interface TorrentSearchResult extends FileSearchResult {
     /**
      * Returns a URL to be used as an HTTP "Referer" (sic) header
      * when requesting the .torrent file.
+     *
      * @return
      */
     String getReferrerUrl();

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,10 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class HttpClientFactory {
-    public enum HttpContext {
-        SEARCH,
-        DOWNLOAD,
-        MISC
-    }
-
     private static Map<HttpContext, ThreadPool> okHttpClientPools = null;
 
     private HttpClientFactory() {
@@ -52,7 +44,6 @@ public class HttpClientFactory {
         if (isWindowsXP()) {
             return new JdkHttpClient();
         }
-
         if (okHttpClientPools == null) {
             okHttpClientPools = buildThreadPools();
         }
@@ -61,9 +52,9 @@ public class HttpClientFactory {
 
     private static Map<HttpContext, ThreadPool> buildThreadPools() {
         final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
-        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 1, 5, 60, new LinkedBlockingQueue<Runnable>(), true));
-        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true));
-        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 10, 30, new LinkedBlockingQueue<Runnable>(), true));
+        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 4, 16, 60, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 4, 16, 30, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 4, 16, 30, new LinkedBlockingQueue<>(), true));
         return map;
     }
 
@@ -71,5 +62,11 @@ public class HttpClientFactory {
         String os = System.getProperty("os.name");
         os = os.toLowerCase(Locale.US);
         return os.contains("windows xp");
+    }
+
+    public enum HttpContext {
+        SEARCH,
+        DOWNLOAD,
+        MISC
     }
 }

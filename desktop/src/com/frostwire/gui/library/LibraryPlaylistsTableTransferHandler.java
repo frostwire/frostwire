@@ -33,10 +33,10 @@ import java.util.List;
 
 /**
  * Transfer Handler for the playlist tables on the right hand side of the library.
- * @see LibraryPlaylistsTransferHandler for drag and drop handling on the left hand side playlist items.
  *
  * @author aldenml
  * @author gubatron
+ * @see LibraryPlaylistsTransferHandler for drag and drop handling on the left hand side playlist items.
  */
 class LibraryPlaylistsTableTransferHandler extends TransferHandler {
     private final LibraryPlaylistsTableMediator mediator;
@@ -116,18 +116,17 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
             return fallback && fallbackTransferHandler.canImport(support);
         }
-
         if (support.isDataFlavorSupported(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY)) {
             Transferable transferable = support.getTransferable();
             PlaylistItemContainer container;
             try {
                 container = (PlaylistItemContainer) transferable.getTransferData(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY);
                 if (mediator.getCurrentPlaylist().getId() == container.playlistID &&
-                    mediator.getDataModel().getSortColumn() == LibraryPlaylistsTableDataLine.SORT_INDEX_IDX &&
-                    mediator.getDataModel().isSortAscending()) {
+                        mediator.getDataModel().getSortColumn() == LibraryPlaylistsTableDataLine.SORT_INDEX_IDX &&
+                        mediator.getDataModel().isSortAscending()) {
                     // only allow playlist item D&D when you are dragging files
                     // within the same playlist and sorting ascending by the correct column
-                    return true; 
+                    return true;
                 }
             } catch (Throwable e) {
                 // continue on with false return below
@@ -135,7 +134,7 @@ class LibraryPlaylistsTableTransferHandler extends TransferHandler {
         }
         return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, true);
     }
-    
+
     private void importPlaylistItemArrayData(Transferable transferable, int index) throws UnsupportedFlavorException, IOException {
         PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferable.getTransferData(LibraryPlaylistsTableTransferable.PLAYLIST_ITEM_ARRAY));
         LibraryUtils.asyncAddToPlaylist(mediator.getCurrentPlaylist(), playlistItems, index);

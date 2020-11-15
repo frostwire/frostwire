@@ -22,13 +22,10 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinCheckBoxIconPainter extends AbstractSkinPainter {
-
     private final Image image;
 
     public SkinCheckBoxIconPainter(State state) {
@@ -42,38 +39,36 @@ public final class SkinCheckBoxIconPainter extends AbstractSkinPainter {
 
     private String getImageName(State state) {
         String imageName = null;
-
         switch (state) {
-        case DisabledSelected:
-            imageName = "checkbox_checked_disabled";
-            break;
-        case Disabled:
-            imageName = "checkbox_unchecked_disabled";
-            break;
-        case Enabled:
-        case FocusedMouseOver:
-        case Focused:
-        case MouseOver:
-            imageName = "checkbox_unchecked_active";
-            break;
-        case FocusedMouseOverSelected:
-        case FocusedPressedSelected:
-        case FocusedPressed:
-        case FocusedSelected:
-        case MouseOverSelected:
-        case PressedSelected:
-        case Pressed:
-        case Selected:
-            imageName = "checkbox_checked_active";
-            break;
-        default:
-            throw new RuntimeException("Not supported state");
+            case DisabledSelected:
+                imageName = "checkbox_checked_disabled";
+                break;
+            case Disabled:
+                imageName = "checkbox_unchecked_disabled";
+                break;
+            case Enabled:
+            case FocusedMouseOver:
+            case Focused:
+            case MouseOver:
+                imageName = "checkbox_unchecked_active";
+                break;
+            case FocusedMouseOverSelected:
+            case FocusedPressedSelected:
+            case FocusedPressed:
+            case FocusedSelected:
+            case MouseOverSelected:
+            case PressedSelected:
+            case Pressed:
+            case Selected:
+                imageName = "checkbox_checked_active";
+                break;
+            default:
+                throw new RuntimeException("Not supported state");
         }
-
         return imageName;
     }
 
-    public static enum State {
+    public enum State {
         DisabledSelected, Disabled, Enabled, FocusedMouseOverSelected, FocusedMouseOver, FocusedPressedSelected, FocusedPressed, FocusedSelected, Focused, MouseOverSelected, MouseOver, PressedSelected, Pressed, Selected
     }
 }

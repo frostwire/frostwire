@@ -2,7 +2,7 @@
  * File    : TimerEvent.java
  * Created : 21-Nov-2003
  * By      : parg
- * 
+ *
  * Azureus - a Java Bittorrent client
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,183 +24,83 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
-
-public class 
+public class
 TimerEvent
-	extends		ThreadPoolTask
-	implements 	Comparable<TimerEvent>
-{
-	private String					name;
-	
-	private Timer					timer;
-	private long					created;
-	private long					when;
-	private TimerEventPerformer	performer;
-	
-	private boolean		absolute;
-	private boolean		cancelled;
-	private boolean		has_run;
-	
-	private long			unique_id	= 1;
-	
-	protected
-	TimerEvent(
-		Timer					_timer,
-		long					_unique_id,
-		long					_created,
-		long					_when,
-		boolean					_absolute,
-		TimerEventPerformer		_performer )
-	{
-		timer		= _timer;
-		unique_id	= _unique_id;
-		when		= _when;
-		absolute	= _absolute;
-		performer	= _performer;
-		
-		created 	= _created;
-		
-		if ( Constants.IS_CVS_VERSION ){
-						
-				// sanity check - seems we sometimes use 0 to denote 'now'
-			
-			if ( when != 0 && when <= 7*24*60*60*1000L ){
-				
-				new Exception( "You sure you want to schedule an event in the past? Time should be absolute!" ).printStackTrace();
-				
-			}else if ( when > 3000L*365*24*60*60*1000 ){
-				
-				new Exception( "You sure you want to schedule an event so far in the future?! (" + when + ")" ).printStackTrace();
-			}
-		}
-	}
-		
-	public void
-	setName(
-		String		_name )
-	{
-		name	= _name;
-	}
-	
-	public String
-	getName()
-	{
-		return( name );
-	}
-	
-	public long
-	getCreatedTime()
-	{
-		return( created );
-	}
-	
-	public long
-	getWhen()
-	{
-		return( when );
-	}
-	
-	protected void
-	setWhen(
-		long	new_when )
-	{
-		when	= new_when;
-	}
-	
-	protected AERunnable
-	getRunnable()
-	{
-		return( this );
-	}
-	
-	protected TimerEventPerformer
-	getPerformer()
-	{
-		return( performer );
-	}
-	
-	protected boolean
-	isAbsolute()
-	{
-		return( absolute );
-	}
-	
-	public void
-	runSupport()
-	{
-		performer.perform( this );
-	}
-	
-	public synchronized void
-	cancel()
-	{
-		cancelled	= true;
-		
-		timer.cancelEvent( this );
-	}
-	
-	public synchronized boolean
-	isCancelled()
-	{
-		return( cancelled );
-	}
-	
-	protected void
-	setHasRun()
-	{
-		has_run	= true;
-	}
-	
-	public boolean
-	hasRun()
-	{
-		return( has_run );
-	}
-	
-	protected long
-	getUniqueId()
-	{
-		return( unique_id );
-	}
-	
-	public int
-	compareTo(
-		TimerEvent		other )
-	{
-		long	res =  when - other.when;
+        extends ThreadPoolTask
+        implements Comparable<TimerEvent> {
+    private final TimerEventPerformer performer;
+    private final boolean absolute;
+    private String name;
+    private long when;
+    private long unique_id = 1;
 
-		if ( res == 0 ){
-			
-			res = unique_id - other.unique_id;
-			
-			if ( res == 0 ){
-				
-				return(  0 );
-			}
-		}
-			
-		return res < 0 ? -1 : 1;
-	}
-	
-	public void 
-	interruptTask() 
-	{
-	}
-	
-	public String
-	getString()
-	{
-		if ( performer instanceof TimerEventPeriodic ){
+    TimerEvent(long _unique_id,
+               long _when,
+               boolean _absolute,
+               TimerEventPerformer _performer) {
+        unique_id = _unique_id;
+        when = _when;
+        absolute = _absolute;
+        performer = _performer;
+    }
 
-			TimerEventPeriodic	tep = (TimerEventPeriodic)performer;
-			
-			return( "when=" + getWhen() + ",run=" + hasRun() + ", can=" + isCancelled() + "/" + tep.isCancelled() + ",freq=" + tep.getFrequency() + ",target=" + tep.getPerformer()+ (name==null?"":",name=" + name ));
+    public String
+    getName() {
+        return (name);
+    }
 
-		}else{
-			
-			return( "when=" + getWhen() + ",run=" + hasRun() + ", can=" + isCancelled() + ",target=" + getPerformer() + (name==null?"":",name=" + name ));
-		}
-	}
+    public void
+    setName(
+            String _name) {
+        name = _name;
+    }
+
+    public long
+    getWhen() {
+        return (when);
+    }
+
+    void
+    setWhen(
+            long new_when) {
+        when = new_when;
+    }
+
+    AERunnable
+    getRunnable() {
+        return (this);
+    }
+
+    TimerEventPerformer
+    getPerformer() {
+        return (performer);
+    }
+
+    boolean
+    isAbsolute() {
+        return (absolute);
+    }
+
+    public void
+    runSupport() {
+        performer.perform(this);
+    }
+
+    void
+    setHasRun() {
+    }
+
+    public int
+    compareTo(
+            TimerEvent other) {
+        long res = when - other.when;
+        if (res == 0) {
+            res = unique_id - other.unique_id;
+            if (res == 0) {
+                return (0);
+            }
+        }
+        return res < 0 ? -1 : 1;
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import java.util.Random;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *         Created on 4/12/17.
+ * Created on 4/12/17.
  */
 public final class InHouseBannerFactory {
     private static final Map<Message, Integer[]> BIG_300x250_DRAWABLES = new HashMap<>();
@@ -119,9 +119,9 @@ public final class InHouseBannerFactory {
             v.getContext().startActivity(intent);
         });
         if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("http://www.frostwire.com/give?from=android-fallback-ad"));
+            CLICK_LISTENERS.put(Message.DONATE, new URLOpenerClickListener("https://www.frostwire.com/give?from=android-fallback-ad"));
         }
-        CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("http://www.frostclick.com/?from=android-fallback-ad"));
+        CLICK_LISTENERS.put(Message.FROSTCLICK, new URLOpenerClickListener("https://www.frostclick.com/?from=android-fallback-ad"));
     }
 
     enum Message {
@@ -130,18 +130,12 @@ public final class InHouseBannerFactory {
         DONATE;
 
         static Message random() {
-            Message[] messages = new Message[values().length - 1];
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-                // don't show ad removal messages if this is plus
-                // ad_removal should be the first element in the values() array.
-                System.arraycopy(values(), 1, messages, 0, messages.length);
-            } else {
-                // don't show donate message if this is basic
-                System.arraycopy(values(), 0, messages, 0, messages.length);
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+                Message[] basic_messages = new Message[]{AD_REMOVAL, FROSTCLICK};
+                return basic_messages[new Random().nextInt(basic_messages.length)];
             }
-            int nMessages = messages.length;
-            int randomOffset = new Random().nextInt(nMessages);
-            return messages[randomOffset];
+            Message[] all_messages = new Message[]{AD_REMOVAL, FROSTCLICK, DONATE};
+            return all_messages[new Random().nextInt(all_messages.length)];
         }
     }
 

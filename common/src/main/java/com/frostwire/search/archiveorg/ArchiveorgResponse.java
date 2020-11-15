@@ -58,11 +58,10 @@ package com.frostwire.search.archiveorg;
         "oai_updatedate":["2010-09-12T01:53:32Z","2010-09-12T01:52:06Z","2010-09-12T01:57:21Z","2010-09-12T02:19:15Z","2010-09-12T02:44:13Z","2010-09-12T02:52:05Z","2011-02-26T01:45:24Z","2012-12-15T10:54:08Z","2012-12-15T10:53:29Z"]},
       {
  */
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgResponse {
     public ArchiveorgResponseField response;

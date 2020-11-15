@@ -39,28 +39,23 @@ import java.awt.event.MouseEvent;
  * @author aldenml
  */
 public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRenderer {
-
     private static final Logger LOG = Logger.getLogger(PaymentOptionsRenderer.class);
-
     private final static ImageIcon bitcoin_enabled;
     private final static ImageIcon bitcoin_disabled;
-
     private final static ImageIcon paypal_enabled;
     private final static ImageIcon paypal_disabled;
-
-    private final TableActionLabel labelBitcoin;
-    private final TableActionLabel labelPaypal;
-
-    //mutable
-    private PaymentOptions paymentOptions;
 
     static {
         bitcoin_enabled = GUIMediator.getThemeImage("bitcoin_enabled");
         bitcoin_disabled = GUIMediator.getThemeImage("bitcoin_disabled");
-
         paypal_enabled = GUIMediator.getThemeImage("paypal_enabled");
         paypal_disabled = GUIMediator.getThemeImage("paypal_disabled");
     }
+
+    private final TableActionLabel labelBitcoin;
+    private final TableActionLabel labelPaypal;
+    //mutable
+    private PaymentOptions paymentOptions;
 
     public PaymentOptionsRenderer() {
         labelBitcoin = new TableActionLabel(bitcoin_enabled, bitcoin_disabled);
@@ -71,11 +66,9 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
     private void setupUI() {
         setEnabled(true);
         setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
-
         //We use "Bitcoin" for the protocol (upper case B), and "bitcoins" for the units of currency (lower case b)
         labelBitcoin.setToolTipText(I18n.tr("Name your price, Send a Tip or Donation in") + " " + I18n.tr("bitcoins"));
         labelPaypal.setToolTipText(I18n.tr("Name your price, Send a Tip or Donation via Paypal"));
-
         initMouseListeners();
         initComponentsLayout();
     }
@@ -93,7 +86,6 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
                 labelBitcoin_mouseReleased(e);
             }
         });
-
         labelPaypal.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -110,7 +102,6 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
                 gotPaymentOptions = paymentOptions != null;
                 paymentOptions = (PaymentOptions) value;
             }
-
             labelBitcoin.updateActionIcon(gotPaymentOptions && !StringUtils.isNullOrEmpty(paymentOptions.bitcoin), showSolid);
             labelPaypal.updateActionIcon(gotPaymentOptions && !StringUtils.isNullOrEmpty(paymentOptions.paypalUrl), showSolid);
         } catch (Throwable t) {
@@ -126,7 +117,6 @@ public final class PaymentOptionsRenderer extends FWAbstractJPanelTableCellRende
             String paymentOptionsJSON = UrlUtils.encode(JsonUtils.toJson(paymentOptions).replaceAll("\n", ""));
             String title = UrlUtils.encode(paymentOptions.getItemName());
             paymentOptionsUrl = "http://www.frostwire.com/tips/?method=" + method.toString() + "&po=" + paymentOptionsJSON + "&title=" + title;
-
         }
         GUIMediator.openURL(paymentOptionsUrl);
     }

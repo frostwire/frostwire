@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 public final class AppleAlbumBox extends AppleUtf8Box {
-
     AppleAlbumBox() {
         super(Calb);
     }

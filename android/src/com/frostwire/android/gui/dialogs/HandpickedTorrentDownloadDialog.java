@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import android.view.View;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -41,12 +41,14 @@ import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.jlibtorrent.swig.tcp_endpoint_vector;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.JsonUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -61,9 +63,11 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private TorrentInfo torrentInfo;
     private String magnetUri;
     private long torrentFetcherDownloadTokenId;
+    private boolean openTransfersOnCancel;
     private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
     private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
     private static final String BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID = "torrentFetcherDownloadTokenId";
+    private static final String BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL = "openTransfersOnCancel";
 
     // non-void constructors must be avoided when creating dialogs. use setArguments instead
     public HandpickedTorrentDownloadDialog() {
@@ -74,7 +78,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             Context ctx,
             TorrentInfo tinfo,
             String magnetUri,
-            long torrentFetcherDownloadTokenId) {
+            long torrentFetcherDownloadTokenId,
+            boolean openTransfersOnCancel) {
         //
         // ideas:  - pre-selected file(s) to just check the one(s)
         //         - passing a file path
@@ -87,9 +92,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         // we are able to use such Bundle to create our adapter.
         final TorrentFileEntryList torrentInfoList = getTorrentInfoList(tinfo.files());
         boolean[] allChecked = new boolean[torrentInfoList.list.size()];
-        for (int i = 0; i < allChecked.length; i++) {
-            allChecked[i] = true;
-        }
+        Arrays.fill(allChecked, true);
 
         dlg.prepareArguments(R.drawable.download_icon,
                 tinfo.name(),
@@ -101,6 +104,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
         arguments.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
         arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
+        arguments.putBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL, openTransfersOnCancel);
 
         return dlg;
     }
@@ -157,6 +161,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
             magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
             torrentFetcherDownloadTokenId = arguments.getLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID);
+            openTransfersOnCancel = arguments.getBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL);
             if (torrentFetcherDownloadTokenId != -1) {
                 setOnCancelListener(new OnCancelDownloadsClickListener(this));
             }
@@ -244,7 +249,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         }
 
         @Override
-        public long getItemSize(TorrentFileEntry data) {
+        public double getItemSize(TorrentFileEntry data) {
             return data.getSize();
         }
 
@@ -257,11 +262,6 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         public int getItemThumbnailResourceId(TorrentFileEntry data) {
             return MediaType.getFileTypeIconId(FilenameUtils.getExtension(data.getPath()));
         }
-
-//        @Override
-//        public View getView(int position, View view, ViewGroup parent) {
-//            return super.getView(position, view, parent);
-//        }
 
         @Override
         public String getCheckedSum() {
@@ -279,6 +279,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
         private WeakReference<AbstractConfirmListDialog> dlgRef;
+        private final static Logger LOG = Logger.getLogger(OnStartDownloadsClickListener.class);
 
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
@@ -332,7 +333,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            Engine.instance().getThreadPool().execute(() -> {
+            AsyncStartDownload.submitRunnable(() -> {
                 try {
                     // there is a still a chance of reference getting null, this is in
                     // the background
@@ -349,10 +350,12 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                             selection,
                             peers,
                             TransferManager.instance().isDeleteStartedTorrentEnabled());
-                    UIUtils.showTransfersOnDownloadStart(ctx);
                     dlg.removeTorrentFetcherDownloadFromTransfers();
+                    TransferManager.instance().updateUIBittorrentDownload(BTEngine.getInstance().find(dlg.getTorrentInfo().infoHash()));
+                    UIUtils.showTransfersOnDownloadStart(ctx);
                     MainActivity.refreshTransfers(ctx);
-                } catch (Throwable ignored) {
+                } catch (Throwable t) {
+                    LOG.info("startTorrentPartialDownload(): " + t.getMessage(), t);
                 }
             });
 
@@ -393,7 +396,9 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 HandpickedTorrentDownloadDialog handpickedTorrentDownloadDialog = dlgRef.get();
                 handpickedTorrentDownloadDialog.removeTorrentFetcherDownloadFromTransfers();
                 // can't use dlgRef.get().getContext() since that call exists only for API >= 23
-                MainActivity.refreshTransfers(dlgRef.get().getDialog().getContext());
+                if (dlgRef.get().openTransfersOnCancel) {
+                    MainActivity.refreshTransfers(dlgRef.get().getDialog().getContext());
+                }
             }
         }
     }

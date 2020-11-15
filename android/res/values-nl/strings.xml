@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste tags aan]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ U bent verbonden met internet via een VPN. <br><br> Als u dit nog niet doet, raden we u aan een van de onderstaande services te gebruiken om uw verbinding te versleutelen en <b>uw privacy te beschermen</b>. ]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Uw privacy is een fundamenteel mensenrecht</b>. Een onbeveiligde verbinding betekent dat alles wat u online doet, inclusief <b>downloads, zoekopdrachten, berichten</b>, kan worden gecontroleerd en onderschept door iedereen in uw netwerk, bijvoorbeeld Internetproviders, hackers, overheden.<br><br><b>We raden ten stelligste aan een VPN-service te gebruiken</b>. <br> Hier zijn enkele opties die betrouwbare service bieden en goed werken met FrostWire:]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Instellingen</string>
     <string name="exit">Exit</string>
     <string name="search_label">Zoek</string>
@@ -161,10 +160,11 @@
     <string name="app_shutdown_dlg_message">Dit zal stilgelegd alle transfers en de achtergrond diensten. Weet je het zeker?</string>
     <string name="send_feedback">feedback verzenden</string>
     <string name="use_torrentdownloads">Gebruik TorrentDownloads</string>
+    <string name="use_torrentz2">Gebruik Torrentz2</string>
     <string name="saving_to_internal_memory">Opslaan in het interne geheugen</string>
     <string name="choose_email_app">Kies een e-mail App…</string>
     <string name="my_filetype">Mijn %s</string>
-    <string name="retry_search">Opnieuw proberen</string>
+    <string name="retry">Opnieuw proberen</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Het bestand kan niet worden gezaaid. BitTorrent wordt losgekoppeld blijven.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android zal de gedownloade bestanden wissen als FrostWire wordt verwijderd.</string>
     <string name="protected_connection">VPN-beschermde</string>
@@ -357,7 +357,6 @@
     <string name="or">of</string>
     <string name="file_names">Bestandsnamen</string>
     <string name="no_data_check_internet_connection">Netwerk niet beschikbaar, controleer alstublieft uw internetverbinding.</string>
-    <string name="use_pixabay">Gebruik Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stop met zaaien van alle overdrachten</string>
     <string name="seed_stop">Stop met zaaien</string>
     <string name="transfers_select_seeding">zaaien</string>
@@ -373,7 +372,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire kan niet goed starten vanwege een gebrek aan rechten. Geef de vereiste machtigingen en start de toepassing opnieuw</string>
     <string name="vpn_find_out_more">Meer te weten komen</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis proefperiode van 7 dagen</string>
-    <string name="play_store_out_of_sync">Play Store moet worden gesynchroniseerd, wacht een paar minuten</string>
     <string name="contact_us">Neem contact op</string>
     <string name="uploaded">Geüpload</string>
     <string name="trackers">Trackers</string>

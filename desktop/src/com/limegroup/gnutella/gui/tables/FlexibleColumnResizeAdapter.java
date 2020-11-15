@@ -29,11 +29,11 @@ import java.awt.event.MouseEvent;
  * &nbsp;&nbsp; Alt key: AUTO_RESIZE_ALL_COLUMNS <br>
  * You may choose a different order by using the other constructor.
  */
-public class FlexibleColumnResizeAdapter extends MouseAdapter {
-    int dMode;
-    int sMode;
-    int cMode;
-    int aMode;
+class FlexibleColumnResizeAdapter extends MouseAdapter {
+    private final int dMode;
+    private final int sMode;
+    private final int cMode;
+    private final int aMode;
 
     /**
      * Create a FlexibleColumnResizeAdapter with the default settings, as
@@ -50,13 +50,14 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
      * Create a FlexibleColumnResizeAdapter with the specified settings.
      * When multiple modifiers are pressed, only one is processed. The
      * priority matches the order of these parameters.
-     * @param defaultMode   The resize mode when no modifier keys are pressed
-     * @param shiftMode     The resize mode when the shift key is pressed
-     * @param controlMode   The resize mode when the control key is pressed
-     * @param altMode       The resize mode when the alt key is pressed
+     *
+     * @param defaultMode The resize mode when no modifier keys are pressed
+     * @param shiftMode   The resize mode when the shift key is pressed
+     * @param controlMode The resize mode when the control key is pressed
+     * @param altMode     The resize mode when the alt key is pressed
      */
-    public FlexibleColumnResizeAdapter(int defaultMode, int shiftMode,
-                                       int controlMode, int altMode) {
+    private FlexibleColumnResizeAdapter(int defaultMode, int shiftMode,
+                                        int controlMode, int altMode) {
         dMode = defaultMode;
         sMode = shiftMode;
         cMode = controlMode;
@@ -66,17 +67,18 @@ public class FlexibleColumnResizeAdapter extends MouseAdapter {
     /**
      * Sets the JTable's auto-resize mode depending on which modifier key is
      * pressed.
+     *
      * @param e
      */
     public void mousePressed(MouseEvent e) {
         JTableHeader hdr = (JTableHeader) e.getSource();
-        int mask = e.getModifiers();
+        int mask = e.getModifiersEx();
         JTable tbl = hdr.getTable();
-        if ((mask & MouseEvent.SHIFT_MASK) != 0)
+        if ((mask & MouseEvent.SHIFT_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(sMode);
-        else if ((mask & MouseEvent.CTRL_MASK) != 0)
+        else if ((mask & MouseEvent.CTRL_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(cMode);
-        else if ((mask & MouseEvent.ALT_MASK) != 0)
+        else if ((mask & MouseEvent.ALT_DOWN_MASK) != 0)
             tbl.setAutoResizeMode(aMode);
         else
             tbl.setAutoResizeMode(dMode);

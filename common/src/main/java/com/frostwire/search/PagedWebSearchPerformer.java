@@ -24,14 +24,14 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
-
     private static final Logger LOG = Logger.getLogger(PagedWebSearchPerformer.class);
-
     private final int pages;
 
     public PagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
@@ -59,6 +59,9 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
             if (url == null) {
                 url = "n.a";
             }
+            if (e instanceof SSLPeerUnverifiedException) {
+                LOG.error("Make sure to add " + getDomainName() + " to Ssl.FWHostnameVerifier valid host name list");
+            }
             LOG.error("Error searching page [" + url + "]: " + e.getMessage());
         }
         return result;
@@ -68,7 +71,9 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         return fetch(url);
     }
 
-    /** The Search URL */
+    /**
+     * The Search URL
+     */
     protected abstract String getUrl(int page, String encodedKeywords);
 
     protected abstract List<? extends SearchResult> searchPage(String page);

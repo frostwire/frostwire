@@ -19,10 +19,9 @@ import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.ResourceManager;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * This class defines the panel in the options
@@ -30,40 +29,32 @@ import java.io.IOException;
  * default shutdown behavior.
  */
 public class ShutdownPaneItem extends AbstractPaneItem {
-
     public final static String TITLE = I18n.tr("Shutdown Behavior");
-
     public final static String LABEL = I18n.tr("You can choose the default shutdown behavior.");
-
-    /** RadioButton for selecting immediate shutdown
+    /**
+     * RadioButton for selecting immediate shutdown
      */
-    private JRadioButton shutdownImmediately;
-
-    /** RadioButton for selecting the minimize to tray option.  This
+    private final JRadioButton shutdownImmediately;
+    /**
+     * RadioButton for selecting the minimize to tray option.  This
      * option is only displayed on systems that support the tray.
      */
-    private JRadioButton minimizeToTray;
+    private final JRadioButton minimizeToTray;
+    private final JCheckBox _checkBoxShowHideExitDialog;
 
-    private JCheckBox _checkBoxShowHideExitDialog;
-
-    /** Creates new ShutdownOptionsPaneItem
+    /**
+     * Creates new ShutdownOptionsPaneItem
      *
-     * @param key the key for this <tt>AbstractPaneItem</tt> that 
-     *      the superclass uses to generate locale-specific keys
      */
     public ShutdownPaneItem() {
         super(TITLE, LABEL);
-
         BoxPanel buttonPanel = new BoxPanel();
-
         String immediateLabel = I18n.tr("Shutdown Immediately");
         String minimizeLabel = I18n.tr("Minimize to System Tray");
         shutdownImmediately = new JRadioButton(I18n.tr(immediateLabel));
         minimizeToTray = new JRadioButton(I18n.tr(minimizeLabel));
-
         String showHideExitDialogLabel = I18n.tr("Show dialog to ask before close");
         _checkBoxShowHideExitDialog = new JCheckBox(showHideExitDialogLabel);
-
         ButtonGroup bg = new ButtonGroup();
         buttonPanel.add(shutdownImmediately);
         bg.add(shutdownImmediately);
@@ -71,31 +62,25 @@ public class ShutdownPaneItem extends AbstractPaneItem {
             buttonPanel.add(minimizeToTray);
             bg.add(minimizeToTray);
         }
-
         BoxPanel mainPanel = new BoxPanel(BoxPanel.X_AXIS);
         mainPanel.add(buttonPanel);
         mainPanel.add(Box.createHorizontalGlue());
-
         mainPanel.add(_checkBoxShowHideExitDialog);
         mainPanel.add(Box.createHorizontalGlue());
-
         add(mainPanel);
     }
 
     /**
      * Applies the options currently set in this <tt>PaneItem</tt>.
      *
-     * @throws IOException if the options could not be fully applied
      */
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         if (minimizeToTray.isSelected()) {
             ApplicationSettings.MINIMIZE_TO_TRAY.setValue(true);
         } else { // if(shutdownImmediately.isSelected())
             ApplicationSettings.MINIMIZE_TO_TRAY.setValue(false);
         }
-
         ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.setValue(_checkBoxShowHideExitDialog.isSelected());
-
         return false;
     }
 
@@ -108,21 +93,18 @@ public class ShutdownPaneItem extends AbstractPaneItem {
 //            if (OSUtils.supportsTray() && !ResourceManager.instance().isTrayIconAvailable()) {
 //                //shutdownAfterTransfers.setSelected(true);
 //            } else {
-                minimizeToTray.setSelected(true);
+            minimizeToTray.setSelected(true);
 //            }
         } else {
             shutdownImmediately.setSelected(true);
         }
-
         _checkBoxShowHideExitDialog.setSelected(ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue());
     }
 
     public boolean isDirty() {
         boolean minimized = ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
         boolean reallyMinimized = minimized && ResourceManager.instance().isTrayIconAvailable();
-
         boolean immediate = !ApplicationSettings.MINIMIZE_TO_TRAY.getValue();
-
         return minimizeToTray.isSelected() != reallyMinimized || shutdownImmediately.isSelected() != immediate
                 || _checkBoxShowHideExitDialog.isSelected() != ApplicationSettings.SHOW_HIDE_EXIT_DIALOG.getValue();
     }

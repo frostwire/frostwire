@@ -22,28 +22,19 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
-
-    private final State state;
     private final Color color;
 
     public SkinSeparatorBackgroundPainter(State state, Color color) {
-        this.state = state;
         this.color = color;
     }
 
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
-        switch (state) {
-        default:
-            paintBackground(g, width, height);
-            break;
-        }
+        paintBackground(g, width, height);
     }
 
     private void paintBackground(Graphics2D g, int width, int height) {
@@ -54,7 +45,7 @@ public final class SkinSeparatorBackgroundPainter extends AbstractSkinPainter {
         }
     }
 
-    public static enum State {
+    public enum State {
         Enabled
     }
 }

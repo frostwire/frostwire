@@ -27,9 +27,7 @@ import javax.swing.*;
 import java.util.List;
 
 public final class TransferDetailTrackers extends JPanel implements TransferDetailComponent.TransferDetailPanel {
-
     private static final Logger LOG = Logger.getLogger(TransferDetailTrackers.class);
-
     private final TransferDetailTrackersTableMediator tableMediator;
 
     TransferDetailTrackers() {
@@ -48,7 +46,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     return;
                 }
                 TorrentStatus status = torrentHandle.status();
-
                 // Let's create the DHT, LSD and PEX TrackerItemHolders
                 List<PeerInfo> peerInfos = torrentHandle.peerInfo();
                 List<AnnounceEntry> items = torrentHandle.trackers();
@@ -58,11 +55,9 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                         tableMediator.add(new TransferDetailTrackers.TrackerItemHolder(i++, item));
                     }
                 }
-
                 TrackerItemHolder dhtTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.DHT, status, peerInfos);
                 TrackerItemHolder lsdTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.LSD, status, peerInfos);
                 TrackerItemHolder pexTrackerItemHolder = getSpecialAnnounceEntry(SpecialAnnounceEntryType.PEX, status, peerInfos);
-
                 // gotta add them last and in reverse order so they appear at the top by default
                 tableMediator.add(pexTrackerItemHolder);
                 tableMediator.add(lsdTrackerItemHolder);
@@ -71,12 +66,6 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                 LOG.error("Error updating data: " + e.getMessage());
             }
         }
-    }
-
-    private enum SpecialAnnounceEntryType {
-        DHT,
-        LSD,
-        PEX
     }
 
     private TrackerItemHolder getSpecialAnnounceEntry(SpecialAnnounceEntryType entryType, TorrentStatus status, List<PeerInfo> peerInfosCopy) {
@@ -106,15 +95,12 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                 byte PEER_SOURCE_FLAG_DHT = 2;
                 boolean entryDHTMatchesSource = entryType == SpecialAnnounceEntryType.DHT &&
                         (peer.source() & PEER_SOURCE_FLAG_DHT) == PEER_SOURCE_FLAG_DHT;
-
                 byte PEER_SOURCE_FLAG_LSD = 8;
                 boolean entryLSDMatchesSource = entryType == SpecialAnnounceEntryType.LSD &&
                         (peer.source() & PEER_SOURCE_FLAG_LSD) == PEER_SOURCE_FLAG_LSD;
-
                 byte PEER_SOURCE_FLAG_PEX = 4;
                 boolean entryPEXMatchesSource = entryType == SpecialAnnounceEntryType.PEX &&
                         (peer.source() & PEER_SOURCE_FLAG_PEX) == PEER_SOURCE_FLAG_PEX;
-
                 if (entryDHTMatchesSource || entryLSDMatchesSource || entryPEXMatchesSource) {
                     int PEER_FLAG_SEED = 1024;
                     if ((peer.flags() & PEER_FLAG_SEED) == PEER_FLAG_SEED) {
@@ -128,11 +114,9 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                 }
             }
         }
-
         if (entryType == SpecialAnnounceEntryType.PEX) {
             isActive = (peers > 0) || (seeds > 0);
         }
-
         boolean stateObjAvailable = status != null;
         boolean activeState = false;
         if (stateObjAvailable) {
@@ -141,12 +125,16 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
                     !state.equals(TorrentStatus.State.UNKNOWN);
         }
         isActive = isActive && activeState;
-
         return new TrackerItemHolder(trackerOffset, isActive, seeds, peers, downloaded, entryType.name());
     }
 
-    public static final class TrackerItemHolder {
+    private enum SpecialAnnounceEntryType {
+        DHT,
+        LSD,
+        PEX
+    }
 
+    public static final class TrackerItemHolder {
         final int trackerOffset;
         final boolean isActive;
         final int seeds;

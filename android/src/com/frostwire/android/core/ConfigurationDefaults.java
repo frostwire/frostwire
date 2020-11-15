@@ -56,7 +56,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_MAIN_APPLICATION_ON_CREATE_TIMESTAMP, System.currentTimeMillis());
 
         defaultValues.put(Constants.PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, (int) Constants.FILE_TYPE_AUDIO);
+        defaultValues.put(Constants.PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER, (int) Constants.FILE_TYPE_TORRENTS);
         defaultValues.put(Constants.PREF_KEY_GUI_TOS_ACCEPTED, false);
         defaultValues.put(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET, false);
         defaultValues.put(Constants.PREF_KEY_GUI_FINISHED_DOWNLOADS_BETWEEN_RATINGS_REMINDER, 10);
@@ -66,9 +66,10 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SEARCH_FILTER_DRAWER_BUTTON_CLICKED, false);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_TRANSFERS_ON_DOWNLOAD_START, true);
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false);
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_MOPUB, true);
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false); // full blown implementation, turned off as it's handled by mopub mediation
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_UNITY, true); // this implementation just starts the sdk, it's all done through mopub
+        defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 80);
         defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, 60000); // 1 min
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
@@ -77,13 +78,14 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES, 3);
         defaultValues.put(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP, -1L);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_LAST_DISPLAY, -1L);
+        defaultValues.put(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES, Constants.MIN_REWARD_AD_FREE_MINUTES);
         defaultValues.put(Constants.PREF_KEY_GUI_OFFERS_WATERFALL,
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_MOPUB,
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
+                        Constants.AD_NETWORK_SHORTCODE_UNITY,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
-        defaultValues.put(Constants.PREF_KEY_GUI_HAPTIC_FEEDBACK_ON, true);
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);
         defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
@@ -94,9 +96,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_MAX_TORRENT_FILES_TO_INDEX, 100); // no ultra big torrents here
         defaultValues.put(Constants.PREF_KEY_SEARCH_FULLTEXT_SEARCH_RESULTS_LIMIT, 256);
 
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_VERTOR, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ZOOQLE, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YOUTUBE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_FROSTCLICK, true);
@@ -105,11 +105,14 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_NYAA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_APPIA, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YIFY, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTSFM, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_PIXABAY, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTZ2, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MAGNETDL, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENT_PARADISE, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);
@@ -125,6 +128,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_MAX_PEERS, 200L);
         defaultValues.put(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES, false);
         defaultValues.put(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX, 1); // pieces
+        defaultValues.put(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED, false);
 
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 

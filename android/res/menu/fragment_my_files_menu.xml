@@ -27,7 +27,7 @@
         android:orderInCategory="1"
         android:title="@string/type_to_filter_results"
         app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView"/>
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
     <item
         android:id="@+id/fragment_my_files_menu_checkbox"
         android:checkable="true"

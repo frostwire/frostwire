@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> लागू टैग को स्पर्श करें]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>आपकी गोपनीयता एक मौलिक मानव अधिकार है</b>. एक असुरक्षित कनेक्शन का अर्थ है कि आप <b>डाउनलोड, खोज, संदेश</b> सहित ऑनलाइन सबकुछ करते हैं, आपके नेटवर्क पर किसी भी व्यक्ति द्वारा निगरानी और अवरोध किया जा सकता है, उदा। इंटरनेट सेवा प्रदाता, हैकर्स, सरकारें।<br><br><b>हम दृढ़ता से एक वीपीएन सेवा का उपयोग करने की सलाह देते हैं</b>. <br> यहां कुछ विकल्प हैं जो विश्वसनीय सेवा प्रदान करते हैं और फ्रॉस्टवायर के साथ अच्छी तरह से काम करते हैं:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ आप एक वीपीएन का उपयोग कर इंटरनेट से जुड़े हुए हैं।<br><br> यदि आप पहले से नहीं हैं, तो हम आपके कनेक्शन को एन्क्रिप्ट करने के लिए नीचे दी गई सेवाओं में से एक का उपयोग करने की सलाह देते हैं और <b>अपनी गोपनीयता की रक्षा करें</b>। ]]></string>
-    <string name="application_label">फ्रॉस्टवाइर</string>
     <string name="activity_preferences_name">सेटिंग्स</string>
     <string name="exit">निकास</string>
     <string name="search_label">तलाश</string>
@@ -160,7 +159,7 @@
     <string name="choose_email_app">एक ईमेल अनुप्रयोग चुनें…</string>
     <string name="my_filetype">मेरे %s</string>
     <string name="accept">स्वीकार करना</string>
-    <string name="retry_search">पुन: प्रयास करें</string>
+    <string name="retry">पुन: प्रयास करें</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">फ़ाइल वरीयता प्राप्त नहीं किया जा सकता है। BitTorrent काट दिया रहेगा।</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">एंड्रॉयड डाउनलोड की फ़ाइलें मिटा देगा यदि FrostWire रद्द की है।</string>
     <string name="protected_connection">वीपीएन की रक्षा की</string>
@@ -227,6 +226,8 @@
     <string name="available">उपलब्ध</string>
     <string name="check_internet_connection">इंटरनेट कनेक्शन की जांच</string>
     <string name="use_yify">उपयोग Yify</string>
+    <string name="use_one337x">उपयोग 1337x</string>
+    <string name="use_idope">उपयोग Idope</string>
     <string name="transfers_context_menu_copy_infohash_copied">जानकारी हैश क्लिपबोर्ड करने के लिए नकल</string>
     <string name="haptic_feedback">हप्टिक राय</string>
     <string name="yes_no_cancel_transfer_question_cloud">तुम बंद करो और सूची से यह डाउनलोड निकालना चाहते हैं, आप सुनिश्चित हैं?</string>
@@ -357,7 +358,6 @@
     <string name="or">या</string>
     <string name="file_names">फ़ाइल नाम</string>
     <string name="no_data_check_internet_connection">नेटवर्क अनुपलब्ध है, कृपया अपने इंटरनेट कनेक्शन की जांच करें।</string>
-    <string name="use_pixabay">उपयोग Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">सभी स्थानान्तरणों को सीडिंग बंद करें</string>
     <string name="seed_stop">बोने बंद करो</string>
     <string name="transfers_select_seeding">बीज बोने की क्रिया</string>
@@ -409,7 +409,7 @@
     <string name="piece_size_header">टुकड़ा आकार:</string>
     <string name="add_tracker">ट्रैकर जोड़ें</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n नि: शुल्क 7-दिन का परीक्षण</string>
-    <string name="play_store_out_of_sync">Play Store को सिंक्रनाइज़ करने की आवश्यकता है, कुछ मिनट प्रतीक्षा करें</string>
     <string name="contact_us">हमसे संपर्क करें</string>
     <string name="use_nyaa">उपयोग Nyaa</string>
+    <string name="use_torrentz2">उपयोग Torrentz2</string>
 </resources>

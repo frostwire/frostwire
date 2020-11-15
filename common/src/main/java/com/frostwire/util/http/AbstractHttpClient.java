@@ -24,6 +24,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -32,20 +33,39 @@ import java.util.Map;
  * @author aldenml
  */
 public abstract class AbstractHttpClient implements HttpClient {
-    private static final Logger LOG = Logger.getLogger(AbstractHttpClient.class);
     protected static final int DEFAULT_TIMEOUT = 10000;
     protected static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
+    private static final Logger LOG = Logger.getLogger(AbstractHttpClient.class);
     protected HttpClientListener listener;
     protected boolean canceled = false;
 
-    @Override
-    public void setListener(HttpClientListener listener) {
-        this.listener = listener;
+    protected static void closeQuietly(Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException ioe) {
+            // ignore
+        }
+    }
+
+    protected static void copyMultiMap(Map<String, List<String>> origin, Map<String, List<String>> destination) {
+        if (origin == null || destination == null) {
+            return;
+        }
+        for (String key : origin.keySet()) {
+            destination.put(key, origin.get(key));
+        }
     }
 
     @Override
     public HttpClientListener getListener() {
         return listener;
+    }
+
+    @Override
+    public void setListener(HttpClientListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -188,26 +208,6 @@ public abstract class AbstractHttpClient implements HttpClient {
             }
             sb.deleteCharAt(0);
         }
-        return sb.toString().getBytes("UTF-8");
-    }
-
-    protected static void closeQuietly(Closeable closeable) {
-        try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
-        }
-    }
-
-    protected static void copyMultiMap(Map<String, List<String>> origin, Map<String, List<String>> destination) {
-        if (origin == null || destination == null){
-            return;
-        }
-
-        for (String key : origin.keySet()) {
-            destination.put(key, origin.get(key));
-        }
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

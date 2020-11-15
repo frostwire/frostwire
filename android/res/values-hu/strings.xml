@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">A telepítés befejezése után.</string>
     <string name="error_connection_timed_out">Hiba: kapcsolat időtúllépés/csökkent. Próbáld újra.</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Minden ingyenes letöltések</string>
     <string name="torrent_max_download_speed">Max letöltési sebesség</string>
     <string name="torrent_max_peers">Max Peers</string>
@@ -74,7 +73,7 @@
     <string name="share">Megosztása</string>
     <string name="accept">Elfogad</string>
     <string name="torrent_max_download_speed_summary">Max letöltési sebesség (0 azt jelenti, korlátlan)</string>
-    <string name="retry_search">Próbálja újra</string>
+    <string name="retry">Próbálja újra</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">A fájlt nem lehet magot. BitTorrent marad le.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android törli a letöltött fájlokat, ha FrostWire eltávolításra kerül.</string>
     <string name="protected_connection">VPN-védett</string>
@@ -357,7 +356,6 @@
     <string name="or">vagy</string>
     <string name="file_names">Fájlnevek</string>
     <string name="no_data_check_internet_connection">A hálózat nem érhető el, ellenőrizze az internetkapcsolatot.</string>
-    <string name="use_pixabay">Használja Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Ne hagyja abba a transzfereket</string>
     <string name="seed_stop">Állítsa le a vetést</string>
     <string name="transfers_select_seeding">vetés</string>
@@ -409,7 +407,7 @@
     <string name="piece_size_header">Darab mérete:</string>
     <string name="add_tracker">Tracker hozzáadása</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Ingyenes 7 napos próba</string>
-    <string name="play_store_out_of_sync">Szinkronizálnia kell a Google Play Áruházat, várjon néhány percet</string>
     <string name="contact_us">Lépjen kapcsolatba velünk</string>
     <string name="use_nyaa">Használja Nyaa</string>
+    <string name="use_torrentz2">Használja Torrentz2</string>
 </resources>

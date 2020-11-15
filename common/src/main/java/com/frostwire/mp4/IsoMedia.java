@@ -27,7 +27,6 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public final class IsoMedia {
-
     private IsoMedia() {
     }
 
@@ -37,35 +36,28 @@ public final class IsoMedia {
             IO.read(ch, 8, buf);
             int size = buf.getInt();
             int type = buf.getInt();
-
             Long largesize = null;
             if (size == 1) {
                 IO.read(ch, 8, buf);
                 largesize = buf.getLong();
             }
-
             byte[] usertype = null;
             if (type == Box.uuid) {
                 usertype = new byte[16];
                 IO.read(ch, 16, buf);
                 buf.get(usertype);
             }
-
             Box b = Box.empty(type);
             b.size = size;
             b.largesize = largesize;
             b.usertype = usertype;
-
             b.parent = p;
-
             long r = ch.count();
             b.read(ch, buf);
             r = ch.count() - r;
-
             if (p != null) {
                 p.boxes.add(b);
             }
-
             if (l != null) {
                 long pos = ch.count();
                 if (!l.onBox(b)) {
@@ -81,7 +73,6 @@ public final class IsoMedia {
                     }
                 }
             }
-
             long length = b.length();
             if (r < length) {
                 if (type != Box.mdat) {
@@ -97,7 +88,6 @@ public final class IsoMedia {
                 }
             }
         } while (len == -1 || ch.count() - n < len);
-
         return true;
     }
 
@@ -111,45 +101,36 @@ public final class IsoMedia {
 
     public static boolean write(OutputChannel ch, LinkedList<Box> boxes, ByteBuffer buf, OnBoxListener l) throws IOException {
         buf.clear();
-
         for (Box b : boxes) {
             buf.putInt(b.size);
             buf.putInt(b.type);
             IO.write(ch, 8, buf);
-
             if (b.largesize != null) {
                 buf.putLong(b.largesize);
                 IO.write(ch, 8, buf);
             }
-
             if (b.usertype != null) {
                 buf.put(b.usertype);
                 IO.write(ch, 16, buf);
             }
-
             long length = b.length();
             long w = ch.count();
-
             b.write(ch, buf);
-
             if (l != null) {
                 if (!l.onBox(b)) {
                     return false;
                 }
             }
-
             if (b.boxes != null) {
                 if (!write(ch, b.boxes, buf, l)) {
                     return false;
                 }
             }
-
             w = ch.count() - w;
             if (w != length && b.type != Box.mdat) {
                 throw new IOException("Inconsistent box data: " + Bits.make4cc(b.type));
             }
         }
-
         return true;
     }
 
@@ -168,6 +149,12 @@ public final class IsoMedia {
     }
 
     public interface OnBoxListener {
+        OnBoxListener ALL = new OnBoxListener() {
+            @Override
+            public boolean onBox(Box b) {
+                return true;
+            }
+        };
 
         /**
          * Give the opportunity to react on box read/write and together
@@ -178,12 +165,5 @@ public final class IsoMedia {
          * @return true if you want to stop
          */
         boolean onBox(Box b) throws IOException;
-
-        OnBoxListener ALL = new OnBoxListener() {
-            @Override
-            public boolean onBox(Box b) {
-                return true;
-            }
-        };
     }
 }

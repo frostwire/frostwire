@@ -34,22 +34,14 @@ import javax.swing.table.TableColumn;
  * </ul>
  */
 public class LimeTableColumn extends TableColumn {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 5966221936060186588L;
-
     /**
      * Variable for the HeaderRenderer for all components.
      */
-    public static TableCellRenderer HEADER_RENDERER;
-
+    private static TableCellRenderer HEADER_RENDERER;
     /**
      * Variable for an invisible HeaderRenderer.
      */
-    public static TableCellRenderer INVIS_RENDERER;
-
+    private static TableCellRenderer INVIS_RENDERER;
     private final boolean defaultVisibility;
     private final int defaultWidth;
     private final String messageId;
@@ -57,12 +49,7 @@ public class LimeTableColumn extends TableColumn {
     private final Icon icon;
     private final boolean visName;
     private final Class<?> clazz;
-
-    private boolean initialized = false;
-
-    public String toString() {
-        return messageId;
-    }
+    private final boolean initialized;
 
     /**
      * Creates a new column.
@@ -87,25 +74,19 @@ public class LimeTableColumn extends TableColumn {
     /**
      * Creates a new column.
      */
-    public LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, boolean visName, Class<?> clazz) {
+    private LimeTableColumn(int model, final String id, final String name, final Icon icon, int width, boolean vis, boolean visName, Class<?> clazz) {
         super(model);
         initialized = true;
-
         this.defaultVisibility = vis;
-
         this.defaultWidth = width;
         if (defaultWidth != -1)
             super.setPreferredWidth(width);
-
         this.messageId = id;
         super.setIdentifier(id);
-
         this.name = name;
         this.icon = icon;
         this.visName = visName;
-
         this.clazz = clazz;
-
         setHeaderVisible(true);
     }
 
@@ -113,19 +94,24 @@ public class LimeTableColumn extends TableColumn {
         this(model, id, name, icon, width, vis, true, clazz);
     }
 
+    public String toString() {
+        return messageId;
+    }
+
     /**
      * Sets the visibility of the header.
-     *
+     * <p>
      * Returns this so that it can be used easily for assigning
      * variables.
      */
-    public LimeTableColumn setHeaderVisible(boolean vis) {
+    private void setHeaderVisible(boolean vis) {
         if (vis) {
             super.setHeaderRenderer(getHeaderSortRenderer());
             if (visName) {
                 if (icon != null) {
                     super.setHeaderValue(icon);
-                } else if (name != null) {
+                } else //noinspection ReplaceNullCheck
+                    if (name != null) {
                     super.setHeaderValue(name);
                 } else {
                     super.setHeaderValue("");
@@ -137,7 +123,6 @@ public class LimeTableColumn extends TableColumn {
             super.setHeaderRenderer(getInvisSortRenderer());
             super.setHeaderValue("");
         }
-        return this;
     }
 
     /**
@@ -178,7 +163,7 @@ public class LimeTableColumn extends TableColumn {
     /**
      * Gets the class of this column.
      */
-    public Class<?> getColumnClass() {
+    Class<?> getColumnClass() {
         return clazz;
     }
 
@@ -189,11 +174,11 @@ public class LimeTableColumn extends TableColumn {
         return messageId;
     }
 
-    /**
-     * The following methods are overridden to ensure that we never
-     * accidentally change the default values.  This is absolutely
-     * necessary so that the DefaultColumnPreferenceHandler can correctly
-     * write the default values to the settings.
+    /*
+      The following methods are overridden to ensure that we never
+      accidentally change the default values.  This is absolutely
+      necessary so that the DefaultColumnPreferenceHandler can correctly
+      write the default values to the settings.
      */
 
     /**
@@ -233,7 +218,7 @@ public class LimeTableColumn extends TableColumn {
     private TableCellRenderer getInvisSortRenderer() {
         if (INVIS_RENDERER == null) {
             SortHeaderRenderer rnd = new SortHeaderRenderer();
-            rnd.setAllowIcon(false);
+            rnd.setAllowIcon();
             INVIS_RENDERER = rnd;
         }
         return INVIS_RENDERER;

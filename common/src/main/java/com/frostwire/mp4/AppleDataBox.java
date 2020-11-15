@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public class AppleDataBox extends Box {
-
     protected int dataLength;
     protected int data4cc;
     protected int dataType;

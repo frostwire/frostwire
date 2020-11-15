@@ -24,7 +24,6 @@
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Divulgation:</b> Bien que recommandée pour vos téléchargements, en particulier lors du téléchargement ou de l\'échange d\'informations sensibles (par exemple bancaires) et lors de l\'utilisation de Wi-Fi publics ou de données mobiles, <b>vous ne pas besoin d\'un VPN à utiliser FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Votre vie privée est un droit humain fondamental</b>. Une connexion non protégée signifie tout ce que vous faites en ligne <b>recherches, messagerie et téléchargements</b>, peut être surveillé et intercepté par n\'importe qui sur votre réseau, par ex. Fournisseurs de services Internet, hackers, gouvernements.<br><br><b>Nous recommandons fortement d\'utiliser un service VPN</b>. <br> Voici quelques options qui fournissent un service fiable et fonctionnent bien avec FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Vous êtes connecté à Internet via un VPN. <br><br> Si ce n\'est déjà fait, nous vous recommandons d\'utiliser l\'un des services ci-dessous pour crypter votre connexion et <b>protéger votre vie privée</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Paramètres</string>
     <string name="exit">Quitter </string>
     <string name="search_label">Recherche</string>
@@ -144,7 +143,7 @@
     <string name="my_filetype">Mon %s</string>
     <string name="use_soundcloud">Utilisez Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Ce type de téléchargement n\'est pas pris en charge</string>
-    <string name="retry_search">Réessayez</string>
+    <string name="retry">Réessayez</string>
     <string name="use_archiveorg">Utilisez Archive.org</string>
     <string name="crawl_cache_size">Taille du cache de parcourt %1$.2fMB</string>
     <string name="deleted_crawl_cache">Effacer le cache de parcourt</string>
@@ -159,6 +158,7 @@
     <string name="drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="use_torlock">Utilisez TorLock</string>
     <string name="use_torrentdownloads">Utilisez TorrentDownloads</string>
+    <string name="use_torrentz2">Utilisez Torrentz2</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va effacer les fichiers téléchargés si FrostWire est désinstallé.</string>
     <string name="use_eztv">Utilisez Eztv</string>
@@ -182,6 +182,8 @@
     <string name="please_enter_valid_url">S\'il vous plaît entrer une URL valide</string>
     <string name="available">disponible</string>
     <string name="use_yify">Utilisez Yify</string>
+    <string name="use_one337x">Utilisez 1337x</string>
+    <string name="use_idope">Utilisez Idope</string>
     <string name="torrent_transfer_consuming_mobile_data">Attention: Ce transfert de torrent utilise vos données 3G/4G. (Vérifiez vos préférences de réseau si vous souhaitez utiliser BitTorrent uniquement sur WiFi)</string>
     <string name="transfers_context_resume_all_torrent_transfers">Reprendre tous les transferts torrent</string>
     <string name="storage_setting_confirm_dialog_title">CARTE SD</string>
@@ -266,6 +268,9 @@
     <string name="http_download_status_save_dir_error">Sauv.répertoire n\'existe pas ou ne peut pas être créé.</string>
     <string name="select_option_below">Sélectionnez l\'option ci-dessous:</string>
     <string name="use_limetorrents">Utilisez Limetorrents</string>
+    <string name="use_magnetdl">Utilisez MagnetDL</string>
+    <string name="use_torrent_paradise">Utilisez TorrentParadise</string>
+    <string name="use_glotorrents">Utilisez GloTorrents</string>
     <string name="error_no_internet_connection">Erreur: Vérifiez la connexion Internet</string>
     <string name="why_we_need_storage_permissions">Pourquoi nous avons besoin des autorisations de stockage.</string>
     <string name="invalid_filename">Nom de fichier non valide</string>
@@ -358,7 +363,6 @@
     <string name="or">ou</string>
     <string name="file_names">Nom des fichiers</string>
     <string name="no_data_check_internet_connection">Réseau indisponible, vérifiez votre connexion Internet.</string>
-    <string name="use_pixabay">Utilisez Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Arrêtez de semer tous les transferts</string>
     <string name="seed_stop">Arrêtez de semer</string>
     <string name="transfers_select_seeding">ensemencement</string>
@@ -410,7 +414,17 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire n\'a pas pu démarrer correctement en raison du manque d\'autorisations. Veuillez accorder les autorisations requises et redémarrer l\'application</string>
     <string name="vpn_find_out_more">En savoir plus</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Essai gratuit de 7 jours</string>
-    <string name="play_store_out_of_sync">Play Store doit se synchroniser, attendre quelques minutes</string>
     <string name="contact_us">Contactez nous</string>
+    <string name="community">Communauté</string>
     <string name="use_nyaa">Utilisez Nyaa</string>
+    <string name="play_uppercase">LIRE</string>
+    <string name="minutes_left_ad_free">%d minutes restantes sans annonces</string>
+    <string name="minute_left_ad_free">Une minute restantes sans annonces</string>
+    <string name="reward_product_title">%d minutes</string>
+    <string name="reward_product_price">Gratuit, diffusion d\'1 annonce vidéo</string>
+    <string name="temporary_ad_removal">Suppression des annonces temporaires</string>
+    <string name="temporary_ad_removal_description">Aucune annonce pendant %d minutes après la lecture d\'une vidéo</string>
+    <string name="looking_For_rewarded_video">Vous recherchez une vidéo récompensée…</string>
+    <string name="no_reward_videos_available">Impossible de récupérer une vidéo récompensée. Veuillez réessayer</string>
+    <string name="free">Gratuit</string>
 </resources>

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,14 @@
 
 package com.frostwire.search.soundcloud;
 
+import com.frostwire.platform.Platform;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.JsonUtils;
+import com.frostwire.util.http.HttpClient;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -29,9 +34,7 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class SoundcloudSearchResult extends AbstractFileSearchResult implements HttpSearchResult, StreamableSearchResult {
-
     private static final String DATE_FORMAT = "yyyy/mm/dd HH:mm:ss Z";
-
     private final String displayName;
     private final String username;
     private final String trackUrl;
@@ -39,8 +42,10 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final String source;
     private final String thumbnailUrl;
     private final long date;
-    private final String downloadUrl;
-    private final long size;
+    private String downloadUrl;
+    private final String progressiveFormatJSONFetcherURL;
+    private final double size;
+    private String hash;
 
     SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
@@ -49,15 +54,23 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         this.filename = item.permalink + "-soundcloud.mp3";
         this.size = buildSize(item);
         this.source = buildSource(item);
-
         String userAvatarUrl = null;
         if (item.user != null) {
             userAvatarUrl = item.user.avatar_url;
         }
         this.thumbnailUrl = buildThumbnailUrl(item.artwork_url != null ? item.artwork_url : userAvatarUrl);
-
         this.date = buildDate(item.created_at);
-        this.downloadUrl = buildDownloadUrl(item, clientId, appVersion);
+        if (null != item.getProgressiveFormatJSONFetcherURL()) {
+            this.progressiveFormatJSONFetcherURL = item.getProgressiveFormatJSONFetcherURL() + "?client_id=" + clientId + "&app_version=" + appVersion;
+        } else {
+            this.progressiveFormatJSONFetcherURL = null;
+        }
+        this.hash = Integer.toHexString(item.id * 953 * 631);
+        this.downloadUrl = null;
+    }
+
+    public boolean fetchedDownloadUrl() {
+        return downloadUrl != null;
     }
 
     @Override
@@ -66,7 +79,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return size;
     }
 
@@ -91,7 +104,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     public String getStreamUrl() {
-        return downloadUrl;
+        return getDownloadUrl();
     }
 
     public String getThumbnailUrl() {
@@ -104,7 +117,37 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
 
     @Override
     public String getDownloadUrl() {
-        return downloadUrl;
+        if (progressiveFormatJSONFetcherURL == null) {
+            return null;
+        }
+        if (downloadUrl != null) {
+            return downloadUrl;
+        }
+
+        if (Platforms.get().isUIThread()) {
+            StackTraceElement[] stackTrace = new Exception().getStackTrace();
+            int maxStackShow = 10;
+            for (StackTraceElement e : stackTrace) {
+                System.out.println(e.toString());
+                if (--maxStackShow == 0) {
+                    break;
+                }
+            }
+            throw new RuntimeException("SoundcloudSearchResult.getDownloadUrl(): Do not invoke getDownloadUrl() from the main thread if downloadUrl is null");
+        }
+
+        HttpClient client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD);
+        try {
+            String json = client.get(progressiveFormatJSONFetcherURL);
+            SoundcloudTrackURL soundcloudTrackURL = JsonUtils.toObject(json, SoundcloudTrackURL.class);
+            if (soundcloudTrackURL != null && soundcloudTrackURL.url != null) {
+                return soundcloudTrackURL.url;
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
     private String buildUsername(SoundcloudItem item) {
@@ -156,17 +199,14 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private String buildDownloadUrl(SoundcloudItem item, String clientId, String appVersion) {
         final String clientAppenderChar = (item.download_url != null && item.download_url.contains("?")) ? "&" : "?";
         String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url);
-
         //http://api.soundcloud.com/tracks/#########/download no longer works, has to be /stream now.
         if (downloadUrl.endsWith("/download")) {
             downloadUrl = downloadUrl.replace("/download", "/stream");
         }
-
         // direct download urls don't seem to need client_id & app_version, if passed to the url returns HTTP 404.
         if (clientId != null && appVersion != null) {
             downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
         }
-
         return downloadUrl;
     }
 
@@ -183,13 +223,15 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         SoundcloudSearchResult other = (SoundcloudSearchResult) o;
         return this.getDetailsUrl().equals(other.getDetailsUrl()) &&
                 this.getDisplayName().equals(other.getDisplayName()) &&
-                this.getDownloadUrl().equals(other.getDownloadUrl());
+                this.getHash().equals(other.getHash());
     }
 
     @Override
     public int hashCode() {
-        return getDetailsUrl().hashCode() +
-                getDisplayName().hashCode() +
-                getDownloadUrl().hashCode();
+        return getHash().hashCode();
+    }
+
+    public String getHash() {
+        return hash;
     }
 }

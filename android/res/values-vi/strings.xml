@@ -24,7 +24,6 @@
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Quyền riêng tư của bạn là quyền cơ bản của con người</b>. Kết nối không được bảo vệ có nghĩa là mọi thứ bạn thực hiện trực tuyến bao gồm <b>tải xuống, tìm kiếm, nhắn tin</b>, có thể được theo dõi và chặn bởi bất kỳ ai trên mạng của bạn, ví dụ: Nhà cung cấp dịch vụ Internet, tin tặc, chính phủ.<br><br><b>Chúng tôi mạnh mẽ khuyên bạn nên sử dụng dịch vụ VPN</b>. <br> Dưới đây là một số tùy chọn cung cấp dịch vụ đáng tin cậy và hoạt động tốt với FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Bạn đang kết nối với Internet bằng VPN. <br><br> Nếu bạn chưa sẵn sàng, chúng tôi khuyên bạn nên sử dụng một trong các dịch vụ bên dưới để mã hóa kết nối của bạn và <b>bảo vệ quyền riêng tư của bạn</b>. ]]></string>
     <string name="invalid_tracker_url">URL trình theo dõi không hợp lệ</string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Thiết đặt</string>
     <string name="exit">Thoát</string>
     <string name="search_label">Tìm kiếm</string>
@@ -165,7 +164,7 @@
     <string name="saving_to_internal_memory">Tiết kiệm để Bộ nhớ trong</string>
     <string name="choose_email_app">Chọn Email App…</string>
     <string name="my_filetype">%s của tôi</string>
-    <string name="retry_search">Thử lại</string>
+    <string name="retry">Thử lại</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Các tập tin không thể được gieo. BitTorrent sẽ vẫn bị ngắt kết nối.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android sẽ xóa các tập tin đã tải về nếu FrostWire được gỡ cài đặt.</string>
     <string name="protected_connection">VPN được bảo vệ</string>
@@ -358,7 +357,6 @@
     <string name="or">hoặc là</string>
     <string name="file_names">Tên tệp</string>
     <string name="no_data_check_internet_connection">Không có mạng, hãy kiểm tra kết nối Internet của bạn.</string>
-    <string name="use_pixabay">Chọn Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Dừng chia sẻ tất cả các lần chuyển</string>
     <string name="seed_stop">Dừng chia sẻ</string>
     <string name="transfers_select_seeding">gieo hột</string>
@@ -409,7 +407,7 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire không thể bắt đầu đúng do thiếu quyền truy cập. Vui lòng cấp các quyền cần thiết và khởi động lại ứng dụng</string>
     <string name="vpn_find_out_more">Tìm hiểu thêm</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Dùng thử 7 ngày miễn phí</string>
-    <string name="play_store_out_of_sync">Cửa hàng Google Play cần đồng bộ hóa, đợi một vài phút</string>
     <string name="contact_us">Liên hệ chúng tôi</string>
     <string name="use_nyaa">Chọn Nyaa</string>
+    <string name="use_torrentz2">Chọn Torrentz2</string>
 </resources>

@@ -18,29 +18,25 @@
 
 package com.frostwire.gui.mplayer;
 
-public class AlphaAnimationThread extends Thread {
-
+class AlphaAnimationThread extends Thread {
     private static final int TARGET_ALPHA = 90 * 255 / 100;
     private static final int ALPHA_STEP = 20;
-
+    private final Object animationStart = new Object();
     private boolean disposed = false;
-    private Object animationStart = new Object();
     private boolean isHiding;
     private boolean isShowing;
     private int currentAlpha = TARGET_ALPHA;
-    private boolean stopAlphaThread = false;
+    private final AlphaTarget target;
 
-    private AlphaTarget target;
-
-    public AlphaAnimationThread(AlphaTarget target) {
+    AlphaAnimationThread(AlphaTarget target) {
         this.target = target;
     }
 
-    public void setDisposed() {
+    void setDisposed() {
         disposed = true;
     }
 
-    public void animateToTransparent() {
+    void animateToTransparent() {
         if (isHiding) {
             return;
         }
@@ -53,7 +49,7 @@ public class AlphaAnimationThread extends Thread {
         }
     }
 
-    public void animateToOpaque() {
+    void animateToOpaque() {
         if (isShowing) {
             return;
         }
@@ -71,6 +67,7 @@ public class AlphaAnimationThread extends Thread {
     }
 
     public void run() {
+        boolean stopAlphaThread = false;
         while (!stopAlphaThread && !disposed) {
             if (isHiding) {
                 if (currentAlpha > 0) {
@@ -79,7 +76,6 @@ public class AlphaAnimationThread extends Thread {
                     } else {
                         currentAlpha = 0;
                     }
-
                     target.setAlpha(currentAlphaValue());
                 } else {
                     isHiding = false;
@@ -97,17 +93,14 @@ public class AlphaAnimationThread extends Thread {
                     isShowing = false;
                 }
             }
-
             try {
                 if (isShowing || isHiding) {
                     Thread.sleep(50);
                 } else {
                     synchronized (animationStart) {
-
                         if (stopAlphaThread) {
                             return;
                         }
-
                         animationStart.wait();
                     }
                 }

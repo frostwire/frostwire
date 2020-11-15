@@ -25,6 +25,8 @@ import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
+import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -33,12 +35,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCellRenderer {
     private final static float BUTTONS_TRANSPARENCY = 0.85f;
@@ -50,24 +51,21 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private final static AlphaIcon details_transparent;
     private final static ImageIcon speaker_icon;
 
-    private JLabel labelPlay;
-    private JLabel labelPartialDownload;
-    private JLabel labelDownload;
-    private UISearchResult searchResult;
-    private boolean showSolid;
-
     static {
         play_solid = GUIMediator.getThemeImage("search_result_play_over");
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-
         download_solid = GUIMediator.getThemeImage("search_result_download_over");
         download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-
         details_solid = GUIMediator.getThemeImage("search_result_details_over");
         details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-
         speaker_icon = GUIMediator.getThemeImage("speaker");
     }
+
+    private JLabel labelPlay;
+    private JLabel labelPartialDownload;
+    private JLabel labelDownload;
+    private UISearchResult uiSearchResult;
+    private boolean showSolid;
 
     public SearchResultActionsRenderer() {
         setupUI();
@@ -76,7 +74,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private void setupUI() {
         setLayout(new GridBagLayout());
         GridBagConstraints c;
-
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
         labelPlay.addMouseListener(new MouseAdapter() {
@@ -89,7 +86,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPlay, c);
-
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
         labelDownload.addMouseListener(new MouseAdapter() {
@@ -102,7 +98,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
-
         labelPartialDownload = new JLabel(details_solid);
         labelPartialDownload.setToolTipText(I18n.tr("Select content to download from this torrent."));
         labelPartialDownload.addMouseListener(new MouseAdapter() {
@@ -115,7 +110,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPartialDownload, c);
-
         setEnabled(true);
     }
 
@@ -129,9 +123,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (actionsHolder == null) {
             return;
         }
-        searchResult = actionsHolder.getSearchResult();
-
-        if (searchResult == null) {
+        uiSearchResult = actionsHolder.getSearchResult();
+        if (uiSearchResult == null) {
             return;
         }
         showSolid = mouseIsOverRow(table, row);
@@ -142,32 +135,37 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         labelDownload.setIcon(showSolid ? download_solid : download_transparent);
         labelDownload.setVisible(true);
         labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
-        SearchResult sr = searchResult.getSearchResult();
+        SearchResult sr = uiSearchResult.getSearchResult();
         labelPartialDownload.setVisible(sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult);
     }
 
     private boolean isSearchResultPlayable() {
         boolean playable = false;
-        if (searchResult.getSearchResult() instanceof StreamableSearchResult) {
-            playable = ((StreamableSearchResult) searchResult.getSearchResult()).getStreamUrl() != null;
+        if (uiSearchResult.getSearchResult() instanceof SoundcloudSearchResult) {
+            return true;
+        } else if (uiSearchResult.getSearchResult() instanceof StreamableSearchResult) {
+            playable = ((StreamableSearchResult) uiSearchResult.getSearchResult()).getStreamUrl() != null;
+        } else if (uiSearchResult.getSearchResult() instanceof TellurideSearchResult) {
+            return true;
         }
 
-        if (playable && searchResult.getExtension() != null) {
-            MediaType mediaType = MediaType.getMediaTypeForExtension(searchResult.getExtension());
+        if (playable && uiSearchResult.getExtension() != null) {
+            MediaType mediaType = MediaType.getMediaTypeForExtension(uiSearchResult.getExtension());
             playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
         }
-
         return playable;
     }
 
     private void updatePlayButton() {
-        labelPlay.setIcon((isStreamableSourceBeingPlayed(searchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon((isStreamableSourceBeingPlayed(uiSearchResult)) ? speaker_icon : (showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            if (searchResult.getSearchResult() instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(searchResult)) {
-                searchResult.play();
+            SearchResult searchResult = uiSearchResult.getSearchResult();
+            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) ||
+                    searchResult instanceof TellurideSearchResult) {
+                uiSearchResult.play();
             }
             updatePlayButton();
         }
@@ -175,26 +173,39 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void labelPartialDownload_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            SearchResult sr = searchResult.getSearchResult();
-            if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
-                searchResult.download(true);
+            MouseListener[] mouseListeners = labelPartialDownload.getMouseListeners();
+            for (MouseListener mouseListener : mouseListeners) {
+                labelPartialDownload.removeMouseListener(mouseListener);
+            }
 
+            SearchResult sr = uiSearchResult.getSearchResult();
+            if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
+                uiSearchResult.download(true);
                 if (sr instanceof ArchiveorgTorrentSearchResult) {
                     GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
                 }
+            }
+
+            for (MouseListener mouseListener : mouseListeners) {
+                labelPartialDownload.addMouseListener(mouseListener);
             }
         }
     }
 
     private void labelDownload_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            searchResult.download(false);
+            uiSearchResult.download(false);
             GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         }
     }
 
     private boolean isStreamableSourceBeingPlayed(UISearchResult sr) {
         SearchResult delegateSearchResult = sr.getSearchResult();
+        if (delegateSearchResult instanceof SoundcloudSearchResult) {
+            if (!((SoundcloudSearchResult) delegateSearchResult).fetchedDownloadUrl()) {
+                return false;
+            }
+        }
         return delegateSearchResult instanceof StreamableSearchResult && MediaPlayer.instance().isThisBeingPlayed(((StreamableSearchResult) delegateSearchResult).getStreamUrl());
     }
 }

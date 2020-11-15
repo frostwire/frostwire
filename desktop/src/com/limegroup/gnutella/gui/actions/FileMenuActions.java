@@ -17,8 +17,10 @@ package com.limegroup.gnutella.gui.actions;
 
 import com.frostwire.gui.bittorrent.CreateTorrentDialog;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
+import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.MagnetClipboardListener;
+import com.limegroup.gnutella.gui.search.SearchInformation;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -29,17 +31,58 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 public final class FileMenuActions {
-
     private static final int SPACE = 6;
 
-    /** Shows the File, Open Magnet or Torrent dialog box to let the user enter a magnet or torrent. */
-    public static class OpenMagnetTorrentAction extends AbstractAction {
+    /**
+     * Opens a magnet link, a Web address to a torrent file, or a path to a
+     * torrent file on the disk.
+     * <p>
+     * Note that DNDUtils performs similar steps when the user drops a magnet
+     * or torrent on the window.
+     *
+     * @param userText The text of the path, link, or address the user entered
+     * @return true if it was valid and we opened it
+     */
+    public static boolean openMagnetOrTorrent(final String userText) {
+        if (userText.startsWith("magnet:?xt=urn:btih")) {
+            GUIMediator.instance().openTorrentURI(userText, true);
+            return true;
+        } else if (userText.matches(".*soundcloud.com.*")) {
+            //the new soundcloud redirects to what seems to be an ajax page
+            String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
+            GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null, true);
+            return true;
+        } else if (userText.startsWith("http") && (userText.endsWith(".torrent"))) {
+            GUIMediator.instance().openTorrentURI(userText, true);
+            return true;
+        } else {
+            // See if it's a path to a file on the disk
+            File file = new File(userText);
+            if (isFileSystemPath(file)) {
+                if (file.exists()) {
+                    GUIMediator.instance().openTorrentFile(file, true); // Open the torrent file
+                    return true;
+                }
+                // Not a file
+            }
+        }
+        // Invalid text, nothing opened
+        return false;
+    }
 
+    private static boolean isFileSystemPath(File file) {
+        return file.isAbsolute();
+    }
+
+    /**
+     * Shows the File, Open Magnet or Torrent dialog box to let the user enter a magnet or torrent.
+     */
+    public static class OpenMagnetTorrentVideoUrlAction extends AbstractAction {
         private JDialog dialog = null;
-        private LimeTextField PATH_FIELD;
+        private final LimeTextField PATH_FIELD;
 
-        public OpenMagnetTorrentAction() {
-            super(I18n.tr("O&pen .Torrent or Magnet"));
+        public OpenMagnetTorrentVideoUrlAction() {
+            super(I18n.tr("O&pen .Torrent, Magnet or Video URL"));
             PATH_FIELD = new LimeTextField(34);
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Opens a magnet link or torrent file"));
         }
@@ -47,31 +90,21 @@ public final class FileMenuActions {
         public void actionPerformed(ActionEvent e) {
             if (dialog == null)
                 createDialog();
-
             // clear input before dialog is shown
             PATH_FIELD.setText(MagnetClipboardListener.getMagnetOrTorrentURLFromClipboard());
-
             // display modal dialog centered
             dialog.pack();
             GUIUtils.centerOnScreen(dialog);
             dialog.setVisible(true);
         }
 
-        private class OpenDialogWindowAdapter extends WindowAdapter {
-            public void windowOpened(WindowEvent e) {
-                PATH_FIELD.requestFocusInWindow();
-            }
-        }
-
         private void createDialog() {
-
             dialog = new JDialog(GUIMediator.getAppFrame(), I18n.tr("Download .Torrent or Magnet link"), true);
             dialog.addWindowListener(new OpenDialogWindowAdapter());
             JPanel panel = (JPanel) dialog.getContentPane();
             GUIUtils.addHideAction(panel);
             panel.setLayout(new GridBagLayout());
             panel.setBorder(new EmptyBorder(2 * SPACE, SPACE, SPACE, SPACE));
-
             // download icon
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridx = 0;
@@ -83,7 +116,6 @@ public final class FileMenuActions {
             constraints.anchor = GridBagConstraints.CENTER;
             constraints.insets = new Insets(0, 0, 2 * SPACE, 0);
             panel.add(new JLabel(IconManager.instance().getIconForButton("SEARCH_DOWNLOAD")), constraints);
-
             // instructions label
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
@@ -95,15 +127,12 @@ public final class FileMenuActions {
             constraints.anchor = GridBagConstraints.NORTHWEST;
             constraints.fill = GridBagConstraints.HORIZONTAL;
             constraints.insets = new Insets(0, SPACE, 2 * SPACE, 0);
-
             panel.add(new MultiLineLabel(I18n.tr("Type a magnet link, the file path or web address of a torrent file and FrostWire will start downloading it for you."), true), constraints);
-
             // open label
             constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 1;
             panel.add(new JLabel(I18n.tr("Open:")), constraints);
-
             // spacer between the open label and the text field
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
@@ -113,9 +142,7 @@ public final class FileMenuActions {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.insets = new Insets(0, SPACE, 0, 0);
             panel.add(PATH_FIELD, constraints);
-
-            ButtonRow row = new ButtonRow(new Action[] { new PasteAction(), new BrowseAction() }, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
-
+            ButtonRow row = new ButtonRow(new Action[]{new PasteAction(), new BrowseAction()}, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
             constraints = new GridBagConstraints();
             constraints.gridx = 1;
             constraints.gridy = 2;
@@ -123,7 +150,6 @@ public final class FileMenuActions {
             constraints.insets = new Insets(SPACE, SPACE, 0, 0);
             constraints.anchor = GridBagConstraints.WEST;
             panel.add(row, constraints);
-
             // add vertical spacer/spring
             constraints = new GridBagConstraints();
             constraints.fill = GridBagConstraints.BOTH;
@@ -132,32 +158,29 @@ public final class FileMenuActions {
             constraints.gridwidth = GridBagConstraints.REMAINDER;
             constraints.weighty = 1;
             panel.add(new JPanel(), constraints);
-
-            row = new ButtonRow(new Action[] { new OkAction(), new CancelAction() }, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
-
+            row = new ButtonRow(new Action[]{new OkAction(), new CancelAction()}, ButtonRow.X_AXIS, ButtonRow.LEFT_GLUE);
             constraints = new GridBagConstraints();
             constraints.gridx = 4;
             constraints.gridy = 4;
             constraints.insets = new Insets(2 * SPACE, 0, 0, 0);
             constraints.anchor = GridBagConstraints.EAST;
             panel.add(row, constraints);
-
             dialog.getRootPane().setDefaultButton(row.getButtonAtIndex(0));
             dialog.setMinimumSize(new Dimension(250, 150));
         }
-        
+
         private void dismissDialog() {
             dialog.setVisible(false);
             dialog.dispose();
         }
 
+        private class OpenDialogWindowAdapter extends WindowAdapter {
+            public void windowOpened(WindowEvent e) {
+                PATH_FIELD.requestFocusInWindow();
+            }
+        }
+
         private class PasteAction extends AbstractAction {
-
-            /**
-             * 
-             */
-            private static final long serialVersionUID = -3351075105994389491L;
-
             PasteAction() {
                 super(I18n.tr("Paste"));
             }
@@ -168,12 +191,6 @@ public final class FileMenuActions {
         }
 
         private class BrowseAction extends AbstractAction {
-
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 3000234847843826596L;
-
             BrowseAction() {
                 super(I18n.tr("Browse..."));
             }
@@ -186,13 +203,21 @@ public final class FileMenuActions {
         }
 
         private class OkAction extends AbstractAction {
-
             OkAction() {
                 super(I18n.tr("OK"));
             }
 
             public void actionPerformed(ActionEvent a) {
                 String str = PATH_FIELD.getText();
+                if (str.startsWith("http") && !str.endsWith(".torrent")) {
+                    // Cloud URL entered
+                    SearchInformation searchInfo = SearchInformation.createKeywordSearch
+                            (str, null, MediaType.getVideoMediaType());
+                    new SearchAction(searchInfo,str).actionPerformed(null);
+                    dismissDialog();
+                    return;
+                }
+
                 if (openMagnetOrTorrent(str)) {
                     dismissDialog();
                 } else {
@@ -201,13 +226,7 @@ public final class FileMenuActions {
             }
         }
 
-        private class CancelAction extends AbstractAction {
-
-            /**
-             * 
-             */
-            private static final long serialVersionUID = 3350673081539434959L;
-
+        private static class CancelAction extends AbstractAction {
             CancelAction() {
                 super(I18n.tr("Cancel"));
             }
@@ -219,59 +238,9 @@ public final class FileMenuActions {
     }
 
     /**
-     * Opens a magnet link, a Web address to a torrent file, or a path to a
-     * torrent file on the disk.
-     * 
-     * Note that DNDUtils performs similar steps when the user drops a magnet
-     * or torrent on the window.
-     * 
-     * @param userText The text of the path, link, or address the user entered
-     * @return true if it was valid and we opened it
-     */
-    public static boolean openMagnetOrTorrent(final String userText) {
-
-        if (userText.startsWith("magnet:?xt=urn:btih")) {
-            GUIMediator.instance().openTorrentURI(userText, true);
-            return true;
-        } else if (userText.matches(".*soundcloud.com.*")) {
-            //the new soundcloud redirects to what seems to be an ajax page
-            String soundCloudURL = userText.replace("soundcloud.com/#", "soundcloud.com/");
-            GUIMediator.instance().openSoundcloudTrackUrl(soundCloudURL, null);
-            return true;
-        } else if (userText.startsWith("http://") || (userText.startsWith("https://"))) {
-            GUIMediator.instance().openTorrentURI(userText, true);
-            return true;
-        } else {
-
-            // See if it's a path to a file on the disk
-            File file = new File(userText);
-            if (isFileSystemPath(file)) {
-                if (file.exists()) {
-                    GUIMediator.instance().openTorrentFile(file, true); // Open the torrent file
-                    return true;
-                }
-                // Not a file
-            }
-        }
-
-        // Invalid text, nothing opened
-        return false;
-    }
-
-    private static boolean isFileSystemPath(File file) {
-        return file.isAbsolute();
-    }
-
-    /**
      * Exits the application.
      */
     public static class CloseAction extends AbstractAction {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -456007457702576349L;
-
         public CloseAction() {
             super(I18n.tr("&Close"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Close the program's main window"));
@@ -283,7 +252,6 @@ public final class FileMenuActions {
     }
 
     public static class ExitAction extends AbstractAction {
-
         public ExitAction() {
             super(I18n.tr("E&xit"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Close and exit the program"));
@@ -295,8 +263,6 @@ public final class FileMenuActions {
     }
 
     public static class CreateTorrentAction extends AbstractAction {
-        private static final long serialVersionUID = 1494672346951877693L;
-
         public CreateTorrentAction() {
             super(I18n.tr("Create New Torrent"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create a new .torrent file"));
@@ -305,13 +271,11 @@ public final class FileMenuActions {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             CreateTorrentDialog dlg = new CreateTorrentDialog(GUIMediator.getAppFrame());
-            dlg.setVisible(true);            
+            dlg.setVisible(true);
         }
-
     }
 
     public static class SendFileAction extends AbstractAction {
-
         public SendFileAction() {
             super(I18n.tr("Send File or Folder..."));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Send a file or a folder to a friend"));

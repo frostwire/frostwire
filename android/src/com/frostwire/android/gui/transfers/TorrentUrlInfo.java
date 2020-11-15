@@ -55,12 +55,16 @@ class TorrentUrlInfo implements TorrentDownloadInfo {
     }
 
     @Override
-    public long getSize() {
+    public double getSize() {
         return -1;
     }
 
     @Override
     public String getHash() {
+        if (url != null && url.startsWith("magnet:?xt=urn:btih:")) {
+            return url.substring(20,60).toLowerCase();
+        }
+
         return null;
     }
 

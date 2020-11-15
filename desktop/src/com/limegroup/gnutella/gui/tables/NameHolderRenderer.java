@@ -26,27 +26,24 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer {
-
     private LocaleLabel labelText;
 
-    public NameHolderRenderer() {
+    NameHolderRenderer() {
         setupUI();
     }
 
     private void setupUI() {
         setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(1,5,1,5));
+        setBorder(new EmptyBorder(1, 5, 1, 5));
         labelText = new LocaleLabel();
         add(labelText, BorderLayout.CENTER);
     }
 
-    private void setData(NameHolder value, JTable table, int row) {
+    private void setData(NameHolder value, JTable table) {
         if (labelText != null) {
             if (value != null) {
                 labelText.setText(value.getLocaleString());
@@ -59,6 +56,6 @@ public final class NameHolderRenderer extends FWAbstractJPanelTableCellRenderer 
 
     @Override
     protected void updateUIData(Object value, JTable table, int row, int column) {
-        setData((NameHolder) value, table, row);
+        setData((NameHolder) value, table);
     }
 }

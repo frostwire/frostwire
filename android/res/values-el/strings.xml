@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Η ιδιωτική σας ζωή είναι ένα θεμελιώδες ανθρώπινο δικαίωμα</b>. Μια μη προστατευμένη σύνδεση σημαίνει ότι ό, τι κάνετε online, συμπεριλαμβανομένων των <b>λήψεων, αναζητήσεων, μηνυμάτων</b>, μπορεί να παρακολουθείται και να παρεμποδίζεται από οποιονδήποτε στο δίκτυό σας, π.χ. Πάροχοι υπηρεσιών διαδικτύου, χάκερ, κυβερνήσεις.<br><br><b>We STRONGLY recommend using a VPN service</b>. <br> Εδώ είναι μερικές επιλογές που παρέχουν αξιόπιστες υπηρεσίες και λειτουργούν καλά με το FrostWire:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Συνδέεστε στο Internet χρησιμοποιώντας ένα VPN. <br><br> Αν δεν το έχετε ήδη, συνιστούμε να χρησιμοποιήσετε μία από τις παρακάτω υπηρεσίες για να κρυπτογραφήσετε τη σύνδεσή σας και <b>να διαφυλάξετε τα προσωπικά σας δεδομένα</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ρυθμίσεις</string>
     <string name="exit">Έξοδος</string>
     <string name="search_label">Αναζήτηση</string>
@@ -145,7 +144,7 @@
     <string name="my_filetype">Ο %s μου</string>
     <string name="use_soundcloud">Χρήση Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Το κατέβασμα δεν υποστηρίζεται</string>
-    <string name="retry_search">Επανάληψη</string>
+    <string name="retry">Επανάληψη</string>
     <string name="use_archiveorg">Χρήση Archive.org</string>
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">Διαγράφηκε το crawl cache</string>
@@ -357,7 +356,6 @@
     <string name="or">ή</string>
     <string name="file_names">Ονόματα αρχείων</string>
     <string name="no_data_check_internet_connection">Το δίκτυο δεν είναι διαθέσιμο, ελέγξτε τη σύνδεση στο Internet.</string>
-    <string name="use_pixabay">Χρήση Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Διακόψτε όλες τις λήψεις και τις μεταφορτώσεις</string>
     <string name="seed_stop">Σταματήστε τη σπορά</string>
     <string name="transfers_select_seeding">σπορά</string>
@@ -409,7 +407,7 @@
     <string name="piece_size_header">Μέγεθος τεμαχίου:</string>
     <string name="add_tracker">Προσθήκη tracker</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Δωρεάν δοκιμή 7 ημερών</string>
-    <string name="play_store_out_of_sync">Το Google Play Store χρειάζεται συγχρονισμό, περιμένετε μερικά λεπτά</string>
     <string name="contact_us">Επικοινωνήστε μαζί μας</string>
     <string name="use_nyaa">Χρήση Nyaa</string>
+    <string name="use_torrentz2">Χρήση Torrentz2</string>
 </resources>

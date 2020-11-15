@@ -20,24 +20,13 @@ import com.limegroup.gnutella.gui.LabeledComponent;
 import com.limegroup.gnutella.settings.SharingSettings;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Allows the user to change whether or not partial files are shared.
  */
 public final class PartialFileSharingPaneItem extends AbstractPaneItem {
-
-    public final static String TITLE = I18n.tr("Partial Files");
-
-    public final static String LABEL = I18n.tr("You can choose whether or not to automatically share partially downloaded files.");
-
-    /**
-     * Constant for the key of the locale-specific <code>String</code> for the
-     * upload pane check box label in the options window.
-     */
-    private final String CHECK_BOX_LABEL =
-            I18n.tr("Allow Partial Sharing:");
-
+    private final static String TITLE = I18n.tr("Partial Files");
+    private final static String LABEL = I18n.tr("You can choose whether or not to automatically share partially downloaded files.");
     /**
      * Constant for the check box that specifies whether or not partial
      * files should be shared.
@@ -51,6 +40,11 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
     public PartialFileSharingPaneItem() {
         super(TITLE, LABEL);
 
+        /*
+          Constant for the key of the locale-specific <code>String</code> for the
+          upload pane check box label in the options window.
+         */
+        String CHECK_BOX_LABEL = I18n.tr("Allow Partial Sharing:");
         LabeledComponent comp = new LabeledComponent(CHECK_BOX_LABEL,
                 CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         add(comp.getComponent());
@@ -60,7 +54,7 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
         CHECK_BOX.setSelected(SharingSettings.ALLOW_PARTIAL_SHARING.getValue());
     }
 
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         SharingSettings.ALLOW_PARTIAL_SHARING.setValue(CHECK_BOX.isSelected());
         return false;
     }

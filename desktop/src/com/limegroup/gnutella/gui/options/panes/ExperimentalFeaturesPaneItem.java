@@ -23,7 +23,6 @@ import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * @author aldenml
@@ -72,7 +71,7 @@ public class ExperimentalFeaturesPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         if (FrostWireUtils.isIsRunningFromSource()) {
             // no need to save these settings when running from source
             return false;

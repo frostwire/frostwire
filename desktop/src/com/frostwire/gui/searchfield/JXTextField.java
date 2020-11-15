@@ -1,151 +1,57 @@
 package com.frostwire.gui.searchfield;
 
-import com.frostwire.gui.searchfield.BuddySupport.Position;
-import com.frostwire.gui.searchfield.PromptSupport.FocusBehavior;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 /**
  * {@link JTextField}, with integrated support for prompts and buddies.
- * 
+ *
+ * @author Peter Weishapl <petw@gmx.net>
  * @see PromptSupport
  * @see BuddySupport
- * @author Peter Weishapl <petw@gmx.net>
- * 
  */
 class JXTextField extends JTextField {
-	
     private static final long serialVersionUID = 7120788755640067659L;
 
-    public JXTextField() {
-		this(null);
-	}
+    JXTextField(String promptText) {
+        this(promptText, null);
+    }
 
-	public JXTextField(String promptText) {
-		this(promptText, null);
-	}
+    private JXTextField(String promptText, Color promptForeground) {
+        this(promptText, promptForeground, null);
+    }
 
-	public JXTextField(String promptText, Color promptForeground) {
-		this(promptText, promptForeground, null);
-	}
+    private JXTextField(String promptText, Color promptForeground,
+                        Color promptBackground) {
+        PromptSupport.init(promptText, promptForeground, promptBackground,
+                this);
+    }
 
-	public JXTextField(String promptText, Color promptForeground,
-			Color promptBackground) {
-		PromptSupport.init(promptText, promptForeground, promptBackground,
-				this);
-	}
+    /**
+     * @see PromptSupport#setPrompt(String, javax.swing.text.JTextComponent)
+     */
+    public void setPrompt(String labelText) {
+        PromptSupport.setPrompt(labelText, this);
+    }
 
-	/**
-	 * @see PromptSupport#getFocusBehavior(javax.swing.text.JTextComponent)
-	 */
-	public FocusBehavior getFocusBehavior() {
-		return PromptSupport.getFocusBehavior(this);
-	}
+    /**
+     * @see PromptSupport#setFontStyle(Integer, javax.swing.text.JTextComponent)
+     */
+    void setPromptFontStyle(Integer fontStyle) {
+        PromptSupport.setFontStyle(fontStyle, this);
+    }
 
-	/**
-	 * @see PromptSupport#getPrompt(javax.swing.text.JTextComponent)
-	 */
-	public String getPrompt() {
-		return PromptSupport.getPrompt(this);
-	}
+    /**
+     * @see BuddySupport#getOuterMargin(JTextField)
+     */
+    Insets getOuterMargin() {
+        return BuddySupport.getOuterMargin(this);
+    }
 
-	/**
-	 * @see PromptSupport#getForeground(javax.swing.text.JTextComponent)
-	 */
-	public Color getPromptForeground() {
-		return PromptSupport.getForeground(this);
-	}
-
-	/**
-	 * @see PromptSupport#getForeground(javax.swing.text.JTextComponent)
-	 */
-	public Color getPromptBackground() {
-		return PromptSupport.getBackground(this);
-	}
-
-	/**
-	 * @see PromptSupport#getFontStyle(javax.swing.text.JTextComponent)
-	 */
-	public Integer getPromptFontStyle() {
-		return PromptSupport.getFontStyle(this);
-	}
-
-	/**
-	 * @see PromptSupport#getFocusBehavior(javax.swing.text.JTextComponent)
-	 */
-	public void setFocusBehavior(FocusBehavior focusBehavior) {
-		PromptSupport.setFocusBehavior(focusBehavior, this);
-	}
-
-	/**
-	 * @see PromptSupport#setPrompt(String, javax.swing.text.JTextComponent)
-	 */
-	public void setPrompt(String labelText) {
-		PromptSupport.setPrompt(labelText, this);
-	}
-
-	/**
-	 * @see PromptSupport#setForeground(Color, javax.swing.text.JTextComponent)
-	 */
-	public void setPromptForeground(Color promptTextColor) {
-		PromptSupport.setForeground(promptTextColor, this);
-	}
-
-	/**
-	 * @see PromptSupport#setBackground(Color, javax.swing.text.JTextComponent)
-	 */
-	public void setPromptBackround(Color promptTextColor) {
-		PromptSupport.setBackground(promptTextColor, this);
-	}
-
-	/**
-	 * @see PromptSupport#setFontStyle(Integer, javax.swing.text.JTextComponent)
-	 */
-	public void setPromptFontStyle(Integer fontStyle) {
-		PromptSupport.setFontStyle(fontStyle, this);
-	}
-
-	/**
-	 * @see BuddySupport#setOuterMargin(JTextField, Insets)
-	 */
-	public void setOuterMargin(Insets margin) {
-		BuddySupport.setOuterMargin(this, margin);
-	}
-
-	/**
-	 * @see BuddySupport#getOuterMargin(JTextField)
-	 */
-	public Insets getOuterMargin() {
-		return BuddySupport.getOuterMargin(this);
-	}
-
-	/**
-	 * @see BuddySupport#add(Component, Position, JTextField)
-	 */
-	public void addBuddy(Component buddy, Position pos) {
-		BuddySupport.add(buddy, pos, this);
-	}
-
-	/**
-	 * @see BuddySupport#addGap(int, Position, JTextField)
-	 */
-	public void addGap(int width, Position pos) {
-		BuddySupport.addGap(width, pos, this);
-	}
-
-	/**
-	 * @see BuddySupport#getBuddies(Position, JTextField)
-	 */
-	public List<Component> getBuddies(Position pos) {
-		return BuddySupport.getBuddies(pos, this);
-	}
-
-	/**
-	 * @see BuddySupport#removeAll(JTextField)
-	 */
-	public void removeAllBuddies() {
-		BuddySupport.removeAll(this);
-	}
+    /**
+     * @see BuddySupport#setOuterMargin(JTextField, Insets)
+     */
+    void setOuterMargin(Insets margin) {
+        BuddySupport.setOuterMargin(this, margin);
+    }
 }

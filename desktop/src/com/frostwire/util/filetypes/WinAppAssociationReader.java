@@ -1,22 +1,22 @@
 /*
  * Copyright (C) 2004 Sun Microsystems, Inc. All rights reserved. Use is
  * subject to license terms.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the Lesser GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
- *  
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA.
- */ 
+ */
 
 package com.frostwire.util.filetypes;
 
@@ -28,7 +28,6 @@ import java.util.List;
  * Concrete implementation of the AppAssociationReader class for Windows platform.
  */
 public class WinAppAssociationReader implements AppAssociationReader {
-
     /**
      * Retrieves the description associated with the given mime type.
      *
@@ -43,7 +42,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
             return null;
         }
     }
-  
+
     /**
      * Retrieves the description associated with the given file extension.
      *
@@ -55,15 +54,15 @@ public class WinAppAssociationReader implements AppAssociationReader {
     }
 
     /**
-     * Retrieves the mime type associated with the given URL, 
+     * Retrieves the mime type associated with the given URL,
      * by checking the content of the URL.
-     * 
+     *
      * @param url given URL (not null)
      * @return corresponding mime type
      */
     public String getMimeTypeByURL(URL url) {
         return WinRegistryUtil.getMimeTypeByURL(url);
-    }        
+    }
 
     /**
      * Retrieves the file extension list associated with the given mime type.
@@ -74,15 +73,13 @@ public class WinAppAssociationReader implements AppAssociationReader {
     public List<String> getFileExtListByMimeType(String mimeType) {
         String fileExt = WinRegistryUtil.getFileExtByMimeType(mimeType);
         if (fileExt != null) {
-          List<String> fileExtList = new ArrayList<String>();
-          fileExtList.add(fileExt);
-          
-          return fileExtList;
+            List<String> fileExtList = new ArrayList<>();
+            fileExtList.add(fileExt);
+            return fileExtList;
         }
-        
         return null;
     }
-  
+
     /**
      * Retrieves the mime type associated with the given file extension.
      *
@@ -92,7 +89,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
     public String getMimeTypeByFileExt(String fileExt) {
         return WinRegistryUtil.getMimeTypeByFileExt(fileExt);
     }
-  
+
     /**
      * Retrieves the icon file name associated with the given mime type.
      *
@@ -107,7 +104,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
             return null;
         }
     }
-  
+
     /**
      * Retrieves the icon file name associated with the given file extension.
      *
@@ -117,7 +114,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
     public String getIconFileNameByFileExt(String fileExt) {
         return WinRegistryUtil.getIconFileNameByFileExt(fileExt);
     }
- 
+
     /**
      * Retrieves the action list associated with the given mime type.
      *
@@ -131,7 +128,7 @@ public class WinAppAssociationReader implements AppAssociationReader {
         } else {
             return null;
         }
-     }
+    }
 
     /**
      * Retrieves the action list associated with the given file extension.
@@ -152,11 +149,11 @@ public class WinAppAssociationReader implements AppAssociationReader {
     public boolean isMimeTypeExist(String mimeType) {
         return WinRegistryUtil.isMimeTypeExist(mimeType);
     }
-    
+
     /**
      * Returns true if the file extension exists in Windows Registry.
-     * 
-     * @param fileExt given file extension 
+     *
+     * @param fileExt given file extension
      * @return true if the file extension exists in the Registry
      */
     public boolean isFileExtExist(String fileExt) {

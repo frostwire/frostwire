@@ -1,9 +1,5 @@
 <a href="http://frostwire.com"><img src="http://biz.prlog.org/frostwire/logo.png"></a>
 
-
-[![tip for next commit](http://tip4commit.com/projects/538.svg)](http://tip4commit.com/projects/538)
-
-
 # Hi there FrostWire hacker!
 
 FrostWire is a file sharing client and media management tool that was made using
@@ -51,7 +47,7 @@ Introductions aside, here's how you build this.
 
 Pre-requisites:
 
-* JDK 1.7 or later ([OpenJDK](http://openjdk.java.net/) or [Oracle JDK](http://www.oracle.com/technetwork/java/index.html))
+* JDK 11 or later ([OpenJDK](http://openjdk.java.net/) or [Oracle JDK](http://www.oracle.com/technetwork/java/index.html))
 * [Apache Ant](http://ant.apache.org/)
 * [Gradle](http://www.gradle.org/)
 * [Git](http://www.git-scm.com/) to clone, check out the project to your machine.
@@ -75,21 +71,21 @@ We recommend using [IntelliJ Idea](http://www.jetbrains.com/idea/) as your devel
 We recommend you first clone the repository to your machine from the `origin` repository at https://github.com/frostwire/frostwire
 
 ```
-git clone https://github.com/frostwire/frostwire
+git clone git@github.com:/frostwire/frostwire.git
 cd frostwire/desktop
 ```
 
 **If you plan on hacking FrostWire**, fork the repository on github, and then add your fork's uri as a remote
 
-`git remote add myGithubAccount https://github.com/myGithubAccount/frostwire`
+`git remote add myGithubAccount git@github.com:/myGithubAccount/frostwire.git`
 
 If you issue a `git remote -v` it should look something like this (where `myGithubAccount` is your user account):
 ```
 $ git remote -v
-origin          https://github.com/frostwire/frostwire (fetch)
-origin          https://github.com/frostwire/frostwire (push)
-myGithubAccount https://github.com/myGithubAccount/frostwire (fetch)
-myGithubAccount https://github.com/myGithubAccount/frostwire (push)
+origin          git@github.com:/frostwire/frostwire.git (fetch)
+origin          git@github.com:/frostwire/frostwire.git (push)
+myGithubAccount git@github.com:/myGithubAccount/frostwire.git (fetch)
+myGithubAccount git@github.com:/myGithubAccount/frostwire.git (push)
 ```
 
 # Build Instructions
@@ -103,7 +99,7 @@ Then run the project with:
 
     ./run
     
-If you are using Windows, run the project with `run.bat` in the `src` folder.
+If you are using Windows, run the project with `run.bat`.
 
 # HAVING ISSUES BUILDING?
 
@@ -148,8 +144,6 @@ If the build is not broken, hit us up at the [Developer Forum](http://forum.fros
 # Contribution Guidelines
 
 Every countribution merged to the master branch will automatically receive a tip of 1% of whatever funds are available on the [tip4commit fund](https://tip4commit.com/github/frostwire/frostwire-android).
-
-Tip for next commit: [![see here](http://tip4commit.com/projects/538.svg)](http://tip4commit.com/projects/538)
 
 If you want to contribute code, start by looking at the [open issues on github.com](https://github.com/frostwire/frostwire/issues).
 
@@ -200,8 +194,9 @@ Frostwire Desktop is offered under the [GNU General Public License](http://www.g
 
 ### Official FrostWire sites
 
-[Main Website Frostwire.com](http://www.frostwire.com) |
-[Frostwire Forum](http://forum.frostwire.com) |
+[Main Website Frostwire.com](https://www.frostwire.com) |
+[FrostWire SubReddit](https://reddit.com/frostwire) |
+[FrostWire Discord Chatrooms](https://www.frostwire.com/chat) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
 [Twitter @frostwire](https://twitter.com/frostwire) |
 [Tumblr](http://tumblr.frostwire.com)

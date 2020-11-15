@@ -22,17 +22,16 @@ import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/** State Your Intent. */
+/**
+ * State Your Intent.
+ */
 final class IntentWindow extends SetupWindow {
-
     private boolean setWillNot = false;
     private Properties properties;
 
@@ -54,7 +53,6 @@ final class IntentWindow extends SetupWindow {
                 IOUtils.closeQuietly(fis);
             }
         }
-
         String exists = properties.getProperty("willnot");
         return exists != null && exists.equals("true");
     }
@@ -66,21 +64,17 @@ final class IntentWindow extends SetupWindow {
     @Override
     protected void createWindow() {
         super.createWindow();
-
         JPanel innerPanel = new JPanel(new BorderLayout());
         final IntentPanel intentPanel = new IntentPanel();
         innerPanel.add(intentPanel, BorderLayout.CENTER);
         setSetupComponent(innerPanel);
         intentPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
-
         setNext(null);
-        intentPanel.addButtonListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (intentPanel.hasSelection()) {
-                    setNext(IntentWindow.this);
-                    setWillNot = intentPanel.isWillNot();
-                    _manager.enableActions(getAppropriateActions());
-                }
+        intentPanel.addButtonListener(e -> {
+            if (intentPanel.hasSelection()) {
+                setNext(IntentWindow.this);
+                setWillNot = intentPanel.isWillNot();
+                _manager.enableActions(getAppropriateActions());
             }
         });
     }

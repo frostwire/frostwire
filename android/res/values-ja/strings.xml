@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>あなたのプライバシーは基本的な人権です</b>. 保護されていない接続は、オンラインを含めないすべてのものを意味し、 <b>ダウンロード、検索、メッセージング</b>あなたのネットワーク上の誰かが監視して傍受することができます。 インターネットサービスプロバイダ、ハッカー、政府.<br><br><b>VPNサービスを使用することを強くお勧めします</b>. <br> 信頼できるサービスを提供し、FrostWireでうまくいくいくつかのオプションがあります：]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ あなたはVPNを使ってインターネットに接続しています。 <br><br> まだ接続していない場合は、以下のいずれかのサービスを使用して接続を暗号化することをお勧めします <b>あなたのプライバシーを守る</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">設定</string>
     <string name="exit">終了する</string>
     <string name="search_label">検索する</string>
@@ -150,7 +149,7 @@
     <string name="my_filetype">マイ %s</string>
     <string name="use_soundcloud">Soundcloud.comを使用する</string>
     <string name="torrent_scheme_download_not_supported">ダウンロードはサポートされていません</string>
-    <string name="retry_search">リトライ</string>
+    <string name="retry">リトライ</string>
     <string name="use_archiveorg">Archive.orgを使用する</string>
     <string name="crawl_cache_size">クロールキャッシュ %1$.2fMB</string>
     <string name="deleted_crawl_cache">クロールキャッシュを削除しました</string>
@@ -358,7 +357,6 @@
     <string name="or">または</string>
     <string name="file_names">ファイル名</string>
     <string name="no_data_check_internet_connection">ネットワークが利用できない場合は、インターネット接続を確認してください。</string>
-    <string name="use_pixabay">Pixabayを使用する</string>
     <string name="transfers_context_stop_seeding_all_transfers">すべての転送のシードを停止する</string>
     <string name="seed_stop">播種を止める</string>
     <string name="transfers_select_seeding">播種</string>
@@ -410,7 +408,7 @@
     <string name="frostwire_start_engine_service_security_exception">アクセス許可が不足しているため、FrostWireを正しく起動できませんでした。 必要な権限を付与してアプリケーションを再起動してください</string>
     <string name="vpn_find_out_more">詳細はこちら</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 無料の7日間のトライアル</string>
-    <string name="play_store_out_of_sync">Google Playストアが同期する必要があり、数分待ってください</string>
     <string name="contact_us">お問い合わせ</string>
     <string name="use_nyaa">Nyaaを使用する</string>
+    <string name="use_torrentz2">Torrentz2を使用する</string>
 </resources>

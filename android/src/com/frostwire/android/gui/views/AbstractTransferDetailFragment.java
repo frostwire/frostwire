@@ -27,6 +27,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
@@ -36,6 +38,10 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.BittorrentDownload;
+import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
+
+import java.util.List;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -46,7 +52,7 @@ import static com.frostwire.android.util.Asyncs.async;
  * Created on 10/10/17.
  */
 public abstract class AbstractTransferDetailFragment extends AbstractFragment {
-
+    private Logger LOG = Logger.getLogger(AbstractTransferDetailFragment.class);
     private String infinity;
     private TransferStateStrings transferStateStrings;
 
@@ -102,6 +108,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     @Override
     public void onResume() {
         super.onResume();
+        ensureTorrentHandle(); // Purposefully not async.
         updateCommonComponents();
     }
 
@@ -111,7 +118,11 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             if (intent != null) {
                 String infoHash = intent.getStringExtra("infoHash");
                 if (infoHash != null && !infoHash.isEmpty()) {
-                    async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+                    if (TaskThrottle.isReadyToSubmitTask("AbstractTransferDetailFragment::recoverUIBittorrentDownload", 1000)) {
+                        async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+                    } else {
+                        System.err.println("AbstractTransferDetailFragment.onTime() Did not submit async task AbstractTransferDetailFragment::recoverUIBittorrentDownload, 1000 ms haven't passed");
+                    }
                 }
             }
             if (uiBittorrentDownload == null) {
@@ -190,10 +201,13 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     private void ensureTorrentHandle() {
-        if (torrentHandle == null && uiBittorrentDownload != null) {
-            torrentHandle = uiBittorrentDownload.getDl().getTorrentHandle();
-            if (torrentHandle == null) {
-                torrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+        if (uiBittorrentDownload != null) {
+            TorrentHandle currentTorrentHandle = BTEngine.getInstance().find(new Sha1Hash(uiBittorrentDownload.getInfoHash()));
+            // If the user restarts an existing partial transfer from a torrent in My Files
+            // this makes sure we refresh the UI torrent
+            if (currentTorrentHandle != null && torrentHandle != currentTorrentHandle) {
+                torrentHandle = currentTorrentHandle;
+                uiBittorrentDownload = (UIBittorrentDownload) TransferManager.instance().getBittorrentDownload(uiBittorrentDownload.getInfoHash());
             }
         }
     }
@@ -219,22 +233,22 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         // build the numbers into a string
         StringBuilder time = new StringBuilder();
         if (days != 0) {
-            time.append(Long.toString(days));
+            time.append(days);
             time.append(":");
             if (hours < 10)
                 time.append("0");
         }
         if (days != 0 || hours != 0) {
-            time.append(Long.toString(hours));
+            time.append(hours);
             time.append(":");
             if (minutes < 10)
                 time.append("0");
         }
-        time.append(Long.toString(minutes));
+        time.append(minutes);
         time.append(":");
         if (seconds < 10)
             time.append("0");
-        time.append(Long.toString(seconds));
+        time.append(seconds);
         return time.toString();
     }
 
@@ -244,6 +258,47 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (received < 0) {
             return "0%";
         }
-        return String.valueOf(100 * ((float) sent / (float) received)) + "%";
+        return 100 * ((float) sent / (float) received) + "%";
+    }
+
+    public static  <T, TH extends RecyclerView.ViewHolder> void updateAdapterItems(
+            RecyclerView.Adapter<TH> adapter,
+            List<T> items,
+            List<T> freshItems) {
+        if (freshItems != null && freshItems.size() > 0) {
+            if (items.isEmpty()) {
+                items.addAll(freshItems);
+
+                adapter.notifyDataSetChanged();
+            } else {
+                // Update existing items
+                int maxSize = Math.min(items.size(), freshItems.size());
+                for (int i = 0; i < maxSize; i++) {
+                    try {
+                        items.set(i, freshItems.get(i));
+                        adapter.notifyItemChanged(i);
+                    } catch (Throwable ignored) {}
+                }
+                if (items.size() < freshItems.size()) {
+                    // New list is bigger, add new elements
+                    int sizeDifference = freshItems.size() - items.size();
+                    int start = items.size();
+                    int end = freshItems.size();
+                    for (int i = start; i < end; i++) {
+                        items.add(freshItems.get(i));
+                        adapter.notifyItemInserted(i);
+                    }
+                } else if (freshItems.size() < items.size()) {
+                    // New list is smaller, shorten our list to match new list size
+                    while ((items.size() - freshItems.size()) > 0) {
+                        items.remove(items.size() - 1);
+                        adapter.notifyItemRangeRemoved(items.size()-1,1);
+                    }
+                }
+            }
+        } else {
+            items.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 }

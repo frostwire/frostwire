@@ -21,107 +21,46 @@ package org.gudy.azureus2.core3.util;
 
 /**
  * @author parg
- *
  */
-
-public abstract class 
+abstract class
 ThreadPoolTask
-	extends AERunnable
-{
-	static final int RELEASE_AUTO = 0x00;
-	static final int RELEASE_MANUAL = 0x01;
-	static final int RELEASE_MANUAL_ALLOWED = 0x02;
-	
-	private int manualRelease;
-	
-	protected ThreadPool.threadPoolWorker		worker;
-	
-	public void
-	setTaskState(
-		String		state )
-	{
-		worker.setState( state );
-	}
-	
-	public String
-	getTaskState()
-	{
-		return( worker == null ? "" : worker.getState());
-	}
-	
-	public String
-	getName()
-	{
-		return( null );
-	}
-	
-	public abstract void
-	interruptTask();
-	
-	public void
-	taskStarted()
-	{
-	}
-	
-	public void
-	taskCompleted()
-	{
-	}
-	
-	/**
-	 * only invoke this method after the first run of the threadpooltask as it is only meant to join
-	 * on a task when it has child tasks and thus is running in manual release mode
-	 */
-	synchronized final void join()
-	{
-		while(manualRelease != RELEASE_AUTO)
-		{
-			try
-			{
-				wait();
-			} catch (Exception e)
-			{
-				Debug.printStackTrace(e);
-			}
-		}
-	}
+        extends AERunnable {
+    private static final int RELEASE_AUTO = 0x00;
+    private static final int RELEASE_MANUAL = 0x01;
+    private static final int RELEASE_MANUAL_ALLOWED = 0x02;
+    private int manualRelease;
 
-	synchronized final void
-	setManualRelease()
-	{
-		manualRelease = ThreadPoolTask.RELEASE_MANUAL;
-	}
-	
-	synchronized final boolean
-	canManualRelease()
-	{
-		return( manualRelease == ThreadPoolTask.RELEASE_MANUAL_ALLOWED );
-	}
-	
-	/**
-	 * only invoke this method after the first run of the threadpooltask as it is only meant to
-	 * update the state of a task when it has child tasks and thus is running in manual release mode
-	 */
-	synchronized final boolean isAutoReleaseAndAllowManual()
-	{
-		if(manualRelease == RELEASE_MANUAL)
-			manualRelease = RELEASE_MANUAL_ALLOWED;
-		return manualRelease == RELEASE_AUTO;
-	}
-	
-	public final synchronized void releaseToPool()
-	{
-		// releasing before the initial run finished, so just let the runner do the cleanup
-		if(manualRelease == RELEASE_MANUAL)
-			manualRelease = RELEASE_AUTO;
-		else if(manualRelease == RELEASE_MANUAL_ALLOWED)
-		{
-			taskCompleted();
-			worker.getOwner().releaseManual(this);
-			manualRelease = RELEASE_AUTO;
-		} else if(manualRelease == RELEASE_AUTO)
-			Debug.out("this should not happen");
-		
-		notifyAll();
-	}
+    public String
+    getName() {
+        return (null);
+    }
+
+    /**
+     * only invoke this method after the first run of the thread pool task as it is only meant to join
+     * on a task when it has child tasks and thus is running in manual release mode
+     */
+    synchronized final void join() {
+        while (manualRelease != RELEASE_AUTO) {
+            try {
+                wait();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    synchronized final void
+    setManualRelease() {
+        manualRelease = ThreadPoolTask.RELEASE_MANUAL;
+    }
+
+    /**
+     * only invoke this method after the first run of the thread pool task as it is only meant to
+     * update the state of a task when it has child tasks and thus is running in manual release mode
+     */
+    synchronized final boolean isAutoReleaseAndAllowManual() {
+        if (manualRelease == RELEASE_MANUAL)
+            manualRelease = RELEASE_MANUAL_ALLOWED;
+        return manualRelease == RELEASE_AUTO;
+    }
 }

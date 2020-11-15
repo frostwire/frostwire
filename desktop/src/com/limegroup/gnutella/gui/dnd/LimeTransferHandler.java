@@ -7,34 +7,30 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 
-
 /**
  * A better TransferHandler.
  */
 public class LimeTransferHandler extends TransferHandler {
-    
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7753614134944789178L;
-
     private static TriggerableDragGestureRecognizer recognizer;
-    
     private final int supportedActions;
-    
+
     /**
      * Constructs a LimeTransferHandler with no supported actions.
      */
-    public LimeTransferHandler() {
+    protected LimeTransferHandler() {
         this.supportedActions = NONE;
     }
 
     /**
      * Creates a new LimeTransferHandler that supports the given actions.
-     * 
+     *
      * @param supportedActions
      */
-    public LimeTransferHandler(int supportedActions) {
+    protected LimeTransferHandler(int supportedActions) {
         this.supportedActions = supportedActions;
     }
 
@@ -51,7 +47,7 @@ public class LimeTransferHandler extends TransferHandler {
      */
     public boolean canImport(JComponent c, DataFlavor[] flavors, DropInfo ddi) {
         return false;
-    }    
+    }
 
     /**
      * Attempts to create a transferable from the given component.
@@ -59,7 +55,7 @@ public class LimeTransferHandler extends TransferHandler {
      */
     @Override
     protected Transferable createTransferable(JComponent c) {
-        return new BasicTransferableCreator(c).getTransferable();
+        return new BasicTransferableCreator().getTransferable();
     }
 
     /**
@@ -81,14 +77,17 @@ public class LimeTransferHandler extends TransferHandler {
     /**
      * UNUSED -- This method is an API bug, it should be returning an Image.
      * Use getImageRepresentation instead.
+     *
      * @deprecated
      */
+    @Deprecated
     public final Icon getVisualRepresentation(Transferable t) {
         throw new IllegalStateException("USE getImageRepresentation INSTEAD");
     }
-    
+
     /**
      * Returns an image representation of the given transferable.
+     *
      * @param t
      * @return
      */
@@ -111,26 +110,23 @@ public class LimeTransferHandler extends TransferHandler {
         // TODO Auto-generated method stub
         return false;
     }
-    
-    
+
     /**
      * Initiates a drag operation from the given component.
      */
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         int srcActions = getSourceActions(comp);
         int dragAction = srcActions & action;
-        if (! (e instanceof MouseEvent))
+        if (!(e instanceof MouseEvent))
             dragAction = NONE;
-        
         if (dragAction != NONE && !GraphicsEnvironment.isHeadless()) {
             // Use a custom DragGestureRecognizer that we can automatically
             // trigger to fire a dragGestureRecognized event.
             if (recognizer == null)
                 recognizer = new TriggerableDragGestureRecognizer(new BasicDragGestureListener());
-            recognizer.trigger(comp, (MouseEvent)e, srcActions, dragAction);
+            recognizer.trigger(comp, (MouseEvent) e, srcActions, dragAction);
         } else {
-                exportDone(comp, null, NONE);
+            exportDone(comp, null, NONE);
         }
     }
-    
 }

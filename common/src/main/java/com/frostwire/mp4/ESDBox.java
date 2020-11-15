@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class ESDBox extends FullBox {
-
     protected byte[] data;
 
     ESDBox() {
@@ -35,7 +34,6 @@ public final class ESDBox extends FullBox {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         int len = (int) (length() - 4);
         IO.read(ch, len, buf);
         data = new byte[len];
@@ -45,7 +43,6 @@ public final class ESDBox extends FullBox {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         buf.put(data);
         IO.write(ch, data.length, buf);
     }

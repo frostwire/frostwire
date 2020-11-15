@@ -25,15 +25,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
-/** 
- * This class shows the <tt>JFileChooser</tt> when the user presses 
+/**
+ * This class shows the <tt>JFileChooser</tt> when the user presses
  * the button to add a new directory to the shared directories.  It
  * adds the directory only if does not already exist in the list.
  */
 public class AddLibraryDirectoryAction extends AbstractAction {
-    
     private static final long serialVersionUID = 7930650059331836863L;
-    
     private final RecursiveLibraryDirectoryPanel recursiveSharingPanel;
     private final Component parent;
 
@@ -45,11 +43,11 @@ public class AddLibraryDirectoryAction extends AbstractAction {
         this.recursiveSharingPanel = recursiveSharingPanel;
         this.parent = parent;
     }
-    
-	public void actionPerformed(ActionEvent ae) {
-		File dir = FileChooserHandler.getInputDirectory(parent);
-		if (dir != null) {
-		    recursiveSharingPanel.addRoot(dir);
-		}
-	}
+
+    public void actionPerformed(ActionEvent ae) {
+        File dir = FileChooserHandler.getInputDirectory(parent);
+        if (dir != null) {
+            recursiveSharingPanel.addRoot(dir);
+        }
+    }
 }

@@ -17,13 +17,13 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceGroup;
-import android.support.v7.preference.PreferenceGroupAdapter;
-import android.support.v7.preference.PreferenceScreen;
-import android.support.v7.preference.PreferenceViewHolder;
-import android.support.v7.widget.RecyclerView;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceGroup;
+import androidx.preference.PreferenceGroupAdapter;
+import androidx.preference.PreferenceScreen;
+import androidx.preference.PreferenceViewHolder;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.gui.SearchEngine;
@@ -106,7 +106,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         inactive.clear();
         active.clear();
 
-        for (SearchEngine engine : SearchEngine.getEngines()) {
+        for (SearchEngine engine : SearchEngine.getEngines(false)) {
             CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
             if (preference != null) { //it could already have been removed due to remote config value.
                 if (engine.isActive()) {

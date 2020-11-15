@@ -22,7 +22,6 @@ package com.frostwire.platform;
  * @author aldenml
  */
 public interface Platform {
-
     FileSystem fileSystem();
 
     SystemPaths systemPaths();
@@ -30,4 +29,6 @@ public interface Platform {
     AppSettings appSettings();
 
     VPNMonitor vpn();
+
+    boolean isUIThread();
 }

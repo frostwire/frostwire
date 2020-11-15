@@ -24,8 +24,7 @@ import com.frostwire.platform.AppSettings;
  * @author gubatron
  * @author aldenml
  */
-public final class DesktopSettings implements AppSettings {
-
+final class DesktopSettings implements AppSettings {
     @Override
     public String string(String key) {
         return null;
@@ -33,7 +32,6 @@ public final class DesktopSettings implements AppSettings {
 
     @Override
     public void string(String key, String value) {
-
     }
 
     @Override
@@ -43,7 +41,6 @@ public final class DesktopSettings implements AppSettings {
 
     @Override
     public void int32(String key, int value) {
-
     }
 
     @Override
@@ -53,7 +50,6 @@ public final class DesktopSettings implements AppSettings {
 
     @Override
     public void int64(String key, long value) {
-
     }
 
     @Override
@@ -63,6 +59,5 @@ public final class DesktopSettings implements AppSettings {
 
     @Override
     public void bool(String key, boolean value) {
-
     }
 }

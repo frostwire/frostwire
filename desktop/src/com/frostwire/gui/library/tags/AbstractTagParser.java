@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,25 +28,34 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 
 /**
- * 
  * @author aldenml
- *
  */
 abstract class AbstractTagParser implements TagsParser {
-
     private static final Logger LOG = Logger.getLogger(AbstractTagParser.class);
+    final File file;
 
-    protected final File file;
-
-    public AbstractTagParser(File file) {
+    AbstractTagParser(File file) {
         this.file = file;
     }
 
-    protected TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
+    static BufferedImage imageFromData(byte[] data) {
+        BufferedImage image = null;
+        try {
+            try {
+                image = ImageIO.read(new ByteArrayInputStream(data, 0, data.length));
+            } catch (IIOException e) {
+                image = JPEGImageIO.read(new ByteArrayInputStream(data, 0, data.length));
+            }
+        } catch (Throwable e) {
+            LOG.error("Unable to create artwork image from bytes");
+        }
+        return image;
+    }
+
+    TagsData sanitize(int duration, String bitrate, String title, String artist, String album, String comment, String genre, String track, String year, String lyrics) {
         if (title == null || title.length() == 0) {
             title = FilenameUtils.getBaseName(file.getAbsolutePath());
         }
-
         if (duration < 0) {
             duration = 0;
         }
@@ -62,46 +71,25 @@ abstract class AbstractTagParser implements TagsParser {
         if (comment == null) {
             comment = "";
         }
-
         if (genre == null) {
             genre = "";
         } else {
             genre = genre.replaceFirst("\\(.*\\)", "");
         }
-
         if (track == null) {
             track = "";
         } else {
-            int index = -1;
-            index = track.indexOf('/');
+            int index = track.indexOf('/');
             if (index != -1) {
                 track = track.substring(0, index);
             }
         }
-
         if (year == null) {
             year = "";
         }
-
         if (lyrics == null) {
             lyrics = "";
         }
-
         return new TagsData(duration, bitrate, title, artist, album, comment, genre, track, year, lyrics);
-    }
-
-    protected static BufferedImage imageFromData(byte[] data) {
-        BufferedImage image = null;
-        try {
-            try {
-                image = ImageIO.read(new ByteArrayInputStream(data, 0, data.length));
-            } catch (IIOException e) {
-                image = JPEGImageIO.read(new ByteArrayInputStream(data, 0, data.length));
-            }
-        } catch (Throwable e) {
-            LOG.error("Unable to create artwork image from bytes");
-        }
-
-        return image;
     }
 }

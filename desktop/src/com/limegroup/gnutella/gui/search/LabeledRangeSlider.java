@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,69 +24,53 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
- *
  */
-public class LabeledRangeSlider extends JPanel {
-
+class LabeledRangeSlider extends JPanel {
     private final RangeSlider slider;
-
     private final JLabel titleLabel;
     private final JLabel minLabel;
     private final JLabel maxLabel;
 
     /**
-     * 
-     * @param title - No need to pass through I18n.tr()
+     * @param title          - No need to pass through I18n.tr()
      * @param defaultMaxText - optional. No need to pass through I18n.tr()
-     * @param minValue
-     * @param maxValue
      */
-    public LabeledRangeSlider(String title, String defaultMaxText, int minValue, int maxValue) {
+    LabeledRangeSlider(String title, String defaultMaxText, int minValue, int maxValue) {
         slider = new RangeSlider();
         slider.setValue(minValue);
         slider.setUpperValue(maxValue);
-
         titleLabel = new JLabel(I18n.tr(title));
-
         minLabel = new JLabel(String.valueOf(minValue));
-
         if (defaultMaxText == null) {
             maxLabel = new JLabel(I18n.tr("Max"));
         } else {
             maxLabel = new JLabel(I18n.tr(defaultMaxText));
         }
-
         initComponents();
     }
 
     private void initComponents() {
         setLayout(new GridBagLayout());
-
         GridBagConstraints c = new GridBagConstraints();
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = GridBagConstraints.REMAINDER;
         //add the title
         add(titleLabel, c);
-
         //add the slider
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
         add(slider, c);
-
         //add the min and max labels
         c = new GridBagConstraints();
         c.gridx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         add(minLabel, c);
-
         c = new GridBagConstraints();
         c.gridx = 1;
         c.weightx = 1.0;
         c.fill = GridBagConstraints.HORIZONTAL;
         add(Box.createGlue(), c);
-
         c = new GridBagConstraints();
         c.gridx = 2;
         c.anchor = GridBagConstraints.LINE_START;
@@ -97,22 +81,22 @@ public class LabeledRangeSlider extends JPanel {
         slider.addChangeListener(listener);
     }
 
-    /**
-     * Sets the lower value in the range.
-     */
-    public void setLowerValue(int value) {
-        slider.setLowerValue(value);
-    }
-
-    public int getLowerValue() {
+    int getLowerValue() {
         return slider.getLowerValue();
     }
 
-    public int getUpperValue() {
+    /**
+     * Sets the lower value in the range.
+     */
+    void setLowerValue(@SuppressWarnings("SameParameterValue") int value) {
+        slider.setLowerValue(value);
+    }
+
+    int getUpperValue() {
         return slider.getUpperValue();
     }
 
-    public void setUpperValue(int value) {
+    void setUpperValue(@SuppressWarnings("SameParameterValue") int value) {
         slider.setUpperValue(value);
     }
 
@@ -124,16 +108,12 @@ public class LabeledRangeSlider extends JPanel {
         slider.setMaximum(max);
     }
 
-    public JLabel getMinimumValueLabel() {
+    JLabel getMinimumValueLabel() {
         return minLabel;
     }
 
-    public JLabel getMaximumValueLabel() {
+    JLabel getMaximumValueLabel() {
         return maxLabel;
-    }
-
-    public JLabel getTitleLabel() {
-        return titleLabel;
     }
 
     @Override

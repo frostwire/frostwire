@@ -30,24 +30,19 @@ import java.io.File;
  * @author aldenml
  */
 public class BTDownloadItem implements TransferItem {
-
     private final TorrentHandle th;
     private final int index;
-
     private final File file;
     private final String name;
     private final long size;
-
     private PiecesTracker piecesTracker;
 
     public BTDownloadItem(TorrentHandle th, int index, String filePath, long fileSize, PiecesTracker piecesTracker) {
         this.th = th;
         this.index = index;
-
         this.file = new File(th.savePath(), filePath);
         this.name = file.getName();
         this.size = fileSize;
-
         this.piecesTracker = piecesTracker;
     }
 
@@ -81,7 +76,6 @@ public class BTDownloadItem implements TransferItem {
         if (!th.isValid()) {
             return 0;
         }
-
         long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
         return progress[index];
     }
@@ -91,16 +85,13 @@ public class BTDownloadItem implements TransferItem {
         if (!th.isValid() || size == 0) { // edge cases
             return 0;
         }
-
         int progress;
         long downloaded = getDownloaded();
-
         if (downloaded == size) {
             progress = 100;
         } else {
             progress = (int) ((float) (getDownloaded() * 100) / (float) size);
         }
-
         return progress;
     }
 

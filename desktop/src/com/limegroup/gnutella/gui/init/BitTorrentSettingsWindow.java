@@ -36,9 +36,7 @@ import java.util.List;
  * the directory for saving their files.
  */
 class BitTorrentSettingsWindow extends SetupWindow {
-
-    private static final String LEARN_MORE_URL = "http://support.frostwire.com/hc/en-us/articles/200302295-What-is-seeding-";
-
+    private static final String LEARN_MORE_URL = "https://www.quora.com/What-is-seeding-on-FrostWire";
     private TorrentSaveFolderComponent _torrentSaveFolderComponent;
     private TorrentSeedingSettingComponent _torrentSeedingSettingComponent;
 
@@ -55,9 +53,7 @@ class BitTorrentSettingsWindow extends SetupWindow {
 
     protected void createWindow() {
         super.createWindow();
-
         JPanel mainPanel = new JPanel(new GridBagLayout());
-
         // "Saved Torrent Data" container
         _torrentSaveFolderComponent = new TorrentSaveFolderComponent(true);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -68,7 +64,6 @@ class BitTorrentSettingsWindow extends SetupWindow {
         gbc.weighty = 0.5;
         mainPanel.add(_torrentSaveFolderComponent, gbc);
         _torrentSaveFolderComponent.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
-
         //Torrent Seeding container
         _torrentSeedingSettingComponent = new TorrentSeedingSettingComponent(false, true);
         gbc = new GridBagConstraints();
@@ -77,11 +72,9 @@ class BitTorrentSettingsWindow extends SetupWindow {
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.weightx = 1;
         gbc.weighty = 0.5;
-
         mainPanel.add(_torrentSeedingSettingComponent, gbc);
         _torrentSeedingSettingComponent.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
         _torrentSeedingSettingComponent.updateUI();
-
         setSetupComponent(mainPanel);
     }
 
@@ -91,12 +84,9 @@ class BitTorrentSettingsWindow extends SetupWindow {
      * This method applies any settings associated with this setup window.
      */
     public void applySettings(boolean loadCoreComponents) throws ApplySettingsException {
-        List<String> errors = new ArrayList<String>(2);
-
+        List<String> errors = new ArrayList<>(2);
         applyTorrentDataSaveFolderSettings(errors);
-
         applyTorrentSeedingSettings(errors);
-
         if (!errors.isEmpty()) {
             throw new ApplySettingsException(StringUtils.explode(errors, "\n\n"));
         }
@@ -105,12 +95,11 @@ class BitTorrentSettingsWindow extends SetupWindow {
     private void applyTorrentSeedingSettings(List<String> errors) {
         if (!_torrentSeedingSettingComponent.hasOneBeenSelected()) {
             errors.add("<html><p>" + I18n.tr("You forgot to select your finished downloads \"Seeding\" setting.") + "</p>\n" +
-                    "<p></p><p align=\"right\"><a href=\"http://support.frostwire.com/hc/en-us/articles/200302295-What-is-seeding-\">" +
+                    "<p></p><p align=\"right\"><a href=\"" + LEARN_MORE_URL + "\">" +
                     I18n.tr("What is \"Seeding\"?") +
                     "</a></p></html>");
             return;
         }
-
         SharingSettings.SEED_FINISHED_TORRENTS.setValue(_torrentSeedingSettingComponent.wantsSeeding());
     }
 
@@ -125,9 +114,7 @@ class BitTorrentSettingsWindow extends SetupWindow {
                 SharingSettings.TORRENT_DATA_DIR_SETTING.setValue(folder);
             }
         }
-
         // setup initial library folders here
         LibrarySettings.setupInitialLibraryFolders();
     }
-
 }

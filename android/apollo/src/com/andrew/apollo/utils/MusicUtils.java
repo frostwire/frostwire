@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,16 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
@@ -47,7 +48,6 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
-import com.andrew.apollo.IApolloService;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.loaders.FavoritesLoader;
 import com.andrew.apollo.loaders.LastAddedLoader;
@@ -62,9 +62,7 @@ import com.andrew.apollo.provider.RecentStore;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -76,7 +74,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
 
 
 /**
@@ -88,70 +88,88 @@ public final class MusicUtils {
 
     private static final Logger LOG = Logger.getLogger(MusicUtils.class);
 
-    public static IApolloService musicPlaybackService = null;
+    private static MusicPlaybackService musicPlaybackService = null;
 
     private static int sForegroundActivities = 0;
 
-    private static final WeakHashMap<Context, ServiceBinder> mConnectionMap;
-
     private static final long[] sEmptyList;
+
+    private static final ServiceConnectionListener serviceConnectionListener;
 
     private static ContentValues[] mContentValuesCache = null;
 
     static {
-        mConnectionMap = new WeakHashMap<>();
         sEmptyList = new long[0];
+        serviceConnectionListener = new ServiceConnectionListener();
     }
 
     /* This class is never initiated */
     public MusicUtils() {
     }
 
-    /**
-     * @param context  The {@link Context} to use
-     * @param callback The {@link ServiceConnection} to use
-     * @return The new instance of {@link ServiceToken}
-     */
-    public static ServiceToken bindToService(final Context context,
-                                             final ServiceConnection callback) {
-        if (context == null) {
-            return null;
+    public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
+        // MusicPlaybackService has to be a foreground service
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LOG.info("startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+                context.startForegroundService(intent);
+            } else {
+                LOG.info("startMusicPlaybackService() startService(MusicPlaybackService)", true);
+                context.startService(intent);
+            }
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
         }
-        Activity realActivity = ((Activity) context).getParent();
-        if (realActivity == null) {
-            realActivity = (Activity) context;
+        try {
+            if (onServiceBoundCallback != null) {
+                serviceConnectionListener.addSubListener(onServiceBoundCallback);
+            }
+            context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
+        } catch (Throwable t) {
+            LOG.error("startMusicPlaybackService() error " + t.getMessage(), t);
         }
-        final ContextWrapper contextWrapper = new ContextWrapper(realActivity);
-        contextWrapper.startService(new Intent(contextWrapper, MusicPlaybackService.class));
-        final ServiceBinder binder = new ServiceBinder(callback);
-        if (contextWrapper.bindService(
-                new Intent().setClass(contextWrapper, MusicPlaybackService.class), binder, 0)) {
-            mConnectionMap.put(contextWrapper, binder);
-            return new ServiceToken(contextWrapper);
-        }
-        return null;
     }
 
     /**
-     * @param token The {@link ServiceToken} to unbind from
+     * Used to build and show a notification when Apollo is sent into the
+     * background
+     *
+     * @param context The {@link Context} to use.
      */
-    public static void unbindFromService(final ServiceToken token) {
-        if (token == null) {
-            return;
+    public static void notifyForegroundStateChanged(final Context context, boolean inForeground) {
+        int old = sForegroundActivities;
+        if (inForeground) {
+            sForegroundActivities++;
+        } else {
+            sForegroundActivities--;
         }
-        final ContextWrapper mContextWrapper = token.mWrappedContext;
-        try {
-            final ServiceBinder mBinder = mConnectionMap.remove(mContextWrapper);
-            if (mBinder == null) {
-                return;
+        if (old == 0 || sForegroundActivities == 0) {
+            boolean startedServiceNow = false;
+            final Intent intent = new Intent(context, MusicPlaybackService.class);
+            intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
+            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
+            try {
+                if (MusicUtils.isMusicPlaybackServiceRunning()) {
+                    // no need to be calling start service to make it do what we want if it's already there
+                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
+                    MusicUtils.getMusicPlaybackService().handleCommandIntent(intent);
+                }
+            } catch (Throwable ignored) {
+                LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
             }
-            mContextWrapper.unbindService(mBinder);
-            if (mConnectionMap.isEmpty()) {
-                musicPlaybackService = null;
-            }
-        } catch (Throwable ignored) {
-            LOG.error(ignored.getMessage(), ignored);
         }
+    }
+
+    public static ServiceConnectionListener getServiceConnectionListener() {
+        return serviceConnectionListener;
+    }
+
+    public static MusicPlaybackService getMusicPlaybackService() {
+        return musicPlaybackService;
+    }
+
+    public static boolean isMusicPlaybackServiceRunning() {
+        return musicPlaybackService != null;
     }
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
@@ -159,7 +177,7 @@ public final class MusicUtils {
             LOG.warn("requestMusicPlaybackServiceShutdown() aborted. context is null.");
             return;
         }
-        if (!SystemUtils.isServiceRunning(context, MusicPlaybackService.class)) {
+        if (!MusicUtils.isMusicPlaybackServiceRunning()) {
             LOG.info("requestMusicPlaybackServiceShutdown() aborted. MusicPlaybackService has already shutdown.");
             return;
         }
@@ -169,7 +187,11 @@ public final class MusicUtils {
             shutdownIntent.putExtra("force", true);
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> sending shut down intent now");
             LOG.info("MusicUtils.requestMusicPlaybackServiceShutdown() -> " + shutdownIntent);
-            Engine.startService(context, shutdownIntent);
+            MusicUtils.getMusicPlaybackService().handleCommandIntent(shutdownIntent);
+// Commenting this, it disconnects, but when we launch the service again it doesn't re-connect
+//            if (serviceConnectionListener != null) {
+//                serviceConnectionListener.onServiceDisconnected(null);
+//            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -182,53 +204,66 @@ public final class MusicUtils {
         final Uri mUri = ContentUris.withAppendedId(
                 MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                 playlistId);
-        int deleted = activity.getContentResolver().delete(mUri, null, null);
-        return deleted;
+        return activity.getContentResolver().delete(mUri, null, null);
     }
 
     public static boolean isPaused() {
         return !MusicUtils.isPlaying() && !MusicUtils.isStopped();
     }
 
-    public static final class ServiceBinder implements ServiceConnection {
-        private final ServiceConnection mCallback;
+    private static class ServiceConnectionListener implements ServiceConnection {
+        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
+        private final ArrayList<Runnable> subListeners = new ArrayList<>();
+        private final AtomicBoolean bound = new AtomicBoolean(false);
 
-        /**
-         * Constructor of <code>ServiceBinder</code>
-         *
-         * @param callback The {@link ServiceConnection} to use
-         */
-        public ServiceBinder(final ServiceConnection callback) {
-            mCallback = callback;
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            bound.set(true);
+            musicPlaybackService = MusicPlaybackService.getInstance();//IApolloService.Stub.asInterface(service);
+            try {
+                LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
+                musicPlaybackService.updateNotification();
+            } catch (Throwable e) {
+                LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
+            }
+
+            notifySubListeners();
+
+            // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
+            subListeners.clear();
         }
 
         @Override
-        public void onServiceConnected(final ComponentName className, final IBinder service) {
-            musicPlaybackService = IApolloService.Stub.asInterface(service);
-            if (mCallback != null) {
-                mCallback.onServiceConnected(className, service);
+        public void onServiceDisconnected(ComponentName name) {
+            LOG.info("onServiceDisconnected() invoked!");
+            bound.set(false);
+            subListeners.clear();
+        }
+
+        public boolean isBound() {
+            return bound.get();
+        }
+
+        void addSubListener(Runnable runnable) {
+            subListeners.add(runnable);
+        }
+
+        private void notifySubListeners() {
+            if (subListeners.isEmpty()) {
+                return;
+            }
+            for (Runnable runnable : subListeners) {
+                try {
+                    MusicPlaybackService.safePost(runnable);
+                } catch (Throwable t) {
+                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
+                }
             }
         }
 
         @Override
-        public void onServiceDisconnected(final ComponentName className) {
-            if (mCallback != null) {
-                mCallback.onServiceDisconnected(className);
-            }
-            musicPlaybackService = null;
-        }
-    }
-
-    public static final class ServiceToken {
-        public ContextWrapper mWrappedContext;
-
-        /**
-         * Constructor of <code>ServiceToken</code>
-         *
-         * @param context The {@link ContextWrapper} to use
-         */
-        public ServiceToken(final ContextWrapper context) {
-            mWrappedContext = context;
+        public void onNullBinding(ComponentName name) {
+            LOG.warn("onNullBinding(componentName=" + name + ")");
         }
     }
 
@@ -273,29 +308,39 @@ public final class MusicUtils {
     public static void next() {
         try {
             if (musicPlaybackService != null) {
-                musicPlaybackService.next();
+                musicPlaybackService.stopPlayer();
+                musicPlaybackService.gotoNext(true);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
-    public static void previous(final Context context) {
-        final Intent previous = new Intent(context, MusicPlaybackService.class);
-        previous.setAction(MusicPlaybackService.PREVIOUS_ACTION);
-        context.startService(previous);
+    public static void previous() {
+        try {
+            if (musicPlaybackService != null) {
+                musicPlaybackService.gotoPrev();
+            }
+        } catch (final Throwable ignored) {
+        }
     }
 
     /**
-     * Plays or pauses the music.
+     * Starts Playback, Pauses, or Resumes.
      */
-    public static void playOrPause() {
+    public static void playPauseOrResume() {
         try {
-            // TODO: Check for PHONE_STATE Permissions here.
             if (musicPlaybackService != null) {
-                if (musicPlaybackService.isPlaying()) {
-                    musicPlaybackService.pause();
-                } else {
+                // PAUSED
+                if (!musicPlaybackService.isPlaying() && !musicPlaybackService.isStopped()) {
+                    musicPlaybackService.resume();
+                }
+                // STOPPED or UNSTARTED
+                else if (musicPlaybackService.isStopped()) {
                     musicPlaybackService.play();
+                }
+                // PLAYING
+                else if (musicPlaybackService.isPlaying()) {
+                    musicPlaybackService.pause();
                 }
             }
         } catch (final Exception ignored) {
@@ -342,7 +387,7 @@ public final class MusicUtils {
                         break;
                 }
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -353,7 +398,8 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.enableShuffle(!isShuffleEnabled());
-            } catch (RemoteException ignored) {}
+            } catch (Throwable ignored) {
+            }
         }
     }
 
@@ -364,7 +410,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isPlaying();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return false;
@@ -374,7 +420,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isStopped();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return true;
@@ -387,7 +433,8 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.isShuffleEnabled();
-            } catch (final RemoteException ignored) { }
+            } catch (final Throwable ignored) {
+            }
         }
         return false;
     }
@@ -399,7 +446,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getRepeatMode();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -412,7 +459,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getTrackName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -425,7 +472,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getArtistName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -438,7 +485,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAlbumName();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return null;
@@ -451,7 +498,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAlbumId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -464,7 +511,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAudioId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -477,7 +524,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getCurrentSimplePlayerAudioId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -490,7 +537,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getArtistId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -499,11 +546,11 @@ public final class MusicUtils {
     /**
      * @return The audio session Id.
      */
-    public static int getAudioSessionId() {
+    static int getAudioSessionId() {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.getAudioSessionId();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return -1;
@@ -517,7 +564,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getQueue();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return sEmptyList;
     }
@@ -531,7 +578,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.removeTrack(id);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return 0;
     }
@@ -539,12 +586,12 @@ public final class MusicUtils {
     /**
      * @return The position of the current track in the queue.
      */
-    public static int getQueuePosition() {
+    private static int getQueuePosition() {
         try {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getQueuePosition();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return 0;
     }
@@ -575,11 +622,10 @@ public final class MusicUtils {
     }
 
     public static Song getSong(Context context, final long songId) {
-        final StringBuilder mSelection = new StringBuilder(BaseColumns._ID + "=?");
-        mSelection.append(" AND " + AudioColumns.IS_MUSIC + "=1");
-        mSelection.append(" AND " + AudioColumns.TITLE + " != ''"); //$NON-NLS-2$
-
-        final Cursor cursor = context.getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
+        String mSelection = BaseColumns._ID + "=?" + " AND " + AudioColumns.IS_MUSIC + "=1" +
+                " AND " + AudioColumns.TITLE + " != ''";//$NON-NLS-2$
+        final Cursor cursor;
+        cursor = context.getContentResolver().query(Media.EXTERNAL_CONTENT_URI,
                 new String[]{
                         /* 0 */
                         BaseColumns._ID,
@@ -592,12 +638,13 @@ public final class MusicUtils {
                         /* 4 */
                         AudioColumns.DURATION
                 },
-                mSelection.toString(),
+                mSelection,
                 new String[]{String.valueOf(songId)},
                 PreferenceUtils.getInstance().getSongSortOrder());
 
         if (cursor != null && cursor.getCount() == 1) {
             cursor.moveToFirst();
+            cursor.close();
             return new Song(songId, cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
         } else {
             return null;
@@ -638,6 +685,8 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 AudioColumns.ALBUM_ID
         };
+        //DEBUG (to get all fields, select *)
+        //String[] projection = null;
         final String selection = AudioColumns._ID + "=" + songId + " AND " + AudioColumns.IS_MUSIC + "=1";
         Cursor cursor;
         try {
@@ -655,6 +704,22 @@ public final class MusicUtils {
         if (cursor != null) {
             cursor.moveToFirst();
             try {
+                // DEBUG: Show me all the fields and values of this table, do we not have an album ID?
+//                String[] columnNames = cursor.getColumnNames();
+//                int i=0;
+//                for (String column : columnNames) {
+//                    switch (cursor.getType(i)) {
+//                        case Cursor.FIELD_TYPE_STRING:
+//                            LOG.info("getAlbumIdForSong: " + column + " = " + cursor.getString(i));
+//                            break;
+//                        case Cursor.FIELD_TYPE_INTEGER:
+//                            LOG.info("getAlbumIdForSong: " + column + " = " + cursor.getLong(i));
+//                            break;
+//                    }
+//                    i++;
+//                }
+//              albumId = cursor.getLong(cursor.getColumnIndexOrThrow(ALBUM_ID));
+                // END OF DEBUG CODE
                 albumId = cursor.getLong(0);
             } catch (CursorIndexOutOfBoundsException oob) {
                 return -1;
@@ -673,7 +738,7 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 AudioColumns.ALBUM
         };
-        final String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
+        final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC + "=1";
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -699,7 +764,7 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 BaseColumns._ID
         };
-        final String selection = AudioColumns.ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
+        final String selection = ALBUM_ID + "=" + id + " AND " + AudioColumns.IS_MUSIC
                 + "=1";
         Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, projection, selection, null,
@@ -735,11 +800,10 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 BaseColumns._ID
         };
-        final StringBuilder selection = new StringBuilder();
-        selection.append(AudioColumns.IS_MUSIC + "=1");
-        selection.append(" AND " + MediaColumns.TITLE + "!=''");
         final Uri uri = MediaStore.Audio.Genres.Members.getContentUri("external", id);
-        Cursor cursor = context.getContentResolver().query(uri, projection, selection.toString(),
+        String selection = AudioColumns.IS_MUSIC + "=1" +
+                " AND " + MediaColumns.TITLE + "!=''";
+        Cursor cursor = context.getContentResolver().query(uri, projection, selection,
                 null, null);
         if (cursor != null) {
             final long[] mList = getSongListForCursor(cursor);
@@ -753,8 +817,6 @@ public final class MusicUtils {
      * @param uri The source of the file
      */
     public static void playFile(final Uri uri) {
-        // TODO: Check for PHONE_STATE Permissions here.
-
         if (uri == null || musicPlaybackService == null) {
             return;
         }
@@ -770,10 +832,10 @@ public final class MusicUtils {
         }
 
         try {
-            musicPlaybackService.stop();
+            musicPlaybackService.stopPlayer();
             musicPlaybackService.openFile(filename);
             musicPlaybackService.play();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -784,12 +846,18 @@ public final class MusicUtils {
      */
     public static void playAll(final long[] list, int position,
                                final boolean forceShuffle) {
-        // TODO: Check for PHONE_STATE Permissions here.
-
-        if (list == null || list.length == 0 || musicPlaybackService == null) {
+        if (list == null) {
+            LOG.info("playAll() aborted, song list null");
             return;
         }
-
+        if (list.length == 0) {
+            LOG.info("playAll() aborted, empty song list");
+            return;
+        }
+        if (musicPlaybackService == null) {
+            LOG.info("playAll() aborted, musicPlaybackService is null");
+            return;
+        }
         try {
             musicPlaybackService.enableShuffle(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
@@ -800,16 +868,15 @@ public final class MusicUtils {
             if (position < 0) {
                 position = 0;
             }
-
             musicPlaybackService.open(list, position);
             musicPlaybackService.play();
-
-        } catch (final RemoteException ignored) {
         } catch (NullPointerException e) {
             // we are getting this error because musicPlaybackService is
             // a global static mutable variable, we can't do anything
             // until a full refactor in player
-            LOG.warn("Review code logic", e);
+            LOG.error("playAll() Review code logic", e);
+        } catch (final Throwable t) {
+            LOG.error("playAll() " + t.getMessage(), t);
         }
     }
 
@@ -819,9 +886,8 @@ public final class MusicUtils {
             if (Arrays.equals(list, playlist)) {
                 try {
                     musicPlaybackService.play();
-                } catch (Throwable ignored) {
-                    ignored.printStackTrace();
-
+                } catch (Throwable t) {
+                    t.printStackTrace();
                     return false;
                 }
                 return true;
@@ -839,7 +905,7 @@ public final class MusicUtils {
         }
         try {
             musicPlaybackService.enqueue(list, MusicPlaybackService.NEXT);
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -865,7 +931,7 @@ public final class MusicUtils {
             musicPlaybackService.open(mTrackList, -1);
             musicPlaybackService.play();
             cursor.close();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -955,8 +1021,7 @@ public final class MusicUtils {
         }
     }
 
-    /*  */
-    public static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
+    private static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
         if (offset + len > ids.length) {
             len = ids.length - offset;
         }
@@ -1065,38 +1130,53 @@ public final class MusicUtils {
             return;
         }
 
+        if (MusicPlaybackService.getMusicPlayerHandler() != null &&
+                MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
+            MusicPlaybackService.getMusicPlayerHandler().safePost(() -> addToPlaylist(context, ids, playlistid));
+            return;
+        }
+
         long[] currentQueue = getQueue();
         long[] playlist = getSongListForPlaylist(context, playlistid);
         boolean updateQueue = isPlaylistInQueue(playlist, currentQueue);
         final int size = ids.length;
         final ContentResolver resolver = context.getContentResolver();
         final String[] projection = new String[]{
-                "count(*)"
+                MediaStore.Audio.Playlists.Members._ID
         };
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
         Cursor cursor = null;
         try {
             cursor = resolver.query(uri, projection, null, null, null);
-        } catch (Throwable ignored) {
+        } catch (Throwable t) {
+            LOG.error("addToPlaylist() resolver.query() failed: " + t.getMessage(), t, true);
         }
 
         if (cursor != null) {
             cursor.moveToFirst();
-            final int base = cursor.getInt(0);
+            final int base = cursor.getCount();
             cursor.close();
             int numinserted = 0;
             //TODO: Check this portion of code, seems is doing extra work.
             for (int offSet = 0; offSet < size; offSet += 1000) {
                 makeInsertItems(ids, offSet, 1000, base);
-                numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+                try {
+                    numinserted += resolver.bulkInsert(uri, mContentValuesCache);
+                } catch (Throwable ignored) {
+                }
             }
             if (updateQueue) {
                 addToQueue(context, ids);
             }
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
-            AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-            refresh();
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                        AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
+                        refresh();
+                    }
+            );
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
         }
@@ -1124,44 +1204,21 @@ public final class MusicUtils {
     /**
      * Removes a single track from a given playlist
      *
-     * @param context          The {@link Context} to use.
-     * @param id               The id of the song to remove.
-     * @param playlistId       The id of the playlist being removed from.
-     * @param showNotification if true shows a notification at the top.
+     * @param context    The {@link Context} to use.
+     * @param id         The id of the song to remove.
+     * @param playlistId The id of the playlist being removed from.
      */
-    public static void removeFromPlaylist(final Context context, final long id,
-                                          final long playlistId, boolean showNotification) {
+    public static void removeFromPlaylist(final Context context,
+                                          final long id,
+                                          final long playlistId) {
         if (context == null) {
             return;
         }
-
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         final ContentResolver resolver = context.getContentResolver();
         resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{
                 Long.toString(id)
         });
-
-        if (showNotification) {
-            try {
-                final String message = context.getResources().getQuantityString(
-                        R.plurals.NNNtracksfromplaylist, 1, 1);
-                AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-            } catch (Throwable t) {
-                // java.lang.RuntimeException: Can't create handler inside thread that has not called Looper.prepare()
-            }
-        }
-    }
-
-    /**
-     * Removes a single track from a given playlist
-     *
-     * @param context    The {@link Context} to use.
-     * @param id         The id of the song to remove.
-     * @param playlistId The id of the playlist being removed from.
-     */
-    public static void removeFromPlaylist(final Context context, final long id,
-                                          final long playlistId) {
-        removeFromPlaylist(context, id, playlistId, false);
     }
 
     /**
@@ -1176,7 +1233,7 @@ public final class MusicUtils {
             musicPlaybackService.enqueue(list, MusicPlaybackService.LAST);
             final String message = makeLabel(context, R.plurals.NNNtrackstoqueue, list.length);
             AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1203,9 +1260,9 @@ public final class MusicUtils {
             values.put(AudioColumns.IS_RINGTONE, "1");
             values.put(AudioColumns.IS_ALARM, "1");
             resolver.update(uri, values, null, null);
-        } catch (final Throwable ignored) {
+        } catch (final Throwable t) {
             //return;
-            LOG.error(ignored.getMessage(), ignored);
+            LOG.error(t.getMessage(), t);
         }
 
         final String[] projection = new String[]{
@@ -1213,9 +1270,8 @@ public final class MusicUtils {
         };
 
         final String selection = BaseColumns._ID + "=" + id;
-        Cursor cursor = resolver.query(contentUri, projection,
-                selection, null, null);
-        try {
+        try (Cursor cursor = resolver.query(contentUri, projection,
+                selection, null, null)) {
             if (cursor != null && cursor.getCount() == 1) {
                 cursor.moveToFirst();
                 RingtoneManager.setActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE, uri);
@@ -1227,10 +1283,6 @@ public final class MusicUtils {
             }
         } catch (Throwable ignored) {
             UIUtils.showLongMessage(context, R.string.ringtone_not_set);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
@@ -1274,7 +1326,7 @@ public final class MusicUtils {
      * @param id      The id of the album.
      * @return The release date for an album.
      */
-    public static String getReleaseDateForAlbum(final Context context, final long id) {
+    static String getReleaseDateForAlbum(final Context context, final long id) {
         if (context == null || id == -1) {
             return null;
         }
@@ -1299,7 +1351,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.getPath();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return null;
     }
@@ -1313,7 +1365,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.moveQueueItem(from, to);
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1325,7 +1377,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.toggleFavorite();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1337,7 +1389,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 return musicPlaybackService.isFavorite();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
         return false;
     }
@@ -1357,11 +1409,11 @@ public final class MusicUtils {
                     MediaStore.Audio.Playlists.Members.AUDIO_ID
             };
             Cursor cursor = context.getContentResolver().query(
-                        MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
-                        projection,
-                        null,
-                        null,
-                        MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
+                    MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId),
+                    projection,
+                    null,
+                    null,
+                    MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
             if (cursor != null) {
                 final long[] list = getSongListForCursor(cursor);
                 cursor.close();
@@ -1392,7 +1444,7 @@ public final class MusicUtils {
      *               database
      * @return The song list for the favorite playlist
      */
-    public static long[] getSongListForFavoritesCursor(Cursor cursor) {
+    private static long[] getSongListForFavoritesCursor(Cursor cursor) {
         if (cursor == null) {
             return sEmptyList;
         }
@@ -1506,13 +1558,14 @@ public final class MusicUtils {
 
     /**
      * Called when one of the lists should refresh or re-query.
+     * Results in a throttled background task submission on our MusicHandlerThread
      */
     public static void refresh() {
         try {
             if (musicPlaybackService != null) {
                 musicPlaybackService.refresh();
             }
-        } catch (final RemoteException ignored) {
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1524,7 +1577,11 @@ public final class MusicUtils {
      * @return The last album name played by an artist
      */
     public static String getLastAlbumForArtist(final Context context, final String artistName) {
-        return RecentStore.getInstance(context).getAlbumName(artistName);
+        RecentStore recentStore = RecentStore.getInstance(context);
+        if (recentStore == null) {
+            return null;
+        }
+        return recentStore.getAlbumName(artistName);
     }
 
     /**
@@ -1536,7 +1593,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.seek(position);
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
     }
@@ -1548,7 +1605,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.position();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -1561,7 +1618,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 return musicPlaybackService.duration();
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
         return 0;
@@ -1574,7 +1631,7 @@ public final class MusicUtils {
         if (musicPlaybackService != null) {
             try {
                 musicPlaybackService.setQueuePosition(position);
-            } catch (final RemoteException ignored) {
+            } catch (final Throwable ignored) {
             }
         }
     }
@@ -1587,29 +1644,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.removeTracks(0, Integer.MAX_VALUE);
             }
-        } catch (final RemoteException ignored) {
-        }
-    }
-
-    /**
-     * Used to build and show a notification when Apollo is sent into the
-     * background
-     *
-     * @param context The {@link Context} to use.
-     */
-    public static void notifyForegroundStateChanged(final Context context, boolean inForeground) {
-        int old = sForegroundActivities;
-        if (inForeground) {
-            sForegroundActivities++;
-        } else {
-            sForegroundActivities--;
-        }
-
-        if (old == 0 || sForegroundActivities == 0) {
-            final Intent intent = new Intent(context, MusicPlaybackService.class);
-            intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
-            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
-            context.startService(intent);
+        } catch (final Throwable ignored) {
         }
     }
 
@@ -1624,7 +1659,7 @@ public final class MusicUtils {
             return;
         }
         final String[] projection = new String[]{
-                BaseColumns._ID, MediaColumns.DATA, AudioColumns.ALBUM_ID
+                BaseColumns._ID, MediaColumns.DATA, ALBUM_ID
         };
         final StringBuilder selection = new StringBuilder();
         selection.append(BaseColumns._ID + " IN (");
@@ -1647,9 +1682,15 @@ public final class MusicUtils {
                 final long id = c.getLong(0);
                 removeTrack(id);
                 // Remove from the favorites playlist.
-                FavoritesStore.getInstance(context).removeItem(id);
+                FavoritesStore favoritesStore = FavoritesStore.getInstance(context);
+                if (favoritesStore != null) {
+                    favoritesStore.removeItem(id);
+                }
                 // Remove any items in the recent's database
-                RecentStore.getInstance(context).removeItem(id);
+                RecentStore recentStore = RecentStore.getInstance(context);
+                if (recentStore != null) {
+                    recentStore.removeItem(id);
+                }
                 // Remove from all remaining playlists.
                 removeSongFromAllPlaylists(context, id);
                 c.moveToNext();
@@ -1720,10 +1761,21 @@ public final class MusicUtils {
         if (list.length == 0) {
             pos = 0;
         }
-        MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
+        if (getMusicPlaybackService() == null) {
+            // first time they invoke us from an ApolloFragment the service
+            // needs to be started and we need can get a callback from it
+            final Context context = adapter.getContext();
+            final int posCopy = pos;
+            startMusicPlaybackService(
+                    context,
+                    new Intent(context, MusicPlaybackService.class),
+                    () -> MusicUtils.playAll(list, posCopy, MusicUtils.isShuffleEnabled()));
+        } else {
+            MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
+        }
     }
 
-    public static void removeSongFromAllPlaylists(final Context context, final long songId) {
+    private static void removeSongFromAllPlaylists(final Context context, final long songId) {
         final List<Playlist> playlists = getPlaylists(context);
 
         if (!playlists.isEmpty()) {
@@ -1765,7 +1817,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.playSimple(path);
             }
-        } catch (RemoteException ignored) {
+        } catch (Throwable ignored) {
         }
     }
 
@@ -1774,7 +1826,7 @@ public final class MusicUtils {
             if (musicPlaybackService != null) {
                 musicPlaybackService.stopSimplePlayer();
             }
-        } catch (RemoteException ignored) {
+        } catch (Throwable ignored) {
         }
     }
 }

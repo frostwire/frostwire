@@ -19,9 +19,10 @@
 package com.limegroup.gnutella.gui.tables;
 
 // simple interface to designate a table as sortable.
-public interface JSortTable {
-
+interface JSortTable {
     int getSortedColumnIndex();
+
     boolean isSortedColumnAscending();
-	int getPressedColumnIndex();
+
+    int getPressedColumnIndex();
 }

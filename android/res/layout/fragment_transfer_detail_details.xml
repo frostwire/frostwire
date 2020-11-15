@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -62,14 +62,18 @@
         </RelativeLayout>
 
         <ImageView
+            android:id="@+id/fragment_transfer_detail_sequential_download_divider_line"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@drawable/divider_line"
-            android:contentDescription="@null" />
+            android:contentDescription="@null"
+            android:visibility="gone"/>
 
         <LinearLayout
+            android:id="@+id/fragment_transfer_detail_sequential_download_linearlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:orientation="horizontal"
             android:paddingBottom="@dimen/transfers_detail_page_padding_vertical_small"
             android:paddingEnd="@dimen/transfers_detail_page_padding_horizontal"
@@ -83,13 +87,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:enabled="false"
                 android:text="@string/sequential_download" />
-
-            <CheckBox
-                android:id="@+id/fragment_transfer_detail_details_sequential_download_checkBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true" />
         </LinearLayout>
 
         <ImageView

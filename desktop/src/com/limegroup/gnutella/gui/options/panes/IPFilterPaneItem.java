@@ -35,7 +35,7 @@ import com.limegroup.gnutella.gui.options.panes.ipfilter.IPRange;
 import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import net.miginfocom.swing.MigLayout;
 import org.apache.commons.io.IOUtils;
-import org.limewire.concurrent.ExecutorsHelper;
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.CommonUtils;
 
 import javax.swing.*;
@@ -49,17 +49,12 @@ import java.util.zip.GZIPInputStream;
 import static com.frostwire.gui.theme.ThemeMediator.fixKeyStrokes;
 
 public class IPFilterPaneItem extends AbstractPaneItem {
-    enum IPFilterFormat {
-        P2P
-    }
-
+    private final static String TITLE = I18n.tr("IP Filter");
+    private final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
     private final static Pattern P2P_LINE_PATTERN = Pattern.compile("(.*)\\:(.*)\\-(.*)$", java.util.regex.Pattern.COMMENTS);
-
     private final static Logger LOG = Logger.getLogger(IPFilterPaneItem.class);
-    public final static String TITLE = I18n.tr("IP Filter");
-    public final static String LABEL = I18n.tr("You can manually enter IP addresses ranges to filter out, you can also import bulk addresses from an IP block list file or URL");
     private final String decompressingString = I18n.tr("Decompressing");
-
+    private final ExecutorService httpExecutor;
     private IPFilterTableMediator ipFilterTable;
     private JTextField fileUrlTextField;
     private JProgressBar progressBar;
@@ -67,17 +62,20 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     private JButton clearFilterButton;
     private JButton addRangeManuallyButton;
     private IconButton fileChooserIcon;
-
     private boolean initialized;
     private int lastPercentage = -1;
     private long lastPercentageUpdateTimestamp;
-    private final ExecutorService httpExecutor;
-
-
-    public IPFilterPaneItem() {
+    private IPFilterPaneItem() {
         super(TITLE, LABEL);
         ipFilterTable = null;
         httpExecutor = ExecutorsHelper.newProcessingQueue("IPFilterPanelItem-http");
+    }
+
+    private static boolean isGZipped(File f) throws IOException {
+        byte[] signature = new byte[2];
+        FileInputStream fis = new FileInputStream(f);
+        fis.read(signature);
+        return signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b;
     }
 
     @Override
@@ -94,13 +92,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         if (ipFilter == null) {
             throw new RuntimeException("Check your logic. No BTEngine ip_filter instance available");
         }
-
         // ipFilterTableModel should be loaded in separate thread
         JPanel panel = new JPanel(new MigLayout("fillx, ins 0, insets, nogrid", "[][][][][][][][]"));
-
         ipFilterTable = IPFilterTableMediator.getInstance();
         BackgroundExecutorService.schedule(this::loadSerializedIPFilter);
-
         panel.add(ipFilterTable.getComponent(), "span, pad 0 0 0 0, grow, wrap");
         panel.add(new JLabel(I18n.tr("Enter the URL or local file path of an IP Filter list (p2p format only supported)")), "pad 0 5px, span, wrap");
         fileUrlTextField = new JTextField();
@@ -110,21 +105,17 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         panel.add(fileChooserIcon, "span 1");
         importButton = new JButton(I18n.tr("Import"));
         panel.add(importButton, "span 1, wrap");
-
         progressBar = new JProgressBar(0, 100);
         progressBar.setStringPainted(true);
         progressBar.setVisible(false);
         panel.add(progressBar, "growx, wrap");
-
         addRangeManuallyButton = new JButton(I18n.tr("Add IP Range Manually"));
         addRangeManuallyButton.addActionListener((e) -> onAddRangeManuallyAction());
         panel.add(addRangeManuallyButton);
-
         clearFilterButton = new JButton(I18n.tr("Clear IP Block List"));
         clearFilterButton.addActionListener((e) -> onClearFilterAction());
         panel.add(clearFilterButton);
         add(panel);
-
         fileChooserIcon.addActionListener((e) -> onFileChooserIconAction());
         importButton.addActionListener((e) -> onImportButtonAction());
     }
@@ -136,7 +127,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             enableImportControls(true);
             return;
         }
-
         if (filterDataPath.toLowerCase().startsWith("http")) {
             // download file
             LOG.info("onImportButtonAction() trying URL");
@@ -184,10 +174,8 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     public void importFromIPBlockFileAsync(final File potentialGunzipFile, boolean removeInputFileWhenDone) {
         // decompress if zip file
         // import file
-
         BackgroundExecutorService.schedule(() -> {
             LOG.info("importFromStreamAsync(): thread invoked", true);
-
             File decompressedFile;
             try {
                 if (isGZipped(potentialGunzipFile)) {
@@ -205,7 +193,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 enableImportControls(true);
                 return;
             }
-
             final IPFilterFormat format = getIPFilterFileFormat(decompressedFile);
             if (format == null) {
                 LOG.error("importFromStreamAsync(): IPFilterFormat could not be determined");
@@ -216,14 +203,12 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             }
             final long decompressedFileSize = decompressedFile.length();
             final IPFilterInputStreamReader ipFilterReader = (format == IPFilterFormat.P2P) ? new P2PIPFilterInputStreamReader(decompressedFile) : null;
-
             if (ipFilterReader == null) {
                 LOG.error("importFromStreamAsync(): Invalid IP Filter file format, only p2p format supported");
                 fileUrlTextField.selectAll();
                 enableImportControls(true);
                 return;
             }
-
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(new File(CommonUtils.getUserSettingsDir(), "ip_filter.db"));
@@ -235,12 +220,10 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                         try {
                             ipRange.writeObjectTo(fos);
                             dataModel.add(ipRange, dataModel.getRowCount());
-
                             // every few imported ipRanges, let's do an UI update
                             if (dataModel.getRowCount() % 100 == 0) {
                                 GUIMediator.safeInvokeLater(() -> updateProgressBar((int) ((ipFilterReader.bytesRead() * 100.0f / decompressedFileSize)), importingString));
                             }
-
                             // TODO: add to actual ip block filter
                         } catch (Throwable t) {
                             LOG.warn(t.getMessage(), t);
@@ -325,7 +308,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             LOG.info("loadSerializedIPFilter(): done, ip filter file existed but it was empty");
             return;
         }
-
         try {
             long start = System.currentTimeMillis();
             LOG.info("loadSerializedIPFilter(): loading " + ipFilterDBFile.length() + "  bytes from ip filter file");
@@ -396,20 +378,13 @@ public class IPFilterPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         return false;
     }
 
     @Override
     public boolean isDirty() {
         return false;
-    }
-
-    private static boolean isGZipped(File f) throws IOException {
-        byte[] signature = new byte[2];
-        FileInputStream fis = new FileInputStream(f);
-        fis.read(signature);
-        return signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b;
     }
 
     private File gunzipFile(File gzipped, File gunzipped) {
@@ -432,7 +407,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
             int b1 = raf.read();
             raf.close();
             final int uncompressedSize = (b1 << 24) | (b2 << 16) + (b3 << 8) + b4;
-
             byte[] buffer = new byte[32768];
             GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipped), buffer.length);
             FileOutputStream fileOutputStream = new FileOutputStream(gunzipped, false);
@@ -460,8 +434,16 @@ public class IPFilterPaneItem extends AbstractPaneItem {
         return new File(gunzipped.getAbsolutePath());
     }
 
+    public void onRangeManuallyAdded(IPRange ipRange) {
+        LOG.info("onRangeManuallyAdded() - " + ipRange);
+    }
+
+    enum IPFilterFormat {
+        P2P
+    }
+
     private static class P2PIPFilterInputStreamReader implements IPFilterInputStreamReader {
-        private BufferedReader br;
+        private final BufferedReader br;
         private InputStream is;
         private int bytesRead;
 
@@ -485,7 +467,6 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                         line = br.readLine();
                         bytesRead += line.length();
                     }
-
                     Matcher matcher = P2P_LINE_PATTERN.matcher(line);
                     if (matcher.find()) {
                         return new IPRange(matcher.group(1), matcher.group(2), matcher.group(3));
@@ -521,11 +502,5 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 t.printStackTrace();
             }
         }
-    }
-
-
-
-    public void onRangeManuallyAdded(IPRange ipRange) {
-        LOG.info("onRangeManuallyAdded() - " + ipRange);
     }
 }

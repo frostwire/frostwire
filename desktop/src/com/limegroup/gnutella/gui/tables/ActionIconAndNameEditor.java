@@ -31,23 +31,18 @@ import java.awt.event.MouseEvent;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ActionIconAndNameEditor extends AbstractCellEditor implements TableCellEditor {
-
     private static final long serialVersionUID = 2661028644256459921L;
-
     private static final Logger LOG = Logger.getLogger(ActionIconAndNameEditor.class);
-
     private final Rectangle actionRegion;
-
     private ActionListener action;
 
-    public ActionIconAndNameEditor(Rectangle actionRegion) {
+    private ActionIconAndNameEditor(Rectangle actionRegion) {
         this.actionRegion = actionRegion;
     }
 
-    public ActionIconAndNameEditor() {
+    private ActionIconAndNameEditor() {
         this(null);
     }
 
@@ -58,7 +53,6 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
     public Component getTableCellEditorComponent(final JTable table, Object value, boolean isSelected, int row, int column) {
         ActionIconAndNameHolder in = (ActionIconAndNameHolder) value;
         action = in.getAction();
-
         final Component component = new ActionIconAndNameRenderer().getTableCellRendererComponent(table, value, isSelected, true, row, column);
         component.addMouseListener(new MouseAdapter() {
             @Override
@@ -71,20 +65,19 @@ public class ActionIconAndNameEditor extends AbstractCellEditor implements Table
                             component_mousePressed(e);
                         } else {
                             if (e.getClickCount() >= 2) {
-                                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, MouseEvent.MOUSE_CLICKED, e.getWhen(), e.getModifiers(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), false));
+                                Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, MouseEvent.MOUSE_CLICKED, e.getWhen(), e.getModifiersEx(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), false));
                             }
                         }
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, e.getID(), e.getWhen(), e.getModifiers(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), true));
+                    Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(new MouseEvent(table, e.getID(), e.getWhen(), e.getModifiersEx(), component.getX() + e.getX(), component.getY() + e.getY(), e.getClickCount(), true));
                 }
             }
         });
-
         return component;
     }
 
-    protected void component_mousePressed(MouseEvent e) {
+    private void component_mousePressed(MouseEvent e) {
         if (action != null) {
             try {
                 action.actionPerformed(new ActionEvent(e.getSource(), e.getID(), ""));

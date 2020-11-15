@@ -26,7 +26,6 @@
     <string name="azureus_peer_manager_status_finished">Klaar</string>
     <string name="your_installation_is_complete">Jou installasie is voltooi.</string>
     <string name="azureus_manager_item_seeding">Saai</string>
-    <string name="application_label">FrostWire</string>
     <string name="transfers_context_stop_seeding_all_transfers">Hou op om alle oordragte te saai</string>
     <string name="cloud_download_aborted_on_mobile_data">Huidige instelling verhoed dat aflaai wanneer dit nie op Wi-Fi-netwerk is nie</string>
     <string name="filter_ellipsis">Filter…</string>
@@ -75,6 +74,7 @@
     <string name="torrent_max_total_connections">Maks Totale verbindings</string>
     <string name="activity_preferences_name">Instellings</string>
     <string name="use_torrentdownloads">Gebruik TorrentDownloads</string>
+    <string name="use_torrentz2">Gebruik Torrentz2</string>
     <string name="my_files">My lêers</string>
     <string name="saving_to_internal_memory">Stoor na interne geheue</string>
     <string name="choose_email_app">Kies \'n e-posprogram…</string>
@@ -83,7 +83,7 @@
     <string name="share">Deel</string>
     <string name="accept">Aanvaar</string>
     <string name="torrent_max_download_speed_summary">Maksimale aflaai spoed (0 beteken onbeperk)</string>
-    <string name="retry_search">Herprobeer</string>
+    <string name="retry">Herprobeer</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Die lêer kon nie geplant word nie. BitTorrent sal ontkoppel bly.</string>
     <string name="seed_all_finished">Saad Alles Voltooi</string>
     <string name="exclude">Uitsluit</string>
@@ -218,7 +218,6 @@
     <string name="settings">Instellings</string>
     <string name="enable_seeding">Aktiveer saai</string>
     <string name="data_saving_turn_off_transfers">Geen Wi-Fi beskikbaar nie, alle oordragte is gestop</string>
-    <string name="use_pixabay">Gebruik Pixabay</string>
     <string name="finishing">Afwerking</string>
     <string name="set_as_wallpaper">Stel as plakpapier</string>
     <string name="available">beskikbaar</string>
@@ -373,7 +372,6 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire kon nie behoorlik begin weens \'n gebrek aan toestemmings nie. Gee asseblief die nodige toestemmings en herbegin die aansoek</string>
     <string name="vpn_find_out_more">Vind meer uit</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Gratis 7-dag verhoor</string>
-    <string name="play_store_out_of_sync">Google Play Winkel moet sinkroniseer, wag \'n paar minutes</string>
     <string name="contact_us">Kontak Ons</string>
     <string name="uploaded">Gelaai</string>
     <string name="trackers">Spoorsnyers</string>
@@ -411,5 +409,5 @@
     <string name="title_activity_transfer_detail">Oordragdetail</string>
     <string name="piece_size_header">Stuk Grootte:</string>
     <string name="add_tracker">Voeg spoorsnyer by</string>
-    <string name="use_nyaa">Gebruik Pixabay</string>
+    <string name="use_nyaa">Gebruik Nyaa</string>
 </resources>

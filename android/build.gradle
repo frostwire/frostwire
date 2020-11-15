@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,27 @@
  * limitations under the License.
  */
 
+
 import groovy.swing.SwingBuilder
 import groovy.xml.Namespace
 
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 buildscript {
     repositories {
         google()
         jcenter()
+        mavenCentral()
     }
     dependencies {
-        //classpath 'com.android.tools.build:gradle:3.2.1'
-        classpath 'com.android.tools.build:gradle:3.2.1'
-        //classpath 'com.android.tools.build:gradle:3.3.2'
-        // (3.2.1 last working) don't upgrade to 3.3.0 yet, R8 issues ensue, Keystore tampered error comes out
-        // even after deleting the ~/.gradle folder
+        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+
+        classpath 'com.google.gms:google-services:4.3.4'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
     }
 }
 
@@ -39,8 +44,7 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    maven { url 'https://jitpack.io' } // for Vungle
+
     flatDir { dirs 'libs' }
 }
 
@@ -75,26 +79,33 @@ def changeApkOutput(variant) {
     variant.outputs.all { output ->
         outputFileName = name + '.apk'
     }
-    variant.assemble.doLast { assemble ->
-        copy {
-            from variant.outputs*.outputFile
-            into "${project.buildDir}"
+    variant.getAssembleProvider().configure() {
+        it.doLast {
+            assemble ->
+                copy {
+                    from variant.outputs*.outputFile
+                    into "${project.buildDir}"
+                }
         }
     }
+
 }
 
 project.ext.versionCode = manifestVersionCode()
 project.ext.versionName = manifestVersionName()
 
+boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
+
 android {
 
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
+        applicationId 'com.frostwire.android'
         versionName project.ext.versionName
-        minSdkVersion 19
-        targetSdkVersion 28
+        minSdkVersion 21 // Lollipop 5.0
+        targetSdkVersion 29 // Android 10
         multiDexEnabled true
     }
 
@@ -115,8 +126,6 @@ android {
                 srcDir 'src'
             }
         }
-
-        plus1.res.srcDirs = ['res-plus1']
     }
 
     lintOptions {
@@ -130,44 +139,47 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
-            storePassword ""
-            keyAlias ""
-            keyPassword ""
+            if (isAssembleRelease) {
+                storeFile file("../../frostwire-tools/certs/android.keystore/frostwire.keystore")
+                def sigRequester = new SignatureRequester()
+                sigRequester.ask()
+                storePassword sigRequester.keyPassword()
+                keyAlias sigRequester.keyAlias()
+                keyPassword sigRequester.keyPassword()
+            } else {
+                storePassword ''
+                keyAlias ''
+                keyPassword ''
+            }
         }
     }
 
     buildTypes {
         release {
             minifyEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             signingConfig signingConfigs.release
             multiDexKeepFile file('multidex-config.txt')
-            //multiDexKeepProguard file('proguard-rules.pro')
         }
         debug {
             minifyEnabled true
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             multiDexKeepFile file('multidex-config.txt')
-            //multiDexKeepProguard file('proguard-rules.pro')
         }
     }
-
 
     flavorDimensions "classicApp"
 
     productFlavors {
         basic {
-            applicationId 'com.frostwire.android'
             versionCode 9060000 + project.ext.versionCode
+            resValue "string", "application_label", "FrostWire"
         }
         plus1 {
-            applicationId 'com.frostwire.android'
             versionCode 9070000 + project.ext.versionCode
+            resValue "string", "application_label", "FrostWire Plus"
         }
     }
 
@@ -177,34 +189,52 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.re2j:re2j:1.2'
-    implementation 'com.google.code.gson:gson:2.8.5'
-    // 3.13.x+ (3.14.0) is only compatible after android 5 (api level 21), android 4.4 (api 19)
-    implementation 'com.squareup.okhttp3:okhttp:3.12.2' // last compatible one for android 4.4
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:animated-vector-drawable:28.0.0'
-    implementation 'com.android.support:customtabs:28.0.0'
-    implementation 'com.android.support:exifinterface:28.0.0'
-    implementation 'com.android.support:preference-v7:28.0.0'
-    implementation 'com.android.support:preference-v14:28.0.0'
-    implementation 'com.android.billingclient:billing:1.2'
-    implementation 'com.google.android.gms:play-services-ads:17.2.0'
-// last version working
-    implementation('com.mopub:mopub-sdk-banner:5.4.1@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-interstitial:5.4.1@aar') { transitive = true }
-// mopub 5.5.0, 5.6.0 won't display banners
-//    implementation('com.mopub:mopub-sdk-banner:5.6.0@aar') { transitive = true }
-//    implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') { transitive = true }
+    implementation 'com.google.re2j:re2j:1.4'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.android.material:material:1.3.0-alpha03'
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
+    implementation 'androidx.browser:browser:1.3.0-alpha06'
+    implementation 'androidx.exifinterface:exifinterface:1.3.1'
+    implementation 'androidx.preference:preference:1.1.1'
 
-    implementation 'com.applovin:applovin-sdk:9.4.2'
+    implementation 'com.android.billingclient:billing:3.0.1'
+    implementation 'com.google.android.gms:play-services-ads:19.5.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.google.android:flexbox:1.0.0'
-    implementation 'com.github.vungle:vungle-android-sdk:6.3.24'
-    implementation 'com.mopub.mediation:vungle:6.3.24.0'
-    implementation files('libs/jlibtorrent-1.2.0.20.jar')
-    implementation files('libs/jlibtorrent-android-arm-1.2.0.20.jar')
-    implementation files('libs/jlibtorrent-android-x86-1.2.0.20.jar')
+    implementation 'com.google.android:flexbox:1.1.1'
+
+    // Firebase Crashlytics
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // MoPub SDK requirements - https://github.com/mopub/mopub-android-sdk#requirements
+    implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'androidx.media2:media2-session:1.0.3'
+    implementation 'androidx.media2:media2-widget:1.0.3'
+    implementation 'androidx.media2:media2-player:1.0.3'
+    implementation 'com.mopub.volley:mopub-volley:2.1.0'
+
+    // MoPub SDK
+    implementation('com.mopub:mopub-sdk-banner:5.14.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-fullscreen:5.14.0@aar') { transitive = true }
+
+    // MoPub Mediation Partners
+    implementation 'com.applovin:applovin-sdk:9.14.5'
+    implementation 'com.mopub.mediation:applovin:9.14.3.0'
+    implementation 'com.unity3d.ads:unity-ads:3.4.6'
+    implementation 'com.mopub.mediation:unityads:3.4.6.0'
+
+    implementation files('libs/jlibtorrent-1.2.10.0.jar')
+    implementation files('libs/jlibtorrent-android-arm-1.2.10.0.jar')
+    implementation files('libs/jlibtorrent-android-x86-1.2.10.0.jar')
+    implementation files('libs/jlibtorrent-android-arm64-1.2.10.0.jar')
+    implementation files('libs/jlibtorrent-android-x86_64-1.2.10.0.jar')
 }
 
 class DeployRelease extends DefaultTask {
@@ -228,7 +258,6 @@ class DeployRelease extends DefaultTask {
 
     @TaskAction
     def run() {
-
         println "Building and installing..."
         println "VERSION: $version"
         println "BUILD: $build"
@@ -243,21 +272,13 @@ class DeployRelease extends DefaultTask {
     }
 }
 
-task deployBasic(type: DeployRelease) {
-    flavor = 'basic'
-}
+class SignatureRequester {
+    String myKeyAlias = ""
+    String myKeyPassword = ""
 
-task deployPlus(type: DeployRelease) {
-    flavor = 'plus'
-}
-
-gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':assembleRelease')) {
-
-        def myKeyAlias = ""
-        def myKeyPassword = ""
+    void ask() {
         System.setProperty('java.awt.headless', 'false')
-        if (System.console() == null) {
+        if (System.console() == null) { // this is always the case on macOS at least
             new SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
@@ -273,22 +294,34 @@ gradle.taskGraph.whenReady { taskGraph ->
                         label(text: "Key Password:")
                         inputPassword = passwordField()
                         button(defaultButton: true, text: 'OK', actionPerformed: {
-                            myKeyAlias = inputAlias.text
-                            myKeyPassword = new String(inputPassword.password)
+                            this.myKeyAlias = inputAlias.text
+                            this.myKeyPassword = new String(inputPassword.password)
                             dispose()
                         })
                     }
                 }
             }
         } else {
-            myKeyAlias = System.console().readPassword("\nKey Alias: ")
-            myKeyAlias = new String(myKeyAlias)
-            myKeyPassword = System.console().readPassword("\nKey Password: ")
-            myKeyPassword = new String(myKeyPassword)
+            this.myKeyAlias = System.console().readPassword("\nKey Alias: ")
+            this.myKeyAlias = new String(myKeyAlias)
+            this.myKeyPassword = System.console().readPassword("\nKey Password: ")
+            this.myKeyPassword = new String(myKeyPassword)
         }
-
-        android.signingConfigs.release.keyAlias = myKeyAlias
-        android.signingConfigs.release.storePassword = myKeyPassword
-        android.signingConfigs.release.keyPassword = myKeyPassword
     }
+
+    String keyAlias() {
+        this.myKeyAlias
+    }
+
+    String keyPassword() {
+        this.myKeyPassword
+    }
+}
+
+task deployBasic(type: DeployRelease) {
+    flavor = 'basic'
+}
+
+task deployPlus(type: DeployRelease) {
+    flavor = 'plus'
 }

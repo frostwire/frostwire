@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
 
 package com.frostwire.android.gui.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Paint;
 import android.net.Uri;
 import android.os.SystemClock;
@@ -28,11 +30,13 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -46,6 +50,7 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -141,6 +146,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         extra.setText(FilenameUtils.getExtension(sr.getFilename()));
         TextView seeds = findView(view, R.id.view_bittorrent_search_result_list_item_text_seeds);
         seeds.setText("");
+        TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
+        age.setText("");
         String license = sr.getLicense().equals(Licenses.UNKNOWN) ? "" : " - " + sr.getLicense();
         TextView sourceLink = findView(view, R.id.view_bittorrent_search_result_list_item_text_source);
         sourceLink.setText(sr.getSource() + license); // TODO: ask for design
@@ -177,6 +184,59 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         } else {
             seeds.setText("");
         }
+        TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
+        age.setText(SearchResultListAdapter.formatElapsedTime(view.getResources(), sr.getCreationTime()));
+    }
+
+    /**
+     * Human friendly time elapsed, in minutes, hours, days, months and years.
+     * If we ever need this elsewhere move it to a new common/.../DateUtils.java file
+     * For now it's overkill.
+     */
+    private static String formatElapsedTime(Resources res, long creationTimeInMs) {
+        long secondsElapsed = (System.currentTimeMillis() - creationTimeInMs) / 1000;
+        if (secondsElapsed <= 1) {
+            return res.getString(R.string.one_second);
+        }
+        if (secondsElapsed < 60) {
+            return res.getString(R.string.n_seconds, String.valueOf(secondsElapsed));
+        }
+        int minutesElapsed = (int) (secondsElapsed / 60);
+        if (minutesElapsed <= 1) {
+            return res.getString(R.string.one_minute);
+        }
+        if (minutesElapsed < 60) {
+            return res.getString(R.string.n_minutes, String.valueOf(minutesElapsed));
+        }
+        int hoursElapsed = minutesElapsed / 60;
+        if (hoursElapsed <= 1) {
+            return res.getString(R.string.one_hour);
+        }
+        if (hoursElapsed < 24) {
+            return res.getString(R.string.n_hours, String.valueOf(hoursElapsed));
+        }
+        int daysElapsed = hoursElapsed / 24;
+        if (daysElapsed <= 1) {
+            return res.getString(R.string.one_day);
+        }
+        if (daysElapsed < 30) {
+            return res.getString(R.string.n_days, String.valueOf(daysElapsed));
+        }
+        int monthsElapsed = daysElapsed / 30;
+        if (monthsElapsed <= 1) {
+            return res.getString(R.string.one_month);
+        }
+        if (monthsElapsed < 12) {
+            return res.getString(R.string.n_months, String.valueOf(monthsElapsed));
+        }
+        int yearsElapsed = monthsElapsed / 12;
+        if (yearsElapsed <= 1) {
+            return res.getString(R.string.one_year);
+        }
+        if (yearsElapsed > 20) {
+            return "";
+        }
+        return res.getString(R.string.n_years, String.valueOf(yearsElapsed));
     }
 
     @Override
@@ -283,10 +343,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return filter();
     }
 
-    public FilteredSearchResults clearKeywordFilters() {
+    private void clearKeywordFilters() {
         this.keywordFiltersPipeline.clear();
         cachedFilteredSearchResults = null;
-        return filter();
+        filter();
     }
 
     private static class OnLinkClickListener implements OnClickListener {
@@ -350,6 +410,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private static final class PreviewClickListener extends ClickAdapter<Context> {
         final WeakReference<SearchResultListAdapter> adapterRef;
 
+        private static final Logger LOG = Logger.getLogger(PreviewClickListener.class);
+
         PreviewClickListener(Context ctx, SearchResultListAdapter adapter) {
             super(ctx);
             adapterRef = Ref.weak(adapter);
@@ -360,19 +422,41 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if (v == null) {
                 return;
             }
-            StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
-            if (sr != null) {
-                LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
-                PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
-                Intent i = new Intent(ctx, PreviewPlayerActivity.class);
-                i.putExtra("displayName", sr.getDisplayName());
-                i.putExtra("source", sr.getSource());
-                i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
-                i.putExtra("streamUrl", sr.getStreamUrl());
-                i.putExtra("audio", isAudio(sr));
-                i.putExtra("hasVideo", false);
-                ctx.startActivity(i);
+            final StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
+            if (sr != null && ctx != null) {
+                WeakReference<Context> ctxRef = Ref.weak(ctx);
+
+                Engine.instance().getThreadPool().execute(() -> {
+                    if (!Ref.alive(ctxRef)) {
+                        return;
+                    }
+                    Activity activity = (Activity) ctxRef.get();
+                    final Intent i = new Intent(activity, PreviewPlayerActivity.class);
+                    PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
+                    i.putExtra("displayName", sr.getDisplayName());
+                    i.putExtra("source", sr.getSource());
+                    i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
+                    i.putExtra("streamUrl", sr.getStreamUrl());
+                    i.putExtra("audio", isAudio(sr));
+                    i.putExtra("hasVideo", false);
+
+                    activity.runOnUiThread(() -> {
+                        if (!Ref.alive(ctxRef)) {
+                            return;
+                        }
+                        try {
+                            LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
+                            ctxRef.get().startActivity(i);
+                        } catch (Throwable t) {
+                            if (BuildConfig.DEBUG) {
+                                throw t;
+                            }
+                            LOG.error("SearchResultListAdapter::PreviewClickListener::onClick() " + t.getMessage(), t);
+                        }
+                    });
+                });
             }
+
         }
     }
 }

@@ -18,12 +18,12 @@
 
 package com.frostwire.transfers;
 
-import com.frostwire.util.Logger;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.util.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,22 +33,13 @@ import java.io.File;
  * @author aldenml
  */
 public class SoundcloudDownload extends HttpDownload {
-
     private static final Logger LOG = Logger.getLogger(SoundcloudDownload.class);
-
     private static final long COVERART_FETCH_THRESHOLD = 20971520; //20MB
-
     private final SoundcloudSearchResult sr;
 
     public SoundcloudDownload(SoundcloudSearchResult sr) {
         super(convert(sr));
         this.sr = sr;
-    }
-
-    @Override
-    protected void onFinishing() {
-        downloadAndUpdateCoverArt(sr, tempPath);
-        super.onFinishing();
     }
 
     private static void downloadAndUpdateCoverArt(SoundcloudSearchResult sr, File file) {
@@ -83,7 +74,6 @@ public class SoundcloudDownload extends HttpDownload {
     private static boolean setAlbumArt(SoundcloudSearchResult sr, byte[] cover, String inPath, String outPath) {
         try {
             Mp3File mp3 = new Mp3File(inPath);
-
             ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
             newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
             newId3Wrapper.setArtist(sr.getUsername());
@@ -91,12 +81,9 @@ public class SoundcloudDownload extends HttpDownload {
             newId3Wrapper.setAlbumImage(cover, "image/jpg");
             newId3Wrapper.setUrl(sr.getDetailsUrl());
             newId3Wrapper.getId3v2Tag().setPadding(true);
-
             mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
             mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
-
             mp3.save(outPath);
-
             return true;
         } catch (Throwable e) {
             LOG.error("Error setting art information for soundcloud download", e);
@@ -106,5 +93,11 @@ public class SoundcloudDownload extends HttpDownload {
 
     private static Info convert(SoundcloudSearchResult sr) {
         return new Info(sr.getStreamUrl(), sr.getFilename(), sr.getDisplayName(), sr.getSize());
+    }
+
+    @Override
+    protected void onFinishing() {
+        downloadAndUpdateCoverArt(sr, tempPath);
+        super.onFinishing();
     }
 }

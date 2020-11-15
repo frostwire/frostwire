@@ -26,7 +26,6 @@ import com.limegroup.gnutella.gui.tables.SizeHolder;
 import com.limegroup.gnutella.gui.tables.SpeedRenderer;
 
 public final class TransferDetailPeersDataLine extends AbstractDataLine<TransferDetailPeers.PeerItemHolder> {
-
     private static final int IP_COLUMN_ID = 0;
     private static final int CLIENT_COLUMN_ID = 1;
     private static final int FLAGS_COLUMN_ID = 2;
@@ -36,18 +35,14 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
     private static final int UPLOADED_COLUMN_ID = 6;
     private static final int DOWN_SPEED_COLUMN_ID = 7;
     private static final int UP_SPEED_COLUMN_ID = 8;
-
     // PEER SOURCE FLAGS
-
     private static final byte tracker = 1;
     private static final byte dht = 1 << 1;
     private static final byte pex = 1 << 2;
     private static final byte lsd = 1 << 3;
     private static final byte resume_data = 1 << 4;
     private static final byte incoming = 1 << 5;
-
     // PEER INFO FLAGS
-
     private static final int interesting = 1;
     private static final int choked = 1 << 1;
     private static final int remote_interested = 1 << 2;
@@ -67,10 +62,9 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
     //private static final int i2p_socket = 1 << 16;
     private static final int utp_socket = 1 << 17;
     private static final int ssl_socket = 1 << 18;
-    private static final int rc4_encrypted= 1 << 19;
-    private static final int plaintext_encrypted= 1 << 20;
-
-    private static LimeTableColumn[] columns = new LimeTableColumn[]{
+    private static final int rc4_encrypted = 1 << 19;
+    private static final int plaintext_encrypted = 1 << 20;
+    private static final LimeTableColumn[] columns = new LimeTableColumn[]{
             new LimeTableColumn(IP_COLUMN_ID, "IP", I18n.tr("IP"), 180, true, true, true, String.class),
             new LimeTableColumn(CLIENT_COLUMN_ID, "CLIENT", I18n.tr("Client"), 120, true, true, true, String.class),
             new LimeTableColumn(FLAGS_COLUMN_ID, "FLAGS", I18n.tr("Flags"), 70, true, true, true, String.class),
@@ -118,7 +112,6 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
                 return connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + address;
             case CLIENT_COLUMN_ID:
                 String client = holder.peerItem.client();
-
                 if (client == null || client.isEmpty()) {
                     client = I18n.tr("Unknown");
                 }
@@ -130,7 +123,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             case DOWNLOADED_COLUMN_ID:
                 return new SizeHolder(holder.peerItem.totalDownload());
             case PROGRESS_COLUMN_ID:
-                return 100*peer.progress() + "%";
+                return 100 * peer.progress() + "%";
             case UPLOADED_COLUMN_ID:
                 return holder.peerItem.totalUpload();
             case DOWN_SPEED_COLUMN_ID:
@@ -151,7 +144,6 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
      */
     private String getSourceAsString(byte source) {
         StringBuilder sb = new StringBuilder();
-
         if ((source & tracker) == tracker) {
             sb.append("Tracker "); // purposefully not-translatable
         }
@@ -193,7 +185,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
      * <p>
      * And these are the flags we have in libtorrent (peer_info.hpp)
      * https://github.com/arvidn/libtorrent/blob/master/include/libtorrent/peer_info.hpp#L94
-     *
+     * <p>
      * interesting = 0_bit (we are interested)
      * choked = 1_bit (we choke them)
      * remote_interested = 2_bit (they are interested)
@@ -217,11 +209,9 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
      * plaintext_encrypted = 20_bit
      */
     private String getFlagsAsString(int flags, int sourceFlags) {
-
         StringBuilder sb = new StringBuilder();
-
         //D = Currently downloading (interested and not choked)
-        if ( (flags & interesting) == interesting && (flags & remote_choked) == 0) {
+        if ((flags & interesting) == interesting && (flags & remote_choked) == 0) {
             sb.append("D");
         }
         //d = Your client wants to download, but peer doesn't want to send (interested and choked)
@@ -266,17 +256,16 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
             sb.append("H");
         }
         //E = Peer is using Protocol Encryption (all traffic)
-        if ((flags & plaintext_encrypted)==plaintext_encrypted ||
-            (flags & rc4_encrypted) == rc4_encrypted ||
-            (flags & ssl_socket) == ssl_socket) {
+        if ((flags & plaintext_encrypted) == plaintext_encrypted ||
+                (flags & rc4_encrypted) == rc4_encrypted ||
+                (flags & ssl_socket) == ssl_socket) {
             sb.append("E");
         }
         //e = Peer is using Protocol Encryption (handshake)
-
         if ((flags & handshake) == handshake &&
                 ((flags & plaintext_encrypted) == plaintext_encrypted ||
-                 (flags & rc4_encrypted) == rc4_encrypted ||
-                 (flags & ssl_socket) == ssl_socket)) {
+                        (flags & rc4_encrypted) == rc4_encrypted ||
+                        (flags & ssl_socket) == ssl_socket)) {
             sb.append("e");
         }
         //P = Peer is using uTorrent uTP
@@ -293,9 +282,12 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
 
     private String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
         switch (t) {
-            case WEB_SEED: return "web_seed";
-            case HTTP_SEED: return "http_seed";
-            default: return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
+            case WEB_SEED:
+                return "web_seed";
+            case HTTP_SEED:
+                return "http_seed";
+            default:
+                return (flags & utp_socket) == utp_socket ? "uTP" : "bt";
         }
     }
 

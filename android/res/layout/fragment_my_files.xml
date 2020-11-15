@@ -3,7 +3,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
-    <android.support.design.widget.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <com.google.android.material.tabs.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fragment_my_files_tab_layout_file_type"
         style="@style/AppTabLayout"
@@ -37,36 +37,36 @@
         app:tabGravity="fill"
         app:tabMode="fixed">
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_audio_icon_tab_selector" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_ringtone_icon_tab_selector" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_video_icon_tab_selector" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_picture_icon_tab_selector" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_document_icon_tab_selector" />
 
-        <android.support.design.widget.TabItem
+        <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:icon="@drawable/my_files_torrent_icon_tab_selector" />
-    </android.support.design.widget.TabLayout>
+    </com.google.android.material.tabs.TabLayout>
 
     <!-- Checkbox and Search Box for Browse Peer, see view_my_files_search_bar.xml -->
     <RelativeLayout
@@ -130,7 +130,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v4.widget.SwipeRefreshLayout
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/fragment_my_files_swipe_refresh"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -148,7 +148,7 @@
                     android:textFilterEnabled="true"
                     android:verticalSpacing="1dp" />
 
-            </android.support.v4.widget.SwipeRefreshLayout>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </com.frostwire.android.gui.views.SwipeLayout>
 
     </FrameLayout>

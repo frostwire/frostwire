@@ -7,17 +7,17 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 
 class ResultPanelTransferHandler extends LimeTransferHandler {
-
-	/**
-     * 
+    /**
+     *
      */
     private static final long serialVersionUID = 6250741497962589713L;
-    
-    /** The ResultPanel this is handling. */
+    /**
+     * The ResultPanel this is handling.
+     */
     private final SearchResultMediator panel;
-    
+
     ResultPanelTransferHandler(SearchResultMediator panel) {
-    	super(DnDConstants.ACTION_COPY | DnDConstants.ACTION_MOVE | DnDConstants.ACTION_LINK);
+        super(DnDConstants.ACTION_COPY | DnDConstants.ACTION_MOVE | DnDConstants.ACTION_LINK);
         this.panel = panel;
     }
 
@@ -25,7 +25,6 @@ class ResultPanelTransferHandler extends LimeTransferHandler {
      * Creates a Transferable for the selected lines.
      */
     protected Transferable createTransferable(JComponent c) {
-		return new SearchResultTransferable(panel, panel.getAllSelectedLines());
-	}
-
+        return new SearchResultTransferable(panel, panel.getAllSelectedLines());
+    }
 }

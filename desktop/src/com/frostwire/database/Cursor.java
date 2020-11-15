@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.database;
@@ -27,12 +26,9 @@ import java.sql.Statement;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class Cursor {
-
     private static final Logger LOG = Logger.getLogger(Cursor.class);
-
     private final Statement statement;
     private final ResultSet rs;
 
@@ -71,6 +67,7 @@ public class Cursor {
      * @param columnIndex the zero-based index of the target column.
      * @return the value of that column as a String.
      */
+    @SuppressWarnings("unused")
     public String getString(int columnIndex) {
         try {
             return rs.getString(columnIndex);
@@ -102,13 +99,12 @@ public class Cursor {
 
     /**
      * Returns the zero-based index for the given column name, or -1 if the column doesn't exist.
-     * If you expect the column to exist use {@link #getColumnIndexOrThrow(String)} instead, which
+     * If you expect the column to exist use getColumnIndexOrThrow(String) instead, which
      * will make the error more clear.
      *
      * @param columnName the name of the target column.
      * @return the zero-based column index for the given column name, or -1 if
      * the column name does not exist.
-     * @see #getColumnIndexOrThrow(String)
      */
     public int getColumnIndex(String columnName) {
         try {
@@ -138,7 +134,7 @@ public class Cursor {
 
     /**
      * Closes the Cursor, releasing all of its resources and making it completely invalid.
-     * Unlike {@link #deactivate()} a call to {@link #requery()} will not make the Cursor valid
+     * Unlike deactivate() a call to requery() will not make the Cursor valid
      * again.
      */
     public void close() {
@@ -158,12 +154,13 @@ public class Cursor {
      * Move the cursor to an absolute position. The valid
      * range of values is -1 &lt;= position &lt;= count.
      *
-     * <p>This method will return true if the request destination was reachable, 
+     * <p>This method will return true if the request destination was reachable,
      * otherwise, it returns false.
      *
-     * @param position the zero-based position to move to.
+     * @param offset the zero-based position to move to.
      * @return whether the requested move fully succeeded.
      */
+    @SuppressWarnings("unused")
     public boolean moveToPosition(int offset) {
         try {
             return rs.relative(offset);
@@ -190,6 +187,7 @@ public class Cursor {
         return false;
     }
 
+    @SuppressWarnings("unused")
     public byte getByte(int columnIndex) {
         try {
             return rs.getByte(columnIndex);
@@ -199,6 +197,7 @@ public class Cursor {
         return 0;
     }
 
+    @SuppressWarnings("unused")
     public boolean getBoolean(int columnIndex) {
         try {
             return rs.getBoolean(columnIndex);

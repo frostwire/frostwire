@@ -25,9 +25,7 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class UnknownBox extends Box {
-
     private static final int MAX_DATA_SIZE = 1024 * 1024; // 1MB
-
     protected byte[] data;
 
     UnknownBox(int type) {

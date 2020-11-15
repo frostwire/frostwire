@@ -23,37 +23,32 @@ import org.limewire.util.SystemUtils;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class MPlayerWindowLinux extends MPlayerWindow {
+    private static boolean isFullScreen = false;
 
-	private static boolean isFullScreen = false;
-	
-	@Override
-	public long getCanvasComponentHwnd() {
-		return SystemUtils.getWindowHandle(videoCanvas);
-	}
+    @Override
+    public long getCanvasComponentHwnd() {
+        return SystemUtils.getWindowHandle(videoCanvas);
+    }
 
-	@Override
-	public long getHwnd() {
-		return SystemUtils.getWindowHandle(this);
-	}
-	
-	@Override
-	public void toggleFullScreen() {
-		
-		isFullScreen = !isFullScreen;
-		
-		setExtendedState( isFullScreen ? MAXIMIZED_BOTH : NORMAL);
-		super.toggleFullScreen();
-	}
-	
-	// on linux, alpha composite trick not working to get desired background color.  however,
-	// changing default paint behavior of window does work.
-	@Override
-	public void paint(Graphics g) {
+    @Override
+    public long getHwnd() {
+        return SystemUtils.getWindowHandle(this);
+    }
+
+    @Override
+    public void toggleFullScreen() {
+        isFullScreen = !isFullScreen;
+        setExtendedState(isFullScreen ? MAXIMIZED_BOTH : NORMAL);
+        super.toggleFullScreen();
+    }
+
+    // on linux, alpha composite trick not working to get desired background color.  however,
+    // changing default paint behavior of window does work.
+    @Override
+    public void paint(Graphics g) {
     }
 }

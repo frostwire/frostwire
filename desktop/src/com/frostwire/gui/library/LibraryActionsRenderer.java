@@ -25,21 +25,16 @@ import com.limegroup.gnutella.gui.tables.AbstractActionsRenderer;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- * 
  */
 public final class LibraryActionsRenderer extends AbstractActionsRenderer {
-
     @Override
     protected void onPlayAction() {
         if (actionsHolder != null && actionsHolder.getDataLine() != null) {
-
             MediaSource mediaSource = null;
             List<MediaSource> filesView = null;
             Object dataLine = actionsHolder.getDataLine();
-
             if (dataLine instanceof LibraryFilesTableDataLine) {
                 mediaSource = new MediaSource(((LibraryFilesTableDataLine) dataLine).getFile());
                 filesView = LibraryFilesTableMediator.instance().getFilesView();
@@ -47,11 +42,10 @@ public final class LibraryActionsRenderer extends AbstractActionsRenderer {
                 mediaSource = new MediaSource(((LibraryPlaylistsTableDataLine) dataLine).getPlayListItem());
                 filesView = LibraryPlaylistsTableMediator.instance().getFilesView();
             }
-
             if (mediaSource != null && !actionsHolder.isPlaying()) {
                 MediaPlayer.instance().asyncLoadMedia(mediaSource, true, null, filesView);
             }
-        }        
+        }
     }
 
     @Override

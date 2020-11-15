@@ -22,7 +22,6 @@ package com.frostwire.platform;
  * @author aldenml
  */
 public abstract class AbstractPlatform implements Platform {
-
     private final FileSystem fileSystem;
     private final SystemPaths systemPaths;
     private final AppSettings appSettings;
@@ -37,7 +36,6 @@ public abstract class AbstractPlatform implements Platform {
         if (appSettings == null) {
             throw new IllegalArgumentException("AppSettings can't be null");
         }
-
         this.fileSystem = fileSystem;
         this.systemPaths = systemPaths;
         this.appSettings = appSettings;

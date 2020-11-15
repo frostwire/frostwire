@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
  * @author aldenml
  */
 public final class AudioSampleEntry extends SampleEntry {
-
     protected final int[] reserved1;
     protected short channelcount;
     protected short samplesize;
@@ -41,7 +40,6 @@ public final class AudioSampleEntry extends SampleEntry {
     @Override
     void read(InputChannel ch, ByteBuffer buf) throws IOException {
         super.read(ch, buf);
-
         IO.read(ch, 20, buf);
         IO.get(buf, reserved1);
         channelcount = buf.getShort();
@@ -54,7 +52,6 @@ public final class AudioSampleEntry extends SampleEntry {
     @Override
     void write(OutputChannel ch, ByteBuffer buf) throws IOException {
         super.write(ch, buf);
-
         IO.put(buf, reserved1);
         buf.putShort(channelcount);
         buf.putShort(samplesize);

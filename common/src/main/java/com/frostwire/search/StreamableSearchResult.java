@@ -19,10 +19,8 @@
 package com.frostwire.search;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface StreamableSearchResult extends SearchResult {
     String getStreamUrl();

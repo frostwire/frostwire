@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import java.util.List;
  * @author aldenml
  */
 public interface Transfer {
-
     String getName();
 
     String getDisplayName();
@@ -36,7 +35,7 @@ public interface Transfer {
 
     File previewFile();
 
-    long getSize();
+    double getSize();
 
     Date getCreated();
 
@@ -51,9 +50,6 @@ public interface Transfer {
     long getUploadSpeed();
 
     boolean isDownloading();
-
-    // TODO: add this method in the future
-    //boolean isUploading();
 
     long getETA();
 

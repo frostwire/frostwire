@@ -27,7 +27,6 @@
     <string name="your_installation_is_complete">Вашата инсталация е завършена.</string>
     <string name="error_connection_timed_out">Грешка: връзка с изтичане на времето/спадна. Опитай пак.</string>
     <string name="azureus_manager_item_seeding">Засяване</string>
-    <string name="application_label">FrostWire</string>
     <string name="all_free_downloads">Всички свободно сваляне</string>
     <string name="torrent_max_download_speed">Максимална скорост на изтегляне</string>
     <string name="torrent_max_peers">Макс връстници</string>
@@ -74,7 +73,7 @@
     <string name="share">Дял</string>
     <string name="accept">Приеми</string>
     <string name="torrent_max_download_speed_summary">Максимална скорост на изтегляне (0 означава неограничен)</string>
-    <string name="retry_search">Повторен опит</string>
+    <string name="retry">Повторен опит</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файлът не може да се засява. BitTorrent ще остане изключен.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ще изтрие изтеглените файлове, ако FrostWire е деинсталиран.</string>
     <string name="protected_connection">VPN-защитени</string>
@@ -357,7 +356,6 @@
     <string name="or">или</string>
     <string name="file_names">Име на файловете</string>
     <string name="no_data_check_internet_connection">Мрежата не е налична, моля, проверете връзката си с интернет.</string>
-    <string name="use_pixabay">Използвайте Pixabay</string>
     <string name="transfers_context_stop_seeding_all_transfers">Спрете сеитба на всички трансфери</string>
     <string name="seed_stop">Спрете сеитбата</string>
     <string name="transfers_select_seeding">посев</string>
@@ -408,8 +406,8 @@
     <string name="frostwire_start_engine_service_security_exception">FrostWire не можа да започне правилно поради липса на разрешения. Моля, дайте необходимите разрешения и рестартирайте приложението</string>
     <string name="vpn_find_out_more">Открийте повече</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Безплатен 7-дневен пробен период</string>
-    <string name="play_store_out_of_sync">Google Play Магазин трябва да се синхронизира, изчакайте няколко минути</string>
     <string name="contact_us">Свържете се с нас</string>
     <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
     <string name="use_nyaa">Използвайте Nyaa</string>
+    <string name="use_torrentz2">Използвайте Torrentz2</string>
 </resources>

@@ -19,11 +19,9 @@ import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.WindowsUtils;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.MacOSXUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,12 +31,10 @@ import java.awt.*;
  * their connection speed.
  */
 final class MiscWindow extends SetupWindow {
-
     /*
      * System Startup
      */
     private JCheckBox _startup;
-    private JCheckBox checkBoxUXStats;
 
     /**
      * Creates the window and its components.
@@ -49,45 +45,34 @@ final class MiscWindow extends SetupWindow {
 
     protected void createWindow() {
         super.createWindow();
-
         JPanel mainPanel = new JPanel(new GridBagLayout());
-
         // System Startup
         if (GUIUtils.shouldShowStartOnStartupWindow()) {
             GridBagConstraints gbc = new GridBagConstraints();
             JPanel startupPanel = new JPanel(new GridBagLayout());
-
             startupPanel.setBorder(ThemeMediator.createTitledBorder(I18n.tr("System Startup")));
-
             _startup = new JCheckBox(I18n.tr("Start Automatically"));
             _startup.setSelected(StartupSettings.RUN_ON_STARTUP.getValue());
-
             JLabel desc = new JLabel("<html>" + I18n.tr("Would you like FrostWire to start when you log into your computer? This will cause FrostWire to start faster when you use it later.") + "</html>");
             desc.setBorder(BorderFactory.createEmptyBorder(0, 10, 5, 5));
             desc.setForeground(Color.BLACK);
             desc.setFont(desc.getFont().deriveFont(Font.PLAIN));
-
             gbc.anchor = GridBagConstraints.NORTHWEST;
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridwidth = GridBagConstraints.REMAINDER;
             gbc.weightx = 1.0;
-
             startupPanel.add(desc, gbc);
             startupPanel.add(_startup, gbc);
-
             gbc.insets = new Insets(0, 0, 10, 0);
             mainPanel.add(startupPanel, gbc);
-
             startupPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
         }
-
         // Vertical Filler
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.weighty = 1;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         mainPanel.add(new JPanel(), gbc);
-
         setSetupComponent(mainPanel);
     }
 

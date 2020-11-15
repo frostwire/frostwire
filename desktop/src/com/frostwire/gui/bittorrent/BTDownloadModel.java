@@ -25,8 +25,7 @@ import java.util.HashSet;
  * downloads displayed in the download window.
  */
 public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDownload> {
-
-    private HashSet<String> _hashDownloads;
+    private final HashSet<String> _hashDownloads;
 
     /**
      * Initialize the model by setting the class of its DataLines.
@@ -46,7 +45,6 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     int getActiveDownloads() {
         int size = getRowCount();
         int count = 0;
-
         for (int i = 0; i < size; i++) {
             BTDownload downloader = get(i).getInitializeObject();
             if (!downloader.isCompleted() && downloader.getState() == TransferState.DOWNLOADING) {
@@ -59,7 +57,6 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     int getActiveUploads() {
         int size = getRowCount();
         int count = 0;
-
         for (int i = 0; i < size; i++) {
             BTDownload downloader = get(i).getInitializeObject();
             if (downloader.isCompleted() && downloader.getState() == TransferState.SEEDING) {
@@ -80,12 +77,10 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     public Object refresh() {
         try {
             int size = getRowCount();
-
             for (int i = 0; i < size; i++) {
                 BTDownloadDataLine ud = get(i);
                 ud.update();
             }
-
             fireTableRowsUpdated(0, size);
         } catch (Exception e) {
             System.out.println("ATTENTION: Send the following output to the FrostWire Development team.");
@@ -94,7 +89,6 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
             System.out.println("===============================END COPY & PASTE=======================================");
             return Boolean.FALSE;
         }
-
         return Boolean.TRUE;
     }
 
@@ -122,7 +116,6 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     public void remove(String hash) {
         _hashDownloads.remove(hash);
     }
-
 //    public BTDownloadDataLine getDataline(int i) {
 //        return get(i);
 //    }
@@ -130,7 +123,7 @@ public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDo
     public boolean isDownloading(String hash) {
         return _hashDownloads.contains(hash);
     }
-    
+
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == BTDownloadDataLine.PAYMENT_OPTIONS_COLUMN.getModelIndex() ||

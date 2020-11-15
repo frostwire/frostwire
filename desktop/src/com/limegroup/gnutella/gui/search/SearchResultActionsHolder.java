@@ -25,7 +25,6 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
  * @author aldenml
  */
 public final class SearchResultActionsHolder implements Comparable<SearchResultActionsHolder> {
-
     private final UISearchResult sr;
     private final String displayName;
 

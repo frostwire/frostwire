@@ -1,11 +1,11 @@
 /*
- * Copyright 2012 Evgeny Shishkin
+ * Copyright 2012-2020 Evgeny Shishkin, Angel Leon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,19 +16,20 @@
 
 package com.devspark.appmsg;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
- * 
  * @author Evgeny Shishkin
- * 
+ * @author Angel Leon
  */
 class MsgManager extends Handler {
 
@@ -38,11 +39,11 @@ class MsgManager extends Handler {
 
     private static MsgManager mInstance;
 
-    private Queue<AppMsg> msgQueue;
+    private final Queue<AppMsg> msgQueue;
     private Animation inAnimation, outAnimation;
 
     private MsgManager() {
-        msgQueue = new LinkedList<AppMsg>();
+        msgQueue = new LinkedList<>();
     }
 
     /**
@@ -57,8 +58,6 @@ class MsgManager extends Handler {
 
     /**
      * Inserts a {@link AppMsg} to be displayed.
-     * 
-     * @param AppMsg
      */
     void add(AppMsg appMsg) {
         msgQueue.add(appMsg);
@@ -102,6 +101,12 @@ class MsgManager extends Handler {
         if (msgQueue.isEmpty()) {
             return;
         }
+        boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if (!onMainThread) {
+            new Handler(Looper.getMainLooper()).post(this::displayMsg);
+            return;
+        }
+
         // First peek whether the AppMsg is being displayed.
         final AppMsg appMsg = msgQueue.peek();
         // If the activity is null we throw away the AppMsg.
@@ -127,10 +132,16 @@ class MsgManager extends Handler {
 
     /**
      * Removes the {@link AppMsg}'s view after it's display duration.
-     * 
+     *
      * @param appMsg The {@link AppMsg} added to a {@link ViewGroup} and should be removed.s
      */
     private void removeMsg(final AppMsg appMsg) {
+        boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if (!onMainThread) {
+            new Handler(Looper.getMainLooper()).post(() -> removeMsg(appMsg));
+            return;
+        }
+
         ViewGroup parent = ((ViewGroup) appMsg.getView().getParent());
         if (parent != null) {
             appMsg.getView().startAnimation(outAnimation);
@@ -142,18 +153,29 @@ class MsgManager extends Handler {
             }
             // Remove the AppMsg from the view's parent.
             parent.removeView(appMsg.getView());
+
             Message msg = obtainMessage(MESSAGE_DISPLAY);
             sendMessage(msg);
         }
     }
 
     private void addMsgToView(AppMsg appMsg) {
-        if (appMsg.getView().getParent() == null && appMsg.getActivity() != null) {
+        boolean onMainThread = Looper.myLooper() == Looper.getMainLooper();
+        if (!onMainThread) {
+            new Handler(Looper.getMainLooper()).post(() -> addMsgToView(appMsg));
+            return;
+        }
+        View view = appMsg.getView();
+        if (view.getParent() == null && appMsg.getActivity() != null) {
             appMsg.getActivity().addContentView(
-                    appMsg.getView(),
+                    view,
                     appMsg.getLayoutParams());
         }
-        appMsg.getView().startAnimation(inAnimation);
+        view.clearAnimation();
+        view.startAnimation(inAnimation);
+        if (view.getVisibility() != View.VISIBLE) {
+            view.setVisibility(View.VISIBLE);
+        }
         final Message msg = obtainMessage(MESSAGE_REMOVE);
         msg.obj = appMsg;
         sendMessageDelayed(msg, appMsg.getDuration());

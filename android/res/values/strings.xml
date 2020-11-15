@@ -28,7 +28,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Touch applied tags to]]></string>
 
     <!-- non HTML tags. -->
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Settings</string>
     <string name="activity_VPN">Connection</string>
     <string name="exit">Exit</string>
@@ -92,6 +91,8 @@
     <string name="use_tpb">Use TPB</string>
     <string name="use_zooqle">Use Zooqle.com</string>
     <string name="use_yify">Use Yify</string>
+    <string name="use_one337x">Use 1337x</string>
+    <string name="use_idope">Use Idope</string>
     <string name="use_magnet_summary">Magnet based, works only on Wi-Fi</string>
     <string name="ringtone_not_set">Ringtone could not be set</string>
     <string name="search">Search</string>
@@ -187,7 +188,7 @@
     <string name="my_filetype">My %s</string>
     <string name="use_soundcloud">Use Soundcloud.com</string>
     <string name="torrent_scheme_download_not_supported">Download not supported</string>
-    <string name="retry_search">Retry</string>
+    <string name="retry">Retry</string>
     <string name="use_archiveorg">Use Archive.org</string>
     <string name="crawl_cache_size">Crawl cache %1$.2fMB</string>
     <string name="deleted_crawl_cache">Deleted crawl cache</string>
@@ -198,8 +199,11 @@
     <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
+    <string name="use_magnetdl">Use MagnetDL</string>
     <string name="use_nyaa">Use Nyaa</string>
     <string name="use_eztv">Use Eztv</string>
+    <string name="use_torrent_paradise">Use TorrentParadise</string>
+    <string name="use_glotorrents">Use GloTorrents</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
@@ -391,7 +395,6 @@
     <string name="exclude">Exclude</string>
     <string name="try_changing_applied_filters">Try changing applied filters</string>
     <string name="no_data_check_internet_connection">Network unavailable, please check your Internet connection.</string>
-    <string name="use_pixabay">Use Pixabay</string>
     <string name="transfers_context_seed_all_transfers">Seed all finished transfers</string>
     <string name="transfers_context_stop_seeding_all_transfers">Stop seeding all transfers</string>
     <string name="seeding_is_currently_disabled">Seeding is currently disabled</string>
@@ -471,6 +474,36 @@
     <string name="vpn_suggestion_nordvpn">NORDVPN \n Free 7-day trial</string>
     <string name="vpn_find_out_more">Find out more</string>
     <string name="frostwire_start_engine_service_security_exception">FrostWire could not start properly due to lack of permissions. Please grant the required permissions and restart the application</string>
-    <string name="play_store_out_of_sync">Play Store needs to synchronize, wait a few minutes</string>
     <string name="contact_us">Contact Us</string>
+    <string name="community">Community</string>
+    <string name="play_uppercase">PLAY</string>
+    <string name="minutes_left_ad_free">%d minutes left Ad-free</string>
+    <string name="minute_left_ad_free">One minute left Ad-free</string>
+    <string name="reward_product_title">%d minutes</string>
+    <string name="reward_product_price">Free, Play 1 Video Ad</string>
+    <string name="temporary_ad_removal">Temporary Ad Removal</string>
+    <string name="temporary_ad_removal_description">No ads for %d minutes after playing a video</string>
+    <string name="looking_For_rewarded_video">Looking for a rewarded video...</string>
+    <string name="no_reward_videos_available">Couldn\'t fetch a rewarded video. Please try again</string>
+    <string name="try_it_free_for_a_half_hour">Try it free for a half hour</string>
+    <string name="sorry_could_not_find_valid_download_location_at">Sorry, Couldn\'t find a valid download location at %s</string>
+    <string name="use_torrentz2">Use Torrentz2</string>
+    <string name="free">Free</string>
+    <string name="dummy_ad">Ad</string>
+    <string name="dummy_age_ago">2 days ago</string>
+    <string name="one_second">1 second</string>
+    <string name="n_seconds">%s seconds</string>
+    <string name="one_minute">1 minute</string>
+    <string name="n_minutes">%s minutes</string>
+    <string name="one_hour">1 hour</string>
+    <string name="n_hours">%s hours</string>
+    <string name="one_day">1 day</string>
+    <string name="n_days">%s days</string>
+    <string name="one_month">1 month</string>
+    <string name="n_months">%s months</string>
+    <string name="n_years">%s years</string>
+    <string name="enable_sequential_download_summary">Pieces are downloaded in order. Not recommended for network health</string>
+    <string name="dummy_period">/period</string>
+    <string name="period_monthly">monthly</string>
+    <string name="period_yearly">yearly</string>
 </resources>

@@ -20,9 +20,6 @@ package com.frostwire.android.gui.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import com.frostwire.android.gui.views.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 
 import com.frostwire.android.R;
@@ -41,14 +38,21 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
+import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.transfers.BittorrentDownload;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
 
+import androidx.viewpager.widget.ViewPager;
+
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
-    private TimerSubscription subscription;
+    private static final int TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS = 2;
+    private static TimerSubscription subscription;
     private UIBittorrentDownload uiBittorrentDownload;
     private SparseArray<String> tabTitles;
     private AbstractTransferDetailFragment[] detailFragments;
@@ -104,8 +108,15 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             return false;
         }
         if (uiBittorrentDownload == null && !"".equals(infoHash)) {
-            uiBittorrentDownload = (UIBittorrentDownload)
-                    TransferManager.instance().getBittorrentDownload(infoHash);
+            BittorrentDownload bittorrentDownload = TransferManager.instance().getBittorrentDownload(infoHash);
+            if (bittorrentDownload instanceof UIBittorrentDownload) {
+                uiBittorrentDownload = (UIBittorrentDownload) bittorrentDownload;
+            } else if (bittorrentDownload instanceof BTDownload) {
+                uiBittorrentDownload = new UIBittorrentDownload(TransferManager.instance(), (BTDownload) bittorrentDownload);
+            }
+        }
+        if (uiBittorrentDownload != null) {
+            uiBittorrentDownload.checkSequentialDownload();
         }
         return uiBittorrentDownload != null;
     }
@@ -141,14 +152,17 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void onResume() {
         super.onResume();
-        if (subscription != null) {
-            subscription.unsubscribe();
-            subscription = null;
-        }
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
-        subscription = TimerService.subscribe(this, 2);
+        if (subscription != null) {
+            if (subscription.isSubscribed()) {
+                subscription.unsubscribe();
+            }
+            TimerService.reSubscribe(this, subscription, TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS);
+        } else {
+            subscription = TimerService.subscribe(this, TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS);
+        }
         onTime();
     }
 

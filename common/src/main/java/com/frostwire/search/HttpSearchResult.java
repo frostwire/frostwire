@@ -21,7 +21,6 @@ package com.frostwire.search;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public interface HttpSearchResult extends FileSearchResult {
     String getDownloadUrl();

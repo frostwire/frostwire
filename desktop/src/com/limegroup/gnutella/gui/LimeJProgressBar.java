@@ -11,32 +11,14 @@ import java.awt.*;
  * Note: Since Java 1.6 the above bug is reported as fixed.
  */
 public class LimeJProgressBar extends JProgressBar {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -391739746034247225L;
-    
     private final static Dimension PREFERRED_HORIZONTAL_SIZE = new Dimension(146, 17);
 
-    public LimeJProgressBar() {
+    LimeJProgressBar() {
         super();
-    }
-
-    public LimeJProgressBar(int orient) {
-        super(orient);
-    }
-
-    public LimeJProgressBar(int min, int max) {
-        super(min, max);
-    }
-
-    public LimeJProgressBar(int orient, int min, int max) {
-        super(orient, min, max);
-    }
-
-    public LimeJProgressBar(BoundedRangeModel newModel) {
-        super(newModel);
     }
 
     @Override
@@ -78,6 +60,7 @@ public class LimeJProgressBar extends JProgressBar {
             if (getOrientation() == JProgressBar.HORIZONTAL) {
                 d = PREFERRED_HORIZONTAL_SIZE;
             } else {
+                //noinspection SuspiciousNameCombination
                 d = new Dimension(PREFERRED_HORIZONTAL_SIZE.height, PREFERRED_HORIZONTAL_SIZE.width);
             }
             return d;

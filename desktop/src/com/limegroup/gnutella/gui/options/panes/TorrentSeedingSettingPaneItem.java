@@ -24,19 +24,14 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SharingSettings;
 
-import java.io.IOException;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
-
-    public final static String TITLE = I18n.tr("Seeding Settings");
-
-    public final static String LABEL = I18n.tr("Seeding is the process of connecting to a torrent when you have a complete file(s). Pieces of the seeded file(s) will be available to everybody. While downloading pieces are always available to other peers in the swarm.");
-
-    private TorrentSeedingSettingComponent COMPONENT;
+    private final static String TITLE = I18n.tr("Seeding Settings");
+    private final static String LABEL = I18n.tr("Seeding is the process of connecting to a torrent when you have a complete file(s). Pieces of the seeded file(s) will be available to everybody. While downloading pieces are always available to other peers in the swarm.");
+    private final TorrentSeedingSettingComponent COMPONENT;
 
     public TorrentSeedingSettingPaneItem() {
         super(TITLE, LABEL);
@@ -56,7 +51,7 @@ public class TorrentSeedingSettingPaneItem extends AbstractPaneItem {
     }
 
     @Override
-    public boolean applyOptions() throws IOException {
+    public boolean applyOptions() {
         SharingSettings.SEED_FINISHED_TORRENTS.setValue(COMPONENT.wantsSeeding());
         if (!COMPONENT.wantsSeeding()) {
             BTDownloadMediator.instance().stopCompleted();

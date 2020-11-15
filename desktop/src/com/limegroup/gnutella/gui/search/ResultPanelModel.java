@@ -22,30 +22,26 @@ import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import java.util.HashMap;
 import java.util.Map;
 
-/** 
+/**
  * Model for search results.
- *
+ * <p>
  * Ensures that if new lines are added and they are similar to old lines,
  * that the new lines are added as extra information to the existing lines,
  * instead of as brand new lines.
  */
 class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearchResult> {
-
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -2382156313320196261L;
-
     /**
      * The columns.
      */
-    protected final SearchTableColumns COLUMNS = new SearchTableColumns();
-
+    private final SearchTableColumns COLUMNS = new SearchTableColumns();
     /**
      * HashMap for quick access to indexes based on SHA1 info.
      */
     private final Map<String, Integer> _indexes = new HashMap<>();
-
     private int _numResults;
 
     /**
@@ -82,7 +78,6 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * multicast or secure results.
      */
     public int compare(SearchResultDataLine ta, SearchResultDataLine tb) {
-
         //super.compare() will only sort Comparables and Strings.
         //since the Type column returns an Icon, we compare by hand using the file extension.
         if (_activeColumn == SearchTableColumns.TYPE_IDX) {
@@ -94,10 +89,10 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
         }
     }
 
-    /** 
+    /**
      * Overrides the default remove to remove the index from the HashMap.
      *
-     * @param row  the index of the row to remove.
+     * @param row the index of the row to remove.
      */
     public void remove(int row) {
         String sha1 = getHash(row);
@@ -154,7 +149,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
             return super.getRow(tl);
     }
 
-    /** 
+    /**
      * Overrides the default sort to maintain the indexes HashMap,
      * according to the current sort column and order.
      */
@@ -174,7 +169,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * Simple clear -- clears the number of sources & cached SHA1 indexes.
      * Calls super.clear to erase the stored lines.
      */
-    protected void simpleClear() {
+    void simpleClear() {
         _numResults = 0;
         _indexes.clear();
         super.clear();
@@ -224,13 +219,14 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      */
     private int fastMatch(String sha1) {
         Integer idx = _indexes.get(sha1);
+        //noinspection ReplaceNullCheck
         if (idx == null)
             return -1;
         else
-            return idx.intValue();
+            return idx;
     }
 
-    public int getTotalResults() {
+    int getTotalResults() {
         return _numResults;
     }
 

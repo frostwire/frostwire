@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,17 +22,19 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.*;
 import com.frostwire.util.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Use this search performer if you have to crawl search result links to get the data you need,
+ * otherwise @see TorrentSearchPerformer to obtain everything directly from a search results page.
+ *
  * @author gubatron
  * @author aldenml
  */
 public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
-
     private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
-
     private final Pattern preliminarySearchResultsPattern;
     private final Pattern htmlDetailPagePattern;
 
@@ -54,13 +56,11 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     @Override
     protected String getCrawlUrl(CrawlableSearchResult sr) {
         String crawlUrl;
-
         if (sr instanceof TorrentCrawlableSearchResult) {
             crawlUrl = ((TorrentCrawlableSearchResult) sr).getTorrentUrl();
         } else {
             crawlUrl = sr.getDetailsUrl();
         }
-
         return crawlUrl;
     }
 
@@ -71,25 +71,21 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
 
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data, boolean detectAlbums) throws Exception {
         List<SearchResult> list = new LinkedList<>();
-
         if (data == null) {
             return list;
         }
-
         if (sr instanceof TorrentCrawlableSearchResult) {
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
         } else {
-            String unreducedHtml = new String(data, "UTF-8");
+            String unreducedHtml = new String(data, StandardCharsets.UTF_8);
             if (!isValidHtml(unreducedHtml)) {
                 LOG.warn("invalid html from " + sr.getClass().getSimpleName());
                 return list;
             }
             String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));
-
             if (html != null) {
                 Matcher matcher = htmlDetailPagePattern.matcher(html);
-
                 try {
                     // BOOKMARK: this is a good spot to put a break point in-order to test your search performer's regex
                     if (matcher.find()) {
@@ -99,9 +95,8 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                         }
                     } else {
                         LOG.error("TorrentRegexSearchPerformer.crawlSearchResult(" + sr.getClass().getPackage().getName() + "): Update Necessary: Search broken.\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" +
-                        "pattern: " + htmlDetailPagePattern.toString() + "\n" +
-                        sr.getDetailsUrl() + "\n\n");
-
+                                "pattern: " + htmlDetailPagePattern.toString() + "\n" +
+                                sr.getDetailsUrl() + "\n\n");
                         // comment this when in production
                         //LOG.info("================================================================\n\n"+html);
                     }
@@ -112,7 +107,6 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                 LOG.error("Update Necessary: HTML could not be reduced for optimal search. Search broken for " + sr.getClass().getPackage().getName() + " (please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)");
             }
         }
-
         return list;
     }
 

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package com.frostwire.licenses;
 
 import java.util.Locale;
@@ -26,7 +25,6 @@ import java.util.Locale;
  * @author aldenml
  */
 public final class CreativeCommonsLicense extends License {
-
     private final String acronym;
 
     /**
@@ -41,15 +39,14 @@ public final class CreativeCommonsLicense extends License {
         this.acronym = acronym;
     }
 
-    public String acronym() {
-        return acronym;
-    }
-
     static CreativeCommonsLicense standard(String name, String acronym, String version) {
         String fullName = "Creative Commons " + name + " " + version;
         String url = "http://creativecommons.org/licenses/" + acronym.toLowerCase(Locale.US) + "/" + version + "/";
         String fullAcronym = "CC " + acronym.toUpperCase(Locale.US) + " " + version;
-
         return new CreativeCommonsLicense(fullName, url, fullAcronym);
+    }
+
+    public String acronym() {
+        return acronym;
     }
 }

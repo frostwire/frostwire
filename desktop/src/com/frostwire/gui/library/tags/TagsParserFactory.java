@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,12 +25,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * 
  * @author aldenml
- *
  */
 class TagsParserFactory {
-
     private static final List<String> MP3_EXTENSIONS = Collections.singletonList("mp3");
     private static final List<String> M4A_EXTENSIONS = Collections.singletonList("m4a");
     private static final List<String> MP4_EXTENSIONS = Arrays.asList("mp4", "m4v", "mov", "3gp");
@@ -40,7 +37,6 @@ class TagsParserFactory {
 
     public TagsParser getInstance(File file) {
         String ext = FilenameUtils.getExtension(file.getName());
-
         if (isMP3(ext)) {
             return new MP3Parser(file);
         } else if (isM4A(ext)) {

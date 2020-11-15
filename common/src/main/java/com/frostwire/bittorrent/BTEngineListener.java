@@ -23,7 +23,6 @@ package com.frostwire.bittorrent;
  * @author aldenml
  */
 public interface BTEngineListener {
-
     void started(BTEngine engine);
 
     void stopped(BTEngine engine);

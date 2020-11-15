@@ -1,7 +1,204 @@
+frostwire (6.8.8) stable; urgency=high
+  * New Telluride cloud downloader technology
+  * Refreshed welcome screen with search textbox
+  * OpenJDK 15 runtime (Windows, MacOS)
+  * New TorrentParadise search source
+  * New GloTorrents search source
+  * Yify search fixed
+  * Torrentz2 search fixed
+  * MagnetDL search fixed
+  * Soundcloud search fixed
+  * EZTV search fixed
+  * Fixed archive.org broken downloads
+  * Fixes false negative NordLynx/NordVPN detection
+  * All deprecation warnings fixed along with some optimizations
+  * dev: built with openjdk 15
+  * dev: gradle-6.7
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 12 Nov 2020 12:06:00 -0600
+
+frostwire (6.8.7) stable; urgency=high
+  * New jlibtorrent 1.2.10.0 update
+  * OpenJDK 14.0.2 update for Windows and macOS
+  * lt: improve stat_file() performance on Windows
+  * lt: fix issue with loading invalid torrents with only 0-sized files
+  * lt: fix to avoid large stack allocations
+  * lt: removed deprecated wstring overloads on non-windows systems
+  * lt: drop dependency on Unicode's ConvertUTF code (which had a license incompatible with Debian)
+  * lt: fix bugs exposed on big-endian systems
+  * lt: fix detection of hard-links not being supported by filesystem
+  * lt: fixed resume data regression for seeds with prio 0 files
+  * binaries: compiler upgraded from g++-5 to g++-7
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 15 Sep 2020 16:35:00 -0600
+
+frostwire (6.8.6) stable; urgency=high
+  * New jlibtorrent 1.2.8.0 update
+  * New 1337x search (thanks to @HimanshuSharma789)
+  * New iDope search (thanks to @HimanshuSharma789)
+  * Fixed Torrentz2 search dates (thanks to @HimanshuSharma789)
+  * Fixed SC search
+  * Discontinues mplayer video playback, uses os default video player for videos
+  * com.google.re2j:re2j:1.3 -> 1.4
+  * com.squareup.okhttp3:okhttp:4.4.1 -> 4.8.1
+  * com.h2database:h2:1.4.199 -> 200
+  * lt: validate UTF-8 encoding of client version strings from peers
+  * lt: don't time out tracker announces as eagerly while resolving hostnames
+  * lt: fix NAT-PMP shutdown issue
+  * lt: improve hostname lookup by merging identical lookups
+  * lt: fix network route enumeration for large routing tables
+  * lt: fixed issue where pop_alerts() could return old, invalid alerts
+  * lt: fix issue when receiving have-all message before the metadata
+  * lt: don't leave lingering part files handles open
+  * lt: disallow calling add_piece() during checking
+  * lt: fix incorrect filename truncation at multi-byte character
+  * lt: always announce listen port 1 when using a proxy
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 23 Aug 2020 10:45:00 -0600
+
+frostwire (6.8.5) stable; urgency=high
+  * New MagnetDL search provider
+  * Fixed Torrentz2 search
+  * Search improvements
+  * New 'Retry' transfer for failed magnet/torrent downloads with not enough peers
+  * Fixes bug getting source URL from TPB search result
+  * Fixes broken Library local file search
+  * updated: rej2:1.3, gson:2.8.6, okhttp:4.4.1
+  * New jlibtorrent 1.2.7.0 update
+  * jlibtorrent upgraded to build with boost 1.73.0
+  * jlibtorrent upgraded to openssl 1.1.1g
+  * OpenJDK 14 runtime (Windows, Linux), macOS still on OpenJDK 13
+  * lt: fix incorrect filename truncation at multi-byte character
+  * lt: always announce listen port 1 when using a proxy
+  * lt: add set_alert_fd in python binding, to supersede set_alert_notify
+  * lt: fix bug in part files > 2 GiB
+  * lt: add function to clear the peer list for a torrent
+  * lt: fix resume data functions to save/restore more torrent flags
+  * lt: limit number of concurrent HTTP announces
+  * lt: fix queue position for force_rechecking a torrent that is not auto-managed
+  * lt: improve rate-based choker documentation, and minor tweak
+  * lt: undeprecate upnp_ignore_nonrouters (but refering to devices on our subnet)
+  * lt: increase default tracker timeout
+  * lt: retry failed socks5 server connections
+  * lt: allow UPnP lease duration to be changed after device discovery
+  * lt: fix IPv6 address change detection on Windows
+  * lt: fix peer timeout logic
+  * lt: simplify proxy handling. A proxy now overrides listen_interfaces
+  * lt: fix issues when configured to use a non-default choking algorithm
+  * lt: fix issue in reading resume data
+  * lt: revert NXDOMAIN change from 1.2.4
+  * lt: don't open any listen sockets if listen_interfaces is empty or misconfigured
+  * lt: fix bug in auto disk cache size logic
+  * lt: fix issue with outgoing_interfaces setting, where bind() would be called twice
+  * lt: add build option to disable share-mode
+  * lt: support validation of HTTPS trackers
+  * lt: deprecate strict super seeding mode
+  * lt: make UPnP port-mapping lease duration configurable
+  * lt: deprecate the bittyrant choking algorithm
+  * lt: add build option to disable streaming
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Jun 2020 17:06:00 -0600
+
+frostwire (6.8.4) stable; urgency=high
+  * OpenJDK 13 runtime (windows,mac)
+  * Soundcloud search and downloads fixed
+  * LimeTorrents search and downloads fixed
+  * New jlibtorrent 1.2.3.0 update
+  * jlibtorrent updated to boost 1.72.0
+  * jlibtorrent upgraded openssl to 1.1.1d
+  * lt:fix erroneous event=completed tracker announce when checking files
+  * lt:promote errors in parsing listen_interfaces to post listen_failed_alert
+  * lt:fix bug in protocol encryption/obfuscation
+  * lt:fix buffer overflow in SOCKS5 UDP logic
+  * lt:fix issue of rapid calls to file_priority() clobbering each other
+  * lt:clear tracker errors on success
+  * lt:optimize setting with unlimited unchoke slots
+  * lt:fixed restoring of trackers, comment, creation date and created-by in resume data
+  * lt:fix handling of torrents with too large pieces
+  * lt:fixed division by zero in anti-leech choker
+  * lt:fixed bug in torrent_info::swap
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 30 Jan 2020 19:30:45 -0600
+
+frostwire (6.8.3) stable; urgency=high
+  * Soundcloud search and downloads fixed
+  * Mac: CyberGHost VPN detection false-negative bug fix
+  * Mac, Windows: new mplayer 1.4.0 build with ffmpeg 4.2 and openssl-1.1.c
+  * Mac: launcher fixes bug that required legacy Java to be present in the system
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 11 Dec 2019 16:09:59 -0600
+
+frostwire (6.8.2) stable; urgency=high
+  * Partial downloads now show only the files selected on Transfer details
+  * Archive.org .torrent download errors fixed
+  * TorLock and Torrentz2 search results are magnet based to reduce fetching errors
+  * Mac: All C/C++ source code has been recompiled with MacSDK 10.14
+  * Mac: MacOS Mojave compatibility updates, build revised for Apple's notarization
+  * New jlibtorrent 1.2.2.0 update
+  * jlibtorrent updated to boost 1.71.0
+  * jlibtorrent upgraded openssl to 1.1.1c
+  * jlibtorrent compiled with std=c++14 (up from c++11)
+  * libtorrent:pick contiguous pieces from peers with high download rate
+  * libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  * libtorrent:fix integer overflow in http parser
+  * libtorrent:fix integer overflow in chunked http parser
+  * libtorrent:factor out and unit test parts of the DHT routing table logic
+  * libtorrent:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+  * libtorrent:avoid empty dht routing table buckets
+  * libtorrent:fix dht_stats_alert routing table stats for multi-homed clients
+  * libtorrent:fix entry assignment from bdecode_node and lazy_entry
+  * libtorrent:fix use-after-free issue in socket_type
+  * libtorrent:fix error code messages when building without deprecated functions
+  * libtorrent:feature to disable DHT, PEX and LSD per torrent
+  * libtorrent:fix seeding of random number generator on mingw
+  * libtorrent:fix issue where trackers from magnet links were not included in create_torrent()
+  * libtorrent:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+  * libtorrent:fix error handling of moving storage to a drive letter that isn't mounted
+  * libtorrent:don't leak exceptions out of handler callbacks in resolver
+  * libtorrent:ensure headers build independently
+  * libtorrent:fix unit template's mutating operators to give them proper ref qualifiers
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 30 Aug 2019 15:54:22 -0600
+
+frostwire (6.8.1) stable; urgency=high
+  * Time remaining renderer bug fixed
+  * Update system bug fixed
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 23 Jul 2019 05:33:48 -0600
+
+frostwire (6.8.0) stable; urgency=high
+  * Nyaa search fixed
+  * Soundcloud search and downloads fixed
+  * New Torrentz2 search
+  * OpenJDK 12 runtime (windows)
+  * G+ cleanup
+  * Hundreds of cleanups and fixes to modernize the codebase for Java 12
+  * jlibtorrent 1.2.1.0
+  * updated to boost 1.70.0
+  * TPB fallback mirrors support
+  * libtorrent: make sure session cleanup releases all its references to torrents
+  * libtorrent: track the mapped port for each NAT mapping transport
+  * libtorrent: optimize resolve_duplicate_filenames_slow()
+  * libtorrent: use a more restrictive limit on number of pieces allowed in a torrent
+  * libtorrent: improve disk I/O logging
+  * libtorrent: always flush disk I/O job queue before shutdown
+  * libtorrent: fix typo in validation of reject messages. Make on_choke a bit more defensive
+  * libtorrent: tighten up validation of dont-have messages
+  * libtorrent: tighten up validation of reject messages, to ensure consistency of stats counters
+  * libtorrent: tighten up message size checks
+  * libtorrent: update symlinks to conform to BEP 47
+  * libtorrent: source code cleanup, performance and stability
+  * Pixabay search removed
+  * macos: Rebuilt libSystemUtilities.jnilib shared library for x86_64 arch only
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 20 Jul 2019 15:09:17 -0600
+
 frostwire (6.7.9) stable; urgency=high
   * Debian/Ubuntu is now Java 10+ ready. Min. JRE bumped to openjdk-11-jre
+  * Limetorrent search results now have a distinct icon, thanks trollmad3
+  * Archive.org https search
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 31 Mar 2019 10:09:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 10 Apr 2019 17:46:48 -0600
 
 frostwire (6.7.8) stable; urgency=high
   * New jlibtorrent 1.2.0.20 with latest libtorrent release
@@ -638,13 +835,13 @@ frostwire (6.0.5) stable; urgency=high
   * Updates on Hungarian and Romanian translations.
   * Fixes YT search issues.
   * New mplayer binaries with HTTPS support.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 28 Jan 2015 14:18:12 -0500
 
 frostwire (6.0.4) stable; urgency=high
   * Implements torrent loading algorithm to avoid CPU overuse when checking
     torrent integrity.
-  * When transfers are finished they no longer show as 'Paused', 
+  * When transfers are finished they no longer show as 'Paused',
     they show as 'Finished'.
   * Fixes issues with incomplete files.
   * Fixes issues importing too many songs to iTunes playlist.
@@ -753,7 +950,7 @@ frostwire (5.7.4) stable; urgency=high
   * Can download entire soundcloud playlists from playlist url.
   * Fixed broken Torrents.fm search.
   * Updated Gson library, included the sources into our repo.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 26 June 2014 15:44:35 -0500
 
 frostwire (5.7.3) stable; urgency=high
@@ -761,7 +958,7 @@ frostwire (5.7.3) stable; urgency=high
   * Added Canonical Peer Priority support. (BEP40)
   * Fixed broken EZTV search.
   * Removed apache httpclient and httpcore libraries.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Fri, 23 May 2014 16:20:00 -0500
 
 frostwire (5.7.2) stable; urgency=high
@@ -769,18 +966,18 @@ frostwire (5.7.2) stable; urgency=high
   * Multiple crash fixes.
   * UX: playable single file torrents now can be played from transfer list.
   * UX: Fixes UI Thread freeze when opening Options > Search.
-  * UX: Better error reporting when a torrent can't be fetched from a 
+  * UX: Better error reporting when a torrent can't be fetched from a
         magnet connection.
   * Spanish translation update by @dennistobar.
 
  -- FrostWire Team <contact@frostwire.com>  Fri, 11 Apr 2014 14:22:10 -0500
-	
+
 frostwire (5.7.1) stable; urgency=high
   * Wi-Fi sharing discovery improved considerably with JmDNS.
     Removed cling library.
   * Improvements in .torrent creation window:
      1. Web seed url(s) (GetRight style) support.
-     2. Associate a Creative Commons, Open Source, or Public Domain license.	
+     2. Associate a Creative Commons, Open Source, or Public Domain license.
      3. Associate a Bitcoin address for Name-your-price/tips support.
      4. Associate a Litecoin address for Name-your-price/tips support.
      5. Associate a Dogecoin address for Name-your-price/tips support.
@@ -796,7 +993,7 @@ frostwire (5.7.0) stable; urgency=high
   * Updated BitTorrent engine from Azureus/Vuze project.
   * New Torrents.fm meta search integration.
   * Brings back cloud downloads by entering url on search box or open dialog.
-  * Chat Tab gone. Chat button now points to http://frostwire.com/chat. 
+  * Chat Tab gone. Chat button now points to http://frostwire.com/chat.
     Faster startup time.
  -- FrostWire Team <contact@frostwire.com>  Fri, 17 Jan 2014 00:21:30 -0500
 
@@ -978,7 +1175,7 @@ frostwire (5.5.2) stable; urgency=high
     files are shown at the top of the table.
   * Bug fix: On first installation FrostWire wasn't able to add 'From Devices'
     folder to the Library.
-  * Bug fix: When restoring default settings FrostWire was not restoring 
+  * Bug fix: When restoring default settings FrostWire was not restoring
     default library folders.
   * Bug fix: Player remembers volume level from last song played.
   * Bug fix: Sends correct file sizes on HTTP headers for shared files that
@@ -996,7 +1193,7 @@ frostwire (5.5.2) stable; urgency=high
   * Bug fix: (Windows) media player can open files with long paths.
   * Bug fix: prevents NPE when opening a .torrent and trying to show icons when
     the file system chooser wasn't available.
-  
+
  -- FrostWire Team <contact@frostwire.com>  Tue, 15 Jan 2013 20:00:00 -0500
 
 frostwire (5.5.1) stable; urgency=high
@@ -1059,7 +1256,7 @@ frostwire (5.4.0) stable; urgency=high
  -- FrostWire Team <contact@frostwire.com>  Mon, 17 Sep 2012 18:00:00 -0500
 
 frostwire (5.3.9) stable; urgency=high
-  * BEP 34 compliant. FrostWire now checks DNS TXT records for tracker 
+  * BEP 34 compliant. FrostWire now checks DNS TXT records for tracker
     config.
   * Soundcloud integration (Search, Streaming and Downloads).
   * Fixes issue with partial download title window not showing the name
@@ -1081,9 +1278,9 @@ frostwire (5.3.9) stable; urgency=high
   * UI Improvement: A FrostWire update can now be invoked from the 'Tools'
     menu.
   * UI Improvement: New Notification update button will be available on
-    the Window header to let the user know visually that there's a 
+    the Window header to let the user know visually that there's a
     FrostWire update available.
-  * UI Improvement: Added 'Cleanup Playlist' right click menu item in 
+  * UI Improvement: Added 'Cleanup Playlist' right click menu item in
     playlists.
   * UX Improvement: When saving a newly created .torrent, FrostWire
     will make sure the file is saved with the .torrent extension.
@@ -1098,27 +1295,27 @@ frostwire (5.3.8) stable; urgency=high
   * Better language auto-detection on configuration wizard.
   * Fixes Drag and Drop issue with iTunes >= 10.6.3.
   * Fixes issues with Monova search.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 5 Jul 2012 14:10:15 -0500
-	
+
 frostwire (5.3.7) stable; urgency=high
-  * New Feature: Export playlist to iTunes. 
+  * New Feature: Export playlist to iTunes.
   * Core upgrade: Better support for UTF-8 torrent contents.
   * Faster startup time. No more waiting around 31% on splash screen.
-	
+
  -- FrostWire Team <contact@frostwire.com>  Thu, 14 Jun 2012 08:07:05 -0500
 
 frostwire (5.3.6) stable; urgency=high
   * Full support for .m4a audio files (thumbnails, seek)
   * AAC downloads from YouTube.
-  * Fixes issue with search suggestions where the popup wouldn't 
+  * Fixes issue with search suggestions where the popup wouldn't
     hide correctly.
   * Chinese, Korean character display fixed for Windows and Linux (Gnome only)
   * Fixes issue where it was hard to select more than one search result for
     batch downloads.
   * Fixes issue with search results from KAT.ph. Now downloads are started
     using magnet links instead of .torrents.
-  * Supports dragging files from transfer manager. 
+  * Supports dragging files from transfer manager.
     Useful to send files to iTunes as soon as transfers are done.
   * Adds links to Facebook and Google Plus pages on status bar.
   * Single file search results now are launched on double click.
@@ -1132,7 +1329,7 @@ frostwire (5.3.5) stable; urgency=high
   * Removes flickering on album arts when resizing library explorer
   * When the FrostWire window is resized to be very small the search
     filters no longer overlap the "Open" and "Send to" buttons.
-  * Search box on the Library is now on the upper left and 
+  * Search box on the Library is now on the upper left and
     offers contextual hint.
   * Search boxes everywhere now have a clear button.
   * Playlists are now sorted alphabetically.
@@ -1163,7 +1360,7 @@ frostwire (5.3.4) stable; urgency=high
   * Windows build will prefer Java 7 if not JRE is found.
   * Improvements when sending files on a local area network via magnet link
     or send file to friend.
-  * Bug fix when opening magnets from a website when FrostWire 
+  * Bug fix when opening magnets from a website when FrostWire
     was already running.
   * User experience improvements on the transfer manager.
   * Spanish translation update (93% translated)
@@ -2006,4 +2203,3 @@ frostwire (4.13.1) stable; urgency=low
   keep going
 
  -- FrostWire Team <contact@frostwire.com>  Tue, 22 Jun 2007 00:00:00 -0500
-

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ public final class LocalSearchEngine {
         });
     }
 
+    @SuppressWarnings("unused")
     public SearchListener getListener() {
         return listener;
     }
@@ -110,12 +111,16 @@ public final class LocalSearchEngine {
         currentSearchTokens = tokenize(query);
         searchFinished = false;
 
-        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines());
+        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
         for (SearchEngine se : shuffledEngines) {
-            if (se.isEnabled()) {
+            if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
+                try {
+                    Thread.sleep(200);
+                    // breath a little between http requests
+                } catch (Throwable ignored) { }
             }
         }
     }
@@ -156,12 +161,12 @@ public final class LocalSearchEngine {
 
     private void onResults(long token, List<? extends SearchResult> results) {
         if (token == currentSearchToken) { // one more additional protection
-            @SuppressWarnings("unchecked")
             List<SearchResult> filtered = filter(results);
 
             if (!filtered.isEmpty()) {
                 if (listener != null) {
                     listener.onResults(token, filtered);
+                    filtered.clear();
                 }
             }
         }

@@ -24,9 +24,7 @@ import com.limegroup.gnutella.settings.UpdateSettings;
 import java.io.File;
 
 public final class DownloadManagerImpl implements DownloadManager {
-
     private static final Logger LOG = Logger.getLogger(DownloadManagerImpl.class);
-
     private final ActivityCallback activityCallback;
 
     public DownloadManagerImpl(ActivityCallback downloadCallback) {
@@ -48,29 +46,23 @@ public final class DownloadManagerImpl implements DownloadManager {
     public void loadSavedDownloadsAndScheduleWriting() {
         try {
             BTEngine engine = BTEngine.getInstance();
-
             engine.setListener(new BTEngineAdapter() {
                 @Override
                 public void downloadAdded(BTEngine engine, BTDownload dl) {
                     if (engine == null || dl == null) {
                         return;
                     }
-
                     String name = dl.getName();
                     if (name == null || name.contains("fetch_magnet:")) {
                         return;
                     }
-
                     File savePath = dl.getSavePath();
-
                     if (savePath != null && savePath.toString().contains("fetch_magnet")) {
                         return;
                     }
-
                     // don't add frostwire update downloads to the download manager.
                     if (savePath != null) {
                         final File parentFile = savePath.getParentFile();
-
                         if (parentFile != null) {
                             if (parentFile.getAbsolutePath().equals(UpdateSettings.UPDATES_DIR.getAbsolutePath())) {
                                 LOG.info("Update download, not adding to transfer manager: " + savePath);
@@ -82,7 +74,6 @@ public final class DownloadManagerImpl implements DownloadManager {
                             return;
                         }
                     }
-
                     addDownload(dl);
                 }
 
@@ -91,37 +82,9 @@ public final class DownloadManagerImpl implements DownloadManager {
                     updateDownload(dl);
                 }
             });
-
             engine.restoreDownloads();
         } catch (Throwable e) {
             LOG.error("General error loading saved downloads", e);
         }
     }
-
-    /*
-    private void updateDownloadManagerPortableSaveLocation(org.gudy.azureus2.core3.download.DownloadManager downloadManager) {
-        boolean hadToPauseIt = false;
-        if (downloadManager.getState() != org.gudy.azureus2.core3.download.DownloadManager.STATE_STOPPED) {
-            downloadManager.pause();
-            hadToPauseIt = true;
-        }
-        String previousSaveLocation = downloadManager.getSaveLocation().getAbsolutePath();
-        String newLocationPrefix = SharingSettings.DEFAULT_TORRENT_DATA_DIR.getAbsolutePath();
-
-        if (!previousSaveLocation.startsWith(newLocationPrefix)) {
-            File newSaveLocation = new File(SharingSettings.DEFAULT_TORRENT_DATA_DIR, downloadManager.getSaveLocation().getName());
-            if (newSaveLocation.exists()) {
-                if (newSaveLocation.isDirectory()) {
-                    downloadManager.setDataAlreadyAllocated(false); //absolutely necessary
-                    downloadManager.setTorrentSaveDir(newSaveLocation.getAbsolutePath());
-                } else if (newSaveLocation.isFile()) {
-                    downloadManager.setTorrentSaveDir(SharingSettings.DEFAULT_TORRENT_DATA_DIR.getAbsolutePath());
-                }
-            }
-        }
-
-        if (hadToPauseIt) {
-            downloadManager.resume();
-        }
-    }*/
 }

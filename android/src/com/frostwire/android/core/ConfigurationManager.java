@@ -22,8 +22,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -31,6 +32,8 @@ import com.frostwire.util.Logger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Looking for default config values? look at {@link ConfigurationDefaults}
@@ -40,25 +43,26 @@ import java.util.Map.Entry;
  */
 @SuppressLint("CommitPrefEdits") // this is due to a lint false positive
 public final class ConfigurationManager {
-
+    private static final CountDownLatch creationLatch;
     private static final Logger LOG = Logger.getLogger(ConfigurationManager.class);
 
     private SharedPreferences preferences;
     private ConfigurationDefaults defaults;
-
-    private static final Object creationLock = new Object();
     private static ConfigurationManager instance;
+    private static Thread creatorThread;
+
+    static {
+        creationLatch = new CountDownLatch(1);
+    }
 
     public static void create(@NonNull Context context) {
         if (instance != null) {
             throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
 
-        Thread creatorThread = new Thread(() -> {
+        creatorThread = new Thread(() -> {
             instance = new ConfigurationManager(context.getApplicationContext());
-            synchronized (creationLock) {
-                creationLock.notifyAll();
-            }
+            creationLatch.countDown();
         });
         creatorThread.setName("ConfigurationManager::creator");
         creatorThread.setPriority(Thread.MAX_PRIORITY);
@@ -68,18 +72,31 @@ public final class ConfigurationManager {
     public static ConfigurationManager instance() {
         if (instance == null) {
             try {
-                synchronized (creationLock) {
-                    creationLock.wait(20000);
-                }
+                // ANRs are triggered after 5 seconds, don't hold main thread more than double that
+                // (used to be 20 secs)
+                creationLatch.await(4, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
         if (instance == null) {
-            throw new RuntimeException("The ConfigurationManager instance() creation timed out, try reinstalling the app or notify FrostWire developers");
+            waitForCreatorThread();
+            if (instance == null) {
+                throw new RuntimeException("The ConfigurationManager instance() creation timed out, try reinstalling the app or notify FrostWire developers");
+            }
         }
         return instance;
+    }
+
+    private static void waitForCreatorThread() {
+        try {
+            if (creatorThread != null && creatorThread.isAlive()) {
+                creatorThread.join(5000);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private ConfigurationManager(Context context) {

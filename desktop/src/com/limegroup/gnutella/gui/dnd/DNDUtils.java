@@ -17,7 +17,7 @@ package com.limegroup.gnutella.gui.dnd;
 
 import com.frostwire.gui.player.MediaPlayer;
 import com.limegroup.gnutella.util.URIUtils;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -28,23 +28,23 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Static helper class with DND tasks that provides methods for handling
  * URI and file drops and also provides default transfer handlers.
  */
 public class DNDUtils {
-
     /**
      * Immutable list of default transfer handlers that should be chained
      * after a specific one.
      */
     public static final List<LimeTransferHandler> DEFAULT_TRANSFER_HANDLERS;
-
     /**
      * Default transfer handler supporting drops for all flavors limewire
-     * is interested in. 
+     * is interested in.
      */
     public static final LimeTransferHandler DEFAULT_TRANSFER_HANDLER;
 
@@ -55,9 +55,7 @@ public class DNDUtils {
          * on limewire's JFrame is not a JComponent.
          * See TransferHandlerDropTargetListener to see how they are invoked
          */
-        DEFAULT_TRANSFER_HANDLERS = Collections.unmodifiableList(Arrays.asList(new MagnetTransferHandler(), new TorrentURITransferHandler(),
-                new TorrentFilesTransferHandler(), new SendFileTransferHandler()));
-
+        DEFAULT_TRANSFER_HANDLERS = List.of(new MagnetTransferHandler(), new TorrentURITransferHandler(), new TorrentFilesTransferHandler(), new SendFileTransferHandler());
         DEFAULT_TRANSFER_HANDLER = new MulticastTransferHandler(DEFAULT_TRANSFER_HANDLERS);
     }
 
@@ -65,10 +63,8 @@ public class DNDUtils {
      * Returns array of uris extracted from transferable.
      */
     static URI[] getURIs(Transferable transferable) throws UnsupportedFlavorException, IOException {
-
         String lines = (String) (contains(transferable.getTransferDataFlavors(), FileTransferable.URIFlavor) ? transferable
                 .getTransferData(FileTransferable.URIFlavor) : transferable.getTransferData(FileTransferable.URIFlavor16));
-
         StringTokenizer st = new StringTokenizer(lines, System.getProperty("line.separator"));
         ArrayList<URI> uris = new ArrayList<>();
         while (st.hasMoreTokens()) {
@@ -83,7 +79,7 @@ public class DNDUtils {
                 // ignore
             }
         }
-        return uris.toArray(new URI[uris.size()]);
+        return uris.toArray(new URI[0]);
     }
 
     /**
@@ -99,8 +95,8 @@ public class DNDUtils {
     }
 
     /**
-     * Checks for {@link DataFlavor#javaFileListFlavor} and 
-     * {@link FileTransferable#URIFlavor} for unix systems.  
+     * Checks for {@link DataFlavor#javaFileListFlavor} and
+     * {@link FileTransferable#URIFlavor} for unix systems.
      */
     public static boolean containsFileFlavors(DataFlavor[] flavors) {
         return flavors != null && (contains(flavors, DataFlavor.javaFileListFlavor) || contains(flavors, FileTransferable.URIFlavor) || contains(flavors, FileTransferable.URIFlavor16));
@@ -108,6 +104,7 @@ public class DNDUtils {
 
     /**
      * Extracts the array of files from a transferable
+     *
      * @return an empty array if the transferable does not contain any data
      * that can be interpreted as a list of files
      */
@@ -124,9 +121,10 @@ public class DNDUtils {
 
     /**
      * Returns array of files for uris that denote local paths.
+     *
      * @return empty array if no uri denotes a local file
      */
-    public static File[] getFiles(URI[] uris) {
+    private static File[] getFiles(URI[] uris) {
         ArrayList<File> files = new ArrayList<>(uris.length);
         for (URI uri : uris) {
             String scheme = uri.getScheme();
@@ -135,7 +133,7 @@ public class DNDUtils {
                 files.add(new File(path));
             }
         }
-        return files.toArray(new File[files.size()]);
+        return files.toArray(new File[0]);
     }
 
     public static boolean supportCanImport(DataFlavor dataFlavor, TransferHandler.TransferSupport support, TransferHandler fallbackTransferHandler, boolean fallback) {

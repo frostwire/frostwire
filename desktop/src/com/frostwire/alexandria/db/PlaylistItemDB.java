@@ -25,17 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistItemDB {
-
-    private PlaylistItemDB() {}
-
-    public static void fill(LibraryDatabase db, PlaylistItem obj) {
-        List<List<Object>> result = db
-                .query("SELECT playlistItemId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred "
-                        + "FROM PlaylistItems WHERE playlistItemId = ?", obj.getId());
-        if (result.size() > 0) {
-            List<Object> row = result.get(0);
-            fill(row, obj);
-        }
+    private PlaylistItemDB() {
     }
 
     public static void fill(List<Object> row, PlaylistItem obj) {
@@ -55,7 +45,6 @@ public class PlaylistItemDB {
         String trackNumber = (String) row.get(13);
         String trackYear = (String) row.get(14);
         boolean starred = (Boolean) row.get(15);
-
         obj.setId(id);
         obj.setFilePath(filePath);
         obj.setFileName(fileName);
@@ -101,57 +90,49 @@ public class PlaylistItemDB {
     public static void delete(LibraryDatabase db, PlaylistItem obj) {
         db.update("DELETE FROM PlaylistItems WHERE playlistItemId = ?", obj.getId());
     }
-    
+
     public static List<PlaylistItem> getPlaylistItems(LibraryDatabase db, Playlist playlist) {
         String query = "SELECT playlistItemId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred, sortIndex "
                 + "FROM PlaylistItems WHERE playlistId = ? ORDER BY sortIndex ASC";
-
         List<List<Object>> result = db.query(query, playlist.getId());
         List<PlaylistItem> items = new ArrayList<>(result.size());
-
         for (List<Object> row : result) {
             PlaylistItem item = new PlaylistItem(playlist);
             PlaylistItemDB.fill(row, item);
             items.add(item);
         }
-
         return items;
     }
-    
+
     private static Object[] createPlaylistItemInsert(PlaylistItem item) {
         String sql = "INSERT INTO PlaylistItems (playlistId, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred, sortIndex) "
                 + " VALUES (?, LEFT(?, 10000), LEFT(?, 500), ?, LEFT(?, 10), LEFT(?, 500), ?, LEFT(?, 500), LEFT(?, 500), LEFT(?, 10000), LEFT(?, 10), LEFT(?, 500), LEFT(?, 20), LEFT(?, 6), LEFT(?, 6), ?, ?)";
-
-        Object[] values = new Object[] { item.getPlaylist().getId(), item.getFilePath(), item.getFileName(), item.getFileSize(), item.getFileExtension(), item.getTrackTitle(),
+        Object[] values = new Object[]{item.getPlaylist().getId(), item.getFilePath(), item.getFileName(), item.getFileSize(), item.getFileExtension(), item.getTrackTitle(),
                 item.getTrackDurationInSecs(), item.getTrackArtist(), item.getTrackAlbum(), item.getCoverArtPath(), item.getTrackBitrate(), item.getTrackComment(),
-                item.getTrackGenre(), item.getTrackNumber(), item.getTrackYear(), item.isStarred(), item.getSortIndex() };
-
-        return new Object[] { sql, values };
+                item.getTrackGenre(), item.getTrackNumber(), item.getTrackYear(), item.isStarred(), item.getSortIndex()};
+        return new Object[]{sql, values};
     }
 
     private static Object[] createPlaylistItemUpdate(PlaylistItem item) {
         String sql = "UPDATE PlaylistItems SET filePath = LEFT(?, 10000), fileName = LEFT(?, 500), fileSize = ?, fileExtension = LEFT(?, 10), trackTitle = LEFT(?, 500), trackDurationInSecs = ?, trackArtist = LEFT(?, 500), trackAlbum = LEFT(?, 500), coverArtPath = LEFT(?, 10000), trackBitrate = LEFT(?, 10), trackComment = LEFT(?, 500), trackGenre = LEFT(?, 20), trackNumber = LEFT(?, 6), trackYear = LEFT(?, 6), starred = ?, sortIndex = ? WHERE playlistItemId = ?";
-
-        Object[] values = new Object[] { item.getFilePath(), item.getFileName(), item.getFileSize(), item.getFileExtension(), item.getTrackTitle(),
+        Object[] values = new Object[]{item.getFilePath(), item.getFileName(), item.getFileSize(), item.getFileExtension(), item.getTrackTitle(),
                 item.getTrackDurationInSecs(), item.getTrackArtist(), item.getTrackAlbum(), item.getCoverArtPath(), item.getTrackBitrate(), item.getTrackComment(),
-                item.getTrackGenre(), item.getTrackNumber(), item.getTrackYear(), item.isStarred(), item.getSortIndex(), item.getId() };
-
-        return new Object[] { sql, values };
+                item.getTrackGenre(), item.getTrackNumber(), item.getTrackYear(), item.isStarred(), item.getSortIndex(), item.getId()};
+        return new Object[]{sql, values};
     }
 
     private static Object[] updateStarred(PlaylistItem item) {
         String sql = "UPDATE PlaylistItems SET starred = ? WHERE filePath = LEFT(?, 10000)";
-        Object[] values = new Object[] { item.isStarred(), item.getFilePath() };
-        return new Object[] { sql, values };
+        Object[] values = new Object[]{item.isStarred(), item.getFilePath()};
+        return new Object[]{sql, values};
     }
-    
+
     private static boolean isStarred(LibraryDatabase db, PlaylistItem item) {
         List<List<Object>> result = db
                 .query("SELECT starred FROM PlaylistItems WHERE filePath = ? LIMIT 1", item.getFilePath());
         if (result.size() > 0) {
             return (Boolean) result.get(0).get(0);
         }
-        
         return false;
     }
 }

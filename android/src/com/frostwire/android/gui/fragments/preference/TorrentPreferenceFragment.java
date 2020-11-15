@@ -19,14 +19,16 @@
 package com.frostwire.android.gui.fragments.preference;
 
 import android.app.DialogFragment;
-import android.support.v14.preference.SwitchPreference;
-import android.support.v7.preference.CheckBoxPreference;
-import android.support.v7.preference.Preference;
+
+import androidx.preference.SwitchPreference;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.Preference;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.CustomSeekBarPreference;
@@ -82,16 +84,26 @@ public final class TorrentPreferenceFragment extends AbstractPreferenceFragment 
     }
 
     private void setupTorrentOptions() {
-        SwitchPreference pref = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-        pref.setOnPreferenceChangeListener((preference, newValue) -> {
-            boolean newStatus = (boolean) newValue;
-            if (newStatus) {
-                BTEngine.getInstance().startDht();
-            } else {
-                BTEngine.getInstance().stopDht();
-            }
-            return true;
-        });
+        SwitchPreference prefEnableDHT = findPreference(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
+        if (prefEnableDHT != null) {
+            prefEnableDHT.setOnPreferenceChangeListener((preference, newValue) -> {
+                boolean newStatus = (boolean) newValue;
+                if (newStatus) {
+                    BTEngine.getInstance().startDht();
+                } else {
+                    BTEngine.getInstance().stopDht();
+                }
+                return true;
+            });
+        }
+
+        SwitchPreference prefSequentialTransfers = findPreference(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED);
+        if (prefSequentialTransfers != null) {
+            prefSequentialTransfers.setOnPreferenceChangeListener((preference, newValue) -> {
+                UIBittorrentDownload.SEQUENTIAL_DOWNLOADS = (boolean) newValue;
+                return true;
+            });
+        }
 
         final BTEngine e = BTEngine.getInstance();
         setupFWSeekbarPreference(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED, e);

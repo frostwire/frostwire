@@ -22,7 +22,6 @@ package com.frostwire.mp4;
  * @author aldenml
  */
 final class Int32 {
-
     private int value;
 
     public Int32(int value) {
@@ -50,7 +49,6 @@ final class Int32 {
         if (!(obj instanceof Int32)) {
             return false;
         }
-
         Int32 o = (Int32) obj;
         return value == o.value;
     }

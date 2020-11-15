@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014, 2013, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,25 +27,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class Playlist extends LibraryDatabaseEntity {
-
     private int _id;
     private String _name;
     private String _description;
-
     private boolean deleted;
-
-    private List<PlaylistItem> _items;
+    private final List<PlaylistItem> _items;
 
     public Playlist(LibraryDatabase libraryDB) {
         super(libraryDB);
         _id = LibraryDatabase.OBJECT_INVALID_ID;
-        _items = Collections.synchronizedList(new LinkedList<PlaylistItem>());
+        _items = Collections.synchronizedList(new LinkedList<>());
         this.deleted = false;
     }
 
@@ -90,13 +85,6 @@ public class Playlist extends LibraryDatabaseEntity {
         return _items;
     }
 
-    public int size() {
-        if (_items == null) {
-            return 0;
-        }
-        return _items.size();
-    }
-
     public boolean isDeleted() {
         return deleted;
     }
@@ -122,16 +110,15 @@ public class Playlist extends LibraryDatabaseEntity {
     }
 
     public PlaylistItem newItem(String filePath, String fileName, long fileSize, String fileExtension, String trackTitle, float trackDurationInSecs, String trackArtist, String trackAlbum, String coverArtPath, String trackBitrate, String trackComment, String trackGenre, String trackNumber,
-            String trackYear, boolean starred) {
+                                String trackYear, boolean starred) {
         return new PlaylistItem(this, LibraryDatabase.OBJECT_NOT_SAVED_ID, filePath, fileName, fileSize, fileExtension, trackTitle, trackDurationInSecs, trackArtist, trackAlbum, coverArtPath, trackBitrate, trackComment, trackGenre, trackNumber, trackYear, starred);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof Playlist)) {
+        if (!(obj instanceof Playlist)) {
             return false;
         }
-
         Playlist other = (Playlist) obj;
         return other.getId() == getId();
     }

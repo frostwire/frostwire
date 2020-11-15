@@ -29,32 +29,11 @@ import java.util.LinkedList;
  * @author aldenml
  */
 public class ContainerBox extends Box {
-
     private static final HashMap<Integer, int[]> mapping = buildMapping();
 
     ContainerBox(int type) {
         super(type);
         boxes = new LinkedList<>();
-    }
-
-    @Override
-    void read(InputChannel ch, ByteBuffer buf) throws IOException {
-    }
-
-    @Override
-    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
-    }
-
-    @Override
-    final void update() {
-        int[] list = mapping.get(type);
-        if (list != null) {
-            sort(boxes, list);
-        }
-
-        long s = 0;
-        s += length(boxes);
-        length(s);
     }
 
     static long length(LinkedList<Box> boxes) {
@@ -86,14 +65,13 @@ public class ContainerBox extends Box {
                         y = i;
                     }
                 }
-                return (x < y) ? -1 : ((x == y) ? 0 : 1);
+                return Integer.compare(x, y);
             }
         });
     }
 
     private static HashMap<Integer, int[]> buildMapping() {
         HashMap<Integer, int[]> map = new HashMap<>();
-
         map.put(moov, new int[]{mvhd, trak, mvex, ipmc, udta, meta});
         map.put(trak, new int[]{tkhd, tref, edts, mdia, udta, meta});
         map.put(edts, new int[]{elst});
@@ -110,7 +88,25 @@ public class ContainerBox extends Box {
         map.put(ipro, new int[]{sinf});
         map.put(sinf, new int[]{frma, imif, schm, schi});
         map.put(ilst, new int[]{Cnam, CART, aART, Calb, Cgen, gnre, Cday, trkn, stik, covr});
-
         return map;
+    }
+
+    @Override
+    void read(InputChannel ch, ByteBuffer buf) throws IOException {
+    }
+
+    @Override
+    void write(OutputChannel ch, ByteBuffer buf) throws IOException {
+    }
+
+    @Override
+    final void update() {
+        int[] list = mapping.get(type);
+        if (list != null) {
+            sort(boxes, list);
+        }
+        long s = 0;
+        s += length(boxes);
+        length(s);
     }
 }

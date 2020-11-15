@@ -19,414 +19,73 @@
 
 package org.gudy.azureus2.core3.util;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
-public class
-		CopyOnWriteList<T>
-implements Iterable<T>
-{
-	private static final boolean LOG_STATS = false;
-	
-	//private int mutation_count = 0;
-	
-	private List<T>	list = Collections.EMPTY_LIST;
-	
-	private final boolean	use_linked_list;
-	
-	private boolean	visible = false;
-	
-	private int initialCapacity;
-	
-	private static CopyOnWriteList stats;
-	
-	private int	mutation_count;
-	
-	static {
-		if (LOG_STATS) {
-			stats = new CopyOnWriteList(10);
-			AEDiagnostics.addEvidenceGenerator(new AEDiagnosticsEvidenceGenerator() {
-				public void generate(IndentWriter writer) {
-					writer.println("COWList Info");
-					writer.indent();
-					try {
-						long count = 0;
-						long size = 0;
-						for (Iterator iter = stats.iterator(); iter.hasNext();) {
-							WeakReference wf = (WeakReference) iter.next();
-							CopyOnWriteList cowList = (CopyOnWriteList) wf.get();
-							if (cowList != null) {
-								count++;
-								size += cowList.size();
-							}
-						}
-						writer.println(count + " lists with " + size + " total entries");
-						if ( count > 0 ){
-							writer.println((size/count) + " avg size");
-						}
-					} catch (Throwable t) {
-					} finally {
-						writer.exdent();
-					}
-				}
-			});
-		}
-	}
-	
-	/**
-	 * @param i
-	 */
-	public CopyOnWriteList(int initialCapacity) {
-		this.initialCapacity = initialCapacity;
-		use_linked_list = false;
-		if (LOG_STATS) {
-			stats.add(new WeakReference(this));
-		}
-	}
+class CopyOnWriteList<T> implements Iterable<T> {
+    private final boolean use_linked_list;
+    private List<T> list = Collections.EMPTY_LIST;
+    private boolean visible = false;
 
-	/**
-	 * 
-	 */
-	public CopyOnWriteList() {
-		// Smaller default initial capacity as most of our lists are small
-		// Last check on 7/24/2008: 444 lists with 456 total entries
-		this.initialCapacity = 1;
-		use_linked_list = false;
-		if (LOG_STATS) {
-			stats.add(new WeakReference(this));
-		}
-	}
+    CopyOnWriteList(boolean _use_linked_list) {
+        use_linked_list = _use_linked_list;
+    }
 
-	public CopyOnWriteList(boolean _use_linked_list) {
-		this.initialCapacity = 1;
-		use_linked_list = _use_linked_list;
-		if (LOG_STATS) {
-			stats.add(new WeakReference(this));
-		}
-	}
-	
-	public int
-	getMutationCount()
-	{
-		synchronized( this ){
-			
-			return( mutation_count );
-		}
-	}
-	
-	public void
-	add(
-		T	obj )
-	{
-		synchronized( this ){
-			
-			mutation_count++;
-			
-			if ( visible ){
-				
-				List<T>	new_list = use_linked_list?new LinkedList<T>( list ):new ArrayList<T>( list );
-				
-				//mutated();
-				
-				new_list.add( obj );
-			
-				list	= new_list;
-			
-				visible = false;
-				
-			}else{
-				if (list == Collections.EMPTY_LIST) {
-					list = use_linked_list?new LinkedList<T>():new ArrayList<T>(initialCapacity);
-				}
-				
-				list.add( obj );
-			}
-		}
-	}
+    void
+    remove(
+            T obj) {
+        synchronized (this) {
+            if (visible) {
+                list = use_linked_list ? new LinkedList<>(list) : new ArrayList<>(list);
+                visible = false;
+            } else {
+                list.remove(obj);
+            }
+        }
+    }
 
-		/**
-		 * 
-		 * @param obj
-		 * @return true if added, false if not
-		 */
-	
-	public boolean
-	addIfNotPresent(
-		T	obj )
-	{
-		synchronized( this ){
+    public Iterator<T>
+    iterator() {
+        synchronized (this) {
+            visible = true;
+            return (new CopyOnWriteListIterator(list.iterator()));
+        }
+    }
 
-			if ( list.contains( obj )){
-				
-				return(false );
-			}else{
-				
-				add( obj );
-				
-				return( true );
-			}
-		}
-	}
-	
-	public void
-	add(
-		int	index,
-		T	obj )
-	{
-		if ( Constants.IS_CVS_VERSION && use_linked_list ){
-			Debug.out( "hmm" );
-		}
-		synchronized( this ){
-			
-			mutation_count++;
-			
-			if ( visible ){
-				
-				List<T>	new_list = use_linked_list?new LinkedList<T>(list):new ArrayList<T>( list );
-				
-				//mutated();
-				
-				new_list.add( index, obj );
-			
-				list	= new_list;
-			
-				visible = false;
-				
-			}else{
-				if (list == Collections.EMPTY_LIST) {
-					list = use_linked_list?new LinkedList<T>():new ArrayList<T>(initialCapacity);
-				}
-				
-				list.add( index, obj );
-			}
-		}
-	}
-	
-	public void
-	addAll(
-		Collection<T>	c )
-	{
-		synchronized( this ){
-			
-			mutation_count++;
-			
-			if ( visible ){
-				
-				List<T>	new_list = use_linked_list?new LinkedList<T>( list ):new ArrayList<T>( list );
-				
-				//mutated();
-				
-				new_list.addAll( c );
-			
-				list	= new_list;
-			
-				visible = false;
-				
-			}else{
-				if (list == Collections.EMPTY_LIST) {
-					list = use_linked_list?new LinkedList<T>():new ArrayList<T>(initialCapacity);
-				}
-				
-				list.addAll( c );
-			}
-		}
-	}
-	
-	public T
-	get(
-		int		index )
-	{
-		if ( Constants.IS_CVS_VERSION && use_linked_list ){
-			Debug.out( "hmm" );
-		}
-		
-		synchronized( this ){
-			
-			return( list.get(index));
-		}
-	}
-	
-	public boolean
-	remove(
-		T	obj )
-	{
-		synchronized( this ){
-			
-			mutation_count++;
-			
-			if ( visible ){
+    public int
+    size() {
+        synchronized (this) {
+            return (list.size());
+        }
+    }
 
-				List<T>	new_list = use_linked_list?new LinkedList<T>(list):new ArrayList<T>( list );
-				
-				//mutated();
-				
-				boolean result = new_list.remove( obj );
-			
-				list	= new_list;
-						
-				visible = false;
-				
-				return( result );
-				
-			}else{
-				
-				return( list.remove( obj ));
-			}
-		}
-	}
-	
-	public void
-	clear()
-	{
-		synchronized( this ){
-				
-			mutation_count++;
-			
-			list	= Collections.EMPTY_LIST;
-			
-			visible = false;
-		}
-	}
-	
-	public boolean
-	contains(
-		T	obj )
-	{
-		synchronized( this ){
+    private class
+    CopyOnWriteListIterator
+            implements Iterator<T> {
+        private final Iterator<T> it;
+        private T last;
 
-			return( list.contains( obj ));
-		}
-	}
-	
-	public Iterator<T>
-	iterator()
-	{
-		synchronized( this ){
+        CopyOnWriteListIterator(
+                Iterator<T> _it) {
+            it = _it;
+        }
 
-			visible = true;
-			
-			return( new CopyOnWriteListIterator( list.iterator()));
-		}
-	}
-	
-	public List<T>
-	getList()
-	{
-			// TODO: we need to either make this a read-only-list or obey the copy-on-write semantics correctly...
-		
-		synchronized( this ){
+        public boolean
+        hasNext() {
+            return (it.hasNext());
+        }
 
-			visible = true;
-			
-			if ( Constants.IS_CVS_VERSION ){
-				
-				return( Collections.unmodifiableList( list ));
-				
-			}else{
-				
-				return( list );
-			}
-		}
-	}
-	
-	public int
-	size()
-	{
-		synchronized( this ){
+        public T
+        next() {
+            last = it.next();
+            return (last);
+        }
 
-			return( list.size());
-		}
-	}
-	
-	public boolean 
-	isEmpty() 
-	{
-		synchronized( this ){
-
-			return list.isEmpty();
-		}
-	}
-	
-	public Object[]
-	toArray()
-	{
-		synchronized( this ){
-
-			return( list.toArray());
-		}
-	}
-	
-	public T[]
-  	toArray(
-  		T[]	 x )
-  	{
-		synchronized( this ){
-
-			return( list.toArray(x));
-		}
-  	}
-	
-	/*
-	private void
-	mutated()
-	{
-		mutation_count++;
-		
-		if ( mutation_count%10 == 0 ){
-			
-			System.out.println( this + ": mut=" + mutation_count );
-		}
-	}
-	*/
-	
-	private class
-	CopyOnWriteListIterator
-		implements Iterator<T>
-	{
-		private Iterator<T>	it;
-		private T			last;
-		
-		protected
-		CopyOnWriteListIterator(
-			Iterator<T>		_it )
-		{
-			it		= _it;
-		}
-		
-		public boolean
-		hasNext()
-		{
-			return( it.hasNext());
-		}
-		
-		public T
-		next()
-		{
-			last	= it.next();
-			
-			return( last );
-		}
-		
-		public void
-		remove()
-		{
-				// don't actually remove it from the iterator. can't go backwards with this iterator so this is
-				// not a problem
-			
-			if ( last == null ){
-			
-				throw( new IllegalStateException( "next has not been called!" ));
-			}
-			
-			CopyOnWriteList.this.remove( last );
-		}
-	}
-
-	public int getInitialCapacity() {
-		return initialCapacity;
-	}
-
-	public void setInitialCapacity(int initialCapacity) {
-		this.initialCapacity = initialCapacity;
-	}
+        public void
+        remove() {
+            if (last == null) {
+                throw (new IllegalStateException("next has not been called!"));
+            }
+            CopyOnWriteList.this.remove(last);
+        }
+    }
 }

@@ -46,15 +46,14 @@
             android:id="@+id/view_search_header_banner_dismiss_banner_button"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="14dp"
             android:layout_marginEnd="14dp"
             android:background="@null"
             android:src="@drawable/keyword_tag_close_clear_cancel_full"
             android:tint="@color/basic_gray_text_light"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null"
+            android:visibility="invisible"/>
     </RelativeLayout>
     <!-- end of header -->
 

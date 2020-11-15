@@ -30,11 +30,12 @@ import java.util.List;
  */
 public class SearchLoader extends SongLoader {
     private String mQuery;
+
     /**
      * Constructor of <code>SongLoader</code>
-     * 
+     *
      * @param context The {@link Context} to use
-     * @param query The search query
+     * @param query   The search query
      */
     public SearchLoader(final Context context, final String query) {
         super(context);
@@ -64,35 +65,53 @@ public class SearchLoader extends SongLoader {
             do {
                 // Copy the song Id
                 long id = -1;
+                long songId = -1;
+                long albumId = -1;
+                long artistId = -1;
 
                 // Copy the song name
                 final String songName = mCursor.getString(mCursor
                         .getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
 
-                // Check for a song Id
-                if (!TextUtils.isEmpty(songName)) {
-                    id = mCursor.getLong(mCursor
-                            .getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
-                }
+                // Copy the artist name
+                final String artist = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
 
                 // Copy the album name
                 final String album = mCursor.getString(mCursor
                         .getColumnIndexOrThrow(MediaStore.Audio.Albums.ALBUM));
 
+
+                // This logic prioritizes ARTIST ID > ALBUM ID > SONG ID
+
+                // Check for a song Id
+                if (!TextUtils.isEmpty(songName)) {
+                    songId = mCursor.getLong(mCursor
+                            .getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
+                }
+
+                if (songId > 0) {
+                    id = songId;
+                }
+
                 // Check for a album Id
-                if (id < 0 && !TextUtils.isEmpty(album)) {
-                    id = mCursor.getLong(mCursor
+                if (songId < 0 && !TextUtils.isEmpty(album)) {
+                    albumId = mCursor.getLong(mCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Albums._ID));
                 }
 
-                // Copy the artist name
-                final String artist = mCursor.getString(mCursor
-                        .getColumnIndexOrThrow(MediaStore.Audio.Artists.ARTIST));
+                if (albumId > 0) {
+                    id = albumId;
+                }
 
                 // Check for a artist Id
-                if (id < 0 && !TextUtils.isEmpty(artist)) {
-                    id = mCursor.getLong(mCursor
+                if (albumId < 0 && !TextUtils.isEmpty(artist)) {
+                    artistId = mCursor.getLong(mCursor
                             .getColumnIndexOrThrow(MediaStore.Audio.Artists._ID));
+                }
+
+                if (artistId > 0) {
+                    id = artistId;
                 }
 
                 // Create a new song
@@ -111,17 +130,42 @@ public class SearchLoader extends SongLoader {
 
     /**
      * * @param context The {@link Context} to use.
-     * 
+     *
      * @param query The user's query.
      * @return The {@link Cursor} used to perform the search.
      */
     private static Cursor makeSearchCursor(final Context context, final String query) {
+        SearchCursorParameters searchCursorParameters = SearchCursorParameters.buildSearchCursorParameters(query);
         return context.getContentResolver().query(
-                Uri.parse("content://media/external/audio/search/fancy/" + Uri.encode(query)),
-                new String[] {
-                        BaseColumns._ID, MediaStore.Audio.Media.MIME_TYPE,
-                        MediaStore.Audio.Artists.ARTIST, MediaStore.Audio.Albums.ALBUM,
-                        MediaStore.Audio.Media.TITLE, "data1", "data2" //$NON-NLS-2$ 
-                }, null, null, null);
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                searchCursorParameters.projection,
+                searchCursorParameters.selection,
+                searchCursorParameters.selectionArgs,
+                null);
+    }
+
+    public final static class SearchCursorParameters {
+        public final String[] projection = new String[]{
+                BaseColumns._ID,
+                MediaStore.Audio.Media.MIME_TYPE,
+                MediaStore.Audio.Artists.ARTIST,
+                MediaStore.Audio.Albums.ALBUM,
+                MediaStore.Audio.Media.TITLE
+        };
+
+        public final String selection = MediaStore.Audio.Artists.ARTIST + " like ? or " +
+                MediaStore.Audio.Albums.ALBUM + " like ? or " +
+                MediaStore.Audio.Media.TITLE + " like ?";
+
+        public final String[] selectionArgs;
+
+        private SearchCursorParameters(String query) {
+            String encodedQuery = "%" + Uri.encode(query) + "%";
+            selectionArgs = new String[] {encodedQuery, encodedQuery, encodedQuery};
+        }
+
+        public static SearchCursorParameters buildSearchCursorParameters(String query) {
+            return new SearchCursorParameters(query);
+        }
     }
 }

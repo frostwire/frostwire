@@ -1,6 +1,278 @@
-FrostWire 2.1.3 build 586 - APR/05/2019
- - New jlibtorrent 1.2.0.20 with latest libtorrent release
- - play-services-ads 17.2.0, applovin 9.4.2, okhttp 3.12.2
+FrostWire 2.2.5 build 664 - NOV/09/2020
+ - New: TorrentParadise search source
+ - New: GloTorrents search source
+ - New: Firebase Crash Analytics support
+ - Yify search fixed
+ - Torrentz2 search fixed
+ - MagnetDL search fixed
+ - Soundcloud search fixed
+ - EZTV search fixed
+ - Fixed archive.org connection dropped/timeout error
+ - com.google.android.gms:play-services-ads 19.4.0 -> 19.5.0
+ - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
+ - com.applovin:applovin-sdk:9.13.1 -> 9.14.5
+ - com.mopub.mediation:applovin:9.13.1.0 -> 9.14.3.0
+ - material 1.3.0-alpha02 -> 1.3.0-alpha03
+ - browser 1.3.0-alpha05 -> 1.3.0->alpha06
+ - exifinterface 1.2.0 -> 1.3.1
+ - play-services 19.3.0 -> 19.4.0
+ - core-ktx 1.3.1 -> 1.3.2
+ - com.android.tools.build:gradle:4.0.1 -> 4.1.0
+ - gradle wrapper update 6.1.1->6.6.1
+
+FrostWire 2.2.4 build 654 - SEP/24/2020
+ - New jlibtorrent 1.2.10.0 update
+ - Fixes bug where frostclick promo slide would render twice
+ - dev: buildToolsVersion '29.0.2' -> '29.0.3' (@TacoTheDank)
+ - Archive search Json parsing deprecation fix (@TacoTheDank)
+ - com.squareup.okhttp3:okhttp:4.8.1 -> 4.9.0
+ - lt: improve stat_file() performance on Windows
+ - lt: fix issue with loading invalid torrents with only 0-sized files
+ - lt: fix to avoid large stack allocations
+ - lt: add macro TORRENT_CXX11_ABI for clients building with C++14 against
+   libtorrent build with C++11
+ - lt: removed deprecated wstring overloads on non-windows systems
+ - lt: drop dependency on Unicode's ConvertUTF code (which had a license
+   incompatible with Debian)
+ - lt: fix bugs exposed on big-endian systems`
+ - lt: fix detection of hard-links not being supported by filesystem
+ - lt: fixed resume data regression for seeds with prio 0 files
+ - binaries: compiler upgraded from g++-5 to g++-7
+ - reverted to com.mopub:mopub-sdk-banner:5.12.0 (mopub 5.13.1 very unstable)
+
+FrostWire 2.2.3 build 649 - AUG/23/2020
+ - jlibtorrent 1.2.7.0 -> 1.2.8.0 update
+ - com.squareup.okhttp3:okhttp:4.4.1 -> 4.8.1
+ - com.mopub:mopub-sdk-banner:5.12.0 -> 5.13.1
+ - androidx.browser:browser:1.3.0-alpha04 -> 1.3.0-alpha05
+ - com.google.re2j:re2j:1.3 -> 1.4
+ - com.google.android.material:material:1.3.0-alpha01 -> 1.3.0-alpha02
+ - com.google.android.gms:play-services-ads:19.2.0 -> 19.3.0
+ - com.applovin:applovin-sdk:9.12.6 -> 9.13.1
+ - com.unity3d.ads:unity-ads:3.4.2 -> 3.4.6
+ - 1337 search fixed
+ - SC search fixed
+
+FrostWire 2.2.2 build 646 - AUG/01/2020
+ - Considerably faster app startup
+ - .apk size reduced 2.1MB
+ - New 1337x (LeetX) search (thanks to @HimanshuSharma789 for his contribution)
+ - New iDope search (thanks to @HimanshuSharma789 for his contribution)
+ - Fixed Torrentz2 search dates (thanks to @HimanshuSharma789 for his contribution)
+ - Multiple crash fixes on My Music (Player)
+ - Settings screen now includes links to official reddit, twitter, facebook, discord chat, blog, rate us
+ - jlibtorrent 1.2.7.0 recompiled with Android NDK r21d
+ - com.google.android.material:material:1.2.0-alpha06 -> 1.3.0-alpha01
+ - com.android.tools.build:gradle:3.6.3 -> 4.0.1
+ - gradle-5.6.4 -> gradle-6.1.1
+ - androidx.browser:browser:1.3.0-alpha01 -> 1.3.0-alpha04
+ - com.google.android.gms:play-services-ads:19.1.0 -> 19.2.0
+ - com.android.billingclient:billing:2.2.0 -> 3.0.0
+
+FrostWire 2.2.1 build 642 - JUN/17/2020
+ - jlibtorrent/libtorrent 1.2.7.0 update
+ - OpenSSL 1.1.1g update
+ - dev: jlibtorrent build with boost 1.73.0
+ - Fixes bug getting source URL from TPB search result
+ - lt: fix incorrect filename truncation at multi-byte character
+ - lt: always announce listen port 1 when using a proxy
+ - lt: add set_alert_fd in python binding, to supersede set_alert_notify
+ - lt: fix bug in part files > 2 GiB
+ - lt: add function to clear the peer list for a torrent
+ - lt: fix resume data functions to save/restore more torrent flags
+ - lt: limit number of concurrent HTTP announces
+ - lt: fix queue position for force_rechecking a torrent that is not auto-managed
+ - lt: improve rate-based choker documentation, and minor tweak
+ - lt: undeprecate upnp_ignore_nonrouters (but refering to devices on our subnet)
+ - lt: increase default tracker timeout
+ - lt: retry failed socks5 server connections
+ - lt: allow UPnP lease duration to be changed after device discovery
+ - lt: fix IPv6 address change detection on Windows
+ - lt: fix peer timeout logic
+ - lt: simplify proxy handling. A proxy now overrides listen_interfaces
+ - lt: fix issues when configured to use a non-default choking algorithm
+ - lt: fix issue in reading resume data
+ - lt: revert NXDOMAIN change from 1.2.4
+ - lt: don't open any listen sockets if listen_interfaces is empty or misconfigured
+ - lt: fix bug in auto disk cache size logic
+ - lt: fix issue with outgoing_interfaces setting, where bind() would be called twice
+ - lt: add build option to disable share-mode
+ - lt: support validation of HTTPS trackers
+ - lt: deprecate strict super seeding mode
+ - lt: make UPnP port-mapping lease duration configurable
+ - lt: deprecate the bittyrant choking algorithm
+ - lt: add build option to disable streaming
+
+FrostWire 2.1.10 build 640 - JUN/04/2020
+ - Less interstitial ads
+ - Fixes Torrentz2 search
+ - Fixes music playback bug on Android 5.x (Lollypop)
+ - Fixes bug where playing a Unity Video Reward didn't pause ads
+ - Fixes bug getting source URL from TPB search result
+ - com.squareup.okhttp3:okhttp:3.14.0 -> 4.4.1
+ - com.google.android.gms:play-services-ads:18.3.0 -> 19.1.0
+ - com.android.billingclient:billing:2.1.0 -> 2.2.0
+ - dev: com.android.tools.build:gradle:3.6.1->3.6.3
+ - androidx.preference:preference:1.1.1
+ - com.google.android.material:material:1.2.0-alpha06
+ - androidx.exifinterface:exifinterface:1.2.0
+ - com.applovin:applovin-sdk:9.12.6
+ - com.mopub.mediation:applovin:9.12.5.0
+ - com.mopub:mopub-sdk-*:5.12.0
+
+FrostWire 2.1.9 build 637 - MAR/05/2020
+ - Album art display bug fixed
+ - No more annoying 300x250 ad over album art on Music Player
+ - New MagnetDL search
+ - Issues with search results not being displayed fixed
+ - MusicPlaybackService rewritten
+ - Continuous playback issues fixed
+ - Repeat mode and shuffle mode issues fixed
+ - Save to Playlist issue fixed
+ - New Global Sequential Downloads Torrent Setting. Disabled by default
+ - Transfer details file list and peer list no longer flicker when updated
+ - New jlibtorrent 1.2.3
+ - libtorrent 1.2.3.0 update
+ - com.google.android.material:material:1.2.0-alpha04->1.2.0-alpha05 update
+ - com.google.code.gson:gson:2.8.5 -> 2.8.6 update
+ - boost 1.72.0 build
+ - openssl 1.1.1d
+ - Android NDK 21
+ - R8 code minification enabled to build .apk
+ - UX: New 'Retry Download' action for failed magnet downloads
+ - UX: No more annoying ever-present Android notification, only during active transfers or music playback
+ - UX: Torrent search results now show how old they are
+ - EngineService and MusicPlaybackService are no longer ran as foreground services following newer android guidelines
+ - Considerable CPU usage reduction through thread invocation throttling frees resources for better search and download experience
+ - Removed experimental haptic feedback feature
+ - Multiple crashes fixed
+ - Music player and notifications framework update
+ - MusicPlaybackService lifecycle rewrite
+ - SoundCloud search/downloads fixed
+ - LimeTorrents search/downloads fixed
+ - Fixes crash searching for music in My Music screens
+ - Fixes issue media scanning finished download files
+ - androidx browser 1.3.0-alpha01
+ - applovin and mopub mediation 9.11.4
+ - mopub 5.11.0 update
+ - com.unity3d.ads:unity-ads:3.4.2 update
+ - lt:fix erroneous event=completed tracker announce when checking files
+ - lt:promote errors in parsing listen_interfaces to post listen_failed_alert
+ - lt:fix bug in protocol encryption/obfuscation
+ - lt:fix buffer overflow in SOCKS5 UDP logic
+ - lt:fix issue of rapid calls to file_priority() clobbering each other
+ - lt:clear tracker errors on success
+ - lt:optimize setting with unlimited unchoke slots
+ - lt:fixed restoring of trackers, comment, creation date and created-by in resume data
+ - lt:fix handling of torrents with too large pieces
+ - lt:fixed division by zero in anti-leech choker
+ - lt:fixed bug in torrent_info::swap
+  
+FrostWire 2.1.8 build 610 - DEC/25/2019
+ - TPB picks fastest mirror available
+ - SoundCloud search/downloads fixed
+ - Ads can be temporarily removed by playing a rewarded video ad
+ - androidx.browser:browser:1.2.0-rc01 update
+ - androidx.exifinterface:exifinterface:1.1.0 update
+ - com.applovin:applovin-sdk:9.10.5 update
+ - com.unity3d.ads:unity-ads:3.4.0 new
+ - com.android.billingclient:billing:2.1.0 update
+ - dev: com.android.tools.build:gradle:3.5.3
+ - cleanups and optimizations
+
+FrostWire 2.1.7 build 605 - NOV/20/2019
+ - Android 10 compatibility updates
+ - Android 4.4 support dropped, minimum compatible version is Android 5.0 Lollypop
+ - OKHttp 3.14.0 update
+ - androidx components update
+ - billingclient:billing:2.0.3 update
+ - re2j:1.3 update
+ - flexbox:1.1.1 update
+ - applovin-sdk:9.9.2 update
+ - buildToolsVersion '29.0.2' update
+ - play-services-ads:18.3.0 update
+ - mopub-sdk 5.10.0 update
+ - com.google.android.material:material:1.2.0-alpha0
+ - vungle-sdk removed
+ - ANR and crash fixes
+
+FrostWire 2.1.6 build 599 - AUG/30/2019
+ - Fixes bug where sequential downloads couldn't be turned off
+ - Archive.org .torrent download errors fixed
+ - TorLock and Torrentz2 search results are magnet based to reduce fetching errors
+ - material:1.1.0-alpha09 update
+ - play-services-ads:18.1.1 update
+ - com.applovin:applovin-sdk:9.8.4 update
+ - mopub-sdk:5.8.0 update
+ - com.android.tools.build:gradle:3.5.0 update
+ - com.android.support:design:29.0.0 update
+ - com.android.support:animated-vector-drawable:29.0.0 update
+ - com.android.support:customtabs:29.0.0 update
+ - com.android.support:exifinterface:29.0.0 update
+ - com.android.support:preference-v7:29.0.0 update
+ - com.android.support:preference-v14:29.0.0 update
+ - gradle wrapper distributionUrl=https\://services.gradle.org/distributions/gradle-5.6-all.zip
+ - crash fixes and optimizations
+ - New jlibtorrent 1.2.2.0 update
+ - jlibtorrent updated to boost 1.71.0
+ - jlibtorrent upgraded openssl to 1.1.1c
+ - jlibtorrent compiled with std=c++14 (up from c++11)
+ - lt:pick contiguous pieces from peers with high download rate
+ - lt:fix error handling of moving storage to a drive letter that isn't mounted
+ - lt:fix integer overflow in http parser
+ - lt:fix integer overflow in chunked http parser
+ - lt:factor out and unit test parts of the DHT routing table logic
+ - lt:improve sanitation of symlinks, to support more complex link targets (file_storage::sanitize_symlinks)
+ - lt:avoid empty dht routing table buckets
+ - lt:fix dht_stats_alert routing table stats for multi-homed clients
+ - lt:fix entry assignment from bdecode_node and lazy_entry
+ - lt:fix use-after-free issue in socket_type
+ - lt:fix error code messages when building without deprecated functions
+ - lt:feature to disable DHT, PEX and LSD per torrent
+ - lt:fix seeding of random number generator on mingw
+ - lt:fix issue where trackers from magnet links were not included in create_torrent()
+ - lt:extend the whole_pieces_threshold setting to also request contiguous pieces from fast peers
+ - lt:fix error handling of moving storage to a drive letter that isn't mounted
+ - lt:don't leak exceptions out of handler callbacks in resolver
+ - lt:ensure headers build independently
+ - lt:fix unit template's mutating operators to give them proper ref qualifiers
+     
+FrostWire 2.1.5 build 596 - JUL/13/2019
+ - AndroidX API migration update
+ - TPB search censorship improvements
+ - fixes, cleanups, optimizations
+ - applovin 9.7.2, play-services-ads 18.1.0
+
+FrostWire 2.1.4 build 593 - JUN/01/2019
+ - Nyaa search fixed
+ - New Torrentz2 search
+ - Thousands of code cleanups
+ - applovin 9.7.0, play-services-ads 17.2.1, mopub-sdk 5.7.0
+
+FrostWire 2.1.3 build 592 - MAY/16/2019
+ - New jlibtorrent 1.2.1.0 with latest libtorrent release
+ - play-services-ads 17.2.0, applovin 9.6.0, okhttp 3.12.2
+ - Plus: Soundcloud search/downloads fixed
+ - TorLock search fixes
+ - Archive.org search fixes
+ - gradle 4.10.1 -> 5.1.1 update (dev)
+ - com.android.tools.build:gradle 3.2.1 -> 3.4.0 (dev)
+ - More efficient build with D8
+ - using android NDK r19c (released January 2019)
+ - updated to boost 1.70.0
+ - frostwire.com is opened in case apk update can't be launched (Android 9 issue mostly)
+ - libtorrent: make sure session cleanup releases all its references to torrents
+ - libtorrent: track the mapped port for each NAT mapping transport
+ - libtorrent: optimize resolve_duplicate_filenames_slow()
+ - libtorrent: use a more restrictive limit on number of pieces allowed in a torrent
+ - libtorrent: improve disk I/O logging
+ - libtorrent: always flush disk I/O job queue before shutdown
+ - libtorrent: fix typo in validation of reject messages. Make on_choke a bit more defensive
+ - libtorrent: tighten up validation of dont-have messages
+ - libtorrent: tighten up validation of reject messages, to ensure consistency of stats counters
+ - libtorrent: tighten up message size checks
+ - libtorrent: update symlinks to conform to BEP 47
+ - libtorrent: source code cleanup, performance and stability
 
 FrostWire 2.1.2 build 581 - FEB/07/2019
  - Library okhttp 3.12.1,  applovin 9.2.1, play-services-ads 17.1.3

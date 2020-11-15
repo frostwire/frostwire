@@ -137,7 +137,7 @@ public class SearchProgressView extends LinearLayout {
 
     private void stopProgress() {
         progressbar.setVisibility(View.GONE);
-        buttonCancel.setText(R.string.retry_search);
+        buttonCancel.setText(R.string.retry);
         textNoResults.setVisibility(View.VISIBLE);
 
         if (currentQueryReporter.getCurrentQuery() != null) {

@@ -12,10 +12,11 @@ import java.util.Comparator;
 final class FileComparator implements Comparator<File>, Serializable {
     static final long serialVersionUID = 879961226428880051L;
 
-    /** Returns (((File)a).getAbsolutePath()).compareTo(
-     *              ((File)b).getAbsolutePath()) 
-     *  Typically you'll want to make sure a and b are canonical files,
-     *  but that isn't strictly necessary.
+    /**
+     * Returns (((File)a).getAbsolutePath()).compareTo(
+     * ((File)b).getAbsolutePath())
+     * Typically you'll want to make sure a and b are canonical files,
+     * but that isn't strictly necessary.
      */
     public int compare(File as, File bs) {
         return as.compareTo(bs);

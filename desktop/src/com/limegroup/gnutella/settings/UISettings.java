@@ -24,50 +24,72 @@ import java.awt.*;
 
 /**
  * Settings to deal with UI.
- */ 
+ */
 public final class UISettings extends LimeProps {
     /**
      * Setting for autocompletion
      */
     public static final BooleanSetting AUTOCOMPLETE_ENABLED =
-		FACTORY.createBooleanSetting("AUTOCOMPLETE_ENABLED", true);
-		
-    /**
-     * Setting for search-result filters.
-     */
-    public static final BooleanSetting SEARCH_RESULT_FILTERS =
-        FACTORY.createBooleanSetting("SEARCH_RESULT_FILTERS", true);
-                                     
+            FACTORY.createBooleanSetting("AUTOCOMPLETE_ENABLED", true);
     /**
      * Setting for using small icons.
      */
     public static final BooleanSetting SMALL_ICONS =
-        FACTORY.createBooleanSetting("UI_SMALL_ICONS", isResolutionLow());
-        
+            FACTORY.createBooleanSetting("UI_SMALL_ICONS", isResolutionLow());
     /**
      * Setting for displaying text under icons.
      */
     public static final BooleanSetting TEXT_WITH_ICONS =
-        FACTORY.createBooleanSetting("UI_TEXT_WITH_ICONS", true);
+            FACTORY.createBooleanSetting("UI_TEXT_WITH_ICONS", true);
+    public static final IntSetting UI_LIBRARY_MAIN_DIVIDER_LOCATION =
+            FACTORY.createIntSetting("UI_LIBRARY_MAIN_DIVIDER_LOCATION", -1);
+    public static final IntSetting UI_LIBRARY_EXPLORER_DIVIDER_POSITION =
+            FACTORY.createIntSetting("UI_LIBRARY_EXPLORER_DIVIDER_POSITION", 168);
+    /**
+     * Setting for the divider location between incoming query monitors and
+     * upload panel.
+     */
+    public static final IntSetting UI_TRANSFERS_DIVIDER_LOCATION =
+            FACTORY.createIntSetting("UI_TRANSFERS_DIVIDER_LOCATION", 400);
+    /**
+     * Setting for if native icons should be pre-loaded.
+     */
+    public static final BooleanSetting PRELOAD_NATIVE_ICONS =
+            FACTORY.createBooleanSetting("PRELOAD_NATIVE_ICONS", true);
+    /**
+     * Setting to persist the width of the options dialog if the dialog
+     * was resized by the user.
+     */
+    public static final IntSetting UI_OPTIONS_DIALOG_WIDTH =
+            FACTORY.createIntSetting("UI_OPTIONS_DIALOG_WIDTH", 844);
+    /**
+     * Setting to persist the height of the options dialog if the dialog
+     * was resized by the user.
+     */
+    public static final IntSetting UI_OPTIONS_DIALOG_HEIGHT =
+            FACTORY.createIntSetting("UI_OPTIONS_DIALOG_HEIGHT", 670);
+    /**
+     * Setting that globally enables or disables notifications.
+     */
+    public static final BooleanSetting SHOW_NOTIFICATIONS =
+            FACTORY.createBooleanSetting("SHOW_NOTIFICATIONS", true);
+    /**
+     * Use Classic Search/Transfer tab, or new Search, Transfer tabs
+     */
+    public static final BooleanSetting UI_SEARCH_TRANSFERS_SPLIT_VIEW =
+            FACTORY.createBooleanSetting("UI_SEARCH_TRANSFERS_SPLIT_VIEW", false);
+    // See com.limegroup.gnutella.gui.GUIConstants.Feature enum for available experimental features and their states.
+    public static final BooleanSetting ALPHA_FEATURES_ENABLED = FACTORY.createBooleanSetting("ALPHA_FEATURES_ENABLED", false);
+    public static final BooleanSetting BETA_FEATURES_ENABLED = FACTORY.createBooleanSetting("BETA_FEATURES_ENABLED", true);
+    public static final LongSetting LAST_FEEDBACK_SENT_TIMESTAMP = FACTORY.createLongSetting("LAST_FEEDBACK_SENT_TIMESTAMP", 0);
+    /**
+     * GENERAL -> "G" by default
+     */
+    public static final StringSetting LAST_SELECTED_TRANSFER_DETAIL_JPANEL = FACTORY.createStringSetting("LAST_SELECTED_TRANSFER_DETAIL_JPANEL", "G");
 
-    /**
-     * Setting for displaying smileys in chat window.
-     */
-    public static final BooleanSetting SMILEYS_IN_CHAT =
-        FACTORY.createBooleanSetting("UI_SMILEYS_IN_CHAT", true);        
-                       
-    /**
-     * Setting for not grouping search results in GUI
-     */
-    public static final BooleanSetting UI_GROUP_RESULTS =
-        FACTORY.createBooleanSetting("UI_GROUP_RESULTS", true);
-        
-    /**
-     * Setting to allow ignoring of alt-locs in replies.
-     */
-    public static final BooleanSetting UI_ADD_REPLY_ALT_LOCS =
-        FACTORY.createBooleanSetting("UI_ADD_REPLY_ALT_LOCS", true);
-        
+    private UISettings() {
+    }
+
     /**
      * For people with bad eyes.
      */
@@ -75,71 +97,4 @@ public final class UISettings extends LimeProps {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         return screenSize.width <= 800 || screenSize.height <= 600;
     }
-
-    /**
-     * Setting to persist monitor check box state.
-     */
-    public static final BooleanSetting UI_MONITOR_SHOW_INCOMING_SEARCHES =
-        FACTORY.createBooleanSetting("UI_MONITOR_SHOW_INCOMING_SEARCHES", false);
-	
-	/**
-	 * Setting for the divider location between library tree and table.
-	 */
-	public static final IntSetting UI_LIBRARY_TREE_DIVIDER_LOCATION =
-		FACTORY.createIntSetting("UI_LIBRARY_TREE_DIVIDER_LOCATION", -1);
-	
-	public static final IntSetting UI_LIBRARY_MAIN_DIVIDER_LOCATION =
-	        FACTORY.createIntSetting("UI_LIBRARY_MAIN_DIVIDER_LOCATION", -1);
-	
-	public static final IntSetting UI_LIBRARY_EXPLORER_DIVIDER_POSITION =
-	        FACTORY.createIntSetting("UI_LIBRARY_EXPLORER_DIVIDER_POSITION", 168);
-	
-	/**
-	 * Setting for the divider location between incoming query monitors and
-	 * upload panel.
-	 */
-	public static final IntSetting UI_TRANSFERS_DIVIDER_LOCATION =
-		FACTORY.createIntSetting("UI_TRANSFERS_DIVIDER_LOCATION", 400);
-    
-    /** Setting for if native icons should be pre-loaded. */
-    public static final BooleanSetting PRELOAD_NATIVE_ICONS =
-        FACTORY.createBooleanSetting("PRELOAD_NATIVE_ICONS", true);
-    
-    /**
-     * Setting to persist the width of the options dialog if the dialog
-     * was resized by the user.
-     */
-    public static final IntSetting UI_OPTIONS_DIALOG_WIDTH = 
-        FACTORY.createIntSetting("UI_OPTIONS_DIALOG_WIDTH", 844);
-    
-    /**
-     * Setting to persist the height of the options dialog if the dialog
-     * was resized by the user.
-     */
-    public static final IntSetting UI_OPTIONS_DIALOG_HEIGHT= 
-        FACTORY.createIntSetting("UI_OPTIONS_DIALOG_HEIGHT", 670);
-    
-    /**
-     * Setting that globally enables or disables notifications.
-     */
-    public static final BooleanSetting SHOW_NOTIFICATIONS = 
-        FACTORY.createBooleanSetting("SHOW_NOTIFICATIONS", true);
-    
-
-    /** Use Classic Search/Transfer tab, or new Search, Transfer tabs */
-    public static final BooleanSetting UI_SEARCH_TRANSFERS_SPLIT_VIEW =
-            FACTORY.createBooleanSetting("UI_SEARCH_TRANSFERS_SPLIT_VIEW", false);
-
-    // See com.limegroup.gnutella.gui.GUIConstants.Feature enum for available experimental features and their states.
-
-    public static final BooleanSetting ALPHA_FEATURES_ENABLED = FACTORY.createBooleanSetting("ALPHA_FEATURES_ENABLED", false);
-
-    public static final BooleanSetting BETA_FEATURES_ENABLED = FACTORY.createBooleanSetting("BETA_FEATURES_ENABLED", true);
-
-    public static final LongSetting LAST_FEEDBACK_SENT_TIMESTAMP = FACTORY.createLongSetting("LAST_FEEDBACK_SENT_TIMESTAMP", 0);
-
-    /** GENERAL -> "G" by default */
-    public static final StringSetting LAST_SELECTED_TRANSFER_DETAIL_JPANEL = FACTORY.createStringSetting("LAST_SELECTED_TRANSFER_DETAIL_JPANEL", "G");
-
-    private UISettings() {}
 }

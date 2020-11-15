@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -40,12 +40,12 @@ import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.MoPubAdNetwork;
 import com.frostwire.android.offers.MopubBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.StringUtils;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
@@ -138,7 +138,9 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
-        boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
+        boolean inLandscapeMode =
+                Configuration.ORIENTATION_LANDSCAPE ==
+                        getContext().getResources().getConfiguration().orientation;
         int addSpecialOffer = (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) ? 1 : 0;
         int addFrostWireFeaturesTitle = !inLandscapeMode ? 1 : 0;
         int slideCount = (slides != null) ? slides.size() : 0;
@@ -180,35 +182,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         // "FROSTWIRE FEATURES" view logic.
         int offsetFeaturesTitleHeader = 0;
         // OPTIONAL OFFER ON TOP
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
-
-            // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
-            int specialOfferLayout = pickSpecialOfferLayout();
-
-            // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
-            if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
-                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-            } else if (position == 0) {
-                // mopubBannerView does not work well in Android 4.4 (KitKat)
-                // java.lang.ClassCastException:
-                //  at android.widget.GridView.onMeasure (GridView.java:1046)
-                int r = 1 + new Random(System.currentTimeMillis()).nextInt(100);
-                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT || r % 2 == 0) {
-                    if (specialOfferLayout == R.layout.view_remove_ads_notification) {
-                        View removeAdsOfferView = setupRemoveAdsOfferView();
-                        if (removeAdsOfferView != null) {
-                            return removeAdsOfferView;
-                        }
-                    }
-                } else {
-                    return getMopubBannerView();
-                }
-                //this line below should be impossible, but we could have some other special offer layout
-                //return View.inflate(getContext(), specialOfferLayout, null);
-            } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
-                return super.getView(position - 2, null, parent);
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || PlayStore.available()) {
+            View basicPortraitView = getFWBasicPortraitView(position, convertView, parent);
+            if (basicPortraitView != null) {
+                return basicPortraitView;
             }
+            offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
         }
         // "FROSTWIRE FEATURES" title view
         if (position == offsetFeaturesTitleHeader) {
@@ -218,17 +197,40 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
             }
         }
-        return super.getView(position - 1, null, parent);
+        return super.getView(position - offsetFeaturesTitleHeader, null, parent);
     }
 
-    private View getMopubBannerView() {
+    private View getFWBasicPortraitView(int position, View convertView, ViewGroup parent) {
+        // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
+        int specialOfferLayout = pickSpecialOfferLayout();
+        boolean adsAreOn = specialOfferLayout == R.layout.view_remove_ads_notification;
+
+        // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
+        if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
+            return View.inflate(getContext(), R.layout.view_invisible_promo, null);
+        } else if (position == 0 && adsAreOn) {
+            return setupRemoveAdsOfferView();
+        } else if (position == 1 && adsAreOn && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
+            return getMopubBannerView();
+        } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
+            return super.getView(position - 2, null, parent);
+        }
+        return null;
+    }
+
+    private MopubBannerView getMopubBannerView() {
         if (mopubBannerView == null) {
-            mopubBannerView = new MopubBannerView(getContext(), null, true, false);
+            mopubBannerView = new MopubBannerView(getContext(),
+                    null,
+                    true,
+                    false,
+                    false);
             mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
             // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
             // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
             // temp fix placed in MoPubAdNetwork.java#126
-           mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
+            mopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_HOME);
+            mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
         }
         return mopubBannerView;
     }
@@ -262,7 +264,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         // Optimistic: If we're plus, we can't offer ad removal yet.
         specialOfferLayout = NO_SPECIAL_OFFER;
 
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && Offers.removeAdsOffersEnabled()) {
+        if (Offers.removeAdsOffersEnabled()) {
             specialOfferLayout = R.layout.view_remove_ads_notification;
         }
 

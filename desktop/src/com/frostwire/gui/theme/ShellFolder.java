@@ -29,15 +29,38 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Vector;
 
 /**
  * @author Michael Martak
  * @since 1.4
  */
-
 abstract class ShellFolder extends File {
+    // Static
+    private static ShellFolderManager shellFolderManager;
+
+    static {
+//        Class<?> managerClass = (Class<?>)Toolkit.getDefaultToolkit().
+//            getDesktopProperty("Shell.shellFolderManager");
+//        if (managerClass == null) {
+//            managerClass = ShellFolderManager.class;
+//        }
+        Class<?> managerClass = ShellFolderManager.class;
+        try {
+            shellFolderManager =
+                    (ShellFolderManager) managerClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException e) {
+            throw new Error("Could not instantiate Shell Folder Manager: "
+                    + managerClass.getName());
+        } catch (IllegalAccessException e) {
+            throw new Error("Could not access Shell Folder Manager: "
+                    + managerClass.getName());
+        } catch (NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected ShellFolder parent;
 
     /**
@@ -49,9 +72,62 @@ abstract class ShellFolder extends File {
     }
 
     /**
+     * Return a shell folder from a file object
+     *
+     * @throws FileNotFoundException if file does not exist
+     */
+    static ShellFolder getShellFolder(File file) throws FileNotFoundException {
+        if (file instanceof ShellFolder) {
+            return (ShellFolder) file;
+        }
+        if (!file.exists()) {
+            throw new FileNotFoundException();
+        }
+        return shellFolderManager.createShellFolder(file);
+    }
+
+    /**
+     * @param key a <code>String</code>
+     * @return An Object matching the string <code>key</code>.
+     * @see ShellFolderManager#get(String)
+     */
+    public static Object get(String key) {
+        return shellFolderManager.get(key);
+    }
+
+    /**
+     * @return Whether this is a file system root directory
+     */
+    private static boolean isFileSystemRoot(File dir) {
+        return shellFolderManager.isFileSystemRoot(dir);
+    }
+
+    /**
+     * Canonicalizes files that don't have symbolic links in their path.
+     * Normalizes files that do, preserving symbolic links from being resolved.
+     */
+    static File getNormalizedFile(File f) throws IOException {
+        File canonical = f.getCanonicalFile();
+        if (f.equals(canonical)) {
+            // path of f doesn't contain symbolic links
+            return canonical;
+        }
+        // preserve symbolic links from being resolved
+        return new File(f.toURI().normalize());
+    }
+
+    static ShellFolderColumnInfo[] getFolderColumns(File dir) {
+        return shellFolderManager.getFolderColumns(dir);
+    }
+
+    static Object getFolderColumnValue(File file, int column) {
+        return shellFolderManager.getFolderColumnValue(file, column);
+    }
+
+    /**
      * @return Whether this is a file system shell folder
      */
-    public boolean isFileSystem() {
+    boolean isFileSystem() {
         return (!getPath().startsWith("ShellFolder"));
     }
 
@@ -61,21 +137,19 @@ abstract class ShellFolder extends File {
      * <code>true</code>, then the object should be representable with an instance of
      * <code>java.io.File</code> instead. If not, then the object is most likely
      * depending on some internal (native) state and cannot be serialized.
-     *
-     * @returns a <code>java.io.File</code> replacement object, or <code>null</code>
+     * <p>
      * if no suitable replacement can be found.
      */
-    protected abstract Object writeReplace() throws java.io.ObjectStreamException;
+    protected abstract Object writeReplace();
 
     /**
      * Returns the path for this object's parent,
      * or <code>null</code> if this object does not name a parent
      * folder.
      *
-     * @return  the path as a String for this object's parent,
+     * @return the path as a String for this object's parent,
      * or <code>null</code> if this object does not name a parent
      * folder
-     *
      * @see java.io.File#getParent()
      * @since 1.4
      */
@@ -95,10 +169,9 @@ abstract class ShellFolder extends File {
      * or <code>null</code> if this object does not name a parent
      * folder.
      *
-     * @return  a File object representing this object's parent,
+     * @return a File object representing this object's parent,
      * or <code>null</code> if this object does not name a parent
      * folder
-     *
      * @see java.io.File#getParentFile()
      * @since 1.4
      */
@@ -118,21 +191,18 @@ abstract class ShellFolder extends File {
 
     public File[] listFiles(boolean includeHiddenFiles) {
         File[] files = super.listFiles();
-
         if (!includeHiddenFiles) {
-            Vector<File> v = new Vector<File>();
+            Vector<File> v = new Vector<>();
             int nameCount = (files == null) ? 0 : files.length;
             for (int i = 0; i < nameCount; i++) {
                 if (!files[i].isHidden()) {
                     v.addElement(files[i]);
                 }
             }
-            files = (File[])v.toArray(new File[v.size()]);
+            files = v.toArray(new File[0]);
         }
-
         return files;
     }
-
 
     /**
      * @return Whether this shell folder is a link
@@ -140,25 +210,10 @@ abstract class ShellFolder extends File {
     public abstract boolean isLink();
 
     /**
-     * @return The shell folder linked to by this shell folder, or null
-     * if this shell folder is not a link
-     */
-    public abstract ShellFolder getLinkLocation();
-
-    /**
      * @return The name used to display this shell folder
      */
     public abstract String getDisplayName();
-
-    /**
-     * @return The type of shell folder as a string
-     */
-    public abstract String getFolderType();
-
-    /**
-     * @return The executable type as a string
-     */
-    public abstract String getExecutableType();
+    // Override File methods
 
     /**
      * Compares this ShellFolder with the specified ShellFolder for order.
@@ -166,9 +221,8 @@ abstract class ShellFolder extends File {
      * @see #compareTo(Object)
      */
     public int compareTo(File file2) {
-        if (file2 == null || !(file2 instanceof ShellFolder)
-            || ((file2 instanceof ShellFolder) && ((ShellFolder)file2).isFileSystem())) {
-
+        if (!(file2 instanceof ShellFolder)
+                || ((file2 instanceof ShellFolder) && ((ShellFolder) file2).isFileSystem())) {
             if (isFileSystem()) {
                 return super.compareTo(file2);
             } else {
@@ -184,94 +238,10 @@ abstract class ShellFolder extends File {
     }
 
     /**
-     * @param getLargeIcon whether to return large icon (ignored in base implementation)
      * @return The icon used to display this shell folder
      */
-    public Image getIcon(boolean getLargeIcon) {
+    public Image getIcon() {
         return null;
-    }
-
-
-    // Static
-
-    private static ShellFolderManager shellFolderManager;
-
-    static {
-//        Class<?> managerClass = (Class<?>)Toolkit.getDefaultToolkit().
-//            getDesktopProperty("Shell.shellFolderManager");
-//        if (managerClass == null) {
-//            managerClass = ShellFolderManager.class;
-//        }
-    	Class<?> managerClass = ShellFolderManager.class;
-        try {
-            shellFolderManager =
-                (ShellFolderManager)managerClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new Error("Could not instantiate Shell Folder Manager: "
-            + managerClass.getName());
-        } catch (IllegalAccessException e) {
-            throw new Error ("Could not access Shell Folder Manager: "
-            + managerClass.getName());
-        }
-    }
-
-    /**
-     * Return a shell folder from a file object
-     * @exception FileNotFoundException if file does not exist
-     */
-    public static ShellFolder getShellFolder(File file) throws FileNotFoundException {
-        if (file instanceof ShellFolder) {
-            return (ShellFolder)file;
-        }
-        if (!file.exists()) {
-            throw new FileNotFoundException();
-        }
-        return shellFolderManager.createShellFolder(file);
-    }
-
-    /**
-     * @param key a <code>String</code>
-     * @return An Object matching the string <code>key</code>.
-     * @see ShellFolderManager#get(String)
-     */
-    public static Object get(String key) {
-        return shellFolderManager.get(key);
-    }
-
-    /**
-     * Does <code>dir</code> represent a "computer" such as a node on the network, or
-     * "My Computer" on the desktop.
-     */
-    public static boolean isComputerNode(File dir) {
-        return shellFolderManager.isComputerNode(dir);
-    }
-
-    /**
-     * @return Whether this is a file system root directory
-     */
-    public static boolean isFileSystemRoot(File dir) {
-        return shellFolderManager.isFileSystemRoot(dir);
-    }
-
-    /**
-     * Canonicalizes files that don't have symbolic links in their path.
-     * Normalizes files that do, preserving symbolic links from being resolved.
-     */
-    public static File getNormalizedFile(File f) throws IOException {
-        File canonical = f.getCanonicalFile();
-        if (f.equals(canonical)) {
-            // path of f doesn't contain symbolic links
-            return canonical;
-        }
-
-        // preserve symbolic links from being resolved
-        return new File(f.toURI().normalize());
-    }
-
-    // Override File methods
-
-    public static void sortFiles(List<Object> files) {
-        shellFolderManager.sortFiles(files);
     }
 
     public boolean isAbsolute() {
@@ -283,7 +253,7 @@ abstract class ShellFolder extends File {
     }
 
     public boolean canRead() {
-        return (isFileSystem() ? super.canRead() : true);       // ((Fix?))
+        return (!isFileSystem() || super.canRead());       // ((Fix?))
     }
 
     /**
@@ -292,17 +262,17 @@ abstract class ShellFolder extends File {
      * folder.
      */
     public boolean canWrite() {
-        return (isFileSystem() ? super.canWrite() : false);     // ((Fix?))
+        return (isFileSystem() && super.canWrite());     // ((Fix?))
     }
 
     public boolean exists() {
         // Assume top-level drives exist, because state is uncertain for
         // removable drives.
-        return (!isFileSystem() || isFileSystemRoot(this) || super.exists()) ;
+        return (!isFileSystem() || isFileSystemRoot(this) || super.exists());
     }
 
     public boolean isDirectory() {
-        return (isFileSystem() ? super.isDirectory() : true);   // ((Fix?))
+        return (!isFileSystem() || super.isDirectory());   // ((Fix?))
     }
 
     public boolean isFile() {
@@ -318,11 +288,11 @@ abstract class ShellFolder extends File {
     }
 
     public boolean createNewFile() throws IOException {
-        return (isFileSystem() ? super.createNewFile() : false);
+        return (isFileSystem() && super.createNewFile());
     }
 
     public boolean delete() {
-        return (isFileSystem() ? super.delete() : false);       // ((Fix?))
+        return (isFileSystem() && super.delete());       // ((Fix?))
     }
 
     public void deleteOnExit() {
@@ -332,42 +302,34 @@ abstract class ShellFolder extends File {
     }
 
     public boolean mkdir() {
-        return (isFileSystem() ? super.mkdir() : false);
+        return (isFileSystem() && super.mkdir());
     }
 
     public boolean mkdirs() {
-        return (isFileSystem() ? super.mkdirs() : false);
+        return (isFileSystem() && super.mkdirs());
     }
 
     public boolean renameTo(File dest) {
-        return (isFileSystem() ? super.renameTo(dest) : false); // ((Fix?))
+        return (isFileSystem() && super.renameTo(dest)); // ((Fix?))
     }
 
     public boolean setLastModified(long time) {
-        return (isFileSystem() ? super.setLastModified(time) : false); // ((Fix?))
+        return (isFileSystem() && super.setLastModified(time)); // ((Fix?))
     }
 
     public boolean setReadOnly() {
-        return (isFileSystem() ? super.setReadOnly() : false); // ((Fix?))
+        return (isFileSystem() && super.setReadOnly()); // ((Fix?))
     }
 
     public String toString() {
         return (isFileSystem() ? super.toString() : getDisplayName());
     }
 
-    public static ShellFolderColumnInfo[] getFolderColumns(File dir) {
-        return shellFolderManager.getFolderColumns(dir);
-    }
-
-    public static Object getFolderColumnValue(File file, int column) {
-        return shellFolderManager.getFolderColumnValue(file, column);
-    }
-
-    public ShellFolderColumnInfo[] getFolderColumns() {
+    ShellFolderColumnInfo[] getFolderColumns() {
         return null;
     }
 
-    public Object getFolderColumnValue(int column) {
+    Object getFolderColumnValue() {
         return null;
     }
 }

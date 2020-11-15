@@ -20,8 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.AppCompatTextView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.TextAppearanceSpan;
@@ -35,6 +33,9 @@ import com.frostwire.android.R;
 import com.frostwire.search.KeywordDetector;
 import com.frostwire.search.KeywordFilter;
 import com.google.android.flexbox.FlexboxLayout;
+
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.content.ContextCompat;
 
 /**
  * @author aldenml
@@ -120,7 +121,7 @@ public final class KeywordTagView extends AppCompatTextView {
         SpannableStringBuilder sb = new SpannableStringBuilder();
         sb = append(sb, keywordFilter.getKeyword(), keywordSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         if (count != -1) {
-            sb = append(sb, "  (" + String.valueOf(count) + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb = append(sb, "  (" + count + ")", countSpan, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         setText(sb, TextView.BufferType.NORMAL);
 

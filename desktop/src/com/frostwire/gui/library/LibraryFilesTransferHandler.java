@@ -25,7 +25,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.LibrarySettings;
-import org.limewire.util.OSUtils;
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -34,10 +34,10 @@ import java.io.File;
 
 /**
  * The Transfer Handler on the left hand side tree node that help us navigate downloaded files by media type.
- * @see LibraryFilesTableTransferHandler for the handler of the corresponding right hand side table.
+ *
  * @author gubatron
  * @author aldenml
- * 
+ * @see LibraryFilesTableTransferHandler for the handler of the corresponding right hand side table.
  */
 final class LibraryFilesTransferHandler extends TransferHandler {
     private static final Logger LOG = Logger.getLogger(LibraryFilesTransferHandler.class);
@@ -65,7 +65,7 @@ final class LibraryFilesTransferHandler extends TransferHandler {
             MediaTypeSavedFilesDirectoryHolder mediaTypeSavedFilesDirHolder = (MediaTypeSavedFilesDirectoryHolder) dirHolder;
             MediaType mt = mediaTypeSavedFilesDirHolder.getMediaType();
             return mt.equals(MediaType.getAudioMediaType()) &&
-                   DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
+                    DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }
@@ -79,17 +79,17 @@ final class LibraryFilesTransferHandler extends TransferHandler {
                 return true;
             }
             return isSharedFolderReceiver(dirHolder) &&
-                DNDUtils.containsFileFlavors(support.getDataFlavors()) &&
-                areAllFilesDirectories(DNDUtils.getFiles(support.getTransferable()));
+                    DNDUtils.containsFileFlavors(support.getDataFlavors()) &&
+                    areAllFilesDirectories(DNDUtils.getFiles(support.getTransferable()));
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    
+
     private boolean areAllFilesDirectories(File[] files) {
         boolean result = true;
-        for (File f: files) {
+        for (File f : files) {
             if (!f.isDirectory()) {
                 result = false;
                 break;
@@ -106,9 +106,9 @@ final class LibraryFilesTransferHandler extends TransferHandler {
         try {
             Transferable transferable = support.getTransferable();
             LibraryNode node = getNodeFromLocation(support.getDropLocation());
-             {
+            {
                 if (node instanceof DirectoryHolderNode) {
-                    DirectoryHolder dirHolder = ((DirectoryHolderNode)node).getDirectoryHolder();
+                    DirectoryHolder dirHolder = ((DirectoryHolderNode) node).getDirectoryHolder();
                     if (droppingFoldersToAddToLibrary(support, dirHolder, false)) {
                         try {
                             //add to library
@@ -145,12 +145,13 @@ final class LibraryFilesTransferHandler extends TransferHandler {
     /**
      * Checks if this directory holder is either one of:
      * Audio,Video,Images,Documents,Apps,Torrents or Finished Downloads directory holder.
+     *
      * @param directoryHolder
      * @return
      */
     private boolean isSharedFolderReceiver(DirectoryHolder directoryHolder) {
         return directoryHolder instanceof MediaTypeSavedFilesDirectoryHolder ||
-               directoryHolder instanceof FileSettingDirectoryHolder;
+                directoryHolder instanceof FileSettingDirectoryHolder;
     }
 
     @Override

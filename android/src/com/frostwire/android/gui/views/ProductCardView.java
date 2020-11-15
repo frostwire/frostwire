@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.frostwire.android.R;
 import com.frostwire.android.offers.Product;
+import com.frostwire.android.offers.Products;
 
 /**
  * @author gubatron
@@ -38,10 +39,12 @@ public class ProductCardView extends RelativeLayout {
     private final String titleBold;
     private final String titleNormal;
     private String price;
+    private String subscriptionPeriod;
     private String description;
     private final String hintButtonCaption;
     private final boolean selected;
     private final boolean hintButtonVisible;
+    private PaymentOptionsVisibility paymentOptionsVisibility;
 
     public ProductCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -57,16 +60,30 @@ public class ProductCardView extends RelativeLayout {
     }
 
     public void updateData(Product p) {
+        String sku = p.sku();
         String currency = p.currency();
         String productPrice = p.price();
         String productDescription = p.description();
         if (currency != null && productPrice != null) {
             price = currency + " " + productPrice;
         }
+        if (sku != null) {
+            subscriptionPeriod = "";
+            if (Products.SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
+                subscriptionPeriod = getContext().getResources().getString(R.string.period_monthly);
+            } else if (Products.SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
+                subscriptionPeriod = getContext().getResources().getString(R.string.period_yearly);
+            }
+        }
         if (productDescription != null) {
             description = productDescription;
         }
         initComponents();
+    }
+
+    public void updateTitle(String title) {
+        TextView titleBoldTextView = findViewById(R.id.view_product_card_title_bold_portion);
+        titleBoldTextView.setText(title);
     }
 
     @Override
@@ -88,10 +105,19 @@ public class ProductCardView extends RelativeLayout {
         setBackgroundResource(selected ? R.drawable.product_card_background_selected : R.drawable.product_card_background);
     }
 
+    public void setPaymentOptionsVisibility(PaymentOptionsVisibility optionsVisibility) {
+        paymentOptionsVisibility = optionsVisibility;
+    }
+
+    PaymentOptionsVisibility getPaymentOptionsVisibility() {
+        return paymentOptionsVisibility;
+    }
+
     private void initComponents() {
         initTextView(R.id.view_product_card_title_bold_portion, titleBold);
         initTextView(R.id.view_product_card_title_normal_portion, titleNormal);
         initTextView(R.id.view_product_card_price, price);
+        initTextView(R.id.view_product_card_subscription_period, "/" + subscriptionPeriod);
         initTextView(R.id.view_product_card_description, description);
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
     }
@@ -108,5 +134,9 @@ public class ProductCardView extends RelativeLayout {
         } else {
             textView.setVisibility(View.GONE);
         }
+    }
+
+    public String getSubscriptionPeriodString() {
+        return subscriptionPeriod;
     }
 }

@@ -24,8 +24,6 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.view.ActionMode;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -61,6 +59,9 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -288,7 +289,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         }
     }
 
-    private final class ImageViewerActionModeCallback implements android.support.v7.view.ActionMode.Callback {
+    private final class ImageViewerActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
         private final FileDescriptor fd;
         private final int position;
         private ActionMode mode;

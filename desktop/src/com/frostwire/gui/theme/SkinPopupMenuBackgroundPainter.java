@@ -22,26 +22,16 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
-
-    private final State state;
-
     public SkinPopupMenuBackgroundPainter(State state) {
-        this.state = state;
     }
 
     @Override
     protected void doPaint(Graphics2D g, JComponent c, int width, int height, Object[] extendedCacheKeys) {
-        switch (state) {
-        default:
-            paintBackground(g, width, height);
-            break;
-        }
+        paintBackground(g, width, height);
     }
 
     private void paintBackground(Graphics2D g, int width, int height) {
@@ -51,14 +41,13 @@ public final class SkinPopupMenuBackgroundPainter extends AbstractSkinPainter {
             Shape s = shapeGenerator.createRectangle(0, 0, w, h);
             g.setPaint(SkinColors.LIGHT_BACKGROUND_COLOR);
             g.fill(s);
-
             // border
             g.setPaint(SkinColors.GENERAL_BORDER_COLOR);
             g.draw(s);
         }
     }
 
-    public static enum State {
+    public enum State {
         Disabled, Enabled
     }
 }

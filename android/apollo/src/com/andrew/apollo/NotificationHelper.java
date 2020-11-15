@@ -19,11 +19,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v4.app.NotificationCompat;
 import android.widget.RemoteViews;
+
+import androidx.core.app.NotificationCompat;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.util.Logger;
+
+import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS;
 
 /**
  * Builds the notification for Apollo's service. Jelly Bean and higher uses the
@@ -32,6 +36,7 @@ import com.frostwire.android.core.Constants;
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
 public class NotificationHelper {
+    private static final Logger LOG = Logger.getLogger(NotificationHelper.class);
     private static final String INTENT_AUDIO_PLAYER = "com.frostwire.android.AUDIO_PLAYER";
 
     /**
@@ -64,23 +69,45 @@ public class NotificationHelper {
      */
     private RemoteViews mExpandedView;
 
+    public final static Object NOTIFICATION_LOCK = new Object();
+
     /**
      * Constructor of <code>NotificationHelper</code>
      *
      * @param service The {@link Context} to use
      */
-    public NotificationHelper(final MusicPlaybackService service) {
+    NotificationHelper(final MusicPlaybackService service) {
         mService = service;
-        mNotificationManager = (NotificationManager)service
+        mNotificationManager = (NotificationManager) service
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    void createNotificationChannel() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = null;
+            try {
+                channel = mNotificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID); // maybe we need another channel for the player?
+                LOG.info("updatePlayState() got a channel with notificationManager.getNotificationChannel()? -> " + channel, true);
+            } catch (Throwable t) {
+                LOG.error("updatePlayState() " + t.getMessage(), t);
+            }
+            if (channel == null) {
+                channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setSound(null, null);
+                LOG.info("updatePlayState() had to create a new channel with notificationManager.createNotificationChannel()", true);
+            }
+            mNotificationManager.createNotificationChannel(channel);
+        }
     }
 
     /**
      * Call this to build the {@link Notification}.
      */
-    public void buildNotification(final String albumName, final String artistName,
-                                  final String trackName, final Bitmap albumArt,
-                                  final boolean isPlaying) {
+    void buildNotification(final String albumName,
+                           final String artistName,
+                           final String trackName,
+                           final Bitmap albumArt,
+                           final boolean isPlaying) {
 
         // Default notification layout
         mNotificationTemplate = new RemoteViews(mService.getPackageName(),
@@ -90,13 +117,13 @@ public class NotificationHelper {
         initCollapsedLayout(trackName, artistName, albumArt);
 
         //  Save this for debugging
-        PendingIntent pendingintent = getPendingIntent();
+        PendingIntent pendingintent = pendingIntent();
 
         // Notification Builder
         Notification aNotification = new NotificationCompat.Builder(mService, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(getNotificationIcon())
+                .setSmallIcon(notificationIcon())
                 .setContentIntent(pendingintent)
-                .setVisibility(VISIBILITY_PUBLIC)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContent(mNotificationTemplate)
                 .build();
 
@@ -115,27 +142,10 @@ public class NotificationHelper {
         initExpandedLayout(trackName, albumName, artistName, albumArt);
 
         mNotification = aNotification;
-        try {
-            mService.startForeground(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
-        } catch (Throwable ignored) {
-            ignored.printStackTrace();
-        }
-        // TODO: research RuntimeException in Android 7
-        // we are getting this error at Bitmap.nativeWriteToParcel(Native Method:0)
-        // in very low numbers and only in android 7, better research it
-        // and not hide it for now
-    }
+        createNotificationChannel();
 
-    private int getNotificationIcon() {
-        return R.drawable.frostwire_notification_flat;
-    }
-
-    /**
-     * Remove notification
-     */
-    public void killNotification() {
-        mService.stopForeground(true);
-        mNotification = null;
+        // does service.startForeground(notification)
+        mService.onNotificationCreated(mNotification);
     }
 
     /**
@@ -143,40 +153,71 @@ public class NotificationHelper {
      *
      * @param isPlaying True if music is playing, false otherwise
      */
-    public void updatePlayState(final boolean isPlaying) {
-        if (mNotification == null || mNotificationManager == null) {
+    void updatePlayState(final boolean isPlaying, final boolean isStopped) {
+        LOG.info("updatePlayState(isPlaying=" + isPlaying + ", isStopped=" + isStopped + ")");
+        if (mNotification == null && !isStopped) {
+            LOG.info("updatePlayState() aborted! mNotification is null");
             return;
         }
+        if (mNotificationManager == null) {
+            LOG.info("updatePlayState() aborted! mNotificationManager is null");
+            return;
+        }
+        boolean isPaused = !isPlaying && !isStopped;
         if (mNotificationTemplate != null) {
+
             mNotificationTemplate.setImageViewResource(R.id.notification_base_play,
-                    isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
+                    isPaused ? R.drawable.btn_notification_playback_play : R.drawable.btn_notification_playback_pause);
         }
 
         if (mExpandedView != null) {
             mExpandedView.setImageViewResource(R.id.notification_expanded_base_play,
-                    isPlaying ? R.drawable.btn_notification_playback_pause : R.drawable.btn_notification_playback_play);
+                    isPaused ? R.drawable.btn_notification_playback_play : R.drawable.btn_notification_playback_pause);
         }
         try {
-            if (mNotification != null) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_DEFAULT);
-                    channel.setSound(null, null);
-                    mNotificationManager.createNotificationChannel(channel);
+            synchronized (NOTIFICATION_LOCK) {
+                if (isStopped) {
+                    mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS); // otherwise we end up with 2 notifications
                 }
-                mNotificationManager.notify(Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS, mNotification);
+                if (mNotification != null) {
+                    LOG.info("updatePlayState() calling back MusicPlaybackService::onNotificationCreated");
+                    mService.onNotificationCreated(mNotification);
+                }
             }
         } catch (SecurityException t) {
             // java.lang.SecurityException
+            LOG.error("updatePlayState() " + t.getMessage(), t);
         } catch (NullPointerException t2) {
             // possible java.lang.NullPointerException: Attempt to read from field 'android.os.Bundle android.app.Notification.extras' on a null object reference
             // when closing the player notification with the 'X' icon.
+            LOG.error("updatePlayState() " + t2.getMessage(), t2);
+        } catch (Throwable t3) {
+            LOG.error("updatePlayState() " + t3.getMessage(), t3);
         }
     }
 
     /**
+     * Remove notification
+     */
+    void killNotification() {
+        if (mNotificationManager != null) {
+            synchronized (NOTIFICATION_LOCK) {
+                mNotificationManager.cancel(NOTIFICATION_FROSTWIRE_PLAYER_STATUS);
+            }
+            mService.stopForeground(true);
+            mNotification = null;
+        }
+    }
+
+    private int notificationIcon() {
+        return R.drawable.frostwire_notification_flat;
+    }
+
+
+    /**
      * Open to the now playing screen
      */
-    private PendingIntent getPendingIntent() {
+    private PendingIntent pendingIntent() {
         return PendingIntent.getActivity(mService, 0, new Intent(INTENT_AUDIO_PLAYER)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), 0);
     }
@@ -267,7 +308,7 @@ public class NotificationHelper {
      * Sets the track name, artist name, and album art in the normal layout
      */
     private void initCollapsedLayout(final String trackName, final String artistName,
-            final Bitmap albumArt) {
+                                     final Bitmap albumArt) {
         // Track name (line one)
         mNotificationTemplate.setTextViewText(R.id.notification_base_line_one, trackName != null ? trackName : "---");
         // Artist name (line two)
@@ -283,7 +324,7 @@ public class NotificationHelper {
      * expanded layout
      */
     private void initExpandedLayout(final String trackName, final String artistName,
-            final String albumName, final Bitmap albumArt) {
+                                    final String albumName, final Bitmap albumArt) {
         // Track name (line one)
         mExpandedView.setTextViewText(R.id.notification_expanded_base_line_one, trackName != null ? trackName : "---");
         // Album name (line two)

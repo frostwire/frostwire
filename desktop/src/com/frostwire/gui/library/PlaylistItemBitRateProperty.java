@@ -18,15 +18,12 @@
 package com.frostwire.gui.library;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public final class PlaylistItemBitRateProperty extends PlaylistItemIntProperty {
-
-    public PlaylistItemBitRateProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean playing, boolean exists) {
-        super(line, getStringValue(stringValue), getIntValue(stringValue), playing, exists);
+final class PlaylistItemBitRateProperty extends PlaylistItemIntProperty {
+    PlaylistItemBitRateProperty(LibraryPlaylistsTableDataLine line, String stringValue, boolean exists) {
+        super(line, getStringValue(stringValue), getIntValue(stringValue), exists);
     }
 
     private static String getStringValue(String stringValue) {
@@ -36,17 +33,14 @@ public final class PlaylistItemBitRateProperty extends PlaylistItemIntProperty {
     private static int getIntValue(String stringValue) {
         // using Integer.MAX_VALUE to put entries with no bitrate at the bottom of the list
         String s = stringValue.toLowerCase().replace("kbps", "").replace("~", "").trim();
-
         int value = Integer.MAX_VALUE;
-
         if (s.length() > 0) {
             try {
-                value = Integer.valueOf(s);
+                value = Integer.parseInt(s);
             } catch (NumberFormatException e) {
                 // ignore
             }
         }
-
         return value;
     }
 }

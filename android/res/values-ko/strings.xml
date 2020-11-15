@@ -23,7 +23,6 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 적용 태그를 터치하여]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>귀하의 개인 정보는 근본적인 인권입니다.</b>. 보호되지 않은 연결은 온라인을 포함한 모든 것을 의미합니다. <b>다운로드, 검색, 메시징</b> 네트워크상의 모든 사용자가 모니터링하고 차단할 수 있습니다 (예 : 인터넷 서비스 제공 업체, 해커 및 정부 기관 <br> <br> <b> VPN 서비스 사용을 강력히 권장합니다.</b>. <br> 다음은 안정적인 서비스를 제공하고 FrostWire와 잘 작동하는 몇 가지 옵션입니다.]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN을 사용하여 인터넷에 연결되어 있습니다. <br><br> 아직 연결되어 있지 않은 경우 아래 서비스 중 하나를 사용하여 연결을 암호화하고 <b>사생활 보호</b>. ]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">설정</string>
     <string name="exit">나가기</string>
     <string name="search_label">검색</string>
@@ -163,7 +162,7 @@
     <string name="choose_email_app">이메일 앱 선택…</string>
     <string name="my_filetype">나의 %s</string>
     <string name="accept">수락</string>
-    <string name="retry_search">다시 해 보다</string>
+    <string name="retry">다시 해 보다</string>
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">파일을 시드 할 수 없습니다. BitTorrent는 연결이 끊긴 상태로 유지됩니다.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android는 FrostWire를 제거하면 다운로드 한 파일을 지 웁니다.</string>
     <string name="protected_connection">VPN으로 보호 된</string>
@@ -357,7 +356,6 @@
     <string name="or">또는</string>
     <string name="file_names">파일 이름</string>
     <string name="no_data_check_internet_connection">네트워크를 사용할 수 없으므로 인터넷 연결을 확인하십시오.</string>
-    <string name="use_pixabay">Pixabay사용</string>
     <string name="transfers_context_stop_seeding_all_transfers">모든 전송 시딩 중지</string>
     <string name="seed_stop">시딩 중지</string>
     <string name="transfers_select_seeding">시딩</string>
@@ -409,7 +407,7 @@
     <string name="frostwire_start_engine_service_security_exception">권한이 없기 때문에 FrostWire를 제대로 시작할 수 없습니다. 필요한 권한을 부여하고 애플리케이션을 다시 시작하십시오.</string>
     <string name="vpn_find_out_more">더 찾아 봐</string>
     <string name="vpn_suggestion_nordvpn">NORDVPN \n 무료 7 일 평가판</string>
-    <string name="play_store_out_of_sync">Google Play 스토어가 동기화되어 잠시 기다려야합니다.</string>
     <string name="contact_us">연락처</string>
     <string name="use_nyaa">Nyaa사용</string>
+    <string name="use_torrentz2">Torrentz2사용</string>
 </resources>

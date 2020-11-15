@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
@@ -22,34 +21,27 @@ import com.frostwire.gui.filters.TableLineFilter;
 import com.limegroup.gnutella.gui.GUIUtils;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class GeneralResultFilter implements TableLineFilter<SearchResultDataLine> {
-
-    private SearchResultMediator _rp;
-    private LabeledRangeSlider _rangeSliderSeeds;
-    private LabeledRangeSlider _rangeSliderSize;
-
+    private final SearchResultMediator _rp;
+    private final LabeledRangeSlider _rangeSliderSeeds;
+    private final LabeledRangeSlider _rangeSliderSize;
     private int _minResultsSeeds;
     private int _maxResultsSeeds;
-    private long _minResultsSize;
-    private long _maxResultsSize;
-
+    private double _minResultsSize;
+    private double _maxResultsSize;
     private int _minSeeds;
     private int _maxSeeds;
     private int _minSize;
     private int _maxSize;
-
     private String _keywords;
 
-    public GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
+    GeneralResultFilter(SearchResultMediator rp, LabeledRangeSlider rangeSliderSeeds, LabeledRangeSlider rangeSliderSize) {
         _rp = rp;
         _rangeSliderSeeds = rangeSliderSeeds;
         _rangeSliderSize = rangeSliderSize;
-
         _minResultsSeeds = Integer.MAX_VALUE;
         _maxResultsSeeds = 0;
         _minResultsSize = Long.MAX_VALUE;
@@ -61,11 +53,10 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
     }
 
     public boolean allow(SearchResultDataLine node) {
-
         boolean seedsNeedUpdate = false;
         int seeds = node.getSeeds();
         if (seeds < _minResultsSeeds) {
-            _minResultsSeeds = seeds >= 0 ? seeds : 0;
+            _minResultsSeeds = Math.max(seeds, 0);
             seedsNeedUpdate = true;
         }
         if (seeds > _maxResultsSeeds) {
@@ -73,7 +64,7 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             seedsNeedUpdate = true;
         }
         boolean sizeNeedUpdate = false;
-        long size = node.getSize();
+        double size = node.getSize();
         if (size < _minResultsSize) {
             _minResultsSize = size >= 0 ? size : 0;
             sizeNeedUpdate = true;
@@ -82,7 +73,6 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _maxResultsSize = size;
             sizeNeedUpdate = true;
         }
-
         if (seedsNeedUpdate) {
             _rangeSliderSeeds.getMinimumValueLabel().setText(String.valueOf(_minResultsSeeds));
             _rangeSliderSeeds.getMaximumValueLabel().setText(String.valueOf(_maxResultsSeeds));
@@ -91,12 +81,9 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
             _rangeSliderSize.getMinimumValueLabel().setText(GUIUtils.getBytesInHuman(_minResultsSize));
             _rangeSliderSize.getMaximumValueLabel().setText(GUIUtils.getBytesInHuman(_maxResultsSize));
         }
-
-        boolean inSeedRange = false;
-
+        boolean inSeedRange;
         if (_maxResultsSeeds > _minResultsSeeds) {
             int seedNorm = ((seeds - _minResultsSeeds) * 1000) / (_maxResultsSeeds - _minResultsSeeds);
-
             if (_minSeeds == 0 && _maxSeeds == 1000) {
                 inSeedRange = true;
             } else if (seeds == _minSeeds || seeds == _maxSeeds) {
@@ -111,12 +98,9 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         } else {
             inSeedRange = seeds == _maxResultsSeeds;
         }
-
-        boolean inSizeRange = false;
-
+        boolean inSizeRange;
         if (_maxResultsSize > _minResultsSize) {
-            long sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
-
+            double sizeNorm = ((size - _minResultsSize) * 1000) / (_maxResultsSize - _minResultsSize);
             if (_minSize == 0 && _maxSize == 1000) {
                 inSizeRange = true;
             } else if (_minSize == 0) {
@@ -129,10 +113,9 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
         } else {
             inSizeRange = size == _maxResultsSize;
         }
-
         String sourceName = getSourceName(node);
         boolean hasKeywords = hasKeywords(node.getDisplayName() + " " + node.getExtension() + " " + sourceName);
-        return inSeedRange && inSizeRange && hasKeywords;
+        return inSeedRange && inSizeRange && (hasKeywords || sourceName.contains("Cloud"));
     }
 
     private String getSourceName(SearchResultDataLine node) {
@@ -145,16 +128,12 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
     }
 
     private boolean hasKeywords(String filename) {
-
         String keywordText = _keywords;
-
         if (keywordText == null || keywordText.trim().length() == 0) {
             return true;
         }
-
         //if it's just one keyword.
         String[] keywords = keywordText.split(" ");
-
         if (keywords.length == 1) {
             return filename.toLowerCase().contains(keywordText.toLowerCase());
         } else {
@@ -166,60 +145,23 @@ public final class GeneralResultFilter implements TableLineFilter<SearchResultDa
                 }
             }
         }
-
         return true;
     }
 
-    public int getMinResultsSeeds() {
-        return _minResultsSeeds;
-    }
-
-    public int getMaxResultsSeeds() {
-        return _maxResultsSeeds;
-    }
-
-    public long getMinResultsSize() {
-        return _minResultsSize;
-    }
-
-    public long getMaxResultsSize() {
-        return _maxResultsSize;
-    }
-
-    public int getMinSeeds() {
-        return _minSeeds;
-    }
-
-    public int getMaxSeeds() {
-        return _maxSeeds;
-    }
-
-    public int getMinSize() {
-        return _minSize;
-    }
-
-    public int getMaxSize() {
-        return _maxSize;
-    }
-
-    public void setRangeSeeds(int min, int max) {
+    void setRangeSeeds(int min, int max) {
         _minSeeds = min;
         _maxSeeds = max;
         _rp.filterChanged(this, 1);
     }
 
-    public void setRangeSize(int min, int max) {
+    void setRangeSize(int min, int max) {
         _minSize = min;
         _maxSize = max;
         _rp.filterChanged(this, 1);
     }
 
-    public void updateKeywordFiltering(String text) {
-        _keywords = new String(text);
+    void updateKeywordFiltering(String text) {
+        _keywords = text;
         _rp.filterChanged(this, 1);
-    }
-
-    public String getKeywordFilterText() {
-        return _keywords;
     }
 }

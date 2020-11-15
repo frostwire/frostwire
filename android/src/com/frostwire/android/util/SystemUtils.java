@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public final class SystemUtils {
             return false;
         }
 
-        return Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path));
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path));
     }
 
     public static boolean isPrimaryExternalPath(File path) {
@@ -109,7 +109,7 @@ public final class SystemUtils {
             }
         }
 
-        return dirs.toArray(new File[dirs.size()]);
+        return dirs.toArray(new File[0]);
     }
 
     private static boolean hasSdkOrNewer(int versionCode) {

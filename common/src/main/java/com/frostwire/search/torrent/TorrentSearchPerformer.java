@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,10 +24,10 @@ import com.frostwire.search.SearchResult;
 import java.util.List;
 
 /**
- * 
+ * Extend this search performer if you can obtain all you need directly from a search results
+ * page, otherwise extend TorrentRegexSearchPerformer
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class TorrentSearchPerformer extends CrawlPagedWebSearchPerformer<TorrentCrawlableSearchResult> {
 

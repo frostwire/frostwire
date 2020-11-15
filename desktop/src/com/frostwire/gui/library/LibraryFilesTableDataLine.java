@@ -43,82 +43,70 @@ import java.util.Date;
  * @author aldenml
  */
 public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLine<File> {
-
     static final int ACTIONS_IDX = 0;
-
+    /**
+     * Constant for the column indicating the mod time of a file.
+     */
+    static final int MODIFICATION_TIME_IDX = 6;
+    static final int PAYMENT_OPTIONS_IDX = 7;
     /**
      * Constant for the column with the icon of the file.
      */
     private static final int ICON_IDX = 1;
-
     /**
      * Constant for the column with the name of the file.
      */
     private static final int NAME_IDX = 2;
-
     /**
      * Constant for the column storing the size of the file.
      */
     private static final int SIZE_IDX = 3;
-
     /**
      * Constant for the column storing the file type (extension or more
      * more general type) of the file.
      */
     private static final int TYPE_IDX = 4;
-
     /**
      * Constant for the column storing the file's path
      */
     private static final int PATH_IDX = 5;
-
-    /**
-     * Constant for the column indicating the mod time of a file.
-     */
-    static final int MODIFICATION_TIME_IDX = 6;
-
-    static final int PAYMENT_OPTIONS_IDX = 7;
-
     private static final int LICENSE_IDX = 8;
-
     private static final SizeHolder ZERO_SIZED_HOLDER = new SizeHolder(0);
-
     /**
      * Add the columns to static array _in the proper order_.
      * The *_IDX variables above need to match the corresponding
      * column's position in this array.
      */
     private static LimeTableColumn[] ltColumns;
-
-    /**
-     * Variable for the type
-     */
-    private String _type;
-
-    /**
-     * Cached SizeHolder
-     */
-    private SizeHolder _sizeHolder;
-
-    /**
-     * Variable for the path
-     */
-    private String _path;
-
     /**
      * The model this is being displayed on
      */
     private final LibraryFilesTableModel _model;
-
+    /**
+     * Variable for the type
+     */
+    private String _type;
+    /**
+     * Cached SizeHolder
+     */
+    private SizeHolder _sizeHolder;
+    /**
+     * Variable for the path
+     */
+    private String _path;
     /**
      * Whether or not the icon has been loaded.
      */
     private boolean _iconLoaded = false;
-
     /**
      * Whether or not the icon has been scheduled to load.
      */
     private boolean _iconScheduledForLoad = false;
+    private Date lastModified;
+    private String license;
+    private PaymentOptions paymentOptions;
+    private LibraryActionsHolder actionsHolder;
+    private NameHolder nameCell;
 
     LibraryFilesTableDataLine(LibraryFilesTableModel ltm) {
         super();
@@ -129,12 +117,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         return getLimeTableColumns().length;
     }
 
-    private Date lastModified;
-
-    private String license;
-
-    private PaymentOptions paymentOptions;
-
     /**
      * Initialize the object.
      * It will fail if not given a FileDesc or a File
@@ -142,16 +124,13 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
      */
     public void initialize(File file) {
         super.initialize(file);
-
         String fullPath = file.getPath();
         try {
             fullPath = file.getCanonicalPath();
         } catch (IOException ignored) {
         }
-
         String _name = initializer.getName();
         _type = "";
-
         if (!file.isDirectory()) {
             //_isDirectory = false;
             int index = _name.lastIndexOf(".");
@@ -165,7 +144,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
             _path = fullPath;
             //_isDirectory = true;
         }
-
         // only load file sizes, do nothing for directories
         // directories implicitly set SizeHolder to null and display nothing
         if (initializer.isFile()) {
@@ -174,38 +152,28 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         } else {
             _sizeHolder = ZERO_SIZED_HOLDER;
         }
-
         this.lastModified = new Date(initializer.lastModified());
-
         this.actionsHolder = new LibraryActionsHolder(this, false);
-
         this.nameCell = new NameHolder(_name);
-
         if (initializer != null &&
                 initializer.isFile() &&
                 FilenameUtils.getExtension(initializer.getName()) != null &&
                 FilenameUtils.getExtension(initializer.getName()).toLowerCase().endsWith("torrent")) {
-
             BTInfoAdditionalMetadataHolder additionalMetadataHolder = null;
-
             try {
                 additionalMetadataHolder = new BTInfoAdditionalMetadataHolder(initializer, initializer.getName());
             } catch (Throwable t) {
                 System.err.println("[InvalidTorrent] Can't create BTInfoAdditionalMetadataholder out of " + initializer.getAbsolutePath());
                 t.printStackTrace();
             }
-
             boolean hasLicense = additionalMetadataHolder != null && additionalMetadataHolder.getLicenseBroker() != null;
             boolean hasPaymentOptions = additionalMetadataHolder != null && additionalMetadataHolder.getPaymentOptions() != null;
-
             if (hasLicense) {
                 license = additionalMetadataHolder.getLicenseBroker().getLicenseName();
             }
-
             if (license == null) {
                 license = "";
             }
-
             if (hasPaymentOptions) {
                 paymentOptions = additionalMetadataHolder.getPaymentOptions();
             } else {
@@ -222,9 +190,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         return initializer;
     }
 
-    private LibraryActionsHolder actionsHolder;
-    private NameHolder nameCell;
-
     /**
      * Returns the object stored in the specified cell in the table.
      *
@@ -240,7 +205,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                     actionsHolder.setPlaying(isPlaying);
                     return actionsHolder;
                 case ICON_IDX:
-                    return new PlayableIconCell(getIcon(), isPlaying);
+                    return new PlayableIconCell(getIcon());
                 case NAME_IDX:
                     return nameCell;
                 case SIZE_IDX:
@@ -251,8 +216,6 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
                     return new PlayableCell(this, _path, isPlaying, idx);
                 case MODIFICATION_TIME_IDX:
                     return new PlayableCell(this, lastModified, lastModified.toString(), isPlaying, idx);
-//            case SHARE_IDX:
-//                return new FileShareCell(this, initializer.getAbsolutePath(), shared);
                 case PAYMENT_OPTIONS_IDX:
                     return paymentOptions;
                 case LICENSE_IDX:
@@ -273,12 +236,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
     }
 
     public boolean isClippable(int idx) {
-        switch (idx) {
-            case ICON_IDX:
-                return false;
-            default:
-                return true;
-        }
+        return idx != ICON_IDX;
     }
 
     public int getTypeAheadColumn() {
@@ -295,27 +253,17 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
 
     private LimeTableColumn[] getLimeTableColumns() {
         if (ltColumns == null) {
-            LimeTableColumn[] temp = {new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
-
+            ltColumns = new LimeTableColumn[]{new LimeTableColumn(ACTIONS_IDX, "LIBRARY_TABLE_ACTIONS", I18n.tr("Actions"), 18, true, LibraryActionsHolder.class),
                     //new LimeTableColumn(SHARE_IDX, "LIBRARY_TABLE_SHARE", I18n.tr("Wi-Fi Shared"), 18, true, FileShareCell.class),
-
                     new LimeTableColumn(ICON_IDX, "LIBRARY_TABLE_ICON", I18n.tr("Icon"), GUIMediator.getThemeImage("question_mark"), 18, true, PlayableIconCell.class),
-
                     new LimeTableColumn(NAME_IDX, "LIBRARY_TABLE_NAME", I18n.tr("Name"), 239, true, NameHolder.class),
-
                     new LimeTableColumn(SIZE_IDX, "LIBRARY_TABLE_SIZE", I18n.tr("Size"), 62, true, PlayableCell.class),
-
                     new LimeTableColumn(TYPE_IDX, "LIBRARY_TABLE_TYPE", I18n.tr("Type"), 48, true, PlayableCell.class),
-
                     new LimeTableColumn(PATH_IDX, "LIBRARY_TABLE_PATH", I18n.tr("Path"), 108, true, PlayableCell.class),
-
                     new LimeTableColumn(MODIFICATION_TIME_IDX, "LIBRARY_TABLE_MODIFICATION_TIME", I18n.tr("Last Modified"), 20, true, PlayableCell.class),
-
                     new LimeTableColumn(PAYMENT_OPTIONS_IDX, "LIBRARY_TABLE_PAYMENT_OPTIONS", I18n.tr("Tips/Donations"), 20, false, PaymentOptions.class),
-
                     new LimeTableColumn(LICENSE_IDX, "LIBRARY_TABLE_LICENSE", I18n.tr("License"), 100, true, String.class),
             };
-            ltColumns = temp;
         }
         return ltColumns;
     }
@@ -324,17 +272,11 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            BackgroundExecutorService.schedule(new Runnable() {
-                public void run() {
-                    GUIMediator.safeInvokeAndWait(new Runnable() {
-                        public void run() {
-                            IconManager.instance().getIconForFile(initializer);
-                            _iconLoaded = true;
-                            _model.refresh();
-                        }
-                    });
-                }
-            });
+            BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> {
+                IconManager.instance().getIconForFile(initializer);
+                _iconLoaded = true;
+                _model.refresh();
+            }));
             return null;
         } else if (_iconLoaded || iconAvailable) {
             return IconManager.instance().getIconForFile(initializer);

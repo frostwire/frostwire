@@ -39,7 +39,6 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -48,6 +47,8 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
+
+import androidx.appcompat.widget.AppCompatImageView;
 
 public class TouchImageView extends AppCompatImageView {
 
@@ -599,15 +600,13 @@ public class TouchImageView extends AppCompatImageView {
     private int setViewSize(int mode, int size, int drawableWidth) {
         int viewSize;
         switch (mode) {
-            case MeasureSpec.EXACTLY:
-                viewSize = size;
-                break;
             case MeasureSpec.AT_MOST:
                 viewSize = Math.min(drawableWidth, size);
                 break;
             case MeasureSpec.UNSPECIFIED:
                 viewSize = drawableWidth;
                 break;
+            case MeasureSpec.EXACTLY:
             default:
                 viewSize = size;
                 break;

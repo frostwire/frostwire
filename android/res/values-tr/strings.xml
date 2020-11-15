@@ -21,7 +21,6 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Bilgilendirme:</b> İndirmeleriniz için önerilse de, özellikle hassas bilgileri (örneğin bankacılık) indirirken veya paylaşırken ve herkese açık Wi-Fi veya mobil veri kullanırken, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
-    <string name="application_label">FrostWire</string>
     <string name="activity_preferences_name">Ayarlar</string>
     <string name="exit">Çıkış</string>
     <string name="search_label">Arama</string>
@@ -141,7 +140,7 @@
     <string name="my_filetype">Bana ait %s</string>
     <string name="use_soundcloud">Soundcloud.com\'u kullanın</string>
     <string name="torrent_scheme_download_not_supported">İndirme desteklenmiyor</string>
-    <string name="retry_search">Tekrar Deneyin</string>
+    <string name="retry">Tekrar Deneyin</string>
     <string name="use_archiveorg">Archive.org\'u kullanın</string>
     <string name="crawl_cache_size">%1$.2fMB Alt Önbellek</string>
     <string name="deleted_crawl_cache">Silinmiş alt önbellek</string>
@@ -355,7 +354,6 @@
     <string name="or">veya</string>
     <string name="file_names">Dosya adları</string>
     <string name="no_data_check_internet_connection">Ağ kullanılamıyor, lütfen İnternet bağlantınızı kontrol edin.</string>
-    <string name="use_pixabay">Pixabay\'u kullanın</string>
     <string name="transfers_context_stop_seeding_all_transfers">Tüm transferleri durdurmayı bırak</string>
     <string name="seed_stop">Paylaşmayı durdur</string>
     <string name="transfers_select_seeding">paylaşım</string>
@@ -409,7 +407,7 @@
     <string name="title_activity_transfer_detail">Transfer Detayı</string>
     <string name="piece_size_header">Parça boyutu:</string>
     <string name="add_tracker">İzleyici ekle</string>
-    <string name="play_store_out_of_sync">Google Play Store\'un senkronize edilmesi, birkaç dakika beklemesi gerekiyor</string>
     <string name="contact_us">Bizimle iletişime geçin</string>
     <string name="use_nyaa">Nyaa\'u kullanın</string>
+    <string name="use_torrentz2">Torrentz2\'u kullanın</string>
 </resources>
