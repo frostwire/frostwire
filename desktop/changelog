@@ -1,3 +1,8 @@
+frostwire (6.8.9) stable; urgency=high
+  * New source renderer icons for 1337x and MagnetDL search sources by Aholicknight
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 17 Nov 2020 14:33:00 -0600
+
 frostwire (6.8.8) stable; urgency=high
   * New Telluride cloud downloader technology
   * Refreshed welcome screen with search textbox
