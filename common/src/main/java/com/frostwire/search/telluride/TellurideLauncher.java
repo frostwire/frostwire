@@ -152,7 +152,7 @@ public final class TellurideLauncher {
         }
 
         public void parse(String line) {
-            if (!pageUrlRead && line.startsWith("Page_URL:")) {
+            if (!pageUrlRead && line.contains("PAGE_URL:")) {
                 pageUrlRead = true;
                 return;
             }
