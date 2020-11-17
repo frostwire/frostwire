@@ -111,9 +111,6 @@ final class SchemaBox extends JPanel {
     private void addSchemas() {
         NamedMediaType nmt;
         JPanel panel = new JPanel(new MigLayout("insets 0, fillx"));
-//        panel.setBackground(Color.BLUE);
-        //panel.setOpaque(true);
-        //panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
         Dimension dim = new Dimension(400, 30);
         panel.setPreferredSize(dim);
         panel.setMinimumSize(dim);
@@ -221,6 +218,8 @@ final class SchemaBox extends JPanel {
         buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getDocumentMediaType())).setVisible(false);
         buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getTorrentMediaType())).setVisible(false);
         buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getProgramMediaType())).setVisible(false);
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getAudioMediaType())).setVisible(true);
+        buttonsMap.get(NamedMediaType.getFromMediaType(MediaType.getVideoMediaType())).setVisible(true);
     }
 
     private static final class SchemaButtonBackgroundPainter extends AbstractSkinPainter {
