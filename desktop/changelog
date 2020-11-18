@@ -1,5 +1,5 @@
 frostwire (6.8.8) stable; urgency=high
-  * New Telluride cloud downloader technology
+  * New Telluride build 6 cloud downloader technology
   * Refreshed welcome screen with search textbox
   * OpenJDK 15 runtime (Windows, MacOS)
   * New TorrentParadise search source
