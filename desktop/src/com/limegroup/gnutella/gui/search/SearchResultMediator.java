@@ -568,6 +568,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         schemaBox.showOnlyAudioVideoSchemaBox();
     }
 
+    public void selectMediaType(NamedMediaType namedMediaType) {
+        schemaBox.selectMediaType(namedMediaType);
+    }
+
     private JScrollPane createSearchOptionsPanel() {
         searchOptionsPanel = new SearchOptionsPanel(this);
         searchOptionsPanel.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);

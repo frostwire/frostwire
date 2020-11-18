@@ -21,9 +21,11 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchPerformerListener;
 import com.frostwire.search.telluride.TellurideSearchResult;
+import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.util.List;
 
@@ -46,10 +48,31 @@ final class TellurideSearchPerformerDesktopListener implements TellurideSearchPe
 
     @Override
     public void onSearchResults(long token, List<TellurideSearchResult> results) {
+        int audioResults = 0;
+        int videoResults = 0;
+        for (TellurideSearchResult r : results) {
+            NamedMediaType namedMediaType = NamedMediaType.getFromExtension(FilenameUtils.getExtension(r.getFilename()));
+            MediaType mediaType = namedMediaType.getMediaType();
+            if (mediaType == MediaType.getAudioMediaType()) {
+                audioResults++;
+            } else if (mediaType == MediaType.getVideoMediaType()) {
+                videoResults++;
+            }
+        }
+
+        // java life...
+        final int audioCount = audioResults;
+        final int videoCount = videoResults;
+
         GUIMediator.safeInvokeLater(() -> {
             SearchResultMediator resultPanelForGUID = SearchMediator.getSearchResultDisplayer().getResultPanelForGUID(token);
             if (resultPanelForGUID != null) {
                 resultPanelForGUID.showOnlyAudioVideoSchemaBox();
+                if (videoCount > 0 && videoCount > audioCount) {
+                    resultPanelForGUID.selectMediaType(NamedMediaType.getFromMediaType(MediaType.getVideoMediaType()));
+                } else if (audioCount > 0) {
+                    resultPanelForGUID.selectMediaType(NamedMediaType.getFromMediaType(MediaType.getAudioMediaType()));
+                }
             }
         });
     }
