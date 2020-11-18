@@ -20,7 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.frostwire.android"
     android:installLocation="auto"
-    android:versionCode="664"
+    android:versionCode="665"
     android:versionName="2.2.5">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
