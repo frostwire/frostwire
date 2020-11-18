@@ -1,4 +1,4 @@
-FrostWire 2.2.5 build 664 - NOV/09/2020
+FrostWire 2.2.5 build 665 - NOV/18/2020
  - New: TorrentParadise search source
  - New: GloTorrents search source
  - New: Firebase Crash Analytics support
@@ -8,6 +8,7 @@ FrostWire 2.2.5 build 664 - NOV/09/2020
  - Soundcloud search fixed
  - EZTV search fixed
  - Fixed archive.org connection dropped/timeout error
+ - Privacy updates
  - com.google.android.gms:play-services-ads 19.4.0 -> 19.5.0
  - com.mopub:mopub-sdk-banner:5.12.0 -> 5.14.0
  - com.applovin:applovin-sdk:9.13.1 -> 9.14.5
