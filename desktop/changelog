@@ -1,8 +1,3 @@
-frostwire (6.8.9) stable; urgency=high
-  * New source renderer icons for 1337x and MagnetDL search sources by Aholicknight
-
- -- FrostWire Team <contact@frostwire.com>  Tue, 17 Nov 2020 14:33:00 -0600
-
 frostwire (6.8.8) stable; urgency=high
   * New Telluride cloud downloader technology
   * Refreshed welcome screen with search textbox
@@ -17,10 +12,11 @@ frostwire (6.8.8) stable; urgency=high
   * Fixed archive.org broken downloads
   * Fixes false negative NordLynx/NordVPN detection
   * All deprecation warnings fixed along with some optimizations
+  * New source renderer icons for 1337x and MagnetDL search sources by Aholicknight
   * dev: built with openjdk 15
   * dev: gradle-6.7
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 12 Nov 2020 12:06:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 18 Nov 2020 09:56:00 -0600
 
 frostwire (6.8.7) stable; urgency=high
   * New jlibtorrent 1.2.10.0 update
