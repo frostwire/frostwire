@@ -118,13 +118,22 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             LOG.info("formats are null, no valid search results for " + url);
             return results;
         }
+        int originalResultCount = result.formats.size();
         for (TellurideJSONMediaFormat format : result.formats) {
             if (format.url.contains(".m3u8")) {
-                // skip playlists
+                // skip playlists for now
+                // TODO: Implement .m3u8 telluride downloader
                 continue;
             }
-            if (format.height != 0 && format.height < 360) {
-                // skip low quality
+            if (originalResultCount > 1 && format.height != 0 && format.width > format.height && format.width < 320) {
+                // skip low quality horizontal videos
+                LOG.info("very low quality horizontal video, skipped");
+                continue;
+            }
+
+            if (originalResultCount > 1 && format.height > format.width && format.width < 300) {
+                // skip too low quality vertical videos
+                LOG.info("very low quality vertical video, skipped");
                 continue;
             }
 

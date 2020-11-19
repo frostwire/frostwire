@@ -1,5 +1,7 @@
 build 6 - nov/18/2020
  - python: youtube-dl 2020.11.18
+ - python: pyinstaller 4.0
+ - Smaller build, down 2.4MB
 
 build 5 - nov/13/2020
  - python: youtube-dl 2020.11.12
