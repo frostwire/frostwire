@@ -1,3 +1,6 @@
+FrostWire 2.2.6 build 666 - NOV/19/2020
+ - com.mopub.mediation:applovin:9.14.3.0 -> 9.14.8.0
+
 FrostWire 2.2.5 build 665 - NOV/18/2020
  - New: TorrentParadise search source
  - New: GloTorrents search source
