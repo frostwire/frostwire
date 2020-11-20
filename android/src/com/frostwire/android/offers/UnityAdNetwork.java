@@ -6,6 +6,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.unity3d.ads.IUnityAdsListener;
+import com.unity3d.ads.IUnityAdsLoadListener;
 import com.unity3d.ads.UnityAds;
 
 import java.lang.ref.WeakReference;
@@ -13,7 +14,7 @@ import java.lang.ref.WeakReference;
 import static com.frostwire.android.util.Asyncs.async;
 
 public class UnityAdNetwork extends AbstractAdNetwork {
-    private static Logger LOG = Logger.getLogger(UnityAdNetwork.class);
+    private static final Logger LOG = Logger.getLogger(UnityAdNetwork.class);
     private static final String INTERSTITIAL_PLACEMENT_ID = "Interstitial_All";
     private UnityAdsListener unityAdsListener;
 
@@ -25,7 +26,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
         final String GAME_ID = "3351589";
         unityAdsListener = new UnityAdsListener(this);
         UnityAds.addListener(unityAdsListener);
-        UnityAds.initialize(activity, GAME_ID, isDebugOn());
+        UnityAds.initialize(activity.getApplicationContext(), GAME_ID, isDebugOn());
         start();
     }
 
@@ -56,7 +57,17 @@ public class UnityAdNetwork extends AbstractAdNetwork {
     public void loadNewInterstitial(Activity activity) {
         if (started()) {
             LOG.info("UnityAdNetwork.loadNewInterstitial() loading " + INTERSTITIAL_PLACEMENT_ID);
-            UnityAds.load(INTERSTITIAL_PLACEMENT_ID);
+            UnityAds.load(INTERSTITIAL_PLACEMENT_ID, new IUnityAdsLoadListener() {
+                @Override
+                public void onUnityAdsAdLoaded(String placementId) {
+                    unityAdsListener.onUnityAdsReady(placementId);
+                }
+
+                @Override
+                public void onUnityAdsFailedToLoad(String placementId) {
+                    unityAdsListener.onUnityAdsFailedToLoad();
+                }
+            });
         }
     }
 
@@ -89,6 +100,10 @@ public class UnityAdNetwork extends AbstractAdNetwork {
 
         boolean isInterstitialReady() {
             return interstitialReady;
+        }
+
+        public void onUnityAdsFailedToLoad() {
+            interstitialReady = false;
         }
 
         @Override
@@ -144,7 +159,11 @@ public class UnityAdNetwork extends AbstractAdNetwork {
             if (error == UnityAds.UnityAdsError.NOT_INITIALIZED ||
                     error == UnityAds.UnityAdsError.INITIALIZE_FAILED ||
                     error == UnityAds.UnityAdsError.INIT_SANITY_CHECK_FAIL) {
-                if (Ref.alive(adNetwork)) {
+                interstitialReady = false;
+
+                if ((error == UnityAds.UnityAdsError.INITIALIZE_FAILED ||
+                        error == UnityAds.UnityAdsError.INIT_SANITY_CHECK_FAIL) &&
+                        Ref.alive(adNetwork)) {
                     adNetwork.get().stop(null);
                 }
             }
