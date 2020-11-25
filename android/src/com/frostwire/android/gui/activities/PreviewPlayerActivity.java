@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +28,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
@@ -44,6 +46,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -83,6 +87,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     private static final Logger LOG = Logger.getLogger(PreviewPlayerActivity.class);
     public static WeakReference<FileSearchResult> srRef;
+    private static String definitiveStreamUrl;
 
     private MediaPlayer androidMediaPlayer;
     private Surface surface;
@@ -122,15 +127,13 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.activity_preview_player_menu_fullscreen:
-                final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
-                toggleFullScreen(videoTexture);
+        if (item.getItemId() == R.id.activity_preview_player_menu_fullscreen) {
+            final TextureView videoTexture = findView(R.id.activity_preview_player_videoview);
+            toggleFullScreen(videoTexture);
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -215,7 +218,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         if (outState != null) {
             super.onSaveInstanceState(outState);
             outState.putString("displayName", displayName);
@@ -249,7 +252,15 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private String getFinalUrl(String url) {
+    /**
+     * Tries to get an alternate URI on a HTTP Location header,
+     * if the header isn't present it returns the url parameter
+     * The result is cached in the definitiveStreamUrl member variable.
+     */
+    private static String getDefinitiveStreamUrl(String url) {
+        if (definitiveStreamUrl != null) {
+            return definitiveStreamUrl;
+        }
         HttpURLConnection con = null;
         try {
             con = (HttpURLConnection) (new URL(url).openConnection());
@@ -258,8 +269,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             String location = con.getHeaderField("Location");
 
             if (location != null) {
-                return location;
+                definitiveStreamUrl = location;
+                return definitiveStreamUrl;
             }
+            definitiveStreamUrl = url;
         } catch (Throwable e) {
             LOG.error("Unable to detect final url", e);
         } finally {
@@ -271,13 +284,14 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 }
             }
         }
-        return url;
+        return definitiveStreamUrl;
     }
 
     @Override
     public void onDialogClick(String tag, int which) {
         if (tag.equals(NewTransferDialog.TAG) && which == Dialog.BUTTON_POSITIVE) {
             if (Ref.alive(NewTransferDialog.srRef)) {
+                definitiveStreamUrl = null;
                 releaseMediaPlayer();
                 Intent i = new Intent(this, MainActivity.class);
                 i.setAction(Constants.ACTION_START_TRANSFER_FROM_PREVIEW);
@@ -323,7 +337,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
 
-            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL,false);
+            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
 
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
@@ -331,9 +345,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
                 //noinspection SuspiciousNameCombination
                 frameLayoutParams.height = metrics.widthPixels;
             } else {
-                //noinspection SuspiciousNameCombination
                 frameLayoutParams.width = metrics.widthPixels;
-                //noinspection SuspiciousNameCombination
                 frameLayoutParams.height = metrics.heightPixels;
             }
             isFullScreen = true;
@@ -403,9 +415,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             }
         } else {
             if (isFullScreen) {
-                //noinspection SuspiciousNameCombination
                 params.width = metrics.widthPixels;
-                //noinspection SuspiciousNameCombination
                 params.height = metrics.heightPixels;
             } else {
                 params.width = Math.max(videoWidth, metrics.widthPixels / 2);
@@ -454,35 +464,57 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
+    private static void onConnectionDroppedError(final WeakReference<PreviewPlayerActivity> contextRef) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (Ref.alive(contextRef)) {
+                contextRef.get().finish();
+                UIUtils.showLongMessage(contextRef.get(), R.string.check_internet_connection);
+            }
+        });
+    }
+
+    private static void launchPlayerWithFinalStreamUrl(final WeakReference<PreviewPlayerActivity> contextRef, final Uri uri) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (!Ref.alive(contextRef)) {
+                return;
+            }
+            contextRef.get().androidMediaPlayer = new MediaPlayer();
+            Surface surface = (!contextRef.get().audio ? contextRef.get().surface : null);
+            MediaPlayer androidMediaPlayer = contextRef.get().androidMediaPlayer;
+            try {
+                androidMediaPlayer.setDataSource(contextRef.get(), uri);
+                androidMediaPlayer.setSurface(surface);
+                androidMediaPlayer.setOnBufferingUpdateListener(contextRef.get());
+                androidMediaPlayer.setOnCompletionListener(contextRef.get());
+                androidMediaPlayer.setOnPreparedListener(contextRef.get());
+                androidMediaPlayer.setOnVideoSizeChangedListener(contextRef.get());
+                androidMediaPlayer.setOnInfoListener(contextRef.get());
+                androidMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                androidMediaPlayer.prepare();
+                androidMediaPlayer.start();
+                if (MusicUtils.isPlaying()) {
+                    MusicUtils.playPauseOrResume();
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
         surface = new Surface(surfaceTexture);
-        Thread t = new Thread("PreviewPlayerActivity-onSurfaceTextureAvailable") {
-            @Override
-            public void run() {
-                final String url = getFinalUrl(streamUrl);
-                final Uri uri = Uri.parse(url);
-                androidMediaPlayer = new MediaPlayer();
-                try {
-                    androidMediaPlayer.setDataSource(PreviewPlayerActivity.this, uri);
-                    androidMediaPlayer.setSurface(!audio ? surface : null);
-                    androidMediaPlayer.setOnBufferingUpdateListener(PreviewPlayerActivity.this);
-                    androidMediaPlayer.setOnCompletionListener(PreviewPlayerActivity.this);
-                    androidMediaPlayer.setOnPreparedListener(PreviewPlayerActivity.this);
-                    androidMediaPlayer.setOnVideoSizeChangedListener(PreviewPlayerActivity.this);
-                    androidMediaPlayer.setOnInfoListener(PreviewPlayerActivity.this);
-                    androidMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    androidMediaPlayer.prepare();
-                    androidMediaPlayer.start();
-                    if (MusicUtils.isPlaying()) {
-                        MusicUtils.playPauseOrResume();
-                    }
-                } catch (Throwable e) {
-                    e.printStackTrace();
-                }
+        final WeakReference<PreviewPlayerActivity> contextRef = Ref.weak(this);
+        final String streamUrlCopy = streamUrl;
+        Engine.instance().getThreadPool().execute(() -> {
+            String finalUrl = PreviewPlayerActivity.getDefinitiveStreamUrl(streamUrlCopy);
+            if (finalUrl == null) {
+                PreviewPlayerActivity.onConnectionDroppedError(contextRef);
+                return;
             }
-        };
-        t.start();
+            final Uri uri = Uri.parse(finalUrl);
+            PreviewPlayerActivity.launchPlayerWithFinalStreamUrl(contextRef, uri);
+        });
     }
 
     @Override
@@ -593,6 +625,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
     @Override
     protected void onDestroy() {
+        definitiveStreamUrl = null;
         destroyMopubView();
         stopAnyOtherPlayers();
         releaseMediaPlayer();
@@ -613,8 +646,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             if (mopubBannerView != null) {
                 mopubBannerView.destroy();
             }
-        } catch (Throwable ignored) {
-            LOG.error(ignored.getMessage(), ignored);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
         } finally {
             mopubLoaded = false;
         }
@@ -639,8 +672,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     @Override
     public void onAudioFocusChange(int focusChange) {
         if (focusChange == AudioManager.AUDIOFOCUS_LOSS || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            definitiveStreamUrl = null;
             releaseMediaPlayer();
-
             int mediaTypeStrId = audio ? R.string.audio : R.string.video;
             setTitle(getString(R.string.media_preview, getString(mediaTypeStrId)));
         }
