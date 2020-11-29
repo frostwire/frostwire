@@ -331,7 +331,6 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
     private void requestSearchFocusImmediately() {
         if (cloudSearchField != null) {
             cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
-            cloudSearchField.setText(CLOUD_SEARCH_FIELD_HINT_TEXT);
             cloudSearchField.selectAll();
             cloudSearchField.requestFocus();
         }
