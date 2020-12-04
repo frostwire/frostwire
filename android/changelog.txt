@@ -1,4 +1,5 @@
-FrostWire 2.2.6 build 667 - NOV/25/2020
+FrostWire 2.2.6 build 668 - DEC/04/2020
+ - Fixes Soundcloud search
  - Fixes crash when previewing stream and internet connection is dropped
  - com.mopub:mopub-sdk*:5.14.0 -> 5.15.0
  - com.mopub.mediation:applovin:9.14.3.0 -> 9.14.8.0
