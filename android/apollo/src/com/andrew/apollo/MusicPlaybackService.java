@@ -424,9 +424,9 @@ public class MusicPlaybackService extends JobIntentService {
     // playlists
     private int mCardId;
 
-    private int mPlayListLen = 0;
+    private volatile int mPlayListLen = 0;
 
-    private int mPlayPos = -1;
+    private volatile int mPlayPos = -1;
 
     private int mNextPlayPos = -1;
 
@@ -1351,8 +1351,19 @@ public class MusicPlaybackService extends JobIntentService {
         }
         stopPlayer();
 
-        mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
-        updateCursor(mPlayList[mPlayPos]);
+        long trackId = -1;
+        synchronized (mPlayList) {
+            mPlayPos = Math.min(mPlayPos, mPlayList.length - 1);
+            try {
+                trackId = mPlayList[mPlayPos];
+            } catch (ArrayIndexOutOfBoundsException t) {
+                LOG.warn("Aborting openCurrentAndMaybeNext(openNext=" + openNext + ")");
+                LOG.error(t.getMessage(), t);
+                return false;
+            }
+        }
+        updateCursor(trackId);
+
         boolean hasOpenCursor = mCursor != null && !mCursor.isClosed();
         if (!hasOpenCursor) {
             if (openNext) {
