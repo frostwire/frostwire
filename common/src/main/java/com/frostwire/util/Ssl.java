@@ -158,6 +158,7 @@ public final class Ssl {
                 // check if the s is a subdomain
                 for (String baseDomain : validDomainsSet) {
                     if (s.contains(baseDomain)) {
+                        validDomainsSet.add(s);
                         return true;
                     }
                 }
