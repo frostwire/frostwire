@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class SoundcloudSearchPerformerTest {
     @Test
-    public void testTorrentParadiseSearchPerformer() {
+    public void testSoundcloudSearchPerformer() {
         Platforms.set(new DesktopPlatform());
         String TEST_SEARCH_TERM = UrlUtils.encode("free download");
         SoundcloudSearchPerformer searchPerformer = new SoundcloudSearchPerformer("api-v2.sndcdn.com", 1, TEST_SEARCH_TERM, 5000);
