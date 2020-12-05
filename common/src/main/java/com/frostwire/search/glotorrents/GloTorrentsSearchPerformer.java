@@ -38,13 +38,13 @@ public class GloTorrentsSearchPerformer extends TorrentSearchPerformer {
             "<font color='green'><b>(?<seeds>.*?)</b></font>";
 
     public GloTorrentsSearchPerformer(long token, String keywords, int timeoutMillis) {
-        super("gtdb.to", token, keywords, timeoutMillis, 1, 0);
+        super("www.gtdb.to", token, keywords, timeoutMillis, 1, 0);
         pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://gtdb.to/search_results.php?search=" + encodedKeywords + "&cat=0&incldead=0&lang=0&sort=seeders&order=desc";
+        return "https://www.gtdb.to/search_results.php?search=" + encodedKeywords + "&cat=0&incldead=0&lang=0&sort=seeders&order=desc";
     }
 
     private GloTorrentsSearchResult fromMatcher(SearchMatcher matcher) {
