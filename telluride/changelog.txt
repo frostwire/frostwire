@@ -1,3 +1,7 @@
+build 7 - dec 7/18/2020
+ - python: pip-20.3.1
+ - python: youtube-dl 2020.12.7
+
 build 6 - nov/18/2020
  - python: youtube-dl 2020.11.18
  - python: pyinstaller 4.0
