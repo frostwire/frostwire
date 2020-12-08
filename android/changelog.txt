@@ -2,6 +2,7 @@ FrostWire 2.2.6 build 668 - DEC/04/2020
  - Fixes Soundcloud search
  - Fixes GloTorrents search
  - Fixes crash when previewing stream and internet connection is dropped
+ - Fixes crash on MusicPlaybackService
  - com.mopub:mopub-sdk*:5.14.0 -> 5.15.0
  - com.mopub.mediation:applovin:9.14.3.0 -> 9.14.8.0
  - com.unity3d.ads:unity-ads:3.4.6 -> 3.5.1
