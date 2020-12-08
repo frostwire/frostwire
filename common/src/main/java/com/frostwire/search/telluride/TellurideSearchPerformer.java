@@ -131,7 +131,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
                 continue;
             }
 
-            if (originalResultCount > 1 && format.height > format.width && format.width < 300) {
+            if (originalResultCount > 1 && format.height > format.width && format.height < 480) {
                 // skip too low quality vertical videos
                 LOG.info("very low quality vertical video, skipped");
                 continue;
@@ -158,6 +158,8 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
                 } else if (format.width == 0 && format.height != 0) {
                     videoFormatParenthesis = " (" + format.height + "p)";
                 }
+            } else if (noCodec(format.acodec) && noCodec(format.vcodec) && format.height > 240) {
+                videoFormatParenthesis = " (" + format.height + "p)";
             }
             LOG.info("acodec=" + format.acodec + ", vcodec=" + format.vcodec + ", ext=" + result.ext + ", url=" + format.url);
             String domainName = UrlUtils.extractDomainName(format.url);
