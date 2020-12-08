@@ -2,8 +2,9 @@ frostwire (6.8.9) stable; urgency=high
  * Soundcloud search fixed
  * GloTorrents search fixed
  * Telluride Cloud Video Downloader build 7
+ * Better video format parsing from Telluride extracted metadata
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 07 Dec 2020 20:54:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 08 Dec 2020 01:51:00 -0600
 
 frostwire (6.8.8) stable; urgency=high
   * New Telluride build 6 cloud downloader technology
