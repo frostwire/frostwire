@@ -199,9 +199,14 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
     @Override
     public boolean showInterstitial(Activity activity, String placement, boolean shutdownActivityAfterwards, boolean dismissActivityAfterward) {
         if (interstitials == null || interstitials.isEmpty()) {
+            LOG.warn("showInterstitial() failed, interstitials null or empty.");
             return false;
         }
         MoPubInterstitial interstitial = interstitials.get(placement);
+        if (interstitial == null) {
+            LOG.warn("showInterstitial() failed, could not find interstitial for placement=" + placement);
+            return false;
+        }
         MoPubInterstitialListener listener = (MoPubInterstitialListener) interstitial.getInterstitialAdListener();
         if (listener != null) {
             listener.shutdownAppAfter(shutdownActivityAfterwards);
@@ -217,8 +222,9 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         if (!interstitial.isReady()) {
             try {
                 Method isDestroyedMethod = interstitial.getClass().getDeclaredMethod("isDestroyed");
+                boolean isDestroyed = false;
                 isDestroyedMethod.setAccessible(true);
-                boolean isDestroyed = (boolean) isDestroyedMethod.invoke(interstitial);
+                isDestroyed = (boolean) isDestroyedMethod.invoke(interstitial);
                 isDestroyedMethod.setAccessible(false);
 
                 if (isDestroyed) {

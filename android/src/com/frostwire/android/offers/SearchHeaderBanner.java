@@ -155,7 +155,6 @@ public final class SearchHeaderBanner extends LinearLayout {
         moPubView.setTesting(false);
         moPubView.setAutorefreshEnabled(true);
         moPubView.setAdUnitId(MoPubAdNetwork.UNIT_ID_SEARCH_HEADER);
-        String currentQuery = getCurrentQuery();
         moPubView.setBannerAdListener(getMoPubBannerListener());
         try {
             moPubView.loadAd();
