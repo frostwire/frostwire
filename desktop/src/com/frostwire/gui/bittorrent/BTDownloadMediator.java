@@ -116,8 +116,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return false;
         }
         final TransferState state = dl.getState();
-        return state == TransferState.ALLOCATING ||
-                state == TransferState.CHECKING ||
+        return  state == TransferState.CHECKING ||
                 state == TransferState.DOWNLOADING ||
                 state == TransferState.DOWNLOADING_METADATA ||
                 state == TransferState.DOWNLOADING_TORRENT ||

@@ -105,7 +105,6 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
         TRANSFER_STATE_STRING_MAP.put(TransferState.DOWNLOADING, I18n.tr("Downloading"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.FINISHED, I18n.tr("Finished"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.SEEDING, I18n.tr("Seeding"));
-        TRANSFER_STATE_STRING_MAP.put(TransferState.ALLOCATING, I18n.tr("Allocating"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.PAUSED, I18n.tr("Paused"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR, I18n.tr("Error"));
         TRANSFER_STATE_STRING_MAP.put(TransferState.ERROR_MOVING_INCOMPLETE, I18n.tr("Error: Moving incomplete"));
@@ -199,7 +198,7 @@ public final class BTDownloadDataLine extends AbstractDataLine<BTDownload> {
     public boolean isDownloading() {
         final TransferState state = initializer.getState();
         // almost like TorrentUtils.isActive() but doesn't consider uploading or seeding.
-        final boolean downloading = state == TransferState.ALLOCATING ||
+        final boolean downloading =
                 state == TransferState.CHECKING ||
                 state == TransferState.DOWNLOADING ||
                 state == TransferState.DOWNLOADING_METADATA ||
