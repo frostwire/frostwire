@@ -30,7 +30,6 @@ public enum TransferState {
     DOWNLOADING,
     FINISHED,
     SEEDING,
-    ALLOCATING,
     PAUSED,
     ERROR,
     ERROR_MOVING_INCOMPLETE,

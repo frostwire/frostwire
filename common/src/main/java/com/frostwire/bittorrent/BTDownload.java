@@ -189,8 +189,6 @@ public final class BTDownload implements BittorrentDownload {
                 return TransferState.FINISHED;
             case SEEDING:
                 return TransferState.SEEDING;
-            case ALLOCATING:
-                return TransferState.ALLOCATING;
             case CHECKING_RESUME_DATA:
                 return TransferState.CHECKING;
             case UNKNOWN:
