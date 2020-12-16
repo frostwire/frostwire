@@ -1,3 +1,23 @@
+FrostWire 2.2.7 build 669 - DEC/13/2020
+ - New jlibtorrent 1.12.10.0
+ - libtorrent 1.2.11.0 update (471e772cb7038f1bf5f44c32a09eb42fbb80ee99)
+ - lt: upgraded to openssl 1.1.1l
+ - lt: fix issue with moving the session object
+ - lt: deprecate torrent_status::allocating. This state is no longer used
+ - TorrentStatus::State::ALLOCATING enum removed
+ - lt: fix bug creating torrents with symbolic links
+ - lt: remove special case to save metadata in resume data unconditionally when added throught magnet link
+ - lt: fix bugs in mutable-torrent support (reusing identical files from different torrents)
+ - lt: fix incorrectly inlined move-assignment of file_storage
+ - lt: add session::paused flag, and the ability to construct a session in paused mode
+ - lt: fix session-pause causing tracker announces to fail
+ - lt: fix peer-exchange flags bug
+ - lt: allow saving resume data before metadata has been downloaded (for magnet links)
+ - lt: record blocks in the disk queue as downloaded in the resume data
+ - lt: fix bug in set_piece_deadline() when set in a zero-priority piece
+ - lt: fix issue in URL parser, causing issues with certain tracker URLs
+ - lt: use a different error code than host-unreachable, when skipping tracker announces
+
 FrostWire 2.2.6 build 668 - DEC/04/2020
  - Fixes Soundcloud search
  - Fixes GloTorrents search
