@@ -82,7 +82,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Apakah Anda yakin ingin membatalkan unduhan ini (data yang telah diunduh sejauh ini akan hapus)?</string>
     <string name="cancel_transfer">Batalkan Transfer</string>
     <string name="azureus_peer_manager_status_finished">Selesai</string>
-    <string name="azureus_manager_item_allocating">Sedang Mengalokasikan</string>
     <string name="azureus_manager_item_downloading">Sedang Mengunduh</string>
     <string name="azureus_manager_item_seeding">memproses Seeding</string>
     <string name="azureus_manager_item_stopped">berhenti</string>

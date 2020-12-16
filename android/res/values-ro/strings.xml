@@ -56,7 +56,6 @@
     <string name="wifi_seeding_has_been_turned_off">Wi-Fi nu este disponibil, însămânțarea a fost oprit</string>
     <string name="pause_torrent_menu_action">Pauză</string>
     <string name="storage_preference_title">Selectați Stocare Locație</string>
-    <string name="azureus_manager_item_allocating">Alocând</string>
     <string name="app_shutdown_dlg_message">Acest lucru va opri toate transferurile și serviciile de fundal. Esti sigur?</string>
     <string name="show_transfers_on_download_start">Afișați transferurile de descărcare de start</string>
     <string name="send_feedback">Trimite feedback</string>

@@ -84,7 +84,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Bạn có chắc chắn muốn hủy quá trình tải về này (Dữ liệu đã tải về sẽ không bị xóa)?</string>
     <string name="cancel_transfer">Hủy truyền tải</string>
     <string name="azureus_peer_manager_status_finished">Hoàn thành</string>
-    <string name="azureus_manager_item_allocating">Đang cấp phát</string>
     <string name="azureus_manager_item_downloading">Đang tải về</string>
     <string name="azureus_manager_item_seeding">Đang Seed</string>
     <string name="azureus_manager_item_stopped">Đã dừng</string>

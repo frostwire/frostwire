@@ -84,7 +84,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Θέλεις σίγουρα να ακυρώσεις αυτό το download (τα κατεβασμένα δεδομένα θα διαγραφούν);</string>
     <string name="cancel_transfer">Ακύρωση Μεταφοράς</string>
     <string name="azureus_peer_manager_status_finished">Ολοκληρώθηκε</string>
-    <string name="azureus_manager_item_allocating">Δεσμεύεται</string>
     <string name="azureus_manager_item_downloading">Κατεβαίνει</string>
     <string name="azureus_manager_item_seeding">Μοιράζεται</string>
     <string name="azureus_manager_item_stopped">Σταμάτησε</string>

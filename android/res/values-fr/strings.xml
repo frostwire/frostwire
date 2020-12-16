@@ -84,7 +84,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Voulez-vous vraiment annuler ce téléchargement (les données téléchargées seront effacées)?</string>
     <string name="cancel_transfer">Annuler le transfert </string>
     <string name="azureus_peer_manager_status_finished">Terminé</string>
-    <string name="azureus_manager_item_allocating">Attribution </string>
     <string name="azureus_manager_item_downloading">Téléchargement</string>
     <string name="azureus_manager_item_seeding">Ensemencement</string>
     <string name="azureus_manager_item_stopped">Arrêter </string>

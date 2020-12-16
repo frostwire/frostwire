@@ -81,7 +81,6 @@
     <string name="yes_no_cancel_delete_transfer_question">هل أنت متأكد أنك ترغب في إلغاء هذا التنزيل (سوف يتم حذف البيانات التي تم تنزيلها حتى الآن)؟</string>
     <string name="cancel_transfer">إلغاء النقل</string>
     <string name="azureus_peer_manager_status_finished">منتهي</string>
-    <string name="azureus_manager_item_allocating">جاري التوزيع</string>
     <string name="azureus_manager_item_downloading">جاري التنزيل</string>
     <string name="azureus_manager_item_seeding">رفع للمشاركة</string>
     <string name="azureus_manager_item_stopped">متوقف</string>

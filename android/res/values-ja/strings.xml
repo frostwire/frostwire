@@ -86,7 +86,6 @@
     <string name="yes_no_cancel_delete_transfer_question">このダウンロードをキャンセルしますか(これまでのダウンロードデータは削除されます)？</string>
     <string name="cancel_transfer">転送をキャンセルする</string>
     <string name="azureus_peer_manager_status_finished">完了しました</string>
-    <string name="azureus_manager_item_allocating">割り当て中</string>
     <string name="azureus_manager_item_downloading">ダウンロード中</string>
     <string name="azureus_manager_item_seeding">シード処理</string>
     <string name="azureus_manager_item_stopped">停止しました</string>

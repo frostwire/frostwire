@@ -112,7 +112,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Are you sure you want to cancel this download (downloaded data so far will be erased)?</string>
     <string name="cancel_transfer">Cancel Transfer</string>
     <string name="azureus_peer_manager_status_finished">Finished</string>
-    <string name="azureus_manager_item_allocating">Allocating</string>
     <string name="azureus_manager_item_downloading">Downloading</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="azureus_manager_item_stopped">Stopped</string>

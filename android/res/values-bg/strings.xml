@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Не Wifi достъпно, засяване е изключен</string>
     <string name="pause_torrent_menu_action">Пауза</string>
     <string name="storage_preference_title">Изберете Място на съхранение</string>
-    <string name="azureus_manager_item_allocating">Разпределяне</string>
     <string name="app_shutdown_dlg_message">Това ще изключи всички трансфери и фонови услуги. Сигурен ли си?</string>
     <string name="show_transfers_on_download_start">Показване на преводи по изтегляне старт</string>
     <string name="send_feedback">Изпратете отзиви</string>

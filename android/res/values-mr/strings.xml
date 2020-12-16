@@ -72,7 +72,6 @@
     <string name="pause_torrent_menu_action">विराम द्या</string>
     <string name="storage_preference_title">स्टोरेज स्थान निवडा</string>
     <string name="working">कार्यरत</string>
-    <string name="azureus_manager_item_allocating">वाटप</string>
     <string name="app_shutdown_dlg_message">हे सर्व बदल्या आणि पार्श्वभूमी सेवा बंद करेल तुला खात्री आहे?</string>
     <string name="show_transfers_on_download_start">डाउनलोड प्रारंभ वर हस्तांतरण दर्शवा</string>
     <string name="send_feedback">अभिप्राय पाठवा</string>

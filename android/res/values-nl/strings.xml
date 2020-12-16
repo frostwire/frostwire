@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Weet je zeker dat je deze download wilt annuleren (Tot nu toe gedownloade data zullen verwijderd worden)?</string>
     <string name="cancel_transfer">Transfer Annuleren</string>
     <string name="azureus_peer_manager_status_finished">Voltooid</string>
-    <string name="azureus_manager_item_allocating">Toewijzen </string>
     <string name="azureus_manager_item_downloading">Downloaden</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="azureus_manager_item_stopped">Gestopt</string>

@@ -66,7 +66,6 @@ public final class TransferStateStrings {
         map.put(TransferState.DOWNLOADING, c.getString(R.string.azureus_manager_item_downloading));
         map.put(TransferState.FINISHED, c.getString(R.string.azureus_peer_manager_status_finished));
         map.put(TransferState.SEEDING, c.getString(R.string.azureus_manager_item_seeding));
-        map.put(TransferState.ALLOCATING, c.getString(R.string.azureus_manager_item_allocating));
         map.put(TransferState.PAUSED, c.getString(R.string.azureus_manager_item_paused));
         map.put(TransferState.ERROR, c.getString(R.string.azureus_manager_item_error));
         map.put(TransferState.ERROR_MOVING_INCOMPLETE, c.getString(R.string.error_moving_incomplete));

@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Jste si jisti, že chcete zrušit tento software ke stažení (Stažená data zatím budou smazány)?</string>
     <string name="cancel_transfer">Zrušit Transfer</string>
     <string name="azureus_peer_manager_status_finished">Dokončeno</string>
-    <string name="azureus_manager_item_allocating">Přidělování</string>
     <string name="azureus_manager_item_downloading">Stahování</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="azureus_manager_item_stopped">Zastaveno</string>

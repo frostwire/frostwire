@@ -81,7 +81,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Bu indirmeden vazgeçmek istediğinize emin misiniz (Şu ana kadarki indirilen veri silinecektir)?</string>
     <string name="cancel_transfer">Transferden Vazgeç</string>
     <string name="azureus_peer_manager_status_finished">Tamamlandı</string>
-    <string name="azureus_manager_item_allocating">Yer Ayırıyor</string>
     <string name="azureus_manager_item_downloading">İndiriyor</string>
     <string name="azureus_manager_item_seeding">Tohumluyor</string>
     <string name="azureus_manager_item_stopped">Durduruldu</string>

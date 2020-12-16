@@ -90,7 +90,6 @@
     <string name="storage_picker_treeuri_error">غیر متوقع خرابی اٹھا اسٹوریج پاتھ</string>
     <string name="open_menu_action">کھولیں s%</string>
     <string name="wifi_seeding_has_been_turned_off">کوئی وائی فائی دستیاب، بوائ بند کردیا گیا ہے</string>
-    <string name="azureus_manager_item_allocating">آونٹن</string>
     <string name="app_shutdown_dlg_message">یہ مرضی سے بند تمام کی منتقلی اور پس منظر کی خدمات. کیا تمہیں یقین ہے؟</string>
     <string name="show_transfers_on_download_start">ٹرانسفر ڈاؤن لوڈ شروع پر شو</string>
     <string name="send_feedback">رائے بھیجیں</string>

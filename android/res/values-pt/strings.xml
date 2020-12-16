@@ -81,7 +81,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Você tem certeza que quer cancelar este download (Dados baixados serão apagados)?</string>
     <string name="cancel_transfer">Cancelar Transferência</string>
     <string name="azureus_peer_manager_status_finished">Acabou</string>
-    <string name="azureus_manager_item_allocating">Alocando</string>
     <string name="azureus_manager_item_downloading">Baixando</string>
     <string name="azureus_manager_item_seeding">Sementeando</string>
     <string name="azureus_manager_item_stopped">Parou</string>

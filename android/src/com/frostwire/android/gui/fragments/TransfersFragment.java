@@ -683,7 +683,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         return state == TransferState.CHECKING ||
                 state == TransferState.DOWNLOADING ||
                 state == TransferState.DEMUXING ||
-                state == TransferState.ALLOCATING ||
                 state == TransferState.DOWNLOADING_METADATA ||
                 state == TransferState.DOWNLOADING_TORRENT ||
                 state == TransferState.FINISHING ||

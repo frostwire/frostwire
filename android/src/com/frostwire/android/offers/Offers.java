@@ -50,7 +50,7 @@ public final class Offers {
 
     /** Turn this on to enable Test Ad Units*/
     static final boolean DEBUG_MODE = false;
-    
+
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
     public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();

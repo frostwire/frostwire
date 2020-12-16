@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Er du sikker på du ønsker at annullere denne download (Overførte data indtil videre vil blive slettet)?</string>
     <string name="cancel_transfer">Annuller overførsel</string>
     <string name="azureus_peer_manager_status_finished">Udført</string>
-    <string name="azureus_manager_item_allocating">Tildeling</string>
     <string name="azureus_manager_item_downloading">Downloading</string>
     <string name="azureus_manager_item_seeding">Frø</string>
     <string name="azureus_manager_item_stopped">Stoppede</string>

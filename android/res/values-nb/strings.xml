@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Ingen Wifi tilgjengelig, Seeding er slått av</string>
     <string name="pause_torrent_menu_action">Bli stående</string>
     <string name="storage_preference_title">Velg lagringssted</string>
-    <string name="azureus_manager_item_allocating">Tildeling</string>
     <string name="app_shutdown_dlg_message">Dette vil nedleggelse alle overføringer og bakgrunnen tjenester. Er du sikker?</string>
     <string name="show_transfers_on_download_start">Vis overføringer på Last ned start</string>
     <string name="send_feedback">Gi tilbakemelding</string>

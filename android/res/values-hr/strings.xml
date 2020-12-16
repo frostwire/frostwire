@@ -70,7 +70,6 @@
     <string name="search">Traži</string>
     <string name="transfers">Prijenosi</string>
     <string name="cancel_transfer">Otkazati prijenos</string>
-    <string name="azureus_manager_item_allocating">Dodjeljujem</string>
     <string name="azureus_manager_item_downloading">Preuzimam</string>
     <string name="azureus_manager_item_seeding">Dijelim</string>
     <string name="azureus_manager_item_stopped">Zaustavljeno</string>

@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Няма Wi-Fi даступны, Пасеў ня быў выключаны</string>
     <string name="pause_torrent_menu_action">Паўза</string>
     <string name="storage_preference_title">Выберыце месцы захоўвання</string>
-    <string name="azureus_manager_item_allocating">Вылучаючы</string>
     <string name="app_shutdown_dlg_message">Гэта прывядзе да завяршэння усе трансферы і фонавыя службы. Вы ўпэўнены?</string>
     <string name="show_transfers_on_download_start">Паказаць Рынак на загрузку пачатку</string>
     <string name="send_feedback">Адправіць водгук</string>

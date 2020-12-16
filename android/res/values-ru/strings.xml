@@ -85,7 +85,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Вы уверены, что хотите отменить это скачивание (Скаченная информация будет удалена)?</string>
     <string name="cancel_transfer">Отменить передачу</string>
     <string name="azureus_peer_manager_status_finished">Завершено</string>
-    <string name="azureus_manager_item_allocating">Размещение</string>
     <string name="azureus_manager_item_downloading">Идет скачивание</string>
     <string name="azureus_manager_item_seeding">Раздача</string>
     <string name="azureus_manager_item_stopped">Остановлено</string>

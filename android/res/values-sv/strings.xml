@@ -60,7 +60,6 @@
     <string name="wifi_seeding_has_been_turned_off">Ingen WiFi tillgängliga, sådd har stängts av</string>
     <string name="pause_torrent_menu_action">Paus</string>
     <string name="storage_preference_title">Välj lagringsplats</string>
-    <string name="azureus_manager_item_allocating">Fördela</string>
     <string name="app_shutdown_dlg_message">Detta kommer avstängning alla överföringar och bakgrundstjänster. Är du säker?</string>
     <string name="show_transfers_on_download_start">Visa överföringar på nedladdning start</string>
     <string name="send_feedback">Skicka feedback</string>

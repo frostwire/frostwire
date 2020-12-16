@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Ні Wi-Fi доступний, Посів ні вимкнений</string>
     <string name="pause_torrent_menu_action">Пауза</string>
     <string name="storage_preference_title">Виберіть місця зберігання</string>
-    <string name="azureus_manager_item_allocating">Виділяючи</string>
     <string name="app_shutdown_dlg_message">Це призведе до завершення всі трансфери і фонові служби. Ти впевнений?</string>
     <string name="show_transfers_on_download_start">Показати трансфери на старті завантаження</string>
     <string name="send_feedback">Надіслати відгук</string>

@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Ei WiFi, Seeding on sammutettu</string>
     <string name="pause_torrent_menu_action">Paussi</string>
     <string name="storage_preference_title">Valitse tallennuspaikka</string>
-    <string name="azureus_manager_item_allocating">Kohdentaminen</string>
     <string name="app_shutdown_dlg_message">Tämä aiotaan sulkea kaikki siirrot ja taustan palveluja. Oletko varma?</string>
     <string name="show_transfers_on_download_start">Näytä Siirrot download alku</string>
     <string name="send_feedback">Lähetä palautetta</string>

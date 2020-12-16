@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">ไม่มี WiFi ใช้ได้เมล็ดถูกปิด</string>
     <string name="pause_torrent_menu_action">หยุด</string>
     <string name="storage_preference_title">เลือกสถานที่เก็บสินค้า</string>
-    <string name="azureus_manager_item_allocating">การจัดสรร</string>
     <string name="app_shutdown_dlg_message">นี้จะปิดการโอนและบริการทั้งหมดพื้นหลัง คุณแน่ใจไหม?</string>
     <string name="show_transfers_on_download_start">แสดงการโอนเงินในการดาวน์โหลดเริ่มต้น</string>
     <string name="send_feedback">ส่งความคิดเห็น</string>

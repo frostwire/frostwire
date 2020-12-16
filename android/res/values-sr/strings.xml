@@ -95,7 +95,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Да ли сте сигурни да желите да откажете преузимање (скинута подаци до сада ће бити избрисани)?</string>
     <string name="cancel_transfer">Откажи Трансфер</string>
     <string name="azureus_peer_manager_status_finished">Готов</string>
-    <string name="azureus_manager_item_allocating">Додела</string>
     <string name="azureus_manager_item_downloading">Преузимање</string>
     <string name="azureus_manager_item_seeding">Сетве</string>
     <string name="azureus_manager_item_stopped">Стоппед</string>

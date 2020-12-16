@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Czy na pewno chcesz anulować pobieranie (pobrane dane zostaną usunięte)?</string>
     <string name="cancel_transfer">Anuluj Transfer</string>
     <string name="azureus_peer_manager_status_finished">Zakończono</string>
-    <string name="azureus_manager_item_allocating">Przydzielanie</string>
     <string name="azureus_manager_item_downloading">Pobieranie</string>
     <string name="azureus_manager_item_seeding">Seedowanie</string>
     <string name="azureus_manager_item_stopped">Zatrzymano</string>

@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">确定要取消此次下载（目前的下载数据会被删除）?</string>
     <string name="cancel_transfer">Cancel 传输</string>
     <string name="azureus_peer_manager_status_finished">完成</string>
-    <string name="azureus_manager_item_allocating">正在配置</string>
     <string name="azureus_manager_item_downloading">下载中</string>
     <string name="azureus_manager_item_seeding">播种</string>
     <string name="azureus_manager_item_stopped">停止</string>

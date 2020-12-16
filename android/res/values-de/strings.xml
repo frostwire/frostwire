@@ -93,7 +93,6 @@
     <string name="yes_no_cancel_delete_transfer_question">Bist du sicher, dass du diesen Download abbrechen willst (Schon heruntergeladene Daten werden gelöscht)?</string>
     <string name="cancel_transfer">Übertragung abbrechen</string>
     <string name="azureus_peer_manager_status_finished">Fertig</string>
-    <string name="azureus_manager_item_allocating">Wird zugewiesen</string>
     <string name="azureus_manager_item_downloading">Wird heruntergeladen</string>
     <string name="azureus_manager_item_seeding">Seeding</string>
     <string name="azureus_manager_item_stopped">Gestoppt</string>

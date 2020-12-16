@@ -58,7 +58,6 @@
     <string name="wifi_seeding_has_been_turned_off">Tiada Wifi ada, Seeding Telah berada</string>
     <string name="pause_torrent_menu_action">Jeda</string>
     <string name="storage_preference_title">Pilih Storan Lokasi</string>
-    <string name="azureus_manager_item_allocating">Memperuntukkan</string>
     <string name="app_shutdown_dlg_message">Ini akan penutupan semua pemindahan dan perkhidmatan latar belakang. Adakah anda pasti?</string>
     <string name="show_transfers_on_download_start">Show pemindahan di muat permulaan</string>
     <string name="send_feedback">Hantar maklumbalas</string>

@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">क्या आप सुनिश्चित हैं कि आप इस डाउनलोड  को रद्द करना चाहते हैं( अभी तक किया गया डाउनलोड डेटा मिट जाएगा)?</string>
     <string name="cancel_transfer">स्थानांतरण रद्द करें</string>
     <string name="azureus_peer_manager_status_finished">समाप्त</string>
-    <string name="azureus_manager_item_allocating">आवंटन</string>
     <string name="azureus_manager_item_downloading">डाउनलोड हो रहा है</string>
     <string name="azureus_manager_item_seeding">सीडिंग</string>
     <string name="azureus_manager_item_stopped">रुक गया </string>

@@ -83,7 +83,6 @@
     <string name="yes_no_cancel_delete_transfer_question">정말 다운로드를 취소하시겠습니까? (지금까지 다운로드된 데이터는 손실됩니다)</string>
     <string name="cancel_transfer">트랜스퍼 취소</string>
     <string name="azureus_peer_manager_status_finished">완료</string>
-    <string name="azureus_manager_item_allocating">할당중</string>
     <string name="azureus_manager_item_downloading">다운로드중</string>
     <string name="azureus_manager_item_seeding">시드중</string>
     <string name="azureus_manager_item_stopped">정지됨</string>
