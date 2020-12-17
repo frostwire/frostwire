@@ -33,6 +33,7 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
     private static Logger LOG = Logger.getLogger(MagnetDLSearchPerformer.class);
     private final Pattern pattern;
     private final String nonEncodedKeywords;
+    private int minSeeds = 1;
     private static final String SEARCH_RESULT_PAGE_REGEX =
             "(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
                     "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
@@ -44,6 +45,10 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
         super("magnetdl.com", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
         pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+    }
+
+    public void setMinSeeds(int minSeeds) {
+        this.minSeeds = minSeeds;
     }
 
     @Override
@@ -75,10 +80,12 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
             }
             if (matcherFound) {
                 MagnetDLSearchResult sr = fromMatcher(matcher);
-                if (sr.getSeeds() > 0) {
+                if (sr.getSeeds() >= minSeeds) {
+                    LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
                     results.add(sr);
+                } else {
+                    LOG.info("Not adding 0 seed search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
                 }
-                LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
             } else {
                 LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
                 LOG.warn("========");

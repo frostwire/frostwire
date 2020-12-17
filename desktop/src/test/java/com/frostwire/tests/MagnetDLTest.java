@@ -40,6 +40,7 @@ public class MagnetDLTest {
     public void main() {
         String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
         MagnetDLSearchPerformer magnetDLSearchPerformer = new MagnetDLSearchPerformer(1, TEST_SEARCH_TERM, 5000);
+        magnetDLSearchPerformer.setMinSeeds(0); // just for testing
         MagnetDLSearchListener magnetDLSearchListener = new MagnetDLSearchListener();
         magnetDLSearchPerformer.setListener(magnetDLSearchListener);
         try {
@@ -58,9 +59,13 @@ public class MagnetDLTest {
 
     static class MagnetDLSearchListener implements SearchListener {
         final List<String> failedTests = new ArrayList<>();
+        int totalResults = 0;
 
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
+            if (results != null) {
+                totalResults = results.size();
+            }
             for (SearchResult result : results) {
                 MagnetDLSearchResult sr = (MagnetDLSearchResult) result;
                 System.out.println("MagnetDLSearchResult.SearchListener.onResults:");
@@ -105,7 +110,9 @@ public class MagnetDLTest {
 
         @Override
         public void onError(long token, SearchError error) {
-            failedTests.add(error.message());
+            if (totalResults == 0) {
+                failedTests.add(error.message());
+            }
         }
 
         @Override
