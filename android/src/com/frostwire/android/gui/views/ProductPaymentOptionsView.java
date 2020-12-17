@@ -146,7 +146,7 @@ public class ProductPaymentOptionsView extends LinearLayout {
             return;
         }
         PaymentOptionsVisibility paymentOptionsVisibility = selectedProductCard.getPaymentOptionsVisibility();
-        if (paymentOptionsLayouts == null) {
+        if (paymentOptionsLayouts == null || paymentOptionsVisibility == null) {
             return;
         }
         if (paymentOptionsLayouts[PayButtonType.ONE_TIME.offset] != null) {

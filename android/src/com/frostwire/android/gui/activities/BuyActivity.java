@@ -413,6 +413,9 @@ public final class BuyActivity extends AbstractActivity {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }
+        // let's do this here to avoid a rare NPE that's popping up on ProductPaymentOptionsView::refreshOptionsVisibility
+        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, true, false));
+
         if (store == null) {
             throw new IllegalArgumentException("store argument can't be null");
         }
@@ -429,6 +432,7 @@ public final class BuyActivity extends AbstractActivity {
         card.setTag(R.id.subs_product_tag_id, prodSubs);
         card.setTag(R.id.inapp_product_tag_id, prodInApp);
         card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(includeOnetimeProducts, true, false));
+
         card.updateData(prodSubs);
     }
 
