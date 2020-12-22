@@ -1216,9 +1216,13 @@ public final class MusicUtils {
         }
         final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
         final ContentResolver resolver = context.getContentResolver();
-        resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{
-                Long.toString(id)
-        });
+        try {
+            resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{
+                    Long.toString(id)
+            });
+        } catch (IllegalAccessError ignored) {
+            // could not acquire provider for uri
+        }
     }
 
     /**
