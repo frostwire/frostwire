@@ -368,7 +368,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
             final String mimeType = cursor.getString(cursor
                     .getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE));
 
-            if (mimeType.equals("artist")) {
+            if ("artist".equals(mimeType)) {
                 holder.mImage.get().setScaleType(ScaleType.CENTER_CROP);
 
                 // Get the artist name
@@ -391,7 +391,7 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
 
                 // Highlight the query
                 mHighlighter.setText(holder.mLineOne.get(), artist, mPrefix);
-            } else if (mimeType.equals("album")) {
+            } else if ("album".equals(mimeType)) {
                 holder.mImage.get().setScaleType(ScaleType.FIT_XY);
 
                 // Get the Id of the album
@@ -414,8 +414,8 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
                 // Highlight the query
                 mHighlighter.setText(holder.mLineOne.get(), album, mPrefix);
 
-            } else if (mimeType.startsWith("audio/") || mimeType.equals("application/ogg")
-                    || mimeType.equals("application/x-ogg")) {
+            } else if (mimeType != null && (mimeType.startsWith("audio/") || "application/ogg".equals(mimeType)
+                    || "application/x-ogg".equals(mimeType))) {
                 holder.mImage.get().setScaleType(ScaleType.FIT_XY);
                 holder.mImage.get().setImageResource(R.drawable.header_temp);
 
