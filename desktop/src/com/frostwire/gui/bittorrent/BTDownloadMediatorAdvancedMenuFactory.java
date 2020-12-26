@@ -191,9 +191,20 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         return list.toArray(new com.frostwire.bittorrent.BTDownload[0]);
     }
 
-    private static void addSpeedMenu(SkinMenu menuAdvanced, boolean downSpeedDisabled, boolean downSpeedUnlimited, long totalDownSpeed,
-                                     long downSpeedSetMax, long maxDownload, boolean upSpeedDisabled, boolean upSpeedUnlimited, long totalUpSpeed, long upSpeedSetMax, long maxUpload, final int num_entries,
+    private static void addSpeedMenu(SkinMenu menuAdvanced,
+                                     boolean downSpeedDisabled,
+                                     boolean downSpeedUnlimited,
+                                     long totalDownSpeed,
+                                     long downSpeedSetMax,
+                                     long maxDownload,
+                                     boolean upSpeedDisabled,
+                                     boolean upSpeedUnlimited,
+                                     long totalUpSpeed,
+                                     long upSpeedSetMax,
+                                     long maxUpload,
+                                     final int num_entries,
                                      final SpeedAdapter adapter) {
+        final int menuEntries = 24;
         // advanced > Download Speed Menu //
         final SkinMenu menuDownSpeed = new SkinMenu(I18n.tr("Set Down Speed"));
         menuAdvanced.add(menuDownSpeed);
@@ -218,7 +229,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemCurrentDownSpeed.setText(speedText.toString());
         menuDownSpeed.add(itemCurrentDownSpeed);
         menuDownSpeed.addSeparator();
-        final SkinMenuItem[] itemsDownSpeed = new SkinMenuItem[12];
+        final SkinMenuItem[] itemsDownSpeed = new SkinMenuItem[menuEntries];
         ActionListener itemsDownSpeedListener = e -> {
             if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
                 SkinMenuItem item = (SkinMenuItem) e.getSource();
@@ -231,47 +242,27 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemsDownSpeed[1].putClientProperty("maxdl", 0);
         itemsDownSpeed[1].addActionListener(itemsDownSpeedListener);
         menuDownSpeed.add(itemsDownSpeed[1]);
+
         if (true) {
-            //using 200KiB/s as the default limit when no limit set.
+            //using 1024KiB/s as the default limit when no limit set.
             if (maxDownload == 0) {
                 if (downSpeedSetMax == 0) {
-                    maxDownload = 200 * 1024;
+                    maxDownload = 1024 * 1024;
                 } else {
                     maxDownload = 4 * (downSpeedSetMax / 1024) * 1024;
                 }
             }
-            for (int i = 2; i < 12; i++) {
+            for (int i = 2; i < menuEntries; i++) {
                 itemsDownSpeed[i] = new SkinMenuItem();
                 itemsDownSpeed[i].addActionListener(itemsDownSpeedListener);
                 // dms.length has to be > 0 when hasSelection
-                int limit = (int) (maxDownload / (10 * num_entries) * (12 - i));
+                int limit = (int) (maxDownload / (10 * num_entries) * (menuEntries - i));
                 itemsDownSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
                 itemsDownSpeed[i].putClientProperty("maxdl", limit);
                 menuDownSpeed.add(itemsDownSpeed[i]);
             }
         }
-        // ---
-        //        menuDownSpeed.addSeparator();
-        //
-        //        final SkinMenuItem itemDownSpeedManualSingle = new SkinMenuItem();
-        //        itemDownSpeedManualSingle.setText(I18n.tr("Manual..."));
-        //        itemDownSpeedManualSingle.addActionListener(new ActionListener() {
-        //            public void actionPerformed(ActionEvent e) {
-        //                //int speed_value = getManualSpeedValue(shell, true);
-        //                //if (speed_value > 0) {adapter.setDownSpeed(speed_value);}
-        //            }
-        //        });
-        //        menuDownSpeed.add(itemDownSpeedManualSingle);
-        //        if (num_entries > 1) {
-        //            final MenuItem itemDownSpeedManualShared = new MenuItem(menuDownSpeed, SWT.PUSH);
-        //            Messages.setLanguageText(itemDownSpeedManualShared, isTorrentContext?"MyTorrentsView.menu.manual.shared_torrents":"MyTorrentsView.menu.manual.shared_peers");
-        //            itemDownSpeedManualShared.addSelectionListener(new SelectionAdapter() {
-        //                public void widgetSelected(SelectionEvent e) {
-        //                    int speed_value = getManualSharedSpeedValue(shell, true, num_entries);
-        //                    if (speed_value > 0) {adapter.setDownSpeed(speed_value);}
-        //                }
-        //            });
-        //        }
+
         // advanced >Upload Speed Menu //
         final SkinMenu menuUpSpeed = new SkinMenu(I18n.tr("Set Up Speed"));
         menuAdvanced.add(menuUpSpeed);
@@ -297,7 +288,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         menuUpSpeed.add(itemCurrentUpSpeed);
         // ---
         menuUpSpeed.addSeparator();
-        final SkinMenuItem[] itemsUpSpeed = new SkinMenuItem[12];
+        final SkinMenuItem[] itemsUpSpeed = new SkinMenuItem[menuEntries];
         ActionListener itemsUpSpeedListener = e -> {
             if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
                 SkinMenuItem item = (SkinMenuItem) e.getSource();
@@ -310,47 +301,25 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemsUpSpeed[1].putClientProperty("maxul", 0);
         itemsUpSpeed[1].addActionListener(itemsUpSpeedListener);
         menuUpSpeed.add(itemsUpSpeed[1]);
-        if (true) {
-            //using 75KiB/s as the default limit when no limit set.
-            if (maxUpload == 0) {
-                maxUpload = 75 * 1024;
+
+        //using 1024KiB/s as the default limit when no limit set.
+        if (maxUpload == 0) {
+            maxUpload = 1024 * 1024;
+        } else {
+            if (upSpeedSetMax == 0) {
+                maxUpload = 200 * 1024;
             } else {
-                if (upSpeedSetMax == 0) {
-                    maxUpload = 200 * 1024;
-                } else {
-                    maxUpload = 4 * (upSpeedSetMax / 1024) * 1024;
-                }
-            }
-            for (int i = 2; i < 12; i++) {
-                itemsUpSpeed[i] = new SkinMenuItem();
-                itemsUpSpeed[i].addActionListener(itemsUpSpeedListener);
-                int limit = (int) (maxUpload / (10 * num_entries) * (12 - i));
-                itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
-                itemsUpSpeed[i].putClientProperty("maxul", limit);
-                menuUpSpeed.add(itemsUpSpeed[i]);
+                maxUpload = 4 * (upSpeedSetMax / 1024) * 1024;
             }
         }
-        //        menuUpSpeed.addSeparator();
-        //
-        //        final SkinMenuItem itemUpSpeedManualSingle = new SkinMenuItem();
-        //        itemUpSpeedManualSingle.setText(I18n.tr("Manual..."));
-        //        itemUpSpeedManualSingle.addActionListener(new ActionListener() {
-        //            public void actionPerformed(ActionEvent e) {
-        //                //int speed_value = getManualSpeedValue(shell, false);
-        //                //if (speed_value > 0) {adapter.setUpSpeed(speed_value);}
-        //            }
-        //        });
-        //        menuUpSpeed.add(itemUpSpeedManualSingle);
-        //        if (num_entries > 1) {
-        //            final MenuItem itemUpSpeedManualShared = new MenuItem(menuUpSpeed, SWT.PUSH);
-        //            Messages.setLanguageText(itemUpSpeedManualShared, isTorrentContext?"MyTorrentsView.menu.manual.shared_torrents":"MyTorrentsView.menu.manual.shared_peers" );
-        //            itemUpSpeedManualShared.addSelectionListener(new SelectionAdapter() {
-        //                public void widgetSelected(SelectionEvent e) {
-        //                    int speed_value = getManualSharedSpeedValue(shell, false, num_entries);
-        //                    if (speed_value > 0) {adapter.setUpSpeed(speed_value);}
-        //                }
-        //            });
-        //        }
+        for (int i = 2; i < menuEntries; i++) {
+            itemsUpSpeed[i] = new SkinMenuItem();
+            itemsUpSpeed[i].addActionListener(itemsUpSpeedListener);
+            int limit = (int) (maxUpload / (10 * num_entries) * (menuEntries - i));
+            itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
+            itemsUpSpeed[i].putClientProperty("maxul", limit);
+            menuUpSpeed.add(itemsUpSpeed[i]);
+        }
     }
 
     interface SpeedAdapter {
