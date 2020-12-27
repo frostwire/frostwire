@@ -414,6 +414,10 @@ public class StringUtils {
         return s != null ? s.replaceAll("\\s+", " ") : null;
     }
 
+    public static String removeUnicodeCharacters(String s) {
+        return s.replaceAll("[^\\p{L}\\p{N}\\p{P}\\p{Z}]","");
+    }
+
     public static String getLocaleString(Map<String, String> strMap, String defaultStr) {
         String localeLanguageCode = Locale.getDefault().getLanguage();
         if (StringUtils.isNullOrEmpty(localeLanguageCode, true)) {
