@@ -2,6 +2,8 @@ frostwire (6.8.10) stable; urgency=high
  * jlibtorrent-1.2.11.0 update
  * lt: upgraded to openssl 1.1.1l
  * Fixes issue with Telluride results and emojis in filenames
+ * Fixes bug where transfer file detail actions would go blank when left clicked. (74291c004)
+ * New File Transfer details popup menus: FIles > Explore, Play
  * lt: fix issue with moving the session object
  * lt: deprecate torrent_status::allocating. This state is no longer used
  * lt: fix bug creating torrents with symbolic links
@@ -17,7 +19,7 @@ frostwire (6.8.10) stable; urgency=high
  * lt: fix issue in URL parser, causing issues with certain tracker URLs
  * lt: use a different error code than host-unreachable, when skipping tracker announces
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 27 Dec 2020 13:16:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 28 Dec 2020 00:17:00 -0600
 
 frostwire (6.8.9) stable; urgency=high
  * Soundcloud search fixed
