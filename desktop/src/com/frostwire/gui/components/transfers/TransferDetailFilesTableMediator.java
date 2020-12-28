@@ -59,18 +59,6 @@ public class TransferDetailFilesTableMediator extends AbstractTableMediator<Tran
     }
 
     @Override
-    public void handleActionKey() {
-    }
-
-    @Override
-    public void handleSelection(int row) {
-    }
-
-    @Override
-    public void handleNoSelection() {
-    }
-
-    @Override
     protected void setDefaultEditors() {
         TransferDetailFilesDataLine.ACTIONS_COLUMN.setCellEditor(new GenericCellEditor(getTransferDetailFileActionsRenderer()));
         TransferDetailFilesDataLine.ACTIONS_COLUMN.setCellRenderer(getTransferDetailFileActionsRenderer());

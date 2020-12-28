@@ -979,4 +979,16 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
             force = false;
         }
     }
+
+    @Override
+    public void handleActionKey() {
+    }
+
+    @Override
+    public void handleSelection(int row) {
+    }
+
+    @Override
+    public void handleNoSelection() {
+    }
 }

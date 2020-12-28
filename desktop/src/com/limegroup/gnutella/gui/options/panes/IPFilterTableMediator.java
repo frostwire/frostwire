@@ -60,18 +60,6 @@ public class IPFilterTableMediator extends AbstractTableMediator<IPFilterTableMe
         return null;
     }
 
-    @Override
-    public void handleActionKey() {
-    }
-
-    @Override
-    public void handleSelection(int row) {
-    }
-
-    @Override
-    public void handleNoSelection() {
-    }
-
     public static class IPFilterDataLine extends AbstractDataLine<IPRange> {
         private final static int DESCRIPTION_ID = 0;
         private final static int START = 1;

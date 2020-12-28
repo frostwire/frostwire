@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.PaddedPanel;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
@@ -31,10 +32,6 @@ public class TransferDetailPeersTableMediator extends
     }
 
     @Override
-    protected void updateSplashScreen() {
-    }
-
-    @Override
     protected void setupConstants() {
         MAIN_PANEL = new PaddedPanel();
         DATA_MODEL = new TransferDetailPeersModel();
@@ -44,18 +41,15 @@ public class TransferDetailPeersTableMediator extends
 
     @Override
     protected JPopupMenu createPopupMenu() {
+        SkinPopupMenu menu = new SkinPopupMenu();
+        TransferDetailPeersModel dataModel = getDataModel();
+        TransferDetailPeersDataLine transferDetailPeersDataLine = dataModel.get(TABLE.getSelectedRow());
+        TransferDetailPeers.PeerItemHolder peerItemHolder = transferDetailPeersDataLine.getInitializeObject();
+
         return null;
     }
 
     @Override
-    public void handleActionKey() {
-    }
-
-    @Override
-    public void handleSelection(int row) {
-    }
-
-    @Override
-    public void handleNoSelection() {
+    protected void updateSplashScreen() {
     }
 }
