@@ -1,6 +1,7 @@
 frostwire (6.8.10) stable; urgency=high
  * jlibtorrent-1.2.11.0 update
  * jaudiotagger 2.2.5 to 2.2.6 update
+ * Telluride Cloud Video Downloader build 8
  * lt: upgraded to openssl 1.1.1l
  * Fixes issue with Telluride results and emojis in filenames
  * Fixes bug where transfer file detail actions would go blank when left clicked. (74291c004)
