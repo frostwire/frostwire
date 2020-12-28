@@ -277,7 +277,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Assigns the listeners to their slots.
      * This must be done _before_ the individual components
-     * are created, incase any of them want to use a listener.
+     * are created, in case any of them want to use a listener.
      * Extending components that want to build extra listeners
      * should call super.buildListeners and then build their own.
      * DEFAULT_LISTENER, SELECTION_LISTENER, HEADER_LISTENER,

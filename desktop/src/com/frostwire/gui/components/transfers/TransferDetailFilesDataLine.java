@@ -32,6 +32,7 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
     // -> A custom cell renderer for that column that displays a button and it's action listener
     static LimeTableColumn ACTIONS_COLUMN;
     private static final LimeTableColumn[] columns = new LimeTableColumn[]{
+            // See TransferDetailFilesActionsRenderer for action's code
             ACTIONS_COLUMN = new LimeTableColumn(0, "ACTIONS", I18n.tr("Actions"), 80, true, true, true, TransferDetailFiles.TransferItemHolder.class),
             new LimeTableColumn(1, "NUMBER", "#", 40, true, true, true, String.class),
             new LimeTableColumn(2, "NAME", I18n.tr("Name"), 400, true, true, true, String.class),
@@ -87,6 +88,7 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
             case TYPE:
                 return holder.transferItem.getName().substring(holder.transferItem.getName().lastIndexOf(".") + 1);
             case ACTIONS:
+                // See TransferDetailFilesActionsRenderer for action's code
                 return holder;
         }
         return null;

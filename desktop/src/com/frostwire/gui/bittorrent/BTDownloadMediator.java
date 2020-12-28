@@ -21,6 +21,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
+import com.frostwire.gui.components.transfers.TransferDetailFiles;
 import com.frostwire.gui.filters.TableLineFilter;
 import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
@@ -614,6 +615,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         TABLE.setDefaultRenderer(PaymentOptions.class, new PaymentOptionsRenderer());
         TABLE.setDefaultRenderer(TransferHolder.class, new TransferActionsRenderer());
         TABLE.setDefaultRenderer(SeedingHolder.class, new TransferSeedingRenderer());
+        TABLE.setDefaultRenderer(TransferDetailFiles.TransferItemHolder.class, new TransferDetailFilesActionsRenderer());
     }
 
     @Override

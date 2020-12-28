@@ -23,11 +23,13 @@ import com.frostwire.gui.components.transfers.TransferDetailFiles;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -45,12 +47,13 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         share_faded = new AlphaIcon(share_solid, 0.1f);
     }
 
-    private JLabel playButton;
-    private JLabel shareButton;
+    private final JLabel playButton;
+    private final JLabel shareButton;
     private TransferDetailFiles.TransferItemHolder transferItemHolder;
 
     public TransferDetailFilesActionsRenderer() {
-        setLayout(new MigLayout("insets 2px 18px 0 0", "align center"));
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+        setLayout(new MigLayout("gap 2px, fillx, center, insets 5px 5px 5px 5px", "[20px!][20px!]"));
         playButton = new JLabel(play_transparent);
         playButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -69,18 +72,13 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
                 }
             }
         });
-        add(playButton, "center");
-        add(shareButton, "center");
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        updateButtons();
+        add(playButton, "width 20px!, growx 0, aligny top, push");
+        add(shareButton, "width 20px!, growx 0, aligny top, push");
     }
 
     @Override
     protected void updateUIData(Object dataHolder, JTable table, int row, int column) {
+        cancelEdit(); // Gubatron: This is what solved the flickering/empty cell bug when the first column cells were clicked on. -Dec 28th 2020
         if (!(dataHolder instanceof TransferDetailFiles.TransferItemHolder)) {
             if (transferItemHolder != null) {
                 updateButtons();
@@ -95,12 +93,7 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         if (!transferItemHolder.transferItem.isComplete()) {
             return;
         }
-        File file = transferItemHolder.transferItem.getFile();
-        if (MediaPlayer.isPlayableFile(file)) {
-            MediaPlayer.instance().asyncLoadMedia(new MediaSource(file), false, false);
-        } else {
-            GUIMediator.launchFile(file);
-        }
+        new PlayAction(transferItemHolder).actionPerformed(null);
     }
 
     private void onShare() {
@@ -111,9 +104,7 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
             new Thread(() -> {
                 TorrentUtil.makeTorrentAndDownload(file, null, true);
-                GUIMediator.safeInvokeLater(() -> {
-                    BTDownloadMediator.instance().updateTableFilters();
-                });
+                GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
             }).start();
         }
     }
@@ -126,5 +117,44 @@ public class TransferDetailFilesActionsRenderer extends FWAbstractJPanelTableCel
         shareButton.setIcon(transferItemHolder.transferItem.isComplete() ? share_solid : share_faded);
         playButton.invalidate();
         shareButton.invalidate();
+    }
+
+    public final static class OpenInFolderAction extends AbstractAction {
+        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+        public OpenInFolderAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+            transferItemHolder = itemHolder;
+            putValue(Action.NAME, I18n.tr("Explore"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Open Folder Containing the File"));
+            putValue(LimeAction.ICON_NAME, "LIBRARY_EXPLORE");
+        }
+
+        public void actionPerformed(ActionEvent ae) {
+            File selectedFile = transferItemHolder.transferItem.getFile();
+            if (selectedFile.isFile() && selectedFile.getParentFile() != null) {
+                GUIMediator.launchExplorer(selectedFile);
+            }
+        }
+    }
+
+    public final static class PlayAction extends AbstractAction {
+        private final TransferDetailFiles.TransferItemHolder transferItemHolder;
+
+        public PlayAction(TransferDetailFiles.TransferItemHolder itemHolder) {
+            transferItemHolder = itemHolder;
+            putValue(Action.NAME, I18n.tr("Play"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Play"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File file = transferItemHolder.transferItem.getFile();
+            if (MediaPlayer.isPlayableFile(file)) {
+                MediaPlayer.instance().asyncLoadMedia(new MediaSource(file), false, false);
+            } else {
+                GUIMediator.launchFile(file);
+            }
+        }
     }
 }

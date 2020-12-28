@@ -73,7 +73,7 @@ public final class TransferDetailFiles extends JPanel implements TransferDetailC
      * <p>
      * Also, this is necessary to update the table, since tableMediator.update() doesn't work with plain TransferItems
      */
-    public class TransferItemHolder {
+    public static class TransferItemHolder {
         public final TransferItem transferItem;
         final int fileOffset;
 
