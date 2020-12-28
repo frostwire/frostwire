@@ -108,8 +108,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         PeerInfo peer = holder.peerItem;
         switch (col) {
             case IP_COLUMN_ID:
-                String address = peer.ip();
-                return connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + address;
+                return getBittorrentAddress(peer);
             case CLIENT_COLUMN_ID:
                 String client = holder.peerItem.client();
                 if (client == null || client.isEmpty()) {
@@ -280,7 +279,7 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
         return sb.toString();
     }
 
-    private String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
+    private static String connectionTypeAsString(PeerInfo.ConnectionType t, int flags) {
         switch (t) {
             case WEB_SEED:
                 return "web_seed";
@@ -294,5 +293,9 @@ public final class TransferDetailPeersDataLine extends AbstractDataLine<Transfer
     @Override
     public int getTypeAheadColumn() {
         return 0;
+    }
+
+    public static String getBittorrentAddress(PeerInfo peer) {
+        return connectionTypeAsString(peer.connectionType(), peer.flags()) + "://" + peer.ip();
     }
 }
