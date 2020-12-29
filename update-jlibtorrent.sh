@@ -38,7 +38,9 @@ fi
 rm android/libs/jlibtorrent-*.jar
 cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-${JLIBTORRENT_VERSION}.jar android/libs/
 cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-android-arm-${JLIBTORRENT_VERSION}.jar android/libs/
+cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-android-arm64-${JLIBTORRENT_VERSION}.jar android/libs/
 cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-android-x86-${JLIBTORRENT_VERSION}.jar android/libs/
+cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-android-x86_64-${JLIBTORRENT_VERSION}.jar android/libs/
 
 # Desktop (ALL) - The java classes jar
 cp ${JLIBTORRENT_ROOT}/build/libs/jlibtorrent-${JLIBTORRENT_VERSION}.jar desktop/lib/jars/
