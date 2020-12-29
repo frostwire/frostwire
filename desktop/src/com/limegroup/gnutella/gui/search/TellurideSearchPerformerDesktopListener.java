@@ -52,11 +52,13 @@ final class TellurideSearchPerformerDesktopListener implements TellurideSearchPe
         int videoResults = 0;
         for (TellurideSearchResult r : results) {
             NamedMediaType namedMediaType = NamedMediaType.getFromExtension(FilenameUtils.getExtension(r.getFilename()));
-            MediaType mediaType = namedMediaType.getMediaType();
-            if (mediaType == MediaType.getAudioMediaType()) {
-                audioResults++;
-            } else if (mediaType == MediaType.getVideoMediaType()) {
-                videoResults++;
+            if (namedMediaType != null) {
+                MediaType mediaType = namedMediaType.getMediaType();
+                if (mediaType == MediaType.getAudioMediaType()) {
+                    audioResults++;
+                } else if (mediaType == MediaType.getVideoMediaType()) {
+                    videoResults++;
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package com.frostwire.search.telluride;
 import com.frostwire.licenses.License;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.util.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 
 public class TellurideSearchResult implements HttpSearchResult {
     private final String id;
@@ -27,7 +28,7 @@ public class TellurideSearchResult implements HttpSearchResult {
             long _creationTime) {
         id = _id;
         title = StringUtils.removeDoubleSpaces(StringUtils.removeUnicodeCharacters(_title));
-        filename = StringUtils.removeDoubleSpaces(StringUtils.removeUnicodeCharacters(_filename));
+        filename = FilenameUtils.sanitizeFilename(_filename);
         source = _source;
         detailsUrl = _detailsUrl;
         downloadUrl = _downloadUrl;

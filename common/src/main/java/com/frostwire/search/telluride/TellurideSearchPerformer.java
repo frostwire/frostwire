@@ -170,7 +170,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             results.add(new TellurideSearchResult(
                     result.id,
                     result.title + videoFormatParenthesis,
-                    sanitizeFilename(result.title) + videoFormatParenthesis + "." + format.ext,
+                    result.title + videoFormatParenthesis + "." + format.ext,
                     "Cloud:" + result.extractor,
                     result.webpage_url,
                     format.url,
@@ -180,10 +180,6 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
 
         return results;
-    }
-
-    private String sanitizeFilename(String filename) {
-        return filename.replaceAll("[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ\\!:]", "");
     }
 
     //20200324
