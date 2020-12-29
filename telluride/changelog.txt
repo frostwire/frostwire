@@ -1,6 +1,7 @@
 build 8 - dec/28/2020
  - python: pip-20.3.3
  - python: youtube-dl 2020.12.29
+ - macos binary comes signed and notarized with hardened runtime
 
 build 7 - dec/8/2020
  - python: pip-20.3.1

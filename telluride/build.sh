@@ -49,10 +49,15 @@ then
 fi
 }
 
+EXTRA_FLAGS=
+if [ $(uname -a | grep -c Darwin) == 1 ]; then
+  EXTRA_FLAGS="--osx-bundle-identifier com.frostwire.Telluride"
+fi
+
 cleanup
 pylint telluride.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
-${PYINSTALLER_CMD} --onefile telluride.py
+${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py
 
 if [ -f dist/telluride ]
 then
