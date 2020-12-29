@@ -27,7 +27,6 @@ compileJava {
 
 repositories {
     mavenCentral()
-    //maven { url "https://dl.bintray.com/ijabz/maven" }
 }
 
 dependencies {
@@ -36,7 +35,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.8.1'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'com.h2database:h2:1.4.200'
-    //implementation 'net.jthink:jaudiotagger:2.2.5'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
     implementation 'org.junit.jupiter:junit-jupiter:5.4.2'
