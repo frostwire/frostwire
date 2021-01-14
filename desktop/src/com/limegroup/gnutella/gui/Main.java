@@ -48,16 +48,14 @@ public class Main {
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
         if (OSUtils.isWindows() && !OSUtils.isMachineX64()) {
-            String jlibtorrentPath = getWindows32JLibtorrentPath();
-            System.setProperty("jlibtorrent.jni.path", jlibtorrentPath);
+            System.setProperty("jlibtorrent.jni.path", getWindows32JLibtorrentPath());
         }
         if (OSUtils.isMacOSX()) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
         }
         if (OSUtils.isLinux() && !OSUtils.isMachineX64()) {
-            String jlibtorrentPath = getLinux32JLibtorrentPath();
-            System.setProperty("jlibtorrent.jni.path", jlibtorrentPath);
+            System.setProperty("jlibtorrent.jni.path", getLinux32JLibtorrentPath());
         }
         //System.out.println("1: Main.main("+args+")");
         // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
@@ -71,7 +69,9 @@ public class Main {
             // which would slow the speed of class-loading, causing the splash to be
             // displayed later.
             try {
-                Class.forName("com.limegroup.gnutella.gui.GUILoader").getMethod("load", new Class[]{String[].class, Frame.class}).invoke(null, args, splash);
+                Class.forName("com.limegroup.gnutella.gui.GUILoader").
+                        getMethod("load", new Class[]{String[].class, Frame.class}).
+                        invoke(null, args, splash);
             } catch (Exception e) {
                 e.printStackTrace();
             }
