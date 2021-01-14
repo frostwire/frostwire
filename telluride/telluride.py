@@ -22,7 +22,7 @@ import json
 import sys
 import youtube_dl
 
-BUILD = 8
+BUILD = 9
 
 def welcome():
     '''
