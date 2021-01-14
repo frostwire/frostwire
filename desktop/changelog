@@ -1,5 +1,17 @@
+frostwire (6.9.1) stable; urgency=high
+ * jlibtorrent-1.2.12.0 update
+ * lt:fix loading of DHT node ID from previous session on startup
+ * lt:use getrandom(), when available, and fall back to /dev/urandom
+ * lt:fix uTP issue acking FIN packets
+ * lt:validate HTTPS certificates by default (trackers and web seeds)
+ * lt:load SSL certificates from windows system certificate store, to authenticate trackers
+ * lt:introduce mitigation for Server Side Request Forgery in tracker and web seed URLs
+ * lt:fix error handling for pool allocation failure
+ * Windows build reverts to jdk-14
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 14 Jan 2020 02:03:00 -0600
+
 frostwire (6.8.10) stable; urgency=high
- * Fixes file naming issues that would cause errors in cloud video downloads
  * jlibtorrent-1.2.11.0 update
  * jaudiotagger 2.2.5 to 2.2.6 update
  * Telluride Cloud Video Downloader build 8
@@ -22,7 +34,7 @@ frostwire (6.8.10) stable; urgency=high
  * lt: fix issue in URL parser, causing issues with certain tracker URLs
  * lt: use a different error code than host-unreachable, when skipping tracker announces
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 29 Dec 2020 17:10:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 28 Dec 2020 00:17:00 -0600
 
 frostwire (6.8.9) stable; urgency=high
  * Soundcloud search fixed
