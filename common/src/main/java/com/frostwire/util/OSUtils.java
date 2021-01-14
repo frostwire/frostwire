@@ -18,6 +18,7 @@
 
 package com.frostwire.util;
 
+import java.io.File;
 import java.util.Locale;
 
 /**
@@ -347,5 +348,18 @@ public class OSUtils {
         int major = Integer.parseInt(os_parts[0]);
         int minor = Integer.parseInt(os_parts[1]);
         return OSUtils.isAnyMac() && major >= 10 && minor >= 15;
+    }
+
+    private static File APP_X_MANIFEST_XML = null;
+
+    public static boolean isWindowsAppStoreInstall() {
+      if (!isWindows()) {
+          return false;
+      }
+      if (APP_X_MANIFEST_XML == null) {
+          APP_X_MANIFEST_XML = new File("AppxManifest.xml");
+      }
+
+      return APP_X_MANIFEST_XML.exists() && APP_X_MANIFEST_XML.isFile();
     }
 }
