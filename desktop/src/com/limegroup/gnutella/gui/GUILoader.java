@@ -16,7 +16,9 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.desktop.DesktopPlatform;
+import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.platform.Platforms;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
@@ -42,8 +44,17 @@ class GUILoader {
     public static void load(String[] args, Frame frame) {
         try {
             Platforms.set(new DesktopPlatform());
-            System.out.println("FrostWire version " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
+            System.out.printf("FrostWire version %s build %d\n", FrostWireUtils.getFrostWireVersion(), FrostWireUtils.getBuildNumber());
             System.out.println(System.getProperty("java.vm.name") + " " + System.getProperty("java.vendor") + " " + System.getProperty("java.version") + " " + System.getProperty("java.specification.vendor"));
+            System.out.printf("JLibTorrent v%s\n", LibTorrent.jlibtorrentVersion());
+            System.out.printf("Boost v%s\n", LibTorrent.boostVersion());
+            System.out.printf("OpenSSL v%s\n", LibTorrent.opensslVersion());
+            System.out.print("Windows App Store Installation: ");
+            if (OSUtils.isWindowsAppStoreInstall()) {
+                System.out.println("Yes");
+            } else {
+                System.out.println("Nope");
+            }
             Initializer initializer = new Initializer();
             initializer.initialize(args, frame);
         } catch (Throwable err) {
