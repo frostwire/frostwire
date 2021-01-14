@@ -98,7 +98,8 @@ public final class VPNs {
                     isWindowsVPNAdapterActive(interfaces, routes, "CyberGhost") || // CyberGhost
                     isWindowsVPNAdapterActive(interfaces, routes, "Windscribe VPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "Windscribe IKEv2") ||
-                    isWindowsVPNAdapterActive(interfaces, routes, "PureVPN");
+                    isWindowsVPNAdapterActive(interfaces, routes, "PureVPN") ||
+                    isWindowsVPNAdapterActive(interfaces, routes, "WireGuard Tunnel"); // Mozilla VPN
         } catch (Throwable t2) {
             t2.printStackTrace();
             return false;
