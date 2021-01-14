@@ -1,4 +1,23 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
+
+import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +33,13 @@ class ShutdownWindow extends JDialog {
 
     ShutdownWindow() {
         super(GUIMediator.getAppFrame());
-        backgroundImage = ResourceManager.getImageFromResourcePath("org/limewire/gui/images/app_shutdown.jpg");
+        final String image_path = String.format("org/limewire/gui/images/%s.jpg",
+                !OSUtils.isWindowsAppStoreInstall() ? "app_shutdown" : "windows_appstore_install_shutdown");
+        backgroundImage = ResourceManager.getImageFromResourcePath(image_path);
+        final String backgroundUrl = !OSUtils.isWindowsAppStoreInstall() ?
+                "https://www.frostwire.com/android/?from=shutdown" :
+                "https://www.frostwire.com/give/?from=shutdown";
+
         setResizable(false);
         setTitle(I18n.tr("Shutting down FrostWire..."));
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -29,7 +54,7 @@ class ShutdownWindow extends JDialog {
             @Override
             public void mouseReleased(MouseEvent e) {
                 e.consume();
-                GUIMediator.openURL("http://www.frostwire.com/android/?from=shutdown");
+                GUIMediator.openURL(backgroundUrl);
             }
         });
         backgroundPanel.setLayout(null);

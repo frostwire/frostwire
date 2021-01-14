@@ -353,12 +353,13 @@ public class OSUtils {
     private static File APP_X_MANIFEST_XML = null;
 
     public static boolean isWindowsAppStoreInstall() {
-      if (!isWindows()) {
-          return false;
-      }
-      if (APP_X_MANIFEST_XML == null) {
-          APP_X_MANIFEST_XML = new File("AppxManifest.xml");
-      }
-      return APP_X_MANIFEST_XML.exists() && APP_X_MANIFEST_XML.isFile();
+        if (!isWindows()) {
+            return false;
+        }
+        if (APP_X_MANIFEST_XML == null) {
+            APP_X_MANIFEST_XML = new File("AppxManifest.xml");
+        }
+        return APP_X_MANIFEST_XML.exists() && APP_X_MANIFEST_XML.isFile();
     }
+
 }
