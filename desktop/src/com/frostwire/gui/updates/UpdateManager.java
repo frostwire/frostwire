@@ -83,6 +83,10 @@ public final class UpdateManager implements Serializable {
      * Starts an Update Task in <secondsAfter> seconds after.
      */
     static void scheduleUpdateCheckTask(final int secondsAfter, final boolean force) {
+        if (OSUtils.isWindowsAppStoreInstall()){
+            System.out.println("UpdateManager.scheduleUpdateCheckTask() - aborted. Updates are done via Windows App Store for this distribution");
+            return;
+        }
         // Uses the UpdateManager to check for updates. Then kills the timer
         Runnable checkForUpdatesTask = () -> {
             //System.out.println("UpdateManager.scheduleUpdateCheckTask() - about to check for update in " + secondsAfter + " seconds");
