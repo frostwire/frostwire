@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,12 @@ public final class UpdateManagerSettings extends LimeProps {
      */
     public static final BooleanSetting SHOW_PROMOTION_OVERLAYS = (BooleanSetting) FACTORY.createBooleanSetting("SHOW_PROMOTION_OVERLAYS", true).setAlwaysSave(true);
     public static final BooleanSetting SHOW_FROSTWIRE_RECOMMENDATIONS = (BooleanSetting) FACTORY.createBooleanSetting("SHOW_FROSTWIRE_RECOMMENDATIONS", true).setAlwaysSave(true);
+
+    private static final String winappstore = OSUtils.isWindowsAppStoreInstall() ? "1" : "0";
     /**
      * URL to feed the Slideshow with the promotional FrostClick overlays
      */
-    public static final StringSetting OVERLAY_SLIDESHOW_JSON_URL = FACTORY.createStringSetting("OVERLAY_SLIDESHOW_JSON_URL", "https://update.frostwire.com/o2.php?from=desktop&version=" + FrostWireUtils.getFrostWireVersion() + "&build=" + FrostWireUtils.getBuildNumber() + "&os=" + UrlUtils.encode(OSUtils.getFullOS()));
+    public static final StringSetting OVERLAY_SLIDESHOW_JSON_URL = FACTORY.createStringSetting("OVERLAY_SLIDESHOW_JSON_URL", "https://update.frostwire.com/o2.php?from=desktop&version=" + FrostWireUtils.getFrostWireVersion() + "&build=" + FrostWireUtils.getBuildNumber() + "&os=" + UrlUtils.encode(OSUtils.getFullOS()) + "&winappstore=" + winappstore);
 
     private UpdateManagerSettings() {
     }

@@ -359,7 +359,6 @@ public class OSUtils {
       if (APP_X_MANIFEST_XML == null) {
           APP_X_MANIFEST_XML = new File("AppxManifest.xml");
       }
-
       return APP_X_MANIFEST_XML.exists() && APP_X_MANIFEST_XML.isFile();
     }
 }
