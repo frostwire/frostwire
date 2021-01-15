@@ -1,3 +1,7 @@
+FrostWire 2.2.8 build 671 - JAN/14/2021
+ - Plus: SoundCloud search fixes
+ - com.google.android.material:material:1.3.0-alpha03 -> rc01 update
+ 
 FrostWire 2.2.7 build 670 - DEC/23/2020
  - New jlibtorrent 1.12.10.0
  - libtorrent 1.2.11.0 update (471e772cb7038f1bf5f44c32a09eb42fbb80ee99)
