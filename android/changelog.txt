@@ -6,6 +6,7 @@ FrostWire 2.2.8 build 671 - JAN/14/2021
  - com.google.android.gms:play-services-ads:19.6.0 update
  - androidx.media2:media2-*:1.1.1 update
  - com.android.billingclient:billing:3.0.2 update
+ - com.applovin:applovin-sdk:9.14.12 update
 
 FrostWire 2.2.7 build 670 - DEC/23/2020
  - New jlibtorrent 1.12.10.0
