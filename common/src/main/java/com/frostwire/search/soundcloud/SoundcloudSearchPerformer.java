@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,8 +29,8 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "gNVzaqTohpqhemjfMYjlPlv14Nu4sn9u";
-    private static final String SOUNDCLOUD_APP_VERSION = "1607091168";
+    private static final String SOUNDCLOUD_CLIENTID = "dwEyLDp7xWIqlUI1M2YxPnIXGtBhtsia";
+    private static final String SOUNDCLOUD_APP_VERSION = "1610617356";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
@@ -63,8 +63,8 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
                         try {
                             SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                             r.add(sr);
-                        } catch (Throwable ignored) {
-                            ignored.printStackTrace();
+                        } catch (Throwable e) {
+                            e.printStackTrace();
                         }
                     }
                 }
