@@ -71,7 +71,10 @@ public final class VPNs {
         try {
             List<EnumNet.IpRoute> routes = EnumNet.enumRoutes(BTEngine.getInstance());
             for (EnumNet.IpRoute route : routes) {
-                if (route.destination().toString().equals("0.0.0.0") && route.name().contains("tun")) {
+                String route_name = route.name();
+                String destination = route.destination().toString();
+                if (destination.equals("0.0.0.0") &&
+                        (route_name.contains("tun") || route_name.contains("wg"))) {
                     result = true;
                     break;
                 }
