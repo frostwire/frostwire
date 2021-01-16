@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ class DonationButtons extends JPanel {
         //MigLayout lesson: Using px explicitly as the unit does make a big difference.
         int bitcoinWidth = (OSUtils.isLinux()) ? 52 : 40;
         int usdErc20Width = (OSUtils.isLinux()) ? 78 : 68;
-        add(new DonationButton("$1", "https://www.frostwire.com/?id=donate&amt=1", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
         add(new DonationButton("$5", "https://www.frostwire.com/?id=donate&amt=5", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
         add(new DonationButton("$10", "https://www.frostwire.com/?id=donate&amt=10", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
         add(new DonationButton("$x", "https://www.frostwire.com/?id=donate&amt=open", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
