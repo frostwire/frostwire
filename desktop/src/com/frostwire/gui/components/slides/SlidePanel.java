@@ -55,7 +55,6 @@ class SlidePanel extends JPanel {
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setMinimumSize(new Dimension(717, 380));
         layeredPane.setPreferredSize(new Dimension(717, 380));
-        //layeredPane.setMaximumSize(new Dimension(717,380));
         layeredPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

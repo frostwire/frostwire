@@ -19,6 +19,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.components.slides.MultimediaSlideshowPanel;
 import com.frostwire.gui.components.slides.Slide;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -37,6 +38,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -136,11 +138,16 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     private List<Slide> getDefaultSlides() {
-        Slide s1 = new Slide("https://static.frostwire.com/images/overlays/default_now_on_android.png", "https://www.frostwire.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
-                null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
-        Slide s2 = new Slide("https://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "https://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
-                null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
-        return Arrays.asList(s1, s2);
+        if (!OSUtils.isWindowsAppStoreInstall()) {
+            Slide s1 = new Slide("https://static.frostwire.com/images/overlays/default_now_on_android.png", "https://www.frostwire.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
+                    null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
+            Slide s2 = new Slide("https://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "https://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
+                    null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD);
+            return Arrays.asList(s1, s2);
+        } else {
+            return Collections.singletonList(new Slide("https://static.frostwire.com/images/overlays/frostclick_default_overlay.jpg", "https://www.frostclick.com/?from=defaultSlide", 240000, null, null, null, null, null, null, 0, Slide.SLIDE_DOWNLOAD_METHOD_OPEN_URL, null, null, null, null, null, null, null, null,
+                    null, Slide.OPEN_CLICK_URL_ON_DOWNLOAD));
+        }
     }
 
     /**
