@@ -1,5 +1,7 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.util.OSUtils;
+
 class TipOfTheDayMessages {
     private static final String FIRST_MESSAGE = I18n.tr("<a href=\"{0}\"><h2>Support FrostWire Today</h2></a><br>The FrostWire installer features no bundled offers or advertisement and you can download it for free. You can help support the continued development of FrostWire with your <a href=\"{0}\">donations</a>.<br><br>You can donate via:<ul><li><a href=\"{1}\">Paypal</a></li><li><a href=\"{2}\">BTC</a></li><li><a href=\"{3}\">ETH or ERC-20 tokens</a></li></ul><br>Thank you for your continued support.",
             "https://www.frostwire.com/?id=donate&amt=open",
@@ -24,7 +26,9 @@ class TipOfTheDayMessages {
         return new String[]{
                 I18n.tr(FIRST_MESSAGE),
                 I18n.tr("Use the search box to enter search keywords or to paste video urls so that you can backup your video content from social media posts or to archive and time-shift free and legal video content for offline use. Always make sure to respect your local copyright laws."),
-                I18n.tr("<h2><a href=\"https://www.frostwire.com/android\">Try FrostWire Plus for Android free today</a></h2>"),
+                (!OSUtils.isWindowsAppStoreInstall()) ?
+                        "<h2><a href=\"https://www.frostwire.com/android\">" + I18n.tr("Try FrostWire Plus for Android free today") + "</a></h2>" :
+                        "<h2><a href=\"https://www.frostwire.com/give\">" + I18n.tr("Keep FrostWire Free") + "</a></h2>",
                 I18n.tr("Tired of downloads stopping halfway through? It helps to pick search results with a higher number in the 'Seeds' column. The Seeds are the amount of unique places on the network that are hosting the file. The more sources, the better the chance of getting your torrent file!"),
                 I18n.tr("<h2>Follow us</h2> We are on <a href=\"{0}\">Twitter</a>, <a href=\"{1}\">Instagram</a> and <a href=\"{2}\">Facebook</a>", "https://twitter.com/frostwire", "https://instagram.com/frostwire", "https://www.facebook.com/FrostwireOfficial/"),
                 I18n.tr("You can change the look and feel of FrostWire by going to View &gt; Use Small Icons, Show Icon Text and Increase-Decrease the Font Size."),
