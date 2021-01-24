@@ -42,7 +42,11 @@ final class HelpMenu extends AbstractMenu {
     HelpMenu() {
         super(I18n.tr("&Help"));
         addMenuItem(new OpenLinkAction("https://www.youtube.com/watch?v=A0p_DpOjpO8", I18n.tr("How to use FrostWire (Video)"), I18n.tr("How to use FrostWire (Video)")));
-        addMenuItem(new OpenLinkAction("https://www.frostwire.com/android", I18n.tr("FrostWire for Android"), I18n.tr("Get FrostWire on your Android phone, tablet or google tv, all free.")));
+
+        if (!OSUtils.isWindowsAppStoreInstall()) {
+            addMenuItem(new OpenLinkAction("https://www.frostwire.com/android", I18n.tr("FrostWire for Android"), I18n.tr("Get FrostWire on your Android phone, tablet or google tv, all free.")));
+        }
+
         addMenuItem(new OpenLinkAction("https://www.quora.com/What-is-seeding-on-FrostWire", I18n.tr("What is \"Seeding\"?"), I18n.tr("Learn about BitTorrent Seeding")));
         addMenuItem(new OpenLinkAction("https://www.frostwire.com/vpn", I18n.tr("What is a VPN?"), I18n.tr("Learn about how to protect your internet connection and your privacy online")));
         addSeparator();
