@@ -72,6 +72,9 @@ gradlew
 gradlew.bat
 light/
 settings.gradle
+telluride/notarizationLog.sh
+telluride/notarizeMacOSApp.sh
+telluride/telluride.exe
 telluride/telluride_linux
 telluride/telluride_macos
 .todos.json
