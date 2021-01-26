@@ -151,15 +151,15 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             }
 
             if (!noCodec(format.acodec) && noCodec(format.vcodec)) {
-                videoFormatParenthesis = " (audio)";
+                videoFormatParenthesis = "(audio)";
             } else if (!noCodec(format.vcodec)) {
                 if (format.width != 0 && format.height != 0) {
-                    videoFormatParenthesis = " (" + format.width + "x" + format.height + ")";
+                    videoFormatParenthesis = "(" + format.width + "x" + format.height + ")";
                 } else if (format.width == 0 && format.height != 0) {
-                    videoFormatParenthesis = " (" + format.height + "p)";
+                    videoFormatParenthesis = "(" + format.height + "p)";
                 }
             } else if (noCodec(format.acodec) && noCodec(format.vcodec) && format.height > 240) {
-                videoFormatParenthesis = " (" + format.height + "p)";
+                videoFormatParenthesis = "(" + format.height + "p)";
             }
             LOG.info("acodec=" + format.acodec + ", vcodec=" + format.vcodec + ", ext=" + result.ext + ", url=" + format.url);
             String domainName = UrlUtils.extractDomainName(format.url);
@@ -169,8 +169,8 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
             results.add(new TellurideSearchResult(
                     result.id,
-                    result.title + videoFormatParenthesis,
-                    result.title + videoFormatParenthesis + "." + format.ext,
+                    videoFormatParenthesis + " " + result.title,
+                    result.title + " " + videoFormatParenthesis + "." + format.ext,
                     "Cloud:" + result.extractor,
                     result.webpage_url,
                     format.url,
