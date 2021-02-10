@@ -1,6 +1,6 @@
 '''
 Telluride Cloud Video Downloader.
-Copyright 2020 FrostWire LLC.
+Copyright 2020-2021 FrostWire LLC.
 Author: @gubatron
 
 A portable and easy to use youtube_dl wrapper by FrostWire.
@@ -22,7 +22,7 @@ import json
 import sys
 import youtube_dl
 
-BUILD = 9
+BUILD = 10
 
 def welcome():
     '''
