@@ -7,7 +7,9 @@ FrostWire 2.2.9 build 673 - FEB/10/2021
  - lt:load SSL certificates from windows system certificate store, to authenticate trackers
  - lt:introduce mitigation for Server Side Request Forgery in tracker and web seed URLs
  - lt:fix error handling for pool allocation failure
-
+ - dev:com.android.tools.build:gradle:4.1.2
+ - com.google.android.material:material:1.3.0
+ - com.google.android.gms:play-services-ads:19.7.0
 
 FrostWire 2.2.8 build 672 - JAN/18/2021
  - Plus: SoundCloud search fixes
