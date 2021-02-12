@@ -1,4 +1,4 @@
-FrostWire 2.2.9 build 673 - FEB/10/2021
+FrostWire 2.2.9 build 673 - FEB/11/2021
  - New jlibtorrent 1.2.12.0
  - lt:fix loading of DHT node ID from previous session on startup
  - lt:use getrandom(), when available, and fall back to /dev/urandom
