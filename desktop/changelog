@@ -1,8 +1,8 @@
 frostwire (6.9.2) stable; urgency=high
- * jlibtorrent-1.2.12.0 rebuild to fix linux compatibility issues
  * Telluride Cloud Video Downloader build 10
+ * jlibtorrent-1.2.12.0 rebuild to fix linux compatibility issues
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 12 Jan 2020 14:18:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 12 Feb 2020 14:18:00 -0600
 
 frostwire (6.9.1) stable; urgency=high
  * jlibtorrent-1.2.12.0 update
