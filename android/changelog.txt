@@ -1,4 +1,4 @@
-FrostWire 2.2.9 build 673 - FEB/11/2021
+FrostWire 2.2.9 build 674 - FEB/16/2021
  - New jlibtorrent 1.2.12.0
  - lt:fix loading of DHT node ID from previous session on startup
  - lt:use getrandom(), when available, and fall back to /dev/urandom
@@ -10,6 +10,9 @@ FrostWire 2.2.9 build 673 - FEB/11/2021
  - dev:com.android.tools.build:gradle:4.1.2
  - com.google.android.material:material:1.3.0
  - com.google.android.gms:play-services-ads:19.7.0
+ - androidx.media2:media2-widget:1.1.2
+ - androidx.media2:media2-player:1.1.2
+ - com.mopub:mopub-sdk-*:5.16.0
 
 FrostWire 2.2.8 build 672 - JAN/18/2021
  - Plus: SoundCloud search fixes
