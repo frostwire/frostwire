@@ -1,5 +1,6 @@
-FrostWire 2.2.9 build 674 - FEB/16/2021
+FrostWire 2.2.9 build 675 - FEB/16/2021
  - New jlibtorrent 1.2.12.0
+ - Mopub 5.16.0: s/RewardedVideo/RewardedAd/g refactor
  - lt:fix loading of DHT node ID from previous session on startup
  - lt:use getrandom(), when available, and fall back to /dev/urandom
  - lt:fix uTP issue acking FIN packets
