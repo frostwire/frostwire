@@ -53,7 +53,7 @@ import com.frostwire.android.offers.Products;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.mobileads.MoPubRewardedVideos;
+import com.mopub.mobileads.MoPubRewardedAds;
 
 import java.lang.ref.WeakReference;
 
@@ -170,7 +170,7 @@ public final class BuyActivity extends AbstractActivity {
             // we shouldn't be here if ads have been paused, do not load rewarded videos
             return;
         }
-        if (!MoPubRewardedVideos.hasRewardedVideo(MoPubAdNetwork.UNIT_ID_REWARDED_VIDEO)) {
+        if (!MoPubRewardedAds.hasRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD)) {
             LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
             Offers.MOPUB.loadRewardedVideo();
         }

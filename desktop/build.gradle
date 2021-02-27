@@ -4,6 +4,7 @@
  gradle clean - cleans the build.
  gradle tasks - shows available tasks.
 
+ Make sure ${ANT_HOME} is properly set for these tasks to work
  gradle gettextExtract - extract all the strings from the sourcecode into frostwire.pot
  gradle gettextBundle  - create messages.jar with the extracted strings.
 

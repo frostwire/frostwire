@@ -66,7 +66,8 @@ then
     mv dist/telluride telluride_linux
   elif [ $(uname -a | grep -c Darwin) == 1 ]
   then
-    mv dist/telluride telluride_macos
+  	mv dist/telluride telluride_macos
+		./sign.sh
   elif [ $(uname -a | grep -c windows) == 1 ]
   then
     mv dist/telluride.exe .

@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -30,7 +29,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.common.MediationSettings;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog;
@@ -41,7 +39,7 @@ import com.mopub.common.privacy.PersonalInfoManager;
 import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
-import com.mopub.mobileads.MoPubRewardedVideos;
+import com.mopub.mobileads.MoPubRewardedAds;
 import com.mopub.network.Networking;
 
 import java.lang.ref.WeakReference;
@@ -82,7 +80,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
 
     private static final String UNIT_ID_INTERSTITIAL_TABLET = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "cebdbc56b37c4d31ba79e861d1cb0de4";
     private static final String UNIT_ID_INTERSTITIAL_MOBILE = (Offers.DEBUG_MODE) ? TEST_UNIT_INTERSTITIAL : "399a20d69bdc449a8e0ca171f82179c8";
-    public static final String UNIT_ID_REWARDED_VIDEO = (Offers.DEBUG_MODE) ? TEST_UNIT_REWARDED_VIDEO : "4e4f31e5067049998664b5ec7b9451e1";
+    public static final String UNIT_ID_REWARDED_AD = (Offers.DEBUG_MODE) ? TEST_UNIT_REWARDED_VIDEO : "4e4f31e5067049998664b5ec7b9451e1";
 
     private final Bundle npaBundle = new Bundle();
     private boolean starting = false;
@@ -260,8 +258,8 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             LOG.info("loadRewardedVideo() aborted. Network not started or not enabled");
             return; //not ready
         }
-        MoPubRewardedVideos.setRewardedVideoListener(MoPubRewardedVideoListener.instance());
-        MoPubRewardedVideos.loadRewardedVideo(UNIT_ID_REWARDED_VIDEO);
+        MoPubRewardedAds.setRewardedAdListener(MoPubRewardedAdListener.instance());
+        MoPubRewardedAds.loadRewardedAd(UNIT_ID_REWARDED_AD);
         LOG.info("loadRewardedVideo() called");
     }
 

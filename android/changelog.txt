@@ -1,5 +1,6 @@
-FrostWire 2.2.9 build 673 - FEB/10/2021
+FrostWire 2.2.9 build 675 - FEB/16/2021
  - New jlibtorrent 1.2.12.0
+ - Mopub 5.16.0: s/RewardedVideo/RewardedAd/g refactor
  - lt:fix loading of DHT node ID from previous session on startup
  - lt:use getrandom(), when available, and fall back to /dev/urandom
  - lt:fix uTP issue acking FIN packets
@@ -7,7 +8,12 @@ FrostWire 2.2.9 build 673 - FEB/10/2021
  - lt:load SSL certificates from windows system certificate store, to authenticate trackers
  - lt:introduce mitigation for Server Side Request Forgery in tracker and web seed URLs
  - lt:fix error handling for pool allocation failure
-
+ - dev:com.android.tools.build:gradle:4.1.2
+ - com.google.android.material:material:1.3.0
+ - com.google.android.gms:play-services-ads:19.7.0
+ - androidx.media2:media2-widget:1.1.2
+ - androidx.media2:media2-player:1.1.2
+ - com.mopub:mopub-sdk-*:5.16.0
 
 FrostWire 2.2.8 build 672 - JAN/18/2021
  - Plus: SoundCloud search fixes
