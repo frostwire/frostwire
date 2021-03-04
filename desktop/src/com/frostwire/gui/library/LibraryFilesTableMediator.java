@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
@@ -42,7 +43,6 @@ import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -55,6 +55,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
  * This class wraps the JTable that displays files in the library,
@@ -372,6 +374,11 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         return result;
     }
 
+    private static class RemoveElementsResults {
+        boolean somethingWasRemoved = false;
+        List<String> undeletedFileNames;
+    }
+
     /**
      * Override the default removal so we can actually stop sharing
      * and delete the file.
@@ -390,11 +397,12 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         // sort row indices and go backwards so list indices don't change when
         // removing the files from the model list
         Arrays.sort(rows);
-        for (int i = rows.length - 1; i >= 0; i--) {
-            File file = DATA_MODEL.getFile(rows[i]);
-            files.add(file);
-        }
-        CheckBoxListPanel<File> listPanel = new CheckBoxListPanel<>(files, new FileTextProvider(), true);
+        Arrays.stream(rows).
+                boxed().
+                sorted(Collections.reverseOrder()).
+                forEach(row -> files.add(DATA_MODEL.getFile(row)));
+
+        final CheckBoxListPanel<File> listPanel = new CheckBoxListPanel<>(files, new FileTextProvider(), true);
         listPanel.getList().setVisibleRowCount(4);
         // display list of files that should be deleted
         Object[] message = new Object[]{new MultiLineLabel(I18n.tr("Are you sure you want to delete the selected file(s), thus removing it from your computer?"), 400), Box.createVerticalStrut(ButtonRow.BUTTON_SEP), listPanel, Box.createVerticalStrut(ButtonRow.BUTTON_SEP)};
@@ -405,44 +413,72 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                 || option == JOptionPane.CLOSED_OPTION) {
             return;
         }
-        // remove still selected files
-        List<File> selected = listPanel.getSelectedElements();
-        List<String> undeletedFileNames;
-        undeletedFileNames = new ArrayList<>();
-        boolean somethingWasRemoved = false;
-        for (File file : selected) {
-            // stop seeding if seeding
-            BittorrentDownload dm;
-            if ((dm = TorrentUtil.getDownloadManager(file)) != null) {
-                dm.setDeleteDataWhenRemove(false);
-                dm.setDeleteTorrentWhenRemove(false);
-                BTDownloadMediator.instance().remove(dm);
+
+        Future<RemoveElementsResults> removeElementsResultsFuture = backgroundRemoveElements(listPanel, removeOptions, option);
+        try {
+            RemoveElementsResults removeElementsResults = removeElementsResultsFuture.get();
+
+            clearSelection();
+            if (removeElementsResults.somethingWasRemoved) {
+                LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
             }
-            // close media player if still playing
-            if (MediaPlayer.instance().isThisBeingPlayed(file)) {
-                MediaPlayer.instance().stop();
-                MPlayerMediator.instance().showPlayerWindow(false);
+            if (removeElementsResults.undeletedFileNames.isEmpty()) {
+                return;
             }
-            // removeOptions > 2 => OS offers trash options
-            boolean removed = FileUtils.delete(file, removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
-            if (removed) {
-                somethingWasRemoved = true;
-                DATA_MODEL.remove(DATA_MODEL.getRow(file));
-            } else {
-                undeletedFileNames.add(getCompleteFileName(file));
+
+            // display list of files that could not be deleted
+            message = new Object[]{
+                    new MultiLineLabel(
+                            I18n.tr("The following files could not be deleted. They may be in use by another application or are currently being downloaded to."),
+                            400),
+                    Box.createVerticalStrut(ButtonRow.BUTTON_SEP),
+                    new JScrollPane(createFileList(removeElementsResults.undeletedFileNames))};
+            JOptionPane.showMessageDialog(MessageService.getParentComponent(), message, I18n.tr("Error"), JOptionPane.ERROR_MESSAGE);
+            super.removeSelection();
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Future<RemoveElementsResults> backgroundRemoveElements(
+            final CheckBoxListPanel<File> listPanel,
+            final Object[] removeOptions,
+            final int option) {
+        return BackgroundExecutorService.submit(() -> {
+            // remove still selected files
+            List<File> selected = listPanel.getSelectedElements();
+            List<String> undeletedFileNames;
+            undeletedFileNames = new ArrayList<>();
+            boolean somethingWasRemoved = false;
+            for (File file : selected) {
+                // stop seeding if seeding
+                BittorrentDownload dm;
+                if ((dm = TorrentUtil.getDownloadManager(file)) != null) {
+                    dm.setDeleteDataWhenRemove(false);
+                    dm.setDeleteTorrentWhenRemove(false);
+                    BTDownloadMediator.instance().remove(dm);
+                }
+                // close media player if still playing
+                if (MediaPlayer.instance().isThisBeingPlayed(file)) {
+                    MediaPlayer.instance().stop();
+                    // executes safely on main thread only
+                    MPlayerMediator.instance().showPlayerWindow(false);
+                }
+                // removeOptions > 2 => OS offers trash options
+                boolean removed = FileUtils.delete(file, removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
+                if (removed) {
+                    somethingWasRemoved = true;
+                    DATA_MODEL.remove(DATA_MODEL.getRow(file));
+                } else {
+                    undeletedFileNames.add(getCompleteFileName(file));
+                }
             }
-        }
-        clearSelection();
-        if (somethingWasRemoved) {
-            LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
-        }
-        if (undeletedFileNames.isEmpty()) {
-            return;
-        }
-        // display list of files that could not be deleted
-        message = new Object[]{new MultiLineLabel(I18n.tr("The following files could not be deleted. They may be in use by another application or are currently being downloaded to."), 400), Box.createVerticalStrut(ButtonRow.BUTTON_SEP), new JScrollPane(createFileList(undeletedFileNames))};
-        JOptionPane.showMessageDialog(MessageService.getParentComponent(), message, I18n.tr("Error"), JOptionPane.ERROR_MESSAGE);
-        super.removeSelection();
+            RemoveElementsResults results = new RemoveElementsResults();
+            results.somethingWasRemoved = somethingWasRemoved;
+            results.undeletedFileNames = undeletedFileNames;
+            return results;
+        });
     }
 
     /**
@@ -481,7 +517,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                 return;
             } else if (!MediaPlayer.isPlayableFile(selectedFile)) {
                 String extension = FilenameUtils.getExtension(selectedFile.getName());
-                if (extension != null && extension.toLowerCase().equals("torrent")) {
+                if (extension != null && extension.equalsIgnoreCase("torrent")) {
                     GUIMediator.instance().openTorrentFile(selectedFile, true);
                 } else {
                     GUIMediator.launchFile(selectedFile);
@@ -549,11 +585,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                 SEND_TO_ITUNES_ACTION.setEnabled(getMediaType().equals(MediaType.getAudioMediaType()) || hasExtension(selectedFile.getAbsolutePath(), "mp4"));
             }
         }
-        if (sel.length == 1 && selectedFile != null && selectedFile.isFile() && selectedFile.getParentFile() != null) {
-            OPEN_IN_FOLDER_ACTION.setEnabled(true);
-        } else {
-            OPEN_IN_FOLDER_ACTION.setEnabled(false);
-        }
+        OPEN_IN_FOLDER_ACTION.setEnabled(sel.length == 1 && selectedFile != null && selectedFile.isFile() && selectedFile.getParentFile() != null);
         if (sel.length == 1) {
             LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(new TagsReader(selectedFile)).asyncRetrieveImage();
         }
@@ -736,11 +768,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private final class RemoveAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -8704093935791256631L;
-
         RemoveAction() {
             putValue(Action.NAME, I18n.tr("Delete"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Delete Selected Files"));
