@@ -1,6 +1,6 @@
-build 11 - feb/22/2021
- - python: youtube-dl 2021.2.22
- - python: pylint 2.7.0
+build 11 - nar/03/2021
+ - python: youtube-dl 2021.3.3
+ - python: pylint 2.7.2
 
 build 10 - feb/10/2021
  - python: pip-21.0.1
