@@ -230,7 +230,7 @@ dependencies {
     implementation 'com.unity3d.ads:unity-ads:3.5.1'
     implementation 'com.mopub.mediation:unityads:3.5.1.0'
 
-    def jlibtorrent_version='1.2.12.0'
+    def jlibtorrent_version='1.2.13.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
     implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar')
     implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')

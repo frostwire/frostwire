@@ -1,3 +1,12 @@
+FrostWire 2.3.0 build 676 - MAR/12/2021
+ - New jlibtorent 1.2.13.0
+ - lt:fix incoming TCP connections when using tracker-only proxy
+ - lt:fix issue with paths starting with ./
+ - lt:fix integer overflow when setting a high DHT upload rate limit
+ - lt:improve Path MTU discovery logic in uTP
+ - lt:fix overflow issue when rlimit_nofile is set to infinity
+ - lt:Fix cxxflags and linkflags injection via environment variables
+
 FrostWire 2.2.9 build 675 - FEB/16/2021
  - New jlibtorrent 1.2.12.0
  - Mopub 5.16.0: s/RewardedVideo/RewardedAd/g refactor
