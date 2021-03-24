@@ -1,5 +1,13 @@
-FrostWire 2.3.0 build 676 - MAR/12/2021
+FrostWire 2.3.0 build 677 - MAR/24/2021
  - New jlibtorent 1.2.13.0
+ - com.google.firebase:firebase-bom:26.7.0
+ - com.android.billingclient:billing:3.0.3
+ - com.google.android.gms:play-services-ads:19.8.0
+ - androidx.annotation:annotation:1.2.0
+ - com.mopub:mopub-sdk-banner:5.16.3
+ - dev: com.android.tools.build:gradle:4.1.3
+ - com.applovin:applovin-sdk:10.0.1
+ - com.mopub.mediation:applovin:10.0.1.0
  - lt:fix incoming TCP connections when using tracker-only proxy
  - lt:fix issue with paths starting with ./
  - lt:fix integer overflow when setting a high DHT upload rate limit
