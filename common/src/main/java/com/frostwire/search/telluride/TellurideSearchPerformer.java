@@ -35,7 +35,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static final Logger LOG = Logger.getLogger(TellurideSearchPerformer.class);
     private static Gson gson = null;
     private static Calendar calendar = null;
-    private final CountDownLatch performanceLatch;
+    private final CountDownLatch performerLatch;
 
     private final String url;
     private final File tellurideLauncher;
@@ -58,7 +58,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         tellurideLauncher = _tellurideLauncher;
         saveDirectory = _saveDirectory;
         performerListener = _performerListener;
-        performanceLatch = new CountDownLatch(1);
+        performerLatch = new CountDownLatch(1);
         if (gson == null) {
             gson = new GsonBuilder().create();
         }
@@ -89,7 +89,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
                         }
                     });
             LOG.info("perform(): working...");
-            performanceLatch.await();
+            performerLatch.await();
         } catch (IllegalArgumentException e) {
             if (performerListener != null) {
                 performerListener.onTellurideBinaryNotFound(e);
@@ -203,14 +203,14 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         // When a performer ends in the PerformTask, it's stopped (stopped=true) by the SearchManager
         // as it removes the task.
         // This latch is released so the PerformTask can finish.
-        performanceLatch.countDown();
+        performerLatch.countDown();
     }
 
     private void onError(String errorMessage) {
         if (performerListener != null) {
             performerListener.onError(getToken(), errorMessage);
         }
-        performanceLatch.countDown();
+        performerLatch.countDown();
     }
 
     private boolean noCodec(String codec) {
