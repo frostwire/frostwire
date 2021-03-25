@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+import server
 import argparse
 import json
 import sys
@@ -37,6 +38,19 @@ if __name__ == "__main__":
     welcome()
     PARSER = argparse.ArgumentParser()
     PARSER.add_argument(
+        "--server",
+        "-s",
+        action="store_true",
+        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The shutdown parameter will only be considered when the request comes from localhost"
+        )
+    PARSER.add_argument(
+        "--port",
+        "-p",
+        default=47999,
+        type=int,
+        help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
+    )
+    PARSER.add_argument(
         "--audio-only",
         "-a",
         action='store_true',
@@ -51,12 +65,20 @@ if __name__ == "__main__":
         'Does not download the video file')
     PARSER.add_argument(
         "page_url",
+        nargs='?',
         help="The URL of the page that hosts the video you need to backup locally")
     ARGS, LEFTOVERS = PARSER.parse_known_args()
 
+    SERVER_MODE = ARGS.server
+    SERVER_PORT = ARGS.port
     AUDIO_ONLY = ARGS.audio_only
     META_ONLY = ARGS.meta_only
     PAGE_URL = ARGS.page_url
+
+    if SERVER_MODE:
+        print('Starting Telluride Web Server on port {}'.format(SERVER_PORT))
+        server.start(BUILD, SERVER_PORT,)
+        sys.exit(0)
 
     print('PAGE_URL: <' + PAGE_URL + '>')
     YDL_OPTS = {'nocheckcertificate' : True,
