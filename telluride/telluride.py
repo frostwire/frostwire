@@ -90,7 +90,10 @@ if __name__ == "__main__":
         server.start(BUILD, SERVER_PORT)
         sys.exit(0)
 
-    print('PAGE_URL: <' + PAGE_URL + '>')
+    if PAGE_URL is None:
+        print('Please pass a video page URL or "--help" for instructions\n')
+        sys.exit(1)
+    
     YDL_OPTS = {'nocheckcertificate' : True,
                 'quiet': False,
                 'restrictfilenames': True
@@ -113,7 +116,6 @@ if __name__ == "__main__":
                 'preferredquality': '192',
             }
         ]
-    print()
 
     with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
         ydl.download([PAGE_URL])

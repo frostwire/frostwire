@@ -6,19 +6,33 @@
 
 ## Usage
 ```
-usage: telluride[.exe|_macos|_linux] [-h] [--audio-only] [--meta-only] page_url
+Telluride Cloud Video Downloader. Build 14
+Copyright 2020-2021 FrostWire LLC. Licensed under Apache 2.0.
+
+usage: telluride[.exe|_macos|_linux] [-h] [--server] [--port PORT] [--audio-only] [--meta-only]
+                    [page_url]
 
 positional arguments:
-  page_url          The URL of the page that hosts the video you need to
-                    backup locally
+  page_url              The URL of the page that hosts the video you need to
+                        backup locally
 
 optional arguments:
-  -h, --help        show this help message and exit
-  --audio-only, -a  Downloads the video and keeps only a separate audio file
-                    usually a .mp3. (requires ffmpeg installed in the system)
-  --meta-only, -m   Prints a JSON dictionary with all the metadata available
-                    on the video file found in the page_url. Does not download
-                    the video file
+  -h, --help            show this help message and exit
+  --server, -s          Launches Telluride as a web server to perform URL
+                        queries and return meta data as JSON. There's only one
+                        endpoint at the root path. Possible parameters are
+                        url=<video_page_url> and shutdown=1 to shutdown the
+                        server. The shutdown parameter will only be considered
+                        when the request comes from localhost
+  --port PORT, -p PORT  HTTP port when running on server mode. Default port
+                        number is 47999. This parameter is only taken into
+                        account if --server or -s passed
+  --audio-only, -a      Downloads the video and keeps only a separate audio
+                        file usually a .mp3. (requires ffmpeg installed in the
+                        system)
+  --meta-only, -m       Prints a JSON dictionary with all the metadata
+                        available on the video file found in the page_url.
+                        Does not download the video file
 ```
 
 ## Building
@@ -44,7 +58,7 @@ You should end up with a stand-alone executable for the platform you are on:
 
 ## License
 ```
-Copyright 2020 FrostWire LLC.
+Copyright 2020-2021 FrostWire LLC.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
