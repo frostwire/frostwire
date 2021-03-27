@@ -17,13 +17,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-import server
+# python path imports
 import argparse
 import json
 import sys
 import youtube_dl
 
-BUILD = 12
+# our imports
+import server
+
+
+BUILD = 14
 
 def welcome():
     '''
@@ -34,39 +38,45 @@ def welcome():
     print("Copyright 2020 FrostWire LLC. Licensed under Apache 2.0.")
     print()
 
-if __name__ == "__main__":
-    welcome()
-    PARSER = argparse.ArgumentParser()
-    PARSER.add_argument(
+def prepare_parser(parser):
+    '''
+    Initialize all the possible program options
+    '''
+    parser.add_argument(
         "--server",
         "-s",
         action="store_true",
         help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The shutdown parameter will only be considered when the request comes from localhost"
         )
-    PARSER.add_argument(
+    parser.add_argument(
         "--port",
         "-p",
         default=47999,
         type=int,
         help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
     )
-    PARSER.add_argument(
+    parser.add_argument(
         "--audio-only",
         "-a",
         action='store_true',
         help='Downloads the video and keeps only a separate audio file' +
         ' usually a .mp3. (requires ffmpeg installed in the system)')
-    PARSER.add_argument(
+    parser.add_argument(
         "--meta-only",
         "-m",
         action='store_true',
         help='Prints a JSON dictionary with all the metadata available on' +
         ' the video file found in the page_url. ' +
         'Does not download the video file')
-    PARSER.add_argument(
+    parser.add_argument(
         "page_url",
         nargs='?',
         help="The URL of the page that hosts the video you need to backup locally")
+
+if __name__ == "__main__":
+    welcome()
+    PARSER = argparse.ArgumentParser()
+    prepare_parser(PARSER)
     ARGS, LEFTOVERS = PARSER.parse_known_args()
 
     SERVER_MODE = ARGS.server
@@ -77,7 +87,7 @@ if __name__ == "__main__":
 
     if SERVER_MODE:
         print('Starting Telluride Web Server on port {}'.format(SERVER_PORT))
-        server.start(BUILD, SERVER_PORT,)
+        server.start(BUILD, SERVER_PORT)
         sys.exit(0)
 
     print('PAGE_URL: <' + PAGE_URL + '>')

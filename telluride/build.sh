@@ -55,7 +55,7 @@ if [ $(uname -a | grep -c Darwin) == 1 ]; then
 fi
 
 cleanup
-pylint telluride.py
+pylint --max-line-length=350 telluride.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
 ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py
 

@@ -17,14 +17,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+import sys
 from sanic import Sanic
 from sanic.response import json
 
-def start(build_number, http_port_number, workers_number=4):
+def query_video(page_url):
+  YDL_OPTS = {'nocheckcertificate' : True,
+              'quiet': True,
+              'restrictfilenames': True,
+              'format': 'bestaudio/best'
+              }
+  with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
+    INFO_DICT = ydl.extract_info(page_url, download=False)
+    return json(INFO_DICT)
+
+
+def start(build_number, http_port_number, workers_number=2):
   app = Sanic('Telluride Web Server {}'.format(build_number))
 
   @app.route('/')
   async def root_handler(request):
-      return json({'build' : build_number})
-  
+    if request.ip != '127.0.0.1' and request.ip != 'localhost':
+      return json({'build': build_number, 'message': 'gtfo'})
+    query = dict(request.query_args)
+    if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
+      return json({'build' : build_number, 'message': 'Shutting down'})
+
+
+    return json({'build' : build_number})
+
   app.run(host='127.0.0.1', port=http_port_number, workers=workers_number)
