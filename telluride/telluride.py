@@ -93,7 +93,7 @@ if __name__ == "__main__":
     if PAGE_URL is None:
         print('Please pass a video page URL or "--help" for instructions\n')
         sys.exit(1)
-    
+
     YDL_OPTS = {'nocheckcertificate' : True,
                 'quiet': False,
                 'restrictfilenames': True
