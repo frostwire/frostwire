@@ -26,7 +26,6 @@ import youtube_dl
 # our imports
 import server
 
-
 BUILD = 14
 
 def welcome():
@@ -51,7 +50,7 @@ def prepare_parser(parser):
     parser.add_argument(
         "--port",
         "-p",
-        default=47999,
+        default=server.DEFAULT_HTTP_PORT,
         type=int,
         help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
     )

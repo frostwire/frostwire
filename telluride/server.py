@@ -18,32 +18,47 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 import sys
+import urllib
+import youtube_dl
 from sanic import Sanic
 from sanic.response import json
 
+DEFAULT_HTTP_PORT=47999
+
 def query_video(page_url):
-  YDL_OPTS = {'nocheckcertificate' : True,
-              'quiet': True,
-              'restrictfilenames': True,
-              'format': 'bestaudio/best'
-              }
-  with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
-    INFO_DICT = ydl.extract_info(page_url, download=False)
-    return json(INFO_DICT)
+    '''
+    query_video: queries metadata for the video in page_url using youtube_dl
+    '''
+    ydl_opts = {'nocheckcertificate' : True,
+                'quiet': True,
+                'restrictfilenames': True,
+                'format': 'bestaudio/best'
+                }
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
+        return json(info_dict)
 
+def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=4):
+    '''
+    starts the web server.
+    Parameters:
+    build_number: telluride build number
+    http_port_number
+    workers_number
+    '''
+    app = Sanic('Telluride Web Server {}'.format(build_number))
 
-def start(build_number, http_port_number, workers_number=2):
-  app = Sanic('Telluride Web Server {}'.format(build_number))
+    @app.route('/')
+    async def root_handler(request):
+      #pylint: disable=unused-variable
+        if request.ip != '127.0.0.1' and request.ip != 'localhost':
+            return json({'build': build_number, 'message': 'gtfo'})
+        query = dict(request.query_args)
+        if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
+            sys.exit(0)
+            return
+        if 'url' in query:
+            return query_video(query['url'])
+        return json({'build' : build_number, 'message': 'no valid parameters received'})
 
-  @app.route('/')
-  async def root_handler(request):
-    if request.ip != '127.0.0.1' and request.ip != 'localhost':
-      return json({'build': build_number, 'message': 'gtfo'})
-    query = dict(request.query_args)
-    if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
-      return json({'build' : build_number, 'message': 'Shutting down'})
-
-
-    return json({'build' : build_number})
-
-  app.run(host='127.0.0.1', port=http_port_number, workers=workers_number)
+    app.run(host='127.0.0.1', port=http_port_number, workers=workers_number)
