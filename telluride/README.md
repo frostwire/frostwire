@@ -66,7 +66,7 @@ Telluride will receive your HTTP requests at the root path and it will expect on
  - `url=<url encoded video page url>` - It will search for the available metadata and return it in JSON, the same as when you execute telluride in `--meta-only` mode
  - `shutdown=1` - Pass this paremeter if you want to shutdown the telluride web server
 
-**This web server is designed only to receive requests from `localhost`**. If you want to do something like a P2P network of telluride webservers to resolve a lot of these requests, you need to implement all the peer to peer abstractions and have your p2p client/server talk to the local instance of telluride on each peer. Web server mode is a simple web interface to telluride.
+**This web server is designed only to receive requests from `localhost`**. If you want to do something like a P2P network of telluride webservers to resolve a lot of these requests, you need to implement all the peer to peer coordination, throttling, caching, anti-DDOS logic in a service or app that launches this server. This is a simple web interface to the local telluride process, a simple lego piece you can use as best you can.
 
 ## License
 ```
