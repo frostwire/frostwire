@@ -56,6 +56,18 @@ You should end up with a stand-alone executable for the platform you are on:
  - `ffmpeg` (for audio-only downloads. audio is extracted from the downloaded video)
  - `youtube_dl`, `pycryptodome`, `pyinstaller`
 
+## Web Server Mode
+
+If you want your app to make repeated requests to telluride it's very expensive starting and destroying a new telluride process every time. By passing the `--server` option and optionally a tcp `--port` number you can run telluride in the background and send requests to the web server from localhost.
+
+The default port number is `47999`, as defined on `server.py`
+
+Telluride will receive your HTTP requests at the root path and it will expect only two possible request parameters:
+ - `url=<url encoded video page url>` - It will search for the available metadata and return it in JSON, the same as when you execute telluride in `--meta-only` mode
+ - `shutdown=1` - Pass this paremeter if you want to shutdown the telluride web server
+
+**This web server is designed only to receive requests from `localhost`**. If you want to do something like a P2P network of telluride webservers to resolve a lot of these requests, you need to implement all the peer to peer abstractions and have your p2p client/server talk to the local instance of telluride on each peer. Web server mode is a simple web interface to telluride.
+
 ## License
 ```
 Copyright 2020-2021 FrostWire LLC.
