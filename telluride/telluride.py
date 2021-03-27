@@ -19,6 +19,7 @@ limitations under the License.
 '''
 # python path imports
 import argparse
+from datetime import datetime
 import json
 import sys
 import youtube_dl
@@ -34,7 +35,7 @@ def welcome():
     '''
     print()
     print("Telluride Cloud Video Downloader. Build " + str(BUILD))
-    print("Copyright 2020 FrostWire LLC. Licensed under Apache 2.0.")
+    print("Copyright 2020-{} FrostWire LLC. Licensed under Apache 2.0.".format(datetime.today().year))
     print()
 
 def prepare_parser(parser):
