@@ -38,7 +38,7 @@ def welcome():
     print("Copyright 2020-{} FrostWire LLC. Licensed under Apache 2.0.".format(datetime.today().year))
     print()
 
-def prepare_parser(parser):
+def prepare_options_parser(parser):
     '''
     Initialize all the possible program options
     '''
@@ -46,7 +46,7 @@ def prepare_parser(parser):
         "--server",
         "-s",
         action="store_true",
-        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The shutdown parameter will only be considered when the request comes from localhost"
+        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
         )
     parser.add_argument(
         "--port",
@@ -76,7 +76,7 @@ def prepare_parser(parser):
 if __name__ == "__main__":
     welcome()
     PARSER = argparse.ArgumentParser()
-    prepare_parser(PARSER)
+    prepare_options_parser(PARSER)
     ARGS, LEFTOVERS = PARSER.parse_known_args()
 
     SERVER_MODE = ARGS.server
