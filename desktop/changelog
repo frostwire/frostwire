@@ -1,8 +1,9 @@
 frostwire (6.9.3) stable; urgency=high
- * Telluride Cloud Video Downloader build 11
+ * Telluride Cloud Video Downloader build 15
  * jlibtorrent-1.2.13.0 rebuild to fix linux compatibility issues
+ * Telluride searches are much faster, telluride runs as an RPC server in background
 
--- FrostWire Team <contact@frostwire.com>  Mar, 14 Feb 2020 14:18:00 -0600
+-- FrostWire Team <contact@frostwire.com>  Tue, 6 Apr 2020 17:50:00 -0600
 
 frostwire (6.9.2) stable; urgency=high
  * Telluride Cloud Video Downloader build 10
