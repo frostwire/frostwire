@@ -22,7 +22,8 @@ optional arguments:
                         queries and return meta data as JSON. There's only one
                         endpoint at the root path. Possible parameters are
                         url=<video_page_url> and shutdown=1 to shutdown the
-                        server. The shutdown parameter will only be considered
+                        server. The server will only answer to requests from
+                        localhost
                         when the request comes from localhost
   --port PORT, -p PORT  HTTP port when running on server mode. Default port
                         number is 47999. This parameter is only taken into
