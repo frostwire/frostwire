@@ -38,7 +38,7 @@ def query_video(page_url):
         info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
         return json(info_dict)
 
-def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=4):
+def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
     '''
     starts the web server.
     Parameters:
