@@ -18,8 +18,10 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.desktop.DesktopPlatform;
 import com.frostwire.jlibtorrent.LibTorrent;
 import com.frostwire.platform.Platforms;
+import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
+import com.limegroup.gnutella.gui.search.SearchEngine;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.swing.*;
@@ -57,6 +59,8 @@ class GUILoader {
             }
             Initializer initializer = new Initializer();
             initializer.initialize(args, frame);
+
+            SearchEngine.startTellurideRPCServer();
         } catch (Throwable err) {
             hideSplash(frame);
             try {

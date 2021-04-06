@@ -29,6 +29,7 @@ import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
+import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
+import static com.limegroup.gnutella.settings.SearchSettings.TELLURIDE_RPC_PORT;
 
 /**
  * @author gubatron
@@ -228,22 +230,30 @@ public abstract class SearchEngine {
         }
     };
 
+    public static void startTellurideRPCServer() {
+        if (TELLURIDE_LAUNCHER == null) {
+            TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
+            if (TELLURIDE_LAUNCHER != null) {
+                LOG.info("TELLURIDE_LAUNCHER: File -> " + TELLURIDE_LAUNCHER.getAbsolutePath());
+
+                if (!TellurideLauncher.SERVER_UP.get()) {
+                    LOG.info("Launching Telluride RPC Server on " + TELLURIDE_RPC_PORT.getValue() + "...");
+                    TellurideLauncher.launchServer(
+                            TELLURIDE_LAUNCHER,
+                            TELLURIDE_RPC_PORT.getValue(),
+                            SharingSettings.TORRENTS_DIR_SETTING.getValue());
+                }
+            } else {
+                LOG.warn("TELLURIDE_LAUNCHER could not be found");
+            }
+        }
+    }
+
     private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", TELLURIDE_ENABLED, "*") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            if (TELLURIDE_LAUNCHER == null) {
-                TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
-                if (TELLURIDE_LAUNCHER != null) {
-                    LOG.info("TELLURIDE_LAUNCHER:File -> " + TELLURIDE_LAUNCHER.getAbsolutePath());
-                } else {
-                    LOG.warn("TELLURIDE_LAUNCHER could not be found");
-                }
-            }
-
             return new TellurideSearchPerformer(token,
                     keywords,
-                    TELLURIDE_LAUNCHER,
-                    SharingSettings.TORRENTS_DIR_SETTING.getValue(),
                     new TellurideSearchPerformerDesktopListener());
         }
     };

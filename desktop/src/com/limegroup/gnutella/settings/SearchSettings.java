@@ -25,6 +25,8 @@ import java.io.File;
  * Settings for searches.
  */
 public final class SearchSettings extends LimeProps {
+    public static final IntSetting TELLURIDE_RPC_PORT = FACTORY.createIntSetting("TELLURIDE_RPC_PORT", 47999);
+
     /**
      * Amount of time to wait in milliseconds before showing details page
      */

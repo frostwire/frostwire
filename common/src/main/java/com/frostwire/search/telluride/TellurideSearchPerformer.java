@@ -19,13 +19,15 @@ package com.frostwire.search.telluride;
 
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.UrlUtils;
+import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.limegroup.gnutella.settings.SearchSettings;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -38,14 +40,10 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private final CountDownLatch performerLatch;
 
     private final String url;
-    private final File tellurideLauncher;
-    private final File saveDirectory;
     private final TellurideSearchPerformerListener performerListener;
 
     public TellurideSearchPerformer(long token,
                                     String _url,
-                                    File _tellurideLauncher,
-                                    File _saveDirectory,
                                     TellurideSearchPerformerListener _performerListener) {
         super(token);
 
@@ -55,8 +53,6 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
 
         url = _url;
-        tellurideLauncher = _tellurideLauncher;
-        saveDirectory = _saveDirectory;
         performerListener = _performerListener;
         performerLatch = new CountDownLatch(1);
         if (gson == null) {
@@ -70,32 +66,16 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     @Override
     public void perform() {
         try {
-            TellurideLauncher.launch(tellurideLauncher,
-                    url,
-                    saveDirectory,
-                    false,
-                    true,
-                    false,
-                    // MetaListener
-                    new TellurideAbstractListener() {
-                        @Override
-                        public void onMeta(String json) {
-                            TellurideSearchPerformer.this.onMeta(json);
-                        }
-
-                        @Override
-                        public void onError(String errorMessage) {
-                            TellurideSearchPerformer.this.onError(errorMessage);
-                        }
-                    });
-            LOG.info("perform(): working...");
-            performerLatch.await();
-        } catch (IllegalArgumentException e) {
-            if (performerListener != null) {
-                performerListener.onTellurideBinaryNotFound(e);
-            }
-        } catch (InterruptedException e) {
+            HttpClient httpClient = HttpClientFactory.newInstance();
+            String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",
+                    SearchSettings.TELLURIDE_RPC_PORT.getValue(),
+                    UrlUtils.encode(url));
+            LOG.info("perform(): working on " + queryUrl);
+            String tellurideJSON = httpClient.get(queryUrl);
+            TellurideSearchPerformer.this.onMeta(tellurideJSON);
+        } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
+            TellurideSearchPerformer.this.onError(e.getMessage());
         }
         LOG.info("perform(): finished.");
     }
