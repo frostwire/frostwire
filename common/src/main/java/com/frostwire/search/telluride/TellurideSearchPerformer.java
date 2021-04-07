@@ -26,7 +26,6 @@ import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.limegroup.gnutella.settings.SearchSettings;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,6 +37,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static Gson gson = null;
     private static Calendar calendar = null;
     private final CountDownLatch performerLatch;
+    private final int TELLURIDE_RPC_PORT = 47999;
 
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
@@ -68,7 +68,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         try {
             HttpClient httpClient = HttpClientFactory.newInstance();
             String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",
-                    SearchSettings.TELLURIDE_RPC_PORT.getValue(),
+                    TELLURIDE_RPC_PORT,
                     UrlUtils.encode(url));
             LOG.info("perform(): working on " + queryUrl);
             String tellurideJSON = httpClient.get(queryUrl);
