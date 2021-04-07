@@ -1,7 +1,16 @@
 build 15 - apr/06/2021
+ - NEW: --server mode, run teluride as an RPC web server
  - python: pylint-2.7.4
  - python: youtube_dl-2021.4.7
- - RPC --server mode
+ - python: astroid-2.5.2
+ - python: sanic-21.3.2
+ - python: sanic_routing-0.5.2    
+ - python: httptools-0.1.1
+ - python: ujson-4.0.2
+ - python: uvloop-0.15.2
+ - python: websockets-8.1
+ - python: aiofiles-0.6.0
+ - python: multidict-5.1.0
 
 build 12 - mar/14/2021
  - python: youtube-dl-2021.3.14
