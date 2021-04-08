@@ -23,7 +23,7 @@ import youtube_dl
 from sanic import Sanic
 from sanic.response import json
 
-DEFAULT_HTTP_PORT=47999
+DEFAULT_HTTP_PORT = 47999
 
 def query_video(page_url):
     '''
