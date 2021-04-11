@@ -1,12 +1,26 @@
 #!/bin/bash
 PYINSTALLER_CMD="pyinstaller"
 
+isdocker() {
+  if [ -f /.dockerenv ]
+  then
+    return ${TRUE}
+  fi
+  return ${FALSE}
+}
+
 # Linux's pyinstaller PATH
 if [ $(uname -a | grep -c Ubuntu) == 1 ]
 then
     PYINSTALLER_CMD="${HOME}/.local/bin/pyinstaller"
-    echo "PYINSTALLER_CMD=${PYINSTALLER_CMD}"
 fi
+
+if isdocker
+then
+    PYINSTALLER_CMD=/usr/local/bin/pyinstaller
+fi
+
+echo PYINSTALLER_CMD=${PYINSTALLER_CMD}
 
 # Windows + MINGW
 # pylint and pyinstaller might be in a place like this if you are in windows
