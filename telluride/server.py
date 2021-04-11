@@ -33,7 +33,7 @@ def query_video(page_url):
                 'quiet': True,
                 'restrictfilenames': True,
                 'format': 'bestaudio/best'
-                }
+               }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
         return json(info_dict)
@@ -50,7 +50,13 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
 
     @app.route('/')
     async def root_handler(request):
-      #pylint: disable=unused-variable
+        '''
+        http handler, rejects connections not coming from localhost|127.0.0.1
+        url parameters:
+        url=<url encoded video page url to obtain json metadata from>
+        [shutdown=1] if passed it will shutdown the server
+        '''
+        #pylint: disable=unused-variable
         if request.ip != '127.0.0.1' and request.ip != 'localhost':
             return json({'build': build_number, 'message': 'gtfo'})
         query = dict(request.query_args)

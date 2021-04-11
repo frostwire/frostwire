@@ -97,7 +97,7 @@ if __name__ == "__main__":
     YDL_OPTS = {'nocheckcertificate' : True,
                 'quiet': False,
                 'restrictfilenames': True
-                }
+               }
     if META_ONLY:
         YDL_OPTS['quiet'] = True
         YDL_OPTS['format'] = 'bestaudio/best'

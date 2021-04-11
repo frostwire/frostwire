@@ -46,7 +46,7 @@ iswindows() {
 if isubuntu
 then
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-  sudo apt-get install python3 python3-pip pylint
+  sudo apt-get install python3 python3-pip pylint3
   PYINSTALLER_PACKAGE='PyInstaller'
 fi
 
