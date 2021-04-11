@@ -25,6 +25,14 @@ PYINSTALLER_PACKAGE='pyinstaller'
 TRUE=0
 FALSE=1
 
+isdocker() {
+  if [ -f /.dockerenv ]
+  then
+    return ${TRUE}
+  fi
+  return ${FALSE}
+}
+
 isubuntu() {
   if [ $(uname -a | grep -c Ubuntu) == 0 ]
   then
@@ -43,10 +51,10 @@ iswindows() {
   fi
 }
 
-if isubuntu
-then
-  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+if ! isdocker -a isubuntu
+then   
   sudo apt-get install python3 python3-pip pylint3
+  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
   PYINSTALLER_PACKAGE='PyInstaller'
 fi
 
