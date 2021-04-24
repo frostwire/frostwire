@@ -227,8 +227,8 @@ dependencies {
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:10.1.2'
     implementation 'com.mopub.mediation:applovin:10.1.1.0'
-    implementation 'com.unity3d.ads:unity-ads:3.5.1'
-    implementation 'com.mopub.mediation:unityads:3.5.1.0'
+    implementation 'com.unity3d.ads:unity-ads:3.6.2'
+    implementation 'com.mopub.mediation:unityads:3.6.0.0'
 
     def jlibtorrent_version='1.2.13.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
