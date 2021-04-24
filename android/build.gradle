@@ -225,8 +225,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-fullscreen:5.16.3@aar') { transitive = true }
 
     // MoPub Mediation Partners
-    implementation 'com.applovin:applovin-sdk:10.0.1'
-    implementation 'com.mopub.mediation:applovin:10.0.1.0'
+    implementation 'com.applovin:applovin-sdk:10.1.2'
+    implementation 'com.mopub.mediation:applovin:10.1.1.0'
     implementation 'com.unity3d.ads:unity-ads:3.5.1'
     implementation 'com.mopub.mediation:unityads:3.5.1.0'
 
