@@ -42,6 +42,13 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:remove="android:maxSdkVersion" />
+
+    <!--
+     Ignore Android Studio's Warning, If you remove WRITE_SETTINGS from
+     this Manifest, when the "Modify system settings" appears the user
+     will not be able to Allow modify system settings because the checkbox
+     will be disabled
+    -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <!-- generic -->
