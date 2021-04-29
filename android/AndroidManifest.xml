@@ -38,19 +38,29 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- storage -->
+    <!-- External refers not to SD Cards, but to SHARED files outside our app's
+         internal storage -->
+
+    <!-- READ_EXTERNAL_STORAGE should allow us to read media files from other apps,
+         this should be useful for My Files to at least browse, and open files,
+         but we will no longer have the power to remove files unless we ask Google
+         Play to grant us with WRITE_EXTERNAL_STORAGE special permissions
+
+         The File api comes back in Android 11, however it's really a wrapper
+         for accessing the shared external storage and performance will suffer if you
+         open and close the same files multiple times.
+         -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:remove="android:maxSdkVersion" />
 
     <!--
      Ignore Android Studio's Warning, If you remove WRITE_SETTINGS from
      this Manifest, when the "Modify system settings" appears the user
      will not be able to Allow modify system settings because the checkbox
-     will be disabled
+     will be disabled.
+
+     We use this permission to allow the user to set ring tones from media files
     -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -69,7 +79,6 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
-        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.FrostWire"
         tools:replace="android:label">
 
