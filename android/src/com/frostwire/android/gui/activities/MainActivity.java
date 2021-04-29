@@ -39,6 +39,7 @@ import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -88,6 +89,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
@@ -131,6 +133,9 @@ public class MainActivity extends AbstractActivity implements
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
         localBroadcastReceiver = new LocalBroadcastReceiver();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ignoreHardwareMenu();
+        }
     }
 
     @Override
@@ -906,6 +911,20 @@ public class MainActivity extends AbstractActivity implements
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
             return false;
+        }
+    }
+
+    private void ignoreHardwareMenu() {
+        try {
+            ViewConfiguration config = ViewConfiguration.get(this);
+            @SuppressWarnings("JavaReflectionMemberAccess")
+            Field f = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+            if (f != null) {
+                f.setAccessible(true);
+                f.setBoolean(config, false);
+            }
+        } catch (Throwable e) {
+            // ignore
         }
     }
 
