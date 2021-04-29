@@ -18,6 +18,7 @@
 package com.frostwire.android.gui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -92,7 +93,16 @@ public class MainApplication extends MultiDexApplication {
 
         // some phones still can configure an external button as the
         // permanent menu key
-        ignoreHardwareMenu();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            // R = 30 = Android 11
+            // Android 11 will freeze and give a Strict Mode error
+            // if you call this
+            // android.os.strictmode.IncorrectContextUseViolation
+            // UI constants, such as display metrics or window metrics,
+            // must be accessed from Activity or other visual Context.
+            // Use an Activity or a Context created with Context#createWindowContext(int, Bundle), which are adjusted to the configuration and visual bounds of an area on screen
+            ignoreHardwareMenu();
+        }
 
         AbstractActivity.setMenuIconsVisible(true);
 
