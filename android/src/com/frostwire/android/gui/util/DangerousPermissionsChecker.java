@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -61,7 +62,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     public static final int WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE = 0x000B;
     public static final int ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE = 0x000C;
     public static final int READ_EXTERNAL_STORAGE = 0x000D;
-    public static final int WRITE_EXTERNAL_STORAGE = 0x000E;
+    //public static final int WRITE_EXTERNAL_STORAGE = 0x000E;
 
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
@@ -93,9 +94,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Activity activity = activityRef.get();
         String[] permissions = null;
         switch (requestCode) {
-            case WRITE_EXTERNAL_STORAGE:
-                permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-                break;
+//            case WRITE_EXTERNAL_STORAGE:
+//                permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+//                break;
             case READ_EXTERNAL_STORAGE:
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 break;
@@ -129,7 +130,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case WRITE_EXTERNAL_STORAGE:
+            //case WRITE_EXTERNAL_STORAGE:
             case READ_EXTERNAL_STORAGE:
             case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
                 onExternalStoragePermissionsResult(permissions, grantResults);
@@ -224,11 +225,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
      * Google geniuses, Make up your minds please.
      */
     private void requestWriteSettingsPermissionsAPILevel23(Activity activity) {
-        // Settings.ACTION_MANAGE_WRITE_SETTINGS - won't build if the
-        // intellij sdk is set to API 16 Platform, so I'll just hardcode
-        // the value.
-        // Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-        Intent intent = new Intent("android.settings.action.MANAGE_WRITE_SETTINGS");
+        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
         intent.setData(Uri.parse("package:" + activity.getPackageName()));
         activity.startActivityForResult(intent, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
@@ -240,7 +237,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         final Activity activity = activityRef.get();
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                if (/*permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||*/
                         permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setIcon(R.drawable.sd_card_notification);
