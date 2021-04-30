@@ -127,6 +127,16 @@ public final class SystemUtils {
         return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0);
     }
 
+    /** Used to determine if the device is running Android11 or greater */
+    public static boolean hasAndroid10OrNewer() {
+        return hasSdkOrNewer(Build.VERSION_CODES.Q);
+    }
+
+    /** Used to determine if the device is running Android11 or greater */
+    public static boolean hasAndroid11OrNewer() {
+        return hasSdkOrNewer(Build.VERSION_CODES.R);
+    }
+
     /**
      * @param context
      * @param timeout        timeout in ms. set to -1 to wait forever.

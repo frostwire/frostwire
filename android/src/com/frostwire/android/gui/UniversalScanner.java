@@ -145,7 +145,13 @@ final class UniversalScanner {
             /* should only arrive here on connected state, but let's double check since it's possible */
             if (connection.isConnected() && !files.isEmpty()) {
                 for (File f : files) {
-                    connection.scanFile(f.getAbsolutePath(), null);
+                    String path = f.getAbsolutePath();
+                    MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(path));
+                    if (mt != null) {
+                        connection.scanFile(path, mt.getMimeType());
+                    } else {
+                        connection.scanFile(path, null);
+                    }
                 }
             }
         } catch (IllegalStateException e) {
@@ -163,13 +169,23 @@ final class UniversalScanner {
      */
     private void scanPrivateFile(Uri oldUri, String filePath, MediaType mt) {
         try {
-            int n = context.getContentResolver().delete(oldUri, null, null);
-            if (n > 0) {
-                LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
+            if (oldUri == null) {
+                oldUri = Uri.fromFile(new File(filePath));
+                LOG.debug("oldUri is null, what comes out of Uri.fromFile? " + oldUri);
             }
-            nativeScanFile(context, filePath);
+            if (oldUri != null) {
+                int n = context.getContentResolver().delete(oldUri, null, null);
+                if (n > 0) {
+                    LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
+                }
+            }
         } catch (Throwable e) {
             LOG.error("Unable to scan file: " + filePath, e);
+        }
+        try {
+            nativeScanFile(context, filePath);
+        } catch (Throwable e2) {
+            LOG.error("Unable to scan file: " + filePath, e2);
         }
     }
 

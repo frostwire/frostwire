@@ -22,11 +22,17 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
@@ -43,6 +49,7 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -419,7 +426,11 @@ public final class Librarian {
             if (ignorableFiles.contains(file)) {
                 return;
             }
-            new UniversalScanner(context).scan(file.getAbsolutePath());
+            if (SystemUtils.hasAndroid10OrNewer()) {
+                mediaStoreScan(context, file);
+            } else {
+                new UniversalScanner(context).scan(file.getAbsolutePath());
+            }
         } else if (file.isDirectory() && file.canRead()) {
             Collection<File> flattenedFiles = getAllFolderFiles(file, null);
 
@@ -428,9 +439,61 @@ public final class Librarian {
             }
 
             if (flattenedFiles != null && !flattenedFiles.isEmpty()) {
-                new UniversalScanner(context).scan(flattenedFiles);
+                if (SystemUtils.hasAndroid10OrNewer()) {
+                    flattenedFiles.forEach(f -> mediaStoreScan(context, f));
+                } else {
+                    new UniversalScanner(context).scan(flattenedFiles);
+                }
             }
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void mediaStoreScan(final Context context, File file) {
+        try {
+            ContentResolver resolver = context.getApplicationContext().getContentResolver();
+            Uri mediaStoreCollectionUri = getMediaStoreCollectionUri(file);
+            ContentValues newFileDetails = new ContentValues();
+
+            newFileDetails.put(MediaStore.Audio.Media.TITLE, file.getName());
+            newFileDetails.put(MediaStore.Audio.Media.DISPLAY_NAME, file.getName());
+            newFileDetails.put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_MUSIC);
+            newFileDetails.put(MediaStore.Audio.Media.DATA, file.getAbsolutePath());
+            newFileDetails.put(MediaStore.Audio.Media.SIZE, file.length());
+            newFileDetails.put(MediaStore.Audio.Media.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(file.getName())));
+            newFileDetails.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+            newFileDetails.put(MediaStore.Audio.Media.IS_PENDING, 1);
+            Uri myFavoriteSongUri = resolver
+                    .insert(mediaStoreCollectionUri, newFileDetails);
+            newFileDetails.clear();
+            newFileDetails.put(MediaStore.Audio.Media.IS_PENDING, 0);
+            resolver.update(myFavoriteSongUri, newFileDetails, null, null);
+            LOG.info("mediaStoreScan success -> " + myFavoriteSongUri);
+        } catch (Throwable t) {
+            LOG.error("mediaStoreScan failed -> ", t);
+        }
+    }
+
+    private Uri getMediaStoreCollectionUri(File file) {
+        byte fileType = getFileType(file.getAbsolutePath(), true);
+        switch (fileType) {
+            case Constants.FILE_TYPE_AUDIO:
+                return SystemUtils.hasAndroid10OrNewer() ?
+                        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            case Constants.FILE_TYPE_PICTURES:
+                return SystemUtils.hasAndroid10OrNewer() ?
+                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            case Constants.FILE_TYPE_VIDEOS:
+                return SystemUtils.hasAndroid10OrNewer() ?
+                        MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            case Constants.FILE_TYPE_APPLICATIONS:
+            case Constants.FILE_TYPE_TORRENTS:
+                return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        }
+        return null;
     }
 
     private byte getFileType(String filename, boolean returnTorrentsAsDocument) {

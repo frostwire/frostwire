@@ -77,6 +77,7 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -133,7 +134,7 @@ public class MainActivity extends AbstractActivity implements
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
         localBroadcastReceiver = new LocalBroadcastReceiver();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (SystemUtils.hasAndroid11OrNewer()) {
             ignoreHardwareMenu();
         }
     }

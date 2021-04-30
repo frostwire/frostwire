@@ -20,6 +20,7 @@ package com.frostwire.android.core.providers;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AudioColumns;
 import android.provider.MediaStore.Files.FileColumns;
@@ -86,6 +87,10 @@ public final class TableFetchers {
         }
 
         public Uri getContentUri() {
+            // Q = 29 = Android 10
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            }
             return MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         }
 
@@ -154,6 +159,11 @@ public final class TableFetchers {
         }
 
         public Uri getContentUri() {
+            // Q = 29 = Android 10
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                //return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+                return MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            }
             return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         }
 
@@ -207,6 +217,10 @@ public final class TableFetchers {
         }
 
         public Uri getContentUri() {
+            // Q = 29 = Android 10
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            }
             return MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         }
 
@@ -257,7 +271,12 @@ public final class TableFetchers {
         }
 
         public Uri getContentUri() {
-            return MediaStore.Files.getContentUri("external");
+            // Q = 29 = Android 10
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+                //return MediaStore.Downloads.INTERNAL_CONTENT_URI;
+            }
+            return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
         }
 
         public byte getFileType() {
