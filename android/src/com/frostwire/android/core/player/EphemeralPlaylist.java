@@ -18,7 +18,7 @@
 
 package com.frostwire.android.core.player;
 
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,10 +37,10 @@ public final class EphemeralPlaylist implements Playlist {
 
     private int currentIndex;
 
-    public EphemeralPlaylist(List<FileDescriptor> fds) {
+    public EphemeralPlaylist(List<FWFileDescriptor> fds) {
         this.items = new ArrayList<>();
 
-        for (FileDescriptor fd : fds) {
+        for (FWFileDescriptor fd : fds) {
             this.items.add(new PlaylistItem(fd));
         }
         
