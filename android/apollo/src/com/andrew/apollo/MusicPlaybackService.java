@@ -39,7 +39,6 @@ import android.media.audiofx.AudioEffect;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -56,7 +55,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.andrew.apollo.cache.ImageFetcher;
@@ -68,10 +66,12 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.TaskThrottle;
+import com.google.android.gms.common.internal.Asserts;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -92,6 +92,12 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 public class MusicPlaybackService extends JobIntentService {
 
     // public methods
+    // these first methods are here for convenience when maintaining the code, they're all related to the creation
+    // lifecycle of this service, and they are called in the order they're declared
+    // 1st onCreate -> invokes initService in handler thread
+    // 2nd onStartCommand
+    // 3rd handleCommandIntent
+
     @Override
     public void onCreate() {
         INSTANCE = this;
@@ -110,7 +116,42 @@ public class MusicPlaybackService extends JobIntentService {
         }
     }
 
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
+        mServiceStartId = startId;
+
+        if (intent != null) {
+            final String action = intent.getAction();
+
+            if (intent.hasExtra(NOW_IN_FOREGROUND)) {
+                musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
+                updateNotification();
+                // since the notification creation is asynchronous, we don't call startForeground until we have it
+                // The NotificationHelper in charge of creating the notification channel and notification will call us back
+                // with the notification object, so that we can then invoke startForeground with it if we're on
+                // newer versions of android
+                // see #onNotificationCreated
+            }
+
+            handleCommandIntent(intent);
+
+            if (SHUTDOWN_ACTION.equals(action)) {
+                return START_NOT_STICKY;
+            }
+        }
+
+        // Make sure the service will shut down on its own if it was
+        // just started but not bound to and nothing is playing
+        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
+            MediaButtonIntentReceiver.completeWakefulIntent(intent);
+        }
+        return START_STICKY;
+    }
+
+
     public void handleCommandIntent(Intent intent) {
+        Asserts.checkNotNull(intent);
         // can't handleCommandIntent until service is fully started
         LOG.info("handleCommandIntent waiting for initServiceLatch...", true);
         try {
@@ -165,38 +206,6 @@ public class MusicPlaybackService extends JobIntentService {
         }
     }
 
-    @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId);
-        mServiceStartId = startId;
-
-        if (intent != null) {
-            final String action = intent.getAction();
-
-            if (intent.hasExtra(NOW_IN_FOREGROUND)) {
-                musicPlaybackActivityInForeground = intent.getBooleanExtra(NOW_IN_FOREGROUND, false);
-                updateNotification();
-                // since the notification creation is asynchronous, we don't call startForeground until we have it
-                // The NotificationHelper in charge of creating the notification channel and notification will call us back
-                // with the notification object, so that we can then invoke startForeground with it if we're on
-                // newer versions of android
-                // see #onNotificationCreated
-            }
-
-            handleCommandIntent(intent);
-
-            if (SHUTDOWN_ACTION.equals(action)) {
-                return START_NOT_STICKY;
-            }
-        }
-
-        // Make sure the service will shut down on its own if it was
-        // just started but not bound to and nothing is playing
-        if (intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false)) {
-            MediaButtonIntentReceiver.completeWakefulIntent(intent);
-        }
-        return START_STICKY;
-    }
 
     private static final Logger LOG = Logger.getLogger(MusicPlaybackService.class);
     private static final boolean D = BuildConfig.DEBUG;
@@ -589,14 +598,13 @@ public class MusicPlaybackService extends JobIntentService {
     private final BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            onCreate(); // this safePosts(this::initService)
-            //initService();
+            onCreate(); // this invokes initService safely on a handler thread for the service
             try {
-                while (mAudioManager == null) {
-                    LOG.info("BroadcastReceiver.onReceive waiting for initService() to have an mAudioManager");
-                    Thread.sleep(100);
-                }
-            } catch (Throwable t) {
+                LOG.info("mIntentReceiver waiting for initServiceLatch...", true);
+                initServiceLatch.await();
+                LOG.info("mIntentReceiver done waiting initServiceLatch...", true);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             LOG.info("BroadcastReceiver.onReceive mAudioManager initialized, invoking handleCommandIntent()");
             handleCommandIntent(intent);
@@ -937,7 +945,7 @@ public class MusicPlaybackService extends JobIntentService {
             registerReceiver(mIntentReceiver, filter);
         } catch (Throwable t) {
             // this can happen if the service got destroyed and didn't have a chance to
-            // register the receiver, current work arounds are extending receiver classes
+            // register the receiver, current workarounds are extending receiver classes
             // to track if they've been registered, or using a static map<Receiver,boolean>
             // for now will just catch the exception and check the code on how this service
             // is getting destroyed and making sure the unregisterReceiver code is invoked.
@@ -2901,14 +2909,6 @@ public class MusicPlaybackService extends JobIntentService {
          *             you want to play
          */
         void setNextDataSource(final String path) {
-            try {
-                mCurrentMediaPlayer.setNextMediaPlayer(null);
-            } catch (IllegalArgumentException e) {
-                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e, true);
-            } catch (Throwable e) {
-                LOG.error("setNextDataSource(): could not unset current player's next media player" + e.getMessage(), e, true);
-                return;
-            }
             releaseNextMediaPlayer();
             if (path == null) {
                 return;
@@ -2933,18 +2933,23 @@ public class MusicPlaybackService extends JobIntentService {
                 LOG.warn("setDataSourceTask() aborted, no MusicPlaybackService available");
                 return false;
             }
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                LOG.error("setDataSource failed, READ_EXTERNAL_STORAGE permission not granted");
+                return false;
+            }
             MediaPlayer player = mCurrentMediaPlayer;
             if (designatedPlayer == TargetPlayer.NEXT) {
                 player = mNextMediaPlayer;
             }
             try {
+                player.reset();
                 player.setOnCompletionListener(this);
                 player.setOnErrorListener(this);
                 if (MusicPlaybackService.INSTANCE.launchPlayerActivity) {
                     player.setOnPreparedListener(new AudioOnPreparedListener(Ref.weak(MusicPlaybackService.INSTANCE)));
                 }
                 if (path.startsWith("content://")) {
-                    player.setDataSource(MusicPlaybackService.INSTANCE, Uri.parse(path));
+                    trySettingDataSourceManyWays(player, path);
                 } else {
                     player.setDataSource(path);
                 }
@@ -2954,16 +2959,30 @@ public class MusicPlaybackService extends JobIntentService {
                 return false;
             }
             return true;
-//            try {
-//                final Intent intent = new Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION);
-//                intent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, MusicPlaybackService.INSTANCE.getAudioSessionId());
-//                intent.putExtra(AudioEffect.EXTRA_PACKAGE_NAME, MusicPlaybackService.INSTANCE.getPackageName());
-//                MusicPlaybackService.INSTANCE.sendBroadcast(intent);
-//                return true;
-//            } catch (Throwable t) {
-//                LOG.error("MultiPlayer::setDataSourceTask error: " + t.getMessage(), t);
-//                return false;
-//            }
+        }
+
+        private boolean trySettingDataSourceManyWays(final MediaPlayer player, final String path) {
+            try {
+                player.reset();
+                LOG.info("setDataSource: path = " + path);
+                player.setDataSource(MusicPlaybackService.INSTANCE, Uri.parse(path));
+                return true;
+            } catch (Throwable e) {
+                LOG.error("setDataSource (1): " + e.getMessage(), e);
+                LOG.info("setDataSource: failed with path = " + path);
+                String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, Uri.parse(path));
+                try {
+                    player.reset();
+                    LOG.info("setDataSource: dataPath = " + dataPath);
+                    Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);
+                    LOG.info("setDataSource: dataPathUri = " + dataPathUri);
+                    player.setDataSource(MusicPlaybackService.INSTANCE, dataPathUri);
+                    return true;
+                } catch (Throwable e2) {
+                    LOG.error("setDataSource (2): " + e2.getMessage(), e2);
+                    return false;
+                }
+            }
         }
 
         private void initCurrentMediaPlayer() {
