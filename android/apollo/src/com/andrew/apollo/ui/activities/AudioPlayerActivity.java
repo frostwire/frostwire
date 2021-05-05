@@ -422,6 +422,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            Uri dataUri = intent.getData();
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                MusicUtils.startMusicPlaybackService(getApplicationContext(),
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
+                        () -> onNewIntent(intent));
+            } else {
+                onNewIntent(intent);
+            }
+        }
+
         waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
