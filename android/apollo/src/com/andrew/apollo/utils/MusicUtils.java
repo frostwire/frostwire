@@ -48,6 +48,8 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
+import androidx.loader.content.CursorLoader;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.loaders.FavoritesLoader;
 import com.andrew.apollo.loaders.LastAddedLoader;
@@ -94,17 +96,26 @@ public final class MusicUtils {
 
     private static final long[] sEmptyList;
 
-    private static final ServiceConnectionListener serviceConnectionListener;
+    private static ServiceConnectionListener serviceConnectionListener;
 
     private static ContentValues[] mContentValuesCache = null;
 
+    private static final Object startMusicPlaybackServiceLock = new Object();
+
     static {
-        sEmptyList = new long[0];
-        serviceConnectionListener = new ServiceConnectionListener();
+        sEmptyList = new long[0];;
     }
 
     /* This class is never initiated */
     public MusicUtils() {
+    }
+
+    public static Intent buildStartMusicPlaybackServiceIntent(final Context context) {
+        Intent musicPlaybackServiceIntent = new Intent(context, MusicPlaybackService.class);
+        musicPlaybackServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        musicPlaybackServiceIntent.setAction(MusicPlaybackService.SERVICECMD);
+        musicPlaybackServiceIntent.putExtra(MusicPlaybackService.CMDNAME, MusicPlaybackService.CMDPLAY);
+        return musicPlaybackServiceIntent;
     }
 
     public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
@@ -112,6 +123,8 @@ public final class MusicUtils {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 LOG.info("startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+                // should end with a android.app.Service#startForeground(int, android.app.Notification) call
+                // otherwise if in 5 seconds it's not invoked, the system will crash the app
                 context.startForegroundService(intent);
             } else {
                 LOG.info("startMusicPlaybackService() startService(MusicPlaybackService)", true);
@@ -121,8 +134,8 @@ public final class MusicUtils {
             LOG.error(t.getMessage(), t);
         }
         try {
-            if (onServiceBoundCallback != null) {
-                serviceConnectionListener.addSubListener(onServiceBoundCallback);
+            synchronized (startMusicPlaybackServiceLock) {
+                serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
             }
             context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
         } catch (Throwable t) {
@@ -145,6 +158,7 @@ public final class MusicUtils {
         }
         if (old == 0 || sForegroundActivities == 0) {
             boolean startedServiceNow = false;
+            LOG.info("notifyForegroundStateChanged trying to start the MusicPlaybackService");
             final Intent intent = new Intent(context, MusicPlaybackService.class);
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
             intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
@@ -213,13 +227,21 @@ public final class MusicUtils {
 
     private static class ServiceConnectionListener implements ServiceConnection {
         private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
-        private final ArrayList<Runnable> subListeners = new ArrayList<>();
+        private Runnable callback;
         private final AtomicBoolean bound = new AtomicBoolean(false);
+
+        public ServiceConnectionListener(Runnable callback_) {
+            callback = callback_;
+        }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            bound.set(true);
             musicPlaybackService = MusicPlaybackService.getInstance();//IApolloService.Stub.asInterface(service);
+            if (musicPlaybackService == null) {
+                RuntimeException t = new RuntimeException("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, musicPlaybackService is null, we're calling this too early - check your logic)");
+                LOG.error(t.getMessage(), t);
+                throw t;
+            }
             try {
                 LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
                 musicPlaybackService.updateNotification();
@@ -227,43 +249,34 @@ public final class MusicUtils {
                 LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
-            notifySubListeners();
+            if (callback != null) {
+                try {
+                    MusicPlaybackService.safePost(callback);
+                } catch (Throwable t) {
+                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
+                }
+            }
 
             // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
-            subListeners.clear();
+            callback = null;
+            bound.set(true);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             LOG.info("onServiceDisconnected() invoked!");
+            callback = null;
             bound.set(false);
-            subListeners.clear();
         }
 
         public boolean isBound() {
             return bound.get();
         }
 
-        void addSubListener(Runnable runnable) {
-            subListeners.add(runnable);
-        }
-
-        private void notifySubListeners() {
-            if (subListeners.isEmpty()) {
-                return;
-            }
-            for (Runnable runnable : subListeners) {
-                try {
-                    MusicPlaybackService.safePost(runnable);
-                } catch (Throwable t) {
-                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
-                }
-            }
-        }
-
         @Override
         public void onNullBinding(ComponentName name) {
             LOG.warn("onNullBinding(componentName=" + name + ")");
+            callback = null;
         }
     }
 
@@ -756,6 +769,27 @@ public final class MusicUtils {
     }
 
     /**
+     * WARNING: The cursor loader can only be created in a Looper Thread.
+     *
+     * Extracts the path in the DATA column of the media store entry
+     * convert a path like -> content://media/external_primary/audio/media/117
+     * to content://com.frostwire.android.fileprovider/external_files/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/looklikeyou-soundcloud.mp3
+     * */
+    public static String getDataPathFromMediaStoreContentURI(Context context, Uri contentUri) {
+        if (Looper.myLooper() == null) {
+            Looper.prepare();
+        }
+        String[] projection = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(context, contentUri, projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
+    }
+
+    /**
      * @param context The {@link Context} to use.
      * @param id      The ID of the album.
      * @return The song list for an album.
@@ -836,6 +870,7 @@ public final class MusicUtils {
             musicPlaybackService.openFile(filename);
             musicPlaybackService.play();
         } catch (final Throwable ignored) {
+            LOG.error(ignored.getMessage(), ignored);
         }
     }
 
@@ -1772,7 +1807,7 @@ public final class MusicUtils {
             final int posCopy = pos;
             startMusicPlaybackService(
                     context,
-                    new Intent(context, MusicPlaybackService.class),
+                    buildStartMusicPlaybackServiceIntent(context),
                     () -> MusicUtils.playAll(list, posCopy, MusicUtils.isShuffleEnabled()));
         } else {
             MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
