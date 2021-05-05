@@ -19,7 +19,6 @@
 package com.frostwire.android;
 
 import android.app.Application;
-import android.os.Build;
 import android.os.Environment;
 
 import com.frostwire.android.core.ConfigurationManager;
@@ -33,22 +32,27 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-final class AndroidPaths implements SystemPaths {
+public final class AndroidPaths implements SystemPaths {
 
-    private static final String STORAGE_PATH = "FrostWire";
-    private static final String TORRENT_DATA_PATH = "TorrentsData";
-    private static final String TORRENTS_PATH = "Torrents";
+    private static final String STORAGE_PATH = "FrostWire"; // for Android10+ it's not used
+    public static final String TORRENT_DATA_PATH = "TorrentsData";
+    public static final String TORRENTS_PATH = "Torrents";
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
 
     private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
+    private final File externalFilesDir; // downloads should go here
+    private final File internalFilesDir; // internal files should go here
 
     private static final boolean requestLegacyExternalStorage = false;
 
     public AndroidPaths(Application app) {
         this.app = app;
+        // We save to external shared folder
+        externalFilesDir = app.getExternalFilesDir(null);
+        internalFilesDir = app.getFilesDir();
     }
 
     @Override
@@ -63,34 +67,25 @@ final class AndroidPaths implements SystemPaths {
 
     @Override
     public File temp() {
-        if (!requestLegacyExternalStorage || SystemUtils.hasAndroid11OrNewer()) {
-            return new File(app.getFilesDir(), TEMP_PATH);
-        }
-        return new File(app.getExternalFilesDir(null), TEMP_PATH);
+        return new File(internalFilesDir, TEMP_PATH);
     }
 
     @Override
     public File libtorrent() {
-        if (!requestLegacyExternalStorage || SystemUtils.hasAndroid11OrNewer()) {
-            return new File(app.getFilesDir(), LIBTORRENT_PATH);
-        }
-        return new File(app.getExternalFilesDir(null), LIBTORRENT_PATH);
-    }
-
-    @Override
-    public File update() {
-        if (!requestLegacyExternalStorage || SystemUtils.hasAndroid11OrNewer()) {
-            return new File(app.getFilesDir(), UPDATE_APK_NAME);
-        }
-        return new File(app.getExternalFilesDir(null), UPDATE_APK_NAME);
+        return new File(internalFilesDir, LIBTORRENT_PATH);
     }
 
     private static File storage(Application app) {
+        /** For Android 10+ we'll store all files in internal storage for now
+         *  We will use our file provider paths to share files with the outside world
+         * */
         if (!requestLegacyExternalStorage || SystemUtils.hasAndroid11OrNewer()) {
-            //File result = Environment.getDataDirectory();
-            //return app.getFilesDir();
             return app.getExternalFilesDir(null);
         }
+
+        /** For Older versions of Android where we used to have access to write to external storage
+         *  <externalStoragePath>/FrostWire/
+         * */
         String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
         if (path.toLowerCase().endsWith("/" + STORAGE_PATH.toLowerCase())) {
             return new File(path);

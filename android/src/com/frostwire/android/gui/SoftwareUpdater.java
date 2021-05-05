@@ -31,7 +31,6 @@ import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.Asyncs;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -144,10 +143,6 @@ public final class SoftwareUpdater {
         return false;
     }
 
-    private static File getUpdateApk() {
-        return Platforms.get().systemPaths().update();
-    }
-
     public void notifyUserAboutUpdate(final MainActivity activity) {
         try {
             if (update.a == null) {
@@ -185,14 +180,6 @@ public final class SoftwareUpdater {
             LOG.error("Failed to notify update", e);
             updateTimestamp = -1; // try again next time MainActivity is resumed
         }
-    }
-
-    /**
-     * @param md5 - Expected MD5 hash as a string.
-     * @return true if the latest apk was downloaded and md5 verified.
-     */
-    private boolean downloadedLatestFrostWire(String md5) {
-        return getUpdateApk().exists() && checkMD5(getUpdateApk(), md5);
     }
 
     /**
