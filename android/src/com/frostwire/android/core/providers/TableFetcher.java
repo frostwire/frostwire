@@ -21,7 +21,7 @@ package com.frostwire.android.core.providers;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 
 /**
  * @author gubatron
@@ -37,7 +37,7 @@ public interface TableFetcher {
 
     void prepare(Cursor cur);
 
-    FileDescriptor fetch(Cursor cur);
+    FWFileDescriptor fetch(Cursor cur);
 
     byte getFileType();
 
