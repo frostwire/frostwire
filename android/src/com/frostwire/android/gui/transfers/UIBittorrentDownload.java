@@ -24,7 +24,7 @@ import android.provider.MediaStore;
 import androidx.annotation.Nullable;
 
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
@@ -199,8 +199,8 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             return;
         }
         for (TransferItem item : items) {
-            final List<FileDescriptor> fileDescriptors = librarian.getFiles(context, item.getFile().getAbsolutePath(), true);
-            for (FileDescriptor fd : fileDescriptors) {
+            final List<FWFileDescriptor> FWFileDescriptors = librarian.getFiles(context, item.getFile().getAbsolutePath(), true);
+            for (FWFileDescriptor fd : FWFileDescriptors) {
                 File file = new File(fd.filePath);
                 if (file.isFile()) {
                     try {
@@ -218,7 +218,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         if (deleteTorrent) {
             File torrent = dl.getTorrentFile();
             if (torrent != null) {
-                final List<FileDescriptor> fds = librarian.getFiles(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
+                final List<FWFileDescriptor> fds = librarian.getFiles(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
                 librarian.deleteFiles(context, Constants.FILE_TYPE_TORRENTS, fds);
             }
         }

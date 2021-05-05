@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.SparseArray;
@@ -47,7 +48,9 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
+import com.frostwire.android.core.providers.TableFetcher;
+import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
@@ -73,6 +76,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -108,15 +112,15 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     private String previousFilter;
     private final SparseArray<Set<FileListAdapter.FileDescriptorItem>> checkedItemsMap;
 
-    private final byte[] tabPositionToFileType = new byte[] {
+    private final byte[] tabPositionToFileType = new byte[]{
             Constants.FILE_TYPE_AUDIO,
             Constants.FILE_TYPE_RINGTONES,
             Constants.FILE_TYPE_VIDEOS,
             Constants.FILE_TYPE_PICTURES,
             Constants.FILE_TYPE_DOCUMENTS,
-            Constants.FILE_TYPE_TORRENTS };
+            Constants.FILE_TYPE_TORRENTS};
 
-    private final int[] fileTypeToTabPosition = new int[] {
+    private final int[] fileTypeToTabPosition = new int[]{
             0,  // 0x0 Audio @ 0
             3,  // 0x1 Picture @ 3
             2,  // 0x2 Video @ 2
@@ -243,6 +247,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void onResume() {
         super.onResume();
@@ -273,6 +278,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private void initBroadcastReceiver() {
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_REFRESH_FINGER);
@@ -285,7 +291,8 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         filter.addAction(MusicPlaybackService.SIMPLE_PLAYSTATE_STOPPED);
         try {
             getActivity().registerReceiver(broadcastReceiver, filter);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -295,7 +302,8 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         MusicUtils.stopSimplePlayer();
         try {
             getActivity().unregisterReceiver(broadcastReceiver);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -398,7 +406,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         try {
             loader.forceLoad();
         } catch (Throwable t) {
-            LOG.warn("createLoaderFiles(fileType="+fileType+") loader.forceLoad() failed. Continuing.", t);
+            LOG.warn("createLoaderFiles(fileType=" + fileType + ") loader.forceLoad() failed. Continuing.", t);
         }
         return loader;
     }
@@ -415,7 +423,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         @Override
         public Object loadInBackground() {
             try {
-                List<FileDescriptor> files = Librarian.instance().getFiles(getContext(), fileType, 0, Integer.MAX_VALUE);
+                List<FWFileDescriptor> files = Librarian.instance().getFiles(getContext(), fileType, 0, Integer.MAX_VALUE);
                 return new Object[]{fileType, files};
             } catch (Throwable e) {
                 LOG.error("Error performing finger", e);
@@ -483,7 +491,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
         try {
             byte fileType = (Byte) data[0];
-            @SuppressWarnings("unchecked") List<FileDescriptor> items = (List<FileDescriptor>) data[1];
+            @SuppressWarnings("unchecked") List<FWFileDescriptor> items = (List<FWFileDescriptor>) data[1];
             adapter = new FileListAdapter(getActivity(), items, fileType, selectAllModeOn) {
                 @Override
                 protected void onLocalPlay() {
@@ -628,13 +636,13 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
     private void switchToThe(boolean right) {
         int currentTabPosition = tabLayout.getSelectedTabPosition();
-        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition ) % 6;
+        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition) % 6;
         if (nextTabPosition == -1) {
             nextTabPosition = 5;
         }
         TabLayout.Tab tab = tabLayout.getTabAt(nextTabPosition);
         if (tab != null) {
-           tab.select();
+            tab.select();
         }
     }
 
@@ -687,15 +695,15 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             if (fileDescriptorItems.length == 0) {
                 return false;
             }
-            List<FileDescriptor> fileDescriptors = new ArrayList<>(fileDescriptorItems.length);
+            List<FWFileDescriptor> FWFileDescriptors = new ArrayList<>(fileDescriptorItems.length);
             for (FileListAdapter.FileDescriptorItem fileDescriptorItem : fileDescriptorItems) {
-                fileDescriptors.add(fileDescriptorItem.fd);
+                FWFileDescriptors.add(fileDescriptorItem.fd);
             }
             FileListAdapter.FileDescriptorItem fileDescriptorItem = fileDescriptorItems[0];
-            final FileDescriptor fd = fileDescriptorItem.fd;
+            final FWFileDescriptor fd = fileDescriptorItem.fd;
             switch (item.getItemId()) {
                 case R.id.fragment_my_files_action_mode_menu_delete:
-                    new DeleteAdapterFilesMenuAction(context, adapter, fileDescriptors, null).onClick();
+                    new DeleteAdapterFilesMenuAction(context, adapter, FWFileDescriptors, null).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_seed:
                     new SeedAction(context, fd, null).onClick();
@@ -730,7 +738,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                     new RenameFileMenuAction(context, adapter, fd).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_add_to_playlist:
-                    new AddToPlaylistMenuAction(context, fileDescriptors).onClick();
+                    new AddToPlaylistMenuAction(context, FWFileDescriptors).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_share:
                     new SendFileMenuAction(context, fd).onClick();
@@ -757,7 +765,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
 
         private void updateMenuActionsVisibility(FileListAdapter.FileDescriptorItem selectedFileDescriptor) {
             List<Integer> actionsToHide = new ArrayList<>();
-            FileDescriptor fd = selectedFileDescriptor.fd;
+            FWFileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
             if (numChecked > 1) {
                 actionsToHide.add(R.id.fragment_my_files_action_mode_menu_seed);
@@ -807,6 +815,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
+        @RequiresApi(api = Build.VERSION_CODES.R)
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -823,7 +832,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                     action.equals(MusicPlaybackService.PLAYSTATE_CHANGED) ||
                     action.equals(MusicPlaybackService.META_CHANGED) ||
                     action.equals(MusicPlaybackService.SIMPLE_PLAYSTATE_STOPPED)
-                    ) {
+            ) {
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 }

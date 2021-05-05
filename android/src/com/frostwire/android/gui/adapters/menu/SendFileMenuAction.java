@@ -24,7 +24,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -37,9 +37,9 @@ public class SendFileMenuAction extends MenuAction {
 
     private static final String TAG = "FW.SendFileMenuAction";
 
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
 
-    public SendFileMenuAction(Context context, FileDescriptor fd) {
+    public SendFileMenuAction(Context context, FWFileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_send, R.string.share);
 
         this.fd = fd;

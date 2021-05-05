@@ -23,7 +23,7 @@ import android.content.Intent;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
@@ -31,8 +31,6 @@ import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
-
-import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
 /**
  * @author gubatron
@@ -42,7 +40,7 @@ public class OpenMenuAction extends MenuAction {
     private final String path;
     private final String mime;
     private final byte fileType;
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
     private final int position;
 
     public OpenMenuAction(Context context, String title, String path, String mime) {
@@ -63,22 +61,22 @@ public class OpenMenuAction extends MenuAction {
         this.position = -1;
     }
 
-    public OpenMenuAction(Context context, FileDescriptor fileDescriptor, int position) {
+    public OpenMenuAction(Context context, FWFileDescriptor FWFileDescriptor, int position) {
         super(context, R.drawable.contextmenu_icon_open, R.string.open);
-        this.path = fileDescriptor.filePath;
-        this.mime = fileDescriptor.mime;
-        this.fileType = fileDescriptor.fileType;
-        this.fd = fileDescriptor;
+        this.path = FWFileDescriptor.filePath;
+        this.mime = FWFileDescriptor.mime;
+        this.fileType = FWFileDescriptor.fileType;
+        this.fd = FWFileDescriptor;
         this.position = position;
     }
 
 
-    public OpenMenuAction(Context context, String title, FileDescriptor pictureFileDescriptor) {
+    public OpenMenuAction(Context context, String title, FWFileDescriptor pictureFWFileDescriptor) {
         super(context, R.drawable.contextmenu_icon_picture, R.string.open_menu_action, title);
-        this.path = pictureFileDescriptor.filePath;
-        this.mime = pictureFileDescriptor.mime;
-        this.fileType = pictureFileDescriptor.fileType;
-        this.fd = pictureFileDescriptor;
+        this.path = pictureFWFileDescriptor.filePath;
+        this.mime = pictureFWFileDescriptor.mime;
+        this.fileType = pictureFWFileDescriptor.fileType;
+        this.fd = pictureFWFileDescriptor;
         this.position = -1;
     }
 

@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
@@ -43,9 +43,9 @@ import java.util.Calendar;
  */
 public final class FileInformationAction extends MenuAction {
 
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
 
-    public FileInformationAction(Context context, FileDescriptor fd) {
+    public FileInformationAction(Context context, FWFileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_file, R.string.file_information);
         this.fd = fd;
     }
@@ -60,22 +60,22 @@ public final class FileInformationAction extends MenuAction {
         private TextView fileSizeTextView;
         private TextView fileDateTextView;
         private TextView fileStoragePathTextView;
-        private FileDescriptor fileDescriptor;
+        private FWFileDescriptor FWFileDescriptor;
 
         public FileInformationDialog() {
             super(R.layout.dialog_file_information);
         }
 
-        public static FileInformationDialog newInstance(FileDescriptor fileDescriptor) {
+        public static FileInformationDialog newInstance(FWFileDescriptor FWFileDescriptor) {
             FileInformationDialog dlg = new FileInformationDialog();
-            dlg.fileDescriptor = fileDescriptor;
+            dlg.FWFileDescriptor = FWFileDescriptor;
             return dlg;
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
             if (outState != null) {
-                outState.putAll(fileDescriptor.toBundle());
+                outState.putAll(FWFileDescriptor.toBundle());
             }
             super.onSaveInstanceState(outState);
         }
@@ -84,21 +84,21 @@ public final class FileInformationAction extends MenuAction {
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
             if (savedInstanceState == null) {
                 savedInstanceState = new Bundle();
-                savedInstanceState.putAll(fileDescriptor.toBundle());
+                savedInstanceState.putAll(FWFileDescriptor.toBundle());
             } else {
-                fileDescriptor = new FileDescriptor(savedInstanceState);
+                FWFileDescriptor = new FWFileDescriptor(savedInstanceState);
             }
 
             fileNameTextView = findView(dlg, R.id.dialog_file_information_filename);
             fileSizeTextView = findView(dlg, R.id.dialog_file_information_filesize);
             fileDateTextView = findView(dlg, R.id.dialog_file_information_date_created);
             fileStoragePathTextView = findView(dlg, R.id.dialog_file_information_storage_path);
-            updateFileMetadata(fileDescriptor);
+            updateFileMetadata(FWFileDescriptor);
             Button buttonOk = findView(dlg, R.id.dialog_file_information_button_ok);
             buttonOk.setOnClickListener(v -> onOkButtonClick());
         }
 
-        private void updateFileMetadata(FileDescriptor fd) {
+        private void updateFileMetadata(FWFileDescriptor fd) {
             fileNameTextView.setText(FilenameUtils.getName(fd.filePath));
             fileSizeTextView.setText(UIUtils.getBytesInHuman(fd.fileSize));
             Calendar cal = Calendar.getInstance();

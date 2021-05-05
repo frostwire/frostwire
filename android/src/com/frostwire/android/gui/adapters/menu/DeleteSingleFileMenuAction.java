@@ -21,7 +21,7 @@ package com.frostwire.android.gui.adapters.menu;
 import android.content.Context;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.views.AbstractDialog;
 
@@ -36,18 +36,18 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public final class DeleteSingleFileMenuAction extends AbstractDeleteFilesMenuAction {
 
-    private final FileDescriptor fileDescriptor;
+    private final FWFileDescriptor FWFileDescriptor;
     private final byte fileType;
 
-    public DeleteSingleFileMenuAction(Context context, byte fileType, FileDescriptor file, AbstractDialog.OnDialogClickListener clickListener) {
+    public DeleteSingleFileMenuAction(Context context, byte fileType, FWFileDescriptor file, AbstractDialog.OnDialogClickListener clickListener) {
         super(context, R.drawable.contextmenu_icon_trash, R.string.delete_file_menu_action, clickListener);
         this.fileType = fileType;
-        this.fileDescriptor = file;
+        this.FWFileDescriptor = file;
     }
 
     protected void onDeleteClicked() {
         if (getContext() != null && fileType != (byte) -1) {
-            async(getContext(), Librarian.instance()::deleteFiles, fileType, Collections.singletonList(fileDescriptor));
+            async(getContext(), Librarian.instance()::deleteFiles, fileType, Collections.singletonList(FWFileDescriptor));
         }
     }
 }

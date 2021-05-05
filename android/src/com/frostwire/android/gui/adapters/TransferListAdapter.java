@@ -39,7 +39,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
@@ -183,7 +183,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully && Ref.alive(contextRef)) {
-            final List<FileDescriptor> files = Librarian.instance().getFiles(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
+            final List<FWFileDescriptor> files = Librarian.instance().getFiles(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
             boolean singleFile = files != null && files.size() == 1;
 
             if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {

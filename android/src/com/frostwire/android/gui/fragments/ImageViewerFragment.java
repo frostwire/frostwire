@@ -35,7 +35,7 @@ import android.widget.RelativeLayout;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.menu.DeleteSingleFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
@@ -82,7 +82,7 @@ public final class ImageViewerFragment extends AbstractFragment {
     private boolean highResLoaded = false;
     private Bundle previousStateBundle;
     private Bundle nextStateBundle;
-    private FileDescriptor fd;
+    private FWFileDescriptor fd;
     private Uri fileUri;
 
     private TouchImageView imageViewHighRes;
@@ -160,7 +160,7 @@ public final class ImageViewerFragment extends AbstractFragment {
         LOG.info("toggleFullScreen() my position is " + position);
     }
 
-    public void updateData(final FileDescriptor fd, int position) {
+    public void updateData(final FWFileDescriptor fd, int position) {
         this.fd = fd;
         this.position = position;
         async(this, ImageViewerFragment::loadSurroundingFileDescriptors);
@@ -226,7 +226,7 @@ public final class ImageViewerFragment extends AbstractFragment {
             int position = stateBundle.getInt(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, -1);
             if (data != null) {
                 inFullScreenMode = stateBundle.getBoolean(EXTRA_IN_FULL_SCREEN_MODE);
-                updateData(new FileDescriptor(data), position);
+                updateData(new FWFileDescriptor(data), position);
             }
         }
     }
@@ -236,30 +236,30 @@ public final class ImageViewerFragment extends AbstractFragment {
         int offset = fragment.position;
         Librarian librarian = Librarian.instance();
 
-        List<FileDescriptor> fileDescriptors = new ArrayList<>(0);
+        List<FWFileDescriptor> FWFileDescriptors = new ArrayList<>(0);
         // We're at the beginning
         if (offset == 0) {
-            fileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
+            FWFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
             fragment.setPreviousStateBundle(null);
-            if (fileDescriptors.size() == 1) {
-                fragment.setNextStateBundle(fragment.prepareFileBundle(fileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
+            if (FWFileDescriptors.size() == 1) {
+                fragment.setNextStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
             }
         } else if (offset > 0) {
-            fileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
+            FWFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
             // We're at the end
-            if (fileDescriptors.size() == 2) {
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
+            if (FWFileDescriptors.size() == 2) {
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
                 fragment.setNextStateBundle(null);
             }
             // We're somewhere in the list of files
-            else if (fileDescriptors.size() == 3) {
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fileDescriptors.get(2), offset + 1, fragment.inFullScreenMode));
+            else if (FWFileDescriptors.size() == 3) {
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(2), offset + 1, fragment.inFullScreenMode));
             }
         }
     }
 
-    private Bundle prepareFileBundle(FileDescriptor fd, int offset, boolean inFullScreenMode) {
+    private Bundle prepareFileBundle(FWFileDescriptor fd, int offset, boolean inFullScreenMode) {
         Bundle result = new Bundle();
         result.putBundle(EXTRA_FILE_DESCRIPTOR_BUNDLE, fd.toBundle());
         result.putBoolean(EXTRA_IN_FULL_SCREEN_MODE, inFullScreenMode);
@@ -290,13 +290,13 @@ public final class ImageViewerFragment extends AbstractFragment {
     }
 
     private final class ImageViewerActionModeCallback implements androidx.appcompat.view.ActionMode.Callback {
-        private final FileDescriptor fd;
+        private final FWFileDescriptor fd;
         private final int position;
         private ActionMode mode;
         private Menu menu;
         private boolean inFullScreenMode;
 
-        ImageViewerActionModeCallback(FileDescriptor fd, int position) {
+        ImageViewerActionModeCallback(FWFileDescriptor fd, int position) {
             this.fd = fd;
             this.position = position;
         }
@@ -368,7 +368,7 @@ public final class ImageViewerFragment extends AbstractFragment {
             }
         }
 
-        private void updateMenuActionsVisibility(FileDescriptor fd) {
+        private void updateMenuActionsVisibility(FWFileDescriptor fd) {
             List<Integer> actionsToHide = new ArrayList<>();
             actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_ringtone);
             actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_magnet);

@@ -5,7 +5,7 @@ import android.util.LongSparseArray;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.core.player.Playlist;
 import com.frostwire.android.core.player.PlaylistItem;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class ApolloMediaPlayer implements CoreMediaPlayer {
 
-    private final LongSparseArray<FileDescriptor> idMap = new LongSparseArray<>();
+    private final LongSparseArray<FWFileDescriptor> idMap = new LongSparseArray<>();
 
     public ApolloMediaPlayer() {
     }
@@ -60,10 +60,10 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     }
 
     @Override
-    public FileDescriptor getCurrentFD(final Context context) {
+    public FWFileDescriptor getCurrentFD(final Context context) {
         try {
             long audioId = MusicUtils.getCurrentAudioId();
-            FileDescriptor fd = idMap.get(audioId);
+            FWFileDescriptor fd = idMap.get(audioId);
 
             if (audioId != -1 && fd == null && context != null) {
                 fd = Librarian.instance().getFileDescriptor(context, Constants.FILE_TYPE_AUDIO, (int) audioId);
@@ -80,7 +80,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
     }
 
     @Override
-    public FileDescriptor getSimplePlayerCurrentFD(final Context context) {
+    public FWFileDescriptor getSimplePlayerCurrentFD(final Context context) {
         if (context == null) {
             return null;
         }

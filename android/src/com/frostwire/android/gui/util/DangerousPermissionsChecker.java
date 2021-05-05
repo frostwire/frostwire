@@ -36,6 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -62,7 +63,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     public static final int WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE = 0x000B;
     public static final int ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE = 0x000C;
     public static final int READ_EXTERNAL_STORAGE = 0x000D;
-    //public static final int WRITE_EXTERNAL_STORAGE = 0x000E;
+    public static final int WRITE_EXTERNAL_STORAGE = 0x000E;
 
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
@@ -94,9 +95,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Activity activity = activityRef.get();
         String[] permissions = null;
         switch (requestCode) {
-//            case WRITE_EXTERNAL_STORAGE:
-//                permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-//                break;
+            case WRITE_EXTERNAL_STORAGE:
+                permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                break;
             case READ_EXTERNAL_STORAGE:
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 break;
@@ -130,7 +131,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            //case WRITE_EXTERNAL_STORAGE:
+            case WRITE_EXTERNAL_STORAGE:
             case READ_EXTERNAL_STORAGE:
             case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
                 onExternalStoragePermissionsResult(permissions, grantResults);
@@ -156,6 +157,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return true;
         }
         Activity activity = activityRef.get();
+        if (SystemUtils.hasAndroid10OrNewer()) {
+            return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        }
         return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
                 ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
