@@ -24,7 +24,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
@@ -33,9 +32,11 @@ import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.MediaType;
@@ -54,6 +55,7 @@ import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -139,15 +141,30 @@ public final class Librarian {
      */
     public int getNumFiles(Context context, byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
+        if (fetcher == null) {
+            return 0;
+        }
+
         Cursor c = null;
 
         int numFiles = 0;
 
         try {
             ContentResolver cr = context.getContentResolver();
-            c = cr.query(fetcher.getContentUri(), new String[]{"count(" + BaseColumns._ID + ")"},
-                    fetcher.where(), fetcher.whereArgs(), null);
-            numFiles = c != null && c.moveToFirst() ? c.getInt(0) : 0;
+            Uri internalContentUri = fetcher.getInternalContentUri();
+            Uri externalContentUri = fetcher.getExternalContentUri();
+            List<Uri> contentUris = new ArrayList<>();
+            if (internalContentUri != null) {
+                contentUris.add(internalContentUri);
+            }
+            if (externalContentUri != null) {
+                contentUris.add(externalContentUri);
+            }
+            for (Uri contentUri : contentUris) {
+                c = cr.query(contentUri, new String[]{"count(" + BaseColumns._ID + ")"},
+                        fetcher.where(), fetcher.whereArgs(), null);
+                numFiles += c != null && c.moveToFirst() ? c.getInt(0) : 0;
+            }
         } catch (Throwable e) {
             Log.e(TAG, "Failed to get num of files", e);
         } finally {
@@ -155,7 +172,6 @@ public final class Librarian {
                 c.close();
             }
         }
-
         return numFiles;
     }
 
@@ -180,7 +196,23 @@ public final class Librarian {
             values.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(newFileName));
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
-            cr.update(fetcher.getContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
+
+            if (fetcher.getInternalContentUri() != null) {
+                try {
+                    cr.update(fetcher.getInternalContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                }
+            }
+
+            if (fetcher.getExternalContentUri() != null) {
+                try {
+                    cr.update(fetcher.getExternalContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                }
+            }
+
             oldFile.renameTo(newFile);
             return newFile.getAbsolutePath();
         } catch (Throwable e) {
@@ -231,7 +263,22 @@ public final class Librarian {
             if (context != null) {
                 ContentResolver cr = context.getContentResolver();
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-                cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+
+                try {
+                    if (fetcher.getInternalContentUri() != null) {
+                        cr.delete(fetcher.getInternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+                    }
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                }
+
+                try {
+                    if (fetcher.getExternalContentUri() != null) {
+                        cr.delete(fetcher.getExternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
+                    }
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                }
             } else {
                 Log.e(TAG, "Failed to delete files from media store, no context available");
             }
@@ -314,33 +361,9 @@ public final class Librarian {
 
         Cursor c = null;
         try {
-
             ContentResolver cr = context.getContentResolver();
-
-            String where = MediaColumns.DATA + " LIKE ?";
-            String[] whereArgs = new String[]{Platforms.data() + "%"};
-
-            c = cr.query(fetcher.getContentUri(), new String[]{MediaColumns._ID, MediaColumns.DATA}, where, whereArgs, null);
-            if (c == null) {
-                return;
-            }
-
-            int idCol = c.getColumnIndex(MediaColumns._ID);
-            int pathCol = c.getColumnIndex(MediaColumns.DATA);
-
-            List<Integer> ids = new ArrayList<>(0);
-
-            while (c.moveToNext()) {
-                int id = Integer.parseInt(c.getString(idCol));
-                String path = c.getString(pathCol);
-
-                if (ignorableFiles.contains(new File(path))) {
-                    ids.add(id);
-                }
-            }
-
-            cr.delete(fetcher.getContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
-
+            deleteIgnorableFilesFromVolume(cr, fetcher.getInternalContentUri(), ignorableFiles);
+            deleteIgnorableFilesFromVolume(cr, fetcher.getExternalContentUri(), ignorableFiles);
         } catch (Throwable e) {
             Log.e(TAG, "General failure during sync of MediaStore", e);
         } finally {
@@ -350,26 +373,60 @@ public final class Librarian {
         }
     }
 
+    private void deleteIgnorableFilesFromVolume(ContentResolver cr, Uri volumeUri, Set<File> ignorableFiles) {
+        if (volumeUri == null) {
+            return;
+        }
+        String where = MediaColumns.DATA + " LIKE ?";
+        String[] whereArgs = new String[]{Platforms.data() + "%"};
+
+        Cursor c = cr.query(volumeUri, new String[]{MediaColumns._ID, MediaColumns.DATA}, where, whereArgs, null);
+        if (c == null) {
+            return;
+        }
+
+        int idCol = c.getColumnIndex(MediaColumns._ID);
+        int pathCol = c.getColumnIndex(MediaColumns.DATA);
+
+        List<Integer> ids = new ArrayList<>(0);
+
+        while (c.moveToNext()) {
+            int id = Integer.parseInt(c.getString(idCol));
+            String path = c.getString(pathCol);
+
+            if (ignorableFiles.contains(new File(path))) {
+                ids.add(id);
+            }
+        }
+        cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
+
+    }
+
     private List<FWFileDescriptor> getFiles(final Context context, int offset, int pageSize, TableFetcher fetcher) {
         return getFiles(context, offset, pageSize, fetcher, null, null);
     }
 
     /**
-     * Returns a list of Files.
+     * Returns a list of FWFileDescriptors.
      *
      * @param offset   - from where (starting at 0)
      * @param pageSize - how many results
      * @param fetcher  - An implementation of TableFetcher
      * @return List<FileDescriptor>
      */
-    public List<FWFileDescriptor> getFiles(final Context context, int offset, int pageSize, TableFetcher fetcher, String where, String[] whereArgs) {
-        List<FWFileDescriptor> result = new ArrayList<>(0);
+    public List<FWFileDescriptor> getFiles(
+            final Context context,
+            final int offset,
+            final int pageSize,
+            final TableFetcher fetcher,
+            String where,
+            String[] whereArgs) {
+        final List<FWFileDescriptor> result = new ArrayList<>(0);
 
         if (context == null || fetcher == null) {
             return result;
         }
 
-        Cursor c = null;
         try {
             ContentResolver cr = context.getContentResolver();
             String[] columns = fetcher.getColumns();
@@ -380,25 +437,40 @@ public final class Librarian {
                 whereArgs = fetcher.whereArgs();
             }
 
-            c = cr.query(fetcher.getContentUri(), columns, where, whereArgs, sort);
-            if (c == null || !c.moveToPosition(offset)) {
-                return result;
-            }
-
-            fetcher.prepare(c);
-            int count = 1;
-            do {
-                FWFileDescriptor fd = fetcher.fetch(c);
-                result.add(fd);
-            } while (c.moveToNext() && count++ < pageSize);
+            getFilesInVolume(cr, fetcher.getInternalContentUri(), offset, pageSize, columns, sort,
+                    where, whereArgs, fetcher, result);
+            getFilesInVolume(cr, fetcher.getExternalContentUri(), offset, pageSize, columns, sort,
+                    where, whereArgs, fetcher, result);
         } catch (Throwable e) {
             Log.e(TAG, "General failure getting files", e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
         return result;
+    }
+
+    public void getFilesInVolume(final ContentResolver cr,
+                                 final Uri volumeUri,
+                                 final int offset,
+                                 final int pageSize,
+                                 final String[] columns,
+                                 final String sort,
+                                 final String where,
+                                 final String[] whereArgs,
+                                 final TableFetcher fetcher,
+                                 final List<FWFileDescriptor> result) {
+        if (volumeUri == null) {
+            return;
+        }
+        Cursor c = cr.query(volumeUri, columns, where, whereArgs, sort);
+        if (c == null || !c.moveToPosition(offset)) {
+            return;
+        }
+        fetcher.prepare(c);
+        int count = 1;
+        do {
+            FWFileDescriptor fd = fetcher.fetch(c);
+            result.add(fd);
+        } while (c.moveToNext() && count++ < pageSize);
+        IOUtils.closeQuietly(c);
     }
 
     public List<FWFileDescriptor> getFiles(final Context context, String filepath, boolean exactPathMatch) {
@@ -429,7 +501,13 @@ public final class Librarian {
             }
             if (SystemUtils.hasAndroid10OrNewer()) {
                 // Can't use Media Scanner after Android 10 Scoped storage changes.
-                mediaStoreInsert(context, file);
+                // MediaScanner is supposedly invoked internally when we perform MediaStore inserts/updates
+                // it will set the DATA field for us, so don't try to write it manually, doesn't keep
+                // whatever path you put in there
+                Uri mediaStoreCollectionUri = Uri.parse("content://com.frostwire.android.fileprovider/torrent_data/");
+                        //FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+                //Uri mediaStoreCollectionUri = getMediaStoreCollectionUri(file, MediaStore.VOLUME_INTERNAL);
+                mediaStoreInsert(context, file, mediaStoreCollectionUri);
             } else {
                 new UniversalScanner(context).scan(file.getAbsolutePath());
             }
@@ -440,9 +518,13 @@ public final class Librarian {
                 flattenedFiles.removeAll(ignorableFiles);
             }
 
-            if (flattenedFiles != null && !flattenedFiles.isEmpty()) {
+            if (!flattenedFiles.isEmpty()) {
                 if (SystemUtils.hasAndroid10OrNewer()) {
-                    flattenedFiles.forEach(f -> mediaStoreInsert(context, f));
+                    flattenedFiles.forEach(f ->
+                            mediaStoreInsert(
+                                    context,
+                                    f,
+                                    getMediaStoreCollectionUri(f, MediaStore.VOLUME_INTERNAL)));
                 } else {
                     new UniversalScanner(context).scan(flattenedFiles);
                 }
@@ -450,73 +532,69 @@ public final class Librarian {
         }
     }
 
+    /**
+     * This function was added during the Android 11 targetting refactor
+     * <p>
+     * "To create or update a media file, on the other hand, don't use the value of the DATA column.
+     * Instead, use the values of the DISPLAY_NAME and RELATIVE_PATH columns."
+     * Therefore we don't do it ourselves.
+     * <p>
+     * We did, and no matter what you put, Android will put its own path that's good for nothing
+     * when it comes to the mediaPlayer.setDataSource method
+     */
+
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private Uri mediaStoreInsert(final Context context, File file) {
+    private void mediaStoreInsert(final Context context, File file, final Uri mediaStoreCollectionUri) {
         try {
-            Uri uriForFile = UIUtils.getFileUri(context, file);
-            ContentResolver resolver = context.getApplicationContext().getContentResolver();
-            //Uri mediaStoreCollectionUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", context.getFilesDir());
-            Uri mediaStoreCollectionUri = getMediaStoreCollectionUri(file);
-            String relativePath = getMediaStoreRelativePath(file);
-
-
             ContentValues fileDetails = new ContentValues();
             fileDetails.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(file.getName()));
             fileDetails.put(MediaColumns.TITLE, FilenameUtils.getBaseName(file.getName()));
-            fileDetails.put(MediaColumns.RELATIVE_PATH, relativePath);
-
-            /**
-             * "To create or update a media file, on the other hand, don't use the value of the DATA column.
-             * Instead, use the values of the DISPLAY_NAME and RELATIVE_PATH columns."
-             * Therefore we don't do it ourselves.
-             *
-             * We did, and no matter what you put, Android will put its own path that's good for nothing
-             * when it comes to the mediaPlayer.setDataSource method
-             */
-
+            fileDetails.put(MediaColumns.RELATIVE_PATH, AndroidPaths.TORRENT_DATA_PATH + "/");
             fileDetails.put(MediaColumns.SIZE, file.length());
             fileDetails.put(MediaColumns.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(file.getName())));
             fileDetails.put(MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
             fileDetails.put(MediaColumns.IS_PENDING, 0);
+
+            final Uri uriForFile = UIUtils.getFileUri(context, file); // delete this later
+            final ContentResolver resolver = context.getContentResolver();
             Uri uri = resolver.insert(mediaStoreCollectionUri, fileDetails);
 
-            LOG.info("mediaStoreInsert currentThread is         -> " + Thread.currentThread().getName());
             LOG.info("mediaStoreInsert absolute path is         ->" + file.getAbsolutePath());
             LOG.info("mediaStoreInsert mediaStoreCollection uri -> " + mediaStoreCollectionUri);
             LOG.info("mediaStoreInsert uriForFile was   -> " + uriForFile);
             LOG.info("mediaStoreInsert success      uri -> " + uri);
-
-            return uriForFile;
         } catch (Throwable t) {
             LOG.error("mediaStoreInsert failed -> ", t);
-            return null;
         }
     }
 
     /**
      * For Android 10+ the collection uri will be our internal URI
      * For older versions where we have external storage write access we use the external URI
-     *
+     * <p>
      * These URIs are basically tables that will hold our audio, pictures, videos
-     *
+     * <p>
      * The URL should have path names we define in filepaths.xml and provider_paths.xml
      * so that we can map their url subpaths to folders in external storage
+     * <p>
+     * mediaStoreVolumeUri will be internal, but let's parmetroize it in case we need external for something else
+     * Valid values are MediaStore.VOLUME_INTERNAL | MediaStore.VOLUME_EXTERNAL_PRIMARY
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static Uri getMediaStoreCollectionUri(File file) {
+    public static Uri getMediaStoreCollectionUri(File file, String mediaStoreVolume) {
         byte fileType = getFileType(file.getAbsolutePath(), true);
         switch (fileType) {
             case Constants.FILE_TYPE_AUDIO:
                 return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Audio.Media.getContentUri(mediaStoreVolume) :
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             case Constants.FILE_TYPE_PICTURES:
                 return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Images.Media.getContentUri(mediaStoreVolume) :
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             case Constants.FILE_TYPE_VIDEOS:
                 return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
+                        MediaStore.Video.Media.getContentUri(mediaStoreVolume) :
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
             case Constants.FILE_TYPE_APPLICATIONS:
             case Constants.FILE_TYPE_TORRENTS:
@@ -530,24 +608,23 @@ public final class Librarian {
      * This exists because other apps will not use the DATA field.
      * They will only use the RELATIVE_PATH and DISPLAY_NAME fields to figure out the URI
      */
-    static String getMediaStoreRelativePath(File file) {
-        byte fileType = getFileType(file.getAbsolutePath(), true);
-        switch (fileType) {
-            case Constants.FILE_TYPE_AUDIO:
-                return "Android/data/com.frostwire.android/files/TorrentsData/";
-            case Constants.FILE_TYPE_PICTURES:
-                return Environment.DIRECTORY_PICTURES;// + AndroidPaths.TORRENT_DATA_PATH;
-            case Constants.FILE_TYPE_VIDEOS:
-                return "Movies/";// + AndroidPaths.TORRENT_DATA_PATH;
-            case Constants.FILE_TYPE_TORRENTS:
-                return "Download/" + AndroidPaths.TORRENTS_PATH;
-            case Constants.FILE_TYPE_APPLICATIONS:
-            case Constants.FILE_TYPE_DOCUMENTS:
-                return "Download/";// + AndroidPaths.TORRENT_DATA_PATH;
-        }
-        return "Download/";//FrostWire/" + AndroidPaths.TORRENT_DATA_PATH;
-    }
-
+//    static String getMediaStoreRelativePath(File file) {
+//        byte fileType = getFileType(file.getAbsolutePath(), true);
+//        switch (fileType) {
+//            case Constants.FILE_TYPE_AUDIO:
+//                return Environment.DIRECTORY_MUSIC + "/" + AndroidPaths.TORRENT_DATA_PATH;
+//            case Constants.FILE_TYPE_PICTURES:
+//                return Environment.DIRECTORY_PICTURES + "/" + AndroidPaths.TORRENT_DATA_PATH;
+//            case Constants.FILE_TYPE_VIDEOS:
+//                return Environment.DIRECTORY_MOVIES + "/" + AndroidPaths.TORRENT_DATA_PATH;
+//            case Constants.FILE_TYPE_TORRENTS:
+//                return Environment.DIRECTORY_DOWNLOADS + "/" + AndroidPaths.TORRENTS_PATH;
+//            case Constants.FILE_TYPE_APPLICATIONS:
+//            case Constants.FILE_TYPE_DOCUMENTS:
+//                return Environment.DIRECTORY_DOWNLOADS + "/" + AndroidPaths.TORRENT_DATA_PATH;
+//        }
+//        return Environment.DIRECTORY_DOWNLOADS + "/" + AndroidPaths.TORRENT_DATA_PATH;
+//    }
     private static byte getFileType(String filename, boolean returnTorrentsAsDocument) {
         byte result = Constants.FILE_TYPE_DOCUMENTS;
 

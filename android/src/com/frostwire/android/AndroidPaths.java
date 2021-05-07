@@ -43,15 +43,15 @@ public final class AndroidPaths implements SystemPaths {
     private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
-    private final File externalFilesDir; // downloads should go here
     private final File internalFilesDir; // internal files should go here
 
-    private static final boolean requestLegacyExternalStorage = false;
+    // NEXT EXPERIMENT:
+    // -> Save everything in internal storage.
+    // -> Librarian.mediaStoreInsert using only an internal content uri's
+
 
     public AndroidPaths(Application app) {
         this.app = app;
-        // We save to external shared folder
-        externalFilesDir = app.getExternalFilesDir(null);
         internalFilesDir = app.getFilesDir();
     }
 
@@ -75,17 +75,17 @@ public final class AndroidPaths implements SystemPaths {
         return new File(internalFilesDir, LIBTORRENT_PATH);
     }
 
+    /**
+     * For Android 10+ we'll store all files in internal storage for now
+     * We will use our file provider paths to share files with the outside world
+     */
     private static File storage(Application app) {
-        /** For Android 10+ we'll store all files in internal storage for now
-         *  We will use our file provider paths to share files with the outside world
-         * */
-        if (!requestLegacyExternalStorage || SystemUtils.hasAndroid11OrNewer()) {
-            return app.getExternalFilesDir(null);
+        if (SystemUtils.hasAndroid11OrNewer()) {
+            return app.getFilesDir();
         }
-
-        /** For Older versions of Android where we used to have access to write to external storage
+        /* For Older versions of Android where we used to have access to write to external storage
          *  <externalStoragePath>/FrostWire/
-         * */
+         */
         String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
         if (path.toLowerCase().endsWith("/" + STORAGE_PATH.toLowerCase())) {
             return new File(path);

@@ -51,7 +51,7 @@ public class SendFileMenuAction extends MenuAction {
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType(fd.mime);
             i.putExtra(Intent.EXTRA_SUBJECT, fd.title);
-            i.putExtra(Intent.EXTRA_STREAM, Uri.parse(TableFetchers.getFetcher(fd.fileType).getContentUri() + "/" + fd.id));
+            i.putExtra(Intent.EXTRA_STREAM, Uri.parse(TableFetchers.getFetcher(fd.fileType).getExternalContentUri() + "/" + fd.id));
             context.startActivity(Intent.createChooser(i, context.getString(R.string.send_file_using)));
         } catch (Throwable e) {
             // catch for general android errors, in particular: android.content.ActivityNotFoundException: No Activity found to handle Intent { act=android.intent.action.CHOOSER (has extras)

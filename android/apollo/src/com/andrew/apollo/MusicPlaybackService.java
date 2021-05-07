@@ -44,6 +44,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
@@ -54,6 +55,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
+import androidx.core.content.ContentProviderCompat;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -73,6 +75,7 @@ import com.frostwire.util.Ref;
 import com.frostwire.util.TaskThrottle;
 import com.google.android.gms.common.internal.Asserts;
 
+import java.io.FileDescriptor;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Random;
@@ -2949,7 +2952,10 @@ public class MusicPlaybackService extends JobIntentService {
                     player.setOnPreparedListener(new AudioOnPreparedListener(Ref.weak(MusicPlaybackService.INSTANCE)));
                 }
                 if (path.startsWith("content://")) {
-                    trySettingDataSourceManyWays(player, path);
+                    if (!trySettingDataSourceManyWays(player, path)) {
+                        player.release();
+                        return false;
+                    };
                 } else {
                     player.setDataSource(path);
                 }
@@ -2961,26 +2967,40 @@ public class MusicPlaybackService extends JobIntentService {
             return true;
         }
 
-        private boolean trySettingDataSourceManyWays(final MediaPlayer player, final String path) {
+        private boolean trySettingDataSourceManyWays(final MediaPlayer player, final String contentPath) {
+            final Uri pathUri = Uri.parse(contentPath);
             try {
+                LOG.info("trySettingDataSourceManyWays: try getting file descriptor from pathUri = " + contentPath);
+                ParcelFileDescriptor pfd = MusicPlaybackService.INSTANCE.getContentResolver().openFileDescriptor(pathUri, "r");
+                FileDescriptor fd = pfd.getFileDescriptor();
+                LOG.info("trySettingDataSourceManyWays: is file descriptor valid? " +fd.valid());
                 player.reset();
-                LOG.info("setDataSource: path = " + path);
-                player.setDataSource(MusicPlaybackService.INSTANCE, Uri.parse(path));
+                player.setDataSource(fd);
+                LOG.info("trySettingDataSourceManyWays: success with file descriptor");
                 return true;
             } catch (Throwable e) {
-                LOG.error("setDataSource (1): " + e.getMessage(), e);
-                LOG.info("setDataSource: failed with path = " + path);
-                String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, Uri.parse(path));
+                LOG.error("trySettingDataSourceManyWays: failure with file descriptor -> " + e.getMessage());
                 try {
                     player.reset();
-                    LOG.info("setDataSource: dataPath = " + dataPath);
-                    Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);
-                    LOG.info("setDataSource: dataPathUri = " + dataPathUri);
-                    player.setDataSource(MusicPlaybackService.INSTANCE, dataPathUri);
+                    LOG.info("trySettingDataSourceManyWays: pathUri = " + pathUri);
+                    player.setDataSource(MusicPlaybackService.INSTANCE, pathUri);
                     return true;
                 } catch (Throwable e2) {
-                    LOG.error("setDataSource (2): " + e2.getMessage(), e2);
-                    return false;
+                    LOG.error("trySettingDataSourceManyWays (1): " + e2.getMessage());
+                    LOG.error("trySettingDataSourceManyWays: failed with pathUri = " + pathUri);
+
+                    String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, pathUri);
+                    try {
+                        player.reset();
+                        LOG.info("trySettingDataSourceManyWays: dataPath = " + dataPath);
+                        Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);
+                        LOG.info("trySettingDataSourceManyWays: dataPathUri = " + dataPathUri);
+                        player.setDataSource(MusicPlaybackService.INSTANCE, dataPathUri);
+                        return true;
+                    } catch (Throwable e3) {
+                        LOG.error("trySettingDataSourceManyWays (2): " + e3.getMessage(), e3);
+                        return false;
+                    }
                 }
             }
         }

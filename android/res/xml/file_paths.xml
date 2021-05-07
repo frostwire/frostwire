@@ -25,6 +25,7 @@
     <!-- This subdirectory is the same as the value
          returned by Context.getFilesDir() -->
     <!-- new File(Context.getFilesDir(), "libtorrent") -->
+    <files-path name="files" path="."/>
     <files-path name="libtorrent" path="libtorrent/"/>
     <files-path name="torrent_data" path="TorrentsData/" />
     <files-path name="torrents" path="Torrents/" />

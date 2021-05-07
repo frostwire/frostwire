@@ -206,7 +206,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
                     try {
                         TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
                         if (fetcher != null) {
-                            cr.delete(fetcher.getContentUri(), MediaStore.MediaColumns._ID + " = " + fd.id, null);
+                            cr.delete(fetcher.getExternalContentUri(), MediaStore.MediaColumns._ID + " = " + fd.id, null);
                         }
                     } catch (Throwable e) {
                         LOG.error("Failed to delete file from media store. (" + fd.filePath + ")", e);

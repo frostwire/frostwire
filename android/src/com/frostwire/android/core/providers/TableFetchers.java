@@ -26,12 +26,24 @@ import android.provider.MediaStore.Files.FileColumns;
 import android.provider.MediaStore.Images.ImageColumns;
 import android.provider.MediaStore.Video.VideoColumns;
 
+import androidx.annotation.RequiresApi;
+
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
 
-import static android.provider.MediaStore.Audio.AudioColumns.*;
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM;
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
+import static android.provider.MediaStore.Audio.AudioColumns.ARTIST;
+import static android.provider.MediaStore.Audio.AudioColumns.DATA;
+import static android.provider.MediaStore.Audio.AudioColumns.DATE_ADDED;
+import static android.provider.MediaStore.Audio.AudioColumns.DATE_MODIFIED;
+import static android.provider.MediaStore.Audio.AudioColumns.MIME_TYPE;
+import static android.provider.MediaStore.Audio.AudioColumns.SIZE;
+import static android.provider.MediaStore.Audio.AudioColumns.TITLE;
+import static android.provider.MediaStore.Audio.AudioColumns.YEAR;
+import static android.provider.MediaStore.Audio.AudioColumns._ID;
 
 /**
  * Help yourself with TableFetchers.
@@ -80,6 +92,7 @@ public final class TableFetchers {
         protected int dateModifiedCol;
         protected int albumIdCol;
 
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{_ID, ARTIST, TITLE, ALBUM, DATA, YEAR, MIME_TYPE, SIZE, DATE_ADDED, DATE_MODIFIED, ALBUM_ID};
         }
@@ -88,14 +101,23 @@ public final class TableFetchers {
             return DATE_ADDED + " DESC";
         }
 
-        public Uri getContentUri() {
-            // Q = 29 = Android 10
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        public Uri getExternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
                 return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         }
 
+        @Override
+        public Uri getInternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
+                return Uri.parse("content://com.frostwire.android.fileprovider");
+                // MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
+            }
+            return MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public void prepare(Cursor cur) {
             idCol = cur.getColumnIndex(_ID);
             pathCol = cur.getColumnIndex(DATA);
@@ -160,13 +182,19 @@ public final class TableFetchers {
             return new String[]{ImageColumns._ID, ImageColumns.TITLE, ImageColumns.DATA, ImageColumns.MIME_TYPE, ImageColumns.MINI_THUMB_MAGIC, ImageColumns.SIZE, ImageColumns.DATE_ADDED, ImageColumns.DATE_MODIFIED};
         }
 
-        public Uri getContentUri() {
-            // Q = 29 = Android 10
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                //return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+        public Uri getExternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
                 return MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        }
+
+        @Override
+        public Uri getInternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
+                return MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
+            }
+            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
         }
 
         public byte getFileType() {
@@ -214,16 +242,24 @@ public final class TableFetchers {
             return new FWFileDescriptor(id, artist, title, album, null, path, Constants.FILE_TYPE_VIDEOS, mime, size, dateAdded, dateModified, true);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{VideoColumns._ID, VideoColumns.ARTIST, VideoColumns.TITLE, VideoColumns.ALBUM, VideoColumns.DATA, VideoColumns.MIME_TYPE, VideoColumns.MINI_THUMB_MAGIC, VideoColumns.SIZE, VideoColumns.DATE_ADDED, VideoColumns.DATE_MODIFIED};
         }
 
-        public Uri getContentUri() {
-            // Q = 29 = Android 10
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        public Uri getExternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
                 return MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+        }
+
+        @Override
+        public Uri getInternalContentUri() {
+            if (SystemUtils.hasAndroid10OrNewer()) {
+                return MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
+            }
+            return MediaStore.Video.Media.INTERNAL_CONTENT_URI;
         }
 
         public byte getFileType() {
@@ -234,6 +270,7 @@ public final class TableFetchers {
             return VideoColumns.DATE_ADDED + " DESC";
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public void prepare(Cursor cur) {
             idCol = cur.getColumnIndex(VideoColumns._ID);
             pathCol = cur.getColumnIndex(VideoColumns.DATA);
@@ -271,11 +308,17 @@ public final class TableFetchers {
             return new String[]{FileColumns._ID, FileColumns.DATA, FileColumns.SIZE, FileColumns.TITLE, FileColumns.MIME_TYPE, FileColumns.DATE_ADDED, FileColumns.DATE_MODIFIED};
         }
 
-        public Uri getContentUri() {
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        public Uri getExternalContentUri() {
             if (SystemUtils.hasAndroid10OrNewer()) {
                 return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        public Uri getInternalContentUri() {
+            return MediaStore.Files.getContentUri(MediaStore.VOLUME_INTERNAL);
         }
 
         public byte getFileType() {
@@ -382,11 +425,16 @@ public final class TableFetchers {
             return new FWFileDescriptor(id, artist, title, album, year, path, Constants.FILE_TYPE_RINGTONES, mime, size, dateAdded, dateModified, true);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{_ID, ARTIST, TITLE, ALBUM, DATA, YEAR, MIME_TYPE, SIZE, DATE_ADDED, DATE_MODIFIED};
         }
 
-        public Uri getContentUri() {
+        public Uri getExternalContentUri() {
+            return null;
+        }
+
+        public Uri getInternalContentUri() {
             return MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
         }
 
@@ -398,6 +446,7 @@ public final class TableFetchers {
             return DATE_ADDED + " DESC";
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.R)
         public void prepare(Cursor cur) {
             idCol = cur.getColumnIndex(_ID);
             pathCol = cur.getColumnIndex(DATA);

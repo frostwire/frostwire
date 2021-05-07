@@ -33,7 +33,12 @@ public interface TableFetcher {
 
     String getSortByExpression();
 
-    Uri getContentUri();
+    Uri getExternalContentUri();
+
+    Uri getInternalContentUri();
+
+    // IDEA, go back to internal storage and have the fetchers have 2 content URIs, internal and external volumes
+    //Uri getInternalContentUri();
 
     void prepare(Cursor cur);
 
