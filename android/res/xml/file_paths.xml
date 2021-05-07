@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<paths>
+    <!-- FOR SD CARD -->
+    <root-path name="external_files" path="/storage/" />
+
+    <!-- APP's INTERNAL FOLDERS -->
+    <!-- This subdirectory is the same as the value
+         returned by Context.getFilesDir() -->
+    <!-- new File(Context.getFilesDir(), "libtorrent") -->
+    <files-path name="libtorrent" path="libtorrent/"/>
+    <files-path name="torrent_data" path="TorrentsData/" />
+    <files-path name="torrents" path="Torrents/" />
+
+    <!-- APP's EXTERNAL FOLDERS -->
+    <!--
+    Represents files in the root of your app's external storage area.
+    The root path of this subdirectory is the same as the value returned
+    by Context#getExternalFilesDir(String)
+       Context.getExternalFilesDir(null)
+    -->
+    <external-files-path name="external_files" path="." />
+</paths>
