@@ -769,23 +769,23 @@ public final class MusicUtils {
     }
 
     /**
-     * WARNING: The cursor loader can only be created in a Looper Thread.
-     *
      * Extracts the path in the DATA column of the media store entry
      * convert a path like -> content://media/external_primary/audio/media/117
      * to content://com.frostwire.android.fileprovider/external_files/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/looklikeyou-soundcloud.mp3
      * */
     public static String getDataPathFromMediaStoreContentURI(Context context, Uri contentUri) {
         if (Looper.myLooper() == null) {
+            // The cursor loader can only be created in a Looper Thread.
             Looper.prepare();
         }
-        String[] projection = { MediaStore.Images.Media.DATA };
+        String[] projection = { MediaStore.Downloads.DATA };
         CursorLoader loader = new CursorLoader(context, contentUri, projection, null, null, null);
         Cursor cursor = loader.loadInBackground();
         int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
         cursor.moveToFirst();
         String result = cursor.getString(column_index);
         cursor.close();
+
         return result;
     }
 
