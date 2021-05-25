@@ -30,6 +30,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -93,7 +94,7 @@ public class MainApplication extends MultiDexApplication {
 
         // some phones still can configure an external button as the
         // permanent menu key
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+        if (SystemUtils.hasAndroid11OrNewer()) {
             // R = 30 = Android 11
             // Android 11 will freeze and give a Strict Mode error
             // if you call this
