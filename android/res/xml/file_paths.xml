@@ -30,12 +30,25 @@
     <files-path name="torrent_data" path="TorrentsData/" />
     <files-path name="torrents" path="Torrents/" />
 
-    <!-- APP's EXTERNAL FOLDERS -->
+		<!-- IDEA FOR 3RD OPTION, STORE TO EXTERNAL MEDIA -->
     <!--
-    Represents files in the root of your app's external storage area.
+    Represents files in the root of your app's external media area.
     The root path of this subdirectory is the same as the value returned
-    by Context#getExternalFilesDir(String)
-       Context.getExternalFilesDir(null)
-    -->
+    by the first result of Context.getExternalMediaDirs().
+<!--    <external-media-path-->
+<!--        name="torrent_data"-->
+<!--        path="TorrentsData/"/>-->
+
+    <!-- APP's EXTERNAL FOLDERS -->
+
+    <!-- Represents files in the root of the external storage area.
+    The root path of this subdirectory is the same as the value returned
+    by Environment.getExternalStorageDirectory() -->
+    <external-path name="external" path="."/>
+
+    <!-- Represents files in the root of your app's external storage area.
+    The root path of this subdirectory is the same as the value returned
+    by Context#getExternalFilesDir(String) Context.getExternalFilesDir(null) -->
     <external-files-path name="external_files" path="." />
+    <external-files-path name="torrents_data" path="TorrentsData/" />
 </paths>
