@@ -98,14 +98,14 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 
 android {
 
-    compileSdkVersion 30
+    compileSdkVersion 30 // By November 2021, all apps that are being updated must target at least Android 11 (API level 30)
     buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
         minSdkVersion 21 // Lollipop 5.0
-        targetSdkVersion 30 // Android 11
+        targetSdkVersion 29 // Android 10
         multiDexEnabled true
     }
 
