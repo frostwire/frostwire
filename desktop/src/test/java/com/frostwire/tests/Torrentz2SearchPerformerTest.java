@@ -31,6 +31,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * gradle test --tests "com.frostwire.tests.Torrentz2SearchPerformerTest.torrentz2SearchTest"
+ */
 public class Torrentz2SearchPerformerTest {
     @Test
     public void torrentz2SearchTest() {
