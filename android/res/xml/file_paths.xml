@@ -57,6 +57,9 @@
     <external-path
         name="external"
         path="." />
+    <external-path
+        name="external_primary"
+        path="." />
 
     <!-- Represents files in the root of your app's external storage area.
     The root path of this subdirectory is the same as the value returned

@@ -1413,9 +1413,12 @@ public class MusicPlaybackService extends JobIntentService {
         } else {
             //final String path = MediaStore.Audio.Media. + "/" + mCursor.getLong(IDCOLIDX);
             //MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
-            final String path = (SystemUtils.hasAndroid10OrNewer() ?
-                    MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY) :
-                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI) + "/" + mCursor.getLong(IDCOLIDX);
+            long fileId = mCursor.getLong(IDCOLIDX);
+            String contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString();
+            if (SystemUtils.hasAndroid10OrNewer()) {
+                contentUri = MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY).toString();
+            }
+            final String path = String.format("%s/%d", contentUri, fileId);
             LOG.info("openCurrentAndMaybeNext(openNext=" + openNext + ") path=" + path);
             if (openFile(path)) {
                 if (openNext) {

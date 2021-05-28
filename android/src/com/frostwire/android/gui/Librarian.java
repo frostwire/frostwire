@@ -22,16 +22,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
-import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -59,7 +55,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -558,7 +553,6 @@ public final class Librarian {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void mediaStoreInsert(final Context context, File file, final Uri mediaStoreCollectionUri) {
         try {
-            symlinkFromDownloadsToScopedFolder(context, file);
             LOG.info("mediaStoreInsert inserting file at         -> " + file.getAbsolutePath());
             ContentValues fileDetails = new ContentValues();
             fileDetails.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(file.getName()));
@@ -580,35 +574,6 @@ public final class Librarian {
         } catch (Throwable t) {
             LOG.error("mediaStoreInsert failed -> ", t);
         }
-    }
-
-    private boolean symlinkFromDownloadsToScopedFolder(final Context context, final File file) {
-        byte fileType = AndroidPaths.getFileType(file.getAbsolutePath(), true);
-        String oldPath = file.getAbsolutePath();
-        if (fileType == Constants.FILE_TYPE_AUDIO) {
-            try {
-                boolean newFile = new File(context.getExternalFilesDir(null), Environment.DIRECTORY_MUSIC).createNewFile();
-                if (newFile) {
-                    LOG.info("symlinkFromDownloadsToScopedFolder: created Music folder");
-                } else {
-                    LOG.info("symlinkFromDownloadsToScopedFolder: could not create music folder");
-                }
-            } catch (IOException e) {
-                LOG.info("symlinkFromDownloadsToScopedFolder error: " + e.getMessage(), e);
-            }
-
-            String newPath = new File(context.getExternalFilesDir(null) + "/Music", file.getName()).getAbsolutePath();
-            LOG.info("symlinkFromDownloadsToScopedFolder oldPath: " + oldPath);
-            LOG.info("symlinkFromDownloadsToScopedFolder newPath: " + newPath);
-            try {
-                Os.symlink(oldPath, newPath);
-                LOG.info("symlinkFromDownloadsToScopedFolder success: " + newPath);
-                return true;
-            } catch (ErrnoException e) {
-                LOG.error("symlinkFromDownloadsToScopedFolder error: " + e.getMessage(), e);
-            }
-        }
-        return false;
     }
 
     private void initHandler() {
