@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
@@ -19,36 +18,53 @@
 -->
 <paths>
     <!-- FOR SD CARD -->
-    <root-path name="external_files" path="/storage/" />
+    <root-path
+        name="external_files"
+        path="/storage/" />
 
     <!-- APP's INTERNAL FOLDERS -->
     <!-- This subdirectory is the same as the value
          returned by Context.getFilesDir() -->
     <!-- new File(Context.getFilesDir(), "libtorrent") -->
-    <files-path name="files" path="."/>
-    <files-path name="libtorrent" path="libtorrent/"/>
-    <files-path name="torrent_data" path="TorrentsData/" />
-    <files-path name="torrents" path="Torrents/" />
+    <files-path
+        name="files"
+        path="." />
+    <files-path
+        name="libtorrent"
+        path="libtorrent/" />
+    <files-path
+        name="torrent_data"
+        path="TorrentsData/" />
+    <files-path
+        name="torrents"
+        path="Torrents/" />
 
-		<!-- IDEA FOR 3RD OPTION, STORE TO EXTERNAL MEDIA -->
+    <!-- IDEA FOR 3RD OPTION, STORE TO EXTERNAL MEDIA -->
     <!--
     Represents files in the root of your app's external media area.
     The root path of this subdirectory is the same as the value returned
     by the first result of Context.getExternalMediaDirs().
-<!--    <external-media-path-->
-<!--        name="torrent_data"-->
-<!--        path="TorrentsData/"/>-->
+    -->
+    <!--    <external-media-path-->
+    <!--        name="torrent_data"-->
+    <!--        path="TorrentsData/"/>-->
 
     <!-- APP's EXTERNAL FOLDERS -->
 
     <!-- Represents files in the root of the external storage area.
     The root path of this subdirectory is the same as the value returned
     by Environment.getExternalStorageDirectory() -->
-    <external-path name="external" path="."/>
+    <external-path
+        name="external"
+        path="." />
 
     <!-- Represents files in the root of your app's external storage area.
     The root path of this subdirectory is the same as the value returned
     by Context#getExternalFilesDir(String) Context.getExternalFilesDir(null) -->
-    <external-files-path name="external_files" path="." />
-    <external-files-path name="torrents_data" path="TorrentsData/" />
+    <external-files-path
+        name="external_files"
+        path="." />
+    <external-files-path
+        name="torrents_data"
+        path="TorrentsData/" />
 </paths>
