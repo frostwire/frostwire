@@ -1,6 +1,7 @@
 frostwire (6.9.4) stable; urgency=high
  * Torrentz2 search fixed
  * SoundCloud search fixed
+ * Files in the transfer detail panel can be dragged out of FrostWire into OS file explorer for copying
 
  -- FrostWire Team <contact@frostwire.com>  Fri, 04 Jun 2021 21:54:00 -0600
 
