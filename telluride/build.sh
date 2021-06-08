@@ -1,5 +1,8 @@
 #!/bin/bash
+TRUE=0
+FALSE=1
 PYINSTALLER_CMD="pyinstaller"
+PYLINT_CMD="pylint3"
 
 isdocker() {
   if [ -f /.dockerenv ]
@@ -8,6 +11,12 @@ isdocker() {
   fi
   return ${FALSE}
 }
+
+if [ $(uname -a | grep -c Darwin) == 1 ]
+then
+  PYLINT_CMD="pylint"
+fi
+
 
 # Linux's pyinstaller PATH
 if [ $(uname -a | grep -c Ubuntu) == 1 ]
@@ -69,7 +78,7 @@ if [ $(uname -a | grep -c Darwin) == 1 ]; then
 fi
 
 cleanup
-pylint3 --max-line-length=350 telluride.py server.py
+${PYLINT_CMD} --max-line-length=350 telluride.py server.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
 ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py
 
@@ -78,10 +87,13 @@ then
   if [ $(uname -a | grep -c Ubuntu) == 1 ]
   then
     mv dist/telluride telluride_linux
+  elif isdocker
+  then
+    mv dist/telluride telluride_linux
   elif [ $(uname -a | grep -c Darwin) == 1 ]
   then
   	mv dist/telluride telluride_macos
-		./sign.sh
+    ./sign.sh
   elif [ $(uname -a | grep -c windows) == 1 ]
   then
     mv dist/telluride.exe .
