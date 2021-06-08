@@ -1,6 +1,4 @@
-
 #!/bin/bash
-
 ##########################################################################
 # Created by Angel Leon (@gubatron)
 # Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
@@ -17,29 +15,61 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
+# Thank you Brian Fox, bash creator
+TRUE=0
+FALSE=1
 
-# Python3 by default for macOS (and Windows to be tested)
-PIP_CMD='python3 -m pip'
-PYINSTALLER_PACKAGE='pyinstaller'
-source common.sh
+isdocker() {
+  if [ -f /.dockerenv ]
+  then
+    return ${TRUE}
+  fi
+  return ${FALSE}
+}
 
-if [ isdocker == ${FALSE} ] && [ isubuntu == ${TRUE} ]
+isubuntu() {
+  if [ $(uname -a | grep -c Ubuntu) == 0 ]
+  then
+    return ${FALSE}
+  else
+    return ${TRUE}
+  fi
+}
+
+iswindows() {
+  if [ $(uname -a | grep -c windows) == 0 ]
+  then
+    return ${FALSE}
+  else
+    return ${TRUE}
+  fi
+}
+
+ismac() {
+  if [  $(uname -a | grep -c Darwin) == 0 ]
+  then
+    return ${FALSE}
+  fi
+  return ${TRUE}
+}
+
+cleanup() {
+if [ -d build ]
 then
-  sudo apt-get install python3 python3-pip pylint3
-  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-  PYINSTALLER_PACKAGE='PyInstaller'
+  rm -fr build
 fi
 
-if iswindows
+if [ -d dist ]
 then
-  PIP_CMD='python -m pip'
+  rm -fr dist
 fi
 
-${PIP_CMD} install --upgrade pip
-${PIP_CMD} install --upgrade pylint
-${PIP_CMD} install --upgrade youtube_dl
-${PIP_CMD} install --upgrade pycryptodome
-${PIP_CMD} install --upgrade sanic
-${PIP_CMD} install --upgrade ${PYINSTALLER_PACKAGE}
-
-${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller
+if [ -d __pycache__ ]
+then
+  rm -fr __pycache__
+fi
+if [ -f telluride.spec ]
+then
+  rm telluride.spec
+fi
+}
