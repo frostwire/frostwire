@@ -1,8 +1,9 @@
+
 #!/bin/bash
 
 ##########################################################################
 # Created by Angel Leon (@gubatron)
-# Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+# Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,8 +52,8 @@ iswindows() {
   fi
 }
 
-if ! isdocker -a isubuntu
-then   
+if [ isdocker == ${FALSE} ] && [ isubuntu == ${TRUE} ]
+then
   sudo apt-get install python3 python3-pip pylint3
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
   PYINSTALLER_PACKAGE='PyInstaller'
