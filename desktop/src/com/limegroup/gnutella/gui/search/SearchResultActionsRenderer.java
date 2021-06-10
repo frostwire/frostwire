@@ -27,6 +27,7 @@ import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
+import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -88,24 +89,22 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         add(labelPlay, c);
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
-        labelDownload.addMouseListener(new MouseAdapter() {
+
+        final MouseAdapter downloadActionAdapter = new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                labelDownload_mouseReleased(e);
+                labelDownloadAction_mouseReleased(e);
             }
-        });
+        };
+
+        labelDownload.addMouseListener(downloadActionAdapter);
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
         labelPartialDownload = new JLabel(details_solid);
         labelPartialDownload.setToolTipText(I18n.tr("Select content to download from this torrent."));
-        labelPartialDownload.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                labelPartialDownload_mouseReleased(e);
-            }
-        });
+        labelPartialDownload.addMouseListener(downloadActionAdapter);
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
@@ -171,7 +170,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         }
     }
 
-    private void labelPartialDownload_mouseReleased(MouseEvent e) {
+    /**
+     * Handles both + and down arrow
+     * @param e
+     */
+    private void labelDownloadAction_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             MouseListener[] mouseListeners = labelPartialDownload.getMouseListeners();
             for (MouseListener mouseListener : mouseListeners) {
@@ -179,23 +182,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             }
 
             SearchResult sr = uiSearchResult.getSearchResult();
-            if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
-                uiSearchResult.download(true);
-                if (sr instanceof ArchiveorgTorrentSearchResult) {
-                    GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-                }
-            }
+            boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+            uiSearchResult.download(isTorrent);
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
 
             for (MouseListener mouseListener : mouseListeners) {
                 labelPartialDownload.addMouseListener(mouseListener);
             }
-        }
-    }
-
-    private void labelDownload_mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            uiSearchResult.download(false);
-            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         }
     }
 
