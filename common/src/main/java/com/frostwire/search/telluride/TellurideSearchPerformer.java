@@ -65,6 +65,21 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
     @Override
     public void perform() {
+        int seconds_to_wait_for_telluride_server = 10;
+        while (!TellurideLauncher.SERVER_UP.get() && seconds_to_wait_for_telluride_server > 0) {
+            LOG.info("perform(): waiting for Telluride Server to be up... (" + seconds_to_wait_for_telluride_server + " secs left to time out)");
+            try {
+                Thread.sleep(1000);
+                seconds_to_wait_for_telluride_server--;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (seconds_to_wait_for_telluride_server == 0) {
+            LOG.info("perform(): timedout waiting for telluride server to start. finished.");
+        }
+
         try {
             HttpClient httpClient = HttpClientFactory.newInstance();
             String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",

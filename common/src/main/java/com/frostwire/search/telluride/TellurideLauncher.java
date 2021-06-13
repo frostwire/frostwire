@@ -65,9 +65,12 @@ public final class TellurideLauncher {
                     }
                     try {
                         processBuilder.start();
+                        // The telluride process doesn't start right away, we wait 5 seconds to be safe before setting the
+                        // SERVER_UP flag to true. TellurideSearchPerformer waits for up to 10 seconds to give up
+                        Thread.currentThread().sleep(5000);
                         SERVER_UP.set(true);
                         LOG.info("RPC server is up successfully at http://127.0.0.1:" + port);
-                    } catch (IOException e) {
+                    } catch (Throwable e) {
                         SERVER_UP.set(false);
                         e.printStackTrace();
                     }
@@ -76,6 +79,8 @@ public final class TellurideLauncher {
     }
 
     /**
+     * We're not using this method anymore, we now communicate with Telluride via HTTP
+     * We're leaving it this code for unit test purposes.
      * @param executable
      * @param downloadUrl
      * @param saveDirectory
