@@ -80,7 +80,7 @@ public final class TellurideLauncher {
 
     /**
      * We're not using this method anymore, we now communicate with Telluride via HTTP
-     * We're leaving it this code for unit test purposes.
+     * We're leaving this code for unit test purposes.
      * @param executable
      * @param downloadUrl
      * @param saveDirectory

@@ -77,7 +77,8 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
 
         if (seconds_to_wait_for_telluride_server == 0) {
-            LOG.info("perform(): timedout waiting for telluride server to start. finished.");
+            LOG.info("perform(): timed out waiting for telluride server to start. finished.");
+            return;
         }
 
         try {
