@@ -5,8 +5,10 @@ frostwire (6.9.4) stable; urgency=high
  * Files in the transfer detail panel can be dragged out of FrostWire into OS file explorer for copying
  * Telluride build 16
  * Recompiled mplayer on macos 11.2.3
+ * Telluride first search waits for Telluride server to fully launch, no more connection refused error
+ * Auto-pasted urls are not deleted from the clipboard. Only auto pasted once
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 10 Jun 2021 19:33:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 14 Jun 2021 00:33:00 -0600
 
 frostwire (6.9.3) stable; urgency=high
  * Telluride Cloud Video Downloader build 15
