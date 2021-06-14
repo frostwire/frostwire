@@ -99,6 +99,8 @@ public class GoogleSearchField extends SearchField {
         super.setText(t);
     }
 
+    private static String lastClipboardSearchQuery = null;
+
     public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
         cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
         cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
@@ -122,16 +124,21 @@ public class GoogleSearchField extends SearchField {
                 if (s == null || "".equals(s)) {
                     return;
                 }
+                if (lastClipboardSearchQuery != null && lastClipboardSearchQuery.equals(s)) {
+                    return;
+                }
                 if (s.startsWith("http") || s.startsWith("magnet")) {
                     cloudSearchField.setText(s);
                     StringSelection stringSelection = new StringSelection("");
-                    systemClipboard.setContents(stringSelection, null);
+                    lastClipboardSearchQuery = s;
                     cloudSearchField.getActionListeners()[0].actionPerformed(null);
                     cloudSearchField.setText("");
                 }
             }
         });
     }
+
+
     protected JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;
