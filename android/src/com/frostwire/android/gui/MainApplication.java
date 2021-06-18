@@ -92,19 +92,6 @@ public class MainApplication extends MultiDexApplication {
     private void onCreateSafe() {
         ConfigurationManager.create(this);
 
-        // some phones still can configure an external button as the
-        // permanent menu key
-        if (SystemUtils.hasAndroid11OrNewer()) {
-            // R = 30 = Android 11
-            // Android 11 will freeze and give a Strict Mode error
-            // if you call this
-            // android.os.strictmode.IncorrectContextUseViolation
-            // UI constants, such as display metrics or window metrics,
-            // must be accessed from Activity or other visual Context.
-            // Use an Activity or a Context created with Context#createWindowContext(int, Bundle), which are adjusted to the configuration and visual bounds of an area on screen
-            ignoreHardwareMenu();
-        }
-
         AbstractActivity.setMenuIconsVisible(true);
 
         PlayStore.getInstance(this); // triggers initial query

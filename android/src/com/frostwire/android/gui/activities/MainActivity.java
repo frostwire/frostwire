@@ -134,9 +134,6 @@ public class MainActivity extends AbstractActivity implements
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
         localBroadcastReceiver = new LocalBroadcastReceiver();
-        if (SystemUtils.hasAndroid11OrNewer()) {
-            ignoreHardwareMenu();
-        }
     }
 
     @Override
@@ -490,6 +487,19 @@ public class MainActivity extends AbstractActivity implements
         }
         if (isShutdown()) {
             return;
+        }
+
+        // some phones still can configure an external button as the
+        // permanent menu key
+        if (!SystemUtils.hasAndroid11OrNewer()) {
+            // R = 30 = Android 11
+            // Android 11 will freeze and give a Strict Mode error
+            // if you call this
+            // android.os.strictmode.IncorrectContextUseViolation
+            // UI constants, such as display metrics or window metrics,
+            // must be accessed from Activity or other visual Context.
+            // Use an Activity or a Context created with Context#createWindowContext(int, Bundle), which are adjusted to the configuration and visual bounds of an area on screen
+            ignoreHardwareMenu();
         }
         checkExternalStoragePermissions();//OrBindMusicService();
         checkAccessCoarseLocationPermissions();
@@ -912,20 +922,6 @@ public class MainActivity extends AbstractActivity implements
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
             return false;
-        }
-    }
-
-    private void ignoreHardwareMenu() {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            @SuppressWarnings("JavaReflectionMemberAccess")
-            Field f = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (f != null) {
-                f.setAccessible(true);
-                f.setBoolean(config, false);
-            }
-        } catch (Throwable e) {
-            // ignore
         }
     }
 
