@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -236,25 +236,25 @@ public final class ImageViewerFragment extends AbstractFragment {
         int offset = fragment.position;
         Librarian librarian = Librarian.instance();
 
-        List<FWFileDescriptor> FWFileDescriptors = new ArrayList<>(0);
+        List<FWFileDescriptor> fwFileDescriptors = new ArrayList<>(0);
         // We're at the beginning
         if (offset == 0) {
-            FWFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
+            fwFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
             fragment.setPreviousStateBundle(null);
-            if (FWFileDescriptors.size() == 1) {
-                fragment.setNextStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
+            if (fwFileDescriptors.size() == 1) {
+                fragment.setNextStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
             }
         } else if (offset > 0) {
-            FWFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
+            fwFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
             // We're at the end
-            if (FWFileDescriptors.size() == 2) {
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
+            if (fwFileDescriptors.size() == 2) {
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
                 fragment.setNextStateBundle(null);
             }
             // We're somewhere in the list of files
-            else if (FWFileDescriptors.size() == 3) {
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
-                fragment.setPreviousStateBundle(fragment.prepareFileBundle(FWFileDescriptors.get(2), offset + 1, fragment.inFullScreenMode));
+            else if (fwFileDescriptors.size() == 3) {
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));
+                fragment.setPreviousStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(2), offset + 1, fragment.inFullScreenMode));
             }
         }
     }
@@ -376,6 +376,9 @@ public final class ImageViewerFragment extends AbstractFragment {
             actionsToHide.add(R.id.fragment_my_files_action_mode_menu_add_to_playlist);
             if (fd.filePath != null && AndroidPlatform.saf(new File(fd.filePath))) {
                 actionsToHide.add(R.id.fragment_my_files_action_mode_menu_seed);
+            }
+            if (!fd.deletable) {
+                actionsToHide.add(R.id.fragment_my_files_action_mode_menu_delete);
             }
             if (menu != null && menu.size() > 0) {
                 for (int i = 0; i < menu.size(); i++) {

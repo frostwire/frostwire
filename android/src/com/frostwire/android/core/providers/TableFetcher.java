@@ -35,8 +35,6 @@ public interface TableFetcher {
 
     Uri getExternalContentUri();
 
-    Uri getInternalContentUri();
-
     void prepare(Cursor cur);
 
     FWFileDescriptor fetch(Cursor cur);

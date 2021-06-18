@@ -148,12 +148,8 @@ public final class Librarian {
 
         try {
             ContentResolver cr = context.getContentResolver();
-            Uri internalContentUri = fetcher.getInternalContentUri();
             Uri externalContentUri = fetcher.getExternalContentUri();
             List<Uri> contentUris = new ArrayList<>();
-            if (internalContentUri != null) {
-                contentUris.add(internalContentUri);
-            }
             if (externalContentUri != null) {
                 contentUris.add(externalContentUri);
             }
@@ -193,14 +189,6 @@ public final class Librarian {
             values.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(newFileName));
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
-
-            if (fetcher.getInternalContentUri() != null) {
-                try {
-                    cr.update(fetcher.getInternalContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
-                } catch (Throwable t) {
-                    LOG.error(t.getMessage(), t);
-                }
-            }
 
             if (fetcher.getExternalContentUri() != null) {
                 try {
@@ -260,14 +248,6 @@ public final class Librarian {
             if (context != null) {
                 ContentResolver cr = context.getContentResolver();
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-                try {
-                    if (fetcher.getInternalContentUri() != null) {
-                        cr.delete(fetcher.getInternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
-                    }
-                } catch (Throwable t) {
-                    LOG.error(t.getMessage(), t);
-                }
 
                 try {
                     if (fetcher.getExternalContentUri() != null) {
@@ -359,7 +339,6 @@ public final class Librarian {
         Cursor c = null;
         try {
             ContentResolver cr = context.getContentResolver();
-            deleteIgnorableFilesFromVolume(cr, fetcher.getInternalContentUri(), ignorableFiles);
             deleteIgnorableFilesFromVolume(cr, fetcher.getExternalContentUri(), ignorableFiles);
         } catch (Throwable e) {
             Log.e(TAG, "General failure during sync of MediaStore", e);
@@ -432,13 +411,6 @@ public final class Librarian {
             if (where == null) {
                 where = fetcher.where();
                 whereArgs = fetcher.whereArgs();
-            }
-
-            try {
-                getFilesInVolume(cr, fetcher.getInternalContentUri(), offset, pageSize, columns, sort,
-                        where, whereArgs, fetcher, result);
-            } catch (Throwable t) {
-                Log.e(TAG, "getFiles::getFilesInVolume failed with fetcher.getInternalContentUri() = " + fetcher.getInternalContentUri(), t);
             }
 
             try {

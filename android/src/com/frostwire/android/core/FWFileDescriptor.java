@@ -34,7 +34,7 @@ public class FWFileDescriptor implements Cloneable {
     public String mime; //MIME Type
     public long dateAdded;
     public long dateModified;
-    public boolean deleteable; // as of Android 11+ we won't be able to target
+    public boolean deletable; // as of Android 11+ we won't be able to target
 
     /**
      * The title of the content.
@@ -88,7 +88,7 @@ public class FWFileDescriptor implements Cloneable {
         this.fileSize = fileSize;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.deleteable = deleteable;
+        this.deletable = deleteable;
         ensureCorrectMimeType(this);
     }
 
@@ -110,7 +110,7 @@ public class FWFileDescriptor implements Cloneable {
         bundle.putLong("fileSize", fileSize);
         bundle.putLong("dateAdded", dateAdded);
         bundle.putLong("dateModified", dateModified);
-        bundle.putBoolean("deleteable", deleteable);
+        bundle.putBoolean("deletable", deletable);
         return bundle;
     }
 
@@ -129,12 +129,12 @@ public class FWFileDescriptor implements Cloneable {
         fileSize = bundle.getLong("fileSize");
         dateAdded = bundle.getLong("dateAdded");
         dateModified = bundle.getLong("dateModified");
-        deleteable = bundle.getBoolean("deleteable");
+        deletable = bundle.getBoolean("deletable");
     }
 
     @Override
     public String toString() {
-        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ", d:" + deleteable + ")";
+        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ", d:" + deletable + ")";
     }
 
     @Override
@@ -153,7 +153,7 @@ public class FWFileDescriptor implements Cloneable {
 
     @Override
     public FWFileDescriptor clone() {
-        return new FWFileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, deleteable);
+        return new FWFileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, deletable);
     }
 
     private void ensureCorrectMimeType(FWFileDescriptor fd) {

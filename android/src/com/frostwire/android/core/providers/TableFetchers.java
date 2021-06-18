@@ -108,14 +108,6 @@ public final class TableFetchers {
             return MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         }
 
-        @Override
-        public Uri getInternalContentUri() {
-            if (SystemUtils.hasAndroid10OrNewer()) {
-                return Uri.parse("content://com.frostwire.android.fileprovider");
-                // MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
-            }
-            return MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-        }
 
         @RequiresApi(api = Build.VERSION_CODES.R)
         public void prepare(Cursor cur) {
@@ -145,7 +137,9 @@ public final class TableFetchers {
             long dateModified = cur.getLong(dateModifiedCol);
             long albumId = cur.getLong(albumIdCol);
 
-            FWFileDescriptor fd = new FWFileDescriptor(id, artist, title, album, year, path, Constants.FILE_TYPE_AUDIO, mime, size, dateAdded, dateModified, true);
+            FWFileDescriptor fd = new FWFileDescriptor(id, artist, title, album, year, path,
+                    Constants.FILE_TYPE_AUDIO, mime, size, dateAdded, dateModified,
+                    !SystemUtils.hasAndroid11OrNewer());
             fd.albumId = albumId;
 
             return fd;
@@ -175,7 +169,7 @@ public final class TableFetchers {
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
 
-            return new FWFileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_PICTURES, mime, size, dateAdded, dateModified, true);
+            return new FWFileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_PICTURES, mime, size, dateAdded, dateModified, !SystemUtils.hasAndroid11OrNewer());
         }
 
         public String[] getColumns() {
@@ -187,14 +181,6 @@ public final class TableFetchers {
                 return MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
-
-        @Override
-        public Uri getInternalContentUri() {
-            if (SystemUtils.hasAndroid10OrNewer()) {
-                return MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
-            }
-            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
         }
 
         public byte getFileType() {
@@ -239,7 +225,7 @@ public final class TableFetchers {
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
 
-            return new FWFileDescriptor(id, artist, title, album, null, path, Constants.FILE_TYPE_VIDEOS, mime, size, dateAdded, dateModified, true);
+            return new FWFileDescriptor(id, artist, title, album, null, path, Constants.FILE_TYPE_VIDEOS, mime, size, dateAdded, dateModified, !SystemUtils.hasAndroid11OrNewer());
         }
 
         @RequiresApi(api = Build.VERSION_CODES.R)
@@ -252,14 +238,6 @@ public final class TableFetchers {
                 return MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
             return MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        }
-
-        @Override
-        public Uri getInternalContentUri() {
-            if (SystemUtils.hasAndroid10OrNewer()) {
-                return MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_INTERNAL);
-            }
-            return MediaStore.Video.Media.INTERNAL_CONTENT_URI;
         }
 
         public byte getFileType() {
@@ -301,7 +279,7 @@ public final class TableFetchers {
             int size = cur.getInt(sizeCol);
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
-            return new FWFileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_DOCUMENTS, mime, size, dateAdded, dateModified, true);
+            return new FWFileDescriptor(id, null, title, null, null, path, Constants.FILE_TYPE_DOCUMENTS, mime, size, dateAdded, dateModified, !SystemUtils.hasAndroid11OrNewer());
         }
 
         public String[] getColumns() {
@@ -422,7 +400,9 @@ public final class TableFetchers {
             long dateAdded = cur.getLong(dateAddedCol);
             long dateModified = cur.getLong(dateModifiedCol);
 
-            return new FWFileDescriptor(id, artist, title, album, year, path, Constants.FILE_TYPE_RINGTONES, mime, size, dateAdded, dateModified, true);
+            return new FWFileDescriptor(id, artist, title, album, year, path,
+                    Constants.FILE_TYPE_RINGTONES, mime, size, dateAdded, dateModified,
+                    !SystemUtils.hasAndroid11OrNewer());
         }
 
         @RequiresApi(api = Build.VERSION_CODES.R)

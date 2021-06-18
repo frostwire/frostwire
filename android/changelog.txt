@@ -1,4 +1,4 @@
-FrostWire 2.3.2 build 679 (experimental/very unstable) - MAY/04/2021
+FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
  - Android 11 - first pass of compatibility fixes
  - FrostWire no longer needs writes access to external storage
@@ -8,7 +8,9 @@ FrostWire 2.3.2 build 679 (experimental/very unstable) - MAY/04/2021
  - For Android 10+ devices, we'll temporarily disable storage selection from settings
    until we make sure we can integrate it for Android 10+ devices
    without external writing permissions
+ - remove ignoreHardwareMenu logic, physical menu key a thing of the past
  - com.google.gms:google-services:4.3.8
+ - com.google.firebase:firebase-crashlytics-gradle:2.7.0
 
 FrostWire 2.3.1 build 678 - APR/23/2021
  - SoundCloud search & downloads fixed

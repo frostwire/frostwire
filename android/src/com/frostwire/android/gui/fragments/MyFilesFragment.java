@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,12 @@ import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.SearchView;
+import androidx.collection.ArraySet;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPlatform;
@@ -49,8 +55,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
-import com.frostwire.android.core.providers.TableFetcher;
-import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
@@ -75,11 +79,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.SearchView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import static com.frostwire.android.util.Asyncs.async;
 
@@ -696,6 +695,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                 return false;
             }
             List<FWFileDescriptor> FWFileDescriptors = new ArrayList<>(fileDescriptorItems.length);
+
             for (FileListAdapter.FileDescriptorItem fileDescriptorItem : fileDescriptorItems) {
                 FWFileDescriptors.add(fileDescriptorItem.fd);
             }
@@ -763,8 +763,20 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
             }
         }
 
+        private boolean allSelectedFileDescriptorsAreDeletable() {
+            if (adapter.getChecked().isEmpty()) {
+                return false;
+            }
+            for (FileListAdapter.FileDescriptorItem item : adapter.getChecked()) {
+                if (!item.fd.deletable) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private void updateMenuActionsVisibility(FileListAdapter.FileDescriptorItem selectedFileDescriptor) {
-            List<Integer> actionsToHide = new ArrayList<>();
+            Set<Integer> actionsToHide = new ArraySet<>();
             FWFileDescriptor fd = selectedFileDescriptor.fd;
             boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
             if (numChecked > 1) {
@@ -777,10 +789,17 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                 actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_magnet);
                 actionsToHide.add(R.id.fragment_my_files_action_mode_menu_copy_info_hash);
                 actionsToHide.add(R.id.fragment_my_files_action_mode_menu_share);
+
+                if (!allSelectedFileDescriptorsAreDeletable()) {
+                    actionsToHide.add(R.id.fragment_my_files_action_mode_menu_delete);
+                }
             } else {
                 if (numChecked == 1) {
                     if (!canOpenFile) {
                         actionsToHide.add(R.id.fragment_my_files_action_mode_menu_open);
+                    }
+                    if (!fd.deletable) {
+                        actionsToHide.add(R.id.fragment_my_files_action_mode_menu_delete);
                     }
                     if (fd.fileType != Constants.FILE_TYPE_AUDIO) {
                         actionsToHide.add(R.id.fragment_my_files_action_mode_menu_use_as_ringtone);
