@@ -32,9 +32,9 @@ public class FWFileDescriptor implements Cloneable {
     public String filePath;
     public long fileSize;
     public String mime; //MIME Type
-    public boolean shared;
     public long dateAdded;
     public long dateModified;
+    public boolean deleteable; // as of Android 11+ we won't be able to target
 
     /**
      * The title of the content.
@@ -65,7 +65,18 @@ public class FWFileDescriptor implements Cloneable {
     public FWFileDescriptor() {
     }
 
-    public FWFileDescriptor(int id, String artist, String title, String album, String year, String path, byte fileType, String mime, long fileSize, long dateAdded, long dateModified, boolean isShared) {
+    public FWFileDescriptor(int id,
+                            String artist,
+                            String title,
+                            String album,
+                            String year,
+                            String path,
+                            byte fileType,
+                            String mime,
+                            long fileSize,
+                            long dateAdded,
+                            long dateModified,
+                            boolean deleteable) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -77,7 +88,7 @@ public class FWFileDescriptor implements Cloneable {
         this.fileSize = fileSize;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.shared = isShared;
+        this.deleteable = deleteable;
         ensureCorrectMimeType(this);
     }
 
@@ -99,7 +110,7 @@ public class FWFileDescriptor implements Cloneable {
         bundle.putLong("fileSize", fileSize);
         bundle.putLong("dateAdded", dateAdded);
         bundle.putLong("dateModified", dateModified);
-        bundle.putBoolean("shared", shared);
+        bundle.putBoolean("deleteable", deleteable);
         return bundle;
     }
 
@@ -118,12 +129,12 @@ public class FWFileDescriptor implements Cloneable {
         fileSize = bundle.getLong("fileSize");
         dateAdded = bundle.getLong("dateAdded");
         dateModified = bundle.getLong("dateModified");
-        shared = bundle.getBoolean("shared");
+        deleteable = bundle.getBoolean("deleteable");
     }
 
     @Override
     public String toString() {
-        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ")";
+        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ", d:" + deleteable + ")";
     }
 
     @Override
@@ -142,7 +153,7 @@ public class FWFileDescriptor implements Cloneable {
 
     @Override
     public FWFileDescriptor clone() {
-        return new FWFileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);
+        return new FWFileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, deleteable);
     }
 
     private void ensureCorrectMimeType(FWFileDescriptor fd) {
