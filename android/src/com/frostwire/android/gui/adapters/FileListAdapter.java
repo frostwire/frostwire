@@ -362,7 +362,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
                 fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
-            items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
+
+            if (fd.deletable) {
+                items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
+            }
         }
 
         return new MenuAdapter(context, fd.title, items);
