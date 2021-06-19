@@ -104,7 +104,8 @@ android {
     defaultConfig {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
-        minSdkVersion 21 // Lollipop 5.0
+        //minSdkVersion 21 // Lollipop 5.0
+        minSdkVersion 23 // Android Marshmallow 6.0
         targetSdkVersion 30 // Android 11
         multiDexEnabled true
     }

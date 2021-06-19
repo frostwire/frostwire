@@ -10,6 +10,8 @@ FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
    without external writing permissions
  - File deletion action not available for external media files not downloaded by FrostWire
  - remove ignoreHardwareMenu logic, physical menu key a thing of the past
+ - minSdkVersion 23 (Android Marshmallow 6.0)
+ - targetSdkVersion 30 (Android 11)
  - com.google.gms:google-services:4.3.8
  - com.google.firebase:firebase-crashlytics-gradle:2.7.0
 

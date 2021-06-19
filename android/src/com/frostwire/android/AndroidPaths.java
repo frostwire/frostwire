@@ -36,7 +36,6 @@ import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.stream.IntStream;
 
 
 /**
@@ -45,9 +44,8 @@ import java.util.stream.IntStream;
  */
 public final class AndroidPaths implements SystemPaths {
     private static final Logger LOG = Logger.getLogger(AndroidPaths.class);
-    private static final String STORAGE_PATH = "FrostWire"; // for Android10+ it's not used
+    private static final String STORAGE_PATH = "FrostWire";
     public static final String TORRENT_DATA_PATH = "TorrentsData";
-    //public static final String TORRENT_DATA_PATH = "Download";
     public static final String TORRENTS_PATH = "Torrents";
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
@@ -60,7 +58,9 @@ public final class AndroidPaths implements SystemPaths {
     private static final boolean USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 = true;
 
     //private static final String VOLUME_EXTERNAL_NAME = MediaStore.VOLUME_EXTERNAL;
-    private static final String VOLUME_EXTERNAL_NAME = MediaStore.VOLUME_EXTERNAL_PRIMARY;
+    private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
+            MediaStore.VOLUME_EXTERNAL_PRIMARY :
+            MediaStore.VOLUME_EXTERNAL;
 
     /**
      * If true uses MediaStore.Files, otherwise uses MediaStore.Downloads
@@ -99,7 +99,9 @@ public final class AndroidPaths implements SystemPaths {
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
             File externalDir = app.getExternalMediaDirs()[0]; // app.getExternalFilesDir(null)
-            return USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 ? externalDir : app.getFilesDir();
+            return new File(USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 ?
+                    externalDir : app.getFilesDir(),
+                    STORAGE_PATH);
         }
         /* For Older versions of Android where we used to have access to write to external storage
          *  <externalStoragePath>/FrostWire/
