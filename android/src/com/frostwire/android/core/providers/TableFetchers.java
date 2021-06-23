@@ -32,6 +32,19 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.mp3.ID3v2;
+import com.frostwire.mp3.Mp3File;
+import com.frostwire.platform.Platforms;
+import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 import static android.provider.MediaStore.Audio.AudioColumns.ALBUM;
 import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
@@ -55,12 +68,71 @@ import static android.provider.MediaStore.Audio.AudioColumns._ID;
  */
 public final class TableFetchers {
 
+    private static final Logger LOG = Logger.getLogger(TableFetchers.class);
+
     private static final TableFetcher AUDIO_TABLE_FETCHER = new AudioTableFetcher();
     private static final TableFetcher PICTURES_TABLE_FETCHER = new PicturesTableFetcher();
     private static final TableFetcher VIDEOS_TABLE_FETCHER = new VideosTableFetcher();
     private static final TableFetcher DOCUMENTS_TABLE_FETCHER = new DocumentsTableFetcher();
     private static final TableFetcher RINGTONES_TABLE_FETCHER = new RingtonesTableFetcher();
     private static final TableFetcher TORRENTS_TABLE_FETCHER = new TorrentsTableFetcher();
+
+    static List<FWFileDescriptor> externalFolderFWFileDescriptors(byte fileType) {
+        File dataFolder = Platforms.get().systemPaths().data();
+        if (!dataFolder.exists()) {
+            dataFolder.mkdir();
+            return Collections.EMPTY_LIST;
+        }
+        List<File> recursiveFileList = new ArrayList<>();
+        List<FWFileDescriptor> result = new ArrayList<>();
+        getRecursiveFiles(dataFolder, fileType, recursiveFileList);
+        for (File f : recursiveFileList) {
+            String artist = "", album = "";
+            if (FilenameUtils.getExtension(f.getName()).equals("mp3")) {
+                try {
+                    Mp3File mp3File = new Mp3File(f.getAbsolutePath());
+                    ID3v2 id3v2Tag = mp3File.getId3v2Tag();
+                    artist = id3v2Tag.getArtist();
+                    album = id3v2Tag.getAlbum();
+                } catch (Throwable e) {
+                    LOG.error("externalFolderFWFileDescriptors can't parse mp3 out of " + f.getAbsolutePath());
+                }
+            }
+            FWFileDescriptor fwFileDescriptor = new FWFileDescriptor(
+                    f.hashCode(),
+                    artist,
+                    "[FW-ext] " + f.getName(),
+                    album,
+                    String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
+                    f.getAbsolutePath(),
+                    fileType,
+                    MimeDetector.getMimeType(FilenameUtils.getExtension(f.getName())),
+                    f.length(),
+                    f.lastModified(),
+                    f.lastModified(),
+                    true);
+            result.add(fwFileDescriptor);
+        }
+        return result;
+    }
+
+    static void getRecursiveFiles(File parent, byte fileType, List<File> results) {
+        File[] files = parent.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File f : files) {
+            if (f.isFile()) {
+                MediaType mediaTypeForExtension = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(f.getAbsolutePath()));
+                if (mediaTypeForExtension.getId() == fileType) {
+                    results.add(f);
+                }
+            } else if (f.isDirectory()) {
+                getRecursiveFiles(f, fileType, results);
+            }
+        }
+    }
+
 
     public static abstract class AbstractTableFetcher implements TableFetcher {
 
@@ -148,6 +220,14 @@ public final class TableFetchers {
         public byte getFileType() {
             return Constants.FILE_TYPE_AUDIO;
         }
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_AUDIO);
+        }
+
+        public int getType() {
+            return Constants.FILE_TYPE_AUDIO;
+        }
     }
 
     public static class PicturesTableFetcher extends AbstractTableFetcher {
@@ -199,6 +279,14 @@ public final class TableFetchers {
             sizeCol = cur.getColumnIndex(ImageColumns.SIZE);
             dateAddedCol = cur.getColumnIndex(ImageColumns.DATE_ADDED);
             dateModifiedCol = cur.getColumnIndex(ImageColumns.DATE_MODIFIED);
+        }
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_PICTURES);
+        }
+
+        public int getType() {
+            return Constants.FILE_TYPE_PICTURES;
         }
     }
 
@@ -259,6 +347,14 @@ public final class TableFetchers {
             sizeCol = cur.getColumnIndex(VideoColumns.SIZE);
             dateAddedCol = cur.getColumnIndex(VideoColumns.DATE_ADDED);
             dateModifiedCol = cur.getColumnIndex(VideoColumns.DATE_MODIFIED);
+        }
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_VIDEOS);
+        }
+
+        public int getType() {
+            return Constants.FILE_TYPE_VIDEOS;
         }
     }
 
@@ -356,6 +452,14 @@ public final class TableFetchers {
         public String[] whereArgs() {
             return new String[]{"%cache%", "%/.%", "%/libtorrent/%", "%com.google.%"};
         }
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_DOCUMENTS);
+        }
+
+        public int getType() {
+            return Constants.FILE_TYPE_DOCUMENTS;
+        }
     }
 
     public static final class TorrentsTableFetcher extends AbstractFilesTableFetcher {
@@ -373,6 +477,16 @@ public final class TableFetchers {
         @Override
         public String[] whereArgs() {
             return new String[]{"%/cache/%", "%/.%", "%/libtorrent/%", "%.torrent"};
+        }
+
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_TORRENTS);
+        }
+
+
+        public int getType() {
+            return Constants.FILE_TYPE_TORRENTS;
         }
     }
 
@@ -438,6 +552,14 @@ public final class TableFetchers {
             sizeCol = cur.getColumnIndex(SIZE);
             dateAddedCol = cur.getColumnIndex(DATE_ADDED);
             dateModifiedCol = cur.getColumnIndex(DATE_MODIFIED);
+        }
+
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+            return new ArrayList<>();
+        }
+
+        public int getType() {
+            return Constants.FILE_TYPE_RINGTONES;
         }
     }
 

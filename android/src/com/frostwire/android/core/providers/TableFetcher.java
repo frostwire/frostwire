@@ -23,6 +23,8 @@ import android.net.Uri;
 
 import com.frostwire.android.core.FWFileDescriptor;
 
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -44,4 +46,8 @@ public interface TableFetcher {
     String where();
 
     String[] whereArgs();
+
+    List<FWFileDescriptor> externalFolderFWFileDescriptors();
+
+    int getType();
 }

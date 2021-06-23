@@ -98,7 +98,7 @@ public final class AndroidPaths implements SystemPaths {
 
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
-            File externalDir = app.getExternalMediaDirs()[0]; // app.getExternalFilesDir(null)
+            File externalDir = app.getExternalFilesDir(null);
             return new File(USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 ?
                     externalDir : app.getFilesDir(),
                     STORAGE_PATH);
@@ -133,11 +133,6 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static Uri getMediaStoreCollectionUri(byte fileType) {
-        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     public static Uri getMediaStoreCollectionUri(byte fileType, boolean useExternalStorage) {
         String mediaStoreVolume = VOLUME_EXTERNAL_NAME;
         if (!useExternalStorage) {
@@ -147,7 +142,6 @@ public final class AndroidPaths implements SystemPaths {
             case Constants.FILE_TYPE_AUDIO:
                 return SystemUtils.hasAndroid10OrNewer() ?
                         MediaStore.Audio.Media.getContentUri(mediaStoreVolume) :
-                        //MediaStore.Downloads.getContentUri(mediaStoreVolume) :
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
             case Constants.FILE_TYPE_PICTURES:
                 return SystemUtils.hasAndroid10OrNewer() ?
@@ -188,14 +182,5 @@ public final class AndroidPaths implements SystemPaths {
         }
 
         return result;
-    }
-
-    public static String getScopedRelativePath(File file) {
-        byte fileType = getFileType(file.getAbsolutePath(), true);
-        if (fileType == Constants.FILE_TYPE_AUDIO) {
-            return "Music/";
-        }
-        // TODO
-        return TORRENT_DATA_PATH;
     }
 }

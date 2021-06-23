@@ -23,14 +23,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
 import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
-
-import androidx.annotation.RequiresApi;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
@@ -48,7 +45,6 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
@@ -124,12 +120,14 @@ public final class Librarian {
         }
     }
 
-    public List<FWFileDescriptor> getFiles(final Context context, byte fileType, int offset, int pageSize) {
-        return getFiles(context, offset, pageSize, TableFetchers.getFetcher(fileType));
+    // Called by MyFileFragment.loadInBackground() -> createLoaderFiles() -> CreateLoaderFilesAsyncTaskLoader.loadInBackground()
+    //
+    public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, int offset, int pageSize) {
+        return getFilesInAndroidMediaStore(context, offset, pageSize, TableFetchers.getFetcher(fileType));
     }
 
-    public List<FWFileDescriptor> getFiles(final Context context, byte fileType, String where, String[] whereArgs) {
-        return getFiles(context, 0, Integer.MAX_VALUE, TableFetchers.getFetcher(fileType), where, whereArgs);
+    public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String where, String[] whereArgs) {
+        return getFilesInAndroidMediaStore(context, 0, Integer.MAX_VALUE, TableFetchers.getFetcher(fileType), where, whereArgs);
     }
 
     /**
@@ -169,7 +167,7 @@ public final class Librarian {
     }
 
     public FWFileDescriptor getFileDescriptor(final Context context, byte fileType, int fileId) {
-        List<FWFileDescriptor> fds = getFiles(context, 0, 1, TableFetchers.getFetcher(fileType), BaseColumns._ID + "=?", new String[]{String.valueOf(fileId)});
+        List<FWFileDescriptor> fds = getFilesInAndroidMediaStore(context, 0, 1, TableFetchers.getFetcher(fileType), BaseColumns._ID + "=?", new String[]{String.valueOf(fileId)});
         if (fds.size() > 0) {
             return fds.get(0);
         } else {
@@ -297,17 +295,27 @@ public final class Librarian {
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
-        List<FWFileDescriptor> fds = getFiles(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
 
-        if (fds.size() == 0) { // just in case
-            Log.w(TAG, "Logic error creating ephemeral playlist");
-            fds.add(fd);
+        if (!fd.deletable) {
+            List<FWFileDescriptor> fds = getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
+
+            if (fds.size() == 0) { // just in case
+                Log.w(TAG, "Logic error creating ephemeral playlist");
+                fds.add(fd);
+            }
+
+            EphemeralPlaylist playlist = new EphemeralPlaylist(fds);
+            playlist.setNextItem(new PlaylistItem(fd));
+
+            return playlist;
+        } else {
+            List<FWFileDescriptor> fsListOfOne = new ArrayList<>();
+            fsListOfOne.add(fd);
+            EphemeralPlaylist playlist = new EphemeralPlaylist(fsListOfOne);
+            playlist.setNextItem(new PlaylistItem(fd));
+
+            return playlist;
         }
-
-        EphemeralPlaylist playlist = new EphemeralPlaylist(fds);
-        playlist.setNextItem(new PlaylistItem(fd));
-
-        return playlist;
     }
 
     private void syncMediaStoreSupport(final WeakReference<Context> contextRef) {
@@ -378,8 +386,8 @@ public final class Librarian {
 
     }
 
-    private List<FWFileDescriptor> getFiles(final Context context, int offset, int pageSize, TableFetcher fetcher) {
-        return getFiles(context, offset, pageSize, fetcher, null, null);
+    private List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, int offset, int pageSize, TableFetcher fetcher) {
+        return getFilesInAndroidMediaStore(context, offset, pageSize, fetcher, null, null);
     }
 
     /**
@@ -390,7 +398,7 @@ public final class Librarian {
      * @param fetcher  - An implementation of TableFetcher
      * @return List<FileDescriptor>
      */
-    public List<FWFileDescriptor> getFiles(
+    public List<FWFileDescriptor> getFilesInAndroidMediaStore(
             final Context context,
             final int offset,
             final int pageSize,
@@ -416,6 +424,12 @@ public final class Librarian {
             try {
                 getFilesInVolume(cr, fetcher.getExternalContentUri(), offset, pageSize, columns, sort,
                         where, whereArgs, fetcher, result);
+                if (SystemUtils.hasAndroid11OrNewer()) {
+                    List<FWFileDescriptor> fwFileDescriptors = fetcher.externalFolderFWFileDescriptors();
+                    if (fwFileDescriptors != null && fwFileDescriptors.size() > 0) {
+                        result.addAll(0, fwFileDescriptors);
+                    }
+                }
             } catch (Throwable t) {
                 Log.e(TAG, "getFiles::getFilesInVolume failed with fetcher.getExternalContentUri() = " + fetcher.getExternalContentUri(), t);
             }
@@ -455,8 +469,8 @@ public final class Librarian {
         }
     }
 
-    public List<FWFileDescriptor> getFiles(final Context context, String filepath, boolean exactPathMatch) {
-        return getFiles(context, AndroidPaths.getFileType(filepath, true), filepath, exactPathMatch);
+    public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, String filepath, boolean exactPathMatch) {
+        return getFilesInAndroidMediaStore(context, AndroidPaths.getFileType(filepath, true), filepath, exactPathMatch);
     }
 
     /**
@@ -465,10 +479,10 @@ public final class Librarian {
      * @param exactPathMatch - set it to false and pass an incomplete filepath prefix to get files in a folder for example.
      * @return
      */
-    public List<FWFileDescriptor> getFiles(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
+    public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
         String[] whereArgs = new String[]{(exactPathMatch) ? filepath : "%" + filepath + "%"};
-        return getFiles(context, fileType, where, whereArgs);
+        return getFilesInAndroidMediaStore(context, fileType, where, whereArgs);
     }
 
     public Thread getHandlerThread() {
@@ -486,8 +500,9 @@ public final class Librarian {
                 // MediaScanner is supposedly invoked internally when we perform MediaStore inserts/updates
                 // it will set the DATA field for us, so don't try to write it manually, doesn't keep
                 // whatever path you put in there
-                Uri mediaStoreCollectionUri = AndroidPaths.getMediaStoreCollectionUri(file);
-                mediaStoreInsert(context, file, mediaStoreCollectionUri);
+
+                // TODO: We'll scan and store this data in a custom DB
+                //mediaStoreInsert(context, file, mediaStoreCollectionUri);
             } else {
                 new UniversalScanner(context).scan(file.getAbsolutePath());
             }
@@ -500,11 +515,12 @@ public final class Librarian {
 
             if (!flattenedFiles.isEmpty()) {
                 if (SystemUtils.hasAndroid10OrNewer()) {
-                    flattenedFiles.forEach(f ->
-                            mediaStoreInsert(
-                                    context,
-                                    f,
-                                    AndroidPaths.getMediaStoreCollectionUri(f)));
+                    //flattenedFiles.forEach(f -> {});
+                            // TODO: Scan with our custom DB
+                            //mediaStoreInsert(
+                            //        context,
+                            //        f,
+                            //        AndroidPaths.getMediaStoreCollectionUri(f)));
                 } else {
                     new UniversalScanner(context).scan(flattenedFiles);
                 }
@@ -512,41 +528,6 @@ public final class Librarian {
         }
     }
 
-    /**
-     * This function was added during the Android 11 targetting refactor
-     * <p>
-     * "To create or update a media file, on the other hand, don't use the value of the DATA column.
-     * Instead, use the values of the DISPLAY_NAME and RELATIVE_PATH columns."
-     * Therefore we don't do it ourselves.
-     * <p>
-     * We did, and no matter what you put, Android will put its own path that's good for nothing
-     * when it comes to the mediaPlayer.setDataSource method
-     */
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void mediaStoreInsert(final Context context, File file, final Uri mediaStoreCollectionUri) {
-        try {
-            LOG.info("mediaStoreInsert inserting file at         -> " + file.getAbsolutePath());
-            ContentValues fileDetails = new ContentValues();
-            fileDetails.put(MediaColumns.DISPLAY_NAME, FilenameUtils.getBaseName(file.getName()));
-            fileDetails.put(MediaColumns.TITLE, FilenameUtils.getBaseName(file.getName()));
-            fileDetails.put(MediaColumns.RELATIVE_PATH, AndroidPaths.getScopedRelativePath(file));
-            fileDetails.put(MediaColumns.SIZE, file.length());
-            fileDetails.put(MediaColumns.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(file.getName())));
-            fileDetails.put(MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
-            fileDetails.put(MediaColumns.IS_PENDING, 0);
-
-            //final Uri uriForFile = UIUtils.getFileUri(context, file); // delete this later
-            final ContentResolver resolver = context.getContentResolver();
-            Uri uri = resolver.insert(mediaStoreCollectionUri, fileDetails);
-
-            LOG.info("mediaStoreInsert absolute path is         ->" + file.getAbsolutePath());
-            LOG.info("mediaStoreInsert mediaStoreCollection uri -> " + mediaStoreCollectionUri);
-            //LOG.info("mediaStoreInsert uriForFile was   -> " + uriForFile);
-            LOG.info("mediaStoreInsert success      uri -> " + uri);
-        } catch (Throwable t) {
-            LOG.error("mediaStoreInsert failed -> ", t);
-        }
-    }
 
     private void initHandler() {
         final HandlerThread handlerThread = new HandlerThread("Librarian::handler",

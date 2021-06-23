@@ -199,7 +199,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
             return;
         }
         for (TransferItem item : items) {
-            final List<FWFileDescriptor> FWFileDescriptors = librarian.getFiles(context, item.getFile().getAbsolutePath(), true);
+            final List<FWFileDescriptor> FWFileDescriptors = librarian.getFilesInAndroidMediaStore(context, item.getFile().getAbsolutePath(), true);
             for (FWFileDescriptor fd : FWFileDescriptors) {
                 File file = new File(fd.filePath);
                 if (file.isFile()) {
@@ -218,7 +218,7 @@ public final class UIBittorrentDownload implements BittorrentDownload {
         if (deleteTorrent) {
             File torrent = dl.getTorrentFile();
             if (torrent != null) {
-                final List<FWFileDescriptor> fds = librarian.getFiles(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
+                final List<FWFileDescriptor> fds = librarian.getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
                 librarian.deleteFiles(context, Constants.FILE_TYPE_TORRENTS, fds);
             }
         }

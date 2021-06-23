@@ -183,7 +183,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         boolean errored = download.getState().name().contains("ERROR");
         boolean finishedSuccessfully = !errored && download.isComplete() && isCloudDownload(tag);
         if (finishedSuccessfully && Ref.alive(contextRef)) {
-            final List<FWFileDescriptor> files = Librarian.instance().getFiles(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
+            final List<FWFileDescriptor> files = Librarian.instance().getFilesInAndroidMediaStore(contextRef.get(), download.getSavePath().getAbsolutePath(), true);
             boolean singleFile = files != null && files.size() == 1;
 
             if (singleFile && !AndroidPlatform.saf(new File(files.get(0).filePath))) {

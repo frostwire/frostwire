@@ -2972,9 +2972,9 @@ public class MusicPlaybackService extends JobIntentService {
 
         private boolean trySettingDataSourceManyWays(final MediaPlayer player,
                                                      final Uri pathUri) {
-            return setDataSourceUsingContentPathURI(player, pathUri)
-                    || setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri)
-                    || setDataSourceUsingAFileDescriptor(player, pathUri);
+            return setDataSourceUsingAFileDescriptor(player, pathUri) ||
+                    setDataSourceUsingContentPathURI(player, pathUri) ||
+                    setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri);
         }
 
         private boolean setDataSourceUsingContentPathURI(

@@ -239,13 +239,13 @@ public final class ImageViewerFragment extends AbstractFragment {
         List<FWFileDescriptor> fwFileDescriptors = new ArrayList<>(0);
         // We're at the beginning
         if (offset == 0) {
-            fwFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
+            fwFileDescriptors.addAll(librarian.getFilesInAndroidMediaStore(activity, Constants.FILE_TYPE_PICTURES, offset + 1, 1));
             fragment.setPreviousStateBundle(null);
             if (fwFileDescriptors.size() == 1) {
                 fragment.setNextStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(0), offset + 1, fragment.inFullScreenMode));
             }
         } else if (offset > 0) {
-            fwFileDescriptors.addAll(librarian.getFiles(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
+            fwFileDescriptors.addAll(librarian.getFilesInAndroidMediaStore(activity, Constants.FILE_TYPE_PICTURES, offset - 1, 3));
             // We're at the end
             if (fwFileDescriptors.size() == 2) {
                 fragment.setPreviousStateBundle(fragment.prepareFileBundle(fwFileDescriptors.get(0), offset - 1, fragment.inFullScreenMode));

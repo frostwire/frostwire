@@ -61,12 +61,12 @@ public class OpenMenuAction extends MenuAction {
         this.position = -1;
     }
 
-    public OpenMenuAction(Context context, FWFileDescriptor FWFileDescriptor, int position) {
+    public OpenMenuAction(Context context, FWFileDescriptor fwFileDescriptor, int position) {
         super(context, R.drawable.contextmenu_icon_open, R.string.open);
-        this.path = FWFileDescriptor.filePath;
-        this.mime = FWFileDescriptor.mime;
-        this.fileType = FWFileDescriptor.fileType;
-        this.fd = FWFileDescriptor;
+        this.path = fwFileDescriptor.filePath;
+        this.mime = fwFileDescriptor.mime;
+        this.fileType = fwFileDescriptor.fileType;
+        this.fd = fwFileDescriptor;
         this.position = position;
     }
 

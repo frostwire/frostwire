@@ -399,7 +399,7 @@ public final class UIUtils {
 
     private static boolean openAudioInternal(final Context context, String filePath) {
         try {
-            List<FWFileDescriptor> fds = Librarian.instance().getFiles(context, filePath, true);
+            List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, true);
             if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
                 return true;
@@ -603,6 +603,7 @@ public final class UIUtils {
                 }
             } catch (Throwable ignored) {
                 // possible Runtime error thrown by Librarian.instance()
+                LOG.error(ignored.getMessage(), ignored);
             }
         }
     }

@@ -422,7 +422,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         @Override
         public Object loadInBackground() {
             try {
-                List<FWFileDescriptor> files = Librarian.instance().getFiles(getContext(), fileType, 0, Integer.MAX_VALUE);
+                List<FWFileDescriptor> files = Librarian.instance().getFilesInAndroidMediaStore(getContext(), fileType, 0, Integer.MAX_VALUE);
                 return new Object[]{fileType, files};
             } catch (Throwable e) {
                 LOG.error("Error performing finger", e);
