@@ -134,7 +134,7 @@ public final class SystemUtils {
 
     /** Used to determine if the device is running Android11 or greater */
     public static boolean hasAndroid11OrNewer() {
-        return hasSdkOrNewer(Build.VERSION_CODES.R);
+        return hasSdkOrNewer(30); //Build.VERSION_CODES.R
     }
 
     /**
