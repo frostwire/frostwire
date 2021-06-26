@@ -90,7 +90,6 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * TODO:
  * - assertInMusicPlayerHandlerThread()
  */
-@RequiresApi(api = Build.VERSION_CODES.R)
 public class MusicPlaybackService extends JobIntentService {
 
     // public methods
@@ -1900,13 +1899,24 @@ public class MusicPlaybackService extends JobIntentService {
      */
     public boolean openFile(final String path) {
         if (D) LOG.info("openFile: path = " + path);
-
         if (path == null) {
             return false;
         }
         long id = getIdFromContextUri(path);
+        // Are we talking about a regular file path?
+        if (path.startsWith("/storage")) {
+            mPlayer.setCurrentDataSource(path);
+            if (mPlayer != null && mPlayer.isInitialized()) {
+                mOpenFailedCounter = 0;
+                return true;
+            } else {
+                mOpenFailedCounter++;
+                stopPlayer();
+                return false;
+            }
+        }
         // If mCursor is null, try to associate path with a database cursor
-        if (mCursor == null) {
+        else if (mCursor == null) {
             if (id != -1 && path.startsWith(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString())) {
                 Uri uri = Uri.parse(path);
                 updateCursor(uri);
@@ -1932,6 +1942,7 @@ public class MusicPlaybackService extends JobIntentService {
                 return false;
             }
         }
+
         if (mPlayerHandler == null) {
             throw new RuntimeException("check your logic, mPlayerHandler can't be null");
         }
@@ -2960,6 +2971,7 @@ public class MusicPlaybackService extends JobIntentService {
                         return false;
                     }
                 } else {
+                    // /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData/...
                     player.setDataSource(path);
                 }
                 player.prepare();

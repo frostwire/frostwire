@@ -169,7 +169,7 @@ public class CarouselTab extends FrameLayoutWithOverlay {
             mPhoto.setOnClickListener(v -> {
                 final long[] albumList = MusicUtils.getSongListForAlbum(getContext(),
                         MusicUtils.getIdForAlbum(context, lastAlbum, artist));
-                MusicUtils.playAll(albumList, 0, MusicUtils.isShuffleEnabled());
+                MusicUtils.playFDs(albumList, 0, MusicUtils.isShuffleEnabled());
             });
         } else {
             setDefault(context);

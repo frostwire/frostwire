@@ -823,7 +823,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         boolean handled = false;
 
         if (uri != null && uri.toString().length() > 0) {
-            MusicUtils.playFile(uri);
+            MusicUtils.playFileFromUri(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
             long id = parseIdFromIntent(intent, "playlistId", "playlist");

@@ -195,7 +195,7 @@ public final class ShortcutActivity extends Activity {
         final boolean shouldOpenAudioPlayer = mIntent.getBooleanExtra(OPEN_AUDIO_PLAYER, true);
         // Play the list
         if (mList != null && mList.length > 0) {
-            MusicUtils.playAll(mList, 0, mShouldShuffle);
+            MusicUtils.playFDs(mList, 0, mShouldShuffle);
         }
 
         // Open the now playing screen

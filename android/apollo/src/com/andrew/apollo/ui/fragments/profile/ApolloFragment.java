@@ -278,7 +278,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     new long[]{mSelectedId};
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicPlaybackService.safePost(() -> MusicUtils.playAll(songList, 0, MusicUtils.isShuffleEnabled()));
+                    MusicPlaybackService.safePost(() -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
                     MusicPlaybackService.safePost(() -> MusicUtils.playNext(songList));
