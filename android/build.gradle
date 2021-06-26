@@ -104,8 +104,7 @@ android {
     defaultConfig {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
-        //minSdkVersion 21 // Lollipop 5.0
-        minSdkVersion 23 // Android Marshmallow 6.0
+        minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
         targetSdkVersion 30 // Android 11
         multiDexEnabled true
     }
@@ -234,7 +233,7 @@ dependencies {
     def jlibtorrent_version='1.2.13.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
     implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar')
-    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
+    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar') // used by android emulator on macos
     implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar')
     implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
