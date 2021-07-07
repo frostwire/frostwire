@@ -25,6 +25,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -55,7 +56,7 @@ public final class AndroidPaths implements SystemPaths {
     private final Application app;
     private final File internalFilesDir;
 
-    private static final boolean USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 = true;
+    private static final boolean USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 = true;
 
     //private static final String VOLUME_EXTERNAL_NAME = MediaStore.VOLUME_EXTERNAL;
     private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
@@ -74,6 +75,10 @@ public final class AndroidPaths implements SystemPaths {
         LOG.info("");
     }
 
+    /**
+     * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData
+     * @return
+     */
     @Override
     public File data() {
         return new File(storage(app), TORRENT_DATA_PATH);
@@ -96,10 +101,18 @@ public final class AndroidPaths implements SystemPaths {
 
     private static volatile boolean APP_PATHS_SHOWN = false;
 
+
+    /**
+     *
+     * getExternalFilesDir() + "/FrostWire"
+     * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
+     * @param app
+     * @return
+     */
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
             File externalDir = app.getExternalFilesDir(null);
-            return new File(USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10 ?
+            return new File(USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 ?
                     externalDir : app.getFilesDir(),
                     STORAGE_PATH);
         }
@@ -129,7 +142,7 @@ public final class AndroidPaths implements SystemPaths {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static Uri getMediaStoreCollectionUri(File file) {
         byte fileType = getFileType(file.getAbsolutePath(), true);
-        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_DIR_AFTER_ANDROID_10);
+        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
