@@ -1904,7 +1904,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
         long id = getIdFromContextUri(path);
         // Are we talking about a regular file path?
-        if (path.startsWith("/storage")) {
+        if (path.startsWith("/storage") || path.startsWith("content://")) {
             mPlayer.setCurrentDataSource(path);
             if (mPlayer != null && mPlayer.isInitialized()) {
                 mOpenFailedCounter = 0;
@@ -2985,8 +2985,8 @@ public class MusicPlaybackService extends JobIntentService {
         private boolean trySettingDataSourceManyWays(final MediaPlayer player,
                                                      final Uri pathUri) {
             return setDataSourceUsingAFileDescriptor(player, pathUri) ||
-                    setDataSourceUsingContentPathURI(player, pathUri) ||
-                    setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri);
+                   setDataSourceUsingContentPathURI(player, pathUri) ||
+                   setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri);
         }
 
         private boolean setDataSourceUsingContentPathURI(
