@@ -1,7 +1,6 @@
 package com.frostwire.android.gui.services;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.util.LongSparseArray;
 
@@ -30,7 +29,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
         List<PlaylistItem> items = playlist.getItems();
 
         idMap.clear();
-        String[] paths = new String[items.size()];
+        File[] files = new File[items.size()];
         long[] list = new long[items.size()];
         int position = 0;
 
@@ -43,7 +42,7 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
 
             if (item.getFD().deletable) {
                 useFilePaths = true;
-                paths[i] = item.getFD().filePath;
+                files[i] = new File(item.getFD().filePath);
             } else {
 
                 list[i] = item.getFD().id;
@@ -56,14 +55,13 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
         }
 
         if (useFilePaths) {
-            MusicUtils.playFile(Uri.fromFile(new File(paths[0])));
+            MusicUtils.playFile(files[0]);
         } else {
-            // use media store paths/file descriptor ids
-            MusicUtils.playAll(list, position, MusicUtils.isShuffleEnabled());
+            // use media store files/file descriptor ids
+            MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     public void stop() {
         try {
