@@ -29,6 +29,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -134,6 +140,9 @@ public final class BTEngine extends SessionManager {
         this.listener = listener;
     }
 
+    /**
+     * @see com.frostwire.android.gui.MainApplication.start() for ctx.interfaces and the rest of the context
+     */
     @Override
     public void start() {
         SessionParams params = loadSettings();
@@ -160,8 +169,8 @@ public final class BTEngine extends SessionManager {
                 ctx.version[2],
                 libtorrent.version());
         sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
-        System.out.println("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
-        System.out.println("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
+        LOG.info("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
+        LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
         super.start(params);
     }
 
@@ -550,7 +559,8 @@ public final class BTEngine extends SessionManager {
     private void onListenFailed(ListenFailedAlert alert) {
         String endp = alert.address() + ":" + alert.port();
         String s = "endpoint: " + endp + " type:" + alert.socketType();
-        String message = alert.error().message();
+        ErrorCode error = alert.error();
+        String message = error.message() + "/value=" + error.value();
         LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
