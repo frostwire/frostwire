@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.SparseArray;
@@ -42,7 +41,6 @@ import android.widget.GridView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.collection.ArraySet;
@@ -246,7 +244,7 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
+
     @Override
     public void onResume() {
         super.onResume();
@@ -277,7 +275,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     private void initBroadcastReceiver() {
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Constants.ACTION_REFRESH_FINGER);
@@ -422,8 +419,9 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
         @Override
         public Object loadInBackground() {
             try {
-                List<FWFileDescriptor> files = Librarian.instance().getFilesInAndroidMediaStore(getContext(), fileType, 0, Integer.MAX_VALUE);
-                return new Object[]{fileType, files};
+                Librarian librarian = Librarian.instance();
+                List<FWFileDescriptor> filesInAndroidMediaStore = librarian.getFilesInAndroidMediaStore(getContext(), fileType, 0, Integer.MAX_VALUE);
+                return new Object[]{fileType, filesInAndroidMediaStore};
             } catch (Throwable e) {
                 LOG.error("Error performing finger", e);
             }
@@ -834,7 +832,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
-        @RequiresApi(api = Build.VERSION_CODES.R)
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
