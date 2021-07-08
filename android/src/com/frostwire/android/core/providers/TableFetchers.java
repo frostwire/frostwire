@@ -18,6 +18,7 @@
 
 package com.frostwire.android.core.providers;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -32,18 +33,12 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.mp3.ID3v2;
-import com.frostwire.mp3.Mp3File;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.MimeDetector;
 
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 import static android.provider.MediaStore.Audio.AudioColumns.ALBUM;
@@ -77,44 +72,6 @@ public final class TableFetchers {
     private static final TableFetcher RINGTONES_TABLE_FETCHER = new RingtonesTableFetcher();
     private static final TableFetcher TORRENTS_TABLE_FETCHER = new TorrentsTableFetcher();
 
-    static List<FWFileDescriptor> externalFolderFWFileDescriptors(byte fileType) {
-        File dataFolder = Platforms.get().systemPaths().data();
-        if (!dataFolder.exists()) {
-            dataFolder.mkdir();
-            return Collections.EMPTY_LIST;
-        }
-        List<File> recursiveFileList = new ArrayList<>();
-        List<FWFileDescriptor> result = new ArrayList<>();
-        getRecursiveFiles(dataFolder, fileType, recursiveFileList);
-        for (File f : recursiveFileList) {
-            String artist = "", album = "";
-            if (FilenameUtils.getExtension(f.getName()).equals("mp3")) {
-                try {
-                    Mp3File mp3File = new Mp3File(f.getAbsolutePath());
-                    ID3v2 id3v2Tag = mp3File.getId3v2Tag();
-                    artist = id3v2Tag.getArtist();
-                    album = id3v2Tag.getAlbum();
-                } catch (Throwable e) {
-                    LOG.error("externalFolderFWFileDescriptors can't parse mp3 out of " + f.getAbsolutePath());
-                }
-            }
-            FWFileDescriptor fwFileDescriptor = new FWFileDescriptor(
-                    f.hashCode(),
-                    artist,
-                    "[FW-ext] " + f.getName(),
-                    album,
-                    String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                    f.getAbsolutePath(),
-                    fileType,
-                    MimeDetector.getMimeType(FilenameUtils.getExtension(f.getName())),
-                    f.length(),
-                    f.lastModified(),
-                    f.lastModified(),
-                    true);
-            result.add(fwFileDescriptor);
-        }
-        return result;
-    }
 
     static void getRecursiveFiles(File parent, byte fileType, List<File> results) {
         File[] files = parent.listFiles();
@@ -132,7 +89,6 @@ public final class TableFetchers {
             }
         }
     }
-
 
     public static abstract class AbstractTableFetcher implements TableFetcher {
 
@@ -164,7 +120,6 @@ public final class TableFetchers {
         protected int dateModifiedCol;
         protected int albumIdCol;
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{_ID, ARTIST, TITLE, ALBUM, DATA, YEAR, MIME_TYPE, SIZE, DATE_ADDED, DATE_MODIFIED, ALBUM_ID};
         }
@@ -181,8 +136,7 @@ public final class TableFetchers {
         }
 
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
-        public void prepare(Cursor cur) {
+        public void prepareColumnIds(Cursor cur) {
             idCol = cur.getColumnIndex(_ID);
             pathCol = cur.getColumnIndex(DATA);
             mimeCol = cur.getColumnIndex(MIME_TYPE);
@@ -196,7 +150,7 @@ public final class TableFetchers {
             albumIdCol = cur.getColumnIndex(ALBUM_ID);
         }
 
-        public FWFileDescriptor fetch(Cursor cur) {
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
             int id = cur.getInt(idCol);
             String path = cur.getString(pathCol);
             String mime = cur.getString(mimeCol);
@@ -221,10 +175,6 @@ public final class TableFetchers {
             return Constants.FILE_TYPE_AUDIO;
         }
 
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
-            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_AUDIO);
-        }
-
         public int getType() {
             return Constants.FILE_TYPE_AUDIO;
         }
@@ -240,7 +190,7 @@ public final class TableFetchers {
         private int dateAddedCol;
         private int dateModifiedCol;
 
-        public FWFileDescriptor fetch(Cursor cur) {
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
             int id = cur.getInt(idCol);
             String path = cur.getString(pathCol);
             String mime = cur.getString(mimeCol);
@@ -271,7 +221,7 @@ public final class TableFetchers {
             return ImageColumns.DATE_ADDED + " DESC";
         }
 
-        public void prepare(Cursor cur) {
+        public void prepareColumnIds(Cursor cur) {
             idCol = cur.getColumnIndex(ImageColumns._ID);
             titleCol = cur.getColumnIndex(ImageColumns.TITLE);
             pathCol = cur.getColumnIndex(ImageColumns.DATA);
@@ -279,10 +229,6 @@ public final class TableFetchers {
             sizeCol = cur.getColumnIndex(ImageColumns.SIZE);
             dateAddedCol = cur.getColumnIndex(ImageColumns.DATE_ADDED);
             dateModifiedCol = cur.getColumnIndex(ImageColumns.DATE_MODIFIED);
-        }
-
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
-            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_PICTURES);
         }
 
         public int getType() {
@@ -302,7 +248,7 @@ public final class TableFetchers {
         private int dateAddedCol;
         private int dateModifiedCol;
 
-        public FWFileDescriptor fetch(Cursor cur) {
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
             int id = cur.getInt(idCol);
             String path = cur.getString(pathCol);
             String mime = cur.getString(mimeCol);
@@ -316,7 +262,6 @@ public final class TableFetchers {
             return new FWFileDescriptor(id, artist, title, album, null, path, Constants.FILE_TYPE_VIDEOS, mime, size, dateAdded, dateModified, !SystemUtils.hasAndroid11OrNewer());
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{VideoColumns._ID, VideoColumns.ARTIST, VideoColumns.TITLE, VideoColumns.ALBUM, VideoColumns.DATA, VideoColumns.MIME_TYPE, VideoColumns.MINI_THUMB_MAGIC, VideoColumns.SIZE, VideoColumns.DATE_ADDED, VideoColumns.DATE_MODIFIED};
         }
@@ -336,8 +281,7 @@ public final class TableFetchers {
             return VideoColumns.DATE_ADDED + " DESC";
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
-        public void prepare(Cursor cur) {
+        public void prepareColumnIds(Cursor cur) {
             idCol = cur.getColumnIndex(VideoColumns._ID);
             pathCol = cur.getColumnIndex(VideoColumns.DATA);
             mimeCol = cur.getColumnIndex(VideoColumns.MIME_TYPE);
@@ -347,10 +291,6 @@ public final class TableFetchers {
             sizeCol = cur.getColumnIndex(VideoColumns.SIZE);
             dateAddedCol = cur.getColumnIndex(VideoColumns.DATE_ADDED);
             dateModifiedCol = cur.getColumnIndex(VideoColumns.DATE_MODIFIED);
-        }
-
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
-            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_VIDEOS);
         }
 
         public int getType() {
@@ -367,7 +307,7 @@ public final class TableFetchers {
         private int dateAddedCol;
         private int dateModifiedCol;
 
-        public FWFileDescriptor fetch(Cursor cur) {
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
             int id = cur.getInt(idCol);
             String path = cur.getString(pathCol);
             String mime = cur.getString(mimeCol);
@@ -403,7 +343,7 @@ public final class TableFetchers {
             return FileColumns.DATE_ADDED + " DESC";
         }
 
-        public void prepare(Cursor cur) {
+        public void prepareColumnIds(Cursor cur) {
             idCol = cur.getColumnIndex(FileColumns._ID);
             pathCol = cur.getColumnIndex(FileColumns.DATA);
             mimeCol = cur.getColumnIndex(FileColumns.MIME_TYPE);
@@ -453,10 +393,6 @@ public final class TableFetchers {
             return new String[]{"%cache%", "%/.%", "%/libtorrent/%", "%com.google.%"};
         }
 
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
-            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_DOCUMENTS);
-        }
-
         public int getType() {
             return Constants.FILE_TYPE_DOCUMENTS;
         }
@@ -479,12 +415,6 @@ public final class TableFetchers {
             return new String[]{"%/cache/%", "%/.%", "%/libtorrent/%", "%.torrent"};
         }
 
-
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
-            return TableFetchers.externalFolderFWFileDescriptors(Constants.FILE_TYPE_TORRENTS);
-        }
-
-
         public int getType() {
             return Constants.FILE_TYPE_TORRENTS;
         }
@@ -502,7 +432,7 @@ public final class TableFetchers {
         private int dateAddedCol;
         private int dateModifiedCol;
 
-        public FWFileDescriptor fetch(Cursor cur) {
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
             int id = cur.getInt(idCol);
             String path = cur.getString(pathCol);
             String mime = cur.getString(mimeCol);
@@ -519,7 +449,6 @@ public final class TableFetchers {
                     !SystemUtils.hasAndroid11OrNewer());
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
         public String[] getColumns() {
             return new String[]{_ID, ARTIST, TITLE, ALBUM, DATA, YEAR, MIME_TYPE, SIZE, DATE_ADDED, DATE_MODIFIED};
         }
@@ -540,8 +469,7 @@ public final class TableFetchers {
             return DATE_ADDED + " DESC";
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.R)
-        public void prepare(Cursor cur) {
+        public void prepareColumnIds(Cursor cur) {
             idCol = cur.getColumnIndex(_ID);
             pathCol = cur.getColumnIndex(DATA);
             mimeCol = cur.getColumnIndex(MIME_TYPE);
@@ -554,13 +482,14 @@ public final class TableFetchers {
             dateModifiedCol = cur.getColumnIndex(DATE_MODIFIED);
         }
 
-        public List<FWFileDescriptor> externalFolderFWFileDescriptors() {
+        public List<FWFileDescriptor> externalFolderFWFileDescriptors(Context context) {
             return new ArrayList<>();
         }
 
         public int getType() {
             return Constants.FILE_TYPE_RINGTONES;
         }
+
     }
 
     public static TableFetcher getFetcher(byte fileType) {
