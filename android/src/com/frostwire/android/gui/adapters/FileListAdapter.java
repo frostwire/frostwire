@@ -686,6 +686,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (fd == null || fd.filePath == null) {
             return true;
         }
+        if (fd.filePath.startsWith("content://")) {
+            return false;
+        }
         File f = new File(fd.filePath);
         if (!f.exists()) {
             if (SystemUtils.isSecondaryExternalStorageMounted(f.getAbsoluteFile())) {
