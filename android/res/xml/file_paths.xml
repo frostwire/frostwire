@@ -70,4 +70,8 @@
     <external-files-path
         name="torrents_data"
         path="TorrentsData/" />
+    
+    <external-files-path
+        name="music/"
+        path="Music" />
 </paths>
