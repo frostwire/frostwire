@@ -91,6 +91,13 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * - assertInMusicPlayerHandlerThread()
  */
 public class MusicPlaybackService extends JobIntentService {
+    public static void safePost(Runnable runnable) {
+        if (MusicPlaybackService.mPlayerHandler == null) {
+            LOG.error("Check your logic, trying to safePost and mPlayerHandler hasn't yet been created");
+            throw new RuntimeException("MusicPlaybackService.safePost can't post without a mPlayerHandler instance");
+        }
+        SystemUtils.safePost(MusicPlaybackService.mPlayerHandler, runnable);
+    }
 
     // public methods
     // these first methods are here for convenience when maintaining the code, they're all related to the creation
@@ -111,7 +118,7 @@ public class MusicPlaybackService extends JobIntentService {
             // Initialize the notification helper
             mNotificationHelper = new NotificationHelper(this);
             setupMPlayerHandler();
-            mPlayerHandler.safePost(this::initService);
+            SystemUtils.safePost(mPlayerHandler, this::initService);
         } else {
             LOG.warn("onCreate: service couldn't be initialized correctly, READ_EXTERNAL_STORAGE permission not granted");
         }
@@ -634,14 +641,6 @@ public class MusicPlaybackService extends JobIntentService {
 
     // public static methods
 
-    /**
-     * Safe Post to MusicPlaybackService's MusicPlayerHandler Thread/Looper.
-     * We call it "safe" because if any exceptions are thrown, they are caught in order to not crash the handler thread.
-     */
-    public static void safePost(Runnable runnable) {
-        mPlayerHandler.safePost(runnable);
-    }
-
     private static void setupMPlayerHandler() {
         // Start up the handlerThread running the service. Note that we create a
         // separate handlerThread because the service normally runs in the process's
@@ -812,7 +811,7 @@ public class MusicPlaybackService extends JobIntentService {
 
         if (isPlaying()) {
             if (TaskThrottle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
-                mPlayerHandler.safePost(() -> {
+                SystemUtils.safePost(mPlayerHandler, () -> {
                     Bitmap albumArt = getAlbumArt();
                     Handler handler = new Handler(Looper.getMainLooper());
                     handler.post(() -> {
@@ -1546,7 +1545,7 @@ public class MusicPlaybackService extends JobIntentService {
             LOG.error("notifyChange() change=" + change + " interval not defined in notifyChangeIntervals, defaulting to 250ms", t);
         }
         if (TaskThrottle.isReadyToSubmitTask(change, interval)) {
-            mPlayerHandler.safePost(notifyChangeTaskRunnable);
+            SystemUtils.safePost(mPlayerHandler, notifyChangeTaskRunnable);
         }
     }
 
@@ -1675,7 +1674,7 @@ public class MusicPlaybackService extends JobIntentService {
             case META_CHANGED:
             case QUEUE_CHANGED:
                 // Asynchronously gets bitmap and then updates the Remote Control Client with that bitmap
-                mPlayerHandler.safePost(() -> changeRemoteControlClientTask(playStateFinalCopy, position()));
+                SystemUtils.safePost(mPlayerHandler, () -> changeRemoteControlClientTask(playStateFinalCopy, position()));
                 break;
         }
     }
@@ -2610,7 +2609,7 @@ public class MusicPlaybackService extends JobIntentService {
         setNextTrack();
         saveQueue(false);
         notifyChange(REPEATMODE_CHANGED);
-        mPlayerHandler.safePost(() -> saveLastRepeatStateAsync(repeatMode));
+        SystemUtils.safePost(mPlayerHandler, () -> saveLastRepeatStateAsync(repeatMode));
     }
 
     private static void saveLastRepeatStateAsync(int repeatMode) {
@@ -2625,7 +2624,7 @@ public class MusicPlaybackService extends JobIntentService {
      */
     public void enableShuffle(boolean on) {
         mShuffleEnabled = on;
-        mPlayerHandler.safePost(() -> saveLastShuffleStateAsync(on));
+        SystemUtils.safePost(mPlayerHandler, () -> saveLastShuffleStateAsync(on));
         notifyChange(SHUFFLEMODE_CHANGED);
     }
 
@@ -2753,7 +2752,7 @@ public class MusicPlaybackService extends JobIntentService {
     private static void mediaPlayerAsyncAction(MediaPlayer mediaPlayer,
                                                MediaPlayerAction action) {
         if (mediaPlayer != null && MusicPlaybackService.mPlayerHandler != null) {
-            MusicPlaybackService.safePost(() -> MusicPlaybackService.mediaPlayerAction(mediaPlayer, action));
+            SystemUtils.safePost(mPlayerHandler, () -> MusicPlaybackService.mediaPlayerAction(mediaPlayer, action));
         }
     }
 
@@ -2773,22 +2772,6 @@ public class MusicPlaybackService extends JobIntentService {
 
         public Thread getLooperThread() {
             return getLooper().getThread();
-        }
-
-        public void safePost(@NonNull Runnable r) {
-            if (Thread.currentThread() == getLooperThread()) {
-                try {
-                    r.run();
-                } catch (Throwable t) {
-                    LOG.error("safePost() exception from Runnable caught: " + t.getMessage(), t, true);
-                }
-            } else {
-                try {
-                    post(r);
-                } catch (Throwable t) {
-                    LOG.error("safePost() exception from Runnable caught: " + t.getMessage(), t, true);
-                }
-            }
         }
 
         @Override

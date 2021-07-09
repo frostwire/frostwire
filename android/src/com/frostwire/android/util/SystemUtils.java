@@ -21,6 +21,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Process;
 import android.os.StatFs;
 
@@ -208,5 +209,30 @@ public final class SystemUtils {
 
         t.setDaemon(false);
         t.start();
+    }
+
+    /**
+     * We call it "safe" because if any exceptions are thrown,
+     * they are caught in order to not crash the handler thread.
+     */
+    public static void safePost(Handler handler, Runnable r) {
+        if (handler != null) {
+            // We are already in the Handler thread, just go!
+            if (Thread.currentThread() == handler.getLooper().getThread()) {
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    LOG.error("safePost() " + t.getMessage(), t);
+                }
+            } else {
+                handler.post(() -> {
+                    try {
+                        r.run();
+                    } catch (Throwable t) {
+                        LOG.error("safePost() " + t.getMessage(), t);
+                    }
+                });
+            }
+        }
     }
 }

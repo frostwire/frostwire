@@ -106,27 +106,6 @@ public final class Librarian {
         initHandler();
     }
 
-    public void safePost(Runnable r) {
-        if (handler != null) {
-            // We are already in the Librarian Handler thread, just go!
-            if (Thread.currentThread() == handler.getLooper().getThread()) {
-                try {
-                    r.run();
-                } catch (Throwable t) {
-                    LOG.error("safePost() " + t.getMessage(), t);
-                }
-            } else {
-                handler.post(() -> {
-                    try {
-                        r.run();
-                    } catch (Throwable t) {
-                        LOG.error("safePost() " + t.getMessage(), t);
-                    }
-                });
-            }
-        }
-    }
-
     public void shutdownHandler() {
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
@@ -297,7 +276,7 @@ public final class Librarian {
      */
     public void scan(final Context context, File file) {
         if (Thread.currentThread() != handler.getLooper().getThread()) {
-            safePost(() -> scan(context, file));
+            SystemUtils.safePost(handler, () -> scan(context, file));
             return;
         }
         scan(context, file, Transfers.getIgnorableFiles());
@@ -312,7 +291,7 @@ public final class Librarian {
         if (!SystemUtils.hasAndroid10OrNewer() && !SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
-        safePost(() -> syncMediaStoreSupport(contextRef));
+        SystemUtils.safePost(handler, () -> syncMediaStoreSupport(contextRef));
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
@@ -712,5 +691,9 @@ public final class Librarian {
         sb.append(")");
 
         return sb.toString();
+    }
+
+    public Handler getHandler() {
+        return handler;
     }
 }

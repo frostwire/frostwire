@@ -1209,7 +1209,7 @@ public final class MusicUtils {
 
         if (MusicPlaybackService.getMusicPlayerHandler() != null &&
                 MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
-            MusicPlaybackService.getMusicPlayerHandler().safePost(() -> addToPlaylist(context, ids, playlistid));
+            MusicPlaybackService.safePost(() -> addToPlaylist(context, ids, playlistid));
             return;
         }
 
