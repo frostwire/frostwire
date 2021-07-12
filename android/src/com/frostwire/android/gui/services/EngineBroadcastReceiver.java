@@ -38,6 +38,7 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -189,7 +190,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 UIUtils.broadcastAction(context, Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
 
                 final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
-                if (privateDir.exists() && privateDir.isDirectory()) {
+                if (privateDir.exists() && privateDir.isDirectory() && !SystemUtils.hasAndroid10OrNewer()) {
                     Platforms.fileSystem().scan(privateDir);
                 }
             }
