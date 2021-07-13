@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@
 package com.frostwire.android.gui;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
@@ -64,10 +62,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -91,8 +87,6 @@ public final class Librarian {
     private static Librarian instance;
     private Handler handler;
 
-    private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
-
     public static Librarian instance() {
         if (instance != null) { // quick check to avoid lock
             return instance;
@@ -100,11 +94,6 @@ public final class Librarian {
 
         synchronized (instanceCreationLock) {
             if (instance == null) {
-                fileTypeFolders.put(Constants.FILE_TYPE_AUDIO, Environment.DIRECTORY_MUSIC);
-                fileTypeFolders.put(Constants.FILE_TYPE_VIDEOS, Environment.DIRECTORY_MOVIES);
-                fileTypeFolders.put(Constants.FILE_TYPE_RINGTONES, Environment.DIRECTORY_RINGTONES);
-                fileTypeFolders.put(Constants.FILE_TYPE_PICTURES, Environment.DIRECTORY_PICTURES);
-
                 instance = new Librarian();
             }
             return instance;
@@ -189,7 +178,7 @@ public final class Librarian {
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
 
-            if (fetcher.getExternalContentUri() != null) {
+            if (fetcher != null && fetcher.getExternalContentUri() != null) {
                 try {
                     cr.update(fetcher.getExternalContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
                 } catch (Throwable t) {
@@ -197,6 +186,7 @@ public final class Librarian {
                 }
             }
 
+            //noinspection ResultOfMethodCallIgnored
             oldFile.renameTo(newFile);
             return newFile.getAbsolutePath();
         } catch (Throwable e) {
@@ -209,10 +199,6 @@ public final class Librarian {
      * Deletes files.
      * If the fileType is audio it'll use MusicUtils.deleteTracks and
      * tell apollo to clean everything there, playslists, recents, etc.
-     *
-     * @param context
-     * @param fileType
-     * @param fds
      */
     public void deleteFiles(final Context context, byte fileType, Collection<FWFileDescriptor> fds) {
         List<Integer> ids = new ArrayList<>(fds.size());
@@ -249,7 +235,7 @@ public final class Librarian {
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
 
                 try {
-                    if (fetcher.getExternalContentUri() != null) {
+                    if (fetcher != null && fetcher.getExternalContentUri() != null) {
                         cr.delete(fetcher.getExternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
                     }
                 } catch (Throwable t) {
@@ -276,12 +262,10 @@ public final class Librarian {
     }
 
     /**
-     * @param context
-     * @param file
-     * @see UIBTDownloadListener.finished() calls this when a torrent download ends
+     * @see com.frostwire.android.gui.transfers.UIBTDownloadListener finished() calls this when a torrent download ends
      * on both the torrents folder and the data folder.
-     * @see com.frostwire.transfers.BaseHttpDownload.moveAndComplete() for http transfers
-     * @see FileSystem.scan() makes use of this function.
+     * @see com.frostwire.transfers.BaseHttpDownload moveAndComplete() for http transfers
+     * @see FileSystem scan() makes use of this function.
      */
     public void scan(final Context context, File file) {
         if (Thread.currentThread() != handler.getLooper().getThread()) {
@@ -357,16 +341,11 @@ public final class Librarian {
             return;
         }
 
-        Cursor c = null;
         try {
             ContentResolver cr = context.getContentResolver();
             deleteIgnorableFilesFromVolume(cr, fetcher.getExternalContentUri(), ignorableFiles);
         } catch (Throwable e) {
             Log.e(TAG, "General failure during sync of MediaStore", e);
-        } finally {
-            if (c != null) {
-                c.close();
-            }
         }
     }
 
@@ -396,7 +375,7 @@ public final class Librarian {
             }
         }
         cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
-
+        c.close();
     }
 
     private List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, int offset, int pageSize, TableFetcher fetcher) {
@@ -481,10 +460,7 @@ public final class Librarian {
     }
 
     /**
-     * @param fileType
-     * @param filepath
      * @param exactPathMatch - set it to false and pass an incomplete filepath prefix to get files in a folder for example.
-     * @return
      */
     public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
@@ -538,50 +514,17 @@ public final class Librarian {
         }
     }
 
-    private File getExternalDestFolder(Context context, File srcFile) {
-        ///storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/creep-soundcloud.mp3 ->
-        //content://com.frostwire.android.fileprovider/external_files/FrostWire/TorrentsData/creep-soundcloud.mp3
-
-        // Copy file to shared external media folder
-        byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
-        // destFolder ->  /storage/emulated/0/Android/data/com.frostwire.android/files/Music/FrostWire
-        String subFolder = fileTypeFolders.get(fileType);
-        File destFolder = new File(context.getExternalFilesDir(null), subFolder + "/FrostWire");
-        return destFolder;
-    }
-
-    class MediaStoreHelper {
-        Context context;
-        ContentValues values;
-        Uri mediaStoreCollectionUri;
-        Uri insertedUri;
-
-    }
-
-//    private void copyFileToDestFolder(Context context, File srcFile) {
-//        if (srcFile.isDirectory()) {
-//            return;
-//        }
-//
-//        // Copy file to shared external media folder
-//        File destFolder = getExternalDestFolder(context, srcFile);
-//        LOG.info("copyFileToDestFolder coping (srcFile:" + srcFile.getAbsolutePath() + ") to (destFolder:" + destFolder.getAbsolutePath() + ")");
-//
-//        File destFile = new File(destFolder, srcFile.getName());
-//        try {
-//            FileUtils.copyFile(srcFile, destFile);
-//            LOG.info("copyFileToDestFolder success");
-//        } catch (Throwable t) {
-//            LOG.error(t.getMessage(), t);
-//        }
-//    }
-
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private void copyFileBytesToMediaStore(ContentResolver contentResolver,
                                            File srcFile,
                                            ContentValues values,
                                            Uri insertedUri) {
         try {
             OutputStream outputStream = contentResolver.openOutputStream(insertedUri);
+            if (outputStream == null) {
+                LOG.error("copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" +insertedUri);
+                return;
+            }
             BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
             sink.writeAll(Okio.source(srcFile));
             sink.flush();
@@ -597,6 +540,12 @@ public final class Librarian {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void mediaStoreInsert(Context context, File srcFile) {
+        // TODO: Gotta check if a file with the same name already exists
+        // https://stackoverflow.com/questions/60632273/mediastore-contentresolver-insert-creates-copies-instead-of-replacing-the-exis
+        // Problem: we might have an issue with scanning after torrent finished alert which happens
+        // when the app starts. Not sure how to go about that, wish we could store a hash of the file
+        // or actually check for the physical file in external storage before inserting it again
+        // vs the srcFile
         if (srcFile.isDirectory()) {
             return;
         }
@@ -605,7 +554,7 @@ public final class Librarian {
         // Add to MediaStore
         ContentResolver resolver = context.getContentResolver();
         byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
-        String subFolder = fileTypeFolders.get(fileType);
+        String subFolder = AndroidPaths.getFileTypeExternalRelativeFolderName(fileType);
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
         Uri mediaStoreCollectionUri = fetcher.getExternalContentUri();
 
@@ -614,44 +563,37 @@ public final class Librarian {
 
         ContentValues values = new ContentValues();
         values.put(MediaColumns.IS_PENDING, 1);
-        values.put(MediaColumns.RELATIVE_PATH, subFolder + "/FrostWire");
-        values.put(MediaColumns.DISPLAY_NAME, srcFile.getAbsolutePath());
+
+        if (subFolder != null) {
+            values.put(MediaColumns.RELATIVE_PATH, subFolder + "/FrostWire");
+        } else {
+            LOG.info("WARNING, relative subFolder is null for " + srcFile.getAbsolutePath());
+        }
+
+        values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
         values.put(MediaColumns.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(srcFile.getName())));
         values.put(MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
         values.put(MediaColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000);
         values.put(MediaColumns.SIZE, srcFile.length());
 
-        if (fileType == Constants.FILE_TYPE_AUDIO) {
+        if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             mmr.setDataSource(srcFile.getAbsolutePath());
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String album = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
-            String artist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
             LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
-            LOG.info("mediaStoreInsert album (MediaDataRetriever): " + album);
-            LOG.info("mediaStoreInsert artist (MediaDataRetriever): " + artist);
             if (title != null) {
                 values.put(MediaColumns.TITLE, title);
+                values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
             }
-            if (album != null) {
-                values.put(MediaColumns.ALBUM, album);
-            }
-            if (artist != null) {
-                values.put(MediaColumns.ARTIST, artist);
-            }
+        } else {
+            values.put(MediaColumns.TITLE, srcFile.getName());
         }
-
         Uri insertedUri = resolver.insert(mediaStoreCollectionUri, values);
-
-        if (fileType == Constants.FILE_TYPE_AUDIO && insertedUri != null) {
-            long audioId = ContentUris.parseId(insertedUri);
-            if (audioId == -1) {
-                return;
-            }
+        if (insertedUri == null) {
+            LOG.error("mediaStoreInsert -> could not perform media store insertion");
+            return;
         }
-
         LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
-
         copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
     }
 
@@ -669,7 +611,6 @@ public final class Librarian {
      * <p>
      * Non-recursive implementation, up to 20% faster in tests than recursive implementation. :)
      *
-     * @param folder
      * @param extensions If you only need certain files filtered by their extensions, use this string array (without the "."). or set to null if you want all files. e.g. ["txt","jpg"] if you only want text files and jpegs.
      * @return The set of files.
      * @author gubatron

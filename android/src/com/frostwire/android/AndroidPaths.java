@@ -19,6 +19,7 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -37,6 +38,8 @@ import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -50,7 +53,6 @@ public final class AndroidPaths implements SystemPaths {
     public static final String TORRENTS_PATH = "Torrents";
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
-
     private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
@@ -58,7 +60,6 @@ public final class AndroidPaths implements SystemPaths {
 
     private static final boolean USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 = true;
 
-    //private static final String VOLUME_EXTERNAL_NAME = MediaStore.VOLUME_EXTERNAL;
     private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
             MediaStore.VOLUME_EXTERNAL_PRIMARY :
             MediaStore.VOLUME_EXTERNAL;
@@ -66,7 +67,7 @@ public final class AndroidPaths implements SystemPaths {
     /**
      * If true uses MediaStore.Files, otherwise uses MediaStore.Downloads
      */
-    private static final boolean USE_FILES_MEDIA_STORE = true;
+    private static final boolean USE_FILES_MEDIA_STORE = false;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public AndroidPaths(Application app) {
@@ -195,5 +196,43 @@ public final class AndroidPaths implements SystemPaths {
         }
 
         return result;
+    }
+
+    private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
+    private static final Object fileTypeFoldersLock = new Object();
+
+    public static File getExternalDestFolder(Context context, File srcFile) {
+        ///storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/creep-soundcloud.mp3 ->
+        //content://com.frostwire.android.fileprovider/external_files/FrostWire/TorrentsData/creep-soundcloud.mp3
+
+        // Copy file to shared external media folder
+        byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
+        // destFolder ->  /storage/emulated/0/Android/data/com.frostwire.android/files/Music/FrostWire
+        String subFolder = fileTypeFolders.get(fileType);
+        File destFolder = new File(context.getExternalFilesDir(null), subFolder + "/FrostWire");
+        return destFolder;
+    }
+
+    /**
+     * FILE_TYPE_AUDIO -> "Music"
+     * FILE_TYPE_VIDEOS -> "Movies"
+     * ...
+     * Based on Android's Environment.DIRECTORY_XXX constants
+     * We'll use these for MediaStore relative path prefixes concatenated to "/FrostWire" so the user
+     * can easily find what's been downloaded with FrostWire in external folders.
+     */
+    public static String getFileTypeExternalRelativeFolderName(byte fileType) {
+        synchronized (fileTypeFoldersLock) {
+            // thread safe lazy load check
+            if (fileTypeFolders.size() == 0) {
+                fileTypeFolders.put(Constants.FILE_TYPE_AUDIO, Environment.DIRECTORY_MUSIC);
+                fileTypeFolders.put(Constants.FILE_TYPE_VIDEOS, Environment.DIRECTORY_MOVIES);
+                fileTypeFolders.put(Constants.FILE_TYPE_RINGTONES, Environment.DIRECTORY_RINGTONES);
+                fileTypeFolders.put(Constants.FILE_TYPE_PICTURES, Environment.DIRECTORY_PICTURES);
+                fileTypeFolders.put(Constants.FILE_TYPE_TORRENTS, Environment.DIRECTORY_DOWNLOADS);
+                fileTypeFolders.put(Constants.FILE_TYPE_DOCUMENTS, Environment.DIRECTORY_DOCUMENTS);
+            }
+        }
+        return fileTypeFolders.get(fileType);
     }
 }
