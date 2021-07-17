@@ -422,6 +422,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            Uri dataUri = intent.getData();
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                MusicUtils.startMusicPlaybackService(getApplicationContext(),
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
+                        () -> onNewIntent(intent));
+            } else {
+                onNewIntent(intent);
+            }
+        }
+
         waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
@@ -809,7 +823,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         boolean handled = false;
 
         if (uri != null && uri.toString().length() > 0) {
-            MusicUtils.playFile(uri);
+            MusicUtils.playFileFromUri(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
             long id = parseIdFromIntent(intent, "playlistId", "playlist");

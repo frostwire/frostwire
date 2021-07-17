@@ -22,7 +22,7 @@ import android.content.Context;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.MenuAction;
@@ -33,9 +33,9 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  */
 public class SetAsRingtoneMenuAction extends MenuAction {
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
 
-    public SetAsRingtoneMenuAction(final Context context, FileDescriptor fd) {
+    public SetAsRingtoneMenuAction(final Context context, FWFileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_ringtone, R.string.context_menu_use_as_ringtone);
         this.fd = fd;
     }

@@ -21,6 +21,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Process;
 import android.os.StatFs;
 
@@ -127,6 +128,16 @@ public final class SystemUtils {
         return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0);
     }
 
+    /** Used to determine if the device is running Android11 or greater */
+    public static boolean hasAndroid10OrNewer() {
+        return hasSdkOrNewer(Build.VERSION_CODES.Q);
+    }
+
+    /** Used to determine if the device is running Android11 or greater */
+    public static boolean hasAndroid11OrNewer() {
+        return hasSdkOrNewer(30); //Build.VERSION_CODES.R
+    }
+
     /**
      * @param context
      * @param timeout        timeout in ms. set to -1 to wait forever.
@@ -198,5 +209,30 @@ public final class SystemUtils {
 
         t.setDaemon(false);
         t.start();
+    }
+
+    /**
+     * We call it "safe" because if any exceptions are thrown,
+     * they are caught in order to not crash the handler thread.
+     */
+    public static void safePost(Handler handler, Runnable r) {
+        if (handler != null) {
+            // We are already in the Handler thread, just go!
+            if (Thread.currentThread() == handler.getLooper().getThread()) {
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    LOG.error("safePost() " + t.getMessage(), t);
+                }
+            } else {
+                handler.post(() -> {
+                    try {
+                        r.run();
+                    } catch (Throwable t) {
+                        LOG.error("safePost() " + t.getMessage(), t);
+                    }
+                });
+            }
+        }
     }
 }

@@ -25,16 +25,16 @@ import com.frostwire.android.gui.util.UIUtils;
  * @author gubatron
  * @author aldenml
  */
-public class FileDescriptor implements Cloneable {
+public class FWFileDescriptor implements Cloneable {
 
     public int id;
     public byte fileType; // As described in Constants.
     public String filePath;
     public long fileSize;
     public String mime; //MIME Type
-    public boolean shared;
     public long dateAdded;
     public long dateModified;
+    public boolean deletable; // as of Android 11+ we won't be able to target
 
     /**
      * The title of the content.
@@ -62,10 +62,21 @@ public class FileDescriptor implements Cloneable {
     /**
      * Empty constructor. Needed for in the JSON (and Gson) serialization process.
      */
-    public FileDescriptor() {
+    public FWFileDescriptor() {
     }
 
-    public FileDescriptor(int id, String artist, String title, String album, String year, String path, byte fileType, String mime, long fileSize, long dateAdded, long dateModified, boolean isShared) {
+    public FWFileDescriptor(int id,
+                            String artist,
+                            String title,
+                            String album,
+                            String year,
+                            String path,
+                            byte fileType,
+                            String mime,
+                            long fileSize,
+                            long dateAdded,
+                            long dateModified,
+                            boolean deleteable) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -77,11 +88,11 @@ public class FileDescriptor implements Cloneable {
         this.fileSize = fileSize;
         this.dateAdded = dateAdded;
         this.dateModified = dateModified;
-        this.shared = isShared;
+        this.deletable = deleteable;
         ensureCorrectMimeType(this);
     }
 
-    public FileDescriptor(Bundle bundle) {
+    public FWFileDescriptor(Bundle bundle) {
         fromBundle(bundle);
         ensureCorrectMimeType(this);
     }
@@ -99,7 +110,7 @@ public class FileDescriptor implements Cloneable {
         bundle.putLong("fileSize", fileSize);
         bundle.putLong("dateAdded", dateAdded);
         bundle.putLong("dateModified", dateModified);
-        bundle.putBoolean("shared", shared);
+        bundle.putBoolean("deletable", deletable);
         return bundle;
     }
 
@@ -118,20 +129,20 @@ public class FileDescriptor implements Cloneable {
         fileSize = bundle.getLong("fileSize");
         dateAdded = bundle.getLong("dateAdded");
         dateModified = bundle.getLong("dateModified");
-        shared = bundle.getBoolean("shared");
+        deletable = bundle.getBoolean("deletable");
     }
 
     @Override
     public String toString() {
-        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ")";
+        return "FD(id:" + id + ", ft:" + fileType + ", t:" + title + ", p:" + filePath + ", d:" + deletable + ")";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof FileDescriptor)) {
+        if (!(o instanceof FWFileDescriptor)) {
             return false;
         }
-        FileDescriptor fd = (FileDescriptor) o;
+        FWFileDescriptor fd = (FWFileDescriptor) o;
         return (this.id == fd.id && this.fileType == fd.fileType) || (this.filePath != null && fd.filePath != null && this.filePath.equals(fd.filePath));
     }
 
@@ -141,11 +152,11 @@ public class FileDescriptor implements Cloneable {
     }
 
     @Override
-    public FileDescriptor clone() {
-        return new FileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, shared);
+    public FWFileDescriptor clone() {
+        return new FWFileDescriptor(id, artist, title, album, year, filePath, fileType, mime, fileSize, dateAdded, dateModified, deletable);
     }
 
-    private void ensureCorrectMimeType(FileDescriptor fd) {
+    private void ensureCorrectMimeType(FWFileDescriptor fd) {
         if (fd.mime == null || fd.filePath.endsWith(".torrent") || fd.filePath.endsWith(".apk")) {
             fd.mime = UIUtils.getMimeType(fd.filePath);
         }

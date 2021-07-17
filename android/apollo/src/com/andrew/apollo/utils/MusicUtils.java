@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -48,6 +48,9 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.RequiresApi;
+import androidx.loader.content.CursorLoader;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.loaders.FavoritesLoader;
 import com.andrew.apollo.loaders.LastAddedLoader;
@@ -74,6 +77,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
@@ -94,17 +98,26 @@ public final class MusicUtils {
 
     private static final long[] sEmptyList;
 
-    private static final ServiceConnectionListener serviceConnectionListener;
+    private static ServiceConnectionListener serviceConnectionListener;
 
     private static ContentValues[] mContentValuesCache = null;
 
+    private static final Object startMusicPlaybackServiceLock = new Object();
+
     static {
         sEmptyList = new long[0];
-        serviceConnectionListener = new ServiceConnectionListener();
     }
 
     /* This class is never initiated */
     public MusicUtils() {
+    }
+
+    public static Intent buildStartMusicPlaybackServiceIntent(final Context context) {
+        Intent musicPlaybackServiceIntent = new Intent(context, MusicPlaybackService.class);
+        musicPlaybackServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        musicPlaybackServiceIntent.setAction(MusicPlaybackService.SERVICECMD);
+        musicPlaybackServiceIntent.putExtra(MusicPlaybackService.CMDNAME, MusicPlaybackService.CMDPLAY);
+        return musicPlaybackServiceIntent;
     }
 
     public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
@@ -112,6 +125,8 @@ public final class MusicUtils {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 LOG.info("startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+                // should end with a android.app.Service#startForeground(int, android.app.Notification) call
+                // otherwise if in 5 seconds it's not invoked, the system will crash the app
                 context.startForegroundService(intent);
             } else {
                 LOG.info("startMusicPlaybackService() startService(MusicPlaybackService)", true);
@@ -121,8 +136,8 @@ public final class MusicUtils {
             LOG.error(t.getMessage(), t);
         }
         try {
-            if (onServiceBoundCallback != null) {
-                serviceConnectionListener.addSubListener(onServiceBoundCallback);
+            synchronized (startMusicPlaybackServiceLock) {
+                serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
             }
             context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
         } catch (Throwable t) {
@@ -136,6 +151,7 @@ public final class MusicUtils {
      *
      * @param context The {@link Context} to use.
      */
+
     public static void notifyForegroundStateChanged(final Context context, boolean inForeground) {
         int old = sForegroundActivities;
         if (inForeground) {
@@ -145,6 +161,7 @@ public final class MusicUtils {
         }
         if (old == 0 || sForegroundActivities == 0) {
             boolean startedServiceNow = false;
+            LOG.info("notifyForegroundStateChanged trying to start the MusicPlaybackService");
             final Intent intent = new Intent(context, MusicPlaybackService.class);
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
             intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
@@ -154,8 +171,8 @@ public final class MusicUtils {
                     LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
                     MusicUtils.getMusicPlaybackService().handleCommandIntent(intent);
                 }
-            } catch (Throwable ignored) {
-                LOG.error("notifyForegroundStateChanged() failed:" + ignored.getMessage(), ignored);
+            } catch (Throwable t) {
+                LOG.error("notifyForegroundStateChanged() failed:" + t.getMessage(), t);
             }
         }
     }
@@ -171,6 +188,7 @@ public final class MusicUtils {
     public static boolean isMusicPlaybackServiceRunning() {
         return musicPlaybackService != null;
     }
+
 
     public static void requestMusicPlaybackServiceShutdown(Context context) {
         if (context == null) {
@@ -212,14 +230,23 @@ public final class MusicUtils {
     }
 
     private static class ServiceConnectionListener implements ServiceConnection {
-        private static Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
-        private final ArrayList<Runnable> subListeners = new ArrayList<>();
+        private static final Logger LOG = Logger.getLogger(ServiceConnectionListener.class);
+        private Runnable callback;
         private final AtomicBoolean bound = new AtomicBoolean(false);
+
+        public ServiceConnectionListener(Runnable callback_) {
+            callback = callback_;
+        }
+
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            bound.set(true);
             musicPlaybackService = MusicPlaybackService.getInstance();//IApolloService.Stub.asInterface(service);
+            if (musicPlaybackService == null) {
+                RuntimeException t = new RuntimeException("MusicUtils::ServiceConnectionListener.onServiceConnected aborted, musicPlaybackService is null, we're calling this too early - check your logic)");
+                LOG.error(t.getMessage(), t);
+                throw t;
+            }
             try {
                 LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
                 musicPlaybackService.updateNotification();
@@ -227,43 +254,34 @@ public final class MusicUtils {
                 LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
-            notifySubListeners();
+            if (callback != null) {
+                try {
+                    MusicPlaybackService.safePost(callback);
+                } catch (Throwable t) {
+                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
+                }
+            }
 
             // Do not hold on to old Runnable objects, we don't want unexpected things happening later on if we shutdown and restart
-            subListeners.clear();
+            callback = null;
+            bound.set(true);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             LOG.info("onServiceDisconnected() invoked!");
+            callback = null;
             bound.set(false);
-            subListeners.clear();
         }
 
         public boolean isBound() {
             return bound.get();
         }
 
-        void addSubListener(Runnable runnable) {
-            subListeners.add(runnable);
-        }
-
-        private void notifySubListeners() {
-            if (subListeners.isEmpty()) {
-                return;
-            }
-            for (Runnable runnable : subListeners) {
-                try {
-                    MusicPlaybackService.safePost(runnable);
-                } catch (Throwable t) {
-                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
-                }
-            }
-        }
-
         @Override
         public void onNullBinding(ComponentName name) {
             LOG.warn("onNullBinding(componentName=" + name + ")");
+            callback = null;
         }
     }
 
@@ -305,6 +323,7 @@ public final class MusicUtils {
     /**
      * Changes to the next track
      */
+
     public static void next() {
         try {
             if (musicPlaybackService != null) {
@@ -314,6 +333,7 @@ public final class MusicUtils {
         } catch (final Throwable ignored) {
         }
     }
+
 
     public static void previous() {
         try {
@@ -327,6 +347,7 @@ public final class MusicUtils {
     /**
      * Starts Playback, Pauses, or Resumes.
      */
+
     public static void playPauseOrResume() {
         try {
             if (musicPlaybackService != null) {
@@ -350,6 +371,7 @@ public final class MusicUtils {
     /**
      * Gets back to playing whatever it was playing before.
      */
+
     public static void play() {
         if (musicPlaybackService != null) {
             try {
@@ -358,6 +380,7 @@ public final class MusicUtils {
             }
         }
     }
+
 
     public static void pause() {
         if (musicPlaybackService != null) {
@@ -372,6 +395,7 @@ public final class MusicUtils {
     /**
      * Cycles through the repeat options.
      */
+
     public static void cycleRepeat() {
         try {
             if (musicPlaybackService != null) {
@@ -394,6 +418,7 @@ public final class MusicUtils {
     /**
      * Cycles through the shuffle options.
      */
+
     public static void cycleShuffle() {
         if (musicPlaybackService != null) {
             try {
@@ -406,6 +431,7 @@ public final class MusicUtils {
     /**
      * @return True if we're playing music, false otherwise.
      */
+
     public static boolean isPlaying() {
         if (musicPlaybackService != null) {
             try {
@@ -415,6 +441,7 @@ public final class MusicUtils {
         }
         return false;
     }
+
 
     public static boolean isStopped() {
         if (musicPlaybackService != null) {
@@ -429,6 +456,7 @@ public final class MusicUtils {
     /**
      * @return The current shuffle mode.
      */
+
     public static boolean isShuffleEnabled() {
         if (musicPlaybackService != null) {
             try {
@@ -442,6 +470,7 @@ public final class MusicUtils {
     /**
      * @return The current repeat mode.
      */
+
     public static int getRepeatMode() {
         if (musicPlaybackService != null) {
             try {
@@ -455,6 +484,7 @@ public final class MusicUtils {
     /**
      * @return The current track name.
      */
+
     public static String getTrackName() {
         if (musicPlaybackService != null) {
             try {
@@ -468,6 +498,7 @@ public final class MusicUtils {
     /**
      * @return The current artist name.
      */
+
     public static String getArtistName() {
         if (musicPlaybackService != null) {
             try {
@@ -481,6 +512,7 @@ public final class MusicUtils {
     /**
      * @return The current album name.
      */
+
     public static String getAlbumName() {
         if (musicPlaybackService != null) {
             try {
@@ -494,6 +526,7 @@ public final class MusicUtils {
     /**
      * @return The current album Id.
      */
+
     public static long getCurrentAlbumId() {
         if (musicPlaybackService != null) {
             try {
@@ -507,6 +540,7 @@ public final class MusicUtils {
     /**
      * @return The current song Id.
      */
+
     public static long getCurrentAudioId() {
         if (musicPlaybackService != null) {
             try {
@@ -520,6 +554,7 @@ public final class MusicUtils {
     /**
      * @return The current song Id played by Simple Player.
      */
+
     public static long getCurrentSimplePlayerAudioId() {
         if (musicPlaybackService != null) {
             try {
@@ -546,6 +581,7 @@ public final class MusicUtils {
     /**
      * @return The audio session Id.
      */
+
     static int getAudioSessionId() {
         if (musicPlaybackService != null) {
             try {
@@ -559,6 +595,7 @@ public final class MusicUtils {
     /**
      * @return The queue.
      */
+
     public static long[] getQueue() {
         try {
             if (musicPlaybackService != null) {
@@ -573,6 +610,7 @@ public final class MusicUtils {
      * @param id The ID of the track to remove.
      * @return removes track from a playlist or the queue.
      */
+
     public static int removeTrack(final long id) {
         try {
             if (musicPlaybackService != null) {
@@ -586,6 +624,7 @@ public final class MusicUtils {
     /**
      * @return The position of the current track in the queue.
      */
+
     private static int getQueuePosition() {
         try {
             if (musicPlaybackService != null) {
@@ -756,6 +795,31 @@ public final class MusicUtils {
     }
 
     /**
+     * Extracts the path in the DATA column of the media store entry
+     * convert a path like -> content://media/external_primary/audio/media/117
+     * to content://com.frostwire.android.fileprovider/external_files/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/looklikeyou-soundcloud.mp3
+     */
+    public static String getDataPathFromMediaStoreContentURI(Context context, Uri contentUri) {
+        if (Looper.myLooper() == null) {
+            // The cursor loader can only be created in a Looper Thread.
+            Looper.prepare();
+        }
+        String[] projection = {MediaStore.Downloads.DATA};
+        CursorLoader loader = new CursorLoader(context, contentUri, projection, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index;
+        if (cursor != null) {
+            column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+            cursor.moveToFirst();
+            String result = cursor.getString(column_index);
+            cursor.close();
+
+            return result;
+        }
+        return null;
+    }
+
+    /**
      * @param context The {@link Context} to use.
      * @param id      The ID of the album.
      * @return The song list for an album.
@@ -784,10 +848,11 @@ public final class MusicUtils {
      * @param artistId The artist Id.
      * @param position Specify where to start.
      */
+
     public static void playArtist(final Context context, final long artistId, int position) {
         final long[] artistList = getSongListForArtist(context, artistId);
         if (artistList != null) {
-            playAll(artistList, position, MusicUtils.isShuffleEnabled());
+            playFDs(artistList, position, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -813,10 +878,16 @@ public final class MusicUtils {
         return sEmptyList;
     }
 
+
+    public static void playFile(final File file) {
+        playFileFromUri(Uri.fromFile(file));
+    }
+
     /**
      * @param uri The source of the file
      */
-    public static void playFile(final Uri uri) {
+
+    public static void playFileFromUri(final Uri uri) {
         if (uri == null || musicPlaybackService == null) {
             return;
         }
@@ -835,7 +906,8 @@ public final class MusicUtils {
             musicPlaybackService.stopPlayer();
             musicPlaybackService.openFile(filename);
             musicPlaybackService.play();
-        } catch (final Throwable ignored) {
+        } catch (final Throwable t) {
+            LOG.error(t.getMessage(), t);
         }
     }
 
@@ -844,18 +916,19 @@ public final class MusicUtils {
      * @param position     Specify where to start.
      * @param forceShuffle True to force a shuffle, false otherwise.
      */
-    public static void playAll(final long[] list, int position,
+
+    public static void playFDs(final long[] list, int position,
                                final boolean forceShuffle) {
         if (list == null) {
-            LOG.info("playAll() aborted, song list null");
+            LOG.info("playFDs() aborted, song list null");
             return;
         }
         if (list.length == 0) {
-            LOG.info("playAll() aborted, empty song list");
+            LOG.info("playFDs() aborted, empty song list");
             return;
         }
         if (musicPlaybackService == null) {
-            LOG.info("playAll() aborted, musicPlaybackService is null");
+            LOG.info("playFDs() aborted, musicPlaybackService is null");
             return;
         }
         try {
@@ -880,6 +953,7 @@ public final class MusicUtils {
         }
     }
 
+
     private static boolean continuedPlayingCurrentQueue(long[] list, int position, long currentId, int currentQueuePosition) {
         if (position != -1 && currentQueuePosition == position && currentId == list[position]) {
             final long[] playlist = getQueue();
@@ -899,6 +973,7 @@ public final class MusicUtils {
     /**
      * @param list The list to enqueue.
      */
+
     public static void playNext(final long[] list) {
         if (musicPlaybackService == null || list == null) {
             return;
@@ -1017,11 +1092,13 @@ public final class MusicUtils {
     public static void playAlbum(final Context context, final long albumId, int position) {
         final long[] albumList = getSongListForAlbum(context, albumId);
         if (albumList != null) {
-            playAll(albumList, position, MusicUtils.isShuffleEnabled());
+            playFDs(albumList, position, MusicUtils.isShuffleEnabled());
         }
     }
 
-    private static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
+    private static void makeInsertItems(final long[] ids, final int offset) {
+        final int base = 1000;
+        int len = 1000;
         if (offset + len > ids.length) {
             len = ids.length - offset;
         }
@@ -1086,7 +1163,7 @@ public final class MusicUtils {
                 final Uri uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                         values);
 
-                if (uri != null) {
+                if (uri != null && uri.getLastPathSegment() != null) {
                     result = Long.parseLong(uri.getLastPathSegment());
                 }
             }
@@ -1132,7 +1209,7 @@ public final class MusicUtils {
 
         if (MusicPlaybackService.getMusicPlayerHandler() != null &&
                 MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
-            MusicPlaybackService.getMusicPlayerHandler().safePost(() -> addToPlaylist(context, ids, playlistid));
+            MusicPlaybackService.safePost(() -> addToPlaylist(context, ids, playlistid));
             return;
         }
 
@@ -1159,7 +1236,7 @@ public final class MusicUtils {
             int numinserted = 0;
             //TODO: Check this portion of code, seems is doing extra work.
             for (int offSet = 0; offSet < size; offSet += 1000) {
-                makeInsertItems(ids, offSet, 1000, base);
+                makeInsertItems(ids, offSet);
                 try {
                     numinserted += resolver.bulkInsert(uri, mContentValuesCache);
                 } catch (Throwable ignored) {
@@ -1244,7 +1321,7 @@ public final class MusicUtils {
     /**
      * @param context  The {@link Context} to use
      * @param id       The song ID.
-     * @param fileType
+     * @param fileType media file type id
      */
     public static void setRingtone(final Context context, final long id, byte fileType) {
         if (context == null) {
@@ -1439,7 +1516,7 @@ public final class MusicUtils {
     public static void playPlaylist(final Context context, final long playlistId) {
         final long[] playlistList = getSongListForPlaylist(context, playlistId);
         if (playlistList != null) {
-            playAll(playlistList, -1, MusicUtils.isShuffleEnabled());
+            playFDs(playlistList, -1, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -1488,7 +1565,7 @@ public final class MusicUtils {
      * @param context The {@link Context} to use
      */
     public static void playFavorites(final Context context) {
-        playAll(getSongListForFavorites(context), 0, MusicUtils.isShuffleEnabled());
+        playFDs(getSongListForFavorites(context), 0, MusicUtils.isShuffleEnabled());
     }
 
     /**
@@ -1515,7 +1592,7 @@ public final class MusicUtils {
      * @param context The {@link Context} to use
      */
     public static void playLastAdded(final Context context) {
-        playAll(getSongListForLastAdded(context), 0, MusicUtils.isShuffleEnabled());
+        playFDs(getSongListForLastAdded(context), 0, MusicUtils.isShuffleEnabled());
     }
 
     /**
@@ -1772,10 +1849,10 @@ public final class MusicUtils {
             final int posCopy = pos;
             startMusicPlaybackService(
                     context,
-                    new Intent(context, MusicPlaybackService.class),
-                    () -> MusicUtils.playAll(list, posCopy, MusicUtils.isShuffleEnabled()));
+                    buildStartMusicPlaybackServiceIntent(context),
+                    () -> MusicUtils.playFDs(list, posCopy, MusicUtils.isShuffleEnabled()));
         } else {
-            MusicUtils.playAll(list, pos, MusicUtils.isShuffleEnabled());
+            MusicUtils.playFDs(list, pos, MusicUtils.isShuffleEnabled());
         }
     }
 
@@ -1798,7 +1875,7 @@ public final class MusicUtils {
         List<Long> songList = new LinkedList<>();
         for (int i = 0; i < count; i++) {
             try {
-                long songId = adapter.getItem(i).mSongId;
+                long songId = Objects.requireNonNull(adapter.getItem(i)).mSongId;
                 songList.add(songId);
             } catch (Throwable ignored) {
                 // possible array out of bounds on adapter.getItem(i)

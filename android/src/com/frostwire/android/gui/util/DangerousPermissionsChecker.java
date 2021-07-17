@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -35,6 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -155,6 +157,9 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             return true;
         }
         Activity activity = activityRef.get();
+        if (SystemUtils.hasAndroid10OrNewer()) {
+            return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        }
         return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
                 ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
@@ -224,11 +229,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
      * Google geniuses, Make up your minds please.
      */
     private void requestWriteSettingsPermissionsAPILevel23(Activity activity) {
-        // Settings.ACTION_MANAGE_WRITE_SETTINGS - won't build if the
-        // intellij sdk is set to API 16 Platform, so I'll just hardcode
-        // the value.
-        // Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-        Intent intent = new Intent("android.settings.action.MANAGE_WRITE_SETTINGS");
+        Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
         intent.setData(Uri.parse("package:" + activity.getPackageName()));
         activity.startActivityForResult(intent, DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE);
     }
@@ -240,7 +241,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         final Activity activity = activityRef.get();
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                if (permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||
+                if (/*permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||*/
                         permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setIcon(R.drawable.sd_card_notification);

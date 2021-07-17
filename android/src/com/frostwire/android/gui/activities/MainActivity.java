@@ -39,6 +39,7 @@ import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -76,6 +77,7 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -88,6 +90,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
@@ -485,6 +488,7 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
+
         checkExternalStoragePermissions();//OrBindMusicService();
         checkAccessCoarseLocationPermissions();
     }
@@ -568,6 +572,8 @@ public class MainActivity extends AbstractActivity implements
         } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
         }
+
+        // the filetype and audio id parameters are passed via static hack
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }

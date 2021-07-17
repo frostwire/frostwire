@@ -31,7 +31,7 @@ import com.andrew.apollo.ui.activities.AudioPlayerActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.andrew.apollo.utils.NavUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.ImageLoader;
@@ -168,7 +168,7 @@ public class MiniPlayerView extends LinearLayout {
         async(this, MiniPlayerView::refreshOnTimerResultTask, MiniPlayerView::refreshOnTimerPostTask);
     }
 
-    private static FileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer) {
+    private static FWFileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer) {
         CoreMediaPlayer mp = Engine.instance().getMediaPlayer();
         if (mp != null) {
             miniPlayer.isPlaying = MusicUtils.isPlaying();
@@ -178,7 +178,7 @@ public class MiniPlayerView extends LinearLayout {
         return null;
     }
 
-    private static void refreshOnTimerPostTask(MiniPlayerView miniPlayer, FileDescriptor fd) {
+    private static void refreshOnTimerPostTask(MiniPlayerView miniPlayer, FWFileDescriptor fd) {
         String title = "";
         String artist = "";
         miniPlayer.refreshComponents();

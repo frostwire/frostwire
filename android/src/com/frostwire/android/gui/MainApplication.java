@@ -18,6 +18,7 @@
 package com.frostwire.android.gui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.ViewConfiguration;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -29,6 +30,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -89,10 +91,6 @@ public class MainApplication extends MultiDexApplication {
 
     private void onCreateSafe() {
         ConfigurationManager.create(this);
-
-        // some phones still can configure an external button as the
-        // permanent menu key
-        ignoreHardwareMenu();
 
         AbstractActivity.setMenuIconsVisible(true);
 

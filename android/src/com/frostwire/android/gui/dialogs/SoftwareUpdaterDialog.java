@@ -17,34 +17,24 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.text.Html;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
-import com.frostwire.android.util.Asyncs;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.StringUtils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.frostwire.android.util.SystemUtils.hasNougatOrNewer;
 
 /**
  * @author gubatron
@@ -75,7 +65,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        @SuppressWarnings("unchecked") final String apkDownloadURL = args.getString("apkDownloadURL");
+        final String apkDownloadURL = args.getString("apkDownloadURL");
         HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
@@ -113,22 +103,5 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
             dismiss();
         });
         noButton.setOnClickListener(v -> dismiss());
-    }
-
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    private void onUpdateAcceptedTask(final String apkDownloadURL) {
-//        // since Nougat, a naked file path can't be put directly inside
-//        // an intent
-//        boolean useFileProvider = hasNougatOrNewer();
-//        // this will talk to the PackageManager and MainActivity should get Intent callbacks
-//        //boolean error = !UIUtils.openAPK(getActivity(), getUpdateApk());
-//        if (error) {
-//            UIUtils.openURL(getActivity(), apkDownloadURL);
-//        }
-//    }
-////// END OF PACKAGE INSTALLER LOGIC SECTION
-
-    private static File getUpdateApk() {
-        return Platforms.get().systemPaths().update();
     }
 }

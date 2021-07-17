@@ -163,6 +163,7 @@ public final class Constants {
     public static final byte FILE_TYPE_APPLICATIONS = 0x04;
     public static final byte FILE_TYPE_RINGTONES = 0x05;
     public static final byte FILE_TYPE_TORRENTS = 0x06;
+    public static final byte FILE_TYPE_FILES = 0x07;
 
     public static final String MIME_TYPE_ANDROID_PACKAGE_ARCHIVE = "application/vnd.android.package-archive";
     public static final String MIME_TYPE_BITTORRENT = "application/x-bittorrent";

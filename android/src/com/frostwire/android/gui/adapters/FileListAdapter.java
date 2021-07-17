@@ -40,7 +40,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.ImageViewerActivity;
@@ -100,7 +100,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     private final DownloadButtonClickListener downloadButtonClickListener;
     private boolean selectAllMode;
 
-    protected FileListAdapter(Context context, List<FileDescriptor> files, byte fileType, boolean selectAllMode) {
+    protected FileListAdapter(Context context, List<FWFileDescriptor> files, byte fileType, boolean selectAllMode) {
         super(context, getLayoutId(fileType), convertFiles(files));
         setShowMenuOnClick(true);
         setShowMenuOnLongClick(false);
@@ -290,13 +290,13 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         List<MenuAction> items = new ArrayList<>();
 
         // due to long click generic handle
-        FileDescriptor fd = null;
+        FWFileDescriptor fd = null;
 
         if (view.getTag() instanceof FileDescriptorItem) {
             FileDescriptorItem item = (FileDescriptorItem) view.getTag();
             fd = item.fd;
-        } else if (view.getTag() instanceof FileDescriptor) {
-            fd = (FileDescriptor) view.getTag();
+        } else if (view.getTag() instanceof FWFileDescriptor) {
+            fd = (FWFileDescriptor) view.getTag();
         }
 
         if (checkIfNotExists(fd)) {
@@ -304,7 +304,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             return null;
         }
 
-        List<FileDescriptor> checked = convertItems(getChecked());
+        List<FWFileDescriptor> checked = convertItems(getChecked());
         boolean canOpenFile = fd.mime != null && (fd.mime.contains("audio") || fd.mime.contains("bittorrent") || fd.filePath != null);
         int numChecked = checked.size();
 
@@ -350,7 +350,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
         }
 
-        List<FileDescriptor> list = checked;
+        List<FWFileDescriptor> list = checked;
         if (list.size() == 0) {
             list = Collections.singletonList(fd);
         }
@@ -362,7 +362,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS &&
                 fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
-            items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
+
+            if (fd.deletable) {
+                items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
+            }
         }
 
         return new MenuAdapter(context, fd.title, items);
@@ -371,7 +374,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     protected void onLocalPlay() {
     }
 
-    private void localPlay(FileDescriptor fd, View view, int position) {
+    private void localPlay(FWFileDescriptor fd, View view, int position) {
         if (fd == null) {
             return;
         }
@@ -419,17 +422,17 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
     }
 
-    private void playRingtone(FileDescriptor fileDescriptor) {
+    private void playRingtone(FWFileDescriptor FWFileDescriptor) {
         //pause real music if any
         if (MusicUtils.isPlaying()) {
             MusicUtils.playPauseOrResume();
         }
-        MusicUtils.playSimple(fileDescriptor.filePath);
+        MusicUtils.playSimple(FWFileDescriptor.filePath);
         notifyDataSetChanged();
     }
 
     private void populateViewThumbnail(View view, FileDescriptorItem item) {
-        FileDescriptor fd = item.fd;
+        FWFileDescriptor fd = item.fd;
 
         final ImageButton fileThumbnail = findView(view,
                 inGridMode() ?
@@ -504,7 +507,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
     }
 
     private void populateViewPlain(View view, FileDescriptorItem item) {
-        FileDescriptor fd = item.fd;
+        FWFileDescriptor fd = item.fd;
 
         TextView title = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_title);
         title.setText(fd.title);
@@ -600,7 +603,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         size.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
     }
 
-    private boolean showSingleOptions(List<FileDescriptor> checked, FileDescriptor fd) {
+    private boolean showSingleOptions(List<FWFileDescriptor> checked, FWFileDescriptor fd) {
         //if ringtone - ignore other checked items
         if (fd.fileType == Constants.FILE_TYPE_RINGTONES) {
             return true;
@@ -608,12 +611,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return checked.size() <= 1 && (checked.size() != 1 || checked.get(0).equals(fd));
     }
 
-    private static ArrayList<FileDescriptor> convertItems(Collection<FileDescriptorItem> items) {
+    private static ArrayList<FWFileDescriptor> convertItems(Collection<FileDescriptorItem> items) {
         if (items == null) {
             return new ArrayList<>();
         }
 
-        ArrayList<FileDescriptor> list = new ArrayList<>(items.size());
+        ArrayList<FWFileDescriptor> list = new ArrayList<>(items.size());
 
         for (FileDescriptorItem item : items) {
             list.add(item.fd);
@@ -622,14 +625,14 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return list;
     }
 
-    private static ArrayList<FileDescriptorItem> convertFiles(Collection<FileDescriptor> fds) {
+    private static ArrayList<FileDescriptorItem> convertFiles(Collection<FWFileDescriptor> fds) {
         if (fds == null) {
             return new ArrayList<>();
         }
 
         ArrayList<FileDescriptorItem> list = new ArrayList<>(fds.size());
 
-        for (FileDescriptor fd : fds) {
+        for (FWFileDescriptor fd : fds) {
             FileDescriptorItem item = new FileDescriptorItem();
             item.fd = fd;
             list.add(item);
@@ -638,7 +641,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         return list;
     }
 
-    public void deleteItem(FileDescriptor fd) {
+    public void deleteItem(FWFileDescriptor fd) {
         FileDescriptorItem item = new FileDescriptorItem();
         item.fd = fd;
         super.deleteItem(item);
@@ -679,9 +682,12 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         }
     }
 
-    private boolean checkIfNotExists(FileDescriptor fd) {
+    private boolean checkIfNotExists(FWFileDescriptor fd) {
         if (fd == null || fd.filePath == null) {
             return true;
+        }
+        if (fd.filePath.startsWith("content://")) {
+            return false;
         }
         File f = new File(fd.filePath);
         if (!f.exists()) {
@@ -738,7 +744,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
             keywords = keywords.toLowerCase(Locale.US);
 
-            FileDescriptor fd = obj.fd;
+            FWFileDescriptor fd = obj.fd;
 
             if (fd.fileType == Constants.FILE_TYPE_AUDIO) {
                 return fd.album.trim().toLowerCase(Locale.US).contains(keywords) || fd.artist.trim().toLowerCase(Locale.US).contains(keywords) || fd.title.trim().toLowerCase(Locale.US).contains(keywords) || fd.filePath.trim().toLowerCase(Locale.US).contains(keywords);
@@ -750,7 +756,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     private final class DownloadButtonClickListener implements OnClickListener {
         public void onClick(View v) {
-            FileDescriptor fd = (FileDescriptor) v.getTag();
+            FWFileDescriptor fd = (FWFileDescriptor) v.getTag();
 
             if (fd == null) {
                 return;
@@ -766,7 +772,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
     public static class FileDescriptorItem {
 
-        public FileDescriptor fd;
+        public FWFileDescriptor fd;
         boolean inSD;
         boolean mounted;
         public boolean exists;

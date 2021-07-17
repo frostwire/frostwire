@@ -131,7 +131,7 @@ public abstract class ApolloFragmentAdapter<I> extends ArrayAdapter<I> {
             album.setOnClickListener(v -> {
                 final long id = getItemId(position);
                 final long[] list = MusicUtils.getSongListForAlbum(getContext(), id);
-                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+                MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
             });
         }
     }

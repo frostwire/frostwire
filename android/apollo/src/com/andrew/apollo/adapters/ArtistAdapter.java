@@ -153,7 +153,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             public void onClick(final View v) {
                 final long id = getItem(position).mArtistId;
                 final long[] list = MusicUtils.getSongListForArtist(getContext(), id);
-                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+                MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
             }
         });
     }

@@ -304,10 +304,10 @@ public final class SearchActivity extends AbstractActivity implements LoaderCall
                 Context context = parent.getContext();
                 MusicUtils.startMusicPlaybackService(
                         context,
-                        new Intent(context, MusicPlaybackService.class),
-                        () -> MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled()));
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(context),
+                        () -> MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled()));
             } else {
-                MusicUtils.playAll(list, 0, MusicUtils.isShuffleEnabled());
+                MusicUtils.playFDs(list, 0, MusicUtils.isShuffleEnabled());
             }
         }
 

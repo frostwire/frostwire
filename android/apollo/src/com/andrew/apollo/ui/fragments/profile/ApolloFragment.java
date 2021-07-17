@@ -62,6 +62,7 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.List;
 
@@ -278,7 +279,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     new long[]{mSelectedId};
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicPlaybackService.safePost(() -> MusicUtils.playAll(songList, 0, MusicUtils.isShuffleEnabled()));
+                    MusicPlaybackService.safePost(() -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
                     MusicPlaybackService.safePost(() -> MusicUtils.playNext(songList));
