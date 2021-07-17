@@ -19,19 +19,18 @@
 package com.frostwire.android;
 
 import android.app.Application;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.Logger;
 
@@ -69,6 +68,9 @@ public final class AndroidPaths implements SystemPaths {
      */
     private static final boolean USE_FILES_MEDIA_STORE = false;
 
+    private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
+    private static final Object fileTypeFoldersLock = new Object();
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public AndroidPaths(Application app) {
         this.app = app;
@@ -78,7 +80,6 @@ public final class AndroidPaths implements SystemPaths {
 
     /**
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData
-     * @return
      */
     @Override
     public File data() {
@@ -100,15 +101,11 @@ public final class AndroidPaths implements SystemPaths {
         return new File(internalFilesDir, LIBTORRENT_PATH);
     }
 
-    private static volatile boolean APP_PATHS_SHOWN = false;
-
+    private static final boolean APP_PATHS_SHOWN = false;
 
     /**
-     *
      * getExternalFilesDir() + "/FrostWire"
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
-     * @param app
-     * @return
      */
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
@@ -198,19 +195,32 @@ public final class AndroidPaths implements SystemPaths {
         return result;
     }
 
-    private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
-    private static final Object fileTypeFoldersLock = new Object();
+    public static String getRelativeFolderPath(File f) {
+        if (BTEngine.ctx.dataDir == null) {
+            throw new RuntimeException("AndroidPaths.getRelativeFolderPath() BTEngine.ctx.dataDir is null, check your logic");
+        }
+        byte fileType = AndroidPaths.getFileType(f.getAbsolutePath(), true);
 
-    public static File getExternalDestFolder(Context context, File srcFile) {
-        ///storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/creep-soundcloud.mp3 ->
-        //content://com.frostwire.android.fileprovider/external_files/FrostWire/TorrentsData/creep-soundcloud.mp3
+        // "Music"
+        String fileTypeSubfolder = AndroidPaths.getFileTypeExternalRelativeFolderName(fileType);
 
-        // Copy file to shared external media folder
-        byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
-        // destFolder ->  /storage/emulated/0/Android/data/com.frostwire.android/files/Music/FrostWire
-        String subFolder = fileTypeFolders.get(fileType);
-        File destFolder = new File(context.getExternalFilesDir(null), subFolder + "/FrostWire");
-        return destFolder;
+        // "Music/FrostWire"
+        String mediaStoreFolderPrefix = fileTypeSubfolder + "/FrostWire";
+
+        String fullOriginalFilePath = f.getAbsolutePath();
+
+        // BTEngine.ctx.dataDir -> /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData
+        // Let's remove this from the fullOriginalFilePath and we should now have only either the file name by itself
+        // or the torrent folders and sub-folders containing it
+        String removedDataPathFromFilePath = fullOriginalFilePath.replace(BTEngine.ctx.dataDir.getAbsolutePath() + "/", "");
+
+        // Single file download, not contained by folders or sub-folders
+        if (removedDataPathFromFilePath.equals(f.getName())) {
+            return mediaStoreFolderPrefix;
+        }
+
+        String fileFoldersWithoutDataPath = removedDataPathFromFilePath.replace(f.getName(), "");
+        return mediaStoreFolderPrefix + "/" + fileFoldersWithoutDataPath;
     }
 
     /**
@@ -221,7 +231,7 @@ public final class AndroidPaths implements SystemPaths {
      * We'll use these for MediaStore relative path prefixes concatenated to "/FrostWire" so the user
      * can easily find what's been downloaded with FrostWire in external folders.
      */
-    public static String getFileTypeExternalRelativeFolderName(byte fileType) {
+    private static String getFileTypeExternalRelativeFolderName(byte fileType) {
         synchronized (fileTypeFoldersLock) {
             // thread safe lazy load check
             if (fileTypeFolders.size() == 0) {

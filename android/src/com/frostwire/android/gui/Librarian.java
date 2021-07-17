@@ -53,6 +53,7 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
+import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -522,7 +523,7 @@ public final class Librarian {
         try {
             OutputStream outputStream = contentResolver.openOutputStream(insertedUri);
             if (outputStream == null) {
-                LOG.error("copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" +insertedUri);
+                LOG.error("copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" + insertedUri);
                 return;
             }
             BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
@@ -554,20 +555,21 @@ public final class Librarian {
         // Add to MediaStore
         ContentResolver resolver = context.getContentResolver();
         byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
-        String subFolder = AndroidPaths.getFileTypeExternalRelativeFolderName(fileType);
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
         Uri mediaStoreCollectionUri = fetcher.getExternalContentUri();
+        String relativeFolderPath = AndroidPaths.getRelativeFolderPath(srcFile);
 
         LOG.info("mediaStoreInsert -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI = " + audioUri);
         LOG.info("mediaStoreInsert -> mediaStoreColectionUri = " + mediaStoreCollectionUri);
+        LOG.info("mediaStoreInsert -> relativeFolderPath: " + relativeFolderPath);
 
         ContentValues values = new ContentValues();
         values.put(MediaColumns.IS_PENDING, 1);
 
-        if (subFolder != null) {
-            values.put(MediaColumns.RELATIVE_PATH, subFolder + "/FrostWire");
+        if (!StringUtils.isNullOrEmpty(relativeFolderPath)) {
+            values.put(MediaColumns.RELATIVE_PATH, relativeFolderPath);
         } else {
-            LOG.info("WARNING, relative subFolder is null for " + srcFile.getAbsolutePath());
+            LOG.info("WARNING, relative relativeFolderPath is null for " + srcFile.getAbsolutePath());
         }
 
         values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
