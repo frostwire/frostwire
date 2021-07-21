@@ -48,7 +48,6 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
-import androidx.annotation.RequiresApi;
 import androidx.loader.content.CursorLoader;
 
 import com.andrew.apollo.MusicPlaybackService;
@@ -879,17 +878,17 @@ public final class MusicUtils {
     }
 
 
-    public static void playFile(final File file) {
-        playFileFromUri(Uri.fromFile(file));
+    public static boolean playFile(final File file) {
+        return playFileFromUri(Uri.fromFile(file));
     }
 
     /**
      * @param uri The source of the file
      */
 
-    public static void playFileFromUri(final Uri uri) {
+    public static boolean playFileFromUri(final Uri uri) {
         if (uri == null || musicPlaybackService == null) {
-            return;
+            return false;
         }
 
         // If this is a file:// URI, just use the path directly instead
@@ -904,10 +903,14 @@ public final class MusicUtils {
 
         try {
             musicPlaybackService.stopPlayer();
-            musicPlaybackService.openFile(filename);
+            if (!musicPlaybackService.openFile(filename)) {
+                return false;
+            }
             musicPlaybackService.play();
+            return true;
         } catch (final Throwable t) {
             LOG.error(t.getMessage(), t);
+            return false;
         }
     }
 

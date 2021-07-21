@@ -6,7 +6,9 @@ import android.util.LongSparseArray;
 
 import androidx.annotation.RequiresApi;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
@@ -39,15 +41,18 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
 
         for (int i = 0; i < items.size(); i++) {
             PlaylistItem item = items.get(i);
+            FWFileDescriptor fd = item.getFD();
 
-            if (item.getFD().deletable) {
+            if (fd.deletable) {
                 useFilePaths = true;
-                files[i] = new File(item.getFD().filePath);
+                files[i] = new File(fd.filePath);
+                list[i] = fd.id;
+                idMap.put((long) fd.id, fd);
             } else {
 
-                list[i] = item.getFD().id;
-                idMap.put((long) item.getFD().id, item.getFD());
-                if (currentItem != null && currentItem.getFD().id == item.getFD().id) {
+                list[i] = fd.id;
+                idMap.put((long) fd.id, fd);
+                if (currentItem != null && currentItem.getFD().id == fd.id) {
                     position = i;
                     //do not break here, otherwise the rest of the playlist ids will be 0ed;
                 }
@@ -55,7 +60,9 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
         }
 
         if (useFilePaths) {
-            MusicUtils.playFile(files[0]);
+            if (!MusicUtils.playFile(files[0])) {
+                MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
+            }
         } else {
             // use media store files/file descriptor ids
             MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
