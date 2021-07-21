@@ -541,12 +541,6 @@ public final class Librarian {
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private void mediaStoreInsert(Context context, File srcFile) {
-        // TODO: Gotta check if a file with the same name already exists
-        // https://stackoverflow.com/questions/60632273/mediastore-contentresolver-insert-creates-copies-instead-of-replacing-the-exis
-        // Problem: we might have an issue with scanning after torrent finished alert which happens
-        // when the app starts. Not sure how to go about that, wish we could store a hash of the file
-        // or actually check for the physical file in external storage before inserting it again
-        // vs the srcFile
         if (srcFile.isDirectory()) {
             return;
         }
@@ -558,6 +552,11 @@ public final class Librarian {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
         Uri mediaStoreCollectionUri = fetcher.getExternalContentUri();
         String relativeFolderPath = AndroidPaths.getRelativeFolderPath(srcFile);
+
+        if (alreadyInMediaStore(context, fetcher, srcFile.getName(), relativeFolderPath)) {
+            LOG.info("mediaStoreInsert: alreadyInMediaStore skipping " + srcFile.getAbsolutePath());
+            return;
+        }
 
         LOG.info("mediaStoreInsert -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI = " + audioUri);
         LOG.info("mediaStoreInsert -> mediaStoreColectionUri = " + mediaStoreCollectionUri);
@@ -599,13 +598,24 @@ public final class Librarian {
         copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
     }
 
+    private boolean alreadyInMediaStore(Context context,
+                                        TableFetcher fetcher,
+                                        String displayName,
+                                        String relativeFolderPath) {
+        String where = MediaColumns.DISPLAY_NAME + " = ? AND " + MediaColumns.RELATIVE_PATH + " = ?";
+        String[] whereArgs = new String[]{displayName, relativeFolderPath};
+        List<FWFileDescriptor> filesInAndroidMediaStore =
+                getFilesInAndroidMediaStore(context,
+                        0, 1, fetcher, where, whereArgs);
+        return filesInAndroidMediaStore.size() > 0;
+    }
+
     private void initHandler() {
         final HandlerThread handlerThread = new HandlerThread("Librarian::handler",
                 android.os.Process.THREAD_PRIORITY_BACKGROUND);
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
     }
-
 
     /**
      * Given a folder path it'll return all the files contained within it and it's subfolders

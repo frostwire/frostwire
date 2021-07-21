@@ -1,3 +1,12 @@
+FrostWire 2.4.0 build 680 - JUL/16/2021
+ - No more WRITE_EXTERNAL permissions required
+ - Android 11+ compatibility updates in the way the app interacts with the Android Media Store API
+ - After Android 10, files can no longer be deleted from "My Files", this has been delegated to
+   the OS's File Manager, less is more.
+ - gradle:4.2.2
+ - minSdkVersion 23 (Android Marshmallow 6.0)
+ - targetSdkVersion 30 (Android 11)
+
 FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
  - Android 11 - first pass of compatibility fixes

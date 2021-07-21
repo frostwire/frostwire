@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
+import com.frostwire.android.gui.adapters.menu.OpenFileExplorerMenuAction;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
@@ -320,6 +321,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new OpenMenuAction(context, fd, getViewPosition(view)));
             }
 
+            items.add(new OpenFileExplorerMenuAction(context, fd));
             items.add(new FileInformationAction(context, fd));
 
             if ((fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
@@ -331,7 +333,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             if (fd.fileType != Constants.FILE_TYPE_APPLICATIONS && numChecked <= 1 &&
-                    fd.fileType != Constants.FILE_TYPE_RINGTONES) {
+                    fd.fileType != Constants.FILE_TYPE_RINGTONES && !SystemUtils.hasAndroid10OrNewer()) {
                 items.add(new RenameFileMenuAction(context, this, fd));
             }
 
@@ -363,7 +365,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 fd.fileType != Constants.FILE_TYPE_RINGTONES) {
             items.add(new SendFileMenuAction(context, fd));
 
-            if (fd.deletable) {
+            if (!SystemUtils.hasAndroid10OrNewer() && fd.deletable) {
                 items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
             }
         }

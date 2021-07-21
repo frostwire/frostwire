@@ -505,4 +505,5 @@
     <string name="dummy_period">/period</string>
     <string name="period_monthly">monthly</string>
     <string name="period_yearly">yearly</string>
+    <string name="open_file_explorer">Open File Explorer</string>
 </resources>
