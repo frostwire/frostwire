@@ -13,10 +13,6 @@ FrostWire 2.4.0 build 681 - AUG/12/2021
  - lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
  - lt:fix bug in parsing chunked encoding
  - lt:fix incorrect reporting of active_duration when entering graceful-pause
- - lt:fix python binding for functions taking string_view
- - lt:fix python binding for torrent_info constructor overloads
- - lt:issue python deprecation warnings for some deprecated functions in the python bindings
- - lt:fix python binding for torrent_info::add_url_seed, add_tracker and add_http_seed
 
 FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
