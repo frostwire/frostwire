@@ -1,3 +1,18 @@
+frostwire (6.9.5) stable; urgency=high
+ * jlibtorrent-1.2.14.0 update
+ * lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+ * lt:make remove_torrent flags be treated as flags (instead of an enum)
+ * lt:improve handling of seed flag in PEX messages
+ * lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
+ * lt:fix bug in parsing chunked encoding
+ * lt:fix incorrect reporting of active_duration when entering graceful-pause
+ * lt:fix python binding for functions taking string_view
+ * lt:fix python binding for torrent_info constructor overloads
+ * lt:issue python deprecation warnings for some deprecated functions in the python bindings
+ * lt:fix python binding for torrent_info::add_url_seed, add_tracker and add_http_seed
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 12 Aug 2021 18:14:00 -0600
+
 frostwire (6.9.4) stable; urgency=high
  * Torrent search results when double clicked or downloaded in bulk by default show partial download dialog
  * Torrentz2 search fixed
