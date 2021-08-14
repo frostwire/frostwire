@@ -27,7 +27,6 @@ apply plugin: 'com.google.firebase.crashlytics'
 buildscript {
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
