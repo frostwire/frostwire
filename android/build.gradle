@@ -35,7 +35,7 @@ buildscript {
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
         classpath 'com.google.gms:google-services:4.3.10'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'
     }
 }
 
@@ -44,7 +44,6 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-
     flatDir { dirs 'libs' }
 }
 
@@ -201,7 +200,7 @@ dependencies {
     implementation 'com.android.billingclient:billing:3.0.3'
     implementation 'com.google.android.gms:play-services-ads:20.0.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.google.android:flexbox:1.1.1'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     // Firebase Crashlytics
     implementation platform('com.google.firebase:firebase-bom:26.7.0')
@@ -227,7 +226,7 @@ dependencies {
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:10.1.2'
     implementation 'com.mopub.mediation:applovin:10.1.1.0'
-    implementation 'com.unity3d.ads:unity-ads:3.6.2'
+    implementation 'com.unity3d.ads:unity-ads:3.7.5'
     implementation 'com.mopub.mediation:unityads:3.6.0.0'
 
     def jlibtorrent_version='1.2.14.0'
