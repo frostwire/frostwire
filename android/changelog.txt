@@ -4,7 +4,7 @@ FrostWire 2.4.0 build 681 - AUG/12/2021
  - After Android 10, files can no longer be deleted from "My Files", this has been delegated to
    the OS's File Manager, less is more.
  - gradle:4.2.2
- - minSdkVersion 23 (Android Marshmallow 6.0)
+ - minSdkVersion 24 (Android 7.0)
  - targetSdkVersion 30 (Android 11)
  - New jlibtorrent 1.2.14.0 (no more netlink sockets, ifaddr sockets)
  - lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
@@ -13,6 +13,7 @@ FrostWire 2.4.0 build 681 - AUG/12/2021
  - lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
  - lt:fix bug in parsing chunked encoding
  - lt:fix incorrect reporting of active_duration when entering graceful-pause
+ - com.google.gms:google-services:4.3.10
 
 FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
