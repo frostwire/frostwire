@@ -14,11 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-import groovy.swing.SwingBuilder
-import groovy.xml.Namespace
-
 apply plugin: 'com.android.application'
 
 apply plugin: 'com.google.gms.google-services'
@@ -31,7 +26,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath 'com.android.tools.build:gradle:7.0.1'
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
         classpath 'com.google.gms:google-services:4.3.10'
@@ -44,24 +39,21 @@ repositories {
     jcenter()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    flatDir { dirs 'libs' }
 }
 
 def manifestVersionCode() {
-    def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
-
-    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
-    def xml = new XmlParser().parse(manifestFile)
-
+    def manifestFile = new File(project.projectDir.absolutePath + '/AndroidManifest.xml')
+    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new groovy.xml.XmlParser().parse(manifestFile)
+    //System.out.println("manifestVersionCode: xml.attributes()[ns.versionCode].toString()=" + xml.attributes()[ns.versionCode].toString())
     return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
 }
 
 def manifestVersionName() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
-
-    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
-    def xml = new XmlParser().parse(manifestFile)
-
+    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new groovy.xml.XmlParser().parse(manifestFile)
+    //System.out.println("manifestVersionName: " + xml.attributes()[ns.versionName].toString())
     return xml.attributes()[ns.versionName].toString()
 }
 
@@ -96,9 +88,8 @@ project.ext.versionName = manifestVersionName()
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 
 android {
-
-    compileSdkVersion 30 // By November 2021, all apps that are being updated must target at least Android 11 (API level 30)
-    buildToolsVersion '29.0.3'
+    // By November 2021, all apps that are being updated must target at least Android 11 (API level 30)
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId 'com.frostwire.android'
@@ -109,8 +100,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11 //VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_11 //VERSION_1_8
     }
 
     sourceSets {
@@ -124,16 +115,12 @@ android {
                 srcDir 'apollo/src'
                 srcDir 'src'
             }
+            jniLibs.srcDirs = ['libs']
         }
     }
 
     lintOptions {
         abortOnError false
-    }
-
-    dexOptions {
-        javaMaxHeapSize "2g"
-        jumboMode = true
     }
 
     signingConfigs {
@@ -229,12 +216,15 @@ dependencies {
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
     implementation 'com.mopub.mediation:unityads:3.6.0.0'
 
-    def jlibtorrent_version='1.2.14.0'
+    def jlibtorrent_version = '1.2.14.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
-    implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar') // att free phones use this and crashes
-    implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar') // oneplus hd1905 uses this
+    implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar')
+    // att free phones use this and crashes
+    implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar')
+    // oneplus hd1905 uses this
 
-    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar') // used by android emulator on macos
+    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
+    // used by android emulator on macos
     implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
 
@@ -280,7 +270,7 @@ class SignatureRequester {
     void ask() {
         System.setProperty('java.awt.headless', 'false')
         if (System.console() == null) { // this is always the case on macOS at least
-            new SwingBuilder().edt {
+            new groovy.swing.SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,
