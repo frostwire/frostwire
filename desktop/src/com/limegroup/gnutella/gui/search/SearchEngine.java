@@ -302,19 +302,14 @@ public abstract class SearchEngine {
                 TORRENTDOWNLOADS,
                 LIMETORRENTS,
                 GLOTORRENTS);
-        List<SearchEngine> list = new ArrayList<>();
-        for (SearchEngine candidate : candidates) {
+        var list = new ArrayList<SearchEngine>();
+        candidates.forEach(candidate -> {
             if (candidate.isReady()) {
                 list.add(candidate);
             }
-        }
+        });
         // ensure that at least one is enabled
-        boolean oneEnabled = false;
-        for (SearchEngine se : list) {
-            if (se.isEnabled()) {
-                oneEnabled = true;
-            }
-        }
+        var oneEnabled = list.stream().anyMatch(SearchEngine::isEnabled);
         if (!oneEnabled) {
             ARCHIVEORG._setting.setValue(true);
         }
@@ -325,13 +320,9 @@ public abstract class SearchEngine {
         if (name.startsWith("Cloud:")) {
             return TELLURIDE;
         }
-        List<SearchEngine> searchEngines = getEngines();
-        for (SearchEngine engine : searchEngines) {
-            if (name.startsWith(engine.getName())) {
-                return engine;
-            }
-        }
-        return null;
+        return getEngines().stream().
+                filter(se -> name.startsWith(se.getName())).findFirst().
+                orElse(null);
     }
 
     public SearchEngineID getId() {
