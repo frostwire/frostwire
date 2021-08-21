@@ -106,17 +106,6 @@ public final class SearchManager {
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<>();
-//        for (SearchResult sr : results) {
-//            if (sr instanceof CrawlableSearchResult) {
-//                CrawlableSearchResult csr = (CrawlableSearchResult) sr;
-//                if (csr.isComplete()) {
-//                    list.add(sr);
-//                }
-//                crawl(performer, csr);
-//            } else {
-//                list.add(sr);
-//            }
-//        }
         results.forEach(sr -> {
             if (sr instanceof CrawlableSearchResult) {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
