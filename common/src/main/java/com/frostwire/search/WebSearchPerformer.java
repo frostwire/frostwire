@@ -25,6 +25,7 @@ import com.frostwire.util.http.HttpClient;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -55,12 +56,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     public static boolean isStreamable(String filename) {
         String ext = FilenameUtils.getExtension(filename);
-        for (String s : STREAMABLE_EXTENSIONS) {
-            if (s.equals(ext)) {
-                return true; // fast return
-            }
-        }
-        return false;
+        return Arrays.asList(STREAMABLE_EXTENSIONS).contains(ext);
     }
 
     public final String getKeywords() {
