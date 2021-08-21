@@ -171,7 +171,12 @@ public final class BTEngine extends SessionManager {
         sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
         LOG.info("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
         LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
-        super.start(params);
+
+        try {
+            super.start(params);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
@@ -351,11 +356,9 @@ public final class BTEngine extends SessionManager {
             priorities = Priority.array(Priority.IGNORE, ti.numFiles());
         }
         if (priorities != null) {
-            boolean changed = false;
             for (int i = 0; i < selection.length; i++) {
                 if (selection[i] && i < priorities.length && priorities[i] == Priority.IGNORE) {
                     priorities[i] = Priority.NORMAL;
-                    changed = true;
                 }
             }
         }

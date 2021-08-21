@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -106,7 +106,18 @@ public final class SearchManager {
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<>();
-        for (SearchResult sr : results) {
+//        for (SearchResult sr : results) {
+//            if (sr instanceof CrawlableSearchResult) {
+//                CrawlableSearchResult csr = (CrawlableSearchResult) sr;
+//                if (csr.isComplete()) {
+//                    list.add(sr);
+//                }
+//                crawl(performer, csr);
+//            } else {
+//                list.add(sr);
+//            }
+//        }
+        results.forEach(sr -> {
             if (sr instanceof CrawlableSearchResult) {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
                 if (csr.isComplete()) {
@@ -116,7 +127,7 @@ public final class SearchManager {
             } else {
                 list.add(sr);
             }
-        }
+        });
         if (!list.isEmpty()) {
             onResults(performer.getToken(), list);
         }
