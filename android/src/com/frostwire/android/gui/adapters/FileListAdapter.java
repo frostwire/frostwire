@@ -50,7 +50,6 @@ import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.adapters.menu.CopyMagnetMenuAction;
 import com.frostwire.android.gui.adapters.menu.DeleteAdapterFilesMenuAction;
 import com.frostwire.android.gui.adapters.menu.FileInformationAction;
-import com.frostwire.android.gui.adapters.menu.OpenFileExplorerMenuAction;
 import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
@@ -321,7 +320,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new OpenMenuAction(context, fd, getViewPosition(view)));
             }
 
-            items.add(new OpenFileExplorerMenuAction(context, fd));
             items.add(new FileInformationAction(context, fd));
 
             if ((fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
