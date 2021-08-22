@@ -313,13 +313,6 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_REQUEST_SHUTDOWN:
                     showShutdownDialog();
                     break;
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    Leaving this code in case I find a solution later.
-//                case Constants.ACTION_PACKAGE_INSTALLED:
-//                    // see UIUtils.openAPK()
-//                    onPackageInstalledCallback(intent.getExtras());
-//                    break;
-////// END OF PACKAGE INSTALLER LOGIC SECTION
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -329,46 +322,6 @@ public class MainActivity extends AbstractActivity implements
             finish();
         }
     }
-
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    Leaving this code in case I find a solution later.
-//    See the commented code in UIUtils.openAPK for details.
-//    private void onPackageInstalledCallback(Bundle extras) {
-//        int status = extras.getInt(PackageInstaller.EXTRA_STATUS);
-//        String message = extras.getString(PackageInstaller.EXTRA_STATUS_MESSAGE);
-//        switch (status) {
-//            case PackageInstaller.STATUS_PENDING_USER_ACTION:
-//                // This test app isn't privileged, so the user has to confirm the install.
-//                Intent confirmIntent = (Intent) extras.get(Intent.EXTRA_INTENT);
-//                //Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
-//                startActivity(confirmIntent); // <-- this call isn't really launching the screen to ask for permissions to install apks
-//                                              // setting <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> on AndroidManifest.xml doesn't work either
-//                break;
-//            case PackageInstaller.STATUS_SUCCESS:
-//                Engine.instance().stopServices(false);
-//                try {
-//                    MusicUtils.getMusicPlaybackService().stop();
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                }
-//                UIUtils.showToastMessage(this, "Install succeeded", Toast.LENGTH_SHORT);
-//                break;
-//            case PackageInstaller.STATUS_FAILURE:
-//            case PackageInstaller.STATUS_FAILURE_ABORTED:
-//            case PackageInstaller.STATUS_FAILURE_BLOCKED:
-//            case PackageInstaller.STATUS_FAILURE_CONFLICT:
-//            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
-//            case PackageInstaller.STATUS_FAILURE_INVALID:
-//            case PackageInstaller.STATUS_FAILURE_STORAGE:
-//                UIUtils.showToastMessage(this, "Install failed! " + status + ", " + message,
-//                        Toast.LENGTH_SHORT);
-//                break;
-//            default:
-//                UIUtils.showToastMessage(this, "Unrecognized status received from installer: " + status,
-//                        Toast.LENGTH_SHORT);
-//        }
-//    }
-////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private void openTorrentUrl(Intent intent) {
         try {
@@ -421,7 +374,6 @@ public class MainActivity extends AbstractActivity implements
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            //checkExternalStoragePermissionsOrBindMusicService();
             checkExternalStoragePermissions();
         }
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
