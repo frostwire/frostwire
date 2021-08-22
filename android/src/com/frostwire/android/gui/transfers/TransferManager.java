@@ -72,12 +72,16 @@ public final class TransferManager {
     private final Object alreadyDownloadingMonitor = new Object();
     private final Object downloadsListMonitor = new Object();
     private final Object downloadsMapMonitor = new Object();
+    private static final Object instanceLock = new Object();
     private final SharedPreferences.OnSharedPreferenceChangeListener onSharedPreferenceChangeListener;
     private volatile static TransferManager instance;
 
+
     public static TransferManager instance() {
         if (instance == null) {
-            instance = new TransferManager();
+            synchronized(instanceLock) {
+                instance = new TransferManager();
+            }
         }
         return instance;
     }
