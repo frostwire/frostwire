@@ -98,25 +98,12 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
             case WRITE_EXTERNAL_STORAGE:
                 permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
                 break;
+            case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
             case READ_EXTERNAL_STORAGE:
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                 break;
-            case EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE:
-                permissions = new String[]{
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                };
-                break;
             case WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE:
-                if (Build.VERSION.SDK_INT >= 23) {
-                    requestWriteSettingsPermissionsAPILevel23(activity);
-                    return;
-                }
-                // this didn't fly on my Android with API Level 23
-                // it might fly on previous versions.
-                permissions = new String[]{
-                        Manifest.permission.WRITE_SETTINGS
-                };
+                requestWriteSettingsPermissionsAPILevel23(activity);
                 break;
             case ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE:
                 permissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -160,8 +147,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         if (SystemUtils.hasAndroid10OrNewer()) {
             return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
         }
-        return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
-                ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
+        return ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED;
     }
 
     public static boolean handleOnWriteSettingsActivityResult(Activity handlerActivity) {
@@ -241,8 +227,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         final Activity activity = activityRef.get();
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
-                if (/*permissions[i].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) ||*/
-                        permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                if (permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setIcon(R.drawable.sd_card_notification);
                     builder.setTitle(R.string.why_we_need_storage_permissions);
@@ -255,6 +240,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                 }
             }
         }
+        LOG.info("onExternalStoragePermissionsResult() " + Manifest.permission.READ_EXTERNAL_STORAGE + " granted");
         return true;
     }
 
