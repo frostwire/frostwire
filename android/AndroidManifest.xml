@@ -43,8 +43,8 @@
 
     <!-- READ_EXTERNAL_STORAGE should allow us to read media files from other apps,
          this should be useful for My Files to at least browse, and open files,
-         but we will no longer have the power to remove files unless we ask Google
-         Play to grant us with WRITE_EXTERNAL_STORAGE special permissions
+         but we will no longer have the power to remove files.
+         Google Play grants special apps only with WRITE_EXTERNAL_STORAGE permissions
 
          The File api comes back in Android 11, however it's really a wrapper
          for accessing the shared external storage and performance will suffer if you
@@ -61,6 +61,7 @@
      We use this permission to allow the user to set ring tones from media files
     -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
