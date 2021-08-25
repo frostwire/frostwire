@@ -35,6 +35,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
+import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.error_code;
@@ -345,13 +346,15 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
 
                     String magnet = dlg.getMagnetUri();
                     List<TcpEndpoint> peers = parsePeers(magnet);
-                    BTEngine.getInstance().download(dlg.getTorrentInfo(),
+                    TorrentInfo torrentInfo = dlg.getTorrentInfo();
+                    BTEngine.getInstance().download(torrentInfo,
                             null,
                             selection,
                             peers,
                             TransferManager.instance().isDeleteStartedTorrentEnabled());
                     dlg.removeTorrentFetcherDownloadFromTransfers();
-                    TransferManager.instance().updateUIBittorrentDownload(BTEngine.getInstance().find(dlg.getTorrentInfo().infoHash()));
+                    TorrentHandle torrentHandle = BTEngine.getInstance().find(torrentInfo.infoHash());
+                    TransferManager.instance().updateUIBittorrentDownload(torrentHandle);
                     UIUtils.showTransfersOnDownloadStart(ctx);
                     MainActivity.refreshTransfers(ctx);
                 } catch (Throwable t) {
