@@ -155,10 +155,8 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                         }
                     }
                     LOG.info("AbstractListAdapter.ViewOnClickListener.onClick()");
-                    onItemClicked(v);
-                } else {
-                    onItemClicked(v);
                 }
+                onItemClicked(v);
             });
         }
         return view;
@@ -481,11 +479,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         if (!inGridMode) {
             TextView title = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_title);
             title.setText(fd.title);
+            TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
             if (fd.fileType == Constants.FILE_TYPE_AUDIO || fd.fileType == Constants.FILE_TYPE_APPLICATIONS) {
-                TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
                 fileExtra.setText(fd.artist);
             } else {
-                TextView fileExtra = findView(view, R.id.view_my_files_thumbnail_list_image_item_extra_text);
                 fileExtra.setText(R.string.empty_string);
             }
             TextView fileSize = findView(view, R.id.view_my_files_thumbnail_list_image_item_file_size);
@@ -576,10 +573,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Resources res = getContext().getResources();
 
-        // TODO: Fix deprecation warning when we hit API 23
-        title.setTextColor(res.getColor(R.color.app_text_primary));
-        text.setTextColor(res.getColor(R.color.app_text_primary));
-        size.setTextColor(res.getColor(R.color.basic_blue_highlight_dark));
+        title.setTextColor(res.getColor(R.color.app_text_primary, null));
+        text.setTextColor(res.getColor(R.color.app_text_primary, null));
+        size.setTextColor(res.getColor(R.color.basic_blue_highlight_dark, null));
     }
 
     private void setInactiveTextColors(View v) {
@@ -592,10 +588,9 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
 
         Resources res = getContext().getResources();
 
-        // TODO: Fix deprecation warning when we hit API 23
-        title.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
-        text.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
-        size.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground));
+        title.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground, null));
+        text.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground, null));
+        size.setTextColor(res.getColor(R.color.my_files_listview_item_inactive_foreground, null));
     }
 
     private boolean showSingleOptions(List<FWFileDescriptor> checked, FWFileDescriptor fd) {
@@ -689,11 +684,10 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             if (SystemUtils.isSecondaryExternalStorageMounted(f.getAbsoluteFile())) {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_mounted);
                 Librarian.instance().deleteFiles(getContext(), fileType, Collections.singletonList(fd));
-                deleteItem(fd);
             } else {
                 UIUtils.showShortMessage(getContext(), R.string.file_descriptor_sd_unmounted);
-                deleteItem(fd);
             }
+            deleteItem(fd);
             return true;
         } else {
             return false;
@@ -733,7 +727,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
         public boolean accept(FileDescriptorItem obj, CharSequence constraint) {
             String keywords = constraint.toString();
 
-            if (keywords == null || keywords.length() == 0) {
+            if (keywords.length() == 0) {
                 return true;
             }
 
