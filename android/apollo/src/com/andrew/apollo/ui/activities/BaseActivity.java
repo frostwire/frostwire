@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.Asyncs;
 
@@ -136,18 +135,6 @@ public abstract class BaseActivity extends AbstractActivity {
         mPlaybackStatus = new PlaybackStatus(this);
         // Initialize the bottom action bar
         initBottomActionBar();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == DangerousPermissionsChecker.WRITE_SETTINGS_PERMISSIONS_REQUEST_CODE) {
-            WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(this);
-            if (helper.onActivityResult(this, requestCode)) {
-                return;
-            }
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

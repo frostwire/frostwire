@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Jose Molina (@votaguz)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,9 +60,6 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
-import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
-import com.frostwire.android.util.SystemUtils;
 
 import java.util.List;
 
@@ -259,10 +256,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 menu.addSubMenu(GROUP_ID, FragmentMenuItems.ADD_TO_PLAYLIST, Menu.NONE, R.string.add_to_playlist)
                         .setIcon(R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
-        if (mItem instanceof Song) {
-            menu.add(GROUP_ID, FragmentMenuItems.USE_AS_RINGTONE, Menu.NONE, getString(R.string.context_menu_use_as_ringtone))
-                    .setIcon(R.drawable.contextmenu_icon_ringtone);
-        }
+
         // More by artist
         menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
                 .setIcon(R.drawable.contextmenu_icon_artist);
@@ -301,10 +295,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     MusicPlaybackService.safePost(() -> MusicUtils.addToPlaylist(getActivity(), songList, playlistId));
                     refresh();
                     return true;
-                case FragmentMenuItems.USE_AS_RINGTONE:
-                    if (onUseAsRingtone()) {
-                        return true;
-                    }
                 case FragmentMenuItems.DELETE:
                     return onDelete(songList);
                 case FragmentMenuItems.MORE_BY_ARTIST:
@@ -323,19 +313,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             }
         }
         return super.onContextItemSelected(item);
-    }
-
-    private boolean onUseAsRingtone() {
-        Activity activity = getActivity();
-        if (activity == null) {
-            return false;
-        }
-        if (mSelectedId == -1) {
-            return false;
-        }
-        WriteSettingsPermissionActivityHelper helper = new WriteSettingsPermissionActivityHelper(getActivity());
-        helper.onSetRingtoneOption(getActivity(), mSelectedId, Constants.FILE_TYPE_AUDIO);
-        return true;
     }
 
     private boolean onRemoveFromRecent() {

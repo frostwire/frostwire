@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,7 +54,6 @@ import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
-import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.services.Engine;
@@ -321,10 +320,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             }
 
             items.add(new FileInformationAction(context, fd));
-
-            if ((fd.fileType == Constants.FILE_TYPE_AUDIO && numChecked <= 1) || fd.fileType == Constants.FILE_TYPE_RINGTONES) {
-                items.add(new SetAsRingtoneMenuAction(context, fd));
-            }
 
             if (fd.fileType == Constants.FILE_TYPE_PICTURES && numChecked <= 1) {
                 items.add(new SetAsWallpaperMenuAction(context, fd));

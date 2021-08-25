@@ -74,7 +74,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.MoPubAdNetwork;
@@ -177,7 +176,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private boolean mIsPaused = false;
 
     private boolean mFromTouch = false;
-    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
     private GestureDetector gestureDetector;
 
     private long lastProgressBarTouched;
@@ -230,8 +228,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mAlbumArt != null) {
             mAlbumArt.setOnTouchListener(gestureListener);
         }
-
-        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
 
         waitingToInitAlbumArtBanner.set(false);
 
@@ -357,10 +353,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 // item
                 toggleFavorite();
                 return true;
-            case R.id.menu_player_audio_player_ringtone:
-                // Set the current track as a ringtone
-                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId(), Constants.FILE_TYPE_AUDIO);
-                return true;
             case R.id.menu_player_audio_player_share:
                 // Share the current meta data
                 shareCurrentTrack();
@@ -414,9 +406,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
-        } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
-            super.onActivityResult(requestCode, resultCode, data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

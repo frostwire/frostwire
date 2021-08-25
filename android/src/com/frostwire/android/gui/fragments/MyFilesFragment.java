@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -63,7 +63,6 @@ import com.frostwire.android.gui.adapters.menu.OpenMenuAction;
 import com.frostwire.android.gui.adapters.menu.RenameFileMenuAction;
 import com.frostwire.android.gui.adapters.menu.SeedAction;
 import com.frostwire.android.gui.adapters.menu.SendFileMenuAction;
-import com.frostwire.android.gui.adapters.menu.SetAsRingtoneMenuAction;
 import com.frostwire.android.gui.adapters.menu.SetAsWallpaperMenuAction;
 import com.frostwire.android.gui.util.ScrollListeners;
 import com.frostwire.android.gui.util.UIUtils;
@@ -711,9 +710,6 @@ public class MyFilesFragment extends AbstractFragment implements LoaderCallbacks
                     break;
                 case R.id.fragment_my_files_action_mode_menu_file_information:
                     new FileInformationAction(context, fd).onClick();
-                    break;
-                case R.id.fragment_my_files_action_mode_menu_use_as_ringtone:
-                    new SetAsRingtoneMenuAction(context, fd).onClick();
                     break;
                 case R.id.fragment_my_files_action_mode_menu_use_as_wallpaper:
                     new SetAsWallpaperMenuAction(context, fd).onClick();
