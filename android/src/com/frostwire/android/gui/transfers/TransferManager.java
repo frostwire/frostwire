@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,7 +79,7 @@ public final class TransferManager {
 
     public static TransferManager instance() {
         if (instance == null) {
-            synchronized(instanceLock) {
+            synchronized (instanceLock) {
                 instance = new TransferManager();
             }
         }
@@ -319,7 +319,7 @@ public final class TransferManager {
                 removed = bittorrentDownloadsList.remove(transfer);
             }
             return removed;
-        } else if (transfer instanceof Transfer) {
+        } else if (transfer != null) {
             return httpDownloads.remove(transfer);
         }
         return false;
@@ -357,7 +357,7 @@ public final class TransferManager {
 
             Uri u = Uri.parse(url);
             String scheme = u.getScheme();
-            if (!scheme.equalsIgnoreCase("file") &&
+            if (scheme != null && !scheme.equalsIgnoreCase("file") &&
                     !scheme.equalsIgnoreCase("http") &&
                     !scheme.equalsIgnoreCase("https") &&
                     !scheme.equalsIgnoreCase("magnet")) {
@@ -368,9 +368,9 @@ public final class TransferManager {
             BittorrentDownload download = null;
 
             if (fetcherListener == null) {
-                if (scheme.equalsIgnoreCase("file")) {
+                if (scheme != null && scheme.equalsIgnoreCase("file")) {
                     BTEngine.getInstance().download(new File(u.getPath()), null, null);
-                } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
+                } else if (scheme != null && scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle));
                     synchronized (downloadsListMonitor) {
                         bittorrentDownloadsList.add(download);
@@ -380,11 +380,11 @@ public final class TransferManager {
                     }
                 }
             } else {
-                if (scheme.equalsIgnoreCase("file")) {
+                if (scheme != null && scheme.equalsIgnoreCase("file")) {
                     // download an existing transfer from a .torrent in My Files (partial download)
                     // See com.frostwire.android.gui.adapters.menu.OpenMenuAction::onClick()
                     fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, new Random(System.currentTimeMillis()).nextLong());
-                } else if (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
+                } else if (scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet"))) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
                     synchronized (downloadsListMonitor) {
@@ -526,13 +526,6 @@ public final class TransferManager {
                     if (bt.isPaused() && !bt.isFinished()) {
                         bt.resume();
                     }
-                } else if (t instanceof HttpDownload) {
-                    // TODO: review this feature taking care of the SD limitations
-                /*if (t.getName().contains("archive.org")) {
-                    if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
-                        ((HttpDownload) t).start(true);
-                    }
-                }*/
                 }
             }
         }
@@ -553,13 +546,6 @@ public final class TransferManager {
                     if (bt.isFinished()) {
                         bt.resume();
                     }
-                } else if (t instanceof HttpDownload) {
-                    // TODO: review this feature taking care of the SD limitations
-                /*if (t.getName().contains("archive.org")) {
-                    if (!t.isComplete() && !((HttpDownload) t).isDownloading()) {
-                        ((HttpDownload) t).start(true);
-                    }
-                }*/
                 }
             }
         }
@@ -626,7 +612,7 @@ public final class TransferManager {
 
     static long getCurrentMountAvailableBytes() {
         StatFs stat = new StatFs(ConfigurationManager.instance().getStoragePath());
-        return ((long) stat.getBlockSizeLong() * (long) stat.getAvailableBlocksLong());
+        return (stat.getBlockSizeLong() * stat.getAvailableBlocksLong());
     }
 
     private void registerPreferencesChangeListener() {
@@ -650,18 +636,25 @@ public final class TransferManager {
         Engine.instance().getThreadPool().execute(() -> {
             BTEngine e = BTEngine.getInstance();
             ConfigurationManager CM = ConfigurationManager.instance();
-            if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED)) {
-                e.downloadRateLimit((int) CM.getLong(key));
-            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED)) {
-                e.uploadRateLimit((int) CM.getLong(key));
-            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS)) {
-                e.maxActiveDownloads((int) CM.getLong(key));
-            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_UPLOADS)) {
-                e.maxActiveSeeds((int) CM.getLong(key));
-            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS)) {
-                e.maxConnections((int) CM.getLong(key));
-            } else if (key.equals(Constants.PREF_KEY_TORRENT_MAX_PEERS)) {
-                e.maxPeers((int) CM.getLong(key));
+            switch (key) {
+                case Constants.PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED:
+                    e.downloadRateLimit((int) CM.getLong(key));
+                    break;
+                case Constants.PREF_KEY_TORRENT_MAX_UPLOAD_SPEED:
+                    e.uploadRateLimit((int) CM.getLong(key));
+                    break;
+                case Constants.PREF_KEY_TORRENT_MAX_DOWNLOADS:
+                    e.maxActiveDownloads((int) CM.getLong(key));
+                    break;
+                case Constants.PREF_KEY_TORRENT_MAX_UPLOADS:
+                    e.maxActiveSeeds((int) CM.getLong(key));
+                    break;
+                case Constants.PREF_KEY_TORRENT_MAX_TOTAL_CONNECTIONS:
+                    e.maxConnections((int) CM.getLong(key));
+                    break;
+                case Constants.PREF_KEY_TORRENT_MAX_PEERS:
+                    e.maxPeers((int) CM.getLong(key));
+                    break;
             }
         });
 
