@@ -225,6 +225,7 @@ public final class LollipopFileSystem implements FileSystem {
             return true;
         } catch (Throwable e) {
             // ignore
+            LOG.error(e.getMessage(), e);
         }
 
         DocumentFile srcF = getFile(app, src, false);

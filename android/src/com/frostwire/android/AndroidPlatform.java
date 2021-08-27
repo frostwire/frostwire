@@ -22,6 +22,8 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Looper;
 
+import androidx.documentfile.provider.DocumentFile;
+
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.swig.libtorrent;
@@ -36,8 +38,6 @@ import com.frostwire.platform.VPNMonitor;
 import com.frostwire.util.Logger;
 
 import java.io.File;
-
-import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron
