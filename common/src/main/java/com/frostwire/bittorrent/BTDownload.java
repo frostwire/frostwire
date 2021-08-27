@@ -307,7 +307,12 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public String getInfoHash() {
-        return th.infoHash().toString().toLowerCase();
+        try {
+            return th.infoHash().toString().toLowerCase();
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+            return null;
+        }
     }
 
     @Override
@@ -381,7 +386,9 @@ public final class BTDownload implements BittorrentDownload {
                 Platforms.get().fileSystem().delete(torrent);
             }
         }
+        //noinspection ResultOfMethodCallIgnored
         engine.resumeDataFile(infoHash).delete();
+        //noinspection ResultOfMethodCallIgnored
         engine.resumeTorrentFile(infoHash).delete();
     }
 
