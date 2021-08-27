@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,7 +214,7 @@ dependencies {
     implementation 'com.applovin:applovin-sdk:10.3.2'
     implementation 'com.mopub.mediation:applovin:10.3.2.0'
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
-    implementation 'com.mopub.mediation:unityads:3.6.0.0'
+    implementation 'com.mopub.mediation:unityads:3.7.5.0'
 
     def jlibtorrent_version = '1.2.14.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')

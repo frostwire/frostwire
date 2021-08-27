@@ -20,6 +20,7 @@ FrostWire 2.4.0 build 681 - AUG/26/2021
  - com.google.firebase:firebase-crashlytics-gradle:2.7.1
  - com.google.android.flexbox:flexbox:3.0.0
  - com.unity3d.ads:unity-ads:3.7.5
+ - com.mopub.mediation:unityads:3.7.5.0
  - com.applovin:applovin-sdk:10.3.2
  - com.mopub.mediation:applovin:10.3.2.0
  - com.google.android.material:material:1.4.0
