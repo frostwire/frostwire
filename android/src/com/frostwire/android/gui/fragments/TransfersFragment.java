@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.fragments;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipData.Item;
@@ -26,16 +28,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-
-import com.frostwire.android.BuildConfig;
-import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
-import com.frostwire.android.gui.tasks.AsyncStartDownload;
-import com.frostwire.util.TaskThrottle;
-import com.google.android.material.tabs.TabLayout;
-
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,9 +40,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.frostwire.android.AndroidPlatform;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
@@ -62,13 +56,13 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
+import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClearableEditTextView;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.android.gui.views.ClickAdapter;
-import com.frostwire.android.gui.views.RichNotification;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
@@ -80,6 +74,8 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.TaskThrottle;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -87,8 +83,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -255,7 +249,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     public void onResume() {
         super.onResume();
         initTimerServiceSubscription();
-        initStorageRelatedRichNotifications(null);
         onTime();
     }
 
@@ -538,9 +531,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden) {
-            initStorageRelatedRichNotifications(null);
-        }
     }
 
     private void showVPNRichToast() {
@@ -551,7 +541,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     @Override
     protected void initComponents(View v, Bundle savedInstanceState) {
-        initStorageRelatedRichNotifications(v); // will hide them and abort half way since we might not be visible
         tabLayout = findView(v, R.id.fragment_transfers_layout_tab_layout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -616,40 +605,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             i.putExtra("from", "transfers");
             ctx.startActivity(i);
         });
-    }
-
-    public void initStorageRelatedRichNotifications(View v) {
-        if (v == null) {
-            v = getView();
-        }
-        RichNotification sdCardNotification = findView(v, R.id.fragment_transfers_sd_card_notification);
-        sdCardNotification.setVisibility(View.GONE);
-        RichNotification internalMemoryNotification = findView(v, R.id.fragment_transfers_internal_memory_notification);
-        internalMemoryNotification.setVisibility(View.GONE);
-        if (!isVisible()) {
-            // this will be invoked later again onResume, don't bother now if it's not visible
-            return;
-        }
-        if (TransferManager.isUsingSDCardPrivateStorage() && !sdCardNotification.wasDismissed()) {
-            String currentPath = ConfigurationManager.instance().getStoragePath();
-            boolean inPrivateFolder = currentPath.contains("Android/data");
-            if (inPrivateFolder) {
-                sdCardNotification.setVisibility(View.VISIBLE);
-                sdCardNotification.setOnClickListener(v12 -> showStoragePreference());
-            }
-        }
-        //if you do have an SD Card mounted and you're using internal memory, we'll let you know
-        //that you now can use the SD Card. We'll keep this for a few releases.
-        File sdCardDir = getBiggestSDCardDir(getActivity());
-        if (com.frostwire.android.util.SystemUtils.isSecondaryExternalStorageMounted(sdCardDir) &&
-                !TransferManager.isUsingSDCardPrivateStorage() &&
-                !internalMemoryNotification.wasDismissed()) {
-            String bytesAvailableInHuman = UIUtils.getBytesInHuman(com.frostwire.android.util.SystemUtils.getAvailableStorageSize(sdCardDir));
-            String internalMemoryNotificationDescription = getString(R.string.saving_to_internal_memory_description, bytesAvailableInHuman);
-            internalMemoryNotification.setDescription(internalMemoryNotificationDescription);
-            internalMemoryNotification.setVisibility(View.VISIBLE);
-            internalMemoryNotification.setOnClickListener(v1 -> showStoragePreference());
-        }
     }
 
     private void setupAdapter(Context context) {
@@ -955,20 +910,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 //might clear.
                 LOG.debug("onClear");
             }
-        }
-    }
-
-    private void showStoragePreference() {
-        Activity activity = getActivity();
-        if (activity == null) {
-            return; // quick return
-        }
-        if (AndroidPlatform.saf()) {
-            StoragePicker.show(activity);
-        } else {
-            Intent i = new Intent(activity, SettingsActivity.class);
-            i.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, ApplicationPreferencesFragment.class.getName());
-            activity.startActivity(i);
         }
     }
 }

@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -28,7 +27,6 @@ import android.widget.TextView;
 
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 
@@ -64,7 +62,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         checkSeedFinishedTorrents.setChecked(CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS));
         checkSeedFinishedTorrentsWifiOnly.setChecked(CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY));
         checkSeedFinishedTorrentsWifiOnly.setEnabled(checkSeedFinishedTorrents.isChecked());
-        checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
+        checkSeedFinishedTorrentsWifiOnly.setTextColor((checkSeedFinishedTorrents.isChecked()) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark, null));
         validate();
     }
 
@@ -95,9 +93,7 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         textStoragePath = findViewById(R.id.view_general_wizard_page_storage_path_textview);
         TextView titleHorizontalBreak = findViewById(R.id.view_general_wizard_page_title_horizontal_break);
 
-        if (AndroidPlatform.saf()) {
-            textStoragePath.setOnClickListener(v -> StoragePicker.show((Activity) getContext()));
-        } else {
+        if (!AndroidPlatform.saf()) {
             titleHorizontalBreak.setVisibility(View.GONE);
             textStoragePathTitle.setVisibility(View.GONE);
             textStoragePath.setVisibility(View.GONE);
@@ -106,8 +102,8 @@ public class GeneralWizardPage extends RelativeLayout implements WizardPageView 
         checkSeedFinishedTorrents = findViewById(R.id.view_general_wizard_page_check_seed_finished_torrents);
         checkSeedFinishedTorrents.setOnCheckedChangeListener((buttonView, isChecked) -> {
             checkSeedFinishedTorrentsWifiOnly.setEnabled(isChecked);
-            checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark));
-            textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.app_text_wizard : R.color.app_text_wizard_dark));
+            checkSeedFinishedTorrentsWifiOnly.setTextColor((isChecked) ? Color.WHITE : getContext().getResources().getColor(R.color.app_text_wizard_dark, null));
+            textWifiOnly.setTextColor(getContext().getResources().getColor(checkSeedFinishedTorrents.isChecked() ? R.color.app_text_wizard : R.color.app_text_wizard_dark, null));
             validate();
         });
 

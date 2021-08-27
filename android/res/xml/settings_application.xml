@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,16 +43,6 @@
             android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
             android:summary="@string/vpn_drop_protection_summary"
             android:title="@string/vpn_drop_protection_title" />
-        <com.frostwire.android.gui.views.preference.KitKatStoragePreference
-            android:key="frostwire.prefs.storage.path"
-            android:summary="@string/storage_preference_summary"
-            android:title="@string/storage_preference_title" />
-        <Preference
-            android:key="frostwire.prefs.storage.path_asf"
-            android:summary="@string/storage_preference_summary"
-            android:title="@string/storage_preference_title">
-            <intent android:action="android.intent.action.OPEN_DOCUMENT_TREE" />
-        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/search_torrent_settings">
@@ -84,16 +74,5 @@
                 android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
                 android:targetPackage="com.frostwire.android" />
         </Preference>
-        <!--<Preference android:title="@string/send_feedback">-->
-        <!--<intent-->
-        <!--android:action="android.intent.action.VIEW"-->
-        <!--android:data="https://support.frostwire.com/hc/en-us/requests/new"/>-->
-        <!--</Preference>-->
-
-        <!--<Preference android:title="@string/join_frostwire_chat">-->
-        <!--<intent-->
-        <!--android:action="android.intent.action.VIEW"-->
-        <!--android:data="http://www.frostwire.com/chat"/>-->
-        <!--</Preference>-->
     </PreferenceCategory>
 </PreferenceScreen>

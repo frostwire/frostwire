@@ -17,9 +17,10 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Intent;
 import android.widget.Toast;
 
@@ -40,8 +41,6 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
-import com.frostwire.android.gui.views.preference.KitKatStoragePreference;
-import com.frostwire.android.gui.views.preference.KitKatStoragePreference.KitKatStoragePreferenceDialog;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
@@ -51,8 +50,6 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -128,21 +125,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         TransferManager.instance().stopHttpTransfers();
         TransferManager.instance().pauseTorrents();
         UIUtils.showShortMessage(getView(), R.string.data_saving_turn_off_transfers);
-    }
-
-    @Override
-    public void onDisplayPreferenceDialog(Preference preference) {
-        DialogFragment dlg = null;
-        if (preference instanceof KitKatStoragePreference) {
-            dlg = KitKatStoragePreferenceDialog.newInstance(preference.getKey());
-        }
-
-        if (dlg != null) {
-            dlg.setTargetFragment(this, 0);
-            dlg.show(getFragmentManager(), DIALOG_FRAGMENT_TAG);
-        } else {
-            super.onDisplayPreferenceDialog(preference);
-        }
     }
 
     private void setupVPNRequirementOption() {

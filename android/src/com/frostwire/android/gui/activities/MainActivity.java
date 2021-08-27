@@ -40,7 +40,6 @@ import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
@@ -51,7 +50,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
@@ -61,7 +59,6 @@ import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
-import com.frostwire.android.gui.dialogs.SDPermissionDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.MyFilesFragment;
@@ -78,7 +75,6 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -91,7 +87,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Stack;
 
@@ -322,6 +317,7 @@ public class MainActivity extends AbstractActivity implements
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
         }
+        super.onNewIntent(intent);
     }
 
     private void openTorrentUrl(Intent intent) {
@@ -369,7 +365,6 @@ public class MainActivity extends AbstractActivity implements
             controller.startWizardActivity();
         }
         checkLastSeenVersionBuild();
-        registerMainBroadcastReceiver();
         syncNavigationMenu();
         updateNavigationMenu();
         //uncomment to test social links dialog
@@ -407,16 +402,6 @@ public class MainActivity extends AbstractActivity implements
         checkers.put(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE, accessCoarseLocationChecker);
         // add more permissions checkers if needed...
         return checkers;
-    }
-
-    private void registerMainBroadcastReceiver() {
-        mainBroadcastReceiver = new MainBroadcastReceiver(this);
-        IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-        try {
-            registerReceiver(mainBroadcastReceiver, bf);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
     }
 
     @Override
@@ -465,10 +450,6 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void onNotifySdCardMounted() {
-        transfers.initStorageRelatedRichNotifications(null);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -496,7 +477,6 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        async(this, MainActivity::checkSDPermission, MainActivity::checkSDPermissionPost);
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -513,17 +493,9 @@ public class MainActivity extends AbstractActivity implements
         SoftwareUpdater.getInstance().checkForUpdate(this);
     }
 
-    private void handleSDPermissionDialogClick(int which) {
-        if (which == Dialog.BUTTON_POSITIVE) {
-            StoragePicker.show(this);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            StoragePicker.handle(this, requestCode, resultCode, data);
-        } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
+        if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
         }
 
@@ -579,8 +551,6 @@ public class MainActivity extends AbstractActivity implements
             onLastDialogButtonPositive();
         } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
             onShutdownDialogButtonPositive();
-        } else if (tag.equals(SDPermissionDialog.TAG)) {
-            handleSDPermissionDialogClick(which);
         }
     }
 
@@ -800,12 +770,14 @@ public class MainActivity extends AbstractActivity implements
         //musicPlaybackService = null;
     }
 
-    //@Override commented override since we are in API 16, but it will in API 23
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            return;
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void performYTSearch(String ytUrl) {
@@ -859,24 +831,11 @@ public class MainActivity extends AbstractActivity implements
         try {
             File data = Platforms.data();
             File parent = data.getParentFile();
-            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent) && !SDPermissionDialog.visible);
+            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent));
         } catch (Throwable e) {
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
             return false;
-        }
-    }
-
-    private void checkSDPermissionPost(boolean showPermissionDialog) {
-        if (showPermissionDialog) {
-            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-            FragmentManager fragmentManager = getFragmentManager();
-            try {
-                if (fragmentManager != null) {
-                    dlg.show(fragmentManager);
-                }
-            } catch (IllegalStateException ignored) {
-            }
         }
     }
 
@@ -909,21 +868,6 @@ public class MainActivity extends AbstractActivity implements
             IOUtils.closeQuietly(outStream);
         }
         return "file://" + target.getAbsolutePath();
-    }
-
-    private static final class MainBroadcastReceiver extends BroadcastReceiver {
-        private final WeakReference<MainActivity> activityRef;
-
-        MainBroadcastReceiver(MainActivity activity) {
-            activityRef = Ref.weak(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Ref.alive(activityRef) && Constants.ACTION_NOTIFY_SDCARD_MOUNTED.equals(intent.getAction())) {
-                activityRef.get().onNotifySdCardMounted();
-            }
-        }
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {

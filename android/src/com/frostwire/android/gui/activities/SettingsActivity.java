@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.gui.fragments.preference.ApplicationPreferencesFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
 
@@ -137,21 +136,8 @@ public final class SettingsActivity extends AbstractActivity
     }
 
     @Override
-    public void startActivity(Intent intent) {
-        if (intent != null && StoragePicker.ACTION_OPEN_DOCUMENT_TREE.equals(intent.getAction())) {
-            StoragePicker.show(this);
-        } else {
-            super.startActivity(intent);
-        }
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            StoragePicker.handle(this, requestCode, resultCode, data);
-            // refresh the fragment
-            switchToFragment(ApplicationPreferencesFragment.class.getName(), null, null);
-        } else if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
+        if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()

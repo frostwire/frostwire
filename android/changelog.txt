@@ -5,6 +5,7 @@ FrostWire 2.4.0 build 681 - AUG/26/2021
    the OS's File Manager, less is more.
  - gradle:4.1.0 -> 4.2.2 -> 7.0.2
  - Java 11 language support, common/ and android/ codebased will be modernized through future updates
+ - Storage location selection feature dropped, the application will use external shared storage where available by default
  - minSdkVersion 24 (Android 7.0)
  - targetSdkVersion 30 (Android 11)
  - New jlibtorrent 1.2.14.0 (no more netlink sockets, ifaddr sockets)
