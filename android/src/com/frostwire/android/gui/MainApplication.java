@@ -27,6 +27,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
@@ -48,6 +49,8 @@ import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.multidex.MultiDexApplication;
 
 import static com.frostwire.android.util.Asyncs.async;
@@ -165,6 +168,11 @@ public class MainApplication extends MultiDexApplication {
 
         private void syncMediaStore() {
             if (Ref.alive(mainAppRef)) {
+                ConfigurationManager CM = ConfigurationManager.instance();
+                if (!CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+                    LOG.info("MainApplication: syncMediaStore() aborted, wizard not done yet.");
+                    return;
+                }
                 Librarian.instance().syncMediaStore(mainAppRef);
             } else {
                 LOG.warn("syncMediaStore() failed, lost MainApplication reference");
