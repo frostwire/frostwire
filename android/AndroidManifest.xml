@@ -52,15 +52,8 @@
          -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!--
-     Ignore Android Studio's Warning, If you remove WRITE_SETTINGS from
-     this Manifest, when the "Modify system settings" appears the user
-     will not be able to Allow modify system settings because the checkbox
-     will be disabled.
-
-     We use this permission to allow the user to set ring tones from media files
-    -->
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <!-- we gotta leave this here for Android 7.0 (24), 7.1.1 (25), 8.0 (26), 8.1 (27) and 9 (28) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" android:requestLegacyExternalStorage="true" tools:ignore="ScopedStorage" />
 
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
