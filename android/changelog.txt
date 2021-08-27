@@ -31,6 +31,7 @@ FrostWire 2.4.0 build 681 - AUG/26/2021
  - com.android.billingclient:billing:4.0.0
  - com.google.android.gms:play-services-ads:20.3.0
  - com.google.code.gson:gson:2.8.8
+ - com.google.re2j:re2j:1.6
 
 FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
