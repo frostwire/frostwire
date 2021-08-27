@@ -60,8 +60,7 @@
 -keep class libcore.io.Memory { *; }
 
 # GMS
--keep class com.google.android.gms.ads.InterstitialAd {*;}
--keep class com.google.android.gms.ads.rewarded.RewardedAdCallback {*;}
+-keep public class com.google.android.gms.** { public protected *; }
 
 # keep all constructors
 -keep class * {
