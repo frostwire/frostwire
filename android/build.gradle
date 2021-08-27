@@ -212,7 +212,7 @@ dependencies {
 
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:10.3.2'
-    implementation 'com.mopub.mediation:applovin:10.1.1.0'
+    implementation 'com.mopub.mediation:applovin:10.3.2.0'
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
     implementation 'com.mopub.mediation:unityads:3.6.0.0'
 
