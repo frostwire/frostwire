@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.activities;
 
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -457,7 +458,8 @@ public class MainActivity extends AbstractActivity implements
 
     private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
+        boolean shouldShowRequestPermissionRationaleForReadExternal = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noAccess())) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         }
