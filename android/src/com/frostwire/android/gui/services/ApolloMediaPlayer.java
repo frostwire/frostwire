@@ -37,36 +37,20 @@ public class ApolloMediaPlayer implements CoreMediaPlayer {
 
         PlaylistItem currentItem = playlist.getCurrentItem();
 
-        boolean useFilePaths = false;
-
         for (int i = 0; i < items.size(); i++) {
             PlaylistItem item = items.get(i);
             FWFileDescriptor fd = item.getFD();
+            list[i] = fd.id;
+            idMap.put((long) fd.id, fd);
 
-            if (fd.deletable) {
-                useFilePaths = true;
-                files[i] = new File(fd.filePath);
-                list[i] = fd.id;
-                idMap.put((long) fd.id, fd);
-            } else {
-
-                list[i] = fd.id;
-                idMap.put((long) fd.id, fd);
-                if (currentItem != null && currentItem.getFD().id == fd.id) {
-                    position = i;
-                    //do not break here, otherwise the rest of the playlist ids will be 0ed;
-                }
+            if (currentItem != null && currentItem.getFD().id == fd.id) {
+                position = i;
+                //do not break here, otherwise the rest of the playlist ids will be 0ed;
             }
         }
 
-        if (useFilePaths) {
-            if (!MusicUtils.playFile(files[0])) {
-                MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
-            }
-        } else {
-            // use media store files/file descriptor ids
-            MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
-        }
+        // use media store files/file descriptor ids
+        MusicUtils.playFDs(list, position, list.length > 1 && MusicUtils.isShuffleEnabled());
     }
 
     @Override
