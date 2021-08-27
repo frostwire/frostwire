@@ -207,8 +207,8 @@ dependencies {
     implementation 'com.mopub.volley:mopub-volley:2.1.0'
 
     // MoPub SDK
-    implementation('com.mopub:mopub-sdk-banner:5.16.3@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-fullscreen:5.16.3@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-banner:5.18.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-fullscreen:5.18.0@aar') { transitive = true }
 
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:10.3.2'
