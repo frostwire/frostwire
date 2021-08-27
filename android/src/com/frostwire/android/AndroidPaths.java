@@ -201,7 +201,7 @@ public final class AndroidPaths implements SystemPaths {
         }
         byte fileType = AndroidPaths.getFileType(f.getAbsolutePath(), true);
 
-        // "Music"
+        // "Music","Movies","Pictures","Download"
         String fileTypeSubfolder = AndroidPaths.getFileTypeExternalRelativeFolderName(fileType);
 
         // "Music/FrostWire"
