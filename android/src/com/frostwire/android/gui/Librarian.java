@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
@@ -270,7 +271,7 @@ public final class Librarian {
      */
     public void scan(final Context context, File file) {
         if (Thread.currentThread() != handler.getLooper().getThread()) {
-            SystemUtils.safePost(handler, () -> scan(context, file));
+            SystemUtils.safePost(handler, () -> scan(context, file, Transfers.getIgnorableFiles()));
             return;
         }
         scan(context, file, Transfers.getIgnorableFiles());
@@ -316,21 +317,13 @@ public final class Librarian {
         if (!Ref.alive(contextRef)) {
             return;
         }
-
-        if (SystemUtils.hasAndroid10OrNewer()) {
-            return;
-        }
-
         Context context = contextRef.get();
-
         Set<File> ignorableFiles = Transfers.getIgnorableFiles();
-
         syncMediaStore(context, Constants.FILE_TYPE_AUDIO, ignorableFiles);
         syncMediaStore(context, Constants.FILE_TYPE_PICTURES, ignorableFiles);
         syncMediaStore(context, Constants.FILE_TYPE_VIDEOS, ignorableFiles);
         syncMediaStore(context, Constants.FILE_TYPE_RINGTONES, ignorableFiles);
         syncMediaStore(context, Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
-
         Platforms.fileSystem().scan(Platforms.torrents());
         Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
     }
@@ -375,8 +368,16 @@ public final class Librarian {
                 ids.add(id);
             }
         }
-        cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
-        c.close();
+
+        try {
+            if (ids.size()  >  0) {
+                cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
+            }
+        } catch (Throwable e) {
+            Log.e(TAG, "General failure during sync of MediaStore", e);
+        } finally {
+            c.close();
+        }
     }
 
     private List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, int offset, int pageSize, TableFetcher fetcher) {
@@ -550,7 +551,7 @@ public final class Librarian {
         ContentResolver resolver = context.getContentResolver();
         byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-        Uri mediaStoreCollectionUri = fetcher.getExternalContentUri();
+        Uri mediaStoreCollectionUri = Objects.requireNonNull(fetcher).getExternalContentUri();
         String relativeFolderPath = AndroidPaths.getRelativeFolderPath(srcFile);
 
         if (alreadyInMediaStore(context, fetcher, srcFile.getName(), relativeFolderPath)) {
@@ -559,7 +560,7 @@ public final class Librarian {
         }
 
         LOG.info("mediaStoreInsert -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI = " + audioUri);
-        LOG.info("mediaStoreInsert -> mediaStoreColectionUri = " + mediaStoreCollectionUri);
+        LOG.info("mediaStoreInsert -> mediaStoreCollectionUri = " + mediaStoreCollectionUri);
         LOG.info("mediaStoreInsert -> relativeFolderPath: " + relativeFolderPath);
 
         ContentValues values = new ContentValues();
@@ -598,6 +599,7 @@ public final class Librarian {
         copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private boolean alreadyInMediaStore(Context context,
                                         TableFetcher fetcher,
                                         String displayName,
@@ -636,6 +638,7 @@ public final class Librarian {
             try {
                 fs = currentFolder.listFiles();
             } catch (SecurityException e) {
+                LOG.error(e.getMessage(), e);
             }
 
             if (fs != null && fs.length > 0) {
