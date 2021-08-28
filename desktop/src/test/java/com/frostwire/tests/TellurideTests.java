@@ -174,7 +174,7 @@ public class TellurideTests {
         };
 
         TellurideLauncher.launch(new File("/Users/gubatron/workspace.frostwire/frostwire/telluride/telluride" + executableSuffix),
-                "https://www.instagram.com/tv/CDC5ludJazw/", // Backing up an Instagram Live video: Bouldering Session at Movement Baker by Gubatron
+                "https://www.instagram.com/p/CTF5pA0jNZ8/", // Tristan de Crusher, IG
                 new File("/Users/gubatron/FrostWire/Torrent Data"),
                 false,
                 false,

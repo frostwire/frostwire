@@ -1,3 +1,12 @@
+build 17 - aug/27/2021
+ - pip-21.2.4
+ - pylint-2.10.2
+ - astroid-2.7.2
+ - youtube_dl-2021.6.6
+ - sanic-21.6.2
+ - websockets-9.1
+ - pyinstaller-4.5.1
+
 build 16 - jun/07/2021
  - pip-21.1.2
  - pylint-2.8.3
@@ -5,14 +14,14 @@ build 16 - jun/07/2021
  - youtube_dl-2021.6.6
  - sanic-21.3.4
  - pyinstaller-4.3
-       
+
 build 15 - apr/06/2021
  - NEW: --server mode, run teluride as an RPC web server
  - python: pylint-2.7.4
  - python: youtube_dl-2021.4.7
  - python: astroid-2.5.2
  - python: sanic-21.3.2
- - python: sanic_routing-0.5.2    
+ - python: sanic_routing-0.5.2
  - python: httptools-0.1.1
  - python: ujson-4.0.2
  - python: uvloop-0.15.2

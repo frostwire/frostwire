@@ -15,10 +15,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
+#set -x
 PYINSTALLER_CMD="pyinstaller"
 PYLINT_CMD="pylint3"
 
-source common.sh
+source ./common.sh
 
 if [ ismac ] || [ iswindows ]
 then
@@ -89,3 +90,4 @@ then
   cleanup
   ls -lth
 fi
+#set +x
