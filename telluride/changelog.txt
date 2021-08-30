@@ -3,11 +3,14 @@ build 17 - aug/27/2021
  - pylint-2.10.2
  - astroid-2.7.2
  - youtube_dl-2021.6.6
- - sanic-21.6.2
  - websockets-9.1
  - pyinstaller-4.5.1
 
+NOTES:
+ - can't update to sanic-21.6.2, breaks with ModuleNotFoundError: No module named 'websockets.legacy.protocol'
+
 build 16 - jun/07/2021
+ - built with python 3.6.9
  - pip-21.1.2
  - pylint-2.8.3
  - astroid-2.5.6

@@ -38,7 +38,9 @@ ${PIP_CMD} install --upgrade pip
 ${PIP_CMD} install --upgrade pylint
 ${PIP_CMD} install --upgrade youtube_dl
 ${PIP_CMD} install --upgrade pycryptodome
-${PIP_CMD} install --upgrade sanic
+# breaks after 21.6.0 with ModuleNotFoundError: No module named 'websockets.legacy.protocol'
+# Waiting to hear from sanic team at https://github.com/sanic-org/sanic/issues/2227
+${PIP_CMD} install --upgrade sanic==21.3.4
 ${PIP_CMD} install --upgrade ${PYINSTALLER_PACKAGE}
 
 ${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller
