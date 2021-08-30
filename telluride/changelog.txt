@@ -3,7 +3,6 @@ build 17 - aug/27/2021
  - pylint-2.10.2
  - astroid-2.7.2
  - youtube_dl-2021.6.6
- - websockets-9.1
  - pyinstaller-4.5.1
 
 NOTES:
