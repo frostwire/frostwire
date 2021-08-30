@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 ##########################################################################
@@ -21,7 +20,7 @@
 # Python3 by default for macOS (and Windows to be tested)
 PIP_CMD='python3 -m pip'
 PYINSTALLER_PACKAGE='pyinstaller'
-source common.sh
+source ./common.sh
 
 if [ isdocker == ${FALSE} ] && [ isubuntu == ${TRUE} ]
 then
