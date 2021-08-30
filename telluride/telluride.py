@@ -36,6 +36,8 @@ def welcome():
     print()
     print("Telluride Cloud Video Downloader. Build " + str(BUILD))
     print("Copyright 2020-{} FrostWire LLC. Licensed under Apache 2.0.".format(datetime.today().year))
+    print("Python {}".format(sys.version))
+    print("{}".format(sys.version_info))
     print()
 
 def prepare_options_parser(parser):
