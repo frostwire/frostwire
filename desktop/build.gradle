@@ -3,6 +3,7 @@
  gradle build - builds code and creates a single jar in build/libs/frostwire.jar
  gradle clean - cleans the build.
  gradle tasks - shows available tasks.
+ gradle run - runs the app
 
  Make sure ${ANT_HOME} is properly set for these tasks to work
  gradle gettextExtract - extract all the strings from the sourcecode into frostwire.pot
@@ -14,6 +15,7 @@ group 'com.frostwire'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -24,6 +26,22 @@ compileJava {
     options.encoding = '8859_1'
     options.fork = true
     options.compilerArgs += ["-Xlint:deprecation"]
+}
+
+application {
+    mainClass = 'com.limegroup.gnutella.gui.Main'
+		applicationDefaultJvmArgs = [
+		    '-Djava.library.path=lib/native',
+				'-Xms64m',
+				'-Xmx512m',
+				'-Xss256k',
+		    '-Dcom.sun.management.jmxremote.port=9595',
+			  '-Dcom.sun.management.jmxremote.ssl=false',
+				'-Dcom.sun.management.jmxremote.authenticate=false',
+				'-Djava.rmi.server.hostname=127.0.0.1',
+				'-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
+				'-Ddebug=1'
+		]
 }
 
 repositories {
