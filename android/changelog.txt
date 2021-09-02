@@ -1,4 +1,4 @@
-FrostWire 2.4.0 build 681 - AUG/26/2021
+FrostWire 2.4.0 build 681 - SEP/02/2021
  - WRITE_EXTERNAL and WRITE_SETTINGS permissions no longer required
  - Android 11+ compatibility updates in the way the app interacts with the Android Media Store API
  - After Android 10, files can no longer be deleted from "My Files", this has been delegated to
@@ -10,6 +10,7 @@ FrostWire 2.4.0 build 681 - AUG/26/2021
  - targetSdkVersion 30 (Android 11)
  - New jlibtorrent 1.2.14.0 (no more netlink sockets, ifaddr sockets)
  - Set as Ringtone action removed (needed WRITE_SETTINGS) permission
+ - Soundcloud search fixed
  - lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
  - lt:make remove_torrent flags be treated as flags (instead of an enum)
  - lt:improve handling of seed flag in PEX messages
