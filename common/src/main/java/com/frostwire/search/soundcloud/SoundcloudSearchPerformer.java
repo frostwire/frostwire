@@ -29,8 +29,8 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "6JcMSl6wQUuPYeBzmXIOpxpp2VlPrIXE";
-    private static final String SOUNDCLOUD_APP_VERSION = "1622710435";
+    private static final String SOUNDCLOUD_CLIENTID = "yemPGqAHfyjNqV0UFzbNsjbRWGsJRHLO";
+    private static final String SOUNDCLOUD_APP_VERSION = "1630571747";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
@@ -45,29 +45,16 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         if (json.contains("\"collection\":")) {
             SoundcloudResponse obj = JsonUtils.toObject(json, SoundcloudResponse.class);
             if (obj != null && obj.collection != null) {
-                for (SoundcloudItem item : obj.collection) {
-                    if (item != null && item.isValidSearchResult(fromPastedUrl)) {
-                        try {
-                            SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                            r.add(sr);
-                        } catch (Throwable ignored) {
-                        }
-                    }
-                }
+                obj.collection.stream().
+                        filter(SoundcloudItem::isValidSearchResult).
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
             }
         } else if (json.contains("\"tracks\":")) {
             SoundcloudPlaylist obj = JsonUtils.toObject(json, SoundcloudPlaylist.class);
             if (obj != null && obj.tracks != null) {
-                for (SoundcloudItem item : obj.tracks) {
-                    if (item != null && item.isValidSearchResult(fromPastedUrl)) {
-                        try {
-                            SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                            r.add(sr);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
+                obj.tracks.stream().
+                        filter(SoundcloudItem::isValidSearchResult).
+                        forEach(item -> r.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
             }
         } else { // assume it's a single item
             SoundcloudItem item = JsonUtils.toObject(json, SoundcloudItem.class);
@@ -90,12 +77,9 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         SoundcloudResponse obj = JsonUtils.toObject(page, SoundcloudResponse.class);
         // can't use fromJson here due to the isStopped call
         if (obj != null && obj.collection != null) {
-            for (SoundcloudItem item : obj.collection) {
-                if (!isStopped() && item != null && item.isValidSearchResult()) {
-                    SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
-                    result.add(sr);
-                }
-            }
+            obj.collection.stream().
+                    filter(item -> !isStopped() && item.isValidSearchResult()).
+                    forEach(item -> result.add(new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION)));
         }
         return result;
     }
