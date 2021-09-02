@@ -107,10 +107,10 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
         }
         SdkConfiguration sdkConfiguration = builder.build();
-        fixExecutor(true);
+        //fixExecutor(true);
 
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
-            fixExecutor(false);
+            //fixExecutor(false);
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
@@ -120,24 +120,25 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }
 
-    private void fixExecutor(boolean change) {
-        try {
-            LOG.info("MoPub -> fixExecutor with change=" + change);
-            Field f = Reflection.getPrivateField(AsyncTask.class, "sDefaultExecutor");
-
-            Field modifiersField = Field.class.getDeclaredField("accessFlags");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-
-            if (change) {
-                f.set(null, AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                f.set(null, AsyncTask.SERIAL_EXECUTOR);
-            }
-        } catch (Exception e) {
-            LOG.info("MoPub -> fixExecutor error change=" + change + " msg=" + e.getMessage());
-        }
-    }
+// TODO: Remove completely if this is no longer needed and we don't see any weird crashes, it's been a while
+//    private void fixExecutor(boolean change) {
+//        try {
+//            LOG.info("MoPub -> fixExecutor with change=" + change);
+//            Field f = Reflection.getPrivateField(AsyncTask.class, "sDefaultExecutor");
+//
+//            Field modifiersField = Field.class.getDeclaredField("accessFlags");
+//            modifiersField.setAccessible(true);
+//            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+//
+//            if (change) {
+//                f.set(null, AsyncTask.THREAD_POOL_EXECUTOR);
+//            } else {
+//                f.set(null, AsyncTask.SERIAL_EXECUTOR);
+//            }
+//        } catch (Exception e) {
+//            LOG.info("MoPub -> fixExecutor error change=" + change + " msg=" + e.getMessage());
+//        }
+//    }
 
     private static void loadConsentDialogAsync(MoPubAdNetwork mopubAdNetwork) {
         PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
