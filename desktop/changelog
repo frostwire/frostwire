@@ -1,4 +1,5 @@
 frostwire (6.9.5) stable; urgency=high
+ * Telluride Cloud Video Downloader build 17
  * SC search fixed
  * jlibtorrent-1.2.14.0 update
  * dev: common java source code now has Java 11 support. cleanups.
@@ -9,7 +10,7 @@ frostwire (6.9.5) stable; urgency=high
  * lt:fix bug in parsing chunked encoding
  * lt:fix incorrect reporting of active_duration when entering graceful-pause
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 02 Sep 2021 14:51:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 02 Sep 2021 22:17:00 -0600
 
 frostwire (6.9.4) stable; urgency=high
  * Torrent search results when double clicked or downloaded in bulk by default show partial download dialog
