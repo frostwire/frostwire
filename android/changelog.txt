@@ -36,6 +36,7 @@ FrostWire 2.4.0 build 681 - SEP/03/2021
  - com.google.code.gson:gson:2.8.8
  - com.google.re2j:re2j:1.6
  - com.squareup.okhttp3:okhttp:5.0.0-alpha.2
+ - com.android.tools.build:gradle:7.0.2
 
 FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
  - We're submitting this to Google Play so they don't remove the app but it's broken
