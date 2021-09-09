@@ -214,7 +214,7 @@ dependencies {
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
     implementation 'com.mopub.mediation:unityads:3.7.5.0'
 
-    def jlibtorrent_version = '1.2.14.0'
+    def jlibtorrent_version = '1.2.14.1'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
 
     // att free phones use this and crashes
@@ -224,9 +224,9 @@ dependencies {
     implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar')
 
     // used by android emulator on macos
-    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
+    //implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
 
-    implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
+    //implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
 
 class DeployRelease extends DefaultTask {
