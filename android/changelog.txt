@@ -8,7 +8,7 @@ FrostWire 2.4.1 build 682 - SEP/12/2021
  - Storage location selection feature dropped, the application will use external shared storage where available by default
  - minSdkVersion 24 (Android 7.0)
  - targetSdkVersion 30 (Android 11)
- - New jlibtorrent 1.2.14.0 (no more netlink sockets, ifaddr sockets)
+ - New jlibtorrent 1.2.14.1 (no more netlink sockets, ifaddr sockets)
  - Set as Ringtone action removed (needed WRITE_SETTINGS) permission
  - Soundcloud search fixed
  - lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
