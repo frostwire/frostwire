@@ -74,7 +74,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
         android:theme="@style/Theme.FrostWire"
-        tools:replace="android:label">
+        >
 
         <meta-data
             android:name="com.google.android.gms.version"
