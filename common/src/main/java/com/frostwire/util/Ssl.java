@@ -120,17 +120,18 @@ public final class Ssl {
                 "update.frostwire.com",
                 "www.1377x.to",
                 "www.limetorrents.info",
-                "magnetdl.com",
+                "www.limetorrents.pro",
                 "www.magnetdl.com",
                 "www.pirate-bay.net",
                 "www.torlock.com",
-                "www.torrentdownloads.me",
                 "www.yify-torrent.org",
                 "www.youtube.com",
                 "yify-torrent.cc",
                 "youtu.be",
                 "zoink.ch",
                 "zooqle.com",
+                "www.torrentdownloads.me",
+                "www.torrentdownloads.pro"
         };
 
         private static final HashSet<String> validDomainsSet = new HashSet<>();
