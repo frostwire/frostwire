@@ -1,25 +1,26 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import com.google.android.material.tabs.TabLayout;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -34,11 +35,11 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.util.Ref;
+import com.google.android.material.tabs.TabLayout;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class SearchInputView extends LinearLayout {
     private final TextInputClickListener textInputListener;
@@ -87,7 +88,7 @@ public class SearchInputView extends LinearLayout {
     public void setShowKeyboardOnPaste(boolean show) {
         textInput.setShowKeyboardOnPaste(show);
     }
-    
+
     public void setOnSearchListener(OnSearchListener listener) {
         this.onSearchListener = listener;
     }
@@ -99,11 +100,11 @@ public class SearchInputView extends LinearLayout {
     public String getText() {
         return textInput.getText();
     }
-    
+
     public void setHint(String hint) {
         textInput.setHint(hint);
     }
-    
+
     public void setText(String text) {
         textInput.setText(text);
     }
@@ -218,11 +219,14 @@ public class SearchInputView extends LinearLayout {
 
     public void switchToThe(boolean right) {
         int currentTabPosition = tabLayout.getSelectedTabPosition();
-        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition ) % 6;
+        int nextTabPosition = (right ? ++currentTabPosition : --currentTabPosition) % 6;
         if (nextTabPosition == -1) {
             nextTabPosition = 5;
         }
-        tabLayout.getTabAt(nextTabPosition).select();
+        TabLayout.Tab tabAt = tabLayout.getTabAt(nextTabPosition);
+        if (tabAt != null) {
+            tabAt.select();
+        }
     }
 
     private void tabItemFileTypeClick(final int fileType) {
@@ -232,17 +236,32 @@ public class SearchInputView extends LinearLayout {
 
     public interface OnSearchListener {
         void onSearch(View v, String query, int mediaTypeId);
+
         void onMediaTypeSelected(View v, int mediaTypeId);
+
         void onClear(View v);
     }
 
     public void updateFileTypeCounter(byte fileType, int numFiles) {
         try {
-            String numFilesStr = String.valueOf(numFiles);
-            if (numFiles > 999) {
-                numFilesStr = "+1k";
+            String attemptBelow1k;
+            try {
+                attemptBelow1k = String.valueOf(numFiles);
+            } catch (Throwable t) {
+                attemptBelow1k = "0";
             }
-            tabLayout.getTabAt(toFileTypeTab.get(fileType).position).setText(numFilesStr);
+            final String numFilesStr = (numFiles > 999) ? "+1k" : attemptBelow1k;
+            Handler h = new Handler(Looper.getMainLooper());
+            h.post(() -> {
+                if (tabLayout == null) {
+                    return;
+                }
+                int position = toFileTypeTab.get(fileType).position;
+                TabLayout.Tab tabAt = tabLayout.getTabAt(position);
+                if (tabAt != null) {
+                    tabAt.setText(numFilesStr);
+                }
+            });
         } catch (Throwable e) {
             // NPE
         }
