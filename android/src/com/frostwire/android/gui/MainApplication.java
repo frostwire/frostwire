@@ -17,9 +17,12 @@
 
 package com.frostwire.android.gui;
 
+import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.RunStrict.runStrict;
+
 import android.content.Context;
-import android.os.Build;
-import android.view.ViewConfiguration;
+
+import androidx.multidex.MultiDexApplication;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
@@ -27,11 +30,9 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -45,16 +46,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.multidex.MultiDexApplication;
-
-import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * @author gubatron
@@ -101,20 +94,6 @@ public class MainApplication extends MultiDexApplication {
 
         NetworkManager.create(this);
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
-    }
-
-    private void ignoreHardwareMenu() {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            @SuppressWarnings("JavaReflectionMemberAccess")
-            Field f = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (f != null) {
-                f.setAccessible(true);
-                f.setBoolean(config, false);
-            }
-        } catch (Throwable e) {
-            // ignore
-        }
     }
 
     private void initializeCrawlPagedWebSearchPerformer(Context context) {
