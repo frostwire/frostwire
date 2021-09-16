@@ -208,9 +208,8 @@ public final class Engine implements IEngineService {
                 }
             }, 0);
         } catch (SecurityException execution) {
-            Handler handler = new Handler(Looper.getMainLooper());
             WeakReference<Context> contextRef = Ref.weak(context);
-            handler.post(() -> {
+            UIUtils.postToUIThread(() -> {
                 try {
                     if (Ref.alive(contextRef)) {
                         UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);

@@ -29,7 +29,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Process;
 import android.os.StatFs;
 import android.provider.BaseColumns;
@@ -38,6 +37,7 @@ import android.widget.ImageView;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.http.OKHTTPClient;
@@ -332,7 +332,7 @@ public final class ImageLoader {
             if (p.filter != null) {
                 rc.transform(new FilterWrapper(p.filter));
             }
-            new Handler(Looper.getMainLooper()).post(
+            UIUtils.postToUIThread(
                     () -> {
                         try {
                             if (!Ref.alive(targetRef)) {
