@@ -37,6 +37,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
@@ -193,7 +194,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     protected void ensureTorrentHandleAsync() {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
+        if (UIUtils.isUIThread()) {
             async(this, AbstractTransferDetailFragment::ensureTorrentHandle);
         } else {
             ensureTorrentHandle();
