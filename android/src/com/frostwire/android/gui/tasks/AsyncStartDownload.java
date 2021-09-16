@@ -68,8 +68,7 @@ public class AsyncStartDownload {
                 Ref.free(ctxRef);
                 return;
             }
-            Handler uiHandler = new Handler(Looper.getMainLooper());
-            uiHandler.postAtFrontOfQueue(() -> {
+            UIUtils.postToUIThreadAtFront(() -> {
                 if (!Ref.alive(ctxRef)) {
                     Ref.free(ctxRef);
                     return;

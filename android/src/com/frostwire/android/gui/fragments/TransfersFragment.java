@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -69,6 +68,7 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.TransfersNoSeedsView;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
@@ -177,7 +177,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         TransferManager tm = TransferManager.instance();
         boolean bittorrentDisconnected = tm.isBittorrentDisconnected();
         final List<Transfer> transfers = tm.getTransfers();
-        if (transfers != null && transfers.size() > 0) {
+        if (transfers.size() > 0) {
             if (someTransfersComplete(transfers) || someTransfersErrored(transfers)) {
                 menu.findItem(R.id.fragment_transfers_menu_clear_all).setVisible(true);
             }
@@ -358,7 +358,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (transferStatus == selectedStatus) {
                 TabLayout.Tab tab = tabLayout.getTabAt(i);
                 if (tab != null && !tab.isSelected()) {
-                    if (Looper.myLooper() == Looper.getMainLooper()) {
+                    if (UIUtils.isUIThread()) {
                         tab.select();
                     } else {
                         try {
@@ -372,7 +372,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                                     LOG.error("onTime() " + t.getMessage(), t);
                                 }
                             });
-
                         } catch (Throwable ignored) {
                         }
                     }
