@@ -58,7 +58,6 @@ public final class AndroidPlatform extends AbstractPlatform {
         return null;
     }
 
-    @Override
     public boolean isUIThread() {
         return Looper.myLooper() == Looper.getMainLooper();
     }
