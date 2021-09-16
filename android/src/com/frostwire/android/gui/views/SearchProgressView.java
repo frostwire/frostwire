@@ -43,8 +43,6 @@ public class SearchProgressView extends LinearLayout {
     private TextView textTryOtherKeywordsOrFilters;
     private TextView textTryFrostWirePlus;
     private TextView textNoDataConnection;
-    private String stringTryOtherKeywords;
-    private String stringTryChangingAppliedFilters;
 
     private boolean progressEnabled;
     private CurrentQueryReporter currentQueryReporter;
@@ -87,13 +85,13 @@ public class SearchProgressView extends LinearLayout {
     }
 
     private void hideRetryViews() {
-        if (textTryOtherKeywordsOrFilters != null || !isDataUp) {
+        if (textTryOtherKeywordsOrFilters != null) {
             textTryOtherKeywordsOrFilters.setVisibility(View.GONE);
         }
-        if (textTryFrostWirePlus != null || !isDataUp) {
+        if (textTryFrostWirePlus != null) {
             textTryFrostWirePlus.setVisibility(View.GONE);
         }
-        if (isDataUp) {
+        if (isDataUp && textNoDataConnection != null) {
             textNoDataConnection.setVisibility(GONE);
         }
     }
@@ -113,9 +111,7 @@ public class SearchProgressView extends LinearLayout {
         textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
         textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
         textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
-        stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
-        stringTryChangingAppliedFilters = getResources().getString(R.string.try_changing_applied_filters);
-
+        String stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
         textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
@@ -158,10 +154,6 @@ public class SearchProgressView extends LinearLayout {
 
     public void setCurrentQueryReporter(CurrentQueryReporter currentQueryReporter) {
         this.currentQueryReporter = currentQueryReporter;
-    }
-
-    public void setKeywordFiltersApplied(boolean filtersApplied) {
-        textTryOtherKeywordsOrFilters.setText(filtersApplied ? stringTryChangingAppliedFilters : stringTryOtherKeywords);
     }
 
     public interface CurrentQueryReporter {
