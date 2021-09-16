@@ -25,7 +25,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.LruCache;
@@ -33,6 +32,7 @@ import android.util.LruCache;
 import androidx.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
@@ -464,7 +464,7 @@ public final class ImageCache {
 
     private void waitUntilUnpaused() {
         synchronized (mPauseLock) {
-            if (Looper.myLooper() != Looper.getMainLooper()) {
+            if (!UIUtils.isUIThread()) {
                 while (mPauseDiskAccess) {
                     try {
                         mPauseLock.wait();

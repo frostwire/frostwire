@@ -69,6 +69,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.TaskThrottle;
@@ -813,8 +814,7 @@ public class MusicPlaybackService extends JobIntentService {
             if (TaskThrottle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
                 SystemUtils.safePost(mPlayerHandler, () -> {
                     Bitmap albumArt = getAlbumArt();
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(() -> {
+                    UIUtils.postToUIThread(() -> {
                         try {
                             buildNotificationWithAlbumArtPost(albumArt);
                         } catch (Throwable t) {

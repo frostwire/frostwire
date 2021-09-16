@@ -1251,8 +1251,7 @@ public final class MusicUtils {
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
 
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
+            UIUtils.postToUIThread(() -> {
                         AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
                         refresh();
                     }
