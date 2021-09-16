@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -45,7 +45,6 @@ import com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.search.KeywordFilter;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -57,7 +56,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -74,7 +73,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private int fileType;
 
     private final ImageLoader thumbLoader;
-    private final List<KeywordFilter> keywordFiltersPipeline;
     private final AtomicLong lastFilterCallTimestamp = new AtomicLong();
     private FilteredSearchResults cachedFilteredSearchResults = null;
 
@@ -84,7 +82,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         this.previewClickListener = new PreviewClickListener(context, this);
         this.fileType = NO_FILE_TYPE;
         this.thumbLoader = ImageLoader.getInstance(context);
-        this.keywordFiltersPipeline = new LinkedList<>();
     }
 
     public int getFileType() {
@@ -94,12 +91,14 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public void setFileType(int fileType) {
         this.fileType = fileType;
         cachedFilteredSearchResults = null;
-        filter();
+        UIUtils.HandlerFactory.postTo(UIUtils.HandlerThreadName.SEARCH_PERFORMER, this::filter);
     }
 
     public void addResults(List<? extends SearchResult> completeList, List<? extends SearchResult> filteredList) {
         visualList.addAll(filteredList); // java, java, and type erasure
-        list.addAll(completeList);
+        synchronized (listLock) {
+            list.addAll(completeList);
+        }
         notifyDataSetChanged();
     }
 
@@ -107,7 +106,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public void clear() {
         super.clear();
         cachedFilteredSearchResults = null;
-        clearKeywordFilters();
     }
 
     @Override
@@ -123,8 +121,8 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private void maybeMarkTitleOpened(View view, SearchResult sr) {
-        int clickedColor = getContext().getResources().getColor(R.color.my_files_listview_item_inactive_foreground);
-        int unclickedColor = getContext().getResources().getColor(R.color.app_text_primary);
+        int clickedColor = getContext().getResources().getColor(R.color.my_files_listview_item_inactive_foreground, null);
+        int unclickedColor = getContext().getResources().getColor(R.color.app_text_primary, null);
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
         title.setTextColor(LocalSearchEngine.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
     }
@@ -248,40 +246,42 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     abstract protected void searchResultClicked(SearchResult sr);
 
     public FilteredSearchResults filter() {
+        UIUtils.ensureBackgroundThreadOrCrash("SearchResultListAdapter::filter(void)");
         long now = SystemClock.currentThreadTimeMillis();
         long timeSinceLastFilterCall = now - lastFilterCallTimestamp.get();
         if (cachedFilteredSearchResults != null && timeSinceLastFilterCall < 250) {
             return cachedFilteredSearchResults;
         }
         lastFilterCallTimestamp.set(now);
-        cachedFilteredSearchResults = filter(list);
-        this.visualList = cachedFilteredSearchResults.filtered;
-        notifyDataSetChanged();
-        notifyDataSetInvalidated();
+        List<SearchResult> listCopy = new ArrayList<>();
+        Collections.copy(listCopy, list); // let's avoid concurrent modification exception when filtering
+        cachedFilteredSearchResults = filter(listCopy);
+        this.visualList = cachedFilteredSearchResults.mediaTypeFiltered;
+
+        UIUtils.postToUIThread(() -> {
+            try {
+                notifyDataSetChanged();
+                notifyDataSetInvalidated();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        });
         return cachedFilteredSearchResults;
     }
 
     public FilteredSearchResults filter(List<SearchResult> results) {
+        UIUtils.ensureBackgroundThreadOrCrash("SearchResultListAdapter::filter(results)");
         FilteredSearchResults fsr = new FilteredSearchResults();
         ArrayList<SearchResult> mediaTypedFiltered = new ArrayList<>();
-        ArrayList<SearchResult> keywordFiltered = new ArrayList<>();
-        List<KeywordFilter> keywordFilters = getKeywordFiltersPipeline();
         for (SearchResult sr : results) {
             String extension = FilenameUtils.getExtension(((FileSearchResult) sr).getFilename());
             MediaType mt = MediaType.getMediaTypeForExtension(extension);
-            boolean passedKeywordFilter = KeywordFilter.passesFilterPipeline(sr, keywordFilters);
+            fsr.increment(mt, true);
             if (isFileSearchResultMediaTypeMatching(sr, mt)) {
-                if (keywordFilters.isEmpty() || passedKeywordFilter) {
-                    mediaTypedFiltered.add(sr);
-                    keywordFiltered.add(sr);
-                }
-            } else if (mt != null && passedKeywordFilter) {
-                keywordFiltered.add(sr);
+                mediaTypedFiltered.add(sr);
             }
-            fsr.increment(mt, passedKeywordFilter);
         }
-        fsr.filtered = mediaTypedFiltered;
-        fsr.keywordFiltered = keywordFiltered;
+        fsr.mediaTypeFiltered.addAll(mediaTypedFiltered);
         return fsr;
     }
 
@@ -312,43 +312,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
     }
 
-    public List<KeywordFilter> getKeywordFiltersPipeline() {
-        return keywordFiltersPipeline;
-    }
-
-    public FilteredSearchResults setKeywordFiltersPipeline(List<KeywordFilter> keywordFiltersPipeline) {
-        // if another instance is being assigned, we clear and copy its members
-        if (keywordFiltersPipeline != this.keywordFiltersPipeline) {
-            this.keywordFiltersPipeline.clear();
-            cachedFilteredSearchResults = null;
-            if (keywordFiltersPipeline != null && keywordFiltersPipeline.size() > 0) {
-                this.keywordFiltersPipeline.addAll(keywordFiltersPipeline);
-            }
-        }
-        return filter();
-    }
-
-    public FilteredSearchResults addKeywordFilter(KeywordFilter kf) {
-        if (!keywordFiltersPipeline.contains(kf)) {
-            this.keywordFiltersPipeline.add(kf);
-            cachedFilteredSearchResults = null;
-            return filter();
-        }
-        return null;
-    }
-
-    public FilteredSearchResults removeKeywordFilter(KeywordFilter kf) {
-        this.keywordFiltersPipeline.remove(kf);
-        cachedFilteredSearchResults = null;
-        return filter();
-    }
-
-    private void clearKeywordFilters() {
-        this.keywordFiltersPipeline.clear();
-        cachedFilteredSearchResults = null;
-        filter();
-    }
-
     private static class OnLinkClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
@@ -358,8 +321,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public static class FilteredSearchResults {
-        public List<SearchResult> filtered;
-        public List<SearchResult> keywordFiltered;
+        public final List<SearchResult> mediaTypeFiltered = new ArrayList<>();
+        // Maybe this comes back in a simpler form
+        //public List<SearchResult> keywordFiltered;
 
         public int numAudio;
         public int numVideo;
@@ -404,6 +368,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                         break;
                 }
             }
+        }
+
+        public void clear() {
+            mediaTypeFiltered.clear();
         }
     }
 
