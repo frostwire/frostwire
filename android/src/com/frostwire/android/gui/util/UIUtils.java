@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.util;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -33,6 +35,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -60,6 +63,7 @@ import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
@@ -76,8 +80,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -493,6 +495,12 @@ public final class UIUtils {
         socialLinksDialog.show();
     }
 
+    public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
+        if (UIUtils.isUIThread()) {
+            throw new RuntimeException(classAndMethodNames + " is not meant to run on the main thread");
+        }
+    }
+
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over engineer.
     public static class IntentByteExtra {
         public final String name;
@@ -653,5 +661,36 @@ public final class UIUtils {
                 LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
             }
         }
+    }
+
+    public static void postToUIThread(Runnable runnable) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(runnable);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
+        }
+    }
+
+    public static void postToUIThreadAtFront(Runnable runnable) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postAtFrontOfQueue(runnable);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postToUIThreadAtFront error: " + t.getMessage());
+        }
+    }
+
+    public static void postDelayed(Runnable runnable, long delayMillis) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(runnable, delayMillis);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postDelayed error: " + t.getMessage());
+        }
+    }
+
+    public static boolean isUIThread() {
+        return Platforms.get().isUIThread();
     }
 }
