@@ -28,10 +28,12 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
 import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -616,7 +618,7 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+        if (UIUtils.isUIThread()) {
             Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
         } else {
             ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener);
@@ -624,7 +626,7 @@ public final class TransferManager {
     }
 
     private void unregisterPreferencesChangeListener() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+        if (UIUtils.isUIThread()) {
             Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
         } else {
             ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener);
