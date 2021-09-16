@@ -19,8 +19,6 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.KeyEvent;
@@ -33,6 +31,7 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.util.Ref;
 import com.google.android.material.tabs.TabLayout;
@@ -251,8 +250,8 @@ public class SearchInputView extends LinearLayout {
                 attemptBelow1k = "0";
             }
             final String numFilesStr = (numFiles > 999) ? "+1k" : attemptBelow1k;
-            Handler h = new Handler(Looper.getMainLooper());
-            h.post(() -> {
+
+            UIUtils.postToUIThreadAtFront(() -> {
                 if (tabLayout == null) {
                     return;
                 }
