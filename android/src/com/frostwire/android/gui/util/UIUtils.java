@@ -31,6 +31,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -40,6 +42,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
 
@@ -69,6 +72,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -270,10 +274,10 @@ public final class UIUtils {
                         Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
 
                 // The mime type makes it match AudioPlayerActivity see AndroidManifest.xml
-                LOG.info("openFile(filePath=" + filePath + ", mime="+mime+")", true);
+                LOG.info("openFile(filePath=" + filePath + ", mime=" + mime + ")", true);
                 Uri fileUri = getFileUri(context, filePath, useFileProvider);
-                LOG.info("openFile(...) -> fileUri="+fileUri.toString(), true);
-                
+                LOG.info("openFile(...) -> fileUri=" + fileUri.toString(), true);
+
                 i.setDataAndType(fileUri, Intent.normalizeMimeType(mime));
 
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -617,5 +621,37 @@ public final class UIUtils {
             return true;
         }
         return km.isKeyguardLocked();
+    }
+
+    public enum HandlerThreadName {
+        SEARCH_PERFORMER,
+        DOWNLOADER
+    }
+
+    public static class HandlerFactory {
+        private static HashMap<String, Handler> handlers = new HashMap<>();
+
+        public static void postTo(final HandlerThreadName threadName, final Runnable r) {
+            get(threadName.name()).post(r);
+        }
+
+        public static Handler get(@NonNull final String threadName) {
+            if (!handlers.containsKey(threadName)) {
+                HandlerThread handlerThread = new HandlerThread("LocalSearchEngine::HandlerThread");
+                handlerThread.start();
+                Handler handler = new Handler(handlerThread.getLooper());
+                handlers.put(threadName, handler);
+                return handler;
+            }
+            return handlers.get(threadName);
+        }
+
+        public static void stopAll() {
+            try {
+                handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
+            } catch (Throwable t) {
+                LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
+            }
+        }
     }
 }
