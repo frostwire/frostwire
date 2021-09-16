@@ -18,11 +18,12 @@
 
 package com.frostwire.android.gui.activities;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -33,7 +34,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.SparseArray;
@@ -86,11 +86,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Stack;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -191,29 +188,23 @@ public class MainActivity extends AbstractActivity implements
             return;
         }
         shuttingdown = true;
-        SearchFragment.freeInstance();
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
+        UIUtils.HandlerFactory.stopAll();
         finish();
         Engine.instance().shutdown();
     }
 
     @Override
     public void finish() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            finishAndRemoveTaskViaReflection();
-        } else {
-            super.finish();
-        }
+        finishAndRemoveTaskViaReflection();
     }
 
     private void finishAndRemoveTaskViaReflection() {
         final Class<? extends MainActivity> clazz = getClass();
         try {
             final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
-            if (finishAndRemoveTaskMethod != null) {
-                finishAndRemoveTaskMethod.invoke(this);
-            }
+            finishAndRemoveTaskMethod.invoke(this);
         } catch (Throwable e) {
             e.printStackTrace();
             super.finish();
@@ -405,14 +396,12 @@ public class MainActivity extends AbstractActivity implements
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            // MIGHT DO: save checkedNavViewMenuItemId in bundle.
-            outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
-            super.onSaveInstanceState(outState);
-            saveLastFragment(outState);
-            saveFragmentsStack(outState);
-        }
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        // MIGHT DO: save checkedNavViewMenuItemId in bundle.
+        outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
+        super.onSaveInstanceState(outState);
+        saveLastFragment(outState);
+        saveFragmentsStack(outState);
     }
 
     @Override
@@ -569,7 +558,6 @@ public class MainActivity extends AbstractActivity implements
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        search.connectDrawerLayoutFilterView(findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
         library = (MyFilesFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_my_files);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
@@ -682,16 +670,14 @@ public class MainActivity extends AbstractActivity implements
      */
 
     public Fragment getFragmentByNavMenuId(int id) {
-        switch (id) {
-            case R.id.menu_main_search:
-                return search;
-            case R.id.menu_main_library:
-                return library;
-            case R.id.menu_main_transfers:
-                return transfers;
-            default:
-                return null;
+        if (id == R.id.menu_main_search) {
+            return search;
+        } else if (id == R.id.menu_main_library) {
+            return library;
+        } else if (id == R.id.menu_main_transfers) {
+            return transfers;
         }
+        return null;
     }
 
     private int getNavMenuIdByFragment(Fragment fragment) {
@@ -728,14 +714,11 @@ public class MainActivity extends AbstractActivity implements
         if (item == null) {
             return false;
         }
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         navigationMenu.onConfigurationChanged(newConfig);
     }
@@ -782,8 +765,8 @@ public class MainActivity extends AbstractActivity implements
 
     public void performYTSearch(String ytUrl) {
         SearchFragment searchFragment = (SearchFragment) getFragmentByNavMenuId(R.id.menu_main_search);
-        searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
+        searchFragment.performYTSearch(ytUrl);
     }
 
     public static void refreshTransfers(Context context) {
@@ -840,7 +823,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     // TODO: refactor and move this method for a common place when needed
-    private static String saveViewContent(Context context, Uri uri, String name) {
+    private static String saveViewContent(Context context, Uri uri, String fileName) {
         InputStream inStream = null;
         OutputStream outStream = null;
         if (!Platforms.temp().exists()) {
@@ -849,7 +832,7 @@ public class MainActivity extends AbstractActivity implements
                 LOG.warn("saveViewContent() could not create Platforms.temp() directory.");
             }
         }
-        File target = new File(Platforms.temp(), name);
+        File target = new File(Platforms.temp(), fileName);
         try {
             inStream = context.getContentResolver().openInputStream(uri);
             outStream = new FileOutputStream(target);
@@ -861,7 +844,7 @@ public class MainActivity extends AbstractActivity implements
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
+            LOG.error("Error when copying file from " + uri + " to temp/" + fileName, e);
             return null;
         } finally {
             IOUtils.closeQuietly(inStream);
