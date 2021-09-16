@@ -21,7 +21,6 @@ package com.frostwire.android.gui.tasks;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.frostwire.android.BuildConfig;
@@ -50,53 +49,42 @@ import java.lang.ref.WeakReference;
 public class AsyncStartDownload {
 
     private static final Logger LOG = Logger.getLogger(AsyncStartDownload.class);
-    private static final Handler handler;
-
-    static {
-        HandlerThread HT = new HandlerThread("AsyncStartDownload-HandlerThread");
-        HT.start();
-        handler = new Handler(HT.getLooper());
-    }
-
-    public static void stopHandlerThread() {
-        if (handler.getLooper().getThread() instanceof HandlerThread) {
-            ((HandlerThread) handler.getLooper().getThread()).quitSafely();
-        }
-    }
 
     public AsyncStartDownload(final Context ctx, final SearchResult sr, final String message) {
         //async(ctx, AsyncStartDownload::doInBackground, sr, message, AsyncStartDownload::onPostExecute);
         WeakReference<Context> ctxRef = Ref.weak(ctx);
-        handler.post(() -> {
-            LOG.info("AsyncStartDownload: posting to handler", true);
-            try {
+        UIUtils.HandlerFactory.postTo(UIUtils.HandlerThreadName.DOWNLOADER, () -> run(ctxRef, sr, message));
+    }
+
+    private void run(WeakReference<Context> ctxRef, final SearchResult sr, final String message) {
+        LOG.info("AsyncStartDownload:run posted and now running to handler", true);
+        try {
+            if (!Ref.alive(ctxRef)) {
+                Ref.free(ctxRef);
+                return;
+            }
+            final Transfer transfer = doInBackground(ctxRef.get(), sr, message);
+            if (transfer == null) {
+                Ref.free(ctxRef);
+                return;
+            }
+            Handler uiHandler = new Handler(Looper.getMainLooper());
+            uiHandler.postAtFrontOfQueue(() -> {
                 if (!Ref.alive(ctxRef)) {
                     Ref.free(ctxRef);
                     return;
                 }
-                final Transfer transfer = doInBackground(ctxRef.get(), sr, message);
-                if (transfer == null) {
+                try {
+                    onPostExecute(ctxRef.get(), sr, message, transfer);
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                } finally {
                     Ref.free(ctxRef);
-                    return;
                 }
-                Handler uiHandler = new Handler(Looper.getMainLooper());
-                uiHandler.postAtFrontOfQueue(() -> {
-                    if (!Ref.alive(ctxRef)) {
-                        Ref.free(ctxRef);
-                        return;
-                    }
-                    try {
-                        onPostExecute(ctxRef.get(), sr, message, transfer);
-                    } catch (Throwable t) {
-                        LOG.error(t.getMessage(), t);
-                    } finally {
-                        Ref.free(ctxRef);
-                    }
-                });
-            } catch (Throwable t) {
-                LOG.error(t.getMessage(), t);
-            }
-        });
+            });
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     public AsyncStartDownload(final Context ctx, final SearchResult sr) {
@@ -104,13 +92,15 @@ public class AsyncStartDownload {
     }
 
     public static void submitRunnable(Runnable runnable) {
-        handler.post(() -> {
-            try {
-                runnable.run();
-            } catch (Throwable t) {
-                LOG.error("submitRunnable() failed: " + t.getMessage(), t);
-            }
-        });
+        UIUtils.HandlerFactory.postTo(
+                UIUtils.HandlerThreadName.DOWNLOADER,
+                () -> {
+                    try {
+                        runnable.run();
+                    } catch (Throwable t) {
+                        LOG.error("submitRunnable() failed: " + t.getMessage(), t);
+                    }
+                });
     }
 
     private static Transfer doInBackground(final Context ctx, final SearchResult sr, final String message) {
