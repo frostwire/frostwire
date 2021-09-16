@@ -97,8 +97,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
-        Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(() -> {
+        UIUtils.postToUIThread(() -> {
             try {
                 if (Ref.alive(buyActivityRef)) {
                     buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
