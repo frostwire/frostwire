@@ -53,7 +53,6 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 import androidx.core.content.ContextCompat;
 
@@ -69,7 +68,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.TaskThrottle;
@@ -814,7 +812,7 @@ public class MusicPlaybackService extends JobIntentService {
             if (TaskThrottle.isReadyToSubmitTask("MusicPlaybackService::updateNotificationTask", 1000)) {
                 SystemUtils.safePost(mPlayerHandler, () -> {
                     Bitmap albumArt = getAlbumArt();
-                    UIUtils.postToUIThread(() -> {
+                    SystemUtils.postToUIThread(() -> {
                         try {
                             buildNotificationWithAlbumArtPost(albumArt);
                         } catch (Throwable t) {

@@ -31,7 +31,6 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -65,6 +64,7 @@ import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -1251,7 +1251,7 @@ public final class MusicUtils {
             final String message = context.getResources().getQuantityString(
                     R.plurals.NNNtrackstoplaylist, numinserted, numinserted);
 
-            UIUtils.postToUIThread(() -> {
+            SystemUtils.postToUIThread(() -> {
                         AppMsg.makeText(context, message, AppMsg.STYLE_CONFIRM).show();
                         refresh();
                     }

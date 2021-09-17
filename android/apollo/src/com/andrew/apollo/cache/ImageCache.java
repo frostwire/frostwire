@@ -32,7 +32,6 @@ import android.util.LruCache;
 import androidx.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
@@ -464,7 +463,7 @@ public final class ImageCache {
 
     private void waitUntilUnpaused() {
         synchronized (mPauseLock) {
-            if (!UIUtils.isUIThread()) {
+            if (!SystemUtils.isUIThread()) {
                 while (mPauseDiskAccess) {
                     try {
                         mPauseLock.wait();

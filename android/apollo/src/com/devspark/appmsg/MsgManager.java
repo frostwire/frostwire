@@ -24,8 +24,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.platform.Platforms;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -104,8 +103,8 @@ class MsgManager extends Handler {
         if (msgQueue.isEmpty()) {
             return;
         }
-        if (!UIUtils.isUIThread()) {
-            UIUtils.postToUIThread(this::displayMsg);
+        if (!SystemUtils.isUIThread()) {
+            SystemUtils.postToUIThread(this::displayMsg);
             return;
         }
 
@@ -138,8 +137,8 @@ class MsgManager extends Handler {
      * @param appMsg The {@link AppMsg} added to a {@link ViewGroup} and should be removed.s
      */
     private void removeMsg(final AppMsg appMsg) {
-        if (!UIUtils.isUIThread()) {
-            UIUtils.postToUIThread(() -> removeMsg(appMsg));
+        if (!SystemUtils.isUIThread()) {
+            SystemUtils.postToUIThread(() -> removeMsg(appMsg));
             return;
         }
 
