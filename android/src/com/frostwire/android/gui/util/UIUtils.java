@@ -33,9 +33,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -45,7 +42,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
 
@@ -63,7 +59,6 @@ import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
@@ -76,7 +71,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -87,12 +81,6 @@ import java.util.Random;
  * @author votaguz
  */
 public final class UIUtils {
-
-    public enum HandlerThreadName {
-        SEARCH_PERFORMER,
-        DOWNLOADER,
-        CONFIG_MANAGER
-    }
 
     private static final Logger LOG = Logger.getLogger(UIUtils.class);
 
@@ -152,7 +140,7 @@ public final class UIUtils {
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
-        UIUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThread(() -> {
             final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
         });
@@ -503,18 +491,6 @@ public final class UIUtils {
         socialLinksDialog.show();
     }
 
-    public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
-        if (UIUtils.isUIThread()) {
-            throw new RuntimeException(classAndMethodNames + " is NOT meant to run on the main thread");
-        }
-    }
-
-    public static void ensureOnMainThreadOrCrash(String classAndMethodNames) {
-        if (!UIUtils.isUIThread()) {
-            throw new RuntimeException(classAndMethodNames + " is meant to run on the main thread");
-        }
-    }
-
     // tried playing around with <T> but at the moment I only need ByteExtra's, no need to over engineer.
     public static class IntentByteExtra {
         public final String name;
@@ -645,61 +621,4 @@ public final class UIUtils {
         return km.isKeyguardLocked();
     }
 
-    public static class HandlerFactory {
-        private static HashMap<String, Handler> handlers = new HashMap<>();
-
-        public static void postTo(final HandlerThreadName threadName, final Runnable r) {
-            get(threadName.name()).post(r);
-        }
-
-        public static Handler get(@NonNull final String threadName) {
-            if (!handlers.containsKey(threadName)) {
-                HandlerThread handlerThread = new HandlerThread("LocalSearchEngine::HandlerThread");
-                handlerThread.start();
-                Handler handler = new Handler(handlerThread.getLooper());
-                handlers.put(threadName, handler);
-                return handler;
-            }
-            return handlers.get(threadName);
-        }
-
-        public static void stopAll() {
-            try {
-                handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
-            } catch (Throwable t) {
-                LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
-            }
-        }
-    }
-
-    public static void postToUIThread(Runnable runnable) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(runnable);
-        } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
-        }
-    }
-
-    public static void postToUIThreadAtFront(Runnable runnable) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postAtFrontOfQueue(runnable);
-        } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThreadAtFront error: " + t.getMessage());
-        }
-    }
-
-    public static void postDelayed(Runnable runnable, long delayMillis) {
-        try {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.postDelayed(runnable, delayMillis);
-        } catch (Throwable t) {
-            LOG.error("UIUtils.postDelayed error: " + t.getMessage());
-        }
-    }
-
-    public static boolean isUIThread() {
-        return Platforms.get().isUIThread();
-    }
 }
