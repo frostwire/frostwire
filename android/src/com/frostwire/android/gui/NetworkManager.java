@@ -71,10 +71,7 @@ public final class NetworkManager {
         this.appContext = context.getApplicationContext();
     }
 
-    /**
-     * aka -> isInternetUp
-     */
-    public boolean isDataUp() {
+    public boolean isInternetDataConnectionUp() {
         ConnectivityManager connectivityManager = getConnectivityManager();
 
         boolean wifiUp = isNetworkTypeUp(connectivityManager, ConnectivityManager.TYPE_WIFI);
@@ -150,7 +147,7 @@ public final class NetworkManager {
     }
 
     public static void queryNetworkStatusBackground(NetworkManager manager) {
-        boolean isDataUp = manager.isDataUp();
+        boolean isDataUp = manager.isInternetDataConnectionUp();
         manager.detectTunnel();
         Intent intent = new Intent(Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION);
         intent.putExtra("isDataUp", isDataUp);

@@ -38,7 +38,6 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.OSUtils;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -129,7 +128,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
         PlayStore.getInstance(context).refresh();
         NetworkManager networkManager = NetworkManager.instance();
-        if (networkManager.isDataUp()) {
+        if (networkManager.isInternetDataConnectionUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();
             boolean useTorrentsOnMobileData = !CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
@@ -199,7 +198,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         }
         if (Engine.instance().isDisconnected()) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                !NetworkManager.instance().isTunnelUp()) {
+                    !NetworkManager.instance().isTunnelUp()) {
                 //don't start
             } else {
                 Engine.instance().startServices();
