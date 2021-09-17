@@ -131,7 +131,8 @@ public final class Ssl {
                 "zoink.ch",
                 "zooqle.com",
                 "www.torrentdownloads.me",
-                "www.torrentdownloads.pro"
+                "www.torrentdownloads.pro",
+                "sni.cloudflaressl.com"
         };
 
         private static final HashSet<String> validDomainsSet = new HashSet<>();
