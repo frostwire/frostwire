@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ package com.frostwire.android.gui;
 import android.text.Html;
 
 import com.frostwire.android.gui.views.AbstractListAdapter;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.CrawledSearchResult;
 import com.frostwire.search.FileSearchResult;
@@ -101,16 +102,14 @@ public final class LocalSearchEngine {
     }
 
     public void performSearch(String query) {
+        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performSearch(query=" + query + ")");
         if (StringUtils.isNullOrEmpty(query, true)) {
             return;
         }
-
         manager.stop();
-
         currentSearchToken = Math.abs(System.nanoTime());
         currentSearchTokens = tokenize(query);
         searchFinished = false;
-
         ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
         for (SearchEngine se : shuffledEngines) {
@@ -120,7 +119,8 @@ public final class LocalSearchEngine {
                 try {
                     Thread.sleep(200);
                     // breath a little between http requests
-                } catch (Throwable ignored) { }
+                } catch (Throwable ignored) {
+                }
             }
         }
     }
