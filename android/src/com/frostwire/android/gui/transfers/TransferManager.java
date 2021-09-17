@@ -20,7 +20,6 @@ package com.frostwire.android.gui.transfers;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.Looper;
 import android.os.StatFs;
 
 import com.frostwire.android.R;
@@ -28,12 +27,11 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.BTEngineAdapter;
 import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.platform.Platforms;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
@@ -618,7 +616,7 @@ public final class TransferManager {
     }
 
     private void registerPreferencesChangeListener() {
-        if (UIUtils.isUIThread()) {
+        if (SystemUtils.isUIThread()) {
             Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
         } else {
             ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener);
@@ -626,8 +624,10 @@ public final class TransferManager {
     }
 
     private void unregisterPreferencesChangeListener() {
-        if (UIUtils.isUIThread()) {
-            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.HandlerFactory.postTo(SystemUtils.HandlerThreadName.CONFIG_MANAGER,
+                    () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
+
         } else {
             ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener);
         }

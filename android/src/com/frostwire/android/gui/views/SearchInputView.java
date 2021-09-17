@@ -31,8 +31,8 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 import com.google.android.material.tabs.TabLayout;
 
@@ -251,7 +251,7 @@ public class SearchInputView extends LinearLayout {
             }
             final String numFilesStr = (numFiles > 999) ? "+1k" : attemptBelow1k;
 
-            UIUtils.postToUIThreadAtFront(() -> {
+            SystemUtils.postToUIThreadAtFront(() -> {
                 if (tabLayout == null) {
                     return;
                 }

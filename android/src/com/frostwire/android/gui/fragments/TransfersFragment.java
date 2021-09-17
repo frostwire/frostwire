@@ -18,6 +18,7 @@
 package com.frostwire.android.gui.fragments;
 
 import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -55,7 +56,6 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
-import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
@@ -67,8 +67,8 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.TransfersNoSeedsView;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
@@ -227,7 +227,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                 if (bittorrentDisconnected) {
                     UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
                 } else {
-                    if (NetworkManager.instance().isDataUp()) {
+                    if (NetworkManager.instance().isInternetDataConnectionUp()) {
                         TransferManager.instance().resumeResumableTransfers();
                     } else {
                         UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
@@ -313,39 +313,40 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (adapter != null) {
             if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-                AsyncStartDownload.submitRunnable(() -> {
-                    if (!Ref.alive(contextRef)) {
-                        Ref.free(contextRef);
-                        return;
-                    }
-                    TransfersHolder transfersHolder;
-                    try {
-                        transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
-                    } catch (Throwable t) {
-                        LOG.error("onTime() " + t.getMessage(), t);
-                        Ref.free(contextRef);
-                        return;
-                    }
-                    if (!Ref.alive(contextRef)) {
-                        Ref.free(contextRef);
-                        return;
-                    }
-                    final TransfersHolder tfCopy = transfersHolder;
+                postTo(SystemUtils.HandlerThreadName.DOWNLOADER,
+                        () -> {
+                            if (!Ref.alive(contextRef)) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            TransfersHolder transfersHolder;
+                            try {
+                                transfersHolder = contextRef.get().sortSelectedStatusTransfersInBackground();
+                            } catch (Throwable t) {
+                                LOG.error("onTime() " + t.getMessage(), t);
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            if (!Ref.alive(contextRef)) {
+                                Ref.free(contextRef);
+                                return;
+                            }
+                            final TransfersHolder tfCopy = transfersHolder;
 
-                    contextRef.get().getActivity().runOnUiThread(() -> {
-                        if (!Ref.alive(contextRef)) {
-                            Ref.free(contextRef);
-                            return;
-                        }
-                        try {
-                            contextRef.get().updateTransferList(tfCopy);
-                        } catch (Throwable t) {
-                            LOG.error("onTime() " + t.getMessage(), t);
-                            Ref.free(contextRef);
-                        }
-                    });
+                            contextRef.get().getActivity().runOnUiThread(() -> {
+                                if (!Ref.alive(contextRef)) {
+                                    Ref.free(contextRef);
+                                    return;
+                                }
+                                try {
+                                    contextRef.get().updateTransferList(tfCopy);
+                                } catch (Throwable t) {
+                                    LOG.error("onTime() " + t.getMessage(), t);
+                                    Ref.free(contextRef);
+                                }
+                            });
 
-                });
+                        });
             } else {
                 LOG.warn("onTime(): check your logic, TransfersFragment::sortSelectedStatusTransfersInBackground was not submitted, interval of " + TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000 + " ms not enough");
             }
@@ -358,7 +359,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             if (transferStatus == selectedStatus) {
                 TabLayout.Tab tab = tabLayout.getTabAt(i);
                 if (tab != null && !tab.isSelected()) {
-                    if (UIUtils.isUIThread()) {
+                    if (SystemUtils.isUIThread()) {
                         tab.select();
                     } else {
                         try {
@@ -435,7 +436,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-
     private void onCheckDHT() {
         if (textDHTPeers == null || !TransfersFragment.this.isAdded() || BTEngine.ctx == null) {
             return;
@@ -443,7 +443,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         textDHTPeers.setVisibility(View.VISIBLE);
         showTorrentSettingsOnClick = true;
         // No Internet
-        if (!NetworkManager.instance().isDataUp()) {
+        if (!NetworkManager.instance().isInternetDataConnectionUp()) {
             textDHTPeers.setText(R.string.check_internet_connection);
             return;
         }
@@ -842,7 +842,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             long biggestBytesAvailable = -1;
             File result = null;
             for (File f : com.frostwire.android.util.SystemUtils.getExternalFilesDirs(context)) {
-                if (!f.getAbsolutePath().startsWith(primaryPath)) {
+                if (primaryPath != null && !f.getAbsolutePath().startsWith(primaryPath)) {
                     long bytesAvailable = com.frostwire.android.util.SystemUtils.getAvailableStorageSize(f);
                     if (bytesAvailable > biggestBytesAvailable) {
                         biggestBytesAvailable = bytesAvailable;

@@ -25,9 +25,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.telephony.TelephonyManager;
 
 import androidx.core.app.JobIntentService;
@@ -38,6 +36,7 @@ import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -209,7 +208,7 @@ public final class Engine implements IEngineService {
             }, 0);
         } catch (SecurityException execution) {
             WeakReference<Context> contextRef = Ref.weak(context);
-            UIUtils.postToUIThread(() -> {
+            SystemUtils.postToUIThread(() -> {
                 try {
                     if (Ref.alive(contextRef)) {
                         UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);
