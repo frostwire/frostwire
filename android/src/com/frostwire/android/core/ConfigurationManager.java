@@ -59,7 +59,6 @@ public final class ConfigurationManager {
         if (instance != null) {
             throw new RuntimeException("CHECK YOUR LOGIC: ConfigurationManager.create(ctx) can only be called once.");
         }
-
         creatorThread = new Thread(() -> {
             instance = new ConfigurationManager(context.getApplicationContext());
             creationLatch.countDown();
@@ -89,6 +88,7 @@ public final class ConfigurationManager {
         return instance;
     }
 
+    /** Waits for up to 5 seconds for the creator thread*/
     private static void waitForCreatorThread() {
         try {
             if (creatorThread != null && creatorThread.isAlive()) {
