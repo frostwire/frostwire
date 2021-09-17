@@ -18,10 +18,11 @@
 
 package com.frostwire.android.gui.tasks;
 
+import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
+import static com.frostwire.android.util.SystemUtils.postToUIThreadAtFront;
+
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -32,6 +33,7 @@ import com.frostwire.android.gui.transfers.InvalidTransfer;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
@@ -53,7 +55,7 @@ public class AsyncStartDownload {
     public AsyncStartDownload(final Context ctx, final SearchResult sr, final String message) {
         //async(ctx, AsyncStartDownload::doInBackground, sr, message, AsyncStartDownload::onPostExecute);
         WeakReference<Context> ctxRef = Ref.weak(ctx);
-        UIUtils.HandlerFactory.postTo(UIUtils.HandlerThreadName.DOWNLOADER, () -> run(ctxRef, sr, message));
+        postTo(SystemUtils.HandlerThreadName.DOWNLOADER, () -> run(ctxRef, sr, message));
     }
 
     private void run(WeakReference<Context> ctxRef, final SearchResult sr, final String message) {
@@ -68,7 +70,7 @@ public class AsyncStartDownload {
                 Ref.free(ctxRef);
                 return;
             }
-            UIUtils.postToUIThreadAtFront(() -> {
+            postToUIThreadAtFront(() -> {
                 if (!Ref.alive(ctxRef)) {
                     Ref.free(ctxRef);
                     return;
@@ -88,18 +90,6 @@ public class AsyncStartDownload {
 
     public AsyncStartDownload(final Context ctx, final SearchResult sr) {
         this(ctx, sr, null);
-    }
-
-    public static void submitRunnable(Runnable runnable) {
-        UIUtils.HandlerFactory.postTo(
-                UIUtils.HandlerThreadName.DOWNLOADER,
-                () -> {
-                    try {
-                        runnable.run();
-                    } catch (Throwable t) {
-                        LOG.error("submitRunnable() failed: " + t.getMessage(), t);
-                    }
-                });
     }
 
     private static Transfer doInBackground(final Context ctx, final SearchResult sr, final String message) {
