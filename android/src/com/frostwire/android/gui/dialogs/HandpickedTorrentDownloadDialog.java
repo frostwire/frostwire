@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
  */
 
 package com.frostwire.android.gui.dialogs;
+
+import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -27,11 +29,11 @@ import android.view.View;
 import com.frostwire.android.R;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.activities.MainActivity;
-import com.frostwire.android.gui.tasks.AsyncStartDownload;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TcpEndpoint;
@@ -176,7 +178,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         // if I was made and there was a TorrentFetcherDownload waiting for me in TransferManager
         if (torrentFetcherDownloadTokenId != -1) {
             List<Transfer> transfers = TransferManager.instance().getTransfers();
-            if (transfers != null && !transfers.isEmpty()) {
+            if (!transfers.isEmpty()) {
                 for (Transfer i : transfers) {
                     if (i instanceof TorrentFetcherDownload) {
                         TorrentFetcherDownload tempTransfer = (TorrentFetcherDownload) i;
@@ -334,33 +336,34 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            AsyncStartDownload.submitRunnable(() -> {
-                try {
-                    // there is a still a chance of reference getting null, this is in
-                    // the background
-                    if (!Ref.alive(ctxRef) || !Ref.alive(dlgRef)) {
-                        return;
-                    }
-                    Context ctx = ctxRef.get();
-                    HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
+            postTo(SystemUtils.HandlerThreadName.DOWNLOADER,
+                    () -> {
+                        try {
+                            // there is a still a chance of reference getting null, this is in
+                            // the background
+                            if (!Ref.alive(ctxRef) || !Ref.alive(dlgRef)) {
+                                return;
+                            }
+                            Context ctx = ctxRef.get();
+                            HandpickedTorrentDownloadDialog dlg = (HandpickedTorrentDownloadDialog) dlgRef.get();
 
-                    String magnet = dlg.getMagnetUri();
-                    List<TcpEndpoint> peers = parsePeers(magnet);
-                    TorrentInfo torrentInfo = dlg.getTorrentInfo();
-                    BTEngine.getInstance().download(torrentInfo,
-                            null,
-                            selection,
-                            peers,
-                            TransferManager.instance().isDeleteStartedTorrentEnabled());
-                    dlg.removeTorrentFetcherDownloadFromTransfers();
-                    TorrentHandle torrentHandle = BTEngine.getInstance().find(torrentInfo.infoHash());
-                    TransferManager.instance().updateUIBittorrentDownload(torrentHandle);
-                    UIUtils.showTransfersOnDownloadStart(ctx);
-                    MainActivity.refreshTransfers(ctx);
-                } catch (Throwable t) {
-                    LOG.info("startTorrentPartialDownload(): " + t.getMessage(), t);
-                }
-            });
+                            String magnet = dlg.getMagnetUri();
+                            List<TcpEndpoint> peers = parsePeers(magnet);
+                            TorrentInfo torrentInfo = dlg.getTorrentInfo();
+                            BTEngine.getInstance().download(torrentInfo,
+                                    null,
+                                    selection,
+                                    peers,
+                                    TransferManager.instance().isDeleteStartedTorrentEnabled());
+                            dlg.removeTorrentFetcherDownloadFromTransfers();
+                            TorrentHandle torrentHandle = BTEngine.getInstance().find(torrentInfo.infoHash());
+                            TransferManager.instance().updateUIBittorrentDownload(torrentHandle);
+                            UIUtils.showTransfersOnDownloadStart(ctx);
+                            MainActivity.refreshTransfers(ctx);
+                        } catch (Throwable t) {
+                            LOG.info("startTorrentPartialDownload(): " + t.getMessage(), t);
+                        }
+                    });
 
             TransferManager.instance().incrementStartedTransfers();
         }

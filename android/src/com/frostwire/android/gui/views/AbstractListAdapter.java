@@ -20,7 +20,6 @@ package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.os.Looper;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -39,8 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 
 import com.frostwire.android.R;
-import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.platform.Platforms;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -81,7 +79,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     private final List<Dialog> dialogs;
 
-    protected Object listLock = new Object();
+    protected final Object listLock = new Object();
     protected List<T> list;
     protected Set<T> checked;
     protected List<T> visualList;
@@ -164,7 +162,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public void clearChecked() {
         if (checked != null && checked.size() > 0) {
             checked.clear();
-            notifyDataSetChanged();
+            SystemUtils.postToUIThread(this::notifyDataSetChanged);
         }
     }
 
@@ -173,7 +171,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         if (visualList != null) {
             checked.addAll(visualList);
         }
-        notifyDataSetChanged();
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     public Context getContext() {
@@ -232,21 +230,25 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public void setList(List<T> list) {
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
+        synchronized (listLock) {
+            this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
+        }
         this.visualList = this.list;
         this.checked.clear();
-        UIUtils.postToUIThread(this::notifyDataSetInvalidated);
+        SystemUtils.postToUIThread(this::notifyDataSetInvalidated);
     }
 
     private void addList(List<T> g, boolean checked) {
         visualList.addAll(g);
         if (visualList != list) {
-            list.addAll(g);
+            synchronized (listLock) {
+                list.addAll(g);
+            }
         }
         if (checked) {
             this.checked.addAll(g);
         }
-        UIUtils.postToUIThread(this::notifyDataSetChanged);
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     /**
@@ -270,9 +272,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             if (visualList == list) {
                 visualList = new ArrayList<>(list);
             }
-            list.add(item);
+            synchronized (listLock) {
+                list.add(item);
+            }
         }
-        UIUtils.postToUIThread(this::notifyDataSetChanged);
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     /**
@@ -283,17 +287,21 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public void deleteItem(T item) {
         visualList.remove(item);
         if (visualList != list) {
-            list.remove(item);
+            synchronized (listLock) {
+                list.remove(item);
+            }
         }
         checked.remove(item);
-        UIUtils.postToUIThread(this::notifyDataSetChanged);
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     public void updateList(List<T> g) {
-        list = g;
+        synchronized (listLock) {
+            list = g;
+        }
         visualList = g;
         checked.clear();
-        UIUtils.postToUIThread(this::notifyDataSetChanged);
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     public void clear() {
@@ -306,7 +314,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         if (checked != null) {
             checked.clear();
         }
-        UIUtils.postToUIThread(this::notifyDataSetInvalidated);
+        SystemUtils.postToUIThread(this::notifyDataSetInvalidated);
     }
 
     public List<T> getList() {
@@ -324,7 +332,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
      */
     public View getView(int position, View view, ViewGroup parent) {
-        UIUtils.ensureBackgroundThreadOrCrash("AbstractListAdapter::getView");
+        SystemUtils.ensureUIThreadOrCrash("AbstractListAdapter::getView");
         T item = getItem(position);
         Context ctx = getContext();
         if (view == null && ctx != null) {
@@ -361,7 +369,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     public void setCheckboxesVisibility(boolean checkboxesVisibility) {
         this.checkboxesVisibility = checkboxesVisibility;
-        UIUtils.postToUIThread(this::notifyDataSetChanged);
+        SystemUtils.postToUIThread(this::notifyDataSetChanged);
     }
 
     public boolean getShowMenuOnClick() {

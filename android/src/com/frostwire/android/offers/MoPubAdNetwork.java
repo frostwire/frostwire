@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
@@ -108,7 +109,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
-            UIUtils.postToUIThreadAtFront(() -> MoPubAdNetwork.loadConsentDialogAsync(this));
+            SystemUtils.postToUIThreadAtFront(() -> MoPubAdNetwork.loadConsentDialogAsync(this));
             loadNewInterstitial(activity);
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());

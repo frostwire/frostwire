@@ -17,7 +17,7 @@
 
 package com.frostwire.android.gui.views;
 
-import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 
 /**
@@ -33,7 +33,7 @@ public final class TimerService {
         //LOG.info("subscribe(" + observer.getClass().getCanonicalName() + ") has created a new TimerSubscription@" + subscription.hashCode());
         long interval = intervalSec * 1000L;
 
-        UIUtils.postDelayed(new TimerTask(subscription, interval), interval);
+        SystemUtils.postDelayed(new TimerTask(subscription, interval), interval);
         return subscription;
     }
 
@@ -41,7 +41,7 @@ public final class TimerService {
         mTimerSubscription.setObserver(observer);
         //LOG.info("reSubscribe(mTimerSubscription=@" + mTimerSubscription.hashCode() + ", intervalSec=" + intervalSec + ")");
         long intervalInMs = intervalSec * 1000L;
-        UIUtils.postDelayed(new TimerTask(mTimerSubscription, intervalInMs), intervalInMs);
+        SystemUtils.postDelayed(new TimerTask(mTimerSubscription, intervalInMs), intervalInMs);
     }
 
     private static final class TimerTask implements Runnable {
@@ -59,7 +59,7 @@ public final class TimerService {
             if (subscription.isSubscribed()) {
                 //LOG.info("TimerTask.run() TimerSubscription@" + subscription.hashCode() + " is still subscribed. Observer=" + subscription.observerClassName);
                 subscription.onTime();
-                UIUtils.postDelayed(this, interval);
+                SystemUtils.postDelayed(this, interval);
             }
         }
     }

@@ -75,6 +75,7 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -190,7 +191,7 @@ public class MainActivity extends AbstractActivity implements
         shuttingdown = true;
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
-        UIUtils.HandlerFactory.stopAll();
+        SystemUtils.HandlerFactory.stopAll();
         finish();
         Engine.instance().shutdown();
     }
@@ -880,7 +881,7 @@ public class MainActivity extends AbstractActivity implements
                 if (mainActivityIntent != null) {
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
-                updateNavigationMenu(value);
+                SystemUtils.postToUIThread(() -> updateNavigationMenu(value));
             }
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
@@ -888,7 +889,7 @@ public class MainActivity extends AbstractActivity implements
                     UIUtils.showDismissableMessage(findView(android.R.id.content),
                             R.string.no_data_check_internet_connection);
                 }
-                search.setDataUp(isDataUp);
+                SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
             }
         }
     }

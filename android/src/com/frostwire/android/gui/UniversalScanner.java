@@ -28,7 +28,7 @@ import android.os.SystemClock;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -96,7 +96,7 @@ final class UniversalScanner {
 
         public void onMediaScannerConnected() {
             // do not do this on main thread, causing ANRs
-            if (UIUtils.isUIThread()) {
+            if (SystemUtils.isUIThread()) {
                 async(UniversalScanner::onMediaScannerConnected, connection, files);
             } else {
                 UniversalScanner.onMediaScannerConnected(connection, files);

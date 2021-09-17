@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -51,6 +49,7 @@ import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.android.util.Asyncs;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.mobileads.MoPubRewardedAds;
@@ -97,7 +96,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
-        UIUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThread(() -> {
             try {
                 if (Ref.alive(buyActivityRef)) {
                     buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();

@@ -44,6 +44,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.google.android.material.navigation.NavigationView;
 
@@ -214,7 +215,7 @@ public final class NavigationMenu {
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        UIUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThread(() -> {
             try {
                 menuRemoveAdsItem.setVisibility(visibility);
             } catch (Throwable t) {
