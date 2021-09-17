@@ -88,6 +88,12 @@ import java.util.Random;
  */
 public final class UIUtils {
 
+    public enum HandlerThreadName {
+        SEARCH_PERFORMER,
+        DOWNLOADER,
+        CONFIG_MANAGER
+    }
+
     private static final Logger LOG = Logger.getLogger(UIUtils.class);
 
     /**
@@ -146,8 +152,10 @@ public final class UIUtils {
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
-        final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
+        UIUtils.postToUIThread(() -> {
+            final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
+        });
     }
 
     public static void sendShutdownIntent(Context ctx) {
@@ -497,7 +505,13 @@ public final class UIUtils {
 
     public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
         if (UIUtils.isUIThread()) {
-            throw new RuntimeException(classAndMethodNames + " is not meant to run on the main thread");
+            throw new RuntimeException(classAndMethodNames + " is NOT meant to run on the main thread");
+        }
+    }
+
+    public static void ensureOnMainThreadOrCrash(String classAndMethodNames) {
+        if (!UIUtils.isUIThread()) {
+            throw new RuntimeException(classAndMethodNames + " is meant to run on the main thread");
         }
     }
 
@@ -629,11 +643,6 @@ public final class UIUtils {
             return true;
         }
         return km.isKeyguardLocked();
-    }
-
-    public enum HandlerThreadName {
-        SEARCH_PERFORMER,
-        DOWNLOADER
     }
 
     public static class HandlerFactory {
