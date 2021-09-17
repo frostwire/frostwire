@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,8 @@
 
 package com.frostwire.android.offers;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,15 +35,12 @@ import com.mopub.common.privacy.ConsentDialogListener;
 import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
-import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubRewardedAds;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -114,7 +108,7 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
-            async(MoPubAdNetwork::loadConsentDialogAsync, this);
+            UIUtils.postToUIThreadAtFront(() -> MoPubAdNetwork.loadConsentDialogAsync(this));
             loadNewInterstitial(activity);
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
@@ -185,13 +179,15 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         if (!interstitial.isReady()) {
             try {
                 Method isDestroyedMethod = interstitial.getClass().getDeclaredMethod("isDestroyed");
-                boolean isDestroyed = false;
+                boolean isDestroyed;
                 isDestroyedMethod.setAccessible(true);
-                isDestroyed = (boolean) isDestroyedMethod.invoke(interstitial);
-                isDestroyedMethod.setAccessible(false);
-
-                if (isDestroyed) {
-                    loadNewInterstitial(activity);
+                Object booleanResult = isDestroyedMethod.invoke(interstitial);
+                if (booleanResult != null) {
+                    isDestroyed = (boolean) booleanResult;
+                    isDestroyedMethod.setAccessible(false);
+                    if (isDestroyed) {
+                        loadNewInterstitial(activity);
+                    }
                 }
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
@@ -239,7 +235,12 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         }
         LOG.info("loadMoPubInterstitial: Loading " + placement + " interstitial");
         try {
-            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
+            String placementID = placements.get(placement);
+            if (placementID == null) {
+                LOG.warn("loadMoPubInterstitial(activity, placement=" + placement + "): placementID not found for placement, aborting, interstitial could not be loaded");
+                return;
+            }
+            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placementID);
             MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(this, placement);
             moPubInterstitial.setInterstitialAdListener(moPubListener);
             interstitials.put(placement, moPubInterstitial);
