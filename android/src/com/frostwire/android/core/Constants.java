@@ -175,7 +175,7 @@ public final class Constants {
     public static final String SERVER_UPDATE_URL = "https://update.frostwire.com/android?" + FROM_URL_PARAMETERS;
     public static final String FROSTWIRE_MORE_RESULTS = "https://www.frostwire.com/more.results";
     public static final String SERVER_PROMOTIONS_URL = "https://update.frostwire.com/o.php?" + FROM_URL_PARAMETERS;
-    public static final String SUPPORT_URL = "http://support.frostwire.com/hc/en-us/categories/200014385-FrostWire-for-Android";
+    public static final String SUPPORT_URL = "https://www.reddit.com/r/FrostWire/";
     public static final String TERMS_OF_USE_URL = "https://www.frostwire.com/terms";
     public static final String ALL_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/";
     public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
@@ -214,7 +214,7 @@ public final class Constants {
     public static final int NOTIFICATION_FROSTWIRE_PLAYER_STATUS = 112002;
 
     public static final String FROSTWIRE_NOTIFICATION_CHANNEL_ID = "frostwire";
-    public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://support.frostwire.com/hc/en-us/articles/213091283-How-To-Create-Playlists-on-FrostWire-for-Android";
+    public static final String FROSTWIRE_ANDROID_FAQ_HOW_TO_ADD_SONGS_TO_PLAYLIST_URL = "https://blog.frostwire.com/2016/12/05/how-to-create-playlists-on-frostwire-for-android/";
 
     public static final int MIN_REWARD_AD_FREE_MINUTES = 30;
     public static final int MAX_REWARD_AD_FREE_MINUTES = 240;
