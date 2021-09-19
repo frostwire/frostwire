@@ -48,6 +48,7 @@ public class SearchInputView extends LinearLayout {
     private OnSearchListener onSearchListener;
     private TabLayout tabLayout;
     private final SparseArray<FileTypeTab> toFileTypeTab;
+    private int selectedFileType = Constants.FILE_TYPE_TORRENTS;
 
     private enum FileTypeTab {
         TAB_AUDIO(Constants.FILE_TYPE_AUDIO, 0),
@@ -59,7 +60,6 @@ public class SearchInputView extends LinearLayout {
 
         final byte fileType;
         final int position;
-
 
         FileTypeTab(byte fileType, int position) {
             this.fileType = fileType;
@@ -181,6 +181,7 @@ public class SearchInputView extends LinearLayout {
 
     private void onMediaTypeSelected(int mediaTypeId) {
         if (onSearchListener != null) {
+            selectedFileType = mediaTypeId;
             onSearchListener.onMediaTypeSelected(this, mediaTypeId);
         }
     }
@@ -205,6 +206,7 @@ public class SearchInputView extends LinearLayout {
     }
 
     public void selectTabByMediaType(final byte mediaTypeId) {
+        selectedFileType = mediaTypeId;
         if (toFileTypeTab != null) {
             FileTypeTab fileTypeTab = toFileTypeTab.get(mediaTypeId);
             if (fileTypeTab != null && tabLayout != null) {
@@ -223,9 +225,14 @@ public class SearchInputView extends LinearLayout {
             nextTabPosition = 5;
         }
         TabLayout.Tab tabAt = tabLayout.getTabAt(nextTabPosition);
+        selectedFileType = FileTypeTab.at(nextTabPosition).fileType;
         if (tabAt != null) {
             tabAt.select();
         }
+    }
+
+    public int getSelectedFileType() {
+        return selectedFileType;
     }
 
     private void tabItemFileTypeClick(final int fileType) {
