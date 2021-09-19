@@ -1,4 +1,5 @@
-FrostWire 2.4.1 build 682 - SEP/12/2021
+FrostWire 2.4.2 build 683 - SEP/19/2021
+ - Search screen rewritten, considerably faster search results
  - WRITE_EXTERNAL and WRITE_SETTINGS permissions no longer required
  - Android 11+ compatibility updates in the way the app interacts with the Android Media Store API
  - After Android 10, files can no longer be deleted from "My Files", this has been delegated to
