@@ -17,7 +17,6 @@
 
 package com.frostwire.search.soundcloud;
 
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
