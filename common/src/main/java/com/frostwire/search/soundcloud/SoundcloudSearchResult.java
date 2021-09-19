@@ -18,6 +18,7 @@
 package com.frostwire.search.soundcloud;
 
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -123,7 +124,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
             return downloadUrl;
         }
 
-        if (SystemUtils.isUIThread()) {
+        if (Platforms.get().isUIThread()) {
             StackTraceElement[] stackTrace = new Exception().getStackTrace();
             int maxStackShow = 10;
             for (StackTraceElement e : stackTrace) {
