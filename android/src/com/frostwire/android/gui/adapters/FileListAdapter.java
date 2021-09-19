@@ -360,7 +360,6 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
                 items.add(new DeleteAdapterFilesMenuAction(context, this, list, null));
             }
         }
-
         return new MenuAdapter(context, fd.title, items);
     }
 
@@ -660,7 +659,7 @@ public class FileListAdapter extends AbstractListAdapter<FileDescriptorItem> {
             return; // yes, fast return (for now)
         }
 
-        for (FileDescriptorItem item : getList()) {
+        for (FileDescriptorItem item : getFullList()) {
             item.inSD = false;
             for (Entry<String, Boolean> e : sds.entrySet()) {
                 if (item.fd.filePath.contains(e.getKey())) {
