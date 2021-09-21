@@ -636,6 +636,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
+            if (results == null || results.values == null) {
+                return;
+            }
             adapter.visualList.clear();
             adapter.visualList.addAll((List<T>) results.values);
             adapter.notifyDataSetChanged();
