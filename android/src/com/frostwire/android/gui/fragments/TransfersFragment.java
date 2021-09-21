@@ -333,6 +333,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
                             }
                             final TransfersHolder tfCopy = transfersHolder;
 
+                            if (contextRef.get().getActivity() == null) {
+                                return;
+                            }
+
                             contextRef.get().getActivity().runOnUiThread(() -> {
                                 if (!Ref.alive(contextRef)) {
                                     Ref.free(contextRef);
