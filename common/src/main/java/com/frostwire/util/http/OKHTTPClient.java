@@ -69,10 +69,11 @@ public class OKHTTPClient extends AbstractHttpClient {
         b.followSslRedirects(true);
         b.hostnameVerifier(Ssl.fwHostnameVerifier());
         b.sslSocketFactory(Ssl.nullSocketFactory(), Ssl.nullTrustManager());
-        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.CLEARTEXT);
-        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
-        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.MODERN_TLS);
-        b.connectionSpecs(Arrays.asList(spec1, spec2, spec3));
+        ConnectionSpec spec0 = cipherSpec(ConnectionSpec.CLEARTEXT);
+        ConnectionSpec spec1 = cipherSpec(ConnectionSpec.COMPATIBLE_TLS);
+        ConnectionSpec spec2 = cipherSpec(ConnectionSpec.MODERN_TLS);
+        ConnectionSpec spec3 = cipherSpec(ConnectionSpec.RESTRICTED_TLS);
+        b.connectionSpecs(Arrays.asList(spec0, spec1, spec2, spec3));
         return b;
     }
 

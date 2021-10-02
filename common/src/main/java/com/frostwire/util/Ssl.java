@@ -132,7 +132,10 @@ public final class Ssl {
                 "zooqle.com",
                 "www.torrentdownloads.me",
                 "www.torrentdownloads.pro",
-                "sni.cloudflaressl.com"
+                "sni.cloudflaressl.com",
+                "cloudflaressl.com",
+                "magnetdl.com",
+                "www.magnetdl.com"
         };
 
         private static final HashSet<String> validDomainsSet = new HashSet<>();
