@@ -1,3 +1,7 @@
+FrostWire 2.4.3 build 685 - OCT/2/2021
+ - androidx.media2:media2-*:1.2.0 update
+ - targetSdkVersion 31 (Android 12)
+
 FrostWire 2.4.2 build 684 - SEP/21/2021
  - Search screen rewritten, considerably faster search results
  - WRITE_EXTERNAL and WRITE_SETTINGS permissions no longer required

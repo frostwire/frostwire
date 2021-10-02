@@ -90,7 +90,8 @@
             android:label="@string/application_label"
             android:launchMode="singleTask"
             android:protectionLevel="dangerous"
-            android:theme="@style/SplashScreenTheme">
+            android:theme="@style/SplashScreenTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
@@ -155,7 +156,8 @@
             android:label="@string/activity_preferences_name" />
         <activity
             android:name="com.frostwire.android.gui.activities.BuyActivity"
-            android:label="@string/remove_ads">
+            android:label="@string/remove_ads"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -195,7 +197,8 @@
             android:clearTaskOnLaunch="true"
             android:label="@string/frostwire_player"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -259,7 +262,8 @@
         <activity
             android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.Transparent">
+            android:theme="@style/Theme.Transparent"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
 
@@ -268,7 +272,8 @@
         </activity>
         <activity
             android:name="com.andrew.apollo.ui.activities.SearchActivity"
-            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
+            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.MEDIA_SEARCH" />
@@ -294,13 +299,13 @@
 
         <!-- receivers -->
 
-        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
+        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver">
+        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
@@ -330,26 +335,13 @@
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
             android:configChanges="orientation|screenSize"
             tools:replace="android:configChanges" />
-        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
 
         <!-- MoPub -->
-        <activity
-            android:name="com.mopub.mobileads.MoPubActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.mopub.mobileads.MraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name="com.mopub.common.MoPubBrowser"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name="com.mopub.common.privacy.ConsentDialogActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
     </application>
 </manifest>
