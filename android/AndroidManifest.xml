@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
@@ -233,7 +234,8 @@
                 <data android:mimeType="application/x-ogg" />
                 <data android:mimeType="application/itunes" />
             </intent-filter>
-            <intent-filter android:scheme="http">
+            <intent-filter android:scheme="http"
+                tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
