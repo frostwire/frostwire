@@ -312,6 +312,7 @@ public final class SystemUtils {
         public static void stopAll() {
             try {
                 handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
+                handlers.clear();
             } catch (Throwable t) {
                 LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
             }
