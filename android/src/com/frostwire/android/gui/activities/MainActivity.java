@@ -80,6 +80,7 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import org.apache.commons.io.IOUtils;
 
@@ -193,6 +194,7 @@ public class MainActivity extends AbstractActivity implements
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         SystemUtils.HandlerFactory.stopAll();
         finish();
+        OkHttpClientWrapper.cancelAllRequests();
         Engine.instance().shutdown();
     }
 
