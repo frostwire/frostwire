@@ -42,7 +42,10 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
     @Override
     public void perform() {
         for (int i = 1; !isStopped() && i <= pages; i++) {
-            onResults(searchPage(i));
+            List<? extends SearchResult> searchResults = searchPage(i);
+            if (searchResults != null && !searchResults.isEmpty()) {
+                onResults(searchResults);
+            }
         }
     }
 

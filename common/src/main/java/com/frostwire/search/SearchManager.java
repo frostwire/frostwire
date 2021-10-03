@@ -21,6 +21,7 @@ import com.frostwire.search.filter.SearchTable;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public final class SearchManager {
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
+    private final Object executorLock = new Object();
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;
@@ -84,11 +86,8 @@ public final class SearchManager {
     }
 
     public void stop() {
-        stopTasks(-1L);
-    }
-
-    public void stop(long token) {
-        stopTasks(token);
+        stopTasks();
+        OkHttpClientWrapper.cancelAllRequests();
     }
 
     public SearchListener getListener() {
@@ -132,7 +131,6 @@ public final class SearchManager {
                 while (it.hasNext()) {
                     WeakReference<SearchTable> t = it.next();
                     if (Ref.alive(t)) {
-                        //noinspection ConstantConditions
                         t.get().add(results);
                     } else {
                         it.remove();
@@ -177,12 +175,10 @@ public final class SearchManager {
         }
     }
 
-    private void stopTasks(long token) {
+    private void stopTasks() {
         synchronized (tasks) {
             for (SearchTask task : tasks) {
-                if (token == -1L || task.token() == token) {
-                    task.stopSearch();
-                }
+                task.stopSearch();
             }
         }
     }

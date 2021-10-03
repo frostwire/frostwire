@@ -25,7 +25,7 @@ import com.frostwire.search.yify.YifySearchResult;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ public final class YifySearchPerformerTest {
     public void yifiSearchTest() {
     //public static void main(String[] args) {
         String TEST_SEARCH_TERM = "one";
-        HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
+        HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = null;
         try {
             fileStr = httpClient.get("https://www.yify-torrent.org/search/" + TEST_SEARCH_TERM);

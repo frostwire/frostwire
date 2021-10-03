@@ -49,7 +49,7 @@ import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
 
@@ -300,14 +300,14 @@ public class EngineService extends JobIntentService implements IEngineService {
     // what a bad design to properly shutdown the framework threads!
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
-        ConnectionPool pool = OKHTTPClient.CONNECTION_POOL;
+        ConnectionPool pool = OkHttpClientWrapper.CONNECTION_POOL;
         try {
             pool.evictAll();
         } catch (Throwable e) {
             e.printStackTrace();
         }
         try {
-            synchronized (OKHTTPClient.CONNECTION_POOL) {
+            synchronized (OkHttpClientWrapper.CONNECTION_POOL) {
                 pool.notifyAll();
             }
         } catch (Throwable e) {

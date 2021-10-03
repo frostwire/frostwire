@@ -25,7 +25,7 @@ import com.frostwire.search.one337x.One337xSearchResult;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public final class One337xSearchPerformerTest {
     @Test
     public void one377xSearchTest() {
         String TEST_SEARCH_TERM = "foo";
-        HttpClient httpClient = new OKHTTPClient(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
+        HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = null;
         try {
             fileStr = httpClient.get("https://www.1377x.to/search/" + TEST_SEARCH_TERM + "/1/");

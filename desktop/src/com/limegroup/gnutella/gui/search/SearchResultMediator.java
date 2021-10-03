@@ -242,7 +242,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
         };
         STOP_SEARCH_LISTENER = e -> {
-            SearchMediator.instance().stopSearch(token);
+            SearchMediator.instance().stopSearch();
             updateSearchIcon(false);
             setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, false);
         };

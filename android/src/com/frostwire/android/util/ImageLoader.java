@@ -39,7 +39,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -623,7 +623,7 @@ public final class ImageLoader {
 
         OkHttpClient.Builder b = new OkHttpClient.Builder();
         b = b.cache(cache);
-        b = OKHTTPClient.configNullSsl(b);
+        b = OkHttpClientWrapper.configNullSsl(b);
         return b.build();
     }
 

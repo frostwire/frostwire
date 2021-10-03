@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,11 +21,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
-import okhttp3.*;
-import okio.Buffer;
-import okio.BufferedSink;
-import okio.GzipSink;
-import okio.Okio;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,19 +33,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ConnectionPool;
+import okhttp3.ConnectionSpec;
+import okhttp3.Dispatcher;
+import okhttp3.Headers;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
+
 /**
- * An OkHttpClient based HTTP Client.
+ * An OkHttpClient based AbstractHttpClient.
  *
  * @author gubatron
  * @author aldenml
  */
-public class OKHTTPClient extends AbstractHttpClient {
+public class OkHttpClientWrapper extends AbstractHttpClient {
     public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 30, TimeUnit.SECONDS);
-    private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
+    private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
     private final ThreadPool pool;
 
-    public OKHTTPClient(final ThreadPool pool) {
+    public OkHttpClientWrapper(final ThreadPool pool) {
         this.pool = pool;
+    }
+
+    public static void cancelAllRequests() {
+        CONNECTION_POOL.evictAll();
     }
 
     public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
