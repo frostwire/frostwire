@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
@@ -19,6 +18,7 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/app_toolbar_background"
@@ -30,7 +30,7 @@
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:src="@drawable/app_icon" />
 
     <RelativeLayout
@@ -42,7 +42,6 @@
             android:id="@+id/nav_view_header_main_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:text="@string/dummy_title"
@@ -64,8 +63,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/nav_view_header_main_title"
-            android:layout_toRightOf="@+id/nav_view_header_main_version"
-            android:text=","
+            android:layout_toEndOf="@+id/nav_view_header_main_version"
+            android:text="@string/comma"
             android:textColor="@color/basic_gray_medium"
             android:textSize="@dimen/text_size_micro" />
 
@@ -74,8 +73,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/nav_view_header_main_title"
-            android:layout_marginLeft="5dp"
-            android:layout_toRightOf="@+id/nav_view_header_main_comma"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/nav_view_header_main_comma"
             android:text="@string/dummy_build"
             android:textColor="@color/basic_gray_medium"
             android:textSize="@dimen/text_size_micro" />
@@ -85,15 +84,15 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
             android:layout_gravity="center_vertical"
             android:layout_marginTop="8dp"
             android:background="@color/transparent"
             android:clickable="true"
             android:elevation="1dp"
+            android:focusable="true"
             android:gravity="end"
             android:src="@drawable/menu_update"
-            android:tint="@color/basic_green" />
+            app:tint="@color/basic_green" />
 
     </RelativeLayout>
 
