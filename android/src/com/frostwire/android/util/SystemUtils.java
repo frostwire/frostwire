@@ -295,7 +295,11 @@ public final class SystemUtils {
         private static final HashMap<String, Handler> handlers = new HashMap<>();
 
         public static void postTo(final HandlerThreadName threadName, final Runnable r) {
-            get(threadName.name()).post(r);
+            try {
+                get(threadName.name()).post(r);
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
         }
 
         public static Handler get(@NonNull final String threadName) {
