@@ -263,21 +263,8 @@ public final class SearchFragment extends AbstractFragment implements
         promotions.setPromotionDownloader(this);
         searchProgress = findView(view, R.id.fragment_search_search_progress);
         searchProgress.setCurrentQueryReporter(this);
-        searchProgress.setCancelOnClickListener(v -> {
-            if (LocalSearchEngine.instance().isSearchFinished()) {
-                // retry
-                final String query = searchInput.getText();
-                prepareUIForSearch(adapter.getFileType());
-                postTo(SEARCH_PERFORMER,
-                        () -> LocalSearchEngine.instance().performSearch(query));
-                searchProgress.setProgressEnabled(true);
-            } else {
-                cancelSearch();
-            }
-        });
-
+        searchProgress.setCancelOnClickListener(new OnCancelSearchListener(Ref.weak(this)));
         list = findView(view, R.id.fragment_search_list);
-
         SwipeLayout swipe = findView(view, R.id.fragment_search_swipe);
         swipe.setOnSwipeListener(new SwipeLayout.OnSwipeListener() {
             @Override
@@ -431,8 +418,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void cancelSearch() {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
-        postTo(SEARCH_PERFORMER,
-                () -> LocalSearchEngine.instance().cancelSearch());
+        postTo(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
         adapter.clear();
         searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
@@ -777,7 +763,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
     }
 
-    private final static class OnRateClickAdapter extends ClickAdapter<SearchFragment> {
+    private static final class OnRateClickAdapter extends ClickAdapter<SearchFragment> {
         private final WeakReference<RichNotification> ratingReminderRef;
         private final ConfigurationManager CM;
 
@@ -798,6 +784,41 @@ public final class SearchFragment extends AbstractFragment implements
             try {
                 owner.startActivity(intent);
             } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    private static final class OnCancelSearchListener implements OnClickListener {
+
+        private final WeakReference<SearchFragment> searchFragmentRef;
+
+        OnCancelSearchListener(WeakReference<SearchFragment> sfr) {
+            this.searchFragmentRef = sfr;
+        }
+
+        @Override
+        public void onClick(View view) {
+            if (!Ref.alive(searchFragmentRef)) {
+                return;
+            }
+            SearchFragment searchFragment = searchFragmentRef.get();
+            if (searchFragment == null) {
+                return;
+            }
+            SearchInputView searchInput = searchFragment.searchInput;
+            SearchResultListAdapter adapter = searchFragment.adapter;
+            SearchProgressView searchProgress = searchFragment.searchProgress;
+            // retry
+            if (LocalSearchEngine.instance().isSearchFinished()) {
+                final String query = searchInput.getText();
+                searchFragment.prepareUIForSearch(adapter.getFileType());
+                postTo(SEARCH_PERFORMER,
+                        () -> LocalSearchEngine.instance().performSearch(query));
+                searchProgress.setProgressEnabled(true);
+            }
+            // cancel
+            else {
+                searchFragment.cancelSearch();
             }
         }
     }
