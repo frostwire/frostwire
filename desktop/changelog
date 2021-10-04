@@ -1,6 +1,7 @@
 frostwire (6.9.6) stable; urgency=high
  * com.google.re2j:re2j:1.6
  * com.google.code.gson:gson:2.8.8
+ * com.squareup.okhttp3:okhttp:4.9.1
 
  -- FrostWire Team <contact@frostwire.com>  Sun, 03 Oct 2021 21:42:00 -0600
 
