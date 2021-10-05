@@ -17,6 +17,9 @@
 
 package com.frostwire.util.http;
 
+import static com.frostwire.android.util.SystemUtils.*;
+
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
@@ -65,7 +68,10 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
     }
 
     public static void cancelAllRequests() {
-        CONNECTION_POOL.evictAll();
+        try {
+            HandlerFactory.postTo(HandlerThreadName.SEARCH_PERFORMER, CONNECTION_POOL::evictAll);
+        } catch (Throwable ignored) {
+        }
     }
 
     public static OkHttpClient.Builder newOkHttpClient(ThreadPool pool) {
@@ -111,10 +117,10 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
-         Response resp = okHttpClient.build().newCall(req).execute();
-         closeQuietly(resp.body());
-         copyMultiMap(resp.headers().toMultimap(), outputHeaders);
-         return resp.code();
+        Response resp = okHttpClient.build().newCall(req).execute();
+        closeQuietly(resp.body());
+        copyMultiMap(resp.headers().toMultimap(), outputHeaders);
+        return resp.code();
     }
 
     @Override
