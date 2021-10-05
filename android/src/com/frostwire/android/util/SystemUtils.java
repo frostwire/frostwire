@@ -89,7 +89,7 @@ public final class SystemUtils {
 
     public static boolean isPrimaryExternalPath(File path) {
         String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
-        return path != null ? path.getAbsolutePath().startsWith(primary) : null;
+        return path != null && path.getAbsolutePath().startsWith(primary);
     }
 
     public static long getAvailableStorageSize(File dir) {
@@ -304,7 +304,7 @@ public final class SystemUtils {
 
         public static Handler get(@NonNull final String threadName) {
             if (!handlers.containsKey(threadName)) {
-                HandlerThread handlerThread = new HandlerThread("LocalSearchEngine::HandlerThread");
+                HandlerThread handlerThread = new HandlerThread("SystemUil::HandlerThread - " + threadName);
                 handlerThread.start();
                 Handler handler = new Handler(handlerThread.getLooper());
                 handlers.put(threadName, handler);
