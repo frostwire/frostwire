@@ -17,9 +17,6 @@
 
 package com.frostwire.util.http;
 
-import static com.frostwire.android.util.SystemUtils.*;
-
-import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.StringUtils;
@@ -53,6 +50,7 @@ import okio.GzipSink;
 import okio.Okio;
 
 /**
+ * COMMON
  * An OkHttpClient based AbstractHttpClient.
  *
  * @author gubatron
@@ -69,7 +67,17 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
 
     public static void cancelAllRequests() {
         try {
-            HandlerFactory.postTo(HandlerThreadName.SEARCH_PERFORMER, CONNECTION_POOL::evictAll);
+            // We're in common so we'll just fire off this one thread here.
+            // This occurs when we cancel searches and when we shutdown the app.
+            new Thread("OkHttpClientWrapper::cancelAllRequests") {
+                @Override
+                public void run() {
+                    try {
+                        CONNECTION_POOL.evictAll();
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }.start();
         } catch (Throwable ignored) {
         }
     }
