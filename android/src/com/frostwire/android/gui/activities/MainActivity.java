@@ -192,9 +192,9 @@ public class MainActivity extends AbstractActivity implements
         shuttingdown = true;
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
-        SystemUtils.HandlerFactory.stopAll();
         finish();
         OkHttpClientWrapper.cancelAllRequests();
+        SystemUtils.HandlerFactory.stopAll();
         Engine.instance().shutdown();
     }
 
@@ -539,9 +539,12 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onDialogClick(String tag, int which) {
-        if (tag.equals(LAST_BACK_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
+        if (which != Dialog.BUTTON_POSITIVE || tag == null || tag.isEmpty()) {
+            return;
+        }
+        if (tag.equals(LAST_BACK_DIALOG_ID)) {
             onLastDialogButtonPositive();
-        } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
+        } else if (tag.equals(SHUTDOWN_DIALOG_ID)) {
             onShutdownDialogButtonPositive();
         }
     }
