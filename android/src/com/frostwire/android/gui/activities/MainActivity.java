@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -90,6 +90,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author gubatron
@@ -121,7 +122,7 @@ public class MainActivity extends AbstractActivity implements
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
 
-    private boolean shuttingdown = false;
+    private AtomicBoolean shuttingdown = new AtomicBoolean(false);
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -182,14 +183,14 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void shutdown() {
-        if (shuttingdown) {
+        if (shuttingdown.get()) {
             // NOTE: the actual solution should be for a re-architecture for
             // a guarantee of a single call of this logic.
             // For now, just mitigate the double call if coming from the exit
             // and at the same time the close of the interstitial
             return;
         }
-        shuttingdown = true;
+        shuttingdown.set(true);
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
