@@ -96,9 +96,13 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
                 LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
             }
             if (matcherFound) {
-                Torrentz2SearchResult sr = fromMatcher(matcher);
-                results.add(sr);
-                LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                try {
+                    Torrentz2SearchResult sr = fromMatcher(matcher);
+                    results.add(sr);
+                    LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
+                }
             } else if (results.size() < 5) {
                 LOG.warn("Torrentz2SearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
             }
