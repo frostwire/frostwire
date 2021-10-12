@@ -75,6 +75,7 @@ public final class ThemeMediator {
                         applySkinSettings();
                         setupGlobalKeyManager();
                     } catch (Throwable e) {
+                        e.printStackTrace();
                         throw new RuntimeException("Unable to change the L&F", e);
                     }
                 }

@@ -133,6 +133,9 @@ public class MacEventHandler {
             if (versionStr.startsWith("16")) {
                 return 16;
             }
+            if (versionStr.startsWith("17")) {
+                return 17;
+            }
             throw new RuntimeException("Java version " + versionStr + " not supported");
         }
 
