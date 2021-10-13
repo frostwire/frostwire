@@ -1007,7 +1007,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             directories.clear();
             File[] baseFolders;
             if (useShellFolder) {
-                baseFolders = AccessController.doPrivileged((PrivilegedAction<File[]>) () -> (File[]) ShellFolder.get("fileChooserComboBoxFolders"));
+                baseFolders = (File[]) ShellFolder.get("fileChooserComboBoxFolders");
             } else {
                 baseFolders = fsv.getRoots();
             }

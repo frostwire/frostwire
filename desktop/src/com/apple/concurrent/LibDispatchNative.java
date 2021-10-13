@@ -25,15 +25,9 @@
 
 package com.apple.concurrent;
 
-import java.security.PrivilegedAction;
-
 final class LibDispatchNative {
     static {
-        java.security.AccessController.doPrivileged(
-                (PrivilegedAction<Void>) () -> {
-                    System.loadLibrary("dispatch");
-                    return null;
-                });
+        System.loadLibrary("dispatch");
     }
 
     private LibDispatchNative() {
