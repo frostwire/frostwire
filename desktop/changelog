@@ -4,8 +4,9 @@ frostwire (6.9.6) stable; urgency=high
  * com.google.re2j:re2j:1.6
  * com.google.code.gson:gson:2.8.8
  * com.squareup.okhttp3:okhttp:4.9.2
+ * org.junit.jupiter:junit-jupiter:5.8.1
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 12 Oct 2021 12:47:40 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 12 Oct 2021 22:58:40 -0600
 
 frostwire (6.9.5) stable; urgency=high
  * Telluride Cloud Video Downloader build 17
