@@ -74,7 +74,8 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
                 public void run() {
                     try {
                         CONNECTION_POOL.evictAll();
-                    } catch (Throwable ignored) {
+                    } catch (Throwable t) {
+                        LOG.error(t.getMessage(), t);
                     }
                 }
             }.start();
