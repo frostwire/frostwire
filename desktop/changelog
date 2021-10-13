@@ -3,7 +3,7 @@ frostwire (6.9.6) stable; urgency=high
  * Includes JDK 17 runtime
  * com.google.re2j:re2j:1.6
  * com.google.code.gson:gson:2.8.8
- * com.squareup.okhttp3:okhttp:4.9.1
+ * com.squareup.okhttp3:okhttp:4.9.2
 
  -- FrostWire Team <contact@frostwire.com>  Tue, 12 Oct 2021 12:47:40 -0600
 
