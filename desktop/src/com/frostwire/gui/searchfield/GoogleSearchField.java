@@ -31,6 +31,7 @@ import com.limegroup.gnutella.gui.actions.FileMenuActions;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.URLDecoder;
 import org.limewire.util.LCS;
 import com.frostwire.util.OSUtils;
@@ -101,6 +102,10 @@ public class GoogleSearchField extends SearchField {
 
     private static String lastClipboardSearchQuery = null;
 
+    public static void eraseLastClipboardSearchQuery() {
+        lastClipboardSearchQuery = null;
+    }
+
     public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
         cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
         cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
@@ -119,6 +124,9 @@ public class GoogleSearchField extends SearchField {
         cloudSearchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
+                if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
+                    return;
+                }
                 Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 String s = GUIUtils.extractStringContentFromClipboard(systemClipboard);
                 if (s == null || "".equals(s)) {

@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.settings;
@@ -25,7 +27,7 @@ import java.io.File;
  * Settings for searches.
  */
 public final class SearchSettings extends LimeProps {
-    public static final IntSetting TELLURIDE_RPC_PORT = FACTORY.createIntSetting("TELLURIDE_RPC_PORT", 47999);
+    public static final IntSetting TELLURIDE_RPC_PORT = (IntSetting) FACTORY.createIntSetting("TELLURIDE_RPC_PORT", 47999).setAlwaysSave(true);
 
     /**
      * Amount of time to wait in milliseconds before showing details page
@@ -51,6 +53,8 @@ public final class SearchSettings extends LimeProps {
     public static final StringSetting LAST_MEDIA_TYPE_USED = FACTORY.createStringSetting("LAST_MEDIA_TYPE_USED", MediaType.getAudioMediaType().getMimeType());
     public static final BooleanSetting SMART_SEARCH_ENABLED = FACTORY.createBooleanSetting("SMART_SEARCH_ENABLED", true);
     public static final BooleanSetting SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START = FACTORY.createBooleanSetting("SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START", false);
+    public static final BooleanSetting AUTO_SEARCH_CLIPBOARD_URL = (BooleanSetting) FACTORY.createBooleanSetting("AUTO_SEARCH_CLIPBOARD_URL", true).setAlwaysSave(true);
+
     /**
      * Constant for the characters that are banned from search
      * strings.

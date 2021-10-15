@@ -17,43 +17,48 @@
 
 package com.limegroup.gnutella.gui.options.panes;
 
+import com.frostwire.gui.searchfield.GoogleSearchField;
 import com.limegroup.gnutella.gui.BoxPanel;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.LabeledComponent;
+import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
 
 import javax.swing.*;
 
 /**
  * @author gubatron
- * @author aldenml
  */
-public class DetailsPaneItem extends AbstractPaneItem {
-    private final JCheckBox DETAILS_CHECK_BOX = new JCheckBox();
-    private final static String TITLE = I18n.tr("Details Page");
-    private final static String DETAILS = I18n.tr("Show details web page after a download starts.");
+public class AutoSearchClipboardURLsPaneItem extends AbstractPaneItem {
+    private final static String TITLE = I18n.tr("Auto-search URLs in Clipboard");
+    private final static String DETAILS = I18n.tr("If there is an URL or magnet URL in your system's clipboard FrostWire will automatically paste and start a search with it");
+    private final JCheckBox AUTO_SEARCH_CHECK_BOX = new JCheckBox();
 
-    public DetailsPaneItem() {
+    public AutoSearchClipboardURLsPaneItem() {
         super(TITLE, "");
         BoxPanel panel = new BoxPanel();
-        LabeledComponent comp = new LabeledComponent(I18n.tr(DETAILS), DETAILS_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
+        LabeledComponent comp = new LabeledComponent(I18n.tr(DETAILS), AUTO_SEARCH_CHECK_BOX, LabeledComponent.LEFT_GLUE, LabeledComponent.LEFT);
         panel.add(comp.getComponent());
         add(panel);
     }
 
     @Override
     public boolean applyOptions() {
-        SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.setValue(DETAILS_CHECK_BOX.isSelected());
+        SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.setValue(AUTO_SEARCH_CHECK_BOX.isSelected());
+        ApplicationSettings.MAGNET_CLIPBOARD_LISTENER.setValue(AUTO_SEARCH_CHECK_BOX.isSelected());
+        if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
+            GoogleSearchField.eraseLastClipboardSearchQuery();
+        }
         return false;
     }
 
     @Override
     public void initOptions() {
-        DETAILS_CHECK_BOX.setSelected(SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.getValue());
+        AUTO_SEARCH_CHECK_BOX.setSelected(SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue());
     }
 
     @Override
     public boolean isDirty() {
-        return SearchSettings.SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START.getValue() != DETAILS_CHECK_BOX.isSelected();
+        return false;//SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue() != AUTO_SEARCH_CHECK_BOX.isSelected();
     }
 }

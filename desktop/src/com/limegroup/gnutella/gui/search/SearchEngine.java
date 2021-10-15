@@ -64,7 +64,7 @@ public abstract class SearchEngine {
     private static final Logger LOG = Logger.getLogger(SearchEngine.class);
     private static final int DEFAULT_TIMEOUT = 5000;
 
-    private static final BooleanSetting TELLURIDE_ENABLED = FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true);
+    private static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
     private static File TELLURIDE_LAUNCHER = null;
 
     enum SearchEngineID {

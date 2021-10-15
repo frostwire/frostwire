@@ -112,10 +112,6 @@ public class MagnetClipboardListener extends WindowAdapter {
         return null;
     }
 
-    /**
-     * @return true if no errors occurred.  False if we should not try to
-     * parse the clipboard anymore.
-     */
     private void parseAndLaunch() {
         String contents = GUIUtils.extractStringContentFromClipboard(CLIPBOARD);
         //could not extract the clipboard as text.

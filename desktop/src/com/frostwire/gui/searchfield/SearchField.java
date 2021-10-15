@@ -19,6 +19,7 @@ import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.collection.AutoCompleteDictionary;
 import org.limewire.collection.StringTrieSet;
@@ -225,6 +226,9 @@ public class SearchField extends JXSearchField {
      * Determines if paste is currently available.
      */
     private boolean isPasteAvailable() {
+        if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
+            return false;
+        }
         try {
             Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             return clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor);
