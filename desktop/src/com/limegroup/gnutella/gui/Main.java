@@ -53,12 +53,14 @@ public class Main {
         if (OSUtils.isMacOSX()) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
+            System.setProperty("jlibtorrent.jni.path", getMacOSJLibtorrentPath());
         }
         if (OSUtils.isLinux() && !OSUtils.isMachineX64()) {
             System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
         }
         //System.out.println("1: Main.main("+args+")");
         // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
+
         libtorrent_jni.version();
         Frame splash = null;
         try {
@@ -116,21 +118,29 @@ public class Main {
     private static String getWindowsJLibtorrentPath() {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
         jarPath = jarPath.replaceAll("%20", " ");
-        boolean isRelease = !jarPath.contains("frostwire-desktop");
+        boolean isRelease = !jarPath.contains("frostwire/desktop");
         String libPath = jarPath + File.separator + ((isRelease) ? "jlibtorrent.dll" : "lib/native/jlibtorrent.dll");
         if (!new File(libPath).exists()) {
-            libPath = new File(jarPath + File.separator + "../../lib/native/jlibtorrent.dll").getAbsolutePath();
+            libPath = new File(jarPath + File.separator + "../../../lib/native/jlibtorrent.dll").getAbsolutePath();
         }
         System.out.println("Using jlibtorrent: " + libPath);
         return libPath;
     }
 
+    private static String getMacOSJLibtorrentPath() {
+        return getPosixJLibtorrentPath("dylib");
+    }
+
     private static String getLinuxJLibtorrentPath() {
+        return getPosixJLibtorrentPath("so");
+    }
+
+    private static String getPosixJLibtorrentPath(String libraryExtension) {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-        boolean isRelease = !jarPath.contains("frostwire-desktop");
-        String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrent.so" : "lib/native/libjlibtorrent.so");
+        boolean isRelease = !jarPath.contains("frostwire/desktop");
+        String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrent." : "lib/native/libjlibtorrent.") + libraryExtension;
         if (!new File(libPath).exists()) {
-            libPath = new File(jarPath + File.separator + "../../lib/native/libjlibtorrent.so").getAbsolutePath();
+            libPath = new File(jarPath + File.separator + "../../../lib/native/libjlibtorrent." + libraryExtension).getAbsolutePath();
         }
         System.out.println("Using jlibtorrent: " + libPath);
         return libPath;
