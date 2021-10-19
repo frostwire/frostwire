@@ -42,11 +42,11 @@ application {
             '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
             '-Ddebug=1'
     ]
+    if (OperatingSystem.current().isWindows() || OperatingSystem.current().isMacOsX) {
+        applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED']
+    }
     if (OperatingSystem.current().isMacOsX()) {
-        applicationDefaultJvmArgs += [
-                '-Dsun.java2d.metal=true',
-                '--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED'
-        ]
+        applicationDefaultJvmArgs += ['-Dsun.java2d.metal=true']
     }
 }
 

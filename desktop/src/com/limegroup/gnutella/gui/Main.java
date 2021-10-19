@@ -47,7 +47,7 @@ public class Main {
         System.setProperty("sun.awt.noerasebackground", "true");
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        if (OSUtils.isWindows() && !OSUtils.isMachineX64()) {
+        if (OSUtils.isWindows()) {
             System.setProperty("jlibtorrent.jni.path", getWindowsJLibtorrentPath());
         }
         if (OSUtils.isMacOSX()) {
@@ -55,7 +55,7 @@ public class Main {
             System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
             System.setProperty("jlibtorrent.jni.path", getMacOSJLibtorrentPath());
         }
-        if (OSUtils.isLinux() && !OSUtils.isMachineX64()) {
+        if (OSUtils.isLinux()) {
             System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
         }
         //System.out.println("1: Main.main("+args+")");
@@ -115,47 +115,44 @@ public class Main {
     }
 
     private static String getWindowsJLibtorrentPath() {
-        String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-        jarPath = jarPath.replaceAll("%20", " ");
-        boolean isRelease = !jarPath.contains("frostwire/desktop");
-        String libPath = jarPath + File.separator + ((isRelease) ? "jlibtorrent.dll" : "lib/native/jlibtorrent.dll");
-        if (!new File(libPath).exists()) {
-            libPath = new File(jarPath + File.separator + "../../../lib/native/jlibtorrent.dll").getAbsolutePath();
-        }
-        System.out.println("Using jlibtorrent: " + libPath);
-        return libPath;
+        return getJLibtorrentPath(".dll");
     }
 
     private static String getMacOSJLibtorrentPath() {
-        return getPosixJLibtorrentPath("dylib");
+        return getJLibtorrentPath(".dylib");
     }
 
     private static String getLinuxJLibtorrentPath() {
-        return getPosixJLibtorrentPath("so");
+        return getJLibtorrentPath(".so");
     }
 
-    private static String getPosixJLibtorrentPath(String libraryExtension) {
+    private static String getJLibtorrentPath(String libraryExtension) {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-        boolean isRelease = !jarPath.contains("frostwire/desktop");
-        String productionLibPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrent." : "lib/native/libjlibtorrent.") + libraryExtension;
+        String libraryName = "libjlibtorrent";
+        if (OSUtils.isWindows()) {
+            jarPath = jarPath.replaceAll("%20", " ");
+            libraryName = "jlibtorrent";
+        }
+        boolean isRelease = !jarPath.contains("frostwire" + File.separator + "desktop");
+        String productionLibPath = jarPath + File.separator + ((isRelease) ? libraryName : "lib" + File.separator + "native" + File.separator + libraryName) + libraryExtension;
         File fileFromProductionPath = new File(productionLibPath);
         if (fileFromProductionPath.exists()) {
             System.out.println("Using jlibtorrent (production path): " + fileFromProductionPath.getAbsolutePath());
             return fileFromProductionPath.getAbsolutePath();
         }
-        String pathRunningFromCmdLine = jarPath + File.separator + "../../../lib/native/libjlibtorrent." + libraryExtension;
+        String pathRunningFromCmdLine = jarPath + File.separator + ".." + File.separator + ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
         File fileFromCMDLine = new File(pathRunningFromCmdLine);
         if (fileFromCMDLine.exists()) {
             System.out.println("Using jlibtorrent (cmd line path): " + fileFromCMDLine.getAbsolutePath());
             return fileFromCMDLine.getAbsolutePath();
         }
-        String pathRunningFromIntelliJ = jarPath + File.separator + "../../lib/native/libjlibtorrent." + libraryExtension;
+        String pathRunningFromIntelliJ = jarPath + File.separator + ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
         File fileFromIntelliJProject = new File(pathRunningFromIntelliJ);
         if (fileFromIntelliJProject.exists()) {
             System.out.println("Using jlibtorrent (intellij path): " + fileFromIntelliJProject.getAbsolutePath());
             return fileFromIntelliJProject.getAbsolutePath();
         }
-        System.out.println("Using jlibtorrent (fallback): " + "../../lib/native/libjlibtorrent." + libraryExtension);
-        return "../../lib/native/libjlibtorrent." + libraryExtension;
+        System.out.println("Using jlibtorrent (fallback): " + "../../lib/native/" + libraryName + libraryExtension);
+        return ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
     }
 }
