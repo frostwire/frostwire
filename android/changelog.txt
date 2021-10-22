@@ -1,10 +1,11 @@
-FrostWire 2.4.3 build 686 - OCT/4/2021
+FrostWire 2.4.3 build 686 - OCT/22/2021
  - Fixes search bug that would occur after exiting and reopening app
  - Better search http connection management
  - androidx.media2:media2-*:1.2.0 update
  - targetSdkVersion 31 (Android 12)
  - com.applovin:applovin-sdk:10.3.4
  - com.mopub.mediation:applovin:10.3.3.0
+ - com.android.tools.build:gradle:7.0.3
 
 FrostWire 2.4.2 build 684 - SEP/21/2021
  - Search screen rewritten, considerably faster search results
