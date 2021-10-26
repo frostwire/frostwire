@@ -399,12 +399,10 @@ public class CommonUtils {
     private static File getUserSettingsDir2() {
         // LOGIC:
         // On all platforms other than Windows or OSX,
-        // this will return <user-home>/.frostwire<versionMajor.versionMinor>
+        // this will return <user-home>/.frostwire5
         // On OSX, this will return <user-home>/Library/Preferences/FrostWire5
         // On Windows, this first tries to find:
-        // a) <user-home>/$LIMEWIRE_PREFS_DIR/.frostwire
-        // b) <user-home>/$APPDATA/FrostWire
-        // c) <user-home/.frostwire
+        // c) <user-home>/.frostwire5
         // If the $LIMEWIRE_PREFS_DIR variable doesn't exist, it falls back
         // to trying b).  If The $APPDATA variable can't be read or doesn't
         // exist, it falls back to a).
