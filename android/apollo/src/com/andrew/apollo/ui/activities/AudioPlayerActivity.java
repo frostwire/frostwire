@@ -74,7 +74,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.gui.util.WriteSettingsPermissionActivityHelper;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.MoPubAdNetwork;
@@ -177,7 +176,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private boolean mIsPaused = false;
 
     private boolean mFromTouch = false;
-    private WriteSettingsPermissionActivityHelper writeSettingsHelper;
     private GestureDetector gestureDetector;
 
     private long lastProgressBarTouched;
@@ -230,8 +228,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mAlbumArt != null) {
             mAlbumArt.setOnTouchListener(gestureListener);
         }
-
-        writeSettingsHelper = new WriteSettingsPermissionActivityHelper(this);
 
         waitingToInitAlbumArtBanner.set(false);
 
@@ -357,10 +353,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 // item
                 toggleFavorite();
                 return true;
-            case R.id.menu_player_audio_player_ringtone:
-                // Set the current track as a ringtone
-                writeSettingsHelper.onSetRingtoneOption(this, MusicUtils.getCurrentAudioId(), Constants.FILE_TYPE_AUDIO);
-                return true;
             case R.id.menu_player_audio_player_share:
                 // Share the current meta data
                 shareCurrentTrack();
@@ -414,14 +406,27 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
             LOG.info("onActivityResult: User just purchased something. removeAdsPurchaseTime=" + removeAdsPurchaseTime);
-        } else if (!writeSettingsHelper.onActivityResult(this, requestCode)) {
-            super.onActivityResult(requestCode, resultCode, data);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            Uri dataUri = intent.getData();
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                MusicUtils.startMusicPlaybackService(getApplicationContext(),
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
+                        () -> onNewIntent(intent));
+            } else {
+                onNewIntent(intent);
+            }
+        }
+
         waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
@@ -809,7 +814,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         boolean handled = false;
 
         if (uri != null && uri.toString().length() > 0) {
-            MusicUtils.playFile(uri);
+            MusicUtils.playFileFromUri(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
             long id = parseIdFromIntent(intent, "playlistId", "playlist");

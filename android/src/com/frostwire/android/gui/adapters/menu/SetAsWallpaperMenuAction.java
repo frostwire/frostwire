@@ -24,7 +24,7 @@ import android.graphics.BitmapFactory;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -36,9 +36,9 @@ import static com.frostwire.android.util.Asyncs.async;
  */
 public class SetAsWallpaperMenuAction extends MenuAction {
 
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
 
-    public SetAsWallpaperMenuAction(Context context, FileDescriptor fd) {
+    public SetAsWallpaperMenuAction(Context context, FWFileDescriptor fd) {
         super(context, R.drawable.contextmenu_icon_picture, R.string.set_as_wallpaper);
         this.fd = fd;
     }

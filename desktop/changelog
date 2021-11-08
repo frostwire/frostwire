@@ -1,8 +1,59 @@
+frostwire (6.9.6) stable; urgency=high
+ * New option to turn off auto-pasting URLs and magnets in the clipboard to search textbox
+ * JDK 17 compatibility update
+ * Includes JDK 17 runtime
+ * com.google.re2j:re2j:1.6
+ * com.google.code.gson:gson:2.8.8
+ * com.squareup.okhttp3:okhttp:4.9.2
+ * org.junit.jupiter:junit-jupiter:5.8.1
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 14 Oct 2021 20:20:40 -0600
+
+frostwire (6.9.5) stable; urgency=high
+ * Telluride Cloud Video Downloader build 17
+ * SC search fixed
+ * jlibtorrent-1.2.14.0 update
+ * dev: common java source code now has Java 11 support. cleanups.
+ * lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+ * lt:make remove_torrent flags be treated as flags (instead of an enum)
+ * lt:improve handling of seed flag in PEX messages
+ * lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
+ * lt:fix bug in parsing chunked encoding
+ * lt:fix incorrect reporting of active_duration when entering graceful-pause
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 02 Sep 2021 22:17:00 -0600
+
+frostwire (6.9.4) stable; urgency=high
+ * Torrent search results when double clicked or downloaded in bulk by default show partial download dialog
+ * Torrentz2 search fixed
+ * SoundCloud search fixed
+ * Files in the transfer detail panel can be dragged out of FrostWire into OS file explorer for copying
+ * Telluride build 16
+ * Recompiled mplayer on macos 11.2.3
+ * Telluride first search waits for Telluride server to fully launch, no more connection refused error
+ * Auto-pasted urls are not deleted from the clipboard. Only auto pasted once
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 14 Jun 2021 00:33:00 -0600
+
+frostwire (6.9.3) stable; urgency=high
+ * Telluride Cloud Video Downloader build 15
+ * jlibtorrent-1.2.13.0 update
+ * Telluride searches are much faster, telluride runs as an RPC server in background
+ * openssl 1.1.1j upgrade
+ * lt:fix incoming TCP connections when using tracker-only proxy
+ * lt:fix issue with paths starting with ./
+ * lt:fix integer overflow when setting a high DHT upload rate limit
+ * lt:improve Path MTU discovery logic in uTP
+ * lt:fix overflow issue when rlimit_nofile is set to infinity
+ * lt:Fix cxxflags and linkflags injection via environment variables
+
+ -- FrostWire Team <contact@frostwire.com>  Tue, 6 Apr 2021 17:50:00 -0600
+
 frostwire (6.9.2) stable; urgency=high
  * Telluride Cloud Video Downloader build 10
  * jlibtorrent-1.2.12.0 rebuild to fix linux compatibility issues
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 12 Feb 2020 14:18:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 12 Feb 2021 14:18:00 -0600
 
 frostwire (6.9.1) stable; urgency=high
  * jlibtorrent-1.2.12.0 update
@@ -17,7 +68,7 @@ frostwire (6.9.1) stable; urgency=high
  * lt:fix error handling for pool allocation failure
  * Windows build reverts to jdk-14
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 14 Jan 2020 18:47:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 14 Jan 2021 18:47:00 -0600
 
 frostwire (6.8.10) stable; urgency=high
  * jlibtorrent-1.2.11.0 update

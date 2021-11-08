@@ -184,7 +184,7 @@ public final class OptionsConstructor {
         // player
         addOption(OptionsMediator.ROOT_NODE_KEY, PLAYER_KEY, I18n.tr("Player"), PlayerPaneItem.class);
         // search options
-        addOption(OptionsMediator.ROOT_NODE_KEY, SEARCH_KEY, I18n.tr("Searching"), SearchEnginesPaneItem.class, MaximumSearchesPaneItem.class, SmartSearchDBPaneItem.class, DetailsPaneItem.class);
+        addOption(OptionsMediator.ROOT_NODE_KEY, SEARCH_KEY, I18n.tr("Searching"), SearchEnginesPaneItem.class, MaximumSearchesPaneItem.class, SmartSearchDBPaneItem.class, DetailsPaneItem.class, AutoSearchClipboardURLsPaneItem.class);
         //status bar
         addOption(OptionsMediator.ROOT_NODE_KEY, STATUS_BAR_KEY, I18n.tr("Status Bar"), StatusBarConnectionQualityPaneItem.class, StatusBarFirewallPaneItem.class, StatusBarBandwidthPaneItem.class); // Removed Lime Store
         //itunes

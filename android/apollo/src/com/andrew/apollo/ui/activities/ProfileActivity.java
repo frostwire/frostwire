@@ -20,7 +20,6 @@ package com.andrew.apollo.ui.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -35,7 +34,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.andrew.apollo.Config;
-import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.menu.FragmentMenuItems;
@@ -60,11 +58,8 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * The {@link Activity} is used to display the data for specific
@@ -328,7 +323,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                     MusicUtils.playLastAdded(this);
                 } else {
                     if (list != null && list.length > 0) {
-                        MusicUtils.playAll(list, 0, true);
+                        MusicUtils.playFDs(list, 0, true);
                     }
                 }
                 return true;

@@ -51,6 +51,20 @@
 -dontwarn org.conscrypt.Conscrypt
 -dontwarn org.conscrypt.OpenSSLProvider
 
+# Applovin
+-keepattributes Signature,InnerClasses,Exceptions,Annotation
+-keep public class com.applovin.sdk.AppLovinSdk{ *; }
+-keep public class com.applovin.sdk.AppLovin* { public protected *; }
+-keep public class com.applovin.nativeAds.AppLovin* { public protected *; }
+-keep public class com.applovin.adview.* { public protected *; }
+-keep public class com.applovin.mediation.* { public protected *; }
+-keep public class com.applovin.mediation.ads.* { public protected *; }
+-keep public class com.applovin.impl.*.AppLovin { public protected *; }
+-keep public class com.applovin.impl.**.*Impl { public protected *; }
+-keepclassmembers class com.applovin.sdk.AppLovinSdkSettings { private java.util.Map localSettings; }
+-keep class com.applovin.mediation.adapters.** { *; }
+-keep class com.applovin.mediation.adapter.**{ *; }
+
 # GoogleBillingClient
 -keep class com.android.billingclient.api.BillingClientImpl$* { *; }
 
@@ -58,6 +72,9 @@
 -keep class com.frostwire.jlibtorrent.swig.libtorrent_jni {*;}
 
 -keep class libcore.io.Memory { *; }
+
+# GMS
+-keep public class com.google.android.gms.** { public protected *; }
 
 # keep all constructors
 -keep class * {

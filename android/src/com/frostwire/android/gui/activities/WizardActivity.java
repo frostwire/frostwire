@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -26,12 +25,10 @@ import android.widget.Button;
 import android.widget.ViewFlipper;
 
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.gui.views.GeneralWizardPage;
 import com.frostwire.android.gui.views.WizardPageView;
 import com.frostwire.android.gui.views.WizardPageView.OnCompleteListener;
 
@@ -81,24 +78,6 @@ public class WizardActivity extends AbstractActivity {
         }
 
         setupViewPage();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // user picked a folder in the GeneralWizardPage.
-        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            onStoragePathChanged(requestCode, resultCode, data);
-        }
-    }
-
-    private void onStoragePathChanged(int requestCode, int resultCode, Intent data) {
-        View view = viewFlipper.getCurrentView();
-        if (view instanceof GeneralWizardPage) {
-            String newPath = StoragePicker.handle(this, requestCode, resultCode, data);
-            if (newPath != null) {
-                ((GeneralWizardPage) view).updateStoragePathTextView(newPath);
-            }
-        }
     }
 
     private void previousPage() {

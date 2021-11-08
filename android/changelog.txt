@@ -1,3 +1,97 @@
+FrostWire 2.4.3 build 686 - OCT/22/2021
+ - Fixes search bug that would occur after exiting and reopening app
+ - Better search http connection management
+ - androidx.media2:media2-*:1.2.0 update
+ - targetSdkVersion 31 (Android 12)
+ - com.applovin:applovin-sdk:10.3.4
+ - com.mopub.mediation:applovin:10.3.3.0
+ - com.android.tools.build:gradle:7.0.3
+
+FrostWire 2.4.2 build 684 - SEP/21/2021
+ - Search screen rewritten, considerably faster search results
+ - WRITE_EXTERNAL and WRITE_SETTINGS permissions no longer required
+ - Android 11+ compatibility updates in the way the app interacts with the Android Media Store API
+ - After Android 10, files can no longer be deleted from "My Files", this has been delegated to
+   the OS's File Manager, less is more.
+ - gradle:4.1.0 -> 4.2.2 -> 7.0.2
+ - Java 11 language support, common/ and android/ codebased will be modernized through future updates
+ - Storage location selection feature dropped, the application will use external shared storage where available by default
+ - minSdkVersion 24 (Android 7.0)
+ - targetSdkVersion 30 (Android 11)
+ - New jlibtorrent 1.2.14.1 (no more netlink sockets, ifaddr sockets)
+ - Set as Ringtone action removed (needed WRITE_SETTINGS) permission
+ - Soundcloud search fixed
+ - lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+ - lt:make remove_torrent flags be treated as flags (instead of an enum)
+ - lt:improve handling of seed flag in PEX messages
+ - lt:fix issue of accruing unlimited DHT node candidates when DHT is disabled
+ - lt:fix bug in parsing chunked encoding
+ - lt:fix incorrect reporting of active_duration when entering graceful-pause
+ - com.google.gms:google-services:4.3.10
+ - com.google.firebase:firebase-crashlytics-gradle:2.7.1
+ - com.google.android.flexbox:flexbox:3.0.0
+ - com.mopub:mopub-sdk:5.18.0
+ - com.mopub.mediation:unityads:3.7.5.0
+ - com.mopub.mediation:applovin:10.3.3.0
+ - com.unity3d.ads:unity-ads:3.7.5
+ - com.applovin:applovin-sdk:10.3.2
+ - com.google.android.material:material:1.4.0
+ - androidx.exifinterface:exifinterface:1.3.3
+ - androidx.appcompat:appcompat:1.3.1
+ - androidx.recyclerview:recyclerview:1.2.1
+ - androidx.core:core-ktx:1.6.0
+ - com.google.android.gms:play-services-ads:20.2.0
+ - com.android.billingclient:billing:4.0.0
+ - com.google.android.gms:play-services-ads:20.3.0
+ - com.google.code.gson:gson:2.8.8
+ - com.google.re2j:re2j:1.6
+ - com.squareup.okhttp3:okhttp:5.0.0-alpha.2
+ - com.android.tools.build:gradle:7.0.2
+
+FrostWire 2.3.2 build 679 (experimental/very unstable) - JUN/18/2021
+ - We're submitting this to Google Play so they don't remove the app but it's broken
+ - Android 11 - first pass of compatibility fixes
+ - FrostWire no longer needs writes access to external storage
+ - FrostWire writes only to its internal directory and make downloaded files
+ - Multiple fixes related to media player startup which could cause
+   the player to enter illegal states or crash the application
+ - For Android 10+ devices, we'll temporarily disable storage selection from settings
+   until we make sure we can integrate it for Android 10+ devices
+   without external writing permissions
+ - File deletion action not available for external media files not downloaded by FrostWire
+ - remove ignoreHardwareMenu logic, physical menu key a thing of the past
+ - minSdkVersion 23 (Android Marshmallow 6.0)
+ - targetSdkVersion 30 (Android 11)
+ - com.google.gms:google-services:4.3.8
+ - com.google.firebase:firebase-crashlytics-gradle:2.7.0
+
+FrostWire 2.3.1 build 678 - APR/23/2021
+ - SoundCloud search & downloads fixed
+ - androidx.media2:media2:1.1.3
+ - androidx.recyclerview:recyclerview:1.2.0
+ - com.google.android.gms:play-services-ads:20.0.0
+ - com.google.firebase:firebase-crashlytics-gradle:2.5.2
+ - com.applovin:applovin-sdk:10.1.2
+ - com.unity3d.ads:unity-ads:3.6.2
+ - don't crash on removeFromPlaylist error
+
+FrostWire 2.3.0 build 677 - MAR/24/2021
+ - New jlibtorent 1.2.13.0
+ - com.google.firebase:firebase-bom:26.7.0
+ - com.android.billingclient:billing:3.0.3
+ - com.google.android.gms:play-services-ads:19.8.0
+ - androidx.annotation:annotation:1.2.0
+ - com.mopub:mopub-sdk-banner:5.16.3
+ - dev: com.android.tools.build:gradle:4.1.3
+ - com.applovin:applovin-sdk:10.0.1
+ - com.mopub.mediation:applovin:10.0.1.0
+ - lt:fix incoming TCP connections when using tracker-only proxy
+ - lt:fix issue with paths starting with ./
+ - lt:fix integer overflow when setting a high DHT upload rate limit
+ - lt:improve Path MTU discovery logic in uTP
+ - lt:fix overflow issue when rlimit_nofile is set to infinity
+ - lt:Fix cxxflags and linkflags injection via environment variables
+
 FrostWire 2.2.9 build 675 - FEB/16/2021
  - New jlibtorrent 1.2.12.0
  - Mopub 5.16.0: s/RewardedVideo/RewardedAd/g refactor

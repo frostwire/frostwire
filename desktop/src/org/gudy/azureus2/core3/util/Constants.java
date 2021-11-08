@@ -44,11 +44,7 @@ public class Constants {
             if (timezone != null) {
                 TimeZone.setDefault(TimeZone.getTimeZone(timezone));
             }
-        } catch (Throwable e) {
-            // can happen in applet
-            if (!(e instanceof AccessControlException)) {
-                e.printStackTrace();
-            }
+        } catch (Throwable ignorable) {
         }
     }
 

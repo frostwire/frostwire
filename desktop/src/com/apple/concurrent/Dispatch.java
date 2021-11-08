@@ -55,14 +55,8 @@ public final class Dispatch {
      * @return a factory instance of Dispatch, or null if not available
      */
     public static Dispatch getInstance() {
-        checkSecurity();
         if (!LibDispatchNative.nativeIsDispatchSupported()) return null;
         return instance;
-    }
-
-    private static void checkSecurity() {
-        final SecurityManager security = System.getSecurityManager();
-        if (security != null) security.checkPermission(new RuntimePermission("canInvokeInSystemThreadGroup"));
     }
 
     /**

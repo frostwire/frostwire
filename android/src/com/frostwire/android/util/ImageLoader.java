@@ -29,7 +29,6 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Process;
 import android.os.StatFs;
 import android.provider.BaseColumns;
@@ -40,7 +39,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -332,7 +331,7 @@ public final class ImageLoader {
             if (p.filter != null) {
                 rc.transform(new FilterWrapper(p.filter));
             }
-            new Handler(Looper.getMainLooper()).post(
+            SystemUtils.postToUIThread(
                     () -> {
                         try {
                             if (!Ref.alive(targetRef)) {
@@ -624,7 +623,7 @@ public final class ImageLoader {
 
         OkHttpClient.Builder b = new OkHttpClient.Builder();
         b = b.cache(cache);
-        b = OKHTTPClient.configNullSsl(b);
+        b = OkHttpClientWrapper.configNullSsl(b);
         return b.build();
     }
 

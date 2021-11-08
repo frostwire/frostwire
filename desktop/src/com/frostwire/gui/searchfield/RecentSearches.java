@@ -48,7 +48,7 @@ class RecentSearches implements ActionListener {
         if (prefs == null) {
             try {
                 prefs = Preferences.userRoot();
-            } catch (AccessControlException ace) {
+            } catch (Throwable t) {
                 // disable persistency, if we aren't allowed to access
                 // preferences.
                 Logger.getLogger(getClass().getName()).warning("cannot acces preferences. persistency disabled.");

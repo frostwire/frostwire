@@ -19,13 +19,14 @@ package com.frostwire.search.telluride;
 
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.UrlUtils;
+import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -35,17 +36,14 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static final Logger LOG = Logger.getLogger(TellurideSearchPerformer.class);
     private static Gson gson = null;
     private static Calendar calendar = null;
-    private final CountDownLatch performanceLatch;
+    private final CountDownLatch performerLatch;
+    private final int TELLURIDE_RPC_PORT = 47999;
 
     private final String url;
-    private final File tellurideLauncher;
-    private final File saveDirectory;
     private final TellurideSearchPerformerListener performerListener;
 
     public TellurideSearchPerformer(long token,
                                     String _url,
-                                    File _tellurideLauncher,
-                                    File _saveDirectory,
                                     TellurideSearchPerformerListener _performerListener) {
         super(token);
 
@@ -55,10 +53,8 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
 
         url = _url;
-        tellurideLauncher = _tellurideLauncher;
-        saveDirectory = _saveDirectory;
         performerListener = _performerListener;
-        performanceLatch = new CountDownLatch(1);
+        performerLatch = new CountDownLatch(1);
         if (gson == null) {
             gson = new GsonBuilder().create();
         }
@@ -69,33 +65,33 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
     @Override
     public void perform() {
-        try {
-            TellurideLauncher.launch(tellurideLauncher,
-                    url,
-                    saveDirectory,
-                    false,
-                    true,
-                    false,
-                    // MetaListener
-                    new TellurideAbstractListener() {
-                        @Override
-                        public void onMeta(String json) {
-                            TellurideSearchPerformer.this.onMeta(json);
-                        }
-
-                        @Override
-                        public void onError(String errorMessage) {
-                            TellurideSearchPerformer.this.onError(errorMessage);
-                        }
-                    });
-            LOG.info("perform(): working...");
-            performanceLatch.await();
-        } catch (IllegalArgumentException e) {
-            if (performerListener != null) {
-                performerListener.onTellurideBinaryNotFound(e);
+        int seconds_to_wait_for_telluride_server = 10;
+        while (!TellurideLauncher.SERVER_UP.get() && seconds_to_wait_for_telluride_server > 0) {
+            LOG.info("perform(): waiting for Telluride Server to be up... (" + seconds_to_wait_for_telluride_server + " secs left to time out)");
+            try {
+                Thread.sleep(1000);
+                seconds_to_wait_for_telluride_server--;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        } catch (InterruptedException e) {
+        }
+
+        if (seconds_to_wait_for_telluride_server == 0) {
+            LOG.info("perform(): timed out waiting for telluride server to start. finished.");
+            return;
+        }
+
+        try {
+            HttpClient httpClient = HttpClientFactory.newInstance();
+            String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",
+                    TELLURIDE_RPC_PORT,
+                    UrlUtils.encode(url));
+            LOG.info("perform(): working on " + queryUrl);
+            String tellurideJSON = httpClient.get(queryUrl);
+            TellurideSearchPerformer.this.onMeta(tellurideJSON);
+        } catch (Throwable e) {
             LOG.error(e.getMessage(), e);
+            TellurideSearchPerformer.this.onError(e.getMessage());
         }
         LOG.info("perform(): finished.");
     }
@@ -203,14 +199,14 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         // When a performer ends in the PerformTask, it's stopped (stopped=true) by the SearchManager
         // as it removes the task.
         // This latch is released so the PerformTask can finish.
-        performanceLatch.countDown();
+        performerLatch.countDown();
     }
 
     private void onError(String errorMessage) {
         if (performerListener != null) {
             performerListener.onError(getToken(), errorMessage);
         }
-        performanceLatch.countDown();
+        performerLatch.countDown();
     }
 
     private boolean noCodec(String codec) {

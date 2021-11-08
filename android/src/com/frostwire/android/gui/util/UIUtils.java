@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.util;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -43,13 +45,12 @@ import android.widget.Toast;
 import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
 
-import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.gui.Librarian;
@@ -73,8 +74,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -141,8 +140,10 @@ public final class UIUtils {
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
-        final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
+        SystemUtils.postToUIThread(() -> {
+            final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
+        });
     }
 
     public static void sendShutdownIntent(Context ctx) {
@@ -256,87 +257,6 @@ public final class UIUtils {
         }
     }
 
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    If you found this in Google, I could not make it work in 2 days, I really tried, I got response
-//    from the package installer session and all, but I couldn't start the android screen to ask for
-//    permissions
-//
-//    Leaving this as an example in case they enable the use of PackageInstaller for non-system apps.
-//    or that sometime in the future I figure out what the hell was missing in order to ask the user
-//    for permission to install apks.
-//
-//    This code currently ends up sending an intent from the PackageInstaller to MainActivity
-//    the intent has an extra intent to ask for permissions, but it doesn't work when you do start an
-//    activity with it.  Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
-//    Also commenting out code in MainActivity::onPackageInstalledCallback()
-//    which would handle the intent :_(
-//
-//    Code commented out in MainActivity, and also SoftwareUpdater::notifyUserAboutUpdate() checking if apk is there.
-//
-//    public static boolean openAPK(Context context, File updateApk) {
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) { // NOUGAT OR NEWER
-//            try {
-//                Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
-//                Intent intent = new Intent("android.content.pm.PackageInstaller");
-//                intent.setData(uri);
-//                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                //intent.setDataAndType(uri, "application/vnd.android.package-archive");
-//                context.startActivity(intent);
-//                return true;
-//            } catch (Throwable t) {
-//                Uri apkUri = null;
-//                // We usually end up here
-//                //LOG.error("openAPK() error - " + t.getMessage(), t);
-//                PackageInstaller packageInstaller = context.getPackageManager().getPackageInstaller();
-//                PackageInstaller.SessionParams sessionParams = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-//                sessionParams.setAppPackageName("com.frostwire.android");
-//                try {
-//                    apkUri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", updateApk);
-//                    DocumentFile documentFile = DocumentFile.fromSingleUri(context, apkUri);
-//                    int sessionID = packageInstaller.createSession(sessionParams);
-//                    PackageInstaller.Session session = packageInstaller.openSession(sessionID);
-//                    OutputStream sessionOutputStream = session.openWrite("Package", 0, -1);
-//
-//                    InputStream apkInputStream = context.getContentResolver().openInputStream(apkUri);
-//                    byte[] buffer = new byte[65536];
-//                    int n;
-//                    while ((n = apkInputStream.read(buffer)) >= 0) {
-//                        sessionOutputStream.write(buffer, 0, n);
-//                    }
-//                    apkInputStream.close();
-//                    session.fsync(sessionOutputStream);
-//                    sessionOutputStream.close();
-//
-//                    // could exit the app for instance
-//                    Intent intent = new Intent(context, MainActivity.class);
-//                    intent.setAction(Constants.ACTION_PACKAGE_INSTALLED);
-//                    PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-//                    IntentSender statusReceiver = pendingIntent.getIntentSender();
-//                    session.commit(statusReceiver);
-//                    LOG.info("openAPK() success!");
-//                    return true;
-//                } catch (Throwable e) {
-//                    LOG.error("openAPK (using FileProvider) failed with filePath=" + apkUri, e);
-//                    return false;
-//                }
-//            }
-//        } else {
-//            Uri uri = null;
-//            try {
-//                uri = Uri.fromFile(updateApk);
-//                Intent intent = new Intent(Intent.ACTION_VIEW);
-//                intent.setDataAndType(uri, "application/vnd.android.package-archive");
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                context.startActivity(intent);
-//                return true;
-//            } catch (Throwable t) {
-//                LOG.error("openAPK (using Uri.fromFile) failed with filePath=" + uri, t);
-//                return false;
-//            }
-//        }
-//    }
-////// END OF PACKAGE INSTALLER LOGIC SECTION
-
     public static boolean openFile(Context context, String filePath, String mime) {
         return openFile(context, filePath, mime, SystemUtils.hasNougatOrNewer());
     }
@@ -348,8 +268,16 @@ public final class UIUtils {
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
             if (filePath != null && !openAudioInternal(context, filePath)) {
-                Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ? Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
-                i.setDataAndType(getFileUri(context, filePath, useFileProvider), Intent.normalizeMimeType(mime));
+                Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ?
+                        Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
+
+                // The mime type makes it match AudioPlayerActivity see AndroidManifest.xml
+                LOG.info("openFile(filePath=" + filePath + ", mime=" + mime + ")", true);
+                Uri fileUri = getFileUri(context, filePath, useFileProvider);
+                LOG.info("openFile(...) -> fileUri=" + fileUri.toString(), true);
+
+                i.setDataAndType(fileUri, Intent.normalizeMimeType(mime));
+
                 i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 if (mime != null && mime.contains("video")) {
                     if (MusicUtils.isPlaying()) {
@@ -414,13 +342,21 @@ public final class UIUtils {
     }
 
     public static Uri getFileUri(Context context, String filePath) {
-        return getFileUri(context, filePath, SystemUtils.hasNougatOrNewer());
+        return getFileUri(context, new File(filePath));
+    }
+
+    public static Uri getFileUri(Context context, File file) {
+        return getFileUri(context, file, SystemUtils.hasNougatOrNewer());
+    }
+
+    public static Uri getFileUri(Context context, File file, boolean useFileProvider) {
+        return useFileProvider ?
+                FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", file) :
+                Uri.fromFile(file);
     }
 
     public static Uri getFileUri(Context context, String filePath, boolean useFileProvider) {
-        return useFileProvider ?
-                FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".fileprovider", new File(filePath)) :
-                Uri.fromFile(new File(filePath));
+        return getFileUri(context, new File(filePath), useFileProvider);
     }
 
     public static boolean openFile(Context context, File file) {
@@ -459,13 +395,13 @@ public final class UIUtils {
     /**
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
      */
-    public static void playEphemeralPlaylist(final Context context, final FileDescriptor fd) {
+    public static void playEphemeralPlaylist(final Context context, final FWFileDescriptor fd) {
         async(context, UIUtils::playEphemeralPlaylistTask, fd);
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
         try {
-            List<FileDescriptor> fds = Librarian.instance().getFiles(context, filePath, true);
+            List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, true);
             if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
                 return true;
@@ -631,15 +567,17 @@ public final class UIUtils {
         return diceRoll <= thresholdValue;
     }
 
-    private static void playEphemeralPlaylistTask(Context context, FileDescriptor fd) {
+    private static void playEphemeralPlaylistTask(Context context, final FWFileDescriptor fd) {
         LOG.info("playEphemeralPlaylistTask() is MusicPlaybackService running? " + MusicUtils.isMusicPlaybackServiceRunning());
         final CoreMediaPlayer mediaPlayer = Engine.instance().getMediaPlayer();
         final WeakReference<Context> contextRef = Ref.weak(context);
         if (!MusicUtils.isMusicPlaybackServiceRunning()) {
             Runnable playEphemeralPlaylistOfOneCallback = () -> {
                 try {
+                    LOG.info("playEphemeralPlaylistTask::playEphemeralPlaylistOfOneCallback for " + fd.filePath, true);
                     if (mediaPlayer != null && Ref.alive(contextRef)) {
                         EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(contextRef.get(), fd);
+                        LOG.info("playEphemeralPlaylistTask::playEphemeralPlaylistOfOneCallback created ephemeral playlist " + fd.filePath, true);
                         mediaPlayer.play(ephemeralPlaylist);
                     }
                 } catch (Throwable ignored) {
@@ -651,7 +589,9 @@ public final class UIUtils {
 
             if (MusicUtils.getMusicPlaybackService() == null) {
                 //LOG.info("playEphemeralPlaylistTask() service is not there, and it's null");
-                MusicUtils.startMusicPlaybackService(context, new Intent(context, MusicPlaybackService.class), playEphemeralPlaylistOfOneCallback);
+                MusicUtils.startMusicPlaybackService(context,
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(context),
+                        playEphemeralPlaylistOfOneCallback);
             } else {
                 //LOG.info("playEphemeralPlaylistTask() calling playEphemeralPlaylistOfOneCallback directly, had music service already");
                 playEphemeralPlaylistOfOneCallback.run();
@@ -665,6 +605,7 @@ public final class UIUtils {
                 }
             } catch (Throwable ignored) {
                 // possible Runtime error thrown by Librarian.instance()
+                LOG.error(ignored.getMessage(), ignored);
             }
         }
     }
@@ -679,4 +620,5 @@ public final class UIUtils {
         }
         return km.isKeyguardLocked();
     }
+
 }

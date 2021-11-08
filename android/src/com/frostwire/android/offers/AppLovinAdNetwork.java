@@ -17,22 +17,20 @@
 
 package com.frostwire.android.offers;
 
+import static com.frostwire.android.offers.Offers.DEBUG_MODE;
+
 import android.app.Activity;
 import android.content.Context;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.sdk.AppLovinAdSize;
 import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.frostwire.android.offers.Offers.DEBUG_MODE;
 
 public class AppLovinAdNetwork extends AbstractAdNetwork {
 

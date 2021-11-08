@@ -1,26 +1,26 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(TM). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.gui.views;
 
-import android.app.Dialog;
+import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
+
 import android.content.Context;
-import android.os.Looper;
 import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -39,10 +39,10 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,35 +57,32 @@ import java.util.Set;
  * @author aldenml
  */
 public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filterable {
-
+    // Immutable
     private static final Logger LOG = Logger.getLogger(AbstractListAdapter.class);
-
     private final Context context;
     private final int viewItemId;
-
     private final OnClickListener viewOnClickListener;
     private final ViewOnLongClickListener viewOnLongClickListener;
     private final ViewOnKeyListener viewOnKeyListener;
-
     private final CheckboxOnCheckedChangeListener checkboxOnCheckedChangeListener;
     private int lastSelectedRadioButtonIndex = -1;
     private final RadioButtonOnCheckedChangeListener radioButtonCheckedChangeListener;
     private OnItemCheckedListener<T> onItemCheckedListener;
-
     private ListAdapterFilter<T> filter;
+    protected final Object listLock = new Object();
+    protected final List<T> visualList;
+    protected final List<T> fullList;
+    protected final Set<T> checked;
+
+    // Mutable
     private boolean checkboxesVisibility;
     private boolean showMenuOnClick;
     private boolean showMenuOnLongClick;
 
-    private final List<Dialog> dialogs;
-
-    protected List<T> list;
-    protected Set<T> checked;
-    protected List<T> visualList;
 
     private AbstractListAdapter(Context context,
                                 int viewItemId,
-                                List<T> list,
+                                List<T> fullList,
                                 Set<T> checked) {
         this.context = context;
         this.viewItemId = viewItemId;
@@ -94,14 +91,16 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         this.viewOnKeyListener = new ViewOnKeyListener();
         this.checkboxOnCheckedChangeListener = new CheckboxOnCheckedChangeListener();
         this.radioButtonCheckedChangeListener = new RadioButtonOnCheckedChangeListener();
-        this.dialogs = new ArrayList<>();
-        this.list = (list == null || list.equals(Collections.emptyList())) ? new ArrayList<>() : list;
-        this.checked = checked;
-        this.visualList = list;
+        this.fullList = new ArrayList<>();
+        this.visualList = new ArrayList<>();
+        this.checked = new HashSet<>();
+        this.visualList.addAll(fullList);
+        this.fullList.addAll(fullList);
+        this.checked.addAll(checked);
     }
 
-    public AbstractListAdapter(Context context, int viewItemId, List<T> list) {
-        this(context, viewItemId, list, new HashSet<>());
+    public AbstractListAdapter(Context context, int viewItemId, List<T> fullList) {
+        this(context, viewItemId, fullList, new HashSet<>());
     }
 
     public AbstractListAdapter(Context context, int viewItemId) {
@@ -151,7 +150,8 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public void setChecked(Set<T> newChecked) {
-        checked = newChecked;
+        checked.clear();
+        checked.addAll(newChecked);
     }
 
     public int getCheckedCount() {
@@ -161,11 +161,12 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public void clearChecked() {
         if (checked != null && checked.size() > 0) {
             checked.clear();
-            notifyDataSetChanged();
+            SystemUtils.postToUIThread(this::notifyDataSetChanged);
         }
     }
 
     public void checkAll() {
+        ensureUIThreadOrCrash("AbstractListAdapter::checkAll");
         checked.clear();
         if (visualList != null) {
             checked.addAll(visualList);
@@ -188,14 +189,18 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * Should return the total count for all file types.
      */
     public int getTotalCount() {
-        return list == null ? 0 : list.size();
+        return fullList == null ? 0 : fullList.size();
     }
 
+    /**
+     * Returns item from the visual list
+     */
     public T getItem(int position) {
         if (position < visualList.size()) {
             try {
                 return visualList.get(position);
-            } catch (Throwable ignore) {}
+            } catch (Throwable ignore) {
+            }
         }
         return null;
     }
@@ -211,7 +216,9 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
     public int getViewPosition(View view) {
         T tag = (T) view.getTag();
+        if (tag == null) return -1;
         int result = -1;
+
         int i = 0;
         for (T t : visualList) {
             if (t.equals(tag)) {
@@ -227,29 +234,23 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
         return position;
     }
 
-    public void setList(List<T> list) {
-        this.list = list.equals(Collections.emptyList()) ? new ArrayList<>() : list;
-        this.visualList = this.list;
-        this.checked.clear();
-        notifyDataSetInvalidated();
-    }
-
-    private void addList(List<T> g, boolean checked) {
-        visualList.addAll(g);
-        if (visualList != list) {
-            list.addAll(g);
-        }
-        if (checked) {
-            this.checked.addAll(g);
-        }
-        notifyDataSetChanged();
-    }
-
     /**
      * Adds new results to the existing list.
      */
-    public void addList(List<T> g) {
-        addList(g, false);
+    public void addList(List<T> l) {
+        ensureUIThreadOrCrash("AbstractListAdapter::addList");
+        synchronized (listLock) {
+            visualList.addAll(l);
+            fullList.addAll(l);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void addToFullList(List<T> l) {
+        synchronized (listLock) {
+            fullList.addAll(l);
+        }
     }
 
     public void addItem(T item) {
@@ -257,60 +258,51 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     }
 
     public void addItem(T item, boolean visible) {
+        ensureUIThreadOrCrash("AbstractListAdapter::addItem(item,visible)");
+        synchronized (listLock) {
+            fullList.add(item);
+        }
         if (visible) {
-            visualList.add(item);
-            if (visualList != list) {
-                list.add(item);
+            synchronized (listLock) {
+                visualList.add(item);
             }
-        } else {
-            if (visualList == list) {
-                visualList = new ArrayList<>(list);
-            }
-            list.add(item);
         }
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            notifyDataSetChanged();
-        }
+        notifyDataSetChanged();
     }
 
     /**
      * Note: only calls notifyDataSetChanged if called from the main thread
-     *
-     * @param item
      */
     public void deleteItem(T item) {
-        visualList.remove(item);
-        if (visualList != list) {
-            list.remove(item);
+        ensureUIThreadOrCrash("AbstractListAdapter::deleteItem()");
+        synchronized (listLock) {
+            visualList.remove(item);
+            fullList.remove(item);
+            checked.remove(item);
         }
-        checked.remove(item);
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            notifyDataSetChanged();
-        }
-    }
-
-    public void updateList(List<T> g) {
-        list = g;
-        visualList = g;
-        checked.clear();
         notifyDataSetChanged();
     }
 
     public void clear() {
-        if (list != null) {
-            list.clear();
+        synchronized (listLock) {
+            if (fullList != null) {
+                fullList.clear();
+            }
+            if (visualList != null) {
+                visualList.clear();
+            }
+            if (checked != null) {
+                checked.clear();
+            }
         }
-        if (visualList != null) {
-            visualList.clear();
-        }
-        if (checked != null) {
-            checked.clear();
-        }
-        notifyDataSetInvalidated();
+        notifyDataSetChanged();
     }
 
-    public List<T> getList() {
-        return list;
+    /**
+     * Returns the full list, not the visual list
+     */
+    public List<T> getFullList() {
+        return fullList;
     }
 
     /**
@@ -324,6 +316,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * It will also bind the data to the view, you can refer to it if you need it by doing a .getTag()
      */
     public View getView(int position, View view, ViewGroup parent) {
+        ensureUIThreadOrCrash("AbstractListAdapter::getView");
         T item = getItem(position);
         Context ctx = getContext();
         if (view == null && ctx != null) {
@@ -397,7 +390,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      * Override this method if you want to do something when the DPAD or ENTER key is pressed and released.
      * This is some sort of master click.
      *
-     * @param v
      * @return if handled
      */
     private boolean onItemKeyMaster(View v) {
@@ -435,7 +427,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     private void onRadioButtonItemChecked(RadioButton radioButton, boolean isChecked) {
         if (isChecked) {
             T item = (T) radioButton.getTag();
-            int position = (item == null) ? 0 : getList().indexOf(item);
+            int position = (item == null) ? 0 : getFullList().indexOf(item);
             updateLastRadioButtonChecked(position);
         }
     }
@@ -443,13 +435,11 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     /**
      * Helper function.
      */
-    @SuppressWarnings("unchecked")
     protected final <TView extends View> TView findView(View view, int id) {
         return (TView) getView(view, getHolder(view), id);
     }
 
     private SparseArray<View> getHolder(View view) {
-        @SuppressWarnings("unchecked")
         SparseArray<View> h = (SparseArray<View>) view.getTag(R.id.abstract_list_adapter_holder_tag_id);
         if (h == null) {
             h = new SparseArray<>();
@@ -476,11 +466,6 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
      */
     protected MenuAdapter getMenuAdapter(View view) {
         return null;
-    }
-
-    protected Dialog trackDialog(Dialog dialog) {
-        dialogs.add(dialog);
-        return dialog;
     }
 
     /**
@@ -567,7 +552,8 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public boolean showMenu(View v) {
         MenuAdapter adapter = getMenuAdapter(v);
         if (adapter != null && adapter.getCount() > 0) {
-            trackDialog(new MenuBuilder(adapter).show());
+            //trackDialog();
+            new MenuBuilder(adapter).show();
             return true;
         }
         return false;
@@ -628,7 +614,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
-            List<T> list = adapter.getList();
+            List<T> list = adapter.getFullList();
             FilterResults result = new FilterResults();
             if (filter == null) {
                 result.values = list;
@@ -648,11 +634,14 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
             return result;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
-            adapter.visualList = (List<T>) results.values;
-            notifyDataSetInvalidated();
+            if (results == null || results.values == null) {
+                return;
+            }
+            adapter.visualList.clear();
+            adapter.visualList.addAll((List<T>) results.values);
+            adapter.notifyDataSetChanged();
         }
     }
 

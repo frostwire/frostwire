@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -46,6 +44,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.google.android.material.navigation.NavigationView;
 
@@ -53,7 +52,7 @@ import com.google.android.material.navigation.NavigationView;
  * @author aldenml
  * @author gubatron
  * @author marcelinkaaa
- *
+ * <p>
  * Created on 02/23/2017
  */
 
@@ -184,9 +183,9 @@ public final class NavigationMenu {
         hide();
 
         if ((menuActionId == R.id.menu_main_my_music ||
-            menuActionId == R.id.menu_main_search ||
-            menuActionId == R.id.menu_main_library) &&
-            controller.getActivity() != null) {
+                menuActionId == R.id.menu_main_search ||
+                menuActionId == R.id.menu_main_library) &&
+                controller.getActivity() != null) {
             Offers.showInterstitialOfferIfNecessary(
                     controller.getActivity(),
                     Offers.PLACEMENT_INTERSTITIAL_MAIN,
@@ -216,10 +215,7 @@ public final class NavigationMenu {
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        Handler handler = new Handler(Looper.getMainLooper());
-        // TODO: review why calling this directly was causing ANR
-        // there is some lifecycle issue here
-        handler.post(() -> {
+        SystemUtils.postToUIThread(() -> {
             try {
                 menuRemoveAdsItem.setVisibility(visibility);
             } catch (Throwable t) {
@@ -228,7 +224,7 @@ public final class NavigationMenu {
                 }
                 LOG.error("NavigationMenu::refreshMenuRemoveAdsItem() error posting menuRemoveAdsItem.setVisibility(...) to main looper: " + t.getMessage(), t);
             }
-        } );
+        });
     }
 
     public void onUpdateAvailable() {
@@ -240,8 +236,8 @@ public final class NavigationMenu {
     public MenuItem getCheckedItem() {
         return navView.getMenu().findItem(
                 checkedNavViewMenuItemId != -1 ?
-                checkedNavViewMenuItemId :
-                R.id.menu_main_search);
+                        checkedNavViewMenuItemId :
+                        R.id.menu_main_search);
     }
 
     public void onOptionsItemSelected(MenuItem item) {

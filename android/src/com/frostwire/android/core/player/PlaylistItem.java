@@ -18,7 +18,7 @@
 
 package com.frostwire.android.core.player;
 
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 
 /**
  * @author gubatron
@@ -27,13 +27,13 @@ import com.frostwire.android.core.FileDescriptor;
  */
 public class PlaylistItem {
 
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
 
-    public PlaylistItem(FileDescriptor fd) {
+    public PlaylistItem(FWFileDescriptor fd) {
         this.fd = fd;
     }
 
-    public FileDescriptor getFD() {
+    public FWFileDescriptor getFD() {
         return fd;
     }
 

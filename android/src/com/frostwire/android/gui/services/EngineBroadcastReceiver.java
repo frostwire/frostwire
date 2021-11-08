@@ -128,7 +128,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
         PlayStore.getInstance(context).refresh();
         NetworkManager networkManager = NetworkManager.instance();
-        if (networkManager.isDataUp()) {
+        if (networkManager.isInternetDataConnectionUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();
             boolean useTorrentsOnMobileData = !CM.getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
 
@@ -189,7 +189,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                 UIUtils.broadcastAction(context, Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
 
                 final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
-                if (privateDir.exists() && privateDir.isDirectory()) {
+                if (privateDir.exists() && privateDir.isDirectory() && !SystemUtils.hasAndroid10OrNewer()) {
                     Platforms.fileSystem().scan(privateDir);
                 }
             }
@@ -198,7 +198,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
         }
         if (Engine.instance().isDisconnected()) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                !NetworkManager.instance().isTunnelUp()) {
+                    !NetworkManager.instance().isTunnelUp()) {
                 //don't start
             } else {
                 Engine.instance().startServices();

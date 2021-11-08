@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 package com.frostwire.gui.components.transfers;
 
+import com.frostwire.transfers.TransferItem;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.tables.AbstractDataLine;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
@@ -93,6 +94,15 @@ public final class TransferDetailFilesDataLine extends AbstractDataLine<Transfer
         }
         return null;
     }
+
+    public TransferItem getTransferItem() {
+        final TransferDetailFiles.TransferItemHolder holder = getInitializeObject();
+        if (holder == null) {
+            return null;
+        }
+        return holder.transferItem;
+    }
+
 
     @Override
     public void setValueAt(Object o, int col) {

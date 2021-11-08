@@ -19,6 +19,7 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -28,8 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp" />
 
-    <com.google.android.material.tabs.TabLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <com.google.android.material.tabs.TabLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/fragment_my_files_tab_layout_file_type"
         style="@style/AppTabLayout"
         android:layout_width="match_parent"
@@ -81,12 +81,13 @@
             style="@style/SelectDeselectAllText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="5dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="5dp"
             android:gravity="center_vertical"
-            android:paddingLeft="5dp"
-            android:text="@string/select_all" />
+            android:paddingStart="5dp"
+            android:text="@string/select_all"
+            tools:ignore="RtlSymmetry" />
 
         <View
             style="@style/divider_line"

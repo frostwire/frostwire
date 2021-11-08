@@ -655,29 +655,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
     }
 
     /**
-     * If there is a security manager, makes sure caller has
-     * permission to shut down threads in general (see shutdownPerm).
-     * If this passes, additionally makes sure the caller is allowed
-     * to interrupt each worker thread. This might not be true even if
-     * first check passed, if the SecurityManager treats some threads
-     * specially.
-     */
-    private void checkShutdownAccess() {
-        SecurityManager security = System.getSecurityManager();
-        if (security != null) {
-            security.checkPermission(shutdownPerm);
-            final ReentrantLock mainLock = this.mainLock;
-            mainLock.lock();
-            try {
-                for (Worker w : workers)
-                    security.checkAccess(w.thread);
-            } finally {
-                mainLock.unlock();
-            }
-        }
-    }
-
-    /**
      * Interrupts up all threads, even if active. Ignores
      * SecurityExceptions (in which case some threads may remain
      * uninterrupted).
@@ -1109,7 +1086,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
         try {
-            checkShutdownAccess();
             advanceRunState(SHUTDOWN);
             interruptIdleWorkers();
             onShutdown2(); // hook for ScheduledThreadPoolExecutor
@@ -1142,7 +1118,6 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
         final ReentrantLock mainLock = this.mainLock;
         mainLock.lock();
         try {
-            checkShutdownAccess();
             advanceRunState(STOP);
             interruptWorkers();
             tasks = drainQueue();

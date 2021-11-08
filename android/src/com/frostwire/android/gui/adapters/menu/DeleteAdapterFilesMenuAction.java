@@ -21,7 +21,7 @@ package com.frostwire.android.gui.adapters.menu;
 import android.content.Context;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.views.AbstractDialog;
@@ -39,10 +39,10 @@ import static com.frostwire.android.util.Asyncs.async;
 public final class DeleteAdapterFilesMenuAction extends AbstractDeleteFilesMenuAction {
 
     private final FileListAdapter adapter;
-    private final List<FileDescriptor> files;
+    private final List<FWFileDescriptor> files;
 
 
-    public DeleteAdapterFilesMenuAction(Context context,  FileListAdapter adapter, List<FileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
+    public DeleteAdapterFilesMenuAction(Context context, FileListAdapter adapter, List<FWFileDescriptor> files, AbstractDialog.OnDialogClickListener clickListener) {
         super(context, R.drawable.contextmenu_icon_trash, files.size() > 1 ? R.string.delete_file_menu_action_count : R.string.delete_file_menu_action, clickListener);
         this.adapter = adapter;
         this.files = files;
@@ -55,20 +55,20 @@ public final class DeleteAdapterFilesMenuAction extends AbstractDeleteFilesMenuA
         }
     }
 
-    private static void deleteFilesTask(FileListAdapter fileListAdapter, List<FileDescriptor> files) {
+    private static void deleteFilesTask(FileListAdapter fileListAdapter, List<FWFileDescriptor> files) {
         byte fileType = fileListAdapter.getFileType();
         Librarian.instance().deleteFiles(fileListAdapter.getContext(), fileType, new ArrayList<>(files));
         int size = files.size();
         for (int i = 0; i < size; i++) {
             try {
-                FileDescriptor fd = files.get(i);
+                FWFileDescriptor fd = files.get(i);
                 fileListAdapter.deleteItem(fd); // only notifies if in main thread
             } catch (Throwable ignored) {
             }
         }
     }
 
-    private static void deleteFilesTaskPost(FileListAdapter fileListAdapter, @SuppressWarnings("unused") List<FileDescriptor> files) {
+    private static void deleteFilesTaskPost(FileListAdapter fileListAdapter, @SuppressWarnings("unused") List<FWFileDescriptor> files) {
         fileListAdapter.notifyDataSetChanged();
     }
 }

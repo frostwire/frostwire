@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,8 +19,8 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
-import com.limegroup.gnutella.util.FrostWireUtils;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -47,15 +47,16 @@ public class Main {
         System.setProperty("sun.awt.noerasebackground", "true");
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        if (OSUtils.isWindows() && !OSUtils.isMachineX64()) {
-            System.setProperty("jlibtorrent.jni.path", getWindows32JLibtorrentPath());
+        if (OSUtils.isWindows()) {
+            System.setProperty("jlibtorrent.jni.path", getWindowsJLibtorrentPath());
         }
         if (OSUtils.isMacOSX()) {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
+            System.setProperty("jlibtorrent.jni.path", getMacOSJLibtorrentPath());
         }
-        if (OSUtils.isLinux() && !OSUtils.isMachineX64()) {
-            System.setProperty("jlibtorrent.jni.path", getLinux32JLibtorrentPath());
+        if (OSUtils.isLinux()) {
+            System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
         }
         //System.out.println("1: Main.main("+args+")");
         // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
@@ -113,26 +114,45 @@ public class Main {
         return CHOSEN_SPLASH_URL;
     }
 
-    private static String getWindows32JLibtorrentPath() {
-        String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-        jarPath = jarPath.replaceAll("%20", " ");
-        boolean isRelease = !jarPath.contains("frostwire-desktop");
-        String libPath = jarPath + File.separator + ((isRelease) ? "jlibtorrentX86.dll" : "lib/native/jlibtorrentX86.dll");
-        if (!new File(libPath).exists()) {
-            libPath = new File(jarPath + File.separator + "../../lib/native/jlibtorrentx86.dll").getAbsolutePath();
-        }
-        System.out.println("Using jlibtorrent 32 bits: " + libPath);
-        return libPath;
+    private static String getWindowsJLibtorrentPath() {
+        return getJLibtorrentPath(".dll");
     }
 
-    private static String getLinux32JLibtorrentPath() {
+    private static String getMacOSJLibtorrentPath() {
+        return getJLibtorrentPath(".dylib");
+    }
+
+    private static String getLinuxJLibtorrentPath() {
+        return getJLibtorrentPath(".so");
+    }
+
+    private static String getJLibtorrentPath(String libraryExtension) {
         String jarPath = new File(FrostWireUtils.getFrostWireJarPath()).getAbsolutePath();
-        boolean isRelease = !jarPath.contains("frostwire-desktop");
-        String libPath = jarPath + File.separator + ((isRelease) ? "libjlibtorrentX86.so" : "lib/native/libjlibtorrentX86.so");
-        if (!new File(libPath).exists()) {
-            libPath = new File(jarPath + File.separator + "../../lib/native/libjlibtorrentx86.so").getAbsolutePath();
+        String libraryName = "libjlibtorrent";
+        if (OSUtils.isWindows()) {
+            jarPath = jarPath.replaceAll("%20", " ");
+            libraryName = "jlibtorrent";
         }
-        System.out.println("Using jlibtorrent 32 bits: " + libPath);
-        return libPath;
+        boolean isRelease = !jarPath.contains("frostwire" + File.separator + "desktop");
+        String productionLibPath = jarPath + File.separator + ((isRelease) ? libraryName : "lib" + File.separator + "native" + File.separator + libraryName) + libraryExtension;
+        File fileFromProductionPath = new File(productionLibPath);
+        if (fileFromProductionPath.exists()) {
+            System.out.println("Using jlibtorrent (production path): " + fileFromProductionPath.getAbsolutePath());
+            return fileFromProductionPath.getAbsolutePath();
+        }
+        String pathRunningFromCmdLine = jarPath + File.separator + ".." + File.separator + ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
+        File fileFromCMDLine = new File(pathRunningFromCmdLine);
+        if (fileFromCMDLine.exists()) {
+            System.out.println("Using jlibtorrent (cmd line path): " + fileFromCMDLine.getAbsolutePath());
+            return fileFromCMDLine.getAbsolutePath();
+        }
+        String pathRunningFromIntelliJ = jarPath + File.separator + ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
+        File fileFromIntelliJProject = new File(pathRunningFromIntelliJ);
+        if (fileFromIntelliJProject.exists()) {
+            System.out.println("Using jlibtorrent (intellij path): " + fileFromIntelliJProject.getAbsolutePath());
+            return fileFromIntelliJProject.getAbsolutePath();
+        }
+        System.out.println("Using jlibtorrent (fallback): " + "../../lib/native/" + libraryName + libraryExtension);
+        return ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
     }
 }

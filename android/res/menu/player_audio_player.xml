@@ -36,11 +36,6 @@
         android:title="@string/menu_equalizer"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menu_player_audio_player_ringtone"
-        android:icon="@drawable/contextmenu_icon_ringtone"
-        android:title="@string/context_menu_use_as_ringtone"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/menu_player_audio_player_stop"
         android:icon="@drawable/contextmenu_icon_stop_playback"
         android:title="@string/stop"

@@ -18,15 +18,17 @@
 
 package com.frostwire.android.gui;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
-import android.os.Looper;
 import android.os.SystemClock;
 
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileFilter;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
@@ -43,8 +45,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -96,7 +96,7 @@ final class UniversalScanner {
 
         public void onMediaScannerConnected() {
             // do not do this on main thread, causing ANRs
-            if (Looper.myLooper() == Looper.getMainLooper()) {
+            if (SystemUtils.isUIThread()) {
                 async(UniversalScanner::onMediaScannerConnected, connection, files);
             } else {
                 UniversalScanner.onMediaScannerConnected(connection, files);
@@ -145,7 +145,13 @@ final class UniversalScanner {
             /* should only arrive here on connected state, but let's double check since it's possible */
             if (connection.isConnected() && !files.isEmpty()) {
                 for (File f : files) {
-                    connection.scanFile(f.getAbsolutePath(), null);
+                    String path = f.getAbsolutePath();
+                    MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(path));
+                    if (mt != null) {
+                        connection.scanFile(path, mt.getMimeType());
+                    } else {
+                        connection.scanFile(path, null);
+                    }
                 }
             }
         } catch (IllegalStateException e) {
@@ -163,13 +169,23 @@ final class UniversalScanner {
      */
     private void scanPrivateFile(Uri oldUri, String filePath, MediaType mt) {
         try {
-            int n = context.getContentResolver().delete(oldUri, null, null);
-            if (n > 0) {
-                LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
+            if (oldUri == null) {
+                oldUri = Uri.fromFile(new File(filePath));
+                LOG.debug("oldUri is null, what comes out of Uri.fromFile? " + oldUri);
             }
-            nativeScanFile(context, filePath);
+            if (oldUri != null) {
+                int n = context.getContentResolver().delete(oldUri, null, null);
+                if (n > 0) {
+                    LOG.debug("Deleted from Files provider: " + oldUri + ", path: " + filePath);
+                }
+            }
         } catch (Throwable e) {
             LOG.error("Unable to scan file: " + filePath, e);
+        }
+        try {
+            nativeScanFile(context, filePath);
+        } catch (Throwable e2) {
+            LOG.error("Unable to scan file: " + filePath, e2);
         }
     }
 

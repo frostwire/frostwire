@@ -262,6 +262,9 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         }
         if (bundle.containsKey(BUNDLE_KEY_CHECKED_OFFSETS)) {
             final boolean[] checkedOffsets = bundle.getBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS);
+            if (checkedOffsets == null) {
+                return;
+            }
             for (int i=0; i < checkedOffsets.length; i++) {
                 adapter.setChecked(i, checkedOffsets[i]);
             }
@@ -303,7 +306,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
                 result.add((T) adapter.getSelectedItem());
             } else if (selectionMode == SelectionMode.NO_SELECTION) {
-                result.addAll(adapter.getList());
+                result.addAll(adapter.getFullList());
             }
         }
         return result;
@@ -312,7 +315,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     public List<T> getList() {
         List<T> result = (List<T>) Collections.EMPTY_LIST;
         if (adapter != null) {
-            result = adapter.getList();
+            result = adapter.getFullList();
         }
         return result;
     }
@@ -325,7 +328,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
                 return result;
             }
             result = new boolean[adapter.getCount()];
-            List<T> all = adapter.getList();
+            List<T> all = adapter.getFullList();
             for (T item : checked) {
                 int i = all.indexOf(item);
                 if (i >= 0) {

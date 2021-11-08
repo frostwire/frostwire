@@ -28,6 +28,7 @@ import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.ThreadPool;
 import com.limegroup.gnutella.MediaType;
@@ -38,10 +39,7 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.LibrarySettings;
-import com.limegroup.gnutella.settings.QuestionsHandler;
-import com.limegroup.gnutella.settings.StartupSettings;
+import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.LaunchException;
 import com.limegroup.gnutella.util.Launcher;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
@@ -211,7 +209,7 @@ public final class GUIMediator {
                     try {
                         GUIMediator
                                 .showError(I18n
-                                        .tr("FrostWire has encountered a problem during startup and cannot proceed. You may be able to fix this problem by changing FrostWire\'s Windows Compatibility. Right-click on the FrostWire icon on your Desktop and select \'Properties\' from the popup menu. Click the \'Compatibility\' tab at the top, then click the \'Run this program in compatibility mode for\' check box, and then select \'Windows 2000\' in the box below the check box. Then click the \'OK\' button at the bottom and restart FrostWire."));
+                                        .tr("FrostWire has encountered a problem during startup and cannot proceed. You may be able to fix this problem by changing FrostWire's Windows Compatibility. Right-click on the FrostWire icon on your Desktop and select 'Properties' from the popup menu. Click the 'Compatibility' tab at the top, then click the 'Run this program in compatibility mode for' check box, and then select 'Windows 2000' in the box below the check box. Then click the 'OK' button at the bottom and restart FrostWire."));
                         System.exit(0);
                     } catch (Throwable t) {
                         if (visible)
@@ -508,6 +506,7 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
+        TellurideLauncher.shutdownServer(SearchSettings.TELLURIDE_RPC_PORT.getValue());
         LibraryMediator.getLibrary().close();
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
         hideVideoPlayerWindow();
@@ -1278,10 +1277,6 @@ public final class GUIMediator {
         _lastConnectivityCheckTimestamp = now;
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            if (interfaces == null) {
-                _wasInternetReachable = false;
-                return false;
-            }
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
                 if (iface.isUp() && !iface.isLoopback()) {

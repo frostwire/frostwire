@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -300,7 +301,9 @@ public final class SearchMediator {
         if (line == null) {
             throw new NullPointerException("Tried to download null line");
         }
-        line.getSearchResult().download(false);
+        SearchResult sr = line.getSearchResult().getSearchResult();
+        boolean isTorrent  = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+        line.getSearchResult().download(isTorrent);
     }
 
     /**
@@ -316,7 +319,7 @@ public final class SearchMediator {
      * Notification that a search has been killed.
      */
     static void searchKilled(SearchResultMediator panel) {
-        instance().stopSearch(panel.getToken());
+        instance().stopSearch();
         panel.cleanup();
         ApplicationHeader header = GUIMediator.instance().getMainFrame().getApplicationHeader();
         header.requestSearchFocus();
@@ -364,7 +367,7 @@ public final class SearchMediator {
         if (!validate(info)) {
             return;
         }
-        stopSearch(rp.getToken());
+        stopSearch();
         updateSearchIcon(rp.getToken(), true);
         rp.resetFiltersPanel();
         performSearch(rp.getToken(), info.getQuery());
@@ -394,7 +397,7 @@ public final class SearchMediator {
         if (StringUtils.isNullOrEmpty(query, true)) {
             return;
         }
-        manager.stop(token);
+        manager.stop();
 
         if (query.startsWith("http") && !query.endsWith(".torrent")) {
             manager.perform(SearchEngine.getTellurideEngine().getPerformer(token, query));
@@ -490,8 +493,8 @@ public final class SearchMediator {
         return norm;
     }
 
-    void stopSearch(long token) {
-        manager.stop(token);
+    void stopSearch() {
+        manager.stop();
     }
 
     public void shutdown() {

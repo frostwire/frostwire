@@ -24,6 +24,7 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.util.OSUtils;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -112,8 +113,10 @@ public final class VPNs {
     private static boolean isWindowsVPNAdapterActive(List<EnumNet.IpInterface> interfaces,
                                                      List<EnumNet.IpRoute> routes, String description) {
         EnumNet.IpInterface adapter = null;
+        String lowercase_description = description.toLowerCase(Locale.ROOT);
+
         for (EnumNet.IpInterface iface : interfaces) {
-            if (iface.description().contains(description) && iface.preferred()) {
+            if (iface.description().toLowerCase(Locale.ROOT).contains(lowercase_description) && iface.preferred()) {
                 adapter = iface;
                 break;
             }

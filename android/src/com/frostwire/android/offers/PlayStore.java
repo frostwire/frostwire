@@ -714,7 +714,10 @@ public final class PlayStore extends StoreBase {
         // custom change for instant update
         // sync on each billing code update
         void addPurchase(Purchase p) {
-            mPurchaseMap.put(p.getSku(), p);
+            ArrayList<String> skus = p.getSkus();
+            if (skus != null && skus.size() > 0) {
+                mPurchaseMap.put(skus.get(0), p);
+            }
         }
     }
 

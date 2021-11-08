@@ -86,24 +86,6 @@
             android:text="@string/transfers_select_completed" />
     </com.google.android.material.tabs.TabLayout>
 
-    <com.frostwire.android.gui.views.RichNotification
-        android:id="@+id/fragment_transfers_sd_card_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        frostwire:rich_notification_description="@string/android_will_erase_files_if_frostwire_is_uninstalled"
-        frostwire:rich_notification_icon="@drawable/sd_card_notification"
-        frostwire:rich_notification_title="@string/saving_to_sd_card"
-        frostwire:rich_notification_title_underlined="true" />
-
-    <com.frostwire.android.gui.views.RichNotification
-        android:id="@+id/fragment_transfers_internal_memory_notification"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        frostwire:rich_notification_description="@string/saving_to_internal_memory_description"
-        frostwire:rich_notification_icon="@drawable/internal_memory_notification"
-        frostwire:rich_notification_title="@string/saving_to_internal_memory"
-        frostwire:rich_notification_title_underlined="true" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"

@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,10 +18,12 @@
 
 package com.frostwire.android.gui.activities;
 
+import static com.frostwire.android.util.Asyncs.async;
+
+import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -32,7 +34,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.SparseArray;
@@ -49,7 +50,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
-import com.frostwire.android.StoragePicker;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.LocalSearchEngine;
@@ -59,7 +59,6 @@ import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
-import com.frostwire.android.gui.dialogs.SDPermissionDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.MainFragment;
 import com.frostwire.android.gui.fragments.MyFilesFragment;
@@ -76,10 +75,12 @@ import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import org.apache.commons.io.IOUtils;
 
@@ -87,11 +88,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.util.Stack;
-
-import static com.frostwire.android.util.Asyncs.async;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author gubatron
@@ -123,7 +122,7 @@ public class MainActivity extends AbstractActivity implements
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
 
-    private boolean shuttingdown = false;
+    private AtomicBoolean shuttingdown = new AtomicBoolean(false);
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -184,37 +183,32 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void shutdown() {
-        if (shuttingdown) {
+        if (shuttingdown.get()) {
             // NOTE: the actual solution should be for a re-architecture for
             // a guarantee of a single call of this logic.
             // For now, just mitigate the double call if coming from the exit
             // and at the same time the close of the interstitial
             return;
         }
-        shuttingdown = true;
-        SearchFragment.freeInstance();
+        shuttingdown.set(true);
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
+        OkHttpClientWrapper.cancelAllRequests();
+        SystemUtils.HandlerFactory.stopAll();
         Engine.instance().shutdown();
     }
 
     @Override
     public void finish() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            finishAndRemoveTaskViaReflection();
-        } else {
-            super.finish();
-        }
+        finishAndRemoveTaskViaReflection();
     }
 
     private void finishAndRemoveTaskViaReflection() {
         final Class<? extends MainActivity> clazz = getClass();
         try {
             final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
-            if (finishAndRemoveTaskMethod != null) {
-                finishAndRemoveTaskMethod.invoke(this);
-            }
+            finishAndRemoveTaskMethod.invoke(this);
         } catch (Throwable e) {
             e.printStackTrace();
             super.finish();
@@ -310,13 +304,6 @@ public class MainActivity extends AbstractActivity implements
                 case Constants.ACTION_REQUEST_SHUTDOWN:
                     showShutdownDialog();
                     break;
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    Leaving this code in case I find a solution later.
-//                case Constants.ACTION_PACKAGE_INSTALLED:
-//                    // see UIUtils.openAPK()
-//                    onPackageInstalledCallback(intent.getExtras());
-//                    break;
-////// END OF PACKAGE INSTALLER LOGIC SECTION
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
@@ -325,47 +312,8 @@ public class MainActivity extends AbstractActivity implements
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
         }
+        super.onNewIntent(intent);
     }
-
-////// START OF PACKAGE INSTALLER LOGIC SECTION
-//    Leaving this code in case I find a solution later.
-//    See the commented code in UIUtils.openAPK for details.
-//    private void onPackageInstalledCallback(Bundle extras) {
-//        int status = extras.getInt(PackageInstaller.EXTRA_STATUS);
-//        String message = extras.getString(PackageInstaller.EXTRA_STATUS_MESSAGE);
-//        switch (status) {
-//            case PackageInstaller.STATUS_PENDING_USER_ACTION:
-//                // This test app isn't privileged, so the user has to confirm the install.
-//                Intent confirmIntent = (Intent) extras.get(Intent.EXTRA_INTENT);
-//                //Intent { act=android.content.pm.action.CONFIRM_PERMISSIONS pkg=com.google.android.packageinstaller (has extras) }
-//                startActivity(confirmIntent); // <-- this call isn't really launching the screen to ask for permissions to install apks
-//                                              // setting <uses-permission android:name="android.permission.INSTALL_PACKAGES"/> on AndroidManifest.xml doesn't work either
-//                break;
-//            case PackageInstaller.STATUS_SUCCESS:
-//                Engine.instance().stopServices(false);
-//                try {
-//                    MusicUtils.getMusicPlaybackService().stop();
-//                } catch (RemoteException e) {
-//                    e.printStackTrace();
-//                }
-//                UIUtils.showToastMessage(this, "Install succeeded", Toast.LENGTH_SHORT);
-//                break;
-//            case PackageInstaller.STATUS_FAILURE:
-//            case PackageInstaller.STATUS_FAILURE_ABORTED:
-//            case PackageInstaller.STATUS_FAILURE_BLOCKED:
-//            case PackageInstaller.STATUS_FAILURE_CONFLICT:
-//            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
-//            case PackageInstaller.STATUS_FAILURE_INVALID:
-//            case PackageInstaller.STATUS_FAILURE_STORAGE:
-//                UIUtils.showToastMessage(this, "Install failed! " + status + ", " + message,
-//                        Toast.LENGTH_SHORT);
-//                break;
-//            default:
-//                UIUtils.showToastMessage(this, "Unrecognized status received from installer: " + status,
-//                        Toast.LENGTH_SHORT);
-//        }
-//    }
-////// END OF PACKAGE INSTALLER LOGIC SECTION
 
     private void openTorrentUrl(Intent intent) {
         try {
@@ -412,13 +360,11 @@ public class MainActivity extends AbstractActivity implements
             controller.startWizardActivity();
         }
         checkLastSeenVersionBuild();
-        registerMainBroadcastReceiver();
         syncNavigationMenu();
         updateNavigationMenu();
         //uncomment to test social links dialog
         //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            //checkExternalStoragePermissionsOrBindMusicService();
             checkExternalStoragePermissions();
         }
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
@@ -453,25 +399,13 @@ public class MainActivity extends AbstractActivity implements
         return checkers;
     }
 
-    private void registerMainBroadcastReceiver() {
-        mainBroadcastReceiver = new MainBroadcastReceiver(this);
-        IntentFilter bf = new IntentFilter(Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-        try {
-            registerReceiver(mainBroadcastReceiver, bf);
-        } catch (Throwable t) {
-            LOG.error(t.getMessage(), t);
-        }
-    }
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            // MIGHT DO: save checkedNavViewMenuItemId in bundle.
-            outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
-            super.onSaveInstanceState(outState);
-            saveLastFragment(outState);
-            saveFragmentsStack(outState);
-        }
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        // MIGHT DO: save checkedNavViewMenuItemId in bundle.
+        outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
+        super.onSaveInstanceState(outState);
+        saveLastFragment(outState);
+        saveFragmentsStack(outState);
     }
 
     @Override
@@ -485,6 +419,7 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
+
         checkExternalStoragePermissions();//OrBindMusicService();
         checkAccessCoarseLocationPermissions();
     }
@@ -501,14 +436,11 @@ public class MainActivity extends AbstractActivity implements
 
     private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        if (!externalStoragePermissionsRequested && checker != null && checker.noAccess()) {
+        boolean shouldShowRequestPermissionRationaleForReadExternal = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noAccess())) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         }
-    }
-
-    private void onNotifySdCardMounted() {
-        transfers.initStorageRelatedRichNotifications(null);
     }
 
     @Override
@@ -538,7 +470,6 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void mainResume() {
-        async(this, MainActivity::checkSDPermission, MainActivity::checkSDPermissionPost);
         syncNavigationMenu();
         if (firstTime) {
             if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -555,19 +486,13 @@ public class MainActivity extends AbstractActivity implements
         SoftwareUpdater.getInstance().checkForUpdate(this);
     }
 
-    private void handleSDPermissionDialogClick(int which) {
-        if (which == Dialog.BUTTON_POSITIVE) {
-            StoragePicker.show(this);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == StoragePicker.SELECT_FOLDER_REQUEST_CODE) {
-            StoragePicker.handle(this, requestCode, resultCode, data);
-        } else if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
+        if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
             Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
         }
+
+        // the filetype and audio id parameters are passed via static hack
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -615,12 +540,13 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onDialogClick(String tag, int which) {
-        if (tag.equals(LAST_BACK_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
+        if (which != Dialog.BUTTON_POSITIVE || tag == null || tag.isEmpty()) {
+            return;
+        }
+        if (tag.equals(LAST_BACK_DIALOG_ID)) {
             onLastDialogButtonPositive();
-        } else if (tag.equals(SHUTDOWN_DIALOG_ID) && which == Dialog.BUTTON_POSITIVE) {
+        } else if (tag.equals(SHUTDOWN_DIALOG_ID)) {
             onShutdownDialogButtonPositive();
-        } else if (tag.equals(SDPermissionDialog.TAG)) {
-            handleSDPermissionDialogClick(which);
         }
     }
 
@@ -639,7 +565,6 @@ public class MainActivity extends AbstractActivity implements
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        search.connectDrawerLayoutFilterView(findView(R.id.activity_main_drawer_layout), findView(R.id.activity_main_keyword_filter_drawer_view));
         library = (MyFilesFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_my_files);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
@@ -752,16 +677,14 @@ public class MainActivity extends AbstractActivity implements
      */
 
     public Fragment getFragmentByNavMenuId(int id) {
-        switch (id) {
-            case R.id.menu_main_search:
-                return search;
-            case R.id.menu_main_library:
-                return library;
-            case R.id.menu_main_transfers:
-                return transfers;
-            default:
-                return null;
+        if (id == R.id.menu_main_search) {
+            return search;
+        } else if (id == R.id.menu_main_library) {
+            return library;
+        } else if (id == R.id.menu_main_transfers) {
+            return transfers;
         }
+        return null;
     }
 
     private int getNavMenuIdByFragment(Fragment fragment) {
@@ -798,14 +721,11 @@ public class MainActivity extends AbstractActivity implements
         if (item == null) {
             return false;
         }
-        switch (item.getItemId()) {
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         navigationMenu.onConfigurationChanged(newConfig);
     }
@@ -840,18 +760,20 @@ public class MainActivity extends AbstractActivity implements
         //musicPlaybackService = null;
     }
 
-    //@Override commented override since we are in API 16, but it will in API 23
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            return;
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     public void performYTSearch(String ytUrl) {
         SearchFragment searchFragment = (SearchFragment) getFragmentByNavMenuId(R.id.menu_main_search);
-        searchFragment.performYTSearch(ytUrl);
         switchContent(searchFragment);
+        searchFragment.performYTSearch(ytUrl);
     }
 
     public static void refreshTransfers(Context context) {
@@ -899,7 +821,7 @@ public class MainActivity extends AbstractActivity implements
         try {
             File data = Platforms.data();
             File parent = data.getParentFile();
-            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent) && !SDPermissionDialog.visible);
+            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent));
         } catch (Throwable e) {
             // we can't do anything about this
             LOG.error("Unable to detect if we have SD permissions", e);
@@ -907,21 +829,8 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    private void checkSDPermissionPost(boolean showPermissionDialog) {
-        if (showPermissionDialog) {
-            SDPermissionDialog dlg = SDPermissionDialog.newInstance();
-            FragmentManager fragmentManager = getFragmentManager();
-            try {
-                if (fragmentManager != null) {
-                    dlg.show(fragmentManager);
-                }
-            } catch (IllegalStateException ignored) {
-            }
-        }
-    }
-
     // TODO: refactor and move this method for a common place when needed
-    private static String saveViewContent(Context context, Uri uri, String name) {
+    private static String saveViewContent(Context context, Uri uri, String fileName) {
         InputStream inStream = null;
         OutputStream outStream = null;
         if (!Platforms.temp().exists()) {
@@ -930,7 +839,7 @@ public class MainActivity extends AbstractActivity implements
                 LOG.warn("saveViewContent() could not create Platforms.temp() directory.");
             }
         }
-        File target = new File(Platforms.temp(), name);
+        File target = new File(Platforms.temp(), fileName);
         try {
             inStream = context.getContentResolver().openInputStream(uri);
             outStream = new FileOutputStream(target);
@@ -942,28 +851,13 @@ public class MainActivity extends AbstractActivity implements
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error when copying file from " + uri + " to temp/" + name, e);
+            LOG.error("Error when copying file from " + uri + " to temp/" + fileName, e);
             return null;
         } finally {
             IOUtils.closeQuietly(inStream);
             IOUtils.closeQuietly(outStream);
         }
         return "file://" + target.getAbsolutePath();
-    }
-
-    private static final class MainBroadcastReceiver extends BroadcastReceiver {
-        private final WeakReference<MainActivity> activityRef;
-
-        MainBroadcastReceiver(MainActivity activity) {
-            activityRef = Ref.weak(activity);
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Ref.alive(activityRef) && Constants.ACTION_NOTIFY_SDCARD_MOUNTED.equals(intent.getAction())) {
-                activityRef.get().onNotifySdCardMounted();
-            }
-        }
     }
 
     private final class LocalBroadcastReceiver extends BroadcastReceiver {
@@ -993,7 +887,7 @@ public class MainActivity extends AbstractActivity implements
                 if (mainActivityIntent != null) {
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
-                updateNavigationMenu(value);
+                SystemUtils.postToUIThread(() -> updateNavigationMenu(value));
             }
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
@@ -1001,7 +895,7 @@ public class MainActivity extends AbstractActivity implements
                     UIUtils.showDismissableMessage(findView(android.R.id.content),
                             R.string.no_data_check_internet_connection);
                 }
-                search.setDataUp(isDataUp);
+                SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
             }
         }
     }

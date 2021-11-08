@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +21,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.frostwire.android"
     android:installLocation="auto"
-    android:versionCode="675"
-    android:versionName="2.2.9">
+    android:versionCode="686"
+    android:versionName="2.4.3">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -38,12 +39,23 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- storage -->
+    <!-- External refers not to SD Cards, but to SHARED files outside our app's
+         internal storage -->
+
+    <!-- READ_EXTERNAL_STORAGE should allow us to read media files from other apps,
+         this should be useful for My Files to at least browse, and open files,
+         but we will no longer have the power to remove files.
+         Google Play grants special apps only with WRITE_EXTERNAL_STORAGE permissions
+
+         The File api comes back in Android 11, however it's really a wrapper
+         for accessing the shared external storage and performance will suffer if you
+         open and close the same files multiple times.
+         -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:remove="android:maxSdkVersion" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
+    <!-- we gotta leave this here for Android 7.0 (24), 7.1.1 (25), 8.0 (26), 8.1 (27) and 9 (28) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" android:requestLegacyExternalStorage="true" tools:ignore="ScopedStorage" />
+
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
@@ -62,9 +74,8 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/application_label"
-        android:requestLegacyExternalStorage="true"
         android:theme="@style/Theme.FrostWire"
-        tools:replace="android:label">
+        >
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -80,7 +91,8 @@
             android:label="@string/application_label"
             android:launchMode="singleTask"
             android:protectionLevel="dangerous"
-            android:theme="@style/SplashScreenTheme">
+            android:theme="@style/SplashScreenTheme"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
@@ -145,7 +157,8 @@
             android:label="@string/activity_preferences_name" />
         <activity
             android:name="com.frostwire.android.gui.activities.BuyActivity"
-            android:label="@string/remove_ads">
+            android:label="@string/remove_ads"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -185,7 +198,8 @@
             android:clearTaskOnLaunch="true"
             android:label="@string/frostwire_player"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -220,7 +234,8 @@
                 <data android:mimeType="application/x-ogg" />
                 <data android:mimeType="application/itunes" />
             </intent-filter>
-            <intent-filter android:scheme="http">
+            <intent-filter android:scheme="http"
+                tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -249,7 +264,8 @@
         <activity
             android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.Transparent">
+            android:theme="@style/Theme.Transparent"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
 
@@ -258,7 +274,8 @@
         </activity>
         <activity
             android:name="com.andrew.apollo.ui.activities.SearchActivity"
-            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity">
+            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.MEDIA_SEARCH" />
@@ -284,13 +301,13 @@
 
         <!-- receivers -->
 
-        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver">
+        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver">
+        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
@@ -298,7 +315,6 @@
         </receiver>
 
         <!-- providers -->
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -306,7 +322,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
+                android:resource="@xml/file_paths" />
         </provider>
 
         <!-- AppLovin -->
@@ -321,26 +337,13 @@
             android:name="com.applovin.adview.AppLovinInterstitialActivity"
             android:configChanges="orientation|screenSize"
             tools:replace="android:configChanges" />
-        <activity android:name="com.applovin.adview.AppLovinConfirmationActivity" />
 
         <!-- MoPub -->
-        <activity
-            android:name="com.mopub.mobileads.MoPubActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.mopub.mobileads.MraidActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name="com.mopub.common.MoPubBrowser"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
             android:name="com.mopub.common.privacy.ConsentDialogActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.mopub.mobileads.RewardedMraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
     </application>
 </manifest>

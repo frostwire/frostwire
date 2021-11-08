@@ -97,7 +97,7 @@ Be sure that you're in the project root, else then execute:
 
 Then run the project with:
 
-    ./run
+    gradle run
     
 If you are using Windows, run the project with `run.bat`.
 

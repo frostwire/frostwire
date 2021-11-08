@@ -23,7 +23,7 @@ import android.content.Context;
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
@@ -45,7 +45,7 @@ public final class AddToPlaylistMenuAction extends MenuAction {
 
     private long[] fds;
 
-    public AddToPlaylistMenuAction(Context context, List<FileDescriptor> fds) {
+    public AddToPlaylistMenuAction(Context context, List<FWFileDescriptor> fds) {
         super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist);
         setFileIdList(fds);
     }
@@ -63,7 +63,7 @@ public final class AddToPlaylistMenuAction extends MenuAction {
         menuBuilder.show();
     }
 
-    private long[] setFileIdList(List<FileDescriptor> fdList) {
+    private long[] setFileIdList(List<FWFileDescriptor> fdList) {
         fds = new long[fdList.size()];
         for (int i = 0; i < fdList.size(); i++) {
             fds[i] = fdList.get(i).id;

@@ -64,7 +64,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
                 }
 
                 @Override
-                public void onUnityAdsFailedToLoad(String placementId) {
+                public void onUnityAdsFailedToLoad(String placementId, UnityAds.UnityAdsLoadError error, String message) {
                     unityAdsListener.onUnityAdsFailedToLoad();
                 }
             });

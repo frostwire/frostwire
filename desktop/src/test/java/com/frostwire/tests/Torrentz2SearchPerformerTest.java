@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * gradle test --tests "com.frostwire.tests.Torrentz2SearchPerformerTest.torrentz2SearchTest"
+ */
 public class Torrentz2SearchPerformerTest {
     @Test
     public void torrentz2SearchTest() {

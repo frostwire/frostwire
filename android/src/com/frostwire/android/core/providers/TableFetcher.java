@@ -18,10 +18,13 @@
 
 package com.frostwire.android.core.providers;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
+
+import java.util.List;
 
 /**
  * @author gubatron
@@ -33,15 +36,17 @@ public interface TableFetcher {
 
     String getSortByExpression();
 
-    Uri getContentUri();
+    Uri getExternalContentUri();
 
-    void prepare(Cursor cur);
+    void prepareColumnIds(Cursor cur);
 
-    FileDescriptor fetch(Cursor cur);
+    FWFileDescriptor fetchFWFileDescriptor(Cursor cur);
 
     byte getFileType();
 
     String where();
 
     String[] whereArgs();
+
+    int getType();
 }

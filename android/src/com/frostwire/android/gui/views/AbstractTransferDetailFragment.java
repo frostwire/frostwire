@@ -18,10 +18,12 @@
 
 package com.frostwire.android.gui.views;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -34,6 +36,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
 import com.frostwire.android.gui.util.TransferStateStrings;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Sha1Hash;
 import com.frostwire.jlibtorrent.TorrentHandle;
@@ -42,8 +45,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
 
 import java.util.List;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author aldenml
@@ -84,7 +85,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         this.tabTitle = tabTitles.get(getTabTitleStringId());
         this.uiBittorrentDownload = uiBittorrentDownload;
         if (activity != null) {
-            onAttach(activity);
+            onAttach((Context) activity);
         }
         ensureTorrentHandleAsync();
         return this;
@@ -171,8 +172,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     /**
      * This is a common section at the top of all the detail fragments
      * which contains the title of the transfer and the current progress
-     *
-     * @param rootView
      */
     private void ensureCommonComponentsReferenced(View rootView) {
         detailProgressTitleTextView = findView(rootView, R.id.view_transfer_detail_progress_title);
@@ -193,7 +192,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
     }
 
     protected void ensureTorrentHandleAsync() {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
+        if (SystemUtils.isUIThread()) {
             async(this, AbstractTransferDetailFragment::ensureTorrentHandle);
         } else {
             ensureTorrentHandle();
@@ -268,7 +267,6 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
         if (freshItems != null && freshItems.size() > 0) {
             if (items.isEmpty()) {
                 items.addAll(freshItems);
-
                 adapter.notifyDataSetChanged();
             } else {
                 // Update existing items

@@ -1,20 +1,20 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Jose Molina (@votaguz)
- * Copyright (c) 2011, 2014, FrostWire(TM). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.frostwire.android.gui.dialogs;
 
@@ -49,8 +49,8 @@ import java.util.Map;
  * @author gubatron
  * @author aldenml
  * @author votaguz
- *
  */
+@SuppressWarnings("ConstantConditions")
 abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
     private static final int ITEM_TITLE = 0;
@@ -64,7 +64,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     static {
         selectionModeToLayoutId.put(SelectionMode.NO_SELECTION, R.layout.confirmation_dialog_no_selection_list_item);
         selectionModeToLayoutId.put(SelectionMode.SINGLE_SELECTION, R.layout.confirmation_dialog_single_selection_list_item);
-        selectionModeToLayoutId.put(SelectionMode.MULTIPLE_SELECTION,R.layout.confirmation_dialog_multiple_selection_list_item);
+        selectionModeToLayoutId.put(SelectionMode.MULTIPLE_SELECTION, R.layout.confirmation_dialog_multiple_selection_list_item);
 
         layoutMapping.put(SelectionMode.NO_SELECTION, new SparseIntArray());
         layoutMapping.get(SelectionMode.NO_SELECTION).put(ITEM_TITLE, R.id.confirmation_dialog_no_selection_list_item_title);
@@ -83,6 +83,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     }
 
     ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
+        //noinspection ConstantConditions
         super(context, selectionModeToLayoutId.get(selectionMode), list);
         this.selectionMode = selectionMode;
         setCheckboxesVisibility(selectionMode != SelectionMode.NO_SELECTION);
@@ -94,13 +95,14 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         Context ctx = getContext();
 
         if (view == null && ctx != null) {
+            //noinspection ConstantConditions
             int layoutId = selectionModeToLayoutId.get(selectionMode);
             view = View.inflate(ctx, layoutId, null);
         }
 
         try {
             initTouchFeedback(view, item);
-            if(selectionMode == SelectionMode.MULTIPLE_SELECTION) {
+            if (selectionMode == SelectionMode.MULTIPLE_SELECTION) {
                 initCheckBox(view, item);
                 setCheckboxesVisibility(true);
             } else if (selectionMode == SelectionMode.SINGLE_SELECTION) {
@@ -115,18 +117,22 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     }
 
     public abstract CharSequence getItemTitle(T data);
+
     public abstract double getItemSize(T data);
+
     public abstract CharSequence getItemThumbnailUrl(T data);
+
     public abstract int getItemThumbnailResourceId(T data);
 
     @Override
     protected void populateView(View view, Object data) {
         T item = (T) data;
-
+        //noinspection ConstantConditions
         TextView trackTitle = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_TITLE));
         trackTitle.setText(getItemTitle(item));
 
         final double itemSize = getItemSize(item);
+        //noinspection ConstantConditions
         TextView trackSizeInHuman = (TextView) findView(view, layoutMapping.get(selectionMode).get(ITEM_SIZE));
         if (itemSize != -1) {
             trackSizeInHuman.setText(UIUtils.getBytesInHuman(itemSize));
@@ -134,7 +140,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         } else {
             trackSizeInHuman.setVisibility(View.GONE);
         }
-
+        //noinspection ConstantConditions
         ImageView imageView = (ImageView) findView(view, layoutMapping.get(selectionMode).get(ITEM_ART));
         final CharSequence itemThumbnailUrl = getItemThumbnailUrl(item);
         if (itemThumbnailUrl != null && itemThumbnailUrl.length() != 0) {
@@ -143,7 +149,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
 
         final int itemThumbnailResourceId = getItemThumbnailResourceId(item);
         if (itemThumbnailResourceId != -1) {
-            Drawable thumbnail = getContext().getResources().getDrawable(itemThumbnailResourceId);
+            Drawable thumbnail = getContext().getResources().getDrawable(itemThumbnailResourceId, null);
             if (thumbnail != null) {
                 imageView.setImageDrawable(thumbnail);
             }
@@ -154,10 +160,10 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
     protected void onItemClicked(View v) {
         if (selectionMode != SelectionMode.NO_SELECTION) {
             final T tag = (T) v.getTag();
-            int i = list.indexOf(tag);
+            int i = fullList.indexOf(tag);
             if (i != -1 && v.getParent() instanceof LinearLayout) {
                 final LinearLayout parent = (LinearLayout) v.getParent();
-                if (parent instanceof View) {
+                if (parent != null) {
                     CompoundButton compoundButton = (CompoundButton) findView(parent,
                             selectionMode == SelectionMode.SINGLE_SELECTION ?
                                     R.id.view_selectable_list_item_radiobutton :

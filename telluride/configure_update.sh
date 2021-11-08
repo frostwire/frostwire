@@ -2,7 +2,7 @@
 
 ##########################################################################
 # Created by Angel Leon (@gubatron)
-# Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+# Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,33 +20,13 @@
 # Python3 by default for macOS (and Windows to be tested)
 PIP_CMD='python3 -m pip'
 PYINSTALLER_PACKAGE='pyinstaller'
+PIP_OPTIONS='install --upgrade --no-cache-dir'
+source ./common.sh
 
-# Thank you Brian Fox, bash creator
-TRUE=0
-FALSE=1
-
-isubuntu() {
-  if [ $(uname -a | grep -c Ubuntu) == 0 ]
-  then
-    return ${FALSE}
-  else
-    return ${TRUE}
-  fi
-}
-
-iswindows() {
-  if [ $(uname -a | grep -c windows) == 0 ]
-  then
-    return ${FALSE}
-  else
-    return ${TRUE}
-  fi
-}
-
-if isubuntu
+if [ isdocker == ${FALSE} ] && [ isubuntu == ${TRUE} ]
 then
+  sudo apt-get install python3 python3-pip pylint3
   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-  sudo apt-get install python3 python3-pip
   PYINSTALLER_PACKAGE='PyInstaller'
 fi
 
@@ -55,10 +35,16 @@ then
   PIP_CMD='python -m pip'
 fi
 
-${PIP_CMD} install --upgrade pip
-${PIP_CMD} install --upgrade pylint
-${PIP_CMD} install --upgrade youtube_dl
-${PIP_CMD} install --upgrade pycryptodome
-${PIP_CMD} install --upgrade ${PYINSTALLER_PACKAGE}
+${PIP_CMD} cache purge
+${PIP_CMD} cache info
+${PIP_CMD} ${PIP_OPTIONS} pip
+${PIP_CMD} ${PIP_OPTIONS} pylint
+${PIP_CMD} ${PIP_OPTIONS} youtube_dl
+${PIP_CMD} ${PIP_OPTIONS} pycryptodome
+# breaks after 21.6.0 with ModuleNotFoundError: No module named 'websockets.legacy.protocol'
+# Waiting to hear from sanic team at https://github.com/sanic-org/sanic/issues/2227
+# They've suggested upgrading to websocket 9 (tried 9.0 and 9.1, and still failed)
+${PIP_CMD} ${PIP_OPTIONS} sanic==21.3.4
+${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
-${PIP_CMD} show pip pylint youtube_dl pycryptodome pyinstaller
+${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller websockets

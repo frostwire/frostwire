@@ -18,7 +18,8 @@
 package com.frostwire.search.filter;
 
 import com.frostwire.search.SearchResult;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.SortedMap;

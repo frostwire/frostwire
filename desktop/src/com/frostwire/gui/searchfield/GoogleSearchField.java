@@ -31,6 +31,7 @@ import com.limegroup.gnutella.gui.actions.FileMenuActions;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.URLDecoder;
 import org.limewire.util.LCS;
 import com.frostwire.util.OSUtils;
@@ -99,6 +100,12 @@ public class GoogleSearchField extends SearchField {
         super.setText(t);
     }
 
+    private static String lastClipboardSearchQuery = null;
+
+    public static void eraseLastClipboardSearchQuery() {
+        lastClipboardSearchQuery = null;
+    }
+
     public static void initCloudSearchField(GoogleSearchField cloudSearchField) {
         cloudSearchField.addActionListener(new GoogleSearchField.SearchListener(cloudSearchField));
         cloudSearchField.setPrompt(CLOUD_SEARCH_FIELD_HINT_TEXT);
@@ -117,21 +124,29 @@ public class GoogleSearchField extends SearchField {
         cloudSearchField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
+                if (!SearchSettings.AUTO_SEARCH_CLIPBOARD_URL.getValue()) {
+                    return;
+                }
                 Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 String s = GUIUtils.extractStringContentFromClipboard(systemClipboard);
                 if (s == null || "".equals(s)) {
                     return;
                 }
+                if (lastClipboardSearchQuery != null && lastClipboardSearchQuery.equals(s)) {
+                    return;
+                }
                 if (s.startsWith("http") || s.startsWith("magnet")) {
                     cloudSearchField.setText(s);
                     StringSelection stringSelection = new StringSelection("");
-                    systemClipboard.setContents(stringSelection, null);
+                    lastClipboardSearchQuery = s;
                     cloudSearchField.getActionListeners()[0].actionPerformed(null);
                     cloudSearchField.setText("");
                 }
             }
         });
     }
+
+
     protected JComponent getPopupComponent() {
         if (entryPanel != null)
             return entryPanel;

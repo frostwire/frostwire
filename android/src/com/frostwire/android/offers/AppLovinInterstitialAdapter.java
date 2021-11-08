@@ -25,6 +25,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
 import com.applovin.sdk.AppLovinAd;
+import com.applovin.sdk.AppLovinAdClickListener;
 import com.applovin.sdk.AppLovinAdDisplayListener;
 import com.applovin.sdk.AppLovinAdLoadListener;
 import com.applovin.sdk.AppLovinSdk;
@@ -34,7 +35,7 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 
-class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDisplayListener, AppLovinAdLoadListener {
+class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDisplayListener, AppLovinAdLoadListener, AppLovinAdClickListener {
     private static final Logger LOG = Logger.getLogger(AppLovinInterstitialAdapter.class);
     private final WeakReference<? extends Activity> activityRef;
     private final Application app;
@@ -81,8 +82,8 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
             try {
                 final AppLovinInterstitialAdDialog adDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(activity), activity);
                 adDialog.setAdDisplayListener(this);
+                adDialog.setAdClickListener(this);
                 adDialog.showAndRender(ad);
-
                 result = true;
             } catch (Throwable t) {
                 result = false;
@@ -134,5 +135,10 @@ class AppLovinInterstitialAdapter implements InterstitialListener, AppLovinAdDis
                 });
             }
         }
+    }
+
+    @Override
+    public void adClicked(AppLovinAd ad) {
+        LOG.info("adClicked: interstitial clicked.", true);
     }
 }

@@ -22,7 +22,10 @@ import android.app.Application;
 import android.os.Build;
 import android.os.Looper;
 
+import androidx.documentfile.provider.DocumentFile;
+
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat_t;
 import com.frostwire.jlibtorrent.swig.posix_wrapper;
@@ -35,8 +38,6 @@ import com.frostwire.platform.VPNMonitor;
 import com.frostwire.util.Logger;
 
 import java.io.File;
-
-import androidx.documentfile.provider.DocumentFile;
 
 /**
  * @author gubatron
@@ -57,7 +58,6 @@ public final class AndroidPlatform extends AbstractPlatform {
         return null;
     }
 
-    @Override
     public boolean isUIThread() {
         return Looper.myLooper() == Looper.getMainLooper();
     }
@@ -75,6 +75,10 @@ public final class AndroidPlatform extends AbstractPlatform {
      * @return if protected by SAF
      */
     public static boolean saf(File f) {
+        if (SystemUtils.hasAndroid11OrNewer()) {
+            // We should have File operations back again on Android 11
+            return false;
+        }
         Platform p = Platforms.get();
 
         if (!(p.fileSystem() instanceof LollipopFileSystem)) {
@@ -94,7 +98,7 @@ public final class AndroidPlatform extends AbstractPlatform {
     private static FileSystem buildFileSystem(Application app) {
         FileSystem fs;
 
-        if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= VERSION_CODE_LOLLIPOP && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             LollipopFileSystem lfs = new LollipopFileSystem(app);
             PosixCalls w = new PosixCalls(lfs);
             w.swigReleaseOwnership();

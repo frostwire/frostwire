@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,7 +242,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
         };
         STOP_SEARCH_LISTENER = e -> {
-            SearchMediator.instance().stopSearch(token);
+            SearchMediator.instance().stopSearch();
             updateSearchIcon(false);
             setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, false);
         };

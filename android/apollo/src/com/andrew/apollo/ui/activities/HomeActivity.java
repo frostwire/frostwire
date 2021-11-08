@@ -54,7 +54,7 @@ public final class HomeActivity extends BaseActivity {
         }
 
         dangerousPermissionsChecker = new DangerousPermissionsChecker(this,
-                DangerousPermissionsChecker.READ_EXTERNAL_STORAGE);
+                DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         dangerousPermissionsChecker.requestPermissions();
     }
 

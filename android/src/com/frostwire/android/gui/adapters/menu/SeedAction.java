@@ -28,7 +28,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -66,13 +66,13 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     private static final String DLG_SEEDING_OFF_TAG = "DLG_SEEDING_OFF_TAG";
     private static final String DLG_TURN_BITTORRENT_BACK_ON = "DLG_TURN_BITTORRENT_BACK_ON";
 
-    private final FileDescriptor fd;
+    private final FWFileDescriptor fd;
     private final BittorrentDownload btDownload;
     private final Transfer transferToClear;
     private final OnBittorrentConnectRunnable onBittorrentConnectRunnable;
 
     private SeedAction(Context context,
-                       FileDescriptor fd,
+                       FWFileDescriptor fd,
                        BittorrentDownload existingBittorrentDownload,
                        Transfer transferToClear) {
         super(context, R.drawable.contextmenu_icon_seed, R.string.seed);
@@ -86,7 +86,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
      * Seeds a file that's not a torrent yet.
      * Reminder: Currently disabled when using SD Card.
      */
-    public SeedAction(Context context, FileDescriptor fd) {
+    public SeedAction(Context context, FWFileDescriptor fd) {
         this(context, fd, null, null);
     }
 
@@ -100,7 +100,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
      * @param fd
      * @param transferToClear
      */
-    public SeedAction(Context context, FileDescriptor fd, Transfer transferToClear) {
+    public SeedAction(Context context, FWFileDescriptor fd, Transfer transferToClear) {
         this(context, fd, null, transferToClear);
     }
 
@@ -226,7 +226,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         }
     }
 
-    private void seedFileDescriptor(FileDescriptor fd) {
+    private void seedFileDescriptor(FWFileDescriptor fd) {
         if (fd.filePath.endsWith(".torrent")) {
             try {
                 BTEngine.getInstance().download(new File(fd.filePath), null, new boolean[]{true});
@@ -249,7 +249,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
         }
     }
 
-    private void buildTorrentAndSeedIt(final FileDescriptor fd) {
+    private void buildTorrentAndSeedIt(final FWFileDescriptor fd) {
         try {
             // TODO: Do this so it works with SD Card support / New BS File storage api from Android.
             File file = new File(fd.filePath);

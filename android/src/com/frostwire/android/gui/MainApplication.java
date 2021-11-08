@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,12 @@
 
 package com.frostwire.android.gui;
 
+import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.RunStrict.runStrict;
+
 import android.content.Context;
-import android.view.ViewConfiguration;
+
+import androidx.multidex.MultiDexApplication;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
@@ -42,14 +46,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Random;
-
-import androidx.multidex.MultiDexApplication;
-
-import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * @author gubatron
@@ -90,30 +88,12 @@ public class MainApplication extends MultiDexApplication {
     private void onCreateSafe() {
         ConfigurationManager.create(this);
 
-        // some phones still can configure an external button as the
-        // permanent menu key
-        ignoreHardwareMenu();
-
         AbstractActivity.setMenuIconsVisible(true);
 
         PlayStore.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);
         async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
-    }
-
-    private void ignoreHardwareMenu() {
-        try {
-            ViewConfiguration config = ViewConfiguration.get(this);
-            @SuppressWarnings("JavaReflectionMemberAccess")
-            Field f = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
-            if (f != null) {
-                f.setAccessible(true);
-                f.setBoolean(config, false);
-            }
-        } catch (Throwable e) {
-            // ignore
-        }
     }
 
     private void initializeCrawlPagedWebSearchPerformer(Context context) {
@@ -167,6 +147,11 @@ public class MainApplication extends MultiDexApplication {
 
         private void syncMediaStore() {
             if (Ref.alive(mainAppRef)) {
+                ConfigurationManager CM = ConfigurationManager.instance();
+                if (!CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
+                    LOG.info("MainApplication: syncMediaStore() aborted, wizard not done yet.");
+                    return;
+                }
                 Librarian.instance().syncMediaStore(mainAppRef);
             } else {
                 LOG.warn("syncMediaStore() failed, lost MainApplication reference");

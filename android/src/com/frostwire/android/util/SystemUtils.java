@@ -21,15 +21,22 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Process;
 import android.os.StatFs;
 
+import androidx.annotation.NonNull;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.gui.services.EngineService;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -82,7 +89,7 @@ public final class SystemUtils {
 
     public static boolean isPrimaryExternalPath(File path) {
         String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
-        return path != null ? path.getAbsolutePath().startsWith(primary) : null;
+        return path != null && path.getAbsolutePath().startsWith(primary);
     }
 
     public static long getAvailableStorageSize(File dir) {
@@ -128,10 +135,19 @@ public final class SystemUtils {
     }
 
     /**
-     * @param context
-     * @param timeout        timeout in ms. set to -1 to wait forever.
-     * @param serviceClasses
+     * Used to determine if the device is running Android11 or greater
      */
+    public static boolean hasAndroid10OrNewer() {
+        return hasSdkOrNewer(Build.VERSION_CODES.Q);
+    }
+
+    /**
+     * Used to determine if the device is running Android11 or greater
+     */
+    public static boolean hasAndroid11OrNewer() {
+        return hasSdkOrNewer(30); //Build.VERSION_CODES.R
+    }
+
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?>... serviceClasses) {
         final long startTime = System.currentTimeMillis();
         Set<Class<?>> servicesRunning = new HashSet<>();
@@ -140,7 +156,7 @@ public final class SystemUtils {
             long elapsedTime = System.currentTimeMillis() - startTime;
             long timeLeft = timeout - elapsedTime;
             Iterator<Class<?>> iterator = servicesRunning.iterator();
-            while (iterator != null && iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 Class serviceClass = iterator.next();
                 if (isServiceRunning(context, serviceClass)) {
                     LOG.info("waitWhileServicesAreRunning(...): " + serviceClass.getSimpleName() + " is still running. (" + timeLeft + " ms left)");
@@ -198,5 +214,112 @@ public final class SystemUtils {
 
         t.setDaemon(false);
         t.start();
+    }
+
+    /**
+     * We call it "safe" because if any exceptions are thrown,
+     * they are caught in order to not crash the handler thread.
+     */
+    public static void safePost(Handler handler, Runnable r) {
+        if (handler != null) {
+            // We are already in the Handler thread, just go!
+            if (Thread.currentThread() == handler.getLooper().getThread()) {
+                try {
+                    r.run();
+                } catch (Throwable t) {
+                    LOG.error("safePost() " + t.getMessage(), t);
+                }
+            } else {
+                handler.post(() -> {
+                    try {
+                        r.run();
+                    } catch (Throwable t) {
+                        LOG.error("safePost() " + t.getMessage(), t);
+                    }
+                });
+            }
+        }
+    }
+
+    public static void ensureBackgroundThreadOrCrash(String classAndMethodNames) {
+        if (isUIThread()) {
+            throw new RuntimeException("ensureBackgroundThreadOrCrash: " + classAndMethodNames + " should not be on main thread.");
+        }
+    }
+
+    public static void ensureUIThreadOrCrash(String classAndMethodNames) {
+        if (!isUIThread()) {
+            Thread t = Thread.currentThread();
+            throw new RuntimeException("ensureUIThreadOrCrash: " + classAndMethodNames + " should be on main thread. Invoked from tid=" + t.getId() + ":" + t.getName());
+        }
+    }
+
+    public static void postToUIThread(Runnable runnable) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(runnable);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
+        }
+    }
+
+    public static void postToUIThreadAtFront(Runnable runnable) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postAtFrontOfQueue(runnable);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postToUIThreadAtFront error: " + t.getMessage());
+        }
+    }
+
+    public static void postDelayed(Runnable runnable, long delayMillis) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(runnable, delayMillis);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postDelayed error: " + t.getMessage());
+        }
+    }
+
+    public static boolean isUIThread() {
+        return Platforms.get().isUIThread();
+    }
+
+    public enum HandlerThreadName {
+        SEARCH_PERFORMER,
+        DOWNLOADER,
+        CONFIG_MANAGER
+    }
+
+    public static class HandlerFactory {
+        private static final HashMap<String, Handler> handlers = new HashMap<>();
+
+        public static void postTo(final HandlerThreadName threadName, final Runnable r) {
+            try {
+                get(threadName.name()).post(r);
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
+        }
+
+        public static Handler get(@NonNull final String threadName) {
+            if (!handlers.containsKey(threadName)) {
+                HandlerThread handlerThread = new HandlerThread("SystemUil::HandlerThread - " + threadName);
+                handlerThread.start();
+                Handler handler = new Handler(handlerThread.getLooper());
+                handlers.put(threadName, handler);
+                return handler;
+            }
+            return handlers.get(threadName);
+        }
+
+        public static void stopAll() {
+            try {
+                handlers.values().forEach(handler -> ((HandlerThread) handler.getLooper().getThread()).quitSafely());
+                handlers.clear();
+            } catch (Throwable t) {
+                LOG.error("HandlerFactory.stopAll() error " + t.getMessage(), t);
+            }
+        }
     }
 }

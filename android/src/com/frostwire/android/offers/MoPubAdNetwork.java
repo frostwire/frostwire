@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@ package com.frostwire.android.offers;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,6 +26,7 @@ import androidx.annotation.NonNull;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.mopub.common.MoPub;
@@ -36,21 +36,15 @@ import com.mopub.common.privacy.ConsentDialogListener;
 import com.mopub.common.privacy.ConsentStatus;
 import com.mopub.common.privacy.ConsentStatusChangeListener;
 import com.mopub.common.privacy.PersonalInfoManager;
-import com.mopub.common.util.Reflection;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubRewardedAds;
-import com.mopub.network.Networking;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Created on Nov/8/16 (2016 US election day)
@@ -108,72 +102,38 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
             builder.withLogLevel(MoPubLog.LogLevel.DEBUG);
         }
         SdkConfiguration sdkConfiguration = builder.build();
-        fixExecutor(true);
-
-        // TEMP HACK: quick sleep to avoid ANR from MoPub
-        // https://twittercommunity.com/t/android-mopub-5-4-0-anr/115804/17
-        /*
-         * "main" prio=5 tid=1 Blocked
-         *   | group="main" sCount=1 dsCount=0 obj=0x7664e4b8 self=0xb727b0b8
-         *   | sysTid=12543 nice=0 cgrp=default sched=0/0 handle=0xb6f4cb34
-         *   | state=S schedstat=( 0 0 0 ) utm=117 stm=24 core=2 HZ=100
-         *   | stack=0xbe41f000-0xbe421000 stackSize=8MB
-         *   | held mutexes=
-         *
-         *   at com.mopub.network.Networking.getRequestQueue (Networking.java:69)
-         * - waiting to lock <0x02e88a82> (a java.lang.Class<com.mopub.network.Networking>) held by thread 25 (tid=25)
-         *
-         *   at com.mopub.network.AdLoader.fetchAd (AdLoader.java:255)
-         *
-         *   at com.mopub.network.AdLoader.loadNextAd (AdLoader.java:154)
-         * - locked <0x09c2c593> (a java.lang.Object)
-         *
-         *   at com.mopub.mobileads.AdViewController.fetchAd (AdViewController.java:519)
-         *
-         *   at com.mopub.mobileads.AdViewController.loadNonJavascript (AdViewController.java:270)
-         *
-         *   at com.mopub.mobileads.AdViewController.internalLoadAd (AdViewController.java:250)
-         *
-         *   at com.mopub.mobileads.AdViewController.loadAd (AdViewController.java:232)
-         *
-         *   at com.mopub.mobileads.MoPubView.loadAd (MoPubView.java:108)
-         *
-         *   at com.frostwire.android.offers.MopubBannerView.loadMoPubBanner (MopubBannerView.java:181)
-         *
-         *   at com.frostwire.android.gui.adapters.PromotionsAdapter.getMopubBannerView (PromotionsAdapter.java:231)
-         */
-        Networking.getRequestQueue(activity);
-        // END OF TEMP HACK BEFORE MoPub 5.4.1 is released
+        //fixExecutor(true);
 
         MoPub.initializeSdk(activity, sdkConfiguration, () -> {
-            fixExecutor(false);
+            //fixExecutor(false);
             LOG.info("MoPub initialization finished");
             starting = false;
             start();
-            async(MoPubAdNetwork::loadConsentDialogAsync, this);
+            SystemUtils.postToUIThreadAtFront(() -> MoPubAdNetwork.loadConsentDialogAsync(this));
             loadNewInterstitial(activity);
         });
         LOG.info("initialize() MoPub.initializeSdk invoked, starting=" + starting + ", started=" + started());
     }
 
-    private void fixExecutor(boolean change) {
-        try {
-            LOG.info("MoPub -> fixExecutor with change=" + change);
-            Field f = Reflection.getPrivateField(AsyncTask.class, "sDefaultExecutor");
-
-            Field modifiersField = Field.class.getDeclaredField("accessFlags");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-
-            if (change) {
-                f.set(null, AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                f.set(null, AsyncTask.SERIAL_EXECUTOR);
-            }
-        } catch (Exception e) {
-            LOG.info("MoPub -> fixExecutor error change=" + change + " msg=" + e.getMessage());
-        }
-    }
+// TODO: Remove completely if this is no longer needed and we don't see any weird crashes, it's been a while
+//    private void fixExecutor(boolean change) {
+//        try {
+//            LOG.info("MoPub -> fixExecutor with change=" + change);
+//            Field f = Reflection.getPrivateField(AsyncTask.class, "sDefaultExecutor");
+//
+//            Field modifiersField = Field.class.getDeclaredField("accessFlags");
+//            modifiersField.setAccessible(true);
+//            modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+//
+//            if (change) {
+//                f.set(null, AsyncTask.THREAD_POOL_EXECUTOR);
+//            } else {
+//                f.set(null, AsyncTask.SERIAL_EXECUTOR);
+//            }
+//        } catch (Exception e) {
+//            LOG.info("MoPub -> fixExecutor error change=" + change + " msg=" + e.getMessage());
+//        }
+//    }
 
     private static void loadConsentDialogAsync(MoPubAdNetwork mopubAdNetwork) {
         PersonalInfoManager personalInfoManager = MoPub.getPersonalInformationManager();
@@ -220,13 +180,15 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         if (!interstitial.isReady()) {
             try {
                 Method isDestroyedMethod = interstitial.getClass().getDeclaredMethod("isDestroyed");
-                boolean isDestroyed = false;
+                boolean isDestroyed;
                 isDestroyedMethod.setAccessible(true);
-                isDestroyed = (boolean) isDestroyedMethod.invoke(interstitial);
-                isDestroyedMethod.setAccessible(false);
-
-                if (isDestroyed) {
-                    loadNewInterstitial(activity);
+                Object booleanResult = isDestroyedMethod.invoke(interstitial);
+                if (booleanResult != null) {
+                    isDestroyed = (boolean) booleanResult;
+                    isDestroyedMethod.setAccessible(false);
+                    if (isDestroyed) {
+                        loadNewInterstitial(activity);
+                    }
                 }
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
@@ -274,7 +236,12 @@ public class MoPubAdNetwork extends AbstractAdNetwork implements ConsentStatusCh
         }
         LOG.info("loadMoPubInterstitial: Loading " + placement + " interstitial");
         try {
-            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placements.get(placement));
+            String placementID = placements.get(placement);
+            if (placementID == null) {
+                LOG.warn("loadMoPubInterstitial(activity, placement=" + placement + "): placementID not found for placement, aborting, interstitial could not be loaded");
+                return;
+            }
+            final MoPubInterstitial moPubInterstitial = new MoPubInterstitial(activity, placementID);
             MoPubInterstitialListener moPubListener = new MoPubInterstitialListener(this, placement);
             moPubInterstitial.setInterstitialAdListener(moPubListener);
             interstitials.put(placement, moPubInterstitial);

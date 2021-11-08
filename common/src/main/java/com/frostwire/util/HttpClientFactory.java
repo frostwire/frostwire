@@ -19,7 +19,7 @@ package com.frostwire.util;
 
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.JdkHttpClient;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -32,6 +32,9 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class HttpClientFactory {
     private static Map<HttpContext, ThreadPool> okHttpClientPools = null;
+
+    private static final Map<HttpContext, OkHttpClientWrapper> fwOKHTTPClients = new HashMap<>();
+    private static final Object okHTTPClientLock = new Object();
 
     private HttpClientFactory() {
     }
@@ -47,7 +50,12 @@ public class HttpClientFactory {
         if (okHttpClientPools == null) {
             okHttpClientPools = buildThreadPools();
         }
-        return new OKHTTPClient(okHttpClientPools.get(context));
+        synchronized (okHTTPClientLock) {
+            if (!fwOKHTTPClients.containsKey(context)) {
+                fwOKHTTPClients.put(context, new OkHttpClientWrapper(okHttpClientPools.get(context)));
+            }
+        }
+        return fwOKHTTPClients.get(context);
     }
 
     private static Map<HttpContext, ThreadPool> buildThreadPools() {

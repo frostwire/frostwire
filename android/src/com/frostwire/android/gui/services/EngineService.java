@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020 FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021 FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,7 +49,7 @@ import com.frostwire.jlibtorrent.swig.sha1_hash;
 import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
-import com.frostwire.util.http.OKHTTPClient;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
 
@@ -300,14 +300,14 @@ public class EngineService extends JobIntentService implements IEngineService {
     // what a bad design to properly shutdown the framework threads!
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
-        ConnectionPool pool = OKHTTPClient.CONNECTION_POOL;
+        ConnectionPool pool = OkHttpClientWrapper.CONNECTION_POOL;
         try {
             pool.evictAll();
         } catch (Throwable e) {
             e.printStackTrace();
         }
         try {
-            synchronized (OKHTTPClient.CONNECTION_POOL) {
+            synchronized (OkHttpClientWrapper.CONNECTION_POOL) {
                 pool.notifyAll();
             }
         } catch (Throwable e) {

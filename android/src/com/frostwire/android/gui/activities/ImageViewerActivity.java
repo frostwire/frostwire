@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.FileDescriptor;
+import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.fragments.ImageViewerFragment;
 import com.frostwire.android.gui.views.AbstractActivity;
 
@@ -42,7 +42,7 @@ public final class ImageViewerActivity extends AbstractActivity {
         Bundle fileDescriptorBundle = intent.getBundleExtra(ImageViewerFragment.EXTRA_FILE_DESCRIPTOR_BUNDLE);
 
         if (fileDescriptorBundle != null && !fileDescriptorBundle.isEmpty()) {
-            FileDescriptor fd = new FileDescriptor(fileDescriptorBundle);
+            FWFileDescriptor fd = new FWFileDescriptor(fileDescriptorBundle);
             int position = intent.getIntExtra(ImageViewerFragment.EXTRA_ADAPTER_FILE_OFFSET, -1);
             ImageViewerFragment imageViewerFragment = findFragment(R.id.fragment_image_viewer);
             imageViewerFragment.updateData(fd, position);

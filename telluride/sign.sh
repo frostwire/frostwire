@@ -17,5 +17,5 @@ if [ -f ./notarizeMacOsApp.sh ]
 then
 		./notarizeMacOsApp.sh telluride_macos com.frostwire.Telluride
 else
-		echo "telluride/sign.sh: telluride_macos signed but not sent for notarization, notarizeMacOsApp.sh not found (symlink from private tools repository)
+		echo "telluride/sign.sh: telluride_macos signed but not sent for notarization, notarizeMacOsApp.sh not found (symlink from private tools repository)"
 fi

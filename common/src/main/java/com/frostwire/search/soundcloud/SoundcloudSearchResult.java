@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@
 
 package com.frostwire.search.soundcloud;
 
-import com.frostwire.platform.Platform;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
@@ -42,10 +41,10 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final String source;
     private final String thumbnailUrl;
     private final long date;
-    private String downloadUrl;
+    private final String downloadUrl;
     private final String progressiveFormatJSONFetcherURL;
     private final double size;
-    private String hash;
+    private final String hash;
 
     SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
         this.displayName = item.title;
@@ -162,7 +161,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
         // not bit optimized for clarity, compiler will do it
         int x = item.duration;
         int y = 128;
-        return (x * y) / 8;
+        return ((long) x * y) / 8;
     }
 
     private String buildSource(SoundcloudItem item) {

@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import com.frostwire.search.filter.SearchTable;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public final class SearchManager {
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
+    private final Object executorLock = new Object();
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;
@@ -84,11 +86,8 @@ public final class SearchManager {
     }
 
     public void stop() {
-        stopTasks(-1L);
-    }
-
-    public void stop(long token) {
-        stopTasks(token);
+        stopTasks();
+        OkHttpClientWrapper.cancelAllRequests();
     }
 
     public SearchListener getListener() {
@@ -105,8 +104,8 @@ public final class SearchManager {
     }
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
-        List<SearchResult> list = new LinkedList<>();
-        for (SearchResult sr : results) {
+        var list = new LinkedList<SearchResult>();
+        results.forEach(sr -> {
             if (sr instanceof CrawlableSearchResult) {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
                 if (csr.isComplete()) {
@@ -116,7 +115,7 @@ public final class SearchManager {
             } else {
                 list.add(sr);
             }
-        }
+        });
         if (!list.isEmpty()) {
             onResults(performer.getToken(), list);
         }
@@ -132,7 +131,6 @@ public final class SearchManager {
                 while (it.hasNext()) {
                     WeakReference<SearchTable> t = it.next();
                     if (Ref.alive(t)) {
-                        //noinspection ConstantConditions
                         t.get().add(results);
                     } else {
                         it.remove();
@@ -177,12 +175,10 @@ public final class SearchManager {
         }
     }
 
-    private void stopTasks(long token) {
+    private void stopTasks() {
         synchronized (tasks) {
             for (SearchTask task : tasks) {
-                if (token == -1L || task.token() == token) {
-                    task.stopSearch();
-                }
+                task.stopSearch();
             }
         }
     }

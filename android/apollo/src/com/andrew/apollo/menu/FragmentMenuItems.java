@@ -49,16 +49,13 @@ public class FragmentMenuItems {
     /* Used to delete track(s) */
     public static final int DELETE = 9;
 
-    /* Used to set a track as a ringtone */
-    public static final int USE_AS_RINGTONE = 12;
-
     /* Used to remove a track from the favorites cache */
-    public static final int REMOVE_FROM_FAVORITES = 13;
+    public static final int REMOVE_FROM_FAVORITES = 10;
 
     /* Used to remove a track from a playlist */
-    public static final int REMOVE_FROM_PLAYLIST = 14;
+    public static final int REMOVE_FROM_PLAYLIST = 11;
 
     /* Used to queue a track to be played next */
-    public static final int PLAY_NEXT = 16;
+    public static final int PLAY_NEXT = 12;
 
 }

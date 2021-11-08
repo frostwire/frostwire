@@ -1,18 +1,49 @@
 #!/bin/bash
+##########################################################################
+# Created by Angel Leon (@gubatron)
+# Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+#set -x
 PYINSTALLER_CMD="pyinstaller"
+PYLINT_CMD="pylint3"
+
+source ./common.sh
+
+if [ ismac ] || [ iswindows ]
+then
+  PYLINT_CMD="pylint"
+fi
 
 # Linux's pyinstaller PATH
-if [ $(uname -a | grep -c Ubuntu) == 1 ]
+if isubuntu
 then
     PYINSTALLER_CMD="${HOME}/.local/bin/pyinstaller"
-    echo "PYINSTALLER_CMD=${PYINSTALLER_CMD}"
 fi
+
+if isdocker
+then
+    PYINSTALLER_CMD=/usr/local/bin/pyinstaller
+fi
+
+echo PYINSTALLER_CMD=${PYINSTALLER_CMD}
 
 # Windows + MINGW
 # pylint and pyinstaller might be in a place like this if you are in windows
 # We make sure they are in the PATH
 # c:\users\myuser\appdata\local\programs\python\python38-32\scripts
-if [ $(uname -a | grep -c windows) == 1 ]
+if iswindows
 then
   echo "PYTHON_HOME=${PYTHON_HOME}"
   if [ ! $(which pyinstaller) ]
@@ -28,47 +59,30 @@ then
   fi
 fi
 
-cleanup() {
-if [ -d build ]
-then
-  rm -fr build
-fi
-
-if [ -d dist ]
-then
-  rm -fr dist
-fi
-
-if [ -d __pycache__ ]
-then
-  rm -fr __pycache__
-fi
-if [ -f telluride.spec ]
-then
-  rm telluride.spec
-fi
-}
-
 EXTRA_FLAGS=
-if [ $(uname -a | grep -c Darwin) == 1 ]; then
+if ismac
+then
   EXTRA_FLAGS="--osx-bundle-identifier com.frostwire.Telluride"
 fi
 
 cleanup
-pylint telluride.py
+${PYLINT_CMD} --max-line-length=350 telluride.py server.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
 ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py
 
 if [ -f dist/telluride ]
 then
-  if [ $(uname -a | grep -c Ubuntu) == 1 ]
+  if isubuntu
   then
     mv dist/telluride telluride_linux
-  elif [ $(uname -a | grep -c Darwin) == 1 ]
+  elif isdocker
+  then
+    mv dist/telluride telluride_linux
+  elif ismac
   then
   	mv dist/telluride telluride_macos
-		./sign.sh
-  elif [ $(uname -a | grep -c windows) == 1 ]
+    ./sign.sh
+  elif iswindows
   then
     mv dist/telluride.exe .
     ./sign.bat
@@ -76,3 +90,4 @@ then
   cleanup
   ls -lth
 fi
+#set +x

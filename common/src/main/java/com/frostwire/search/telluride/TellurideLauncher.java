@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2007-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,12 @@
 package com.frostwire.search.telluride;
 
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
-import com.frostwire.regex.Matcher;
-import com.frostwire.regex.Pattern;
+import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
+import com.frostwire.util.http.HttpClient;
 
 import java.io.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A Java process builder and parser for the telluride cloud downloader.
@@ -29,7 +31,56 @@ import java.io.*;
  */
 public final class TellurideLauncher {
 
+    private static Logger LOG = Logger.getLogger(TellurideLauncher.class);
+
+    public static AtomicBoolean SERVER_UP = new AtomicBoolean(false);
+
+    public static void shutdownServer(final int port) {
+        ThreadExecutor.startThread(() -> {
+            HttpClient httpClient = HttpClientFactory.newInstance();
+            try {
+                httpClient.get(String.format("http://127.0.0.1:%d/?shutdown=1", port));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }, "TellurideLauncher::shutDownServer(" + port + ")");
+    }
+
+    public static void launchServer(final File executable,
+                                    final int port,
+                                    final File saveDirectory) {
+        if (SERVER_UP.get()) {
+            LOG.info("launchServer aborted, server already up.");
+            return;
+        }
+        checkExecutable(executable);
+        if (port < 8080) {
+            throw new IllegalArgumentException("Please use a port greater or equal to 8080 (do not run frostwire as root). Telluride's default port number is 47999");
+        }
+        ThreadExecutor.startThread(() -> {
+                    ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), "--server", String.valueOf(port));
+                    processBuilder.redirectErrorStream(true);
+                    if (saveDirectory != null && saveDirectory.isDirectory() && saveDirectory.canWrite()) {
+                        processBuilder.directory(saveDirectory);
+                    }
+                    try {
+                        processBuilder.start();
+                        // The telluride process doesn't start right away, we wait 5 seconds to be safe before setting the
+                        // SERVER_UP flag to true. TellurideSearchPerformer waits for up to 10 seconds to give up
+                        Thread.currentThread().sleep(5000);
+                        SERVER_UP.set(true);
+                        LOG.info("RPC server is up successfully at http://127.0.0.1:" + port);
+                    } catch (Throwable e) {
+                        SERVER_UP.set(false);
+                        e.printStackTrace();
+                    }
+                },
+                "telluride-server-on-port-" + port);
+    }
+
     /**
+     * We're not using this method anymore, we now communicate with Telluride via HTTP
+     * We're leaving this code for unit test purposes.
      * @param executable
      * @param downloadUrl
      * @param saveDirectory
@@ -44,15 +95,7 @@ public final class TellurideLauncher {
                               final boolean metaOnly,
                               final boolean verboseOutput,
                               TellurideListener processListener) {
-        if (executable == null) {
-            throw new IllegalArgumentException("executable path is null, no telluride to launch");
-        }
-        if (!executable.isFile()) {
-            throw new IllegalArgumentException(executable + " is not a file");
-        }
-        if (!executable.canExecute()) {
-            throw new IllegalArgumentException(executable + " is not executable");
-        }
+        checkExecutable(executable);
         ThreadExecutor.startThread(
                 launchRunnable(
                         executable,
@@ -63,6 +106,18 @@ public final class TellurideLauncher {
                         verboseOutput,
                         processListener),
                 "telluride-process-adapter:" + downloadUrl);
+    }
+
+    private static void checkExecutable(final File executable) {
+        if (executable == null) {
+            throw new IllegalArgumentException("executable path is null, no telluride to launch");
+        }
+        if (!executable.isFile()) {
+            throw new IllegalArgumentException(executable + " is not a file");
+        }
+        if (!executable.canExecute()) {
+            throw new IllegalArgumentException(executable + " is not executable");
+        }
     }
 
     private static Runnable launchRunnable(final File executable,
@@ -125,88 +180,5 @@ public final class TellurideLauncher {
                 e.printStackTrace();
             }
         };
-    }
-
-    private final static class TellurideParser {
-        final static String DECIMAL_GROUP_FORMAT = "(?<%s>\\d{1,3}\\.\\d{1,3})";
-        final static String ETA_GROUP = "(?<eta>\\d{1,3}\\:\\d{1,3})";
-        // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
-        final static String REGEX_PROGRESS = "(?is)" +
-                String.format(DECIMAL_GROUP_FORMAT, "percentage") +
-                "\\% of " +
-                String.format(DECIMAL_GROUP_FORMAT, "size") +
-                "(?<unitSize>[KMGTP]iB) at.*?" +
-                String.format(DECIMAL_GROUP_FORMAT, "rate") +
-                "(?<unitRate>[KMGTP]iB/s) ETA " + ETA_GROUP;
-        final static Pattern downloadPattern = Pattern.compile(REGEX_PROGRESS);
-
-        final TellurideListener processListener;
-        final boolean metaOnly;
-        boolean pageUrlRead;
-        final StringBuilder sb;
-
-        TellurideParser(TellurideListener listener, boolean pMetaOnly) {
-            processListener = listener;
-            metaOnly = pMetaOnly;
-            sb = new StringBuilder();
-        }
-
-        public void parse(String line) {
-            if (!pageUrlRead && line.contains("PAGE_URL:")) {
-                pageUrlRead = true;
-                return;
-            }
-            if (!pageUrlRead) {
-                return;
-            }
-            if (line.contains("] ERROR:")) {
-                processListener.onError(line);
-                return;
-            }
-            if (metaOnly) {
-                sb.append(line);
-            } else if (!line.isEmpty()) {
-                // reports on the file name we're about to download - onDestination
-                if (line.startsWith("[download] Destination: ")) {
-                    processListener.onDestination(line.substring("[download] Destination: ".length()));
-                    return;
-                }
-
-                // reports on progress
-                Matcher progressMatcher = downloadPattern.matcher(line);
-                if (progressMatcher.find()) {
-                    String percentage = progressMatcher.group("percentage");
-                    String size = progressMatcher.group("size");
-                    String unitSize = progressMatcher.group("unitSize");
-                    String rate = progressMatcher.group("rate");
-                    String unitRate = progressMatcher.group("unitRate");
-                    String eta = progressMatcher.group("eta");
-
-                    processListener.onProgress(
-                            Float.parseFloat(percentage),
-                            Float.parseFloat(size),
-                            unitSize,
-                            Float.parseFloat(rate),
-                            // hardcoded for now, we should parse this, we'll see how it integrates with SearchResults
-                            unitRate,
-                            eta
-                    );
-                    return;
-                }
-
-                // reports on errors
-            }
-        }
-
-        public void done() {
-            if (metaOnly) {
-                String JSON = sb.toString();
-                if (JSON != null && JSON.length() > 0) {
-                    processListener.onMeta(JSON);
-                } else {
-                    processListener.onError("No metadata returned by telluride");
-                }
-            }
-        }
     }
 }

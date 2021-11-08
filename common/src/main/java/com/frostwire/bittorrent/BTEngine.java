@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
@@ -134,6 +140,9 @@ public final class BTEngine extends SessionManager {
         this.listener = listener;
     }
 
+    /**
+     * @see com.frostwire.android.gui.MainApplication.start() for ctx.interfaces and the rest of the context
+     */
     @Override
     public void start() {
         SessionParams params = loadSettings();
@@ -160,9 +169,14 @@ public final class BTEngine extends SessionManager {
                 ctx.version[2],
                 libtorrent.version());
         sp.set_str(settings_pack.string_types.user_agent.swigValue(), userAgent);
-        System.out.println("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
-        System.out.println("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
-        super.start(params);
+        LOG.info("Peer Fingerprint: " + sp.get_str(settings_pack.string_types.peer_fingerprint.swigValue()));
+        LOG.info("User Agent: " + sp.get_str(settings_pack.string_types.user_agent.swigValue()));
+
+        try {
+            super.start(params);
+        } catch (Throwable t) {
+            LOG.error(t.getMessage(), t);
+        }
     }
 
     @Override
@@ -342,11 +356,9 @@ public final class BTEngine extends SessionManager {
             priorities = Priority.array(Priority.IGNORE, ti.numFiles());
         }
         if (priorities != null) {
-            boolean changed = false;
             for (int i = 0; i < selection.length; i++) {
                 if (selection[i] && i < priorities.length && priorities[i] == Priority.IGNORE) {
                     priorities[i] = Priority.NORMAL;
-                    changed = true;
                 }
             }
         }
@@ -550,7 +562,8 @@ public final class BTEngine extends SessionManager {
     private void onListenFailed(ListenFailedAlert alert) {
         String endp = alert.address() + ":" + alert.port();
         String s = "endpoint: " + endp + " type:" + alert.socketType();
-        String message = alert.error().message();
+        ErrorCode error = alert.error();
+        String message = error.message() + "/value=" + error.value();
         LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 

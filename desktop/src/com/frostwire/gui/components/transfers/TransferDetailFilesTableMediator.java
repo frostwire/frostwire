@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,26 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class TransferDetailFilesTableMediator extends AbstractTableMediator<TransferDetailFilesModel, TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
+public class TransferDetailFilesTableMediator extends
+    AbstractTableMediator<TransferDetailFilesModel, TransferDetailFilesDataLine, TransferDetailFiles.TransferItemHolder> {
     TransferDetailFilesTableMediator() {
         super("TRANSFER_DETAIL_FILES_TABLE_MEDIATOR");
     }
 
     @Override
     protected void updateSplashScreen() {
+    }
+
+    List<TransferDetailFilesDataLine> getSelectedLines() {
+        int[] selected = TABLE.getSelectedRows();
+        List<TransferDetailFilesDataLine> lines = new ArrayList<>(selected.length);
+        for (int aSelected : selected) {
+            lines.add(DATA_MODEL.get(aSelected));
+        }
+        return lines;
     }
 
     @Override
@@ -63,4 +75,12 @@ public class TransferDetailFilesTableMediator extends AbstractTableMediator<Tran
         TransferDetailFilesDataLine.ACTIONS_COLUMN.setCellEditor(new GenericCellEditor(getTransferDetailFileActionsRenderer()));
         TransferDetailFilesDataLine.ACTIONS_COLUMN.setCellRenderer(getTransferDetailFileActionsRenderer());
     }
+
+    @Override
+    protected void setupDragAndDrop() {
+        TABLE.setDragEnabled(true);
+        TABLE.setTransferHandler(new TransferDetailFilesTableTransferHandler(this));
+    }
+
+
 }

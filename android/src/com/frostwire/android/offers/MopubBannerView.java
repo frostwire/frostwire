@@ -22,8 +22,6 @@ package com.frostwire.android.offers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +35,7 @@ import androidx.annotation.Nullable;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.BuyActivity;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
@@ -205,8 +204,7 @@ public class MopubBannerView extends LinearLayout {
     }
 
     public void loadFallbackBanner(final String adUnitId) {
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(() ->
+        SystemUtils.postToUIThread(() ->
                 {
                     try {
                         InHouseBannerFactory.AdFormat adFormat;

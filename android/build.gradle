@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-import groovy.swing.SwingBuilder
-import groovy.xml.Namespace
-
 apply plugin: 'com.android.application'
 
 apply plugin: 'com.google.gms.google-services'
@@ -27,42 +22,37 @@ apply plugin: 'com.google.firebase.crashlytics'
 buildscript {
     repositories {
         google()
-        jcenter()
+
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.android.tools.build:gradle:7.0.3'
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
-        classpath 'com.google.gms:google-services:4.3.4'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.4.1'
+        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'
     }
 }
 
 repositories {
     google()
-    jcenter()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-
-    flatDir { dirs 'libs' }
 }
 
 def manifestVersionCode() {
-    def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
-
-    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
-    def xml = new XmlParser().parse(manifestFile)
-
+    def manifestFile = new File(project.projectDir.absolutePath + '/AndroidManifest.xml')
+    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new groovy.xml.XmlParser().parse(manifestFile)
+    //System.out.println("manifestVersionCode: xml.attributes()[ns.versionCode].toString()=" + xml.attributes()[ns.versionCode].toString())
     return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
 }
 
 def manifestVersionName() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
-
-    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
-    def xml = new XmlParser().parse(manifestFile)
-
+    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def xml = new groovy.xml.XmlParser().parse(manifestFile)
+    //System.out.println("manifestVersionName: " + xml.attributes()[ns.versionName].toString())
     return xml.attributes()[ns.versionName].toString()
 }
 
@@ -88,7 +78,6 @@ def changeApkOutput(variant) {
                 }
         }
     }
-
 }
 
 project.ext.versionCode = manifestVersionCode()
@@ -97,21 +86,20 @@ project.ext.versionName = manifestVersionName()
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 
 android {
-
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    // By November 2021, all apps that are being updated must target at least Android 11 (API level 30)
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
-        minSdkVersion 21 // Lollipop 5.0
-        targetSdkVersion 29 // Android 10
+        minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
+        targetSdkVersion 30 // Android 11
         multiDexEnabled true
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     sourceSets {
@@ -125,16 +113,12 @@ android {
                 srcDir 'apollo/src'
                 srcDir 'src'
             }
+            jniLibs.srcDirs = ['libs']
         }
     }
 
     lintOptions {
         abortOnError false
-    }
-
-    dexOptions {
-        javaMaxHeapSize "2g"
-        jumboMode = true
     }
 
     signingConfigs {
@@ -189,52 +173,80 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.re2j:re2j:1.4'
-    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
+    implementation 'com.google.re2j:re2j:1.6'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.browser:browser:1.3.0'
-    implementation 'androidx.exifinterface:exifinterface:1.3.2'
+    implementation 'androidx.exifinterface:exifinterface:1.3.3'
     implementation 'androidx.preference:preference:1.1.1'
 
-    implementation 'com.android.billingclient:billing:3.0.2'
-    implementation 'com.google.android.gms:play-services-ads:19.7.0'
+    implementation 'com.android.billingclient:billing:4.0.0'
+
+    /**
+     * Can't yet upgrade to 20.4.0, this happens, tried many different things to fix it to no avail.
+     * Wait until 20.5.0 to see if it's solved by maintainers.
+     *
+     * Duplicate class com.google.android.gms.internal.measurement.zzbs found in modules jetified-play-services-measurement-18.0.2-runtime (com.google.android.gms:play-services-measurement:18.0.2) and jetified-play-services-measurement-sdk-api-18.0.3-runtime (com.google.android.gms:play-services-measurement-sdk-api:18.0.3)
+     Duplicate class com.google.android.gms.internal.measurement.zzl found in modules jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2) and jetified-play-services-measurement-sdk-api-18.0.3-runtime (com.google.android.gms:play-services-measurement-sdk-api:18.0.3)
+     Duplicate class com.google.android.gms.measurement.internal.zzfh found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     Duplicate class com.google.android.gms.measurement.internal.zzgn found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     Duplicate class com.google.android.gms.measurement.internal.zzgo found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     Duplicate class com.google.android.gms.measurement.internal.zzgp found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     Duplicate class com.google.android.gms.measurement.internal.zzgq found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     Duplicate class com.google.android.gms.measurement.internal.zzhs found in modules jetified-play-services-measurement-18.0.2-runtime (com.google.android.gms:play-services-measurement:18.0.2) and jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3)
+     Duplicate class com.google.android.gms.measurement.internal.zzhx found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
+     */
+    implementation 'com.google.android.gms:play-services-ads:20.3.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
-    implementation 'com.google.android:flexbox:1.1.1'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
     // Firebase Crashlytics
-    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation platform('com.google.firebase:firebase-bom:26.7.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
     // MoPub SDK requirements - https://github.com/mopub/mopub-android-sdk#requirements
     implementation 'androidx.legacy:legacy-preference-v14:1.0.0'
-    implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'androidx.media2:media2-session:1.1.2'
-    implementation 'androidx.media2:media2-widget:1.1.2'
-    implementation 'androidx.media2:media2-player:1.1.2'
+    implementation 'androidx.annotation:annotation:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'com.google.code.gson:gson:2.8.8'
     implementation 'com.mopub.volley:mopub-volley:2.1.0'
 
+    // androidx media2. Tried going to 1.2.0, this forced us to target sdk 31 (android 12)
+    // then we had to implement PendingIntent.FLAG_MUTABLE and even though it was implemented on
+    // all PendingIntent instantiations, the app would still crash saying we hadn't specified it,
+    // probably an issue of a third party library not being ready yet for android 12, gotta wait
+    // for this update and refactor.
+    implementation 'androidx.media2:media2-session:1.1.3'
+    implementation 'androidx.media2:media2-widget:1.1.3'
+    implementation 'androidx.media2:media2-player:1.1.3'
+
     // MoPub SDK
-    implementation('com.mopub:mopub-sdk-banner:5.16.0@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-fullscreen:5.16.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-banner:5.18.0@aar') { transitive = true }
+    implementation('com.mopub:mopub-sdk-fullscreen:5.18.0@aar') { transitive = true }
 
     // MoPub Mediation Partners
-    implementation 'com.applovin:applovin-sdk:9.14.12'
-    implementation 'com.mopub.mediation:applovin:9.14.12.0'
-    implementation 'com.unity3d.ads:unity-ads:3.5.1'
-    implementation 'com.mopub.mediation:unityads:3.5.1.0'
+    implementation 'com.applovin:applovin-sdk:10.3.4'
+    implementation 'com.mopub.mediation:applovin:10.3.3.0'
+    implementation 'com.unity3d.ads:unity-ads:3.7.5'
+    implementation 'com.mopub.mediation:unityads:3.7.5.0'
 
-    def jlibtorrent_version='1.2.12.0'
+    def jlibtorrent_version = '1.2.14.1'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
+
+    // att free phones use this and crashes
     implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar')
-    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
+
+    // oneplus hd1905 uses this
     implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar')
+
+    // used by android emulator on macos
+    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
+
     implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
 
@@ -280,7 +292,7 @@ class SignatureRequester {
     void ask() {
         System.setProperty('java.awt.headless', 'false')
         if (System.console() == null) { // this is always the case on macOS at least
-            new SwingBuilder().edt {
+            new groovy.swing.SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,

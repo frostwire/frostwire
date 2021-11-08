@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.limegroup.gnutella.gui.I18n;
@@ -11,9 +28,8 @@ import java.io.IOException;
 
 /**
  * This class defines the panel in the options window that allows the user
- * to change the maximum number of dowloads to allow at any one time.
+ * to change the maximum number of downloads to allow at any one time.
  */
-//2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 public final class MaximumSearchesPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("Maximum Searches");
     private final static String LABEL = I18n.tr("You can set the maximum number of simultaneous searches you can perform.");

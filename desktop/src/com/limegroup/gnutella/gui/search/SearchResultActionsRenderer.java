@@ -1,19 +1,18 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.search;
@@ -27,6 +26,7 @@ import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
+import com.frostwire.search.torrent.TorrentSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -88,24 +88,22 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         add(labelPlay, c);
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
-        labelDownload.addMouseListener(new MouseAdapter() {
+
+        final MouseAdapter downloadActionAdapter = new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                labelDownload_mouseReleased(e);
+                labelDownloadAction_mouseReleased(e);
             }
-        });
+        };
+
+        labelDownload.addMouseListener(downloadActionAdapter);
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
         labelPartialDownload = new JLabel(details_solid);
         labelPartialDownload.setToolTipText(I18n.tr("Select content to download from this torrent."));
-        labelPartialDownload.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                labelPartialDownload_mouseReleased(e);
-            }
-        });
+        labelPartialDownload.addMouseListener(downloadActionAdapter);
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
@@ -171,7 +169,11 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         }
     }
 
-    private void labelPartialDownload_mouseReleased(MouseEvent e) {
+    /**
+     * Handles both + and down arrow
+     * @param e
+     */
+    private void labelDownloadAction_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             MouseListener[] mouseListeners = labelPartialDownload.getMouseListeners();
             for (MouseListener mouseListener : mouseListeners) {
@@ -179,23 +181,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             }
 
             SearchResult sr = uiSearchResult.getSearchResult();
-            if (sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult) {
-                uiSearchResult.download(true);
-                if (sr instanceof ArchiveorgTorrentSearchResult) {
-                    GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-                }
-            }
+            boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+            uiSearchResult.download(isTorrent);
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
 
             for (MouseListener mouseListener : mouseListeners) {
                 labelPartialDownload.addMouseListener(mouseListener);
             }
-        }
-    }
-
-    private void labelDownload_mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            uiSearchResult.download(false);
-            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
         }
     }
 
