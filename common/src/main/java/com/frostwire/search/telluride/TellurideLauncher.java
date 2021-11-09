@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class TellurideLauncher {
 
-    private static Logger LOG = Logger.getLogger(TellurideLauncher.class);
+    private static final Logger LOG = Logger.getLogger(TellurideLauncher.class);
 
     public static AtomicBoolean SERVER_UP = new AtomicBoolean(false);
 
@@ -81,12 +81,7 @@ public final class TellurideLauncher {
     /**
      * We're not using this method anymore, we now communicate with Telluride via HTTP
      * We're leaving this code for unit test purposes.
-     * @param executable
-     * @param downloadUrl
-     * @param saveDirectory
-     * @param audioOnly
      * @param metaOnly        Get only metadata about the downloadUrl. If set to true, it ignores audioOnly
-     * @param processListener
      */
     public static void launch(final File executable,
                               final String downloadUrl,
