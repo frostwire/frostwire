@@ -33,6 +33,7 @@ application {
     applicationDefaultJvmArgs = [
             '-Djava.library.path=lib/native',
             '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
+            '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
             '-Xms64m',
             '-Xmx512m',
             '-Xss768k',
