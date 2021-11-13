@@ -46,7 +46,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
     http_port_number
     workers_number
     '''
-    app = Sanic('Telluride Web Server {}'.format(build_number))
+    app = Sanic(f'Telluride Web Server {build_number}')
 
     @app.route('/')
     async def root_handler(request):
@@ -57,7 +57,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
         [shutdown=1] if passed it will shutdown the server
         '''
         #pylint: disable=unused-variable
-        if request.ip != '127.0.0.1' and request.ip != 'localhost':
+        if request.ip not in ('127.0.0.1', 'localhost'):
             return json({'build': build_number, 'message': 'gtfo'})
         query = dict(request.query_args)
         if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):

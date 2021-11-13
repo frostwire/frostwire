@@ -35,9 +35,9 @@ def welcome():
     '''
     print()
     print("Telluride Cloud Video Downloader. Build " + str(BUILD))
-    print("Copyright 2020-{} FrostWire LLC. Licensed under Apache 2.0.".format(datetime.today().year))
-    print("Python {}".format(sys.version))
-    print("{}".format(sys.version_info))
+    print(f"Copyright 2020-{datetime.today().year} FrostWire LLC. Licensed under Apache 2.0.")
+    print(f"Python {sys.version}")
+    print(sys.version_info)
     print()
 
 def prepare_options_parser(parser):
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     PAGE_URL = ARGS.page_url
 
     if SERVER_MODE:
-        print('Starting Telluride Web Server on port {}'.format(SERVER_PORT))
+        print(f"Starting Telluride Web Server on port {SERVER_PORT}")
         server.start(BUILD, SERVER_PORT)
         sys.exit(0)
 
