@@ -2,7 +2,7 @@
 
 ##########################################################################
 # Created by Angel Leon (@gubatron)
-# Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+# Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,10 +41,7 @@ ${PIP_CMD} ${PIP_OPTIONS} pip
 ${PIP_CMD} ${PIP_OPTIONS} pylint
 ${PIP_CMD} ${PIP_OPTIONS} youtube_dl
 ${PIP_CMD} ${PIP_OPTIONS} pycryptodome
-# breaks after 21.6.0 with ModuleNotFoundError: No module named 'websockets.legacy.protocol'
-# Waiting to hear from sanic team at https://github.com/sanic-org/sanic/issues/2227
-# They've suggested upgrading to websocket 9 (tried 9.0 and 9.1, and still failed)
-${PIP_CMD} ${PIP_OPTIONS} sanic==21.3.4
+${PIP_CMD} ${PIP_OPTIONS} sanic
 ${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
 ${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller websockets

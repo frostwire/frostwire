@@ -1,3 +1,12 @@
+build 18 - nov/12/2021
+ - pip-21.3.1
+ - pylint-2.11.1
+ - astroid-2.8.5
+ - pycryptodome-3.11.0
+ - pyinstaller-4.7
+ - sanic-21.9.1
+ - websockets-10.0
+
 build 17 - aug/27/2021
  - pip-21.2.4
  - pylint-2.10.2
