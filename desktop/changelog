@@ -2,13 +2,14 @@ frostwire (6.9.6) stable; urgency=high
  * New option to turn off auto-pasting URLs and magnets in the clipboard to search textbox
  * JDK 17 compatibility update
  * Includes JDK 17 runtime
+ * Linux installers now include JDK runtime. No more Java not found issues for Linux users
  * com.google.re2j:re2j:1.6
  * com.google.code.gson:gson:2.8.8
  * com.squareup.okhttp3:okhttp:4.9.2
  * org.junit.jupiter:junit-jupiter:5.8.1
  * Telluride Cloud Video Downloader build 18
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 12 Nov 2021 17:31:35 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 20 Nov 2021 09:39:05 -0600
 
 frostwire (6.9.5) stable; urgency=high
  * Telluride Cloud Video Downloader build 17
