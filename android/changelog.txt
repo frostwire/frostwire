@@ -1,3 +1,7 @@
+FrostWire 2.4.4 build 687 - NOV/23/2021
+ - jlibtorrent 1.2.14.2 (rebuild with boost 1.77)
+ - smaller installer size
+
 FrostWire 2.4.3 build 686 - OCT/22/2021
  - Fixes search bug that would occur after exiting and reopening app
  - Better search http connection management

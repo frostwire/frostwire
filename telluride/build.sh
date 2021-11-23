@@ -35,6 +35,7 @@ fi
 if isdocker
 then
     PYINSTALLER_CMD=/usr/local/bin/pyinstaller
+		PYLINT_CMD="pylint"
 fi
 
 echo PYINSTALLER_CMD=${PYINSTALLER_CMD}
