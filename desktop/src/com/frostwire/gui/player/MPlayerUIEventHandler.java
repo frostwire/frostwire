@@ -62,12 +62,6 @@ public class MPlayerUIEventHandler {
         }
     }
 
-    public void onTogglePlayPausePressed() {
-        for (MPlayerUIEventListener listener : listeners) {
-            listener.onUITogglePlayPausePressed();
-        }
-    }
-
     public void onPlayPressed() {
         for (MPlayerUIEventListener listener : listeners) {
             listener.onUIPlayPressed();
@@ -89,12 +83,6 @@ public class MPlayerUIEventHandler {
     public void onRewindPressed() {
         for (MPlayerUIEventListener listener : listeners) {
             listener.onUIRewindPressed();
-        }
-    }
-
-    public void onToggleFullscreenPressed() {
-        for (MPlayerUIEventListener listener : listeners) {
-            listener.onUIToggleFullscreenPressed();
         }
     }
 

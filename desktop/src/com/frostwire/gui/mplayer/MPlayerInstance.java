@@ -22,10 +22,9 @@ package com.frostwire.gui.mplayer;
 
 import com.frostwire.mplayer.Language;
 import com.frostwire.mplayer.LanguageSource;
-import com.limegroup.gnutella.gui.MPlayerMediator;
+import com.frostwire.util.OSUtils;
 import org.gudy.azureus2.core3.util.*;
 import org.limewire.util.FileUtils;
-import com.frostwire.util.OSUtils;
 import org.limewire.util.SystemUtils;
 
 import java.io.*;
@@ -212,8 +211,6 @@ MPlayerInstance {
                 cmdList.add("-priority");
                 cmdList.add("high");
                 cmdList.add("-framedrop");
-                cmdList.add("-wid");
-                cmdList.add(String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
                 //workaround for mplayer on windows not being able to decode wma correctly with the wma demuxer.
                 //by passing lavf it'll force mplayer to use ffmpeg's demuxer (libavformat).
                 if (FileUtils.hasExtension(fileOrUrl, "wma", "wmv", "asf")) {
@@ -224,38 +221,8 @@ MPlayerInstance {
             if (OSUtils.isLinux()) {
                 cmdList.add("-double");
                 cmdList.add("-framedrop");
-                cmdList.add("-wid");
-                cmdList.add(String.valueOf(MPlayerMediator.instance().getCanvasComponentHwnd()));
             }
-//			if(Utils.isWindows()) {
-//
-//			} else {
-//				cmdList.add(0,ShellUtilityFinder.getNice());
-//				cmdList.add(1,"-n");
-//				cmdList.add(2,"0");
-//			}
-//
-//			if(Utils.isWindows()) {
-//
-//				cmdList.add("-ass");
-//				cmdList.add("-ass-color");
-//				cmdList.add("FFFFFF00");
-//				cmdList.add("-ass-border-color");
-//				cmdList.add("00000040");
-//			}
-//			Font font = Font.getFont("LiberationSans-Bold.ttf");
-//			if(font != null) {
-//				cmdList.add("-font");
-//				cmdList.add(font.getFontPath());
-//				cmdList.add("-subfont-text-scale");
-//				//cmdList.add(Utils.isWindows() ? "4" : "2.5");
-//				cmdList.add("-subfont-blur");
-//				cmdList.add("4");
-//				cmdList.add("-subfont-outline");
-//				cmdList.add("2");
-//			}
-//
-//			cmdList.add("-framedrop");
+
             //Set the initial volume.
             cmdList.add("-volume");
             cmdList.add(String.valueOf(initialVolume));
@@ -280,7 +247,7 @@ MPlayerInstance {
             }
             String[] cmd = cmdList.toArray(new String[0]);
             String cmdString = Arrays.toString(cmd).replace(", ", " ");
-            System.out.println(String.format("starting mplayer: %s", cmdString));
+            System.out.printf("starting mplayer: %s%n", cmdString);
             try {
                 System.out.println("File Path: [" + cmdList.get(cmdList.size() - 1) + "]");
             } catch (Exception ignored) {

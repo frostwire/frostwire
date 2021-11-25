@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2007-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import com.limegroup.gnutella.util.FrostWireUtils;
 import java.io.File;
 
 public class MediaPlayerOSX extends MediaPlayer {
-    private static Logger LOG = Logger.getLogger(MediaPlayerOSX.class);
+    private static final Logger LOG = Logger.getLogger(MediaPlayerOSX.class);
+
     @Override
     protected String getPlayerPath() {
         //System.out.println("MediaPlayerOSX: getFrostWireJarPath() -> " + FrostWireUtils.getFrostWireJarPath());
@@ -54,9 +55,8 @@ public class MediaPlayerOSX extends MediaPlayer {
     }
 
 
-
     public static void main(String[] args) {
         var player = new MediaPlayerOSX();
-        LOG.info("getNonReleasePlayerPath() -> "  + player.getNonReleasePlayerPath());
+        LOG.info("getNonReleasePlayerPath() -> " + player.getNonReleasePlayerPath());
     }
 }

@@ -31,13 +31,9 @@ interface MPlayerUIEventListener {
 
     void onUIPausePressed();
 
-    void onUITogglePlayPausePressed();
-
     void onUIFastForwardPressed();
 
     void onUIRewindPressed();
-
-    void onUIToggleFullscreenPressed();
 
     void onUIProgressSlideStart();
 

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020 FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022 FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import com.frostwire.util.OSUtils;
 import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.MPlayerMediator;
 import com.limegroup.gnutella.gui.RefreshListener;
 import com.limegroup.gnutella.settings.PlayerSettings;
 import org.apache.commons.io.FilenameUtils;
@@ -50,7 +49,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 
 /**
- * An media player to play compressed and uncompressed media.
+ * A media player to play compressed and uncompressed media.
  *
  * @author gubatron
  * @author aldenml
@@ -152,14 +151,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     float getVolumeGainFactor() {
         return 100.0f;
-    }
-
-    public Dimension getCurrentVideoSize() {
-        if (mplayer != null) {
-            return mplayer.getVideoSize();
-        } else {
-            return null;
-        }
     }
 
     public MediaSource getCurrentMedia() {
@@ -550,7 +541,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             return false;
         }
         String currentMediaUrl = currentMedia.getURL();
-        return (currentMediaUrl != null) && file.toLowerCase().equals(currentMediaUrl.toLowerCase());
+        return file.equalsIgnoreCase(currentMediaUrl);
     }
 
     public boolean isThisBeingPlayed(PlaylistItem playlistItem) {
@@ -745,11 +736,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     @Override
-    public void onUIToggleFullscreenPressed() {
-        MPlayerMediator.instance().toggleFullScreen();
-    }
-
-    @Override
     public void onUIProgressSlideStart() {
         stateNotificationsEnabled = false;
         if (mplayer.getCurrentState() == MediaPlaybackState.Playing) {
@@ -775,10 +761,5 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     @Override
     public void onUIVolumeDecremented() {
         decrementVolume();
-    }
-
-    @Override
-    public void onUITogglePlayPausePressed() {
-        togglePause();
     }
 }
