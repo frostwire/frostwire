@@ -244,24 +244,23 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             } else {
                 this.playlistFilesView = null;
             }
-            if (currentMedia != null) {
-                durationInSeconds = -1;
-                if (currentMedia.getFile() != null) {
-                    TagsReader tagsReader = new TagsReader(currentMedia.getFile());
-                    LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
-                    calculateDurationInSecs(currentMedia.getFile());
-                    playMedia();
-                } else if (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null) {
-                    TagsReader tagsReader = new TagsReader(new File(currentMedia.getPlaylistItem().getFilePath()));
-                    LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
-                    playMedia();
-                    durationInSeconds = (long) currentMedia.getPlaylistItem().getTrackDurationInSecs();
-                } else if (currentMedia instanceof StreamMediaSource) {
-                    LibraryMediator.instance().getLibraryCoverArtPanel().setDefault();
-                    playMedia(((StreamMediaSource) currentMedia).showPlayerWindow());
-                }
-                notifyOpened(source);
+            durationInSeconds = -1;
+            if (currentMedia.getFile() != null) {
+                TagsReader tagsReader = new TagsReader(currentMedia.getFile());
+                LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
+                calculateDurationInSecs(currentMedia.getFile());
+                playMedia();
+            } else if (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null) {
+                TagsReader tagsReader = new TagsReader(new File(currentMedia.getPlaylistItem().getFilePath()));
+                LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
+                playMedia();
+                durationInSeconds = (long) currentMedia.getPlaylistItem().getTrackDurationInSecs();
+            } else if (currentMedia instanceof StreamMediaSource) {
+                LibraryMediator.instance().getLibraryCoverArtPanel().setDefault();
+                playMedia();
+
             }
+            notifyOpened(source);
         } catch (Throwable e) {
             // NPE from bug report
             e.printStackTrace();
@@ -340,31 +339,11 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     }
 
     /**
-     * Force showing or not the media player window
-     */
-    private void playMedia(boolean showPlayerWindow) {
-        String filename = stopAndPrepareFilename();
-        if (filename.length() > 0) {
-            MPlayerMediator mplayerMediator = MPlayerMediator.instance();
-            if (mplayerMediator != null) {
-                mplayerMediator.showPlayerWindow(showPlayerWindow);
-            }
-            mplayer.open(filename, getAdjustedVolume());
-        }
-        notifyState(getState());
-    }
-
-    /**
      * Plays a file and determines whether or not to show the player window based on the MediaType of the file.
      */
     private void playMedia() {
         String filename = stopAndPrepareFilename();
         if (filename.length() > 0) {
-            boolean isVideoFile = MediaType.getVideoMediaType().matches(filename);
-            MPlayerMediator mplayerMediator = MPlayerMediator.instance();
-            if (mplayerMediator != null) {
-                mplayerMediator.showPlayerWindow(isVideoFile);
-            }
             mplayer.open(filename, getAdjustedVolume());
         }
         notifyState(getState());

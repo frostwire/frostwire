@@ -509,22 +509,7 @@ public final class GUIMediator {
         TellurideLauncher.shutdownServer(SearchSettings.TELLURIDE_RPC_PORT.getValue());
         LibraryMediator.getLibrary().close();
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
-        hideVideoPlayerWindow();
         Finalizer.shutdown();
-    }
-
-    private static void hideVideoPlayerWindow() {
-        // hide video player if visible
-        try {
-            if (MPlayerMediator.instance() != null) {
-                try {
-                    MPlayerMediator.instance().showPlayerWindow(false);
-                } catch (Throwable t) {
-                    //we tried
-                }
-            }
-        } catch (Throwable ignored) {
-        }
     }
 
     /**

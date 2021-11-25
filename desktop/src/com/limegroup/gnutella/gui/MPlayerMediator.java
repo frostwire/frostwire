@@ -47,18 +47,6 @@ public class MPlayerMediator {
         return mplayerWindow.getCanvasComponentHwnd();
     }
 
-    public void showPlayerWindow(final boolean visible) {
-        try {
-            GUIMediator.safeInvokeAndWait(() -> {
-                if (mplayerWindow != null) {
-                    mplayerWindow.setVisible(visible);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void toggleFullScreen() {
         try {
             GUIMediator.safeInvokeAndWait(mplayerWindow::toggleFullScreen);

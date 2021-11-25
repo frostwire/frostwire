@@ -462,8 +462,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
                 // close media player if still playing
                 if (MediaPlayer.instance().isThisBeingPlayed(file)) {
                     MediaPlayer.instance().stop();
-                    // executes safely on main thread only
-                    MPlayerMediator.instance().showPlayerWindow(false);
                 }
                 // removeOptions > 2 => OS offers trash options
                 boolean removed = FileUtils.delete(file, removeOptions.length > 2 && option == 0 /* "move to trash" option index */);
