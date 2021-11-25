@@ -6,9 +6,10 @@
 ###############################################################################################
 
 INCLUDE_PATH="-I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin"
+FLAGS="-fPIC -mmacosx-version-min=10.11 -fno-strict-aliasing -fvisibility=default -D_DARWIN_C_SOURCE -Os -arch x86_64 -dynamiclib"
 # Assign DEBUG_FLAGS=${FLAGS} to add debug symbols to the builds
 #DEBUG_FLAGS="-fPIC -mmacosx-version-min=10.11 -fno-strict-aliasing -fvisibility=default -D_DARWIN_C_SOURCE -g -O0 -arch x86_64 -dynamiclib"
-FLAGS="-fPIC -mmacosx-version-min=10.11 -fno-strict-aliasing -fvisibility=default -D_DARWIN_C_SOURCE -Os -arch x86_64 -dynamiclib"
+#FLAGS=${DEBUG_FLAGS}
 OUTPUT_PATH="../../native"
 
 ###############################################################################################

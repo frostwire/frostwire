@@ -164,7 +164,11 @@ final class Initializer {
             Thread.yield();
         }
         if (OSUtils.isMacOSX()) {
-            MacOSXUtils.setLoginStatus(StartupSettings.RUN_ON_STARTUP.getValue());
+            try {
+                MacOSXUtils.setLoginStatus(StartupSettings.RUN_ON_STARTUP.getValue());
+            } catch (Throwable ignored) {
+                ignored.printStackTrace();
+            }
         }
         if (args.length >= 1 && "-startup".equals(args[0]))
             isStartup = true;
