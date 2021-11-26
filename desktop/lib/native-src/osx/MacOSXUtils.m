@@ -11,6 +11,15 @@
 #import <syslog.h>
 #import <Foundation/Foundation.h>
 
+// poor man's printf
+// tail -f /tmp/fw.log to see this log output in real time when used.
+//static void log2file(char* message) {
+//	FILE* fp = fopen("/tmp/fw.log","a");
+//	fprintf(fp, "%s\n", message);
+//	fflush(fp);
+//	fclose(fp);
+//}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,47 +39,40 @@ JNIEXPORT void JNICALL OS_NATIVE(SetLoginStatusNative)
 	CFURLRef url = (CFURLRef)[NSURL fileURLWithPath:appPath];
     
 	// Create a reference to the shared file list for current user only.  all users use: kLSSharedFileListGlobalLoginItems
-	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL,
-                                                            kLSSharedFileListSessionLoginItems, NULL);
+	LSSharedFileListRef loginItems = LSSharedFileListCreate(NULL, kLSSharedFileListSessionLoginItems, NULL);
+
 	if (loginItems) {
-        
         if (onoff) {
-        
             //Insert an item to the list.
-            LSSharedFileListItemRef item = LSSharedFileListInsertItemURL(loginItems,
-                                                                     kLSSharedFileListItemLast, NULL, NULL,
-                                                                     url, NULL, NULL);
+            LSSharedFileListItemRef item = LSSharedFileListInsertItemURL(loginItems, kLSSharedFileListItemLast, NULL, NULL, url, NULL, NULL);
             if (item){
               NSLog(@"Objective-C:SetLoginStatusNative(appPath=%@)", appPath);
               CFRelease(item);
             }
             
         } else {
-					NSLog(@"Got loginItems but onoff=false");
             //Remove item from the list
             UInt32 seedValue;
             
             //Retrieve the list of Login Items
             NSArray  *loginItemsArray = (NSArray *)LSSharedFileListCopySnapshot(loginItems, &seedValue);
 						if (loginItemsArray) {
-						  NSLog(@"Got loginItemsArray!");
               for(int i=0; i < [loginItemsArray count]; i++){
-								NSLog(@"Iterating over loginItemsArray");
 								LSSharedFileListItemRef itemRef = (LSSharedFileListItemRef) loginItemsArray[i];
                   //Resolve the item with URL
                   if (LSSharedFileListItemResolve(itemRef, 0, (CFURLRef*) &url, NULL) == noErr) {
                       NSString * urlPath = [(NSURL*)url path];
                       NSLog(@"Objective-C:SetLoginStatusNative(urlPath=%@)", urlPath);
-                      CFRelease(urlPath);
-                      if ([urlPath compare:appPath] == NSOrderedSame){
+
+                      if ([urlPath compare:appPath] == NSOrderedSame) {
                           LSSharedFileListItemRemove(loginItems,itemRef);
                       }
+                      CFRelease(urlPath);
                   }
               }
 							[loginItemsArray release];
 						}
         }
-    
         CFRelease(loginItems);
     }
 }
