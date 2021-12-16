@@ -39,7 +39,7 @@ optional arguments:
 ## Building
 
 ```bash
-$ ./configure.sh # tries to install all dependencies
+$ ./configure_pudate.sh # tries to install (or update) all dependencies
 $ ./build.sh     # runs pylint on the code, pauses, performs binary packaging
 ```
 
