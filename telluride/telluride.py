@@ -27,7 +27,7 @@ import youtube_dl
 # our imports
 import server
 
-BUILD = 18
+BUILD = 19
 
 def welcome():
     '''
