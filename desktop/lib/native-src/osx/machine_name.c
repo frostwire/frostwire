@@ -19,7 +19,7 @@ int main(int args, char** argv) {
     printf("uname() failed. error:%d\n", errno);
     return errno;
   }
-  free(name);
   printf("machine: %s\n", name->machine);
+  free(name);	
   return 0;
 }
