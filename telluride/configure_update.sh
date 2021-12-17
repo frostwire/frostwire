@@ -41,7 +41,7 @@ ${PIP_CMD} ${PIP_OPTIONS} pip
 ${PIP_CMD} ${PIP_OPTIONS} pylint
 ${PIP_CMD} ${PIP_OPTIONS} youtube_dl
 ${PIP_CMD} ${PIP_OPTIONS} pycryptodome
-${PIP_CMD} ${PIP_OPTIONS} sanic==21.3.4
+${PIP_CMD} ${PIP_OPTIONS} sanic==20.12.4
 ${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
 ${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller websockets

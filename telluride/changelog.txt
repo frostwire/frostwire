@@ -4,6 +4,7 @@ build 19 - dec/16/2021
  - astroid-2.9.0
  - pylint-2.12.2
  - websockets-8.1
+ - downgrade to sanic-20.12.4 (21.3.4 not available on pip for Docker image)
 
 build 18 - nov/12/2021
  - pip-21.3.1

@@ -8,4 +8,6 @@ RUN apt install libssl1.1 -y
 RUN apt install python3 -y --fix-missing
 RUN apt install python3-pip -y
 RUN apt install pylint3 -y
+RUN apt install less -y
+RUN apt install emacs-nox -y
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
