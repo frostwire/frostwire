@@ -66,11 +66,7 @@ class WinRegistryWrapper {
     static {
         try {
             if (OSUtils.isWindows() && OSUtils.isGoodWindows()) {
-                if (OSUtils.isMachineX64()) {
-                    System.loadLibrary("SystemUtilities");
-                } else {
-                    System.loadLibrary("SystemUtilitiesX86");
-                }
+                System.loadLibrary("SystemUtilities");
             }
         } catch (Throwable t) {
             t.printStackTrace();

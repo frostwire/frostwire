@@ -42,11 +42,7 @@ public class SystemUtils {
         boolean canLoad = false;
         try {
             if ((OSUtils.isWindows() && OSUtils.isGoodWindows())) {
-                if (OSUtils.isMachineX64()) {
-                    System.loadLibrary("SystemUtilities");
-                } else {
-                    System.loadLibrary("SystemUtilitiesX86");
-                }
+                System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
             if (OSUtils.isMacOSX()) {
@@ -54,11 +50,7 @@ public class SystemUtils {
                 canLoad = true;
             }
             if (OSUtils.isLinux()) {
-                if (OSUtils.isMachineX64()) {
-                    System.loadLibrary("SystemUtilities");
-                } else {
-                    System.loadLibrary("SystemUtilitiesX86");
-                }
+                System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
         } catch (Throwable noGo) {
@@ -66,6 +58,7 @@ public class SystemUtils {
             canLoad = false;
         }
         isLoaded = canLoad;
+        LOG.info("SystemUtilities dynamic library loaded? " + isLoaded);
     }
 
     private SystemUtils() {
