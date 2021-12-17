@@ -22,16 +22,20 @@ FALSE=1
 isdocker() {
   if [ -f /.dockerenv ]
   then
+    echo "isdocker(): true"
     return ${TRUE}
   fi
+  echo "isdocker(): false"
   return ${FALSE}
 }
 
 isubuntu() {
   if [ $(uname -a | grep -c Ubuntu) == 0 ]
   then
+    echo "isubuntu(): false"
     return ${FALSE}
   else
+    echo "isubuntu(): true"
     return ${TRUE}
   fi
 }
@@ -39,8 +43,10 @@ isubuntu() {
 iswindows() {
   if [ $(uname -a | grep -c windows) == 0 ]
   then
+    echo "iswindows(): false"
     return ${FALSE}
   else
+    echo "iswindows(): true"
     return ${TRUE}
   fi
 }
@@ -48,9 +54,12 @@ iswindows() {
 ismac() {
   if [  $(uname -a | grep -c Darwin) == 0 ]
   then
+    echo "ismac(): false"
     return ${FALSE}
+  else
+    echo "ismac(): true"
+    return ${TRUE}
   fi
-  return ${TRUE}
 }
 
 cleanup() {
