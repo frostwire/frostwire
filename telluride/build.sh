@@ -18,7 +18,6 @@
 #set -x
 PYINSTALLER_CMD="pyinstaller"
 PYLINT_CMD="pylint3"
-
 source ./common.sh
 
 if [[ ismac -eq ${TRUE} || iswindows -eq ${TRUE} ]]
@@ -82,7 +81,8 @@ then
     mv dist/telluride telluride_linux
   elif ismac
   then
-  	mv dist/telluride telluride_macos
+    ARCH=`arch`
+    mv dist/telluride telluride_macos.${ARCH}
     ./sign.sh
   elif iswindows
   then
