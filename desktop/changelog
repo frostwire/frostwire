@@ -1,3 +1,9 @@
+frostwire (6.9.7) stable; urgency=high
+  * New mplayer 12.0.5/ffmpeg 4.2.1 build.
+  * macOS arm64 and x86_64 fwplayer builds
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 6 Jan 2022 10:04:00 -0600
+
 frostwire (6.9.6) stable; urgency=high
   * Option to turn off auto-pasting URLs and magnets in the clipboard to search textbox
   * JDK 17 compatibility update
