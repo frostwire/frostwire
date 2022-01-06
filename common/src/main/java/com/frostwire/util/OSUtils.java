@@ -332,8 +332,35 @@ public class OSUtils {
         return isWindows() || isMacOSX();
     }
 
+    /** In the case for arm64, Java returns instead os.arch=aarch64, see getArchitectureInPOSIX() */
     public static String getArchitecture() {
         return System.getProperty("os.arch");
+    }
+
+    /** Asks the operating system for the architecture. 
+      gets the struct utsname machine property.
+
+      Same as doing this:
+      #include <stdlib.h>
+      #include <stdio.h>
+      #include <sys/utsname.h>
+
+      int main(int nargs, char** args) {
+      struct utsname* s = (struct utsname*) malloc(sizeof(struct utsname));
+      uname(s);
+      printf("%s\n",s->machine);
+      return 0;
+     }
+     */
+    public static String getArchitectureInPOSIX() {
+        String result = null;
+        try {
+            Process process = Runtime.getRuntime().exec("arch");
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
+            result = reader.readLine();
+            reader.close();
+	} catch (Throwable ignore) {}
+        return result;
     }
 
     public static boolean isMachineX64() {
