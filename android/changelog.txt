@@ -1,3 +1,15 @@
+FrostWire 2.4.5 build 688 - JAN/07/2022
+ - jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
+ - lt:don't disable announcing from local endpoints because of temporary failures
+ - lt:fix issue in parsing UPnP XML response with multiple forwarding services
+ - lt:cache DNS lookups for SOCKS5 proxy
+ - lt:fix stalled pieces on disk-full errors
+ - lt:fix build configuration issue on NetBSD, OpenBSD and DragonFly
+ - lt:make UTF-8 sanitization a bit stricter. This will re-write invalid UTF-8 code points encoding surrogate pairs
+ - lt:fix restoring last_seen_complete from resume data
+ - lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+ - lt:make remove_torrent flags be treated as flags (instead of an enum)
+
 FrostWire 2.4.4 build 687 - NOV/23/2021
  - jlibtorrent 1.2.14.2 (rebuild with boost 1.77)
  - smaller installer size
