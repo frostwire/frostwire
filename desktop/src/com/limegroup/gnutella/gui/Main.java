@@ -119,12 +119,11 @@ public class Main {
     }
 
     private static String getMacOSJLibtorrentPath() {
-        String pathWithoutOSArch = getJLibtorrentPath(".dylib");
         String os_arch = System.getProperty("os.arch");
         if ("aarch64".equals(os_arch)) {
             os_arch = "arm64";
         }
-        return pathWithoutOSArch.replace(".dylib", "." + os_arch + ".dylib");
+        return getJLibtorrentPath("." + os_arch + ".dylib");
     }
 
     private static String getLinuxJLibtorrentPath() {
