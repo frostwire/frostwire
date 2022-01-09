@@ -337,30 +337,18 @@ public class OSUtils {
         return System.getProperty("os.arch");
     }
 
-    /** Asks the operating system for the architecture. 
-      gets the struct utsname machine property.
-
-      Same as doing this:
-      #include <stdlib.h>
-      #include <stdio.h>
-      #include <sys/utsname.h>
-
-      int main(int nargs, char** args) {
-      struct utsname* s = (struct utsname*) malloc(sizeof(struct utsname));
-      uname(s);
-      printf("%s\n",s->machine);
-      return 0;
-     }
+    /**
+     * arm64, x86_86
      */
-    public static String getArchitectureInPOSIX() {
-        String result = null;
-        try {
-            Process process = Runtime.getRuntime().exec("arch");
-            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
-            result = reader.readLine();
-            reader.close();
-	} catch (Throwable ignore) {}
-        return result;
+    public static String getMacOSArchitecture() {
+        String os_arch = System.getProperty("os.arch");
+        if ("aarch64".equals(os_arch)) {
+            return "arm64";
+        }
+        if ("i386".equals(os_arch) || "x86".equals(os_arch)) {
+            return "x86_64";
+        }
+        return os_arch;
     }
 
     public static boolean isMachineX64() {
