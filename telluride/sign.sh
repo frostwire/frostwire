@@ -5,6 +5,9 @@ then
   exit 0
 fi
 ARCH=`arch`
+if [ ${ARCH} == "i386" ]; then
+  ARCH=x86_64
+fi
 codesign --verbose=4 \
          -s KET68JTS3L \
          --entitlements Entitlements.plist \

@@ -82,6 +82,9 @@ then
   elif ismac
   then
     ARCH=`arch`
+    if [ ${ARCH} == "i386" ]; then
+        ARCH=x86_64
+    fi
     mv dist/telluride telluride_macos.${ARCH}
     ./sign.sh
   elif iswindows
