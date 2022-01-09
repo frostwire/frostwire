@@ -18,6 +18,7 @@
 package com.frostwire.gui.player;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import java.io.File;
@@ -46,12 +47,12 @@ public class MediaPlayerOSX extends MediaPlayer {
         f = f.getParentFile(); // jre
         f = f.getParentFile(); // PlugIns
         f = f.getParentFile(); // Contents
-        f = new File(f, "MacOS" + File.separator + "fwplayer_osx");
+        f = new File(f, "MacOS" + File.separator + "fwplayer_osx" + "." + OSUtils.getMacOSArchitecture());
         return f.getAbsolutePath();
     }
 
     private String getNonReleasePlayerPath() {
-        return FrostWireUtils.getDevelopmentFrostWireDesktopFolderPath() + "/lib/native/fwplayer_osx";
+        return FrostWireUtils.getDevelopmentFrostWireDesktopFolderPath() + "/lib/native/fwplayer_osx" + "." + OSUtils.getMacOSArchitecture();
     }
 
 
