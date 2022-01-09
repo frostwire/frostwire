@@ -134,7 +134,7 @@ public final class Launcher {
      * @throws IOException       if the file cannot be launched
      * @throws SecurityException if the file has an extension that is not allowed
      */
-    public static LimeProcess launchFile(File file) throws IOException,
+    public static FWProcess launchFile(File file) throws IOException,
             SecurityException {
         List<String> forbiddenExtensions = Arrays.asList("exe", "vbs", "lnk",
                 "bat", "sys", "com", "js", "scpt");
@@ -171,14 +171,14 @@ public final class Launcher {
             }
             if (file.isDirectory()) {
                 // launches explorer in the directory
-                LimeProcess.exec(new String[]{"explorer", explorePath});
+                FWProcess.exec(new String[]{"explorer", explorePath});
             } else {
                 // launches explorer and highlights the file
-                LimeProcess.exec(new String[]{"explorer", "/select,", explorePath});
+                FWProcess.exec(new String[]{"explorer", "/select,", explorePath});
             }
         } else if (OSUtils.isMacOSX()) {
             // launches the Finder and highlights the file
-            LimeProcess.exec(selectFileCommand(file));
+            FWProcess.exec(selectFileCommand(file));
         } else if (OSUtils.isLinux()) {
             if (file.isDirectory()) {
                 Desktop.getDesktop().open(file);
@@ -213,8 +213,8 @@ public final class Launcher {
      * @throws IOException if an I/O error occurs in making the runtime.exec()
      *                     call or in getting the canonical path of the file
      */
-    private static LimeProcess launchFileMacOSX(final String file) throws IOException {
-        return LimeProcess.exec(new String[]{"open", file});
+    private static FWProcess launchFileMacOSX(final String file) throws IOException {
+        return FWProcess.exec(new String[]{"open", file});
     }
 
     /**
@@ -245,7 +245,7 @@ public final class Launcher {
      *                     or if the Process created by the Runtime.exec call
      *                     throws an InterruptedException
      */
-    private static LimeProcess launchFileOther(String path) throws IOException {
+    private static FWProcess launchFileOther(String path) throws IOException {
         String handler;
         if (MediaType.getAudioMediaType().matches(path)) {
             handler = URLHandlerSettings.AUDIO_PLAYER.getValue();
@@ -261,6 +261,6 @@ public final class Launcher {
         for (int i = 0; i < strs.length; i++) {
             strs[i] = StringUtils.replace(tok.nextToken(), "$URL$", path);
         }
-        return LimeProcess.exec(strs);
+        return FWProcess.exec(strs);
     }
 }

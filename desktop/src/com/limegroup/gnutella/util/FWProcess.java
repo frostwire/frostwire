@@ -6,11 +6,11 @@ import java.io.IOException;
  * Thin wrapper class to execute a command. Stores the command, the arguments
  * and the executed process.
  */
-public class LimeProcess {
+public class FWProcess {
     private final String[] command;
     private Process process;
 
-    private LimeProcess(String[] command) {
+    private FWProcess(String[] command) {
         this.command = command;
     }
 
@@ -23,9 +23,9 @@ public class LimeProcess {
      * @throws LaunchException   If an {@link IOException} occurs
      * @see Runtime#exec(String[])
      */
-    static LimeProcess exec(String[] cmdarray) throws SecurityException,
+    static FWProcess exec(String[] cmdarray) throws SecurityException,
             LaunchException {
-        LimeProcess p = new LimeProcess(cmdarray);
+        FWProcess p = new FWProcess(cmdarray);
         p.exec();
         return p;
     }
