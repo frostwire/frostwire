@@ -1,7 +1,17 @@
 frostwire (6.9.7) stable; urgency=high
   * New mplayer 12.0.5/ffmpeg 4.2.1 build.
   * macOS arm64 and x86_64 fwplayer builds
-
+  * Telluride Cloud Video Downloader build 20
+  * jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
+  * lt:don't disable announcing from local endpoints because of temporary failures
+  * lt:fix issue in parsing UPnP XML response with multiple forwarding services
+  * lt:cache DNS lookups for SOCKS5 proxy
+  * lt:fix stalled pieces on disk-full errors
+  * lt:fix build configuration issue on NetBSD, OpenBSD and DragonFly
+  * lt:make UTF-8 sanitization a bit stricter. This will re-write invalid UTF-8 code points encoding surrogate pairs
+  * lt:fix restoring last_seen_complete from resume data
+  * lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
+  * lt:make remove_torrent flags be treated as flags (instead of an enum)
  -- FrostWire Team <contact@frostwire.com>  Thu, 6 Jan 2022 10:04:00 -0600
 
 frostwire (6.9.6) stable; urgency=high
