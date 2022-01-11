@@ -206,7 +206,7 @@ public final class FrostWireUtils {
                 f = f.getParentFile(); // jre
                 f = f.getParentFile(); // PlugIns
                 f = f.getParentFile(); // Contents
-                return new File(f, "MacOS" + File.separator + "telluride_macos"); //MacOS/telluride_macos
+                return new File(f, "MacOS" + File.separator + "telluride_macos." + OSUtils.getMacOSArchitecture()); //MacOS/telluride_macos
             } else if (OSUtils.isLinux()) {
                 File candidate1 = new File("/usr/lib/frostwire", "telluride_linux");
                 if (candidate1.exists()) {
