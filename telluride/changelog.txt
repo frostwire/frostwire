@@ -1,6 +1,8 @@
 build 20 - dec/22/2021
  - Apple M1 (arm64) build support and binaries
  - python 3.10.1
+ - sanic 21.12.1
+ - websockets 10.1
 
 build 19 - dec/16/2021
  - youtube_dl-2021.12.17

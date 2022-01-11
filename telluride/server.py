@@ -46,7 +46,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
     http_port_number
     workers_number
     '''
-    app = Sanic(f'Telluride Web Server {build_number}')
+    app = Sanic(f'TellurideWebServer_{build_number}')
 
     @app.route('/')
     async def root_handler(request):
