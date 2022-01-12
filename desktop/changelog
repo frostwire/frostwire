@@ -1,7 +1,8 @@
 frostwire (6.9.7) stable; urgency=high
   * New mplayer 12.0.5/ffmpeg 4.2.1 build.
   * macOS arm64 and x86_64 fwplayer builds
-  * Telluride Cloud Video Downloader build 20
+  * Telluride Cloud Video Downloader build 21 (new macOS arm64 builds)
+  * Faster telluride URL search results
   * jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
   * lt:don't disable announcing from local endpoints because of temporary failures
   * lt:fix issue in parsing UPnP XML response with multiple forwarding services
@@ -12,7 +13,8 @@ frostwire (6.9.7) stable; urgency=high
   * lt:fix restoring last_seen_complete from resume data
   * lt:fix issue on MacOS where the DHT was not restarted on a network-up notification
   * lt:make remove_torrent flags be treated as flags (instead of an enum)
- -- FrostWire Team <contact@frostwire.com>  Thu, 6 Jan 2022 10:04:00 -0600
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 12 Jan 2022 01:00:00 -0600
 
 frostwire (6.9.6) stable; urgency=high
   * Option to turn off auto-pasting URLs and magnets in the clipboard to search textbox
