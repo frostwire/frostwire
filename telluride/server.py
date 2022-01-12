@@ -17,11 +17,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-import sys
 import urllib
 import youtube_dl
-from sanic import Sanic
-from sanic.response import json
+from flask import Flask
+from flask import jsonify
+from flask import request
 
 DEFAULT_HTTP_PORT = 47999
 
@@ -36,9 +36,9 @@ def query_video(page_url):
                }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
-        return json(info_dict)
+        return jsonify(info_dict)
 
-def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
+def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
     '''
     starts the web server.
     Parameters:
@@ -46,10 +46,10 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
     http_port_number
     workers_number
     '''
-    app = Sanic(f'TellurideWebServer_{build_number}')
+    app = Flask(f'TellurideWebServer_{build_number}')
 
     @app.route('/')
-    async def root_handler(request):
+    def root_handler():
         '''
         http handler, rejects connections not coming from localhost|127.0.0.1
         url parameters:
@@ -57,14 +57,17 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT, workers_number=1):
         [shutdown=1] if passed it will shutdown the server
         '''
         #pylint: disable=unused-variable
-        if request.ip not in ('127.0.0.1', 'localhost'):
-            return json({'build': build_number, 'message': 'gtfo'})
-        query = dict(request.query_args)
+        if request.remote_addr not in ('127.0.0.1', 'localhost'):
+            return jsonify({'build': build_number, 'message': 'gtfo'}), 403
+        query = request.args.to_dict()
+        print(query)
         if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
-            sys.exit(0)
-            return
+            shutdown_function = request.environ.get('werkzeug.server.shutdown')
+            if shutdown_function is not None:
+                shutdown_function()
+            return jsonify({'message':'shutdown'})
         if 'url' in query:
-            return query_video(query['url'])
-        return json({'build' : build_number, 'message': 'no valid parameters received'})
+            return query_video(query['url']), 200
+        return jsonify({'build' : build_number, 'message': 'no valid parameters received'})
 
-    app.run(host='127.0.0.1', port=http_port_number, workers=workers_number)
+    app.run(host='127.0.0.1', port=http_port_number, threaded=True)

@@ -40,8 +40,7 @@ ${PIP_CMD} cache info
 ${PIP_CMD} ${PIP_OPTIONS} pip
 ${PIP_CMD} ${PIP_OPTIONS} pylint
 ${PIP_CMD} ${PIP_OPTIONS} youtube_dl
-${PIP_CMD} ${PIP_OPTIONS} pycryptodome
-${PIP_CMD} ${PIP_OPTIONS} sanic
+${PIP_CMD} ${PIP_OPTIONS} flask
 ${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
-${PIP_CMD} show pip pylint youtube_dl pycryptodome sanic pyinstaller websockets
+${PIP_CMD} show pip pylint youtube_dl pyinstaller flask werkzeug

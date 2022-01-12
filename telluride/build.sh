@@ -86,7 +86,7 @@ then
         ARCH=x86_64
     fi
     mv dist/telluride telluride_macos.${ARCH}
-    ./sign.sh
+    #./sign.sh
   elif iswindows
   then
     mv dist/telluride.exe .

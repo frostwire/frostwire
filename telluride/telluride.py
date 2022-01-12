@@ -18,8 +18,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 # python path imports
-import argparse
+#from multiprocessing import Process, freeze_support
 from datetime import datetime
+import argparse
 import json
 import sys
 import youtube_dl
@@ -29,16 +30,20 @@ import server
 
 BUILD = 20
 
+
 def welcome():
     '''
     Prints the name of the program, build and copyright
     '''
     print()
     print("Telluride Cloud Video Downloader. Build " + str(BUILD))
-    print(f"Copyright 2020-{datetime.today().year} FrostWire LLC. Licensed under Apache 2.0.")
+    print(
+        f"Copyright 2020-{datetime.today().year} FrostWire LLC. Licensed under Apache 2.0."
+    )
     print(f"Python {sys.version}")
     print(sys.version_info)
     print()
+
 
 def prepare_options_parser(parser):
     '''
@@ -48,14 +53,16 @@ def prepare_options_parser(parser):
         "--server",
         "-s",
         action="store_true",
-        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
-        )
+        help=
+        "Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
+    )
     parser.add_argument(
         "--port",
         "-p",
         default=server.DEFAULT_HTTP_PORT,
         type=int,
-        help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
+        help=
+        'HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
     )
     parser.add_argument(
         "--audio-only",
@@ -73,13 +80,18 @@ def prepare_options_parser(parser):
     parser.add_argument(
         "page_url",
         nargs='?',
-        help="The URL of the page that hosts the video you need to backup locally")
+        help=
+        "The URL of the page that hosts the video you need to backup locally")
 
-if __name__ == "__main__":
+
+def main():
+    '''
+    Main function
+    '''
     welcome()
     PARSER = argparse.ArgumentParser()
     prepare_options_parser(PARSER)
-    ARGS, LEFTOVERS = PARSER.parse_known_args()
+    ARGS, _ = PARSER.parse_known_args()
 
     SERVER_MODE = ARGS.server
     SERVER_PORT = ARGS.port
@@ -96,10 +108,11 @@ if __name__ == "__main__":
         print('Please pass a video page URL or "--help" for instructions\n')
         sys.exit(1)
 
-    YDL_OPTS = {'nocheckcertificate' : True,
-                'quiet': False,
-                'restrictfilenames': True
-               }
+    YDL_OPTS = {
+        'nocheckcertificate': True,
+        'quiet': False,
+        'restrictfilenames': True
+    }
     if META_ONLY:
         YDL_OPTS['quiet'] = True
         YDL_OPTS['format'] = 'bestaudio/best'
@@ -111,13 +124,17 @@ if __name__ == "__main__":
     if AUDIO_ONLY:
         print("Audio-only download.")
         YDL_OPTS['format'] = 'bestaudio/best'
-        YDL_OPTS['postprocessors'] = [
-            {
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '192',
-            }
-        ]
+        YDL_OPTS['postprocessors'] = [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }]
 
     with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
         ydl.download([PAGE_URL])
+
+
+if __name__ == '__main__':
+    main()
+    #freeze_support()
+    #Process(target=main).start()
