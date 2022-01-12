@@ -206,7 +206,7 @@ public final class FrostWireUtils {
                 f = f.getParentFile(); // jre
                 f = f.getParentFile(); // PlugIns
                 f = f.getParentFile(); // Contents
-                return new File(f, "MacOS" + File.separator + "telluride_macos." + OSUtils.getMacOSArchitecture()); //MacOS/telluride_macos
+                return new File(f, "MacOS" + File.separator + "telluride_macos." + OSUtils.getMacOSArchitecture());
             } else if (OSUtils.isLinux()) {
                 File candidate1 = new File("/usr/lib/frostwire", "telluride_linux");
                 if (candidate1.exists()) {
@@ -223,7 +223,7 @@ public final class FrostWireUtils {
             if (OSUtils.isWindows()) {
                 return new File(pathPrefix, "telluride.exe");
             } else if (OSUtils.isAnyMac()) {
-                return new File(pathPrefix, "telluride_macos");
+                return new File(pathPrefix, "telluride_macos." + OSUtils.getMacOSArchitecture());
             } else if (OSUtils.isLinux()) {
                 return new File(pathPrefix, "telluride_linux");
             }

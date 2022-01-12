@@ -231,6 +231,8 @@ public abstract class SearchEngine {
     };
 
     public static void startTellurideRPCServer() {
+        // TODO: Check if Telluride is already up and tell it to shutdown if so
+        // Then we launch a new process
         if (TELLURIDE_LAUNCHER == null) {
             TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
             if (TELLURIDE_LAUNCHER != null) {
