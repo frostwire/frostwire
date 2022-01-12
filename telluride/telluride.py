@@ -18,7 +18,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 # python path imports
-#from multiprocessing import Process, freeze_support
 from datetime import datetime
 import argparse
 import json
@@ -53,16 +52,14 @@ def prepare_options_parser(parser):
         "--server",
         "-s",
         action="store_true",
-        help=
-        "Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
+        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
     )
     parser.add_argument(
         "--port",
         "-p",
         default=server.DEFAULT_HTTP_PORT,
         type=int,
-        help=
-        'HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
+        help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
     )
     parser.add_argument(
         "--audio-only",
@@ -80,8 +77,7 @@ def prepare_options_parser(parser):
     parser.add_argument(
         "page_url",
         nargs='?',
-        help=
-        "The URL of the page that hosts the video you need to backup locally")
+        help="The URL of the page that hosts the video you need to backup locally")
 
 
 def main():
@@ -89,52 +85,50 @@ def main():
     Main function
     '''
     welcome()
-    PARSER = argparse.ArgumentParser()
-    prepare_options_parser(PARSER)
-    ARGS, _ = PARSER.parse_known_args()
+    arg_parser = argparse.ArgumentParser()
+    prepare_options_parser(arg_parser)
+    args, _ = arg_parser.parse_known_args()
 
-    SERVER_MODE = ARGS.server
-    SERVER_PORT = ARGS.port
-    AUDIO_ONLY = ARGS.audio_only
-    META_ONLY = ARGS.meta_only
-    PAGE_URL = ARGS.page_url
+    server_mode = args.server
+    server_port = args.port
+    audio_only = args.audio_only
+    meta_only = args.meta_only
+    page_url = args.page_url
 
-    if SERVER_MODE:
-        print(f"Starting Telluride Web Server on port {SERVER_PORT}")
-        server.start(BUILD, SERVER_PORT)
+    if server_mode:
+        print(f"Starting Telluride Web Server on port {server_port}")
+        server.start(BUILD, server_port)
         sys.exit(0)
 
-    if PAGE_URL is None:
+    if page_url is None:
         print('Please pass a video page URL or "--help" for instructions\n')
         sys.exit(1)
 
-    YDL_OPTS = {
+    youtube_dl_opts = {
         'nocheckcertificate': True,
         'quiet': False,
         'restrictfilenames': True
     }
-    if META_ONLY:
-        YDL_OPTS['quiet'] = True
-        YDL_OPTS['format'] = 'bestaudio/best'
-        with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
-            INFO_DICT = ydl.extract_info(PAGE_URL, download=False)
-            print(json.dumps(INFO_DICT, indent=2))
+    if meta_only:
+        youtube_dl_opts['quiet'] = True
+        youtube_dl_opts['format'] = 'bestaudio/best'
+        with youtube_dl.YoutubeDL(youtube_dl_opts) as ydl:
+            info_dict = ydl.extract_info(page_url, download=False)
+            print(json.dumps(info_dict, indent=2))
             sys.exit(0)
 
-    if AUDIO_ONLY:
+    if audio_only:
         print("Audio-only download.")
-        YDL_OPTS['format'] = 'bestaudio/best'
-        YDL_OPTS['postprocessors'] = [{
+        youtube_dl_opts['format'] = 'bestaudio/best'
+        youtube_dl_opts['postprocessors'] = [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }]
 
-    with youtube_dl.YoutubeDL(YDL_OPTS) as ydl:
-        ydl.download([PAGE_URL])
+    with youtube_dl.YoutubeDL(youtube_dl_opts) as ydl:
+        ydl.download([page_url])
 
 
 if __name__ == '__main__':
     main()
-    #freeze_support()
-    #Process(target=main).start()
