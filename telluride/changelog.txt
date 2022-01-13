@@ -1,5 +1,6 @@
-build 21 - jan/11/2022
+build 21 - jan/12/2022
  - python 3.10.1 adjustments
+ - pyinstaller 4.8
  - replaced sanic for flask (2.0.2)
  - werkzeug 2.0.2
  - click 8.0.3
