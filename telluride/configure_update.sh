@@ -18,6 +18,7 @@
 ##########################################################################
 
 # Python3 by default for macOS (and Windows to be tested)
+# set -x
 PIP_CMD='python3 -m pip'
 PYINSTALLER_PACKAGE='pyinstaller'
 PIP_OPTIONS='install --upgrade --no-cache-dir'
@@ -25,9 +26,8 @@ source ./common.sh
 
 if [ isdocker == ${FALSE} ] && [ isubuntu == ${TRUE} ]
 then
-  sudo apt-get install python3 python3-pip pylint3
-  sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-  PYINSTALLER_PACKAGE='PyInstaller'
+  echo "Don't run this on a host ubuntu, please use the Docker image so we make the resulting binaries will be compatible with as many linux distributions as possible"
+  exit 1
 fi
 
 if iswindows
@@ -38,9 +38,10 @@ fi
 ${PIP_CMD} cache purge
 ${PIP_CMD} cache info
 ${PIP_CMD} ${PIP_OPTIONS} pip
+${PIP)CMD} ${PIP_OPTIONS} astroid
 ${PIP_CMD} ${PIP_OPTIONS} pylint
 ${PIP_CMD} ${PIP_OPTIONS} youtube_dl
 ${PIP_CMD} ${PIP_OPTIONS} flask
 ${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
-${PIP_CMD} show pip pylint youtube_dl pyinstaller flask werkzeug
+${PIP_CMD} show pip astroid pylint youtube_dl pyinstaller flask werkzeug
