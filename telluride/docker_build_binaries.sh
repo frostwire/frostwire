@@ -5,7 +5,7 @@
 # Then executes the build scripts
 docker \
  run \
- --cpus 4 \
+ --cpus 16 \
  -v "$PWD/../telluride:/telluride-ubuntu" \
  -it telluride-ubuntu \
  /bin/bash -c "cd telluride-ubuntu && ./configure_update.sh && ./build.sh"
