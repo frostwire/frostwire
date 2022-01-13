@@ -76,5 +76,11 @@ telluride/notarizationLog.sh
 telluride/notarizeMacOSApp.sh
 telluride/telluride.exe
 telluride/telluride_linux
-telluride/telluride_macos
+telluride/telluride_macos*
 .todos.json
+desktop/lib/native-src/osx/machine_name
+desktop/lib/native-src/osx/machine_name.arm64
+desktop/lib/native-src/osx/machine_name.x86_64
+telluride/.vscode/
+telluride/telluride.build/
+telluride/telluride.dist/
