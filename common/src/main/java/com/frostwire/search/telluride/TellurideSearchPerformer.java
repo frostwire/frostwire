@@ -65,7 +65,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
     @Override
     public void perform() {
-        int seconds_to_wait_for_telluride_server = 10;
+        int seconds_to_wait_for_telluride_server = 15;
         while (!TellurideLauncher.SERVER_UP.get() && seconds_to_wait_for_telluride_server > 0) {
             LOG.info("perform(): waiting for Telluride Server to be up... (" + seconds_to_wait_for_telluride_server + " secs left to time out)");
             try {
