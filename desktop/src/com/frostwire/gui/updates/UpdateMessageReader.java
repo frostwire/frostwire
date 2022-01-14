@@ -122,17 +122,19 @@ final class UpdateMessageReader implements ContentHandler {
     public void endElement(String uri, String name, String qName) throws SAXException {
         // discard buffer message if its not meant for me right away.
         if (!isMessageForMe(_bufferMessage)) {
-            // System.out.println("Discarding message - " + _bufferMessage);
+            System.out.println("UpdateMessageReader.endElement() Discarding message - " + _bufferMessage);
             _bufferMessage = null;
             return;
         }
         if (_bufferMessage != null && name.equalsIgnoreCase("message")) {
             if (_bufferMessage.getMessageType().equalsIgnoreCase("update")) {
+                System.out.println("UpdateMessageReader.endElement() Setting update message " + _bufferMessage);
                 setUpdateMessage(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
+                System.out.println("AUpdateMessageReader.endElement() adding announcement message " + _bufferMessage);
                 addAnnouncement(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("overlay")) {
-                // System.out.println("UpdateMessageReader.endElement() - addOverlay");
+                System.out.println("UpdateMessageReader.endElement() - addOverlay");
                 addOverlay(_bufferMessage);
             }
             _bufferMessage = null;
@@ -208,9 +210,10 @@ final class UpdateMessageReader implements ContentHandler {
      * If you want a full blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
-        if (msg.getOs() == null)
+        if (msg.getOs() == null || "*".equals(msg.getOs()))
             return true;
-        boolean im_mac_msg_for_me = msg.getOs().equals("mac") && OSUtils.isMacOSX();
+        System.out.println("isMessageEligibleForMyOs() -> " + msg.getOs());
+        boolean im_mac_msg_for_me = msg.getOs().equals("mac." + OSUtils.getMacOSArchitecture()) && OSUtils.isMacOSX();
         boolean im_windows_msg_for_me = msg.getOs().equals("windows") && (OSUtils.isWindows() || OSUtils.isWindowsXP() || OSUtils.isWindowsNT() || OSUtils.isWindows98() || OSUtils.isWindows95() || OSUtils.isWindowsMe() || OSUtils.isWindowsVista());
         boolean im_linux_msg_for_me = msg.getOs().equals("linux") && OSUtils.isLinux();
         return im_mac_msg_for_me || im_windows_msg_for_me || im_linux_msg_for_me;
@@ -249,14 +252,17 @@ final class UpdateMessageReader implements ContentHandler {
             return false;
         }
 
-        /*
-         * System.out.println("UpdateManager.isMessageForMe() - isMessageEligibleForMyOs - "
-         * + isMessageEligibleForMyOs(msg));System.out.println(
-         * "UpdateManager.isMessageForMe() - isMessageEligibleForMyLang - " +
-         * isMessageEligibleForMyLang(msg));System.out.println(
-         * "UpdateManager.isMessageForMe() - isMessageEligibleForMyVersion - " +
-         * isMessageEligibleForMyVersion(msg));
-         */
+/**
+        System.out.println("UpdateManager.isMessageForMe() - isMessageEligibleForMyOs (" + msg.getOs() + ") - "
+                + isMessageEligibleForMyOs(msg));
+        System.out.println(
+                "UpdateManager.isMessageForMe() - isMessageEligibleForMyLang - " +
+                        isMessageEligibleForMyLang(msg));
+        System.out.println(
+                "UpdateManager.isMessageForMe() - isMessageEligibleForMyVersion - " +
+                        isMessageEligibleForMyVersion(msg));
+ */
+
         return isMessageEligibleForMyOs(msg) && isMessageEligibleForMyLang(msg) && isMessageEligibleForMyVersion(msg);
     } // isMessageForMe
 
@@ -268,6 +274,9 @@ final class UpdateMessageReader implements ContentHandler {
         InputSource src;
         try {
             String userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
+            if (OSUtils.isAnyMac()) {
+                userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getMacOSArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
+            }
             connection = (HttpURLConnection) (new URL(DEFAULT_UPDATE_URL)).openConnection();
 
             LOG.info("Reading update file from " + DEFAULT_UPDATE_URL);
