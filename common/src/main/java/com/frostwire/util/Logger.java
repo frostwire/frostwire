@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,9 +29,19 @@ public final class Logger {
     private final java.util.logging.Logger jul;
     private final String name;
 
+    private static String contextPrefix;
+
     private Logger(java.util.logging.Logger jul) {
         this.jul = jul;
         this.name = jul.getName();
+    }
+
+    public static void setContextPrefix(String prefix) {
+        contextPrefix = prefix;
+    }
+
+    public static void clearContextPrefix() {
+        contextPrefix = null;
     }
 
     public static Logger getLogger(Class<?> clazz) {
@@ -46,7 +56,7 @@ public final class Logger {
             StackTraceElement stackElement = stackTrace[5];
             caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
         }
-        if (stackTrace.length >=6) {
+        if (stackTrace.length >= 6) {
             StackTraceElement stackElement = stackTrace[6];
             caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
         }
@@ -62,7 +72,11 @@ public final class Logger {
     }
 
     public void info(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (contextPrefix == null) {
+            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        } else {
+            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        }
     }
 
     public void info(String msg) {
@@ -78,7 +92,11 @@ public final class Logger {
     }
 
     public void warn(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (contextPrefix == null) {
+            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        } else {
+            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        }
     }
 
     public void warn(String msg) {
@@ -86,7 +104,11 @@ public final class Logger {
     }
 
     public void warn(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (contextPrefix == null) {
+            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        } else {
+            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        }
     }
 
     public void warn(String msg, Throwable e) {
@@ -94,7 +116,11 @@ public final class Logger {
     }
 
     public void error(String msg, boolean showCallingMethodInfo) {
-        jul.logp(Level.SEVERE, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (contextPrefix == null) {
+            jul.logp(Level.SEVERE, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        } else {
+            jul.logp(Level.SEVERE, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        }
     }
 
     public void error(String msg) {
@@ -102,7 +128,11 @@ public final class Logger {
     }
 
     public void error(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (contextPrefix == null) {
+            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        } else {
+            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        }
     }
 
     public void error(String msg, Throwable e) {
@@ -110,7 +140,11 @@ public final class Logger {
     }
 
     public void debug(String msg, boolean showCallingMethodInfo) {
-        jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        if (contextPrefix == null) {
+            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        } else {
+            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+        }
     }
 
     public void debug(String msg) {
@@ -118,7 +152,11 @@ public final class Logger {
     }
 
     public void debug(String msg, Throwable e, boolean showCallingMethodInfo) {
-        jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        if (contextPrefix == null) {
+            jul.logp(Level.INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        } else {
+            jul.logp(Level.INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg), e);
+        }
     }
 
     public void debug(String msg, Throwable e) {
