@@ -17,7 +17,6 @@
 
 package com.frostwire.gui.updates;
 
-import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 import java.io.*;
@@ -148,7 +147,7 @@ final class UpdateMessage implements Serializable {
             os = os.trim();
             if (os.equalsIgnoreCase("windows") ||
                     os.equalsIgnoreCase("linux") ||
-                    os.equalsIgnoreCase("mac." + OSUtils.getMacOSArchitecture())) {
+                    os.toLowerCase().startsWith("mac")) {
                 _os = os.toLowerCase();
             } else if (os.equals("*")) {
                 _os = null;

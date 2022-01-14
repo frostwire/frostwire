@@ -334,6 +334,7 @@ public final class UpdateManager implements Serializable {
         final String finalUpdateMessage = updateMessage;
 
         SwingUtilities.invokeLater(() -> {
+            LOG.info("UpdateManager.showUpdateMessage() showing option dialog for " + finalUpdateMessage);
             int result = JOptionPane.showOptionDialog(
                     null,
                     finalUpdateMessage,

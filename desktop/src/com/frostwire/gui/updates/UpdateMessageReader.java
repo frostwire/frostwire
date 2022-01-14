@@ -120,15 +120,15 @@ final class UpdateMessageReader implements ContentHandler {
      * method will only add it if the message has not expired.
      */
     public void endElement(String uri, String name, String qName) throws SAXException {
-        // discard buffer message if its not meant for me right away.
+        // discard buffer message if it's not meant for me right away.
         if (!isMessageForMe(_bufferMessage)) {
-            LOG.info("UpdateMessageReader.endElement() Discarding message - " + _bufferMessage);
+            LOG.info("UpdateMessageReader.endElement() Discarding message (os=" + _bufferMessage.getOs() + ")");
             _bufferMessage = null;
             return;
         }
         if (_bufferMessage != null && name.equalsIgnoreCase("message")) {
             if (_bufferMessage.getMessageType().equalsIgnoreCase("update")) {
-                LOG.info("UpdateMessageReader.endElement() Setting update message " + _bufferMessage);
+                LOG.info("UpdateMessageReader.endElement() Setting update message (os=" + _bufferMessage.getOs() + ")");
                 setUpdateMessage(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
                 LOG.info("AUpdateMessageReader.endElement() adding announcement message " + _bufferMessage);
@@ -215,6 +215,7 @@ final class UpdateMessageReader implements ContentHandler {
         boolean im_mac_msg_for_me = msg.getOs().equals("mac." + OSUtils.getMacOSArchitecture()) && OSUtils.isMacOSX();
         boolean im_windows_msg_for_me = msg.getOs().equals("windows") && (OSUtils.isWindows() || OSUtils.isWindowsXP() || OSUtils.isWindowsNT() || OSUtils.isWindows98() || OSUtils.isWindows95() || OSUtils.isWindowsMe() || OSUtils.isWindowsVista());
         boolean im_linux_msg_for_me = msg.getOs().equals("linux") && OSUtils.isLinux();
+        LOG.info("isMessageEligibleForMyOs(" + msg.getOs() + "): im_mac_msg_for_me=" + im_mac_msg_for_me + " || im_windows_msg_for_me=" + im_windows_msg_for_me + " || im_linux_msg_for_me=" + im_linux_msg_for_me);
         return im_mac_msg_for_me || im_windows_msg_for_me || im_linux_msg_for_me;
     }
 
@@ -250,11 +251,11 @@ final class UpdateMessageReader implements ContentHandler {
             // LOG.info("UpdateManager.isMessageForMe() - Message was null");
             return false;
         }
-        Logger.setContextPrefix("UpdateManager.isMessageForMe() - ");
-        LOG.info("isMessageEligibleForMyOs (" + msg.getOs() + ") - " + isMessageEligibleForMyOs(msg));
-        LOG.info("isMessageEligibleForMyLang - " + isMessageEligibleForMyLang(msg));
-        LOG.info("isMessageEligibleForMyVersion - " + isMessageEligibleForMyVersion(msg));
-        Logger.clearContextPrefix();
+//        Logger.setContextPrefix("UpdateManager.isMessageForMe() - ");
+//        LOG.info("isMessageEligibleForMyOs (" + msg.getOs() + ") - " + isMessageEligibleForMyOs(msg));
+//        LOG.info("isMessageEligibleForMyLang - " + isMessageEligibleForMyLang(msg));
+//        LOG.info("isMessageEligibleForMyVersion - " + isMessageEligibleForMyVersion(msg));
+//        Logger.clearContextPrefix();
         return isMessageEligibleForMyOs(msg) && isMessageEligibleForMyLang(msg) && isMessageEligibleForMyVersion(msg);
     } // isMessageForMe
 
