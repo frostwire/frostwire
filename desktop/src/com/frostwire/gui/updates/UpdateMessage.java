@@ -1,26 +1,26 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron)
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.updates;
 
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Date;
 
 /**
@@ -112,13 +112,14 @@ final class UpdateMessage implements Serializable {
         return _messageType;
     }
 
-    // void setMessageType(String mt)
-    // If given a wrong msgType, or none, we default to update.
-    // Currently valid message types are:
-    // "update" : For new frostwire versions
-    // "announcement" : For important announcements to the community
-    // "overlay" : For overlay promotions
-    // "hostiles" : For an update of the hostiles.txt file
+    /** void setMessageType(String mt)
+    * If given a wrong msgType, or none, we default to update.
+    * Valid message types are:
+    * "update" : For new frostwire versions
+    * "announcement" : For important announcements to the community
+    * "overlay" : For overlay promotions
+    * "hostiles" : For an update of the hostiles.txt file
+    * */
     private void setMessageType(String mt) {
         String type = mt != null ? mt.toLowerCase().trim() : "";
         boolean typeIsValid = (type.equals("update") ||
@@ -136,7 +137,7 @@ final class UpdateMessage implements Serializable {
     }
 
     /**
-     * If it receives a valid os string ("windows", "mac", "linux")
+     * If it receives a valid os string ("windows", "mac.<x86_64|arm64>", "linux")
      * it will set it.
      * If it receives null or *, it will set _os to null.
      * Having getOS() return null, means this message is for every OS instance.
@@ -147,7 +148,7 @@ final class UpdateMessage implements Serializable {
             os = os.trim();
             if (os.equalsIgnoreCase("windows") ||
                     os.equalsIgnoreCase("linux") ||
-                    os.startsWith("mac.")) {
+                    os.equalsIgnoreCase("mac." + OSUtils.getMacOSArchitecture())) {
                 _os = os.toLowerCase();
             } else if (os.equals("*")) {
                 _os = null;
@@ -250,10 +251,12 @@ final class UpdateMessage implements Serializable {
         return _hashCode;
     }
 
+    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
     }
 
+    @Serial
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
     }
