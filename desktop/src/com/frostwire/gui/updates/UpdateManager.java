@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron)
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -84,17 +84,17 @@ public final class UpdateManager implements Serializable {
      */
     static void scheduleUpdateCheckTask(final int secondsAfter, final boolean force) {
         if (OSUtils.isWindowsAppStoreInstall()){
-            System.out.println("UpdateManager.scheduleUpdateCheckTask() - aborted. Updates are done via Windows App Store for this distribution");
+            LOG.info("UpdateManager.scheduleUpdateCheckTask() - aborted. Updates are done via Windows App Store for this distribution");
             return;
         }
         // Uses the UpdateManager to check for updates. Then kills the timer
         Runnable checkForUpdatesTask = () -> {
-            //System.out.println("UpdateManager.scheduleUpdateCheckTask() - about to check for update in " + secondsAfter + " seconds");
+            //LOG.info("UpdateManager.scheduleUpdateCheckTask() - about to check for update in " + secondsAfter + " seconds");
             try {
-                Thread.sleep(secondsAfter * 1000);
+                Thread.sleep(secondsAfter * 1000L);
             } catch (InterruptedException ignored) {
             }
-            //System.out.println("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
+            //LOG.info("UpdateManager.scheduleUpdateCheckTask() Runnable: here we go!");
             UpdateManager um = UpdateManager.getInstance();
             um.checkForUpdates(force);
         };
@@ -115,7 +115,7 @@ public final class UpdateManager implements Serializable {
                 int buildNumber = Integer.parseInt(message.getBuild());
                 return buildNumber > FrostWireUtils.getBuildNumber();
             } catch (Throwable t) {
-                System.err.println("UpdateManager::isFrostWireOld() invalid buildNumber ('" + message.getBuild() + "'), falling back to version check");
+                LOG.error("UpdateManager::isFrostWireOld() invalid buildNumber ('" + message.getBuild() + "'), falling back to version check");
                 t.printStackTrace();
             }
         }
@@ -184,17 +184,17 @@ public final class UpdateManager implements Serializable {
             URI uri = new URI(uriStr);
             String scheme = uri.getScheme();
             if (scheme == null || !scheme.equalsIgnoreCase("http")) {
-                // System.out.println("Not a torrent URL");
+                // LOG.error("Not a torrent URL");
                 return;
             }
             String authority = uri.getAuthority();
             if (authority == null || authority.equals("") || authority.indexOf(' ') != -1) {
-                // System.out.println("Invalid authority");
+                // LOG.error("Invalid authority");
                 return;
             }
             GUIMediator.instance().openTorrentURI(uri.toString(), false);
         } catch (URISyntaxException e) {
-            System.out.println(e);
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -212,7 +212,7 @@ public final class UpdateManager implements Serializable {
         try {
             _serverTime = new Date(Long.parseLong(serverTime));
         } catch (Exception e) {
-            System.out.println("Warning: UpdateManager.setServerTime(): Could not set time from server, using local time");
+            LOG.error("Warning: UpdateManager.setServerTime(): Could not set time from server, using local time");
         }
         if (_serverTime == null)
             _serverTime = Calendar.getInstance().getTime();
@@ -225,7 +225,7 @@ public final class UpdateManager implements Serializable {
         // We start the XML Reader/Parser. It will connect to
         // frostwire.com/update.xml
         // and parse the given XML.
-        //System.out.println("UpdateManager.checkForUpdates() - Invoked");
+        //LOG.info("UpdateManager.checkForUpdates() - Invoked");
         UpdateMessageReader umr = new UpdateMessageReader();
         umr.readUpdateFile();
         // if it fails to read an update, we just go on, might be that the
@@ -272,7 +272,7 @@ public final class UpdateManager implements Serializable {
             boolean hasTorrent = updateMessage.getTorrent() != null;
             boolean hasInstallerUrl = updateMessage.getInstallerUrl() != null;
             if (forceUpdateMessage) {
-                System.out.println("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
+                LOG.info("FROSTWIRE_FORCE_UPDATE_MESSAGE env found, testing update message. (turn off with `unset FROSTWIRE_FORCE_UPDATE_MESSAGE`)");
             }
             // Logic for Windows or Mac Update
             if (OSUtils.isWindows() || OSUtils.isMacOSX()) {
@@ -306,7 +306,7 @@ public final class UpdateManager implements Serializable {
         int optionType = JOptionPane.CANCEL_OPTION;
         // check if there's an URL to link to
         if (msg.getUrl() != null && !msg.getUrl().trim().equals("")) {
-            System.out.println("\t" + msg.getUrl());
+            LOG.info("showUpdateMessage():\t" + msg.getUrl());
             optionType |= JOptionPane.OK_OPTION;
         }
         String[] options = new String[3];
@@ -372,9 +372,10 @@ public final class UpdateManager implements Serializable {
         _seenMessages = new HashSet<>();
         if (!f.exists()) {
             try {
+                //noinspection ResultOfMethodCallIgnored
                 f.createNewFile();
             } catch (Exception e) {
-                System.out.println("UpdateManager.loadSeenMessages() - Cannot create file to deserialize");
+                LOG.error("UpdateManager.loadSeenMessages() - Cannot create file to deserialize", e);
             }
             return;
         }
@@ -385,8 +386,7 @@ public final class UpdateManager implements Serializable {
             _seenMessages = (HashSet<UpdateMessage>) ois.readObject();
             ois.close();
         } catch (Exception e) {
-            System.out.println("UpdateManager.loadSeenMessages() - Cannot deserialize - ");
-            System.out.println(e);
+            LOG.error("UpdateManager.loadSeenMessages() - Cannot deserialize - ", e);
         }
     }
 
@@ -397,9 +397,10 @@ public final class UpdateManager implements Serializable {
         File f = new File(CommonUtils.getUserSettingsDir(), "seenMessages.dat");
         if (!f.exists()) {
             try {
+                //noinspection ResultOfMethodCallIgnored
                 f.createNewFile();
             } catch (Exception e) {
-                System.out.println("UpdateManager.saveSeenMessages() cannot create file to serialize seen messages");
+                LOG.error("UpdateManager.saveSeenMessages() cannot create file to serialize seen messages", e);
             }
         }
         try {
@@ -407,8 +408,7 @@ public final class UpdateManager implements Serializable {
             oos.writeObject(_seenMessages);
             oos.close();
         } catch (Exception e) {
-            System.out.println("UpdateManager.saveSeenMessages() - Cannot serialize.");
-            e.printStackTrace();
+            LOG.error("UpdateManager.saveSeenMessages() - Cannot serialize.", e);
         }
     }
 

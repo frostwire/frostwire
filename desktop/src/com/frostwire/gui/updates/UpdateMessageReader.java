@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron)
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -97,7 +97,7 @@ final class UpdateMessageReader implements ContentHandler {
             _overlays.add(msg);
         } // if we actually receive an overlay
         else {
-            System.out.println("UpdateManager.addOverlay() - The message given wasn't good.");
+            LOG.info("UpdateManager.addOverlay() - The message given wasn't good.");
         }
     }
 
@@ -122,19 +122,19 @@ final class UpdateMessageReader implements ContentHandler {
     public void endElement(String uri, String name, String qName) throws SAXException {
         // discard buffer message if its not meant for me right away.
         if (!isMessageForMe(_bufferMessage)) {
-            System.out.println("UpdateMessageReader.endElement() Discarding message - " + _bufferMessage);
+            LOG.info("UpdateMessageReader.endElement() Discarding message - " + _bufferMessage);
             _bufferMessage = null;
             return;
         }
         if (_bufferMessage != null && name.equalsIgnoreCase("message")) {
             if (_bufferMessage.getMessageType().equalsIgnoreCase("update")) {
-                System.out.println("UpdateMessageReader.endElement() Setting update message " + _bufferMessage);
+                LOG.info("UpdateMessageReader.endElement() Setting update message " + _bufferMessage);
                 setUpdateMessage(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
-                System.out.println("AUpdateMessageReader.endElement() adding announcement message " + _bufferMessage);
+                LOG.info("AUpdateMessageReader.endElement() adding announcement message " + _bufferMessage);
                 addAnnouncement(_bufferMessage);
             } else if (_bufferMessage.getMessageType().equalsIgnoreCase("overlay")) {
-                System.out.println("UpdateMessageReader.endElement() - addOverlay");
+                LOG.info("UpdateMessageReader.endElement() - addOverlay");
                 addOverlay(_bufferMessage);
             }
             _bufferMessage = null;
@@ -212,7 +212,6 @@ final class UpdateMessageReader implements ContentHandler {
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
         if (msg.getOs() == null || "*".equals(msg.getOs()))
             return true;
-        System.out.println("isMessageEligibleForMyOs() -> " + msg.getOs());
         boolean im_mac_msg_for_me = msg.getOs().equals("mac." + OSUtils.getMacOSArchitecture()) && OSUtils.isMacOSX();
         boolean im_windows_msg_for_me = msg.getOs().equals("windows") && (OSUtils.isWindows() || OSUtils.isWindowsXP() || OSUtils.isWindowsNT() || OSUtils.isWindows98() || OSUtils.isWindows95() || OSUtils.isWindowsMe() || OSUtils.isWindowsVista());
         boolean im_linux_msg_for_me = msg.getOs().equals("linux") && OSUtils.isLinux();
@@ -248,21 +247,14 @@ final class UpdateMessageReader implements ContentHandler {
      */
     private boolean isMessageForMe(UpdateMessage msg) {
         if (msg == null) {
-            // System.out.println("UpdateManager.isMessageForMe() - Message was null");
+            // LOG.info("UpdateManager.isMessageForMe() - Message was null");
             return false;
         }
-
-/**
-        System.out.println("UpdateManager.isMessageForMe() - isMessageEligibleForMyOs (" + msg.getOs() + ") - "
-                + isMessageEligibleForMyOs(msg));
-        System.out.println(
-                "UpdateManager.isMessageForMe() - isMessageEligibleForMyLang - " +
-                        isMessageEligibleForMyLang(msg));
-        System.out.println(
-                "UpdateManager.isMessageForMe() - isMessageEligibleForMyVersion - " +
-                        isMessageEligibleForMyVersion(msg));
- */
-
+        Logger.setContextPrefix("UpdateManager.isMessageForMe() - ");
+        LOG.info("isMessageEligibleForMyOs (" + msg.getOs() + ") - " + isMessageEligibleForMyOs(msg));
+        LOG.info("isMessageEligibleForMyLang - " + isMessageEligibleForMyLang(msg));
+        LOG.info("isMessageEligibleForMyVersion - " + isMessageEligibleForMyVersion(msg));
+        Logger.clearContextPrefix();
         return isMessageEligibleForMyOs(msg) && isMessageEligibleForMyLang(msg) && isMessageEligibleForMyVersion(msg);
     } // isMessageForMe
 
@@ -365,12 +357,12 @@ final class UpdateMessageReader implements ContentHandler {
             // language properties available only inside overlay
             if (atts.getValue("language") != null) {
                 _bufferMessage.setLanguage(atts.getValue("language"));
-                // System.out.println("UpdateMessageReader.startElement overlay language="
+                // LOG.info("UpdateMessageReader.startElement overlay language="
                 // + atts.getValue("lang"));
             }
             if (atts.getValue("valueInstallerReady") != null) {
                 _bufferMessage.setMessageInstallerReady(atts.getValue("valueInstallerReady"));
-                // System.out.println("UpdateMessageReader.startElement overlay md5="
+                // LOG.info("UpdateMessageReader.startElement overlay md5="
                 // + atts.getValue("md5"));
             }
             if (_bufferMessage.getMessageType().equalsIgnoreCase("announcement")) {
@@ -378,10 +370,10 @@ final class UpdateMessageReader implements ContentHandler {
             }
             // deal with overlay messages specific properties
             if (_bufferMessage.getMessageType().equalsIgnoreCase("overlay")) {
-                // System.out.println("UpdateMessageReader.startElement overlay msg found");
+                // LOG.info("UpdateMessageReader.startElement overlay msg found");
                 _bufferMessage.setSrc(src);
-                // System.out.println("UpdateMessageReader.startElement overlay intro=true");
-                // System.out.println("UpdateMessageReader.startElement overlay intro=false");
+                // LOG.info("UpdateMessageReader.startElement overlay intro=true");
+                // LOG.info("UpdateMessageReader.startElement overlay intro=false");
                 _bufferMessage.setIntro(atts.getValue("intro") != null &&
                         (atts.getValue("intro").equals("1") ||
                                 atts.getValue("intro").equalsIgnoreCase("true") ||
