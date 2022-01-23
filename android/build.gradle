@@ -86,8 +86,7 @@ project.ext.versionName = manifestVersionName()
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 
 android {
-    // By November 2021, all apps that are being updated must target at least Android 11 (API level 30)
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId 'com.frostwire.android'
@@ -176,7 +175,7 @@ dependencies {
     implementation 'com.google.re2j:re2j:1.6'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.browser:browser:1.3.0' // 1.4.0 requires minCompileSDK (31)
     implementation 'androidx.exifinterface:exifinterface:1.3.3'
