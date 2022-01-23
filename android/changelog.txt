@@ -1,3 +1,9 @@
+FrostWire 2.4.6 build 689 - JAN/23/2022
+ - jlibtorrent 1.2.15.2
+ - compileSdkVersion 31
+ - com.google.android.material:material:1.5.0
+ - androidx.browser:browser:1.4.0
+
 FrostWire 2.4.5 build 688 - JAN/07/2022
  - jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
  - lt:don't disable announcing from local endpoints because of temporary failures
