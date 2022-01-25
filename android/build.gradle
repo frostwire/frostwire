@@ -183,21 +183,7 @@ dependencies {
 
     implementation 'com.android.billingclient:billing:4.0.0'
 
-    /**
-     * Can't yet upgrade to 20.4.0, this happens, tried many different things to fix it to no avail.
-     * Wait until 20.5.0 to see if it's solved by maintainers.
-     *
-     * Duplicate class com.google.android.gms.internal.measurement.zzbs found in modules jetified-play-services-measurement-18.0.2-runtime (com.google.android.gms:play-services-measurement:18.0.2) and jetified-play-services-measurement-sdk-api-18.0.3-runtime (com.google.android.gms:play-services-measurement-sdk-api:18.0.3)
-     Duplicate class com.google.android.gms.internal.measurement.zzl found in modules jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2) and jetified-play-services-measurement-sdk-api-18.0.3-runtime (com.google.android.gms:play-services-measurement-sdk-api:18.0.3)
-     Duplicate class com.google.android.gms.measurement.internal.zzfh found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     Duplicate class com.google.android.gms.measurement.internal.zzgn found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     Duplicate class com.google.android.gms.measurement.internal.zzgo found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     Duplicate class com.google.android.gms.measurement.internal.zzgp found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     Duplicate class com.google.android.gms.measurement.internal.zzgq found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     Duplicate class com.google.android.gms.measurement.internal.zzhs found in modules jetified-play-services-measurement-18.0.2-runtime (com.google.android.gms:play-services-measurement:18.0.2) and jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3)
-     Duplicate class com.google.android.gms.measurement.internal.zzhx found in modules jetified-play-services-measurement-base-18.0.3-runtime (com.google.android.gms:play-services-measurement-base:18.0.3) and jetified-play-services-measurement-impl-18.0.2-runtime (com.google.android.gms:play-services-measurement-impl:18.0.2)
-     */
-    implementation 'com.google.android.gms:play-services-ads:20.3.0' // 20.5.0 requires minCompileSDK (31)
+    implementation 'com.google.android.gms:play-services-ads:20.4.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 

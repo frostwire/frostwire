@@ -10,6 +10,7 @@ FrostWire 2.4.6 build 689 - JAN/24/2022
  - androidx.media2:media2-session:1.2.0
  - androidx.media2:media2-widget:1.2.0
  - androidx.media2:media2-player:1.2.0
+ - com.google.android.gms:play-services-ads:20.4.0
 
 FrostWire 2.4.5 build 688 - JAN/07/2022
  - jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
