@@ -6,6 +6,7 @@ FrostWire 2.4.6 build 689 - JAN/24/2022
  - com.google.firebase:firebase-crashlytics-gradle:2.8.1
  - com.google.firebase:firebase-bom:29.0.4
  - androidx.appcompat:appcompat:1.4.1
+ - androidx.core:core-ktx:1.7.0
 
 FrostWire 2.4.5 build 688 - JAN/07/2022
  - jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
