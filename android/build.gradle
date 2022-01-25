@@ -183,6 +183,7 @@ dependencies {
 
     implementation 'com.android.billingclient:billing:4.0.0'
 
+    // couldn't update to 20.5.0 -> ERROR: R8: Type com.google.android.gms.common.GooglePlayServicesUtil is defined multiple times
     implementation 'com.google.android.gms:play-services-ads:20.4.0'
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
@@ -210,8 +211,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-fullscreen:5.18.0@aar') { transitive = true }
 
     // MoPub Mediation Partners
-    implementation 'com.applovin:applovin-sdk:10.3.4'
-    implementation 'com.mopub.mediation:applovin:10.3.3.0'
+    implementation 'com.applovin:applovin-sdk:10.3.5'
+    implementation 'com.mopub.mediation:applovin:10.3.4.0'
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
     implementation 'com.mopub.mediation:unityads:3.7.5.0'
 
