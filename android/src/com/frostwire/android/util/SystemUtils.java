@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -220,7 +220,7 @@ public final class SystemUtils {
      * We call it "safe" because if any exceptions are thrown,
      * they are caught in order to not crash the handler thread.
      */
-    public static void safePost(Handler handler, Runnable r) {
+    public static void exceptionSafePost(Handler handler, Runnable r) {
         if (handler != null) {
             // We are already in the Handler thread, just go!
             if (Thread.currentThread() == handler.getLooper().getThread()) {
