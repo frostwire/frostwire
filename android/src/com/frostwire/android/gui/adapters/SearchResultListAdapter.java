@@ -268,7 +268,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         allFileSearchResults.forEach(fileSearchResult -> {
                     String fileExtension = FilenameUtils.getExtension(fileSearchResult.getFilename());
                     MediaType mediaTypeForExtension = MediaType.getMediaTypeForExtension(fileExtension);
-                    if (mediaTypeForExtension == null) {
+                    if (mediaTypeForExtension == null || mediaTypeForExtension == MediaType.TYPE_UNKNOWN) {
                         return;
                     }
                     if (fileType == mediaTypeForExtension.getId()) {
