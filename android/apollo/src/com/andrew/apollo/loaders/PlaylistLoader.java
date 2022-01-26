@@ -11,14 +11,23 @@
 
 package com.andrew.apollo.loaders;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.PlaylistsColumns;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+
 import com.andrew.apollo.model.Playlist;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +38,7 @@ import java.util.List;
  * 
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
+public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> implements ActivityCompat.OnRequestPermissionsResultCallback  {
     public static final int FAVORITE_PLAYLIST_ID = -1;
     public static final int LAST_ADDED_PLAYLIST_ID = -2;
     public static final int NEW_PLAYLIST_ID = -3;
@@ -48,7 +57,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
         // Add the default playlists to the adapter
         List<Playlist> mPlaylistList = makeDefaultPlaylists();
         // Create the Cursor
-        Cursor mCursor = makeCursor(getContext());
+        Cursor mCursor = makePlaylistCursor(getContext());
         // Gather the data
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -98,20 +107,40 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
      * @return The {@link Cursor} used to run the playlist query.
      */
     public static Cursor makePlaylistCursor(final Context context) {
-        try {
-            return context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    new String[]{
-                            /* 0 */
-                            BaseColumns._ID,
-                            /* 1 */
-                            PlaylistsColumns.NAME
-                    }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
-        } catch (android.database.sqlite.SQLiteException t) {
+        if (context.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            try {
+                return context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+                        new String[]{
+                                /* 0 */
+                                BaseColumns._ID,
+                                /* 1 */
+                                PlaylistsColumns.NAME
+                        }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
+            } catch (Throwable t) {
+                t.printStackTrace();
+                return null;
+            }
+        } else {
+            SystemUtils.postToUIThread(() -> {
+                try {
+                    ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 111010);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+            });
             return null;
         }
     }
 
-    public Cursor makeCursor(Context context) {
-        return makePlaylistCursor(context);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != 111010) {
+            return;
+        }
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            loadInBackground();
+        } else {
+            UIUtils.showShortMessage(getContext(), R.string.permission_denied);
+        }
     }
 }

@@ -507,4 +507,5 @@
     <string name="period_yearly">yearly</string>
     <string name="open_file_explorer">Open File Explorer</string>
     <string name="comma">,</string>
+    <string name="permission_denied">Permission denied</string>
 </resources>
