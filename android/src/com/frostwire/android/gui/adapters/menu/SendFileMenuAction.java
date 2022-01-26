@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -25,7 +26,9 @@ import android.util.Log;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
+import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 
 /**
@@ -47,11 +50,17 @@ public class SendFileMenuAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
+        TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
+        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
+            UIUtils.showLongMessage(context, R.string.cant_open_file);
+            return;
+        }
         try {
+
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType(fd.mime);
             i.putExtra(Intent.EXTRA_SUBJECT, fd.title);
-            i.putExtra(Intent.EXTRA_STREAM, Uri.parse(TableFetchers.getFetcher(fd.fileType).getExternalContentUri() + "/" + fd.id));
+            i.putExtra(Intent.EXTRA_STREAM, Uri.parse(fetcher.getExternalContentUri() + "/" + fd.id));
             context.startActivity(Intent.createChooser(i, context.getString(R.string.send_file_using)));
         } catch (Throwable e) {
             // catch for general android errors, in particular: android.content.ActivityNotFoundException: No Activity found to handle Intent { act=android.intent.action.CHOOSER (has extras)
