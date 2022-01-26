@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -128,7 +128,7 @@ public final class Librarian {
      */
     public int getNumFiles(Context context, byte fileType) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-        if (fetcher == null) {
+        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
             return 0;
         }
 
@@ -180,7 +180,8 @@ public final class Librarian {
             values.put(MediaColumns.TITLE, FilenameUtils.getBaseName(newFileName));
             TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
 
-            if (fetcher != null && fetcher.getExternalContentUri() != null) {
+            if (fetcher != TableFetchers.UNKNOWN_TABLE_FETCHER &&
+                    fetcher.getExternalContentUri() != null) {
                 try {
                     cr.update(fetcher.getExternalContentUri(), values, BaseColumns._ID + "=?", new String[]{String.valueOf(fd.id)});
                 } catch (Throwable t) {
@@ -237,7 +238,7 @@ public final class Librarian {
                 TableFetcher fetcher = TableFetchers.getFetcher(fileType);
 
                 try {
-                    if (fetcher != null && fetcher.getExternalContentUri() != null) {
+                    if (fetcher != TableFetchers.UNKNOWN_TABLE_FETCHER && fetcher.getExternalContentUri() != null) {
                         cr.delete(fetcher.getExternalContentUri(), MediaColumns._ID + " IN " + buildSet(ids), null);
                     }
                 } catch (Throwable t) {
@@ -271,7 +272,7 @@ public final class Librarian {
      */
     public void scan(final Context context, File file) {
         if (Thread.currentThread() != handler.getLooper().getThread()) {
-            SystemUtils.safePost(handler, () -> scan(context, file, Transfers.getIgnorableFiles()));
+            SystemUtils.exceptionSafePost(handler, () -> scan(context, file, Transfers.getIgnorableFiles()));
             return;
         }
         scan(context, file, Transfers.getIgnorableFiles());
@@ -286,7 +287,7 @@ public final class Librarian {
         if (!SystemUtils.hasAndroid10OrNewer() && !SystemUtils.isPrimaryExternalStorageMounted()) {
             return;
         }
-        SystemUtils.safePost(handler, () -> syncMediaStoreSupport(contextRef));
+        SystemUtils.exceptionSafePost(handler, () -> syncMediaStoreSupport(contextRef));
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
@@ -331,7 +332,7 @@ public final class Librarian {
     private void syncMediaStore(final Context context, byte fileType, Set<File> ignorableFiles) {
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
 
-        if (fetcher == null) {
+        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
             return;
         }
 
@@ -370,7 +371,7 @@ public final class Librarian {
         }
 
         try {
-            if (ids.size()  >  0) {
+            if (ids.size() > 0) {
                 cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
             }
         } catch (Throwable e) {
@@ -401,7 +402,7 @@ public final class Librarian {
             String[] whereArgs) {
         final List<FWFileDescriptor> result = new ArrayList<>(0);
 
-        if (context == null || fetcher == null) {
+        if (context == null || fetcher == null || fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
             return result;
         }
 
@@ -551,6 +552,12 @@ public final class Librarian {
         ContentResolver resolver = context.getContentResolver();
         byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
         TableFetcher fetcher = TableFetchers.getFetcher(fileType);
+
+        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
+            LOG.info("mediaStoreInsert -> fetcher unknown for " + srcFile.getAbsolutePath() + ", skipping");
+            return;
+        }
+
         Uri mediaStoreCollectionUri = Objects.requireNonNull(fetcher).getExternalContentUri();
         String relativeFolderPath = AndroidPaths.getRelativeFolderPath(srcFile);
 

@@ -287,7 +287,7 @@ public final class LollipopFileSystem implements FileSystem {
 
             if (paths.size() > 0) {
                 // We're usually called from SessionManager-alertsLoop, don't hug that loop
-                SystemUtils.safePost(
+                SystemUtils.exceptionSafePost(
                         Librarian.instance().getHandler(), () -> {
                             MediaScanner.scanFiles(app, paths);
                             UIUtils.broadcastAction(app, Constants.ACTION_FILE_ADDED_OR_REMOVED);
