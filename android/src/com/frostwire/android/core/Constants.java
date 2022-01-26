@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -164,6 +164,7 @@ public final class Constants {
     public static final byte FILE_TYPE_RINGTONES = 0x05;
     public static final byte FILE_TYPE_TORRENTS = 0x06;
     public static final byte FILE_TYPE_FILES = 0x07;
+    public static final byte FILE_TYPE_UNKNOWN = 0x08;
 
     public static final String MIME_TYPE_ANDROID_PACKAGE_ARCHIVE = "application/vnd.android.package-archive";
     public static final String MIME_TYPE_BITTORRENT = "application/x-bittorrent";
