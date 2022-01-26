@@ -1,19 +1,19 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ *            Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.android.core.providers;
@@ -71,6 +71,7 @@ public final class TableFetchers {
     private static final TableFetcher DOCUMENTS_TABLE_FETCHER = new DocumentsTableFetcher();
     private static final TableFetcher RINGTONES_TABLE_FETCHER = new RingtonesTableFetcher();
     private static final TableFetcher TORRENTS_TABLE_FETCHER = new TorrentsTableFetcher();
+    public static final TableFetcher UNKNOWN_TABLE_FETCHER = new UnknownTableFetcher();
 
 
     static void getRecursiveFiles(File parent, byte fileType, List<File> results) {
@@ -81,6 +82,9 @@ public final class TableFetchers {
         for (File f : files) {
             if (f.isFile()) {
                 MediaType mediaTypeForExtension = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(f.getAbsolutePath()));
+                if (mediaTypeForExtension == MediaType.TYPE_UNKNOWN) {
+                    continue;
+                }
                 if (mediaTypeForExtension.getId() == fileType) {
                     results.add(f);
                 }
@@ -492,6 +496,53 @@ public final class TableFetchers {
 
     }
 
+    private static class UnknownTableFetcher implements TableFetcher {
+        @Override
+        public String[] getColumns() {
+            return new String[0];
+        }
+
+        @Override
+        public String getSortByExpression() {
+            return null;
+        }
+
+        @Override
+        public Uri getExternalContentUri() {
+            return null;
+        }
+
+        @Override
+        public void prepareColumnIds(Cursor cur) {
+
+        }
+
+        @Override
+        public FWFileDescriptor fetchFWFileDescriptor(Cursor cur) {
+            return null;
+        }
+
+        @Override
+        public byte getFileType() {
+            return 0;
+        }
+
+        @Override
+        public String where() {
+            return null;
+        }
+
+        @Override
+        public String[] whereArgs() {
+            return new String[0];
+        }
+
+        @Override
+        public int getType() {
+            return 0;
+        }
+    }
+
     public static TableFetcher getFetcher(byte fileType) {
         switch (fileType) {
             case Constants.FILE_TYPE_AUDIO:
@@ -507,7 +558,8 @@ public final class TableFetchers {
             case Constants.FILE_TYPE_TORRENTS:
                 return TORRENTS_TABLE_FETCHER;
             default:
-                return null;
+                return UNKNOWN_TABLE_FETCHER;
         }
     }
+
 }
