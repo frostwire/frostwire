@@ -26,7 +26,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:7.1.0'
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
         classpath 'com.google.gms:google-services:4.3.10'
@@ -116,9 +116,6 @@ android {
         }
     }
 
-    lintOptions {
-        abortOnError false
-    }
 
     signingConfigs {
         release {
@@ -164,6 +161,9 @@ android {
             versionCode 9070000 + project.ext.versionCode
             resValue "string", "application_label", "FrostWire Plus"
         }
+    }
+    lint {
+        abortOnError false
     }
 
     applicationVariants.all { variant ->
