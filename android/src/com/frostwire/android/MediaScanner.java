@@ -45,7 +45,7 @@ final class MediaScanner {
     private static final Logger LOG = Logger.getLogger(MediaScanner.class);
 
     public static void scanFiles(Context context, List<String> paths) {
-        SystemUtils.safePost(Librarian.instance().getHandler(),
+        SystemUtils.exceptionSafePost(Librarian.instance().getHandler(),
                 () -> MediaScanner.scanFiles(context, paths, 6));
     }
 
