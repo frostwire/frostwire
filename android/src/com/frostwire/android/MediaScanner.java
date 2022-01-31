@@ -22,7 +22,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.Looper;
 import android.os.SystemClock;
 
 import com.frostwire.android.gui.Librarian;
