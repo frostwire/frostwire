@@ -15,6 +15,7 @@ FrostWire 2.4.6 build 689 - JAN/24/2022
  - com.mopub.mediation:applovin:10.3.4.0
  - com.android.tools.build:gradle:7.1.0
  - androidx.preference:preference:1.2.0
+ - Chinese translation update by TheJokerW
 
 FrostWire 2.4.5 build 688 - JAN/07/2022
  - jlibtorrent 1.2.15.1 (boost 1.78, openssl 1.1.1m)
