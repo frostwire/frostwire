@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ final class UniversalScanner {
             } else {
                 if (path.endsWith(".apk")) {
                     //LOG.debug("Can't scan apk for security concerns: " + path);
-                } else if (mt != null) {
+                } else if (mt != null && mt != MediaType.TYPE_UNKNOWN) {
                     if (mt.getId() == Constants.FILE_TYPE_AUDIO ||
                             mt.getId() == Constants.FILE_TYPE_VIDEOS ||
                             mt.getId() == Constants.FILE_TYPE_PICTURES) {
@@ -147,7 +147,7 @@ final class UniversalScanner {
                 for (File f : files) {
                     String path = f.getAbsolutePath();
                     MediaType mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(path));
-                    if (mt != null) {
+                    if (mt != null && mt != MediaType.TYPE_UNKNOWN) {
                         connection.scanFile(path, mt.getMimeType());
                     } else {
                         connection.scanFile(path, null);

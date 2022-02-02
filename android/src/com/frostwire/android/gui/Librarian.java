@@ -31,7 +31,6 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -82,8 +81,6 @@ import okio.Okio;
  * @author aldenml
  */
 public final class Librarian {
-
-    private static final String TAG = "FW.Librarian";
     private static final Logger LOG = Logger.getLogger(Librarian.class);
     private static final Object instanceCreationLock = new Object();
     private static Librarian instance;
@@ -149,7 +146,7 @@ public final class Librarian {
                 numFiles += c != null && c.moveToFirst() ? c.getInt(0) : 0;
             }
         } catch (Throwable e) {
-            Log.e(TAG, "Failed to get num of files", e);
+            LOG.error("Failed to get num of files", e);
         } finally {
             if (c != null) {
                 c.close();
@@ -193,7 +190,7 @@ public final class Librarian {
             oldFile.renameTo(newFile);
             return newFile.getAbsolutePath();
         } catch (Throwable e) {
-            Log.e(TAG, "Failed to rename file: " + fd, e);
+            LOG.error("Failed to rename file: " + fd, e);
         }
         return null;
     }
@@ -245,10 +242,10 @@ public final class Librarian {
                     LOG.error(t.getMessage(), t);
                 }
             } else {
-                Log.e(TAG, "Failed to delete files from media store, no context available");
+                LOG.error("Failed to delete files from media store, no context available");
             }
         } catch (Throwable e) {
-            Log.e(TAG, "Failed to delete files from media store", e);
+            LOG.error("Failed to delete files from media store", e);
         }
 
         FileSystem fs = Platforms.fileSystem();
@@ -277,7 +274,7 @@ public final class Librarian {
         }
         scan(context, file, Transfers.getIgnorableFiles());
         if (context == null) {
-            Log.w(TAG, "Librarian has no `context` object to scan() with.");
+            LOG.error("Librarian has no `context` object to scan() with.");
             return;
         }
         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
@@ -296,7 +293,7 @@ public final class Librarian {
             List<FWFileDescriptor> fds = getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
 
             if (fds.size() == 0) { // just in case
-                Log.w(TAG, "Logic error creating ephemeral playlist");
+                LOG.error("Logic error creating ephemeral playlist");
                 fds.add(fd);
             }
 
@@ -340,7 +337,7 @@ public final class Librarian {
             ContentResolver cr = context.getContentResolver();
             deleteIgnorableFilesFromVolume(cr, fetcher.getExternalContentUri(), ignorableFiles);
         } catch (Throwable e) {
-            Log.e(TAG, "General failure during sync of MediaStore", e);
+            LOG.error("General failure during sync of MediaStore", e);
         }
     }
 
@@ -375,7 +372,7 @@ public final class Librarian {
                 cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
             }
         } catch (Throwable e) {
-            Log.e(TAG, "General failure during sync of MediaStore", e);
+            LOG.error("General failure during sync of MediaStore", e);
         } finally {
             c.close();
         }
@@ -420,10 +417,10 @@ public final class Librarian {
                 getFilesInVolume(cr, fetcher.getExternalContentUri(), offset, pageSize, columns, sort,
                         where, whereArgs, fetcher, result);
             } catch (Throwable t) {
-                Log.e(TAG, "getFiles::getFilesInVolume failed with fetcher.getExternalContentUri() = " + fetcher.getExternalContentUri(), t);
+                LOG.error("getFiles::getFilesInVolume failed with fetcher.getExternalContentUri() = " + fetcher.getExternalContentUri(), t);
             }
         } catch (Throwable e) {
-            Log.e(TAG, "General failure getting files", e);
+            LOG.error("General failure getting files", e);
         }
         return result;
     }
@@ -606,17 +603,94 @@ public final class Librarian {
         copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private boolean alreadyInMediaStore(Context context,
-                                        TableFetcher fetcher,
-                                        String displayName,
-                                        String relativeFolderPath) {
-        String where = MediaColumns.DISPLAY_NAME + " = ? AND " + MediaColumns.RELATIVE_PATH + " = ?";
-        String[] whereArgs = new String[]{displayName, relativeFolderPath};
-        List<FWFileDescriptor> filesInAndroidMediaStore =
-                getFilesInAndroidMediaStore(context,
-                        0, 1, fetcher, where, whereArgs);
-        return filesInAndroidMediaStore.size() > 0;
+    private boolean alreadyInMediaStore(Context context, TableFetcher fetcher, final String displayName, final String relativeFolderPath) {
+        // relativePath looks like:
+        // Documents/FrostWire/storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/Torrents/
+        // but the database may have relative paths stored like:
+        // Documents/FrostWire/(invalid)/storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/Torrents/
+        // let's fix our relativePath search to be only from "com.frostwire.android/..."
+        String normalizedRelativePath = relativeFolderPath;
+
+        if (normalizedRelativePath.contains("com.frostwire.android")) {
+            normalizedRelativePath = relativeFolderPath.substring(relativeFolderPath.indexOf("com.frostwire.android"));
+        }
+
+        String normalizedDisplayName = displayName;
+        String extension = FilenameUtils.getExtension(displayName);
+        if (extension != null && !"".equals(extension)) {
+            normalizedDisplayName = displayName.replace("." + extension, "");
+        }
+
+        // Depending on file type we use different search fields for the file title (see mediaStoreInsert)
+        String[] projection_audio_video = new String[]{MediaColumns._ID, MediaColumns.DISPLAY_NAME, MediaColumns.RELATIVE_PATH};
+        String[] projection_other = new String[]{MediaColumns._ID, MediaColumns.TITLE, MediaColumns.RELATIVE_PATH};
+
+        String selection_audio_video = MediaColumns.DISPLAY_NAME + " LIKE ? AND " + MediaColumns.RELATIVE_PATH + " LIKE ?";
+        String selection_other = MediaColumns.TITLE + " LIKE ? AND " + MediaColumns.RELATIVE_PATH + " LIKE ?";
+
+        Uri volumeUri = fetcher.getExternalContentUri();
+        byte fileType = AndroidPaths.getFileType(displayName, true);
+        if (fileType == Constants.FILE_TYPE_UNKNOWN) {
+            return false;
+        }
+
+        String[] projection = projection_other;
+        String selection = selection_other;
+
+        if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
+            projection = projection_audio_video;
+            selection = selection_audio_video;
+        }
+
+        try {
+            ContentResolver cr = context.getContentResolver();
+            Cursor cursor = null;
+            try {
+                cursor = cr.query(volumeUri, projection, selection, new String[]{"%" + normalizedDisplayName + "%", "%" + normalizedRelativePath}, null);
+            } catch (Throwable t) {
+                LOG.error("alreadyInMediaStore: " + t.getMessage(), t);
+            }
+            if (cursor == null) {
+                return false;
+            }
+
+            int totalResults = cursor.getCount();
+            if (totalResults == 0) {
+                IOUtils.closeQuietly(cursor);
+                return false;
+            }
+
+            cursor.moveToFirst();
+
+            List<Long> fileIdsToDelete = new ArrayList<>();
+            do {
+                int displayNameColIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
+                if (displayNameColIndex == -1) {
+                    displayNameColIndex = cursor.getColumnIndex(MediaColumns.TITLE);
+                }
+
+                // Check if there are repeated entries for the file we're looking for/
+                // If the display name without the extension is a prefix of the current row, we have a duplicate
+                // <normalized display name> (N).<ext>
+                String currentDisplayName = cursor.getString(displayNameColIndex);
+                if (!currentDisplayName.equals(displayName) && currentDisplayName.startsWith(normalizedDisplayName)) {
+                    int idColumnIndex = cursor.getColumnIndex(MediaColumns._ID);
+                    long fileId = cursor.getLong(idColumnIndex);
+                    fileIdsToDelete.add(fileId);
+                }
+            } while (cursor.moveToNext());
+            boolean result = cursor.getCount() > 0;
+            IOUtils.closeQuietly(cursor);
+            // delete any found duplicates
+            if (fileIdsToDelete.size() > 1) {
+                fileIdsToDelete.forEach(fileId -> cr.delete(volumeUri, "_id = ?", new String[]{String.valueOf(fileId)}));
+                fileIdsToDelete.clear();
+            }
+            return result;
+        } catch (Throwable e) {
+            LOG.error(e.getMessage() + " volumeUri=" + volumeUri, e);
+        }
+        return false;
     }
 
     private void initHandler() {

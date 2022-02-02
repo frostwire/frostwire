@@ -1,4 +1,5 @@
-FrostWire 2.4.6 build 689 - JAN/24/2022
+FrostWire 2.4.6 build 689 - FEB/02/2022
+ - Fixes issue with duplicate file entries in My Files
  - jlibtorrent 1.2.15.2
  - compileSdkVersion 31
  - com.google.android.material:material:1.5.0
