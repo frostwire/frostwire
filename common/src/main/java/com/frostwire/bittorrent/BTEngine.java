@@ -111,6 +111,7 @@ public final class BTEngine extends SessionManager {
     private static SettingsPack defaultSettings() {
         SettingsPack sp = new SettingsPack();
         //sp.broadcastLSD(true); //setting was deprecated/removed on libtorrent 1.2.4 (Feb 10th 2020)
+        sp.validateHttpsTrackers(false);
         if (ctx.optimizeMemory) {
             int maxQueuedDiskBytes = sp.maxQueuedDiskBytes();
             sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
