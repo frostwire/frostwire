@@ -263,6 +263,15 @@ public final class SystemUtils {
         }
     }
 
+    public static void postToUIThread(Runnable runnable, long delayMillis) {
+        try {
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(runnable, delayMillis);
+        } catch (Throwable t) {
+            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
+        }
+    }
+
     public static void postToUIThreadAtFront(Runnable runnable) {
         try {
             Handler handler = new Handler(Looper.getMainLooper());
