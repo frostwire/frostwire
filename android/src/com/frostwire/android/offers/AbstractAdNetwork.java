@@ -75,7 +75,7 @@ public abstract class AbstractAdNetwork implements AdNetwork {
         }
     }
 
-    final boolean abortInitialize(Context context) {
+    final boolean shouldWeAbortInitialize(Context context) {
         if (!enabled()) {
             if (!started()) {
                 LOG.info(getClass().getSimpleName() + " initialize(): aborted. AdNetwork Not enabled.");
