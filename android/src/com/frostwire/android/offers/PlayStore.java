@@ -287,7 +287,7 @@ public final class PlayStore extends StoreBase {
 
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 int billingResponseCode = billingResult.getResponseCode();
                 LOG.info("Setup finished. Response code: " + billingResponseCode);
 
