@@ -333,7 +333,7 @@ public class MainActivity extends AbstractActivity implements
                         uri.startsWith("magnet")) {
                     TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                 } else if (uri.startsWith("content")) {
-                    String newUri = saveViewContent(this, Uri.parse(uri), "content-intent.torrent");
+                    String newUri = saveViewContent(this, Uri.parse(uri));
                     if (newUri != null) {
                         TransferManager.instance().downloadTorrent(newUri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                     }
@@ -458,8 +458,6 @@ public class MainActivity extends AbstractActivity implements
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
         }
-        // necessary unregisters broadcast its internal receivers, avoids leaks.
-        Offers.destroyMopubInterstitials();
     }
 
     private void saveLastFragment(Bundle outState) {
@@ -829,8 +827,7 @@ public class MainActivity extends AbstractActivity implements
         }
     }
 
-    // TODO: refactor and move this method for a common place when needed
-    private static String saveViewContent(Context context, Uri uri, String fileName) {
+    private static String saveViewContent(Context context, Uri uri) {
         InputStream inStream = null;
         OutputStream outStream = null;
         if (!Platforms.temp().exists()) {
@@ -839,7 +836,7 @@ public class MainActivity extends AbstractActivity implements
                 LOG.warn("saveViewContent() could not create Platforms.temp() directory.");
             }
         }
-        File target = new File(Platforms.temp(), fileName);
+        File target = new File(Platforms.temp(), "content-intent.torrent");
         try {
             inStream = context.getContentResolver().openInputStream(uri);
             outStream = new FileOutputStream(target);
@@ -851,7 +848,7 @@ public class MainActivity extends AbstractActivity implements
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error when copying file from " + uri + " to temp/" + fileName, e);
+            LOG.error("Error when copying file from " + uri + " to temp/" + "content-intent.torrent", e);
             return null;
         } finally {
             IOUtils.closeQuietly(inStream);
