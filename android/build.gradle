@@ -1,3 +1,6 @@
+import groovy.swing.SwingBuilder
+import groovy.xml.Namespace
+
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
@@ -26,7 +29,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.0'
+        classpath 'com.android.tools.build:gradle:7.1.1'
+        classpath 'org.codehaus.groovy:groovy-all:3.0.9'
+
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
         classpath 'com.google.gms:google-services:4.3.10'
@@ -42,7 +47,7 @@ repositories {
 
 def manifestVersionCode() {
     def manifestFile = new File(project.projectDir.absolutePath + '/AndroidManifest.xml')
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new groovy.xml.XmlParser().parse(manifestFile)
     //System.out.println("manifestVersionCode: xml.attributes()[ns.versionCode].toString()=" + xml.attributes()[ns.versionCode].toString())
     return Integer.parseInt(xml.attributes()[ns.versionCode].toString())
@@ -50,7 +55,7 @@ def manifestVersionCode() {
 
 def manifestVersionName() {
     def manifestFile = file(project.projectDir.absolutePath + '/AndroidManifest.xml')
-    def ns = new groovy.xml.Namespace("http://schemas.android.com/apk/res/android", "android")
+    def ns = new Namespace("http://schemas.android.com/apk/res/android", "android")
     def xml = new groovy.xml.XmlParser().parse(manifestFile)
     //System.out.println("manifestVersionName: " + xml.attributes()[ns.versionName].toString())
     return xml.attributes()[ns.versionName].toString()
@@ -199,22 +204,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'com.google.code.gson:gson:2.8.8'
-    implementation 'com.mopub.volley:mopub-volley:2.1.0'
 
     implementation 'androidx.media2:media2-session:1.2.0'
     implementation 'androidx.media2:media2-widget:1.2.0'
     implementation 'androidx.media2:media2-player:1.2.0'
 
-    // MoPub SDK
-    implementation('com.mopub:mopub-sdk-banner:5.18.0@aar') { transitive = true }
-    implementation('com.mopub:mopub-sdk-fullscreen:5.18.0@aar') { transitive = true }
-
     // MoPub Mediation Partners
-    implementation 'com.applovin:applovin-sdk:10.3.5'
-    implementation 'com.mopub.mediation:applovin:10.3.4.0'
+    implementation 'com.applovin:applovin-sdk:11.1.0'
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
-    implementation 'com.mopub.mediation:unityads:3.7.5.0'
 
     def jlibtorrent_version = '1.2.15.2'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
@@ -273,7 +272,7 @@ class SignatureRequester {
     void ask() {
         System.setProperty('java.awt.headless', 'false')
         if (System.console() == null) { // this is always the case on macOS at least
-            new groovy.swing.SwingBuilder().edt {
+            new SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
                         alwaysOnTop: true,
