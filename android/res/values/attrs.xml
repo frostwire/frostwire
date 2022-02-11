@@ -107,4 +107,8 @@
         <attr name="hexhive_fullColor" format="color" />
     </declare-styleable>
 
+    <declare-styleable name="FWBannerView">
+        <attr name="adUnitId" format="string" />
+    </declare-styleable>
+
 </resources>
