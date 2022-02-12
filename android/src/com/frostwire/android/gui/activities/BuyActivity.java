@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
  */
 
 package com.frostwire.android.gui.activities;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -31,6 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.android.billingclient.api.PurchasesUpdatedListener;
@@ -38,25 +41,22 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.PaymentOptionsVisibility;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
-import com.frostwire.android.offers.MoPubAdNetwork;
+import com.frostwire.android.offers.AppLovinAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.mobileads.MoPubRewardedAds;
 
 import java.lang.ref.WeakReference;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -79,7 +79,6 @@ public final class BuyActivity extends AbstractActivity {
     private ProductCardView cardNminutes;
     private ProductCardView card30days;
     private ProductCardView card1year;
-    //private ProductCardView card6months;
     private ProductCardView selectedProductCard;
 
     /**
@@ -140,6 +139,8 @@ public final class BuyActivity extends AbstractActivity {
 
     @Override
     protected void initComponents(Bundle savedInstanceState) {
+        WeakReference<AppCompatActivity> activityRef = Ref.weak(this);
+        Engine.instance().getThreadPool().execute(() -> Offers.preLoadRewardedVideoAsync(activityRef));
         final boolean interstitialMode = isInterstitial();
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
@@ -154,24 +155,26 @@ public final class BuyActivity extends AbstractActivity {
         // If Google Store not ready or available, auto-select rewarded ad option
         if (card30days.getVisibility() == View.GONE ||
                 card1year.getVisibility() == View.GONE) {
-            //card6months.getVisibility() == View.GONE) {
             cardNminutes.performClick();
         }
 
-        async(Offers::adsPausedAsync,
-                (Asyncs.ResultPostTask<Boolean>)
-                        BuyActivity::onAdsPausedAsyncFinished);
+        Engine.instance().getThreadPool().execute(() -> {
+            boolean paused = Offers.adsPausedAsync();
+            SystemUtils.postToUIThread(() -> onAdsPausedAsyncFinished(paused, activityRef));
+        });
     }
 
-    private static void onAdsPausedAsyncFinished(boolean adsPaused) {
+    private static void onAdsPausedAsyncFinished(boolean adsPaused, WeakReference<AppCompatActivity> activityRef) {
         if (adsPaused) {
             // we shouldn't be here if ads have been paused, do not load rewarded videos
             return;
         }
-        if (!MoPubRewardedAds.hasRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD)) {
-            LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
-            Offers.MOPUB.loadRewardedVideo();
+        if (!Ref.alive(activityRef)) {
+            LOG.info("onAdsPausedAsyncFinished (adsPaused=" + adsPaused + ") aborted, lost reference to BuyActivity");
+            return;
         }
+        LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
+        Engine.instance().getThreadPool().execute(() -> Offers.preLoadRewardedVideoAsync(activityRef));
     }
 
     private String getActionBarTitle() {
@@ -268,7 +271,6 @@ public final class BuyActivity extends AbstractActivity {
         View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
         card30days = findView(R.id.activity_buy_product_card_30_days);
         card1year = findView(R.id.activity_buy_product_card_1_year);
-        //card6months = findView(R.id.activity_buy_product_card_6_months);
         cardNminutes = findView(R.id.activity_buy_product_card_reward);
 
         if (REWARD_FREE_AD_MINUTES > 0) {
@@ -284,14 +286,11 @@ public final class BuyActivity extends AbstractActivity {
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, null);
             initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, null);
-            //initProductCard(card6months, store, Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, null);
             card30days.setOnClickListener(cardClickListener);
             card1year.setOnClickListener(cardClickListener);
-            //card6months.setOnClickListener(cardClickListener);
         } else {
             card30days.setVisibility(View.GONE);
             card1year.setVisibility(View.GONE);
-            //card6months.setVisibility(View.GONE);
         }
 
         initLastCardSelection(lastSelectedCardViewId);
@@ -386,7 +385,7 @@ public final class BuyActivity extends AbstractActivity {
 
             @Override
             public long purchaseTime() {
-                return REWARD_FREE_AD_MINUTES * 60_000;
+                return REWARD_FREE_AD_MINUTES * 60_000L;
             }
 
             @Override
@@ -436,9 +435,11 @@ public final class BuyActivity extends AbstractActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
-        outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
-        outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
+        if (outState != null) {
+            outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
+            outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+            outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -468,7 +469,6 @@ public final class BuyActivity extends AbstractActivity {
         }
         card30days.setSelected(productCardView == card30days);
         card1year.setSelected(productCardView == card1year);
-        //card6months.setSelected(productCardView == card6months);
         cardNminutes.setSelected(productCardView == cardNminutes);
     }
 
@@ -533,9 +533,6 @@ public final class BuyActivity extends AbstractActivity {
             case R.id.activity_buy_product_card_reward:
                 productCard = buyActivity.cardNminutes;
                 break;
-//            case R.id.activity_buy_product_card_6_months:
-//                productCard = buyActivity.card6months;
-//                break;
             case R.id.activity_buy_product_card_1_year:
             default:
                 productCard = buyActivity.card1year;
