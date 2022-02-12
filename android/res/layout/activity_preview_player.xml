@@ -60,7 +60,7 @@
 
     <com.frostwire.android.offers.FWBannerView
         app:adUnitId="c902517bad27d4d7"
-        android:id="@+id/activity_preview_player_320x250_banner"
+        android:id="@+id/activity_preview_player_320x50_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
