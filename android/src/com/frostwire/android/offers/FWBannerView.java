@@ -228,10 +228,6 @@ public class FWBannerView extends LinearLayout {
         return isLoaded;
     }
 
-    public void loadMaxBanner(final String adUnitId) {
-        loadMaxBanner();
-    }
-
     public void loadMaxBanner() {
         isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
