@@ -14,10 +14,11 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/app_background_body_light"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/app_background_body_light"
+        android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
 
@@ -111,8 +112,9 @@
                 android:scaleType="fitXY"
                 android:visibility="visible" />
 
-            <com.frostwire.android.offers.MopubBannerView
-                android:id="@+id/audio_player_mopub_banner_view"
+            <com.frostwire.android.offers.FWBannerView
+                app:adUnitId="c902517bad27d4d7"
+                android:id="@+id/audio_player_applovin_banner_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/audio_player_album_art"
