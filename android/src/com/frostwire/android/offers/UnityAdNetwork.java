@@ -20,7 +20,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
 
     @Override
     public void initialize(Activity activity) {
-        if (abortInitialize(activity)) {
+        if (shouldWeAbortInitialize(activity)) {
             return;
         }
         final String GAME_ID = "3351589";
