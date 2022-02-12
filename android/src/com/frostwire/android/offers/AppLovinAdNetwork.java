@@ -32,6 +32,7 @@ import com.applovin.mediation.MaxError;
 import com.applovin.mediation.MaxReward;
 import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxRewardedAd;
+import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
@@ -64,6 +65,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                     Context appContext = appContextRef.get();
                     Activity activity1 = activityRef.get();
                     AppLovinSdk.initializeSdk(appContext);
+                    AppLovinSdk.getInstance(activity1).setMediationProvider(AppLovinMediationProvider.MAX);
                     AppLovinSdk.getInstance(activity1).getSettings().setMuted(!DEBUG_MODE);
                     AppLovinSdk.getInstance(appContext).getSettings().setVerboseLogging(DEBUG_MODE);
                     LOG.info("AppLovin initialized.");
@@ -79,7 +81,6 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
 
     @Override
     public void loadNewInterstitial(Activity activity) {
-        //interstitialAdapter = new AppLovinInterstitialAdapter(this, activity);
         interstitialAdapter = new AppLovinMaxInterstitialAdapter(this, activity);
     }
 
