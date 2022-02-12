@@ -17,10 +17,21 @@
 
 package com.frostwire.android.offers;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.andrew.apollo.utils.MusicUtils;
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.MaxReward;
+import com.applovin.mediation.MaxRewardedAdListener;
+import com.applovin.mediation.ads.MaxRewardedAd;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -30,9 +41,9 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mopub.mobileads.MoPubRewardedAds;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -43,17 +54,16 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 public final class Offers {
     private static final Logger LOG = Logger.getLogger(Offers.class);
 
-    /** Turn this on to enable Test Ad Units*/
+    /**
+     * Turn this on to enable Test Ad Units
+     */
     static final boolean DEBUG_MODE = false;
 
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
-    public final static MoPubAdNetwork MOPUB = new MoPubAdNetwork();
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
     private final static UnityAdNetwork UNITY = new UnityAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
@@ -62,6 +72,7 @@ public final class Offers {
     private static boolean FORCED_DISABLED = false;
     private static boolean PAUSED;
     private static final ReentrantLock pausedCheckLock = new ReentrantLock();
+    private static MaxRewardedAd rewardedAd;
 
     private Offers() {
     }
@@ -92,10 +103,6 @@ public final class Offers {
         }
         LOG.info("Offers.initAdNetworks() success");
         async(Offers::checkIfPausedAsync);
-    }
-
-    public static void destroyMopubInterstitials() {
-        MOPUB.destroyInterstitials();
     }
 
     public static void stopAdNetworks(Context context) {
@@ -164,6 +171,7 @@ public final class Offers {
     }
 
     static void pauseAdsAsync(int minutes) {
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::pauseAdsAsync");
         LOG.info("pauseAdsAsync: pausing for " + minutes + " minutes");
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -174,19 +182,21 @@ public final class Offers {
     }
 
     public static boolean adsPausedAsync() {
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::adsPausedAsync");
         final ConfigurationManager CM = ConfigurationManager.instance();
         final int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
         final long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
         if (rewarded_video_minutes == -1 || paused_timestamp == -1) {
             return false;
         }
-        final long pause_duration = rewarded_video_minutes * 60_000;
+        final long pause_duration = rewarded_video_minutes * 60_000L;
         final long time_on_pause = System.currentTimeMillis() - paused_timestamp;
         LOG.info("adsPausedAsync(): " + (time_on_pause < pause_duration));
         return time_on_pause < pause_duration;
     }
 
     public static void unPauseAdsAsync() {
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::unPauseAdsAsync");
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
         CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
@@ -201,7 +211,7 @@ public final class Offers {
         if (rewarded_video_minutes == -1) {
             return -1;
         }
-        long pause_duration = rewarded_video_minutes * 60_000;
+        long pause_duration = rewarded_video_minutes * 60_000L;
         long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
         if (paused_timestamp == -1) {
             return -1;
@@ -216,7 +226,6 @@ public final class Offers {
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
-            AD_NETWORKS.put(MOPUB.getShortCode(), MOPUB);
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
             AD_NETWORKS.put(UNITY.getShortCode(), UNITY);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
@@ -233,7 +242,7 @@ public final class Offers {
             pausedCheckLock.unlock();
             return;
         }
-        long pause_duration = rewarded_video_minutes * 60_000;
+        long pause_duration = rewarded_video_minutes * 60_000L;
         long paused_timestamp = CM.getLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP);
         if (paused_timestamp == -1) {
             PAUSED = false;
@@ -270,12 +279,15 @@ public final class Offers {
         }
     }
 
+    public static void preLoadRewardedVideoAsync(WeakReference<AppCompatActivity> activityRef) {
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::preLoadRewardedVideoAsync");
+        rewardedAd = AppLovinAdNetwork.getInstance().loadRewardedVideo(activityRef);
+    }
+
     public static void showRewardedVideo(BuyActivity activity) {
-        if (MoPubRewardedAds.hasRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD)) {
-            MoPubRewardedAds.setRewardedAdListener(MoPubRewardedAdListener.instance());
-            MoPubRewardedAds.showRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD);
+        if (rewardedAd != null && rewardedAd.isReady()) {
+            rewardedAd.showAd();
             activity.finish();
-            // maybe then exit the invoking BuyActivity, which should then be passed here.
         } else {
             UIUtils.showShortMessage(activity, R.string.looking_For_rewarded_video);
             async(Offers::keepTryingRewardedAdAsync, Ref.weak(activity));
@@ -286,21 +298,13 @@ public final class Offers {
         if (!Ref.alive(activityRef)) {
             return;
         }
-        int attempts = 5;
-        while (attempts > 0 && Ref.alive(activityRef) && !MoPubRewardedAds.hasRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD)) {
-            try {
-                LOG.info("keepTryingRewardedAdAsync: sleeping while ad loads... (attempts=" + attempts + ")");
-                Thread.sleep(5000);
-                attempts--;
-            } catch (InterruptedException e) {
-                return;
-            }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        if (!MoPubRewardedAds.hasRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD)) {
+        if (rewardedAd != null && !rewardedAd.isReady()) {
             async(Offers::unPauseAdsAsync);
-            if (!Ref.alive(activityRef)) {
-                return;
-            }
             activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
@@ -316,18 +320,14 @@ public final class Offers {
                 } finally {
                     Ref.free(activityRef);
                 }
-
             });
-        } else if (Ref.alive(activityRef)) {
+        }  else if (Ref.alive(activityRef)) {
             activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
                 }
                 try {
-                    MoPubRewardedAds.showRewardedAd(MoPubAdNetwork.UNIT_ID_REWARDED_AD);
-                    if (Ref.alive(activityRef)) {
-                        activityRef.get().finish();
-                    }
+                    showRewardedVideo(activityRef.get());
                 } catch (Throwable t) {
                     if (BuildConfig.DEBUG) {
                         throw t;
