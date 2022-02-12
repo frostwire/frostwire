@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
 
@@ -404,7 +405,7 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
     }
 
     @Override
-    protected void onSaveInstanceState(final Bundle outState) {
+    protected void onSaveInstanceState(@NonNull  final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putAll(mArguments);
     }
