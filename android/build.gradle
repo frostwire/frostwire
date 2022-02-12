@@ -200,9 +200,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
 
-    implementation 'androidx.media2:media2-session:1.2.0'
-    implementation 'androidx.media2:media2-widget:1.2.0'
-    implementation 'androidx.media2:media2-player:1.2.0'
+    implementation 'androidx.media2:media2-session:1.2.1'
+    implementation 'androidx.media2:media2-widget:1.2.1'
+    implementation 'androidx.media2:media2-player:1.2.1'
 
     // MoPub Mediation Partners
     implementation 'com.applovin:applovin-sdk:11.1.0'
