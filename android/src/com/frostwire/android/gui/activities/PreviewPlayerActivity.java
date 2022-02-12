@@ -208,11 +208,11 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             return;
         }
         if (fwBannerView == null) {
-            fwBannerView = findViewById(R.id.activity_preview_player_320x250_banner);
+            fwBannerView = findViewById(isPortrait() ? R.id.activity_preview_player_320x50_banner : R.id.activity_preview_player_320x250_banner);
         }
         if (fwBannerView != null) {
             fwBannerView.setOnBannerDismissedListener(this::hideAd);
-            fwBannerView.loadMaxBanner(isPortrait() ? FWBannerView.UNIT_ID_PREVIEW_PLAYER_VERTICAL : FWBannerView.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
+            fwBannerView.loadMaxBanner();
         }
     }
 

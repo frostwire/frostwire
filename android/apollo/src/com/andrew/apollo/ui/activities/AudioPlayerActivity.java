@@ -724,7 +724,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             return;
         }
-        maxAdBannerView.loadMaxBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
+        maxAdBannerView.loadMaxBanner();
     }
 
     /**
