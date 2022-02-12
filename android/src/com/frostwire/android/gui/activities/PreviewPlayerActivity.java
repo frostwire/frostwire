@@ -59,8 +59,7 @@ import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
-import com.frostwire.android.offers.MoPubAdNetwork;
-import com.frostwire.android.offers.MopubBannerView;
+import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.search.FileSearchResult;
@@ -100,7 +99,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private boolean isFullScreen = false;
     private boolean videoSizeSetupDone = false;
     private boolean changedActionBarTitleToNonBuffering = false;
-    private MopubBannerView mopubBannerView;
+    private FWBannerView fwBannerView;
     private boolean mopubLoaded = false;
     private boolean isVertical;
 
@@ -196,10 +195,10 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             toggleFullScreen(videoTexture);
         }
 
-        initMopubView();
+        initFWBannerView();
     }
 
-    private void initMopubView() {
+    private void initFWBannerView() {
         if (Offers.disabledAds()) {
             hideAd();
             return;
@@ -208,12 +207,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             hideAd();
             return;
         }
-        if (mopubBannerView == null) {
-            mopubBannerView = findViewById(R.id.activity_preview_player_mopub_squared_banner);
+        if (fwBannerView == null) {
+            fwBannerView = findViewById(R.id.activity_preview_player_320x250_banner);
         }
-        if (mopubBannerView != null) {
-            mopubBannerView.setOnBannerDismissedListener(this::hideAd);
-            mopubBannerView.loadMoPubBanner(isPortrait() ? MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_VERTICAL : MoPubAdNetwork.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
+        if (fwBannerView != null) {
+            fwBannerView.setOnBannerDismissedListener(this::hideAd);
+            fwBannerView.loadMaxBanner(isPortrait() ? FWBannerView.UNIT_ID_PREVIEW_PLAYER_VERTICAL : FWBannerView.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL);
         }
     }
 
@@ -325,8 +324,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         // these ones only exist on landscape mode.
         ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
 
-        if (mopubBannerView == null) {
-            mopubBannerView = findView(R.id.activity_preview_player_mopub_squared_banner);
+        if (fwBannerView == null) {
+            fwBannerView = findView(R.id.activity_preview_player_320x250_banner);
         }
 
         // Let's Go into full screen mode.
@@ -337,7 +336,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             findToolbar().setVisibility(View.GONE);
             setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
 
-            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
 
             if (isPortrait) {
                 //noinspection SuspiciousNameCombination
@@ -360,12 +359,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
             if (Offers.disabledAds()) {
                 hideAd();
-                mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+                fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             } else {
                 if (mopubLoaded) {
-                    mopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true);
+                    fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
                 } else {
-                    mopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+                    fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
                 }
             }
             v.setRotation(0);
@@ -643,8 +642,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private void destroyMopubView() {
         try {
             hideAd();
-            if (mopubBannerView != null) {
-                mopubBannerView.destroy();
+            if (fwBannerView != null) {
+                fwBannerView.destroy();
             }
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
@@ -654,8 +653,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     private void hideAd() {
-        if (mopubBannerView != null) {
-            mopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+        if (fwBannerView != null) {
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
         }
         if (!isPortrait()) {
             LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
