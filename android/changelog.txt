@@ -1,3 +1,10 @@
+FrostWire 2.4.7 build 690 - FEB/12/2022
+ - turn off tracker certificate validation on jlibtorrent to increase data availability on network
+   until issues in libtorrent finding correct location of root certs is solved
+ - removed mopub third party library
+ - AppLovin Max 11.1.0 integration
+ - androidx.media2:media2-*:1.2.1
+
 FrostWire 2.4.6 build 689 - FEB/02/2022
  - Fixes issue with duplicate file entries in My Files
  - jlibtorrent 1.2.15.2
