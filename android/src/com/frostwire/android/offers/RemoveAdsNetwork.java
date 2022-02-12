@@ -39,7 +39,7 @@ class RemoveAdsNetwork extends AbstractAdNetwork {
 
     @Override
     public void initialize(Activity activity) {
-        if (abortInitialize(activity)) {
+        if (shouldWeAbortInitialize(activity)) {
             return;
         }
 
