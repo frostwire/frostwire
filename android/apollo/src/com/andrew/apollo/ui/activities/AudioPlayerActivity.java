@@ -125,7 +125,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private ImageView mAlbumArt;
 
     // FW Banner
-    private FWBannerView maxAdBannerView;
+    private FWBannerView fwBannerView;
 
     // Tiny artwork
     private ImageView mAlbumArtSmall;
@@ -397,8 +397,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
-            if (maxAdBannerView != null) {
-                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
+            if (fwBannerView != null) {
+                fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             }
             showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
@@ -484,8 +484,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mIsPaused = false;
 
         try {
-            if (maxAdBannerView != null) {
-                maxAdBannerView.destroy();
+            if (fwBannerView != null) {
+                fwBannerView.destroy();
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
@@ -592,30 +592,30 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mProgress.setOnSeekBarChangeListener(this);
         }
         showAlbumArt();
-        if (maxAdBannerView != null && !Offers.disabledAds()) {
-            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+        if (fwBannerView != null && !Offers.disabledAds()) {
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
         }
     }
 
     private void initMaxBannerView() {
-        maxAdBannerView = findView(R.id.audio_player_320x50_banner_view);
-        if (maxAdBannerView != null) {
+        fwBannerView = findView(R.id.audio_player_320x50_banner_view);
+        if (fwBannerView != null) {
             if (Offers.disabledAds()) {
-                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
+                fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
                 return;
             }
-            maxAdBannerView.setShowDismissButton(false);
-            maxAdBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
-            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
-            maxAdBannerView.setShowFallbackBannerOnDismiss(false);
-            maxAdBannerView.setOnBannerLoadedListener(() -> maxAdBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
-            maxAdBannerView.setOnFallbackBannerLoadedListener(() -> maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
+            fwBannerView.setShowDismissButton(false);
+            fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+            fwBannerView.setShowFallbackBannerOnDismiss(false);
+            fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
+            fwBannerView.setOnFallbackBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
             deferredInitAlbumArtBanner();
         }
     }
 
     private void deferredInitAlbumArtBanner() {
-        if (maxAdBannerView == null) {
+        if (fwBannerView == null) {
             LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready or available for this layout (mMopubBannerView == null)");
             return;
         }
@@ -643,15 +643,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        if (maxAdBannerView.areLayerVisible(FWBannerView.Layers.APPLOVIN)) {
+        if (fwBannerView.areLayerVisible(FWBannerView.Layers.APPLOVIN)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
             return;
         }
 
         if (waitingToInitAlbumArtBanner.get()) {
 
-            if (!maxAdBannerView.areLayerVisible(FWBannerView.Layers.FALLBACK)) {
-                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+            if (!fwBannerView.areLayerVisible(FWBannerView.Layers.FALLBACK)) {
+                fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             }
 
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
@@ -715,16 +715,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mAlbumArt != null) {
             mAlbumArt.setVisibility(View.VISIBLE);
         }
-        if (maxAdBannerView == null) {
+        if (fwBannerView == null) {
             LOG.info("initAlbumArtBanner() aborted: mMopubBannerView == null");
             return;
         }
         if (Offers.disabledAds()) {
             LOG.info("initAlbumArtBanner() aborted: Ads are disabled");
-            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             return;
         }
-        maxAdBannerView.loadMaxBanner();
+        fwBannerView.loadMaxBanner();
     }
 
     /**
@@ -1161,8 +1161,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * /** Used to shared what the user is currently listening to
      */
     private void shareCurrentTrack() {
-        if (maxAdBannerView != null) {
-            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
+        if (fwBannerView != null) {
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
         }
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
     }

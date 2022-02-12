@@ -226,8 +226,13 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                     false,
                     false,
                     FWBannerView.UNIT_ID_HOME);
-            fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setShowDismissButton(false));
-            //fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_HOME);
+            fwBannerView.setOnBannerLoadedListener(() -> {
+                        fwBannerView.setShowDismissButton(false);
+                        fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
+                    }
+            );
+            fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_HOME);
+            fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             fwBannerView.loadMaxBanner();
         }
         return fwBannerView;

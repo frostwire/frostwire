@@ -423,8 +423,8 @@ public class FWBannerView extends LinearLayout {
         public void onAdLoaded(MaxAd banner) {
             LOG.info("onBannerLoaded(): " + banner);
             isLoaded = true;
+            maxAdView.setVisibility(View.VISIBLE);
             setLayersVisibility(Layers.APPLOVIN, true);
-            maxAdView.setVisibility(View.INVISIBLE);
             maxAd = banner;
 
             if (onBannerLoadedListener != null) {
