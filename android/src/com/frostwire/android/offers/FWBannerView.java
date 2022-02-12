@@ -24,11 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -94,9 +91,10 @@ public class FWBannerView extends LinearLayout {
 
     private static final Logger LOG = Logger.getLogger(FWBannerView.class);
     private ImageButton dismissBannerButton;
-    private MaxAdView maxAdView;
+    private MaxAdView maxAdView320x50;
+    private MaxAdView maxAdView320x250;
+    private MaxAdView maxAdView; // the visible version of the ad
     private MaxAd maxAd; // gets set when the ad is loaded and the listener is notified
-    private String adUnitId;
     private ImageView fallbackBannerView;
     private TextView mAdvertisementText;
     private TextView removeAdsTextView;
@@ -112,6 +110,8 @@ public class FWBannerView extends LinearLayout {
     private boolean showRemoveAdsTextView;
     private final LayersVisibility layersVisibility = new LayersVisibility();
 
+    private String adUnitId;
+
     public FWBannerView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, true, true, true, null);
     }
@@ -122,9 +122,8 @@ public class FWBannerView extends LinearLayout {
             boolean showFallbackBannerOnDismiss,
             boolean showDismissButton,
             boolean showRemoveAdsTextView,
-            String adUnitId) {
+            String adId) {
         super(context, attrs);
-        this.adUnitId = adUnitId;
         onBannerDismissedListener = null;
         onBannerLoadedListener = null;
         this.showFallbackBannerOnDismiss = showFallbackBannerOnDismiss;
@@ -135,6 +134,14 @@ public class FWBannerView extends LinearLayout {
         if (inflater != null) {
             try {
                 inflater.inflate(R.layout.view_frostwire_banner, this, true);
+
+                if (adId == null) {
+                    TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FWBannerView);
+                    adUnitId = typedArray.getString(R.styleable.FWBannerView_adUnitId);
+                } else {
+                    adUnitId = adId;
+                }
+
                 onFinishInflate();
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
@@ -147,9 +154,6 @@ public class FWBannerView extends LinearLayout {
             layoutParams.setLayoutDirection(LinearLayout.VERTICAL);
             layoutParams.setMargins(0, 0, 0, !showRemoveAdsTextView ? 20 : 0);
             setLayoutParams(layoutParams);
-        } else if (adUnitId == null) {
-            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FWBannerView);
-            this.adUnitId = typedArray.getString(R.styleable.FWBannerView_adUnitId);
         }
     }
 
@@ -182,7 +186,7 @@ public class FWBannerView extends LinearLayout {
 
     @Override
     protected void onFinishInflate() {
-        dismissBannerButton = findViewById(R.id.mopub_banner_dismiss_mopubview_button);
+        dismissBannerButton = findViewById(R.id.mopub_banner_dismiss_maxview_button);
         dismissBannerButton.setOnClickListener(onDismissBannerOnClickListener);
         dismissBannerButton.setClickable(true);
         dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
@@ -195,23 +199,29 @@ public class FWBannerView extends LinearLayout {
         removeAdsTextView.setClickable(true);
         removeAdsTextView.setOnClickListener(removeAdsTextViewOnClickListener);
 
-        maxAdView = new MaxAdView(this.adUnitId, getContext());
-        /**
-        <com.applovin.mediation.ads.MaxAdView
-        android:id="@+id/applovin_banner_maxadview"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
-         */
-        maxAdView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
-        maxAdView.setVisibility(View.GONE);
+        // Get references to the 2 possible versions of the add, currently with visibility=GONE
+        maxAdView320x50 = findViewById(R.id.applovin_banner_maxadview_320x50);
+        maxAdView320x50.setClickable(true);
+        maxAdView320x250 = findViewById(R.id.applovin_banner_maxadview_320x250);
+        maxAdView320x250.setClickable(true);
 
-        LinearLayout linearLayout = findViewById(R.id.fw_banner_linear_layout);
-        linearLayout.addView(maxAdView, 1);
+        //by default let's assign the small one as the current one
+        if (adUnitId == null) {
+            maxAdView = maxAdView320x50;
+        } else {
+            pickMaxAdViewByAdUnitId();
+        }
 
-        maxAdView.setClickable(true);
         super.onFinishInflate();
+    }
+
+    private void pickMaxAdViewByAdUnitId() {
+        if (FWBannerView.UNIT_ID_HOME.equals(adUnitId) || FWBannerView.UNIT_ID_PREVIEW_PLAYER_HORIZONTAL.equals(adUnitId)) {
+            maxAdView = maxAdView320x250;
+        }
+        if (FWBannerView.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId)) {
+            maxAdView = maxAdView320x50;
+        }
     }
 
     public boolean isLoaded() {
@@ -219,7 +229,10 @@ public class FWBannerView extends LinearLayout {
     }
 
     public void loadMaxBanner(final String adUnitId) {
+        loadMaxBanner();
+    }
 
+    public void loadMaxBanner() {
         isLoaded = false;
         long timeSinceLastBannerInit = System.currentTimeMillis() - lastInitAlbumArtBanner;
         if (timeSinceLastBannerInit < 5000) {
@@ -229,6 +242,9 @@ public class FWBannerView extends LinearLayout {
         if (Offers.disabledAds()) {
             return;
         }
+
+        pickMaxAdViewByAdUnitId();
+
         lastInitAlbumArtBanner = System.currentTimeMillis();
         if (maxAdView != null && dismissBannerButton != null) {
             if (!AppLovinAdNetwork.getInstance().started()) {
@@ -267,7 +283,9 @@ public class FWBannerView extends LinearLayout {
                             throw new IllegalArgumentException("MopubBannerView.loadFallbackBanner() - invalid/unknown adUnitId <" + adUnitId + ">");
                         }
 
-                        maxAdView.stopAutoRefresh();
+                        if (maxAdView != null) {
+                            maxAdView.stopAutoRefresh();
+                        }
 
                         try {
                             InHouseBannerFactory.loadAd(fallbackBannerView, adFormat);
