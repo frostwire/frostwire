@@ -17,6 +17,8 @@
  */
 package com.andrew.apollo.ui.activities;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
@@ -70,14 +72,12 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
-import com.frostwire.android.offers.MoPubAdNetwork;
-import com.frostwire.android.offers.MopubBannerView;
+import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -86,8 +86,6 @@ import com.frostwire.util.TaskThrottle;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * Apollo's "now playing" interface.
@@ -126,9 +124,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     // Album art
     private ImageView mAlbumArt;
 
-    // MoPub Banner
-    private MopubBannerView mMopubBannerView;
-    private MopubBannerView.OnBannerDismissedListener mopubBannerDismissedListener;
+    // FW Banner
+    private FWBannerView maxAdBannerView;
 
     // Tiny artwork
     private ImageView mAlbumArtSmall;
@@ -215,7 +212,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         // Cache all the items
         initPlaybackControls();
-        initMopubBannerView();
+        initMaxBannerView();
 
         // Album Art Ad Controls
         if (mPlayPauseButton != null) {
@@ -400,8 +397,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
             // We (onActivityResult) are invoked before onResume()
-            if (mMopubBannerView != null) {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            if (maxAdBannerView != null) {
+                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             }
             showAlbumArt();
             long removeAdsPurchaseTime = data.getLongExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP, 0);
@@ -435,7 +432,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
         initPlaybackControls();
-        initMopubBannerView();
+        initMaxBannerView();
         loadCurrentAlbumArt();
     }
 
@@ -487,8 +484,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mIsPaused = false;
 
         try {
-            if (mMopubBannerView != null) {
-                mMopubBannerView.destroy();
+            if (maxAdBannerView != null) {
+                maxAdBannerView.destroy();
             }
         } catch (Throwable ignored) {
             LOG.error(ignored.getMessage(), ignored);
@@ -575,7 +572,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Album art
         mAlbumArt = findView(R.id.audio_player_album_art);
         // MoPubBannerView
-        initMopubBannerView();
+        initMaxBannerView();
         // Small album art
         mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
@@ -595,30 +592,30 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mProgress.setOnSeekBarChangeListener(this);
         }
         showAlbumArt();
-        if (mMopubBannerView != null && !Offers.disabledAds()) {
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+        if (maxAdBannerView != null && !Offers.disabledAds()) {
+            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
         }
     }
 
-    private void initMopubBannerView() {
-        mMopubBannerView = findView(R.id.audio_player_mopub_banner_view);
-        if (mMopubBannerView != null) {
+    private void initMaxBannerView() {
+        maxAdBannerView = findView(R.id.audio_player_320x50_banner_view);
+        if (maxAdBannerView != null) {
             if (Offers.disabledAds()) {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
                 return;
             }
-            mMopubBannerView.setShowDismissButton(false);
-            mMopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
-            mMopubBannerView.setShowFallbackBannerOnDismiss(false);
-            mMopubBannerView.setOnBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.MOPUB, true));
-            mMopubBannerView.setOnFallbackBannerLoadedListener(() -> mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true));
+            maxAdBannerView.setShowDismissButton(false);
+            maxAdBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
+            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
+            maxAdBannerView.setShowFallbackBannerOnDismiss(false);
+            maxAdBannerView.setOnBannerLoadedListener(() -> maxAdBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
+            maxAdBannerView.setOnFallbackBannerLoadedListener(() -> maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
             deferredInitAlbumArtBanner();
         }
     }
 
     private void deferredInitAlbumArtBanner() {
-        if (mMopubBannerView == null) {
+        if (maxAdBannerView == null) {
             LOG.info("deferredInitAlbumArtBanner() mMopubBannerView is not ready or available for this layout (mMopubBannerView == null)");
             return;
         }
@@ -646,15 +643,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return;
         }
 
-        if (mMopubBannerView.areLayerVisible(MopubBannerView.Layers.MOPUB)) {
+        if (maxAdBannerView.areLayerVisible(FWBannerView.Layers.APPLOVIN)) {
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, ad is already visible");
             return;
         }
 
         if (waitingToInitAlbumArtBanner.get()) {
 
-            if (!mMopubBannerView.areLayerVisible(MopubBannerView.Layers.FALLBACK)) {
-                mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.FALLBACK, true);
+            if (!maxAdBannerView.areLayerVisible(FWBannerView.Layers.FALLBACK)) {
+                maxAdBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             }
 
             LOG.info("deferredInitAlbumArtBanner() aborting call to initAlbumArt, already waiting");
@@ -718,16 +715,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mAlbumArt != null) {
             mAlbumArt.setVisibility(View.VISIBLE);
         }
-        if (mMopubBannerView == null) {
+        if (maxAdBannerView == null) {
             LOG.info("initAlbumArtBanner() aborted: mMopubBannerView == null");
             return;
         }
         if (Offers.disabledAds()) {
             LOG.info("initAlbumArtBanner() aborted: Ads are disabled");
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             return;
         }
-        mMopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_AUDIO_PLAYER);
+        maxAdBannerView.loadMaxBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
     }
 
     /**
@@ -1164,8 +1161,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * /** Used to shared what the user is currently listening to
      */
     private void shareCurrentTrack() {
-        if (mMopubBannerView != null) {
-            mMopubBannerView.setLayersVisibility(MopubBannerView.Layers.ALL, false);
+        if (maxAdBannerView != null) {
+            maxAdBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
         }
         async(this, AudioPlayerActivity::shareTrackScreenshotTask);
     }
