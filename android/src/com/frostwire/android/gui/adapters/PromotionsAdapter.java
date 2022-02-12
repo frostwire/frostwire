@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,8 +37,7 @@ import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
-import com.frostwire.android.offers.MoPubAdNetwork;
-import com.frostwire.android.offers.MopubBannerView;
+import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
@@ -61,7 +60,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
     private final ImageLoader imageLoader;
-    private MopubBannerView mopubBannerView;
+    private FWBannerView fwBannerView;
     private int specialOfferLayout;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
 
@@ -163,7 +162,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
         // Plus (or when on landscape orientation) needs no special offer as we can't sell remove ads yet
         boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         // "ALL FREE DOWNLOADS" button shown last
@@ -211,28 +210,27 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         } else if (position == 0 && adsAreOn) {
             return setupRemoveAdsOfferView();
         } else if (position == 1 && adsAreOn && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
-            return getMopubBannerView();
+            return getFwBannerView();
         } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
             return super.getView(position - 2, null, parent);
         }
         return null;
     }
 
-    private MopubBannerView getMopubBannerView() {
-        if (mopubBannerView == null) {
-            mopubBannerView = new MopubBannerView(getContext(),
+    private FWBannerView getFwBannerView() {
+        if (fwBannerView == null) {
+            fwBannerView = new FWBannerView(
+                    getContext(),
                     null,
                     true,
                     false,
-                    false);
-            mopubBannerView.setOnBannerLoadedListener(() -> mopubBannerView.setShowDismissButton(false));
-            // will ANR after MoPub 5.4.0, tried putting it on a background thread, but then when the ad
-            // is destroyed it triggers a android.view.ViewRootImpl$CalledFromWrongThreadException
-            // temp fix placed in MoPubAdNetwork.java#126
-            mopubBannerView.loadFallbackBanner(MoPubAdNetwork.UNIT_ID_HOME);
-            mopubBannerView.loadMoPubBanner(MoPubAdNetwork.UNIT_ID_HOME);
+                    false,
+                    FWBannerView.UNIT_ID_HOME);
+            fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setShowDismissButton(false));
+            //fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_HOME);
+            fwBannerView.loadMaxBanner();
         }
-        return mopubBannerView;
+        return fwBannerView;
     }
 
     private View getLandscapeView(int position, View convertView, ViewGroup parent) {
@@ -246,13 +244,11 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @Nullable
     private View setupRemoveAdsOfferView() {
         String pitch = getContext().getString(UIUtils.randomPitchResId(true));
-        if (pitch != null) {
-            View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
-            TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
-            if (pitchTitle != null) {
-                pitchTitle.setText(pitch);
-                return specialOfferView;
-            }
+        View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
+        TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
+        if (pitchTitle != null) {
+            pitchTitle.setText(pitch);
+            return specialOfferView;
         }
         return null;
     }
@@ -285,8 +281,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     }
 
     public void onDestroyView() {
-        if (mopubBannerView != null) {
-            mopubBannerView.destroy();
+        if (fwBannerView != null) {
+            fwBannerView.destroy();
         }
     }
 }
