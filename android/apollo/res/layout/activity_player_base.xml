@@ -114,7 +114,7 @@
 
             <com.frostwire.android.offers.FWBannerView
                 app:adUnitId="c902517bad27d4d7"
-                android:id="@+id/audio_player_applovin_banner_view"
+                android:id="@+id/audio_player_320x50_banner_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/audio_player_album_art"
