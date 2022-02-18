@@ -15,10 +15,11 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@color/app_background_body_light"
-              android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:background="@color/app_background_body_light"
+        android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
 
@@ -85,10 +86,14 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-            <com.mopub.mobileads.MoPubView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
+            <com.frostwire.android.offers.FWBannerView
+                    app:adUnitId="bd3bb3726c452b46"
+                    app:showRemoveAdsTextView="true"
+                    android:id="@+id/audio_player_320x250_banner_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|top"
+                    android:visibility="visible" />
 
             <ImageView
                 android:layout_width="match_parent"
@@ -246,13 +251,13 @@
         </LinearLayout>
 
         <View
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginEnd="36dp"
-            android:layout_marginRight="36dp" />
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginEnd="36dp"
+                android:layout_marginRight="36dp" />
 
         <TextView
             android:layout_width="wrap_content"

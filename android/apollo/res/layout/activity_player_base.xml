@@ -112,13 +112,13 @@
                     android:scaleType="fitXY"
                     android:visibility="visible" />
 
-            <!-- fw banner was here -->
             <com.frostwire.android.offers.FWBannerView
                     app:adUnitId="c902517bad27d4d7"
+                    app:showRemoveAdsTextView="true"
                     android:id="@+id/audio_player_320x50_banner_view"
                     android:layout_width="match_parent"
-                    android:layout_marginBottom="-75dp"
-                    android:layout_height="100dp"
+                    android:layout_marginBottom="-125dp"
+                    android:layout_height="150dp"
                     android:layout_alignBottom="@+id/audio_player_album_art"
                     android:layout_gravity="center_horizontal"
                     android:visibility="visible" />
