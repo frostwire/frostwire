@@ -211,8 +211,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         mPlaybackStatus = new PlaybackStatus(this);
 
         // Cache all the items
-        initPlaybackControls();
-        initMaxBannerView();
+        initPlaybackControls(); // calls initFWBannerView()
 
         // Album Art Ad Controls
         if (mPlayPauseButton != null) {
@@ -235,6 +234,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+        initPlaybackControls();
         startPlayback();
     }
 
@@ -411,6 +411,16 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
 
+        waitingToInitAlbumArtBanner.set(false);
+        // Set the playback drawables
+        updatePlaybackControls();
+        // Current info
+        updateNowPlayingInfo();
+        // Refresh the queue
+        ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+        initPlaybackControls();
+        loadCurrentAlbumArt();
+
         Intent intent = getIntent();
         if (intent != null) {
             Uri dataUri = intent.getData();
@@ -423,17 +433,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 onNewIntent(intent);
             }
         }
-
-        waitingToInitAlbumArtBanner.set(false);
-        // Set the playback drawables
-        updatePlaybackControls();
-        // Current info
-        updateNowPlayingInfo();
-        // Refresh the queue
-        ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-        initPlaybackControls();
-        initMaxBannerView();
-        loadCurrentAlbumArt();
     }
 
     @Override
@@ -572,7 +571,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Album art
         mAlbumArt = findView(R.id.audio_player_album_art);
         // MoPubBannerView
-        initMaxBannerView();
+        initFWBannerView();
         // Small album art
         mAlbumArtSmall = findView(R.id.audio_player_switch_album_art);
         // Current time
@@ -597,8 +596,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private void initMaxBannerView() {
-        fwBannerView = findView(R.id.audio_player_320x50_banner_view);
+    private void initFWBannerView() {
+        fwBannerView = findView(UIUtils.isPortrait(this) ? R.id.audio_player_320x50_banner_view : R.id.audio_player_320x250_banner_view);
         if (fwBannerView != null) {
             if (Offers.disabledAds()) {
                 fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
@@ -608,8 +607,18 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             fwBannerView.setShowFallbackBannerOnDismiss(false);
-            fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
-            //fwBannerView.setOnFallbackBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
+            fwBannerView.setOnBannerLoadedListener(() -> {
+                fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
+                if (!UIUtils.isPortrait(this)) {
+                    // we don't use hideAlbumArt because it then shows the playlist queue controls
+                    mAlbumArt.setVisibility(View.INVISIBLE);
+                }
+            });
+            fwBannerView.setOnBannerDismissedListener(() -> {
+                if (!UIUtils.isPortrait(this)) {
+                    mAlbumArt.setVisibility(View.VISIBLE);
+                }
+            });
             deferredInitAlbumArtBanner();
             fwBannerView.loadMaxBanner();
         }
@@ -744,12 +753,21 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void onLastKnownUpdatePostTask() {
-        // Set the track name
-        mTrackName.setText(lastTrackName);
-        // Set the artist name
-        mArtistName.setText(lastArtistAndAlbumNames);
-        // Set the total time
-        mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
+        if (mTrackName == null || mArtistName == null || mTotalTime == null) {
+            initPlaybackControls();
+        }
+        if (mTrackName != null && lastTrackName != null) {
+            // Set the track name
+            mTrackName.setText(lastTrackName);
+        }
+        if (mArtistName != null && lastArtistAndAlbumNames != null) {
+            // Set the artist name
+            mArtistName.setText(lastArtistAndAlbumNames);
+        }
+        if (mTotalTime != null) {
+            // Set the total time
+            mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
+        }
 
         loadCurrentAlbumArt();
         updateQueueFragmentCurrentSong();
