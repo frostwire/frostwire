@@ -109,6 +109,7 @@
 
     <declare-styleable name="FWBannerView">
         <attr name="adUnitId" format="string" />
+        <attr name="showRemoveAdsTextView" format="boolean" />
     </declare-styleable>
 
 </resources>

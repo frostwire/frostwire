@@ -134,14 +134,14 @@ public class FWBannerView extends LinearLayout {
         if (inflater != null) {
             try {
                 inflater.inflate(R.layout.view_frostwire_banner, this, true);
-
+                TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FWBannerView);
                 if (adId == null) {
-                    TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FWBannerView);
                     adUnitId = typedArray.getString(R.styleable.FWBannerView_adUnitId);
                 } else {
                     adUnitId = adId;
                 }
 
+                this.showRemoveAdsTextView = typedArray.getBoolean(R.styleable.FWBannerView_showRemoveAdsTextView, this.showRemoveAdsTextView);
                 onFinishInflate();
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
@@ -190,12 +190,12 @@ public class FWBannerView extends LinearLayout {
         dismissBannerButton.setOnClickListener(onDismissBannerOnClickListener);
         dismissBannerButton.setClickable(true);
         dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
-        fallbackBannerView = findViewById(R.id.mopub_banner_fallback_imageview);
+        fallbackBannerView = findViewById(R.id.fwbanner_fallback_imageview);
         fallbackBannerView.setClickable(true);
         mAdvertisementText = findViewById(R.id.fwbanner_advertisement_text);
         mAdvertisementText.setOnClickListener(onDismissBannerOnClickListener);
         mAdvertisementText.setClickable(true);
-        removeAdsTextView = findViewById(R.id.mopub_banner_remove_ads_text_link);
+        removeAdsTextView = findViewById(R.id.fwbanner_remove_ads_text_link);
         removeAdsTextView.setClickable(true);
         removeAdsTextView.setOnClickListener(removeAdsTextViewOnClickListener);
 
