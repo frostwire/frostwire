@@ -104,23 +104,24 @@
             android:layout_alignParentRight="true">
 
             <com.andrew.apollo.widgets.SquareImageView
-                android:id="@+id/audio_player_album_art"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerHorizontal="true"
-                android:padding="16dp"
-                android:scaleType="fitXY"
-                android:visibility="visible" />
+                    android:id="@+id/audio_player_album_art"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:padding="16dp"
+                    android:scaleType="fitXY"
+                    android:visibility="visible" />
 
+            <!-- fw banner was here -->
             <com.frostwire.android.offers.FWBannerView
-                app:adUnitId="c902517bad27d4d7"
-                android:id="@+id/audio_player_320x50_banner_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/audio_player_album_art"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="-123dp"
-                android:visibility="visible" />
+                    app:adUnitId="c902517bad27d4d7"
+                    android:id="@+id/audio_player_320x50_banner_view"
+                    android:layout_width="match_parent"
+                    android:layout_marginBottom="-75dp"
+                    android:layout_height="100dp"
+                    android:layout_alignBottom="@+id/audio_player_album_art"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="visible" />
 
             <FrameLayout
                 android:id="@+id/audio_player_pager_container"

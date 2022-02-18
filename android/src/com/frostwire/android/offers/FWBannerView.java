@@ -186,13 +186,13 @@ public class FWBannerView extends LinearLayout {
 
     @Override
     protected void onFinishInflate() {
-        dismissBannerButton = findViewById(R.id.mopub_banner_dismiss_maxview_button);
+        dismissBannerButton = findViewById(R.id.fwbanner_dismiss_maxview_button);
         dismissBannerButton.setOnClickListener(onDismissBannerOnClickListener);
         dismissBannerButton.setClickable(true);
         dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
         fallbackBannerView = findViewById(R.id.mopub_banner_fallback_imageview);
         fallbackBannerView.setClickable(true);
-        mAdvertisementText = findViewById(R.id.mopub_banner_advertisement_text);
+        mAdvertisementText = findViewById(R.id.fwbanner_advertisement_text);
         mAdvertisementText.setOnClickListener(onDismissBannerOnClickListener);
         mAdvertisementText.setClickable(true);
         removeAdsTextView = findViewById(R.id.mopub_banner_remove_ads_text_link);

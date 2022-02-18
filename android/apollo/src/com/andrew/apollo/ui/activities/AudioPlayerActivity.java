@@ -609,8 +609,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             fwBannerView.setShowFallbackBannerOnDismiss(false);
             fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
-            fwBannerView.setOnFallbackBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
+            //fwBannerView.setOnFallbackBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true));
             deferredInitAlbumArtBanner();
+            fwBannerView.loadMaxBanner();
         }
     }
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
@@ -19,87 +18,85 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fw_banner_linear_layout"
-    android:layout_height="wrap_content"
-    android:layout_width="match_parent"
-    android:orientation="vertical"
-    android:layout_marginBottom="7dp">
+        android:id="@+id/fw_banner_linear_layout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_marginBottom="7dp">
 
     <LinearLayout
-        android:gravity="center_vertical"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="horizontal">
+            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:orientation="horizontal">
 
         <ImageButton
-            android:background="@null"
-            android:layout_gravity="center_horizontal|start"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:src="@drawable/ad_cancel"
-            android:visibility="invisible"/>
+                android:background="@null"
+                android:layout_gravity="center_horizontal|start"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ad_cancel"
+                android:visibility="invisible" />
 
         <TextView
-            android:gravity="center"
-            android:id="@+id/mopub_banner_advertisement_text"
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:layout_width="wrap_content"
-            android:text="@string/advertisement"
-            android:textColor="@color/app_text_disabled"
-            android:visibility="gone"/>
+                android:gravity="center"
+                android:id="@+id/fwbanner_advertisement_text"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:layout_width="wrap_content"
+                android:text="@string/advertisement"
+                android:textColor="@color/app_text_disabled"
+                android:visibility="gone" />
 
         <ImageButton
-            android:background="@null"
-            android:id="@+id/mopub_banner_dismiss_maxview_button"
-            android:layout_gravity="center_vertical|end"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_width="wrap_content"
-            android:src="@drawable/ad_cancel"
-            android:visibility="gone"/>
+                android:background="@null"
+                android:id="@+id/fwbanner_dismiss_maxview_button"
+                android:layout_gravity="center_vertical|end"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ad_cancel"
+                android:visibility="gone" />
     </LinearLayout>
 
-    <com.applovin.mediation.ads.MaxAdView
-            xmlns:maxads="http://schemas.applovin.com/android/1.0"
+    <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
             maxads:adUnitId="c902517bad27d4d7"
-        android:id="@+id/applovin_banner_maxadview_320x50"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="gone"/>
-
-    <com.applovin.mediation.ads.MaxAdView
-            xmlns:maxads="http://schemas.applovin.com/android/1.0"
-            maxads:adUnitId="84abad953f40b933"
-            android:id="@+id/applovin_banner_maxadview_320x250"
-            android:layout_height="wrap_content"
+            android:id="@+id/applovin_banner_maxadview_320x50"
+            android:layout_height="match_parent"
             android:layout_width="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:visibility="gone"/>
+            android:visibility="gone" />
+
+    <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
+            maxads:adUnitId="84abad953f40b933"
+            android:id="@+id/applovin_banner_maxadview_320x250"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/mopub_banner_fallback_imageview"
-        android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:visibility="visible"/>
+            android:id="@+id/mopub_banner_fallback_imageview"
+            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="visible" />
 
     <TextView
-        android:gravity="center"
-        android:id="@+id/mopub_banner_remove_ads_text_link"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:paddingTop="20dp"
-        android:paddingBottom="5dp"
-        android:text="@string/remove_ads"
-        android:textColor="@color/basic_blue_highlight_dark"
-        android:textSize="@dimen/text_medium"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+            android:gravity="center"
+            android:id="@+id/mopub_banner_remove_ads_text_link"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:paddingTop="20dp"
+            android:paddingBottom="5dp"
+            android:text="@string/remove_ads"
+            android:textColor="@color/basic_blue_highlight_dark"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
 </LinearLayout>
