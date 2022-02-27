@@ -35,22 +35,20 @@ import java.util.concurrent.TimeUnit;
 public class AppLovinMaxInterstitialAdapter implements InterstitialListener, MaxAdListener {
     private static final Logger LOG = Logger.getLogger(AppLovinMaxInterstitialAdapter.class);
     private int retryAttempt;
-    private MaxInterstitialAd interstitialAd;
+    private final MaxInterstitialAd interstitialAd;
     private final WeakReference<? extends Activity> activityRef;
     private final Application app;
-    private final AppLovinAdNetwork appLovinAdNetwork;
-
 
     private boolean finishAfterDismiss = false;
     private boolean shutdownAfter = false;
     private boolean wasPlayingMusic = false;
 
-
-    AppLovinMaxInterstitialAdapter(AppLovinAdNetwork appLovinAdNetwork, Activity parentActivity) {
+    AppLovinMaxInterstitialAdapter(Activity parentActivity) {
         this.activityRef = Ref.weak(parentActivity);
-        this.appLovinAdNetwork = appLovinAdNetwork;
         this.app = parentActivity.getApplication();
-        createInterstitialAd();
+        interstitialAd = new MaxInterstitialAd(FWBannerView.UNIT_ID_INTERSTITIAL_MOBILE, activityRef.get());
+        interstitialAd.setListener(this);
+        interstitialAd.loadAd();
     }
 
     @Override
@@ -115,24 +113,12 @@ public class AppLovinMaxInterstitialAdapter implements InterstitialListener, Max
         // AppLovin recommends that you retry with exponentially higher delays up to a maximum delay (in this case 64 seconds)
         retryAttempt++;
         long delayMillis = TimeUnit.SECONDS.toMillis((long) Math.pow(2, Math.min(6, retryAttempt)));
-        SystemUtils.postToUIThread(() -> interstitialAd.loadAd(), delayMillis);
+        SystemUtils.postToUIThread(interstitialAd::loadAd, delayMillis);
     }
 
     @Override
     public void onAdDisplayFailed(MaxAd ad, MaxError error) {
         // Interstitial ad failed to display. AppLovin recommends that you load the next ad.
-        interstitialAd.loadAd();
-    }
-
-    private void createInterstitialAd() {
-        if (!Ref.alive(activityRef)) {
-            LOG.error("createInterstitialAd failed. Lost reference to activity. Not creating interstitial");
-            return;
-        }
-        interstitialAd = new MaxInterstitialAd(FWBannerView.UNIT_ID_INTERSTITIAL_MOBILE, activityRef.get());
-        interstitialAd.setListener(this);
-
-        // Load the first ad
         interstitialAd.loadAd();
     }
 

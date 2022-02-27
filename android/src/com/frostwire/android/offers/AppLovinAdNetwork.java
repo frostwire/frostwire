@@ -81,7 +81,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
 
     @Override
     public void loadNewInterstitial(Activity activity) {
-        interstitialAdapter = new AppLovinMaxInterstitialAdapter(this, activity);
+        interstitialAdapter = new AppLovinMaxInterstitialAdapter(activity);
     }
 
     @Override
