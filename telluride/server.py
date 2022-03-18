@@ -62,7 +62,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
         [shutdown=1] if passed it will shutdown the server
         '''
         gtfo = reject_remote_requests()
-        if gtfo != None:
+        if gtfo is not None:
             return gtfo
 
         query = request.args.to_dict()
@@ -83,7 +83,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
         rejects connections not coming from localhost|127.0.0.1
         '''
         gtfo = reject_remote_requests()
-        if gtfo != None:
+        if gtfo is not None:
             return gtfo
         return jsonify({'build' : build_number, 'message': 'pong'})
 
