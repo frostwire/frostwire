@@ -1,3 +1,10 @@
+build 22 - mar/18/2022
+ - http server now has /ping url handler
+ - pip-22.0.4
+ - astroid-2.11.0
+ - flask-2.0.3
+ - pyinstaller-4.10
+
 build 21 - jan/12/2022
  - python 3.10.1 adjustments
  - pyinstaller 4.8

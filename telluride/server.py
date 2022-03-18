@@ -1,4 +1,3 @@
-
 '''
 Telluride Cloud Video Downloader.
 Copyright 2020-2021 FrostWire LLC.
@@ -49,6 +48,11 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
     '''
     app = Flask(f'TellurideWebServer_{build_number}')
 
+    def reject_remote_requests():
+        #pylint: disable=unused-variable
+        if request.remote_addr not in ('127.0.0.1', 'localhost'):
+            return jsonify({'build': build_number, 'message': 'gtfo'}), 403
+        return None
     @app.route('/')
     def root_handler():
         '''
@@ -57,9 +61,10 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
         url=<url encoded video page url to obtain json metadata from>
         [shutdown=1] if passed it will shutdown the server
         '''
-        #pylint: disable=unused-variable
-        if request.remote_addr not in ('127.0.0.1', 'localhost'):
-            return jsonify({'build': build_number, 'message': 'gtfo'}), 403
+        gtfo = reject_remote_requests()
+        if gtfo != None:
+            return gtfo
+
         query = request.args.to_dict()
         print(query)
         if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
@@ -70,5 +75,16 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
         if 'url' in query:
             return query_video(query['url']), 200
         return jsonify({'build' : build_number, 'message': 'no valid parameters received'})
+
+    @app.route('/ping')
+    def ping_handler():
+        '''
+        http ping handler, use this to determine if the server is up.
+        rejects connections not coming from localhost|127.0.0.1
+        '''
+        gtfo = reject_remote_requests()
+        if gtfo != None:
+            return gtfo
+        return jsonify({'build' : build_number, 'message': 'pong'})
 
     app.run(host='127.0.0.1', port=http_port_number, threaded=True)
