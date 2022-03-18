@@ -231,12 +231,22 @@ public abstract class SearchEngine {
     };
 
     public static void startTellurideRPCServer() {
-        // TODO: Check if Telluride is already up and tell it to shutdown if so
-        // Then we launch a new process
         if (TELLURIDE_LAUNCHER == null) {
             TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
             if (TELLURIDE_LAUNCHER != null) {
                 LOG.info("TELLURIDE_LAUNCHER: File -> " + TELLURIDE_LAUNCHER.getAbsolutePath());
+
+                // Trust but verify,
+                if (TellurideLauncher.checkIfUpAlready(TELLURIDE_RPC_PORT.getValue())) {
+                    LOG.info("SearchEngine.startTellurideRPCServer() Telluride was up already, previously bad shutdown. Let's shut it down and restart it...");
+                    TellurideLauncher.shutdownServer(TELLURIDE_RPC_PORT.getValue());
+                    TellurideLauncher.SERVER_UP.set(false);
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 if (!TellurideLauncher.SERVER_UP.get()) {
                     LOG.info("Launching Telluride RPC Server on " + TELLURIDE_RPC_PORT.getValue() + "...");

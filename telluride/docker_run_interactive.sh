@@ -1,6 +1,6 @@
 docker \
  run \
- --cpus 16 \
+ --cpus 10 \
  -v "$PWD/../telluride:/telluride-ubuntu" \
  -it telluride-ubuntu
 
