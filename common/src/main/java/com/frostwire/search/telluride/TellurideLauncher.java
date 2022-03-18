@@ -21,6 +21,8 @@ import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,7 +83,8 @@ public final class TellurideLauncher {
     /**
      * We're not using this method anymore, we now communicate with Telluride via HTTP
      * We're leaving this code for unit test purposes.
-     * @param metaOnly        Get only metadata about the downloadUrl. If set to true, it ignores audioOnly
+     *
+     * @param metaOnly Get only metadata about the downloadUrl. If set to true, it ignores audioOnly
      */
     public static void launch(final File executable,
                               final String downloadUrl,
@@ -175,5 +178,23 @@ public final class TellurideLauncher {
                 e.printStackTrace();
             }
         };
+    }
+
+    private static class TelluridePong {
+        int build;
+        String message;
+    }
+
+    public static boolean checkIfUpAlready(int port) {
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        try {
+            String json = httpClient.get(String.format("http://127.0.0.1:%d/ping", port), 150);
+            Gson gson = new GsonBuilder().create();
+            TelluridePong telluridePong = gson.fromJson(json, TelluridePong.class);
+            return telluridePong != null && telluridePong.message.equalsIgnoreCase("pong");
+        } catch (IOException e) {
+            LOG.info("TellurideLauncher.checkIfUpAlready() not up, let's go.\n" + e.getMessage());
+            return false;
+        }
     }
 }
