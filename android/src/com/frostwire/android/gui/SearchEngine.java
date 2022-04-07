@@ -19,6 +19,8 @@ package com.frostwire.android.gui;
 
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.search.SearchPerformer;
@@ -35,7 +37,6 @@ import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
@@ -98,6 +99,7 @@ public abstract class SearchEngine {
         this.active = active;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return name;
@@ -304,13 +306,6 @@ public abstract class SearchEngine {
     };
 
 
-    public static final SearchEngine TORRENT_PARADISE = new SearchEngine("TorrentParadise", Constants.PREF_KEY_SEARCH_USE_TORRENT_PARADISE) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorrentParadiseSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public static final SearchEngine GLOTORRENTS = new SearchEngine("GloTorrents", Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -319,7 +314,6 @@ public abstract class SearchEngine {
     };
 
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
-            TORRENT_PARADISE,
             MAGNETDL,
             TORRENTZ2,
             YIFY,

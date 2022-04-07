@@ -33,7 +33,6 @@ import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.torrentparadise.TorrentParadiseSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
@@ -218,11 +217,6 @@ public abstract class SearchEngine {
             return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine TORRENTPARADISE = new SearchEngine(SearchEngineID.TORRENTPARADISE_ID, "TorrentParadise", SearchEnginesSettings.TORRENTPARADISE_ENABLED, "torrent-paradise.ml") {
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorrentParadiseSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
     private static final SearchEngine GLOTORRENTS = new SearchEngine(SearchEngineID.GLOTORRENTS_ID, "GloTorrents", SearchEnginesSettings.GLOTORRENTS_ENABLED, "gtdb.to") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -297,7 +291,6 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine> candidates = Arrays.asList(
-                TORRENTPARADISE,
                 MAGNETDL,
                 TORRENTZ2,
                 ZOOQLE,

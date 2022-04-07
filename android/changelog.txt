@@ -1,3 +1,6 @@
+FrostWire 2.4.8 build 691 - APR/06/2022
+ - Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
+
 FrostWire 2.4.7 build 690 - FEB/18/2022
  - fixes a crash on audio player screen when rotating to landscape
  - libtorrent: turn off tracker certificate validation on jlibtorrent to increase

@@ -1,3 +1,8 @@
+frostwire (6.9.8) stable; urgency=high
+  * Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
+
+ -- FrostWire Team <contact@frostwire.com>  Wed, 6 Apr 2022 18:21:00 -0600
+
 frostwire (6.9.7) stable; urgency=high
   * New mplayer 12.0.5/ffmpeg 4.2.1 build.
   * macOS arm64 and x86_64 fwplayer builds
