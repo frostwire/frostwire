@@ -1,5 +1,6 @@
 frostwire (6.9.8) stable; urgency=high
   * Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
+  * org.junit.jupiter:junit-jupiter:5.8.2
 
  -- FrostWire Team <contact@frostwire.com>  Wed, 6 Apr 2022 18:21:00 -0600
 
