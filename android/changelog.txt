@@ -1,4 +1,5 @@
-FrostWire 2.4.8 build 691 - APR/06/2022
+FrostWire 2.4.8 build 691 - APR/11/2022
+ - TorLock search fixed
  - Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
  - com.android.billingclient:billing:4.1.0
 
