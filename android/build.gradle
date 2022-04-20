@@ -218,7 +218,7 @@ dependencies {
     implementation 'com.applovin:applovin-sdk:11.1.2'
     implementation 'com.unity3d.ads:unity-ads:3.7.5'
 
-    def jlibtorrent_version = '1.2.15.2'
+    def jlibtorrent_version = '1.2.16.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
 
     // att free phones use this and crashes

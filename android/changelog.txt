@@ -1,7 +1,19 @@
-FrostWire 2.4.8 build 691 - APR/11/2022
+FrostWire 2.4.8 build 691 - APR/20/2022
  - TorLock search fixed
  - Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
  - com.android.billingclient:billing:4.1.0
+ - Expose settings_pack.validate_https_trackers with SettingsPack::validateHttpsTrackers methods
+ - lt:upgrade to boost 1.79
+ - lt:openssl 1.1.1n upgrade
+ - lt:fix bdecode support for large strings (>= 100 MB)
+ - lt:send User-Agent field in anonymous mode
+ - lt:fix python binding for settings_pack conversion
+ - lt:fix DHT announce timer issue
+ - lt:use DSCP_TRAFFIC_TYPE socket option on windows
+ - lt:update default ToS setting according to RFC 8622
+ - lt:keep trying to announce to trackers even when all fail
+ - lt:don't disable announcing from local endpoints because of temporary failures
+ - lt:fix issue in parsing UPnP XML response with multiple forwarding services
 
 FrostWire 2.4.7 build 690 - FEB/18/2022
  - fixes a crash on audio player screen when rotating to landscape
