@@ -154,12 +154,13 @@ public class LifecycleManagerImpl implements LifecycleManager {
         shutdown();
         if (toExecute != null) {
             try {
+                String cmd = parseCommand(toExecute).trim();
+                String params = toExecute.substring(cmd.length()).trim();
+                
                 if (OSUtils.isWindowsVista()) {
-                    String cmd = parseCommand(toExecute).trim();
-                    String params = toExecute.substring(cmd.length()).trim();
                     SystemUtils.openFile(cmd, params);
                 } else {
-                    Runtime.getRuntime().exec(toExecute);
+                    new ProcessBuilder(cmd, params).start();
                 }
             } catch (IOException ignored) {
             }
