@@ -210,9 +210,6 @@ public class LifecycleManagerImpl implements LifecycleManager {
                 }
                 //LOG.info("Running GC");
                 System.gc();
-                //LOG.info("GC finished, running finalizers");
-                System.runFinalization();
-                //LOG.info("Finalizers finished.");
             }
         }, "ManualGC");
         t.setDaemon(true);
