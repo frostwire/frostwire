@@ -153,8 +153,6 @@ public final class Constants {
 
     public static final String MY_FILES_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION = "com.frostwire.android.BROWSE_PEER_FRAGMENT_LISTVIEW_FIRST_VISIBLE_POSITION.";
 
-    public static final String ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS = "frostwire.prefs.gui.asked_for_access_coarse_location_permissions";
-
     // generic file types
     public static final byte FILE_TYPE_AUDIO = 0x00;
     public static final byte FILE_TYPE_PICTURES = 0x01;

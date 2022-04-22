@@ -122,7 +122,7 @@ public class MainActivity extends AbstractActivity implements
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
 
-    private AtomicBoolean shuttingdown = new AtomicBoolean(false);
+    private AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -183,14 +183,14 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void shutdown() {
-        if (shuttingdown.get()) {
+        if (shuttingDown.get()) {
             // NOTE: the actual solution should be for a re-architecture for
             // a guarantee of a single call of this logic.
             // For now, just mitigate the double call if coming from the exit
             // and at the same time the close of the interstitial
             return;
         }
-        shuttingdown.set(true);
+        shuttingDown.set(true);
         LocalSearchEngine.instance().cancelSearch();
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
@@ -391,10 +391,6 @@ public class MainActivity extends AbstractActivity implements
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
-        // COARSE
-        final DangerousPermissionsChecker accessCoarseLocationChecker =
-                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
-        checkers.put(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE, accessCoarseLocationChecker);
         // add more permissions checkers if needed...
         return checkers;
     }
@@ -421,17 +417,6 @@ public class MainActivity extends AbstractActivity implements
         }
 
         checkExternalStoragePermissions();//OrBindMusicService();
-        checkAccessCoarseLocationPermissions();
-    }
-
-    private void checkAccessCoarseLocationPermissions() {
-        DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.ACCESS_COARSE_LOCATION_PERMISSIONS_REQUEST_CODE);
-        if (checker != null && !checker.hasAskedBefore()) {
-            checker.requestPermissions();
-            ConfigurationManager.instance().setBoolean(Constants.ASKED_FOR_ACCESS_COARSE_LOCATION_PERMISSIONS, true);
-        } else {
-            LOG.info("Asked for ACCESS_COARSE_LOCATION before, skipping.");
-        }
     }
 
     private void checkExternalStoragePermissions() {
