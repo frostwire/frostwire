@@ -3,6 +3,7 @@ FrostWire 2.4.8 build 691 - APR/20/2022
  - Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
  - com.android.billingclient:billing:4.1.0
  - Expose settings_pack.validate_https_trackers with SettingsPack::validateHttpsTrackers methods
+ - Privacy improvement: App no longer requires asking user for location
  - lt:upgrade to boost 1.79
  - lt:openssl 1.1.1n upgrade
  - lt:fix bdecode support for large strings (>= 100 MB)
