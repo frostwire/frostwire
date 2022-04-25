@@ -1,10 +1,23 @@
 frostwire (6.9.8) stable; urgency=high
   * TorLock search fixed
   * Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
+  * Telluride Build 22
   * com.squareup.okhttp3:okhttp:4.9.3
   * org.junit.jupiter:junit-jupiter:5.8.2
+  * jlibtorrent 1.2.16.0 (boost 1.79, openssl 1.1.1n)
+  * lt:upgrade to boost 1.79
+  * lt:openssl 1.1.1n upgrade
+  * lt:fix bdecode support for large strings (>= 100 MB)
+  * lt:send User-Agent field in anonymous mode
+  * lt:fix python binding for settings_pack conversion
+  * lt:fix DHT announce timer issue
+  * lt:use DSCP_TRAFFIC_TYPE socket option on windows
+  * lt:update default ToS setting according to RFC 8622
+  * lt:keep trying to announce to trackers even when all fail
+  * lt:don't disable announcing from local endpoints because of temporary failures
+  * lt:fix issue in parsing UPnP XML response with multiple forwarding services
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 11 Apr 2022 09:03:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 25 Apr 2022 13:03:00 -0600
 
 frostwire (6.9.7) stable; urgency=high
   * New mplayer 12.0.5/ffmpeg 4.2.1 build.
