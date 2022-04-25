@@ -1,4 +1,5 @@
 frostwire (6.9.8) stable; urgency=high
+  * Java Runtime Environment 18.0.1 update
   * TorLock search fixed
   * Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
   * Telluride Build 22
