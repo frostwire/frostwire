@@ -122,7 +122,9 @@ final class UpdateMessageReader implements ContentHandler {
     public void endElement(String uri, String name, String qName) throws SAXException {
         // discard buffer message if it's not meant for me right away.
         if (!isMessageForMe(_bufferMessage)) {
-            LOG.info("UpdateMessageReader.endElement() Discarding message (os=" + _bufferMessage.getOs() + ")");
+            if (_bufferMessage != null) {
+                LOG.info("UpdateMessageReader.endElement() Discarding message (os=" + _bufferMessage.getOs() + ")");
+            }
             _bufferMessage = null;
             return;
         }
