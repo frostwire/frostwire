@@ -67,11 +67,13 @@ public final class TellurideLauncher {
                         processBuilder.directory(saveDirectory);
                     }
                     try {
-                        processBuilder.start();
-                        // The telluride process doesn't start right away, we wait 5 seconds to be safe before setting the
-                        // SERVER_UP flag to true. TellurideSearchPerformer waits for up to 10 seconds to give up
-                        Thread.currentThread().sleep(6000);
-                        LOG.info("TellurideLauncher::launchServer RPC server should be up successfully at http://127.0.0.1:" + port);
+                        Process process = processBuilder.start();
+                        // The telluride process doesn't start right away, we wait 8 seconds to be safe before
+                        // pinging to set the SERVER_UP flag to true.
+                        // TellurideSearchPerformer waits for up to 10 seconds to give up
+                        Thread.currentThread().sleep(8000);
+                        LOG.info("TellurideLauncher::launchServer is process alive: " + process.isAlive());
+                        LOG.info("TellurideLauncher::launchServer RPC server should be up at http://127.0.0.1:" + port);
                         LOG.info("TellurideLauncher::launchServer pinging...");
                         SERVER_UP.set(TellurideLauncher.checkIfUpAlready(port));
                         if (!SERVER_UP.get()) {
@@ -79,9 +81,10 @@ public final class TellurideLauncher {
                         } else {
                             LOG.info("TellurideLauncher::launchServer success, got a pong back from Telluride");
                         }
+
                     } catch (Throwable e) {
                         SERVER_UP.set(false);
-                        e.printStackTrace();
+                        LOG.error("TellurideLauncher::launchServer error: " + e.getMessage(),e);
                     }
                 },
                 "telluride-server-on-port-" + port);
