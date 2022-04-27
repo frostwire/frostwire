@@ -38,7 +38,6 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static Calendar calendar = null;
     private final CountDownLatch performerLatch;
     private final int TELLURIDE_RPC_PORT = 47999;
-
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
 

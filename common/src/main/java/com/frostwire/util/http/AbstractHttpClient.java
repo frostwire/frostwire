@@ -119,8 +119,8 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
-    public String get(String url, int timeout) throws IOException {
-        return get(url, timeout, DEFAULT_USER_AGENT);
+    public String get(String url, int timeoutInMillis) throws IOException {
+        return get(url, timeoutInMillis, DEFAULT_USER_AGENT);
     }
 
     @Override

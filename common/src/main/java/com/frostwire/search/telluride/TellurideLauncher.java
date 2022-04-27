@@ -42,6 +42,7 @@ public final class TellurideLauncher {
             HttpClient httpClient = HttpClientFactory.newInstance();
             try {
                 httpClient.get(String.format("http://127.0.0.1:%d/?shutdown=1", port));
+                SERVER_UP.set(false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -52,12 +53,12 @@ public final class TellurideLauncher {
                                     final int port,
                                     final File saveDirectory) {
         if (SERVER_UP.get()) {
-            LOG.info("launchServer aborted, server already up.");
+            LOG.info("TellurideLauncher::launchServer aborted, server already up.");
             return;
         }
         checkExecutable(executable);
         if (port < 8080) {
-            throw new IllegalArgumentException("Please use a port greater or equal to 8080 (do not run frostwire as root). Telluride's default port number is 47999");
+            throw new IllegalArgumentException("TellurideLauncher::launchServer Please use a port greater or equal to 8080 (do not run frostwire as root). Telluride's default port number is 47999");
         }
         ThreadExecutor.startThread(() -> {
                     ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), "--server", String.valueOf(port));
@@ -69,9 +70,15 @@ public final class TellurideLauncher {
                         processBuilder.start();
                         // The telluride process doesn't start right away, we wait 5 seconds to be safe before setting the
                         // SERVER_UP flag to true. TellurideSearchPerformer waits for up to 10 seconds to give up
-                        Thread.currentThread().sleep(5000);
-                        SERVER_UP.set(true);
-                        LOG.info("RPC server is up successfully at http://127.0.0.1:" + port);
+                        Thread.currentThread().sleep(6000);
+                        LOG.info("TellurideLauncher::launchServer RPC server should be up successfully at http://127.0.0.1:" + port);
+                        LOG.info("TellurideLauncher::launchServer pinging...");
+                        SERVER_UP.set(TellurideLauncher.checkIfUpAlready(port));
+                        if (!SERVER_UP.get()) {
+                            LOG.info("TellurideLauncher::launchServer could not get a pong back from Telluride");
+                        } else {
+                            LOG.info("TellurideLauncher::launchServer success, got a pong back from Telluride");
+                        }
                     } catch (Throwable e) {
                         SERVER_UP.set(false);
                         e.printStackTrace();
@@ -108,13 +115,13 @@ public final class TellurideLauncher {
 
     private static void checkExecutable(final File executable) {
         if (executable == null) {
-            throw new IllegalArgumentException("executable path is null, no telluride to launch");
+            throw new IllegalArgumentException("TellurideLauncher::checkExecutable executable path is null, no telluride to launch");
         }
         if (!executable.isFile()) {
-            throw new IllegalArgumentException(executable + " is not a file");
+            throw new IllegalArgumentException("TellurideLauncher::checkExecutable " + executable + " is not a file");
         }
         if (!executable.canExecute()) {
-            throw new IllegalArgumentException(executable + " is not executable");
+            throw new IllegalArgumentException("TellurideLauncher::checkExecutable " + executable + " is not executable");
         }
     }
 
@@ -154,7 +161,7 @@ public final class TellurideLauncher {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (verboseOutput) {
-                        System.out.println("[" + executable.getName() + "] " + line);
+                        System.out.println("TellurideLauncher::launchRunnable [" + executable.getName() + "] " + line);
                     }
                     if (processListener != null && processListener.aborted()) {
                         process.destroyForcibly();
@@ -166,7 +173,7 @@ public final class TellurideLauncher {
                 }
                 process.waitFor();
                 if (verboseOutput) {
-                    System.out.println("Exit-Code: " + process.exitValue());
+                    System.out.println("TellurideLauncher::launchRunnable Exit-Code: " + process.exitValue());
                 }
                 if (parser != null) {
                     parser.done();
@@ -188,7 +195,8 @@ public final class TellurideLauncher {
     public static boolean checkIfUpAlready(int port) {
         HttpClient httpClient = HttpClientFactory.newInstance();
         try {
-            String json = httpClient.get(String.format("http://127.0.0.1:%d/ping", port), 150);
+            LOG.info("TellurideLauncher.checkIfUpAlready() checking...");
+            String json = httpClient.get(String.format("http://127.0.0.1:%d/ping", port), 250);
             Gson gson = new GsonBuilder().create();
             TelluridePong telluridePong = gson.fromJson(json, TelluridePong.class);
             return telluridePong != null && telluridePong.message.equalsIgnoreCase("pong");
