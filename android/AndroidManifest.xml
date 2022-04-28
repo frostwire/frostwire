@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
@@ -18,11 +17,11 @@
  */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.frostwire.android"
-    android:installLocation="auto"
-    android:versionCode="692"
-    android:versionName="2.4.8">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.frostwire.android"
+        android:installLocation="auto"
+        android:versionCode="692"
+        android:versionName="2.4.8">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -52,7 +51,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <!-- we gotta leave this here for Android 7.0 (24), 7.1.1 (25), 8.0 (26), 8.1 (27) and 9 (28) -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" android:requestLegacyExternalStorage="true" tools:ignore="ScopedStorage" />
+    <uses-permission
+            android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            android:maxSdkVersion="28"
+            android:requestLegacyExternalStorage="true"
+            tools:ignore="ScopedStorage" />
 
     <!-- generic -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -68,29 +71,28 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name="com.frostwire.android.gui.MainApplication"
-        android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/application_label"
-        android:theme="@style/Theme.FrostWire"
-        >
+            android:name="com.frostwire.android.gui.MainApplication"
+            android:allowBackup="false"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/application_label"
+            android:theme="@style/Theme.FrostWire">
 
         <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+                android:name="com.google.android.gms.version"
+                android:value="@integer/google_play_services_version" />
         <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-0657224435269327~1839292928" />
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-0657224435269327~1839292928" />
 
         <!-- activities -->
 
         <activity
-            android:name="com.frostwire.android.gui.activities.MainActivity"
-            android:label="@string/application_label"
-            android:launchMode="singleTask"
-            android:protectionLevel="dangerous"
-            android:theme="@style/SplashScreenTheme"
-            android:exported="true">
+                android:name="com.frostwire.android.gui.activities.MainActivity"
+                android:label="@string/application_label"
+                android:launchMode="singleTask"
+                android:protectionLevel="dangerous"
+                android:theme="@style/SplashScreenTheme"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.MUSIC_PLAYER" />
@@ -147,16 +149,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.frostwire.android.gui.activities.WizardActivity"
-            android:label="@string/application_label"
-            android:theme="@style/WizardActivity" />
+                android:name="com.frostwire.android.gui.activities.WizardActivity"
+                android:label="@string/application_label"
+                android:theme="@style/WizardActivity" />
         <activity
-            android:name="com.frostwire.android.gui.activities.SettingsActivity"
-            android:label="@string/activity_preferences_name" />
+                android:name="com.frostwire.android.gui.activities.SettingsActivity"
+                android:label="@string/activity_preferences_name" />
         <activity
-            android:name="com.frostwire.android.gui.activities.BuyActivity"
-            android:label="@string/remove_ads"
-            android:exported="true">
+                android:name="com.frostwire.android.gui.activities.BuyActivity"
+                android:label="@string/remove_ads"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -164,40 +166,40 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "app://com.frostwire.android” -->
                 <data
-                    android:host="com.frostwire.android"
-                    android:scheme="app" />
+                        android:host="com.frostwire.android"
+                        android:scheme="app" />
             </intent-filter>
         </activity>
         <activity
-            android:name="com.frostwire.android.gui.activities.AboutActivity"
-            android:label="@string/about" />
+                android:name="com.frostwire.android.gui.activities.AboutActivity"
+                android:label="@string/about" />
         <activity
-            android:name="com.frostwire.android.gui.activities.ImageViewerActivity"
-            android:label="@string/picture" />
+                android:name="com.frostwire.android.gui.activities.ImageViewerActivity"
+                android:label="@string/picture" />
         <activity
-            android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-            android:configChanges="screenSize"
-            android:label="@string/playing" />
+                android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
+                android:configChanges="screenSize"
+                android:label="@string/playing" />
         <activity
-            android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/activity_VPN"
-            android:noHistory="true" />
+                android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
+                android:excludeFromRecents="true"
+                android:label="@string/activity_VPN"
+                android:noHistory="true" />
         <activity
-            android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
-            android:label="@string/title_activity_transfer_detail" />
+                android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
+                android:label="@string/title_activity_transfer_detail" />
 
         <!-- apollo activities -->
         <activity
-            android:name="com.andrew.apollo.ui.activities.HomeActivity"
-            android:windowSoftInputMode="adjustPan" />
+                android:name="com.andrew.apollo.ui.activities.HomeActivity"
+                android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
-            android:clearTaskOnLaunch="true"
-            android:label="@string/frostwire_player"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+                android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+                android:clearTaskOnLaunch="true"
+                android:label="@string/frostwire_player"
+                android:launchMode="singleTask"
+                android:windowSoftInputMode="adjustPan"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -232,8 +234,9 @@
                 <data android:mimeType="application/x-ogg" />
                 <data android:mimeType="application/itunes" />
             </intent-filter>
-            <intent-filter android:scheme="http"
-                tools:ignore="AppLinkUrlError">
+            <intent-filter
+                    android:scheme="http"
+                    tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -257,13 +260,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.andrew.apollo.ui.activities.ProfileActivity"
-            android:excludeFromRecents="true" />
+                android:name="com.andrew.apollo.ui.activities.ProfileActivity"
+                android:excludeFromRecents="true" />
         <activity
-            android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
-            android:excludeFromRecents="true"
-            android:theme="@style/Theme.Transparent"
-            android:exported="true">
+                android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
+                android:excludeFromRecents="true"
+                android:theme="@style/Theme.Transparent"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.media.action.MEDIA_PLAY_FROM_SEARCH" />
 
@@ -271,9 +274,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.andrew.apollo.ui.activities.SearchActivity"
-            android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity"
-            android:exported="true">
+                android:name="com.andrew.apollo.ui.activities.SearchActivity"
+                android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
                 <action android:name="android.intent.action.MEDIA_SEARCH" />
@@ -282,30 +285,34 @@
             </intent-filter>
 
             <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                    android:name="android.app.searchable"
+                    android:resource="@xml/searchable" />
         </activity>
         <!-- services -->
 
         <service
-            android:name="com.frostwire.android.gui.services.EngineService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+                android:name="com.frostwire.android.gui.services.EngineService"
+                android:exported="false"
+                android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
-            android:name="com.andrew.apollo.MusicPlaybackService"
-            android:foregroundServiceType="mediaPlayback"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:protectionLevel="dangerous" />
+                android:name="com.andrew.apollo.MusicPlaybackService"
+                android:foregroundServiceType="mediaPlayback"
+                android:permission="android.permission.BIND_JOB_SERVICE"
+                android:protectionLevel="dangerous" />
 
         <!-- receivers -->
 
-        <receiver android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver" android:exported="true">
+        <receiver
+                android:name="com.frostwire.android.gui.services.EngineBroadcastReceiver"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.andrew.apollo.MediaButtonIntentReceiver" android:exported="true">
+        <receiver
+                android:name="com.andrew.apollo.MediaButtonIntentReceiver"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
@@ -314,34 +321,21 @@
 
         <!-- providers -->
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true">
             <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />
         </provider>
 
         <!-- AppLovin -->
         <meta-data
-            android:name="applovin.sdk.key"
-            android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
+                android:name="applovin.sdk.key"
+                android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
         <meta-data
-            android:name="applovin.sdk.verbose_logging"
-            android:value="false" />
-
-        <activity
-            android:name="com.applovin.adview.AppLovinInterstitialActivity"
-            android:configChanges="orientation|screenSize"
-            tools:replace="android:configChanges" />
-
-        <!-- MoPub -->
-        <activity
-            android:name="com.mopub.common.MoPubBrowser"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.mopub.common.privacy.ConsentDialogActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
+                android:name="applovin.sdk.verbose_logging"
+                android:value="false" />
     </application>
 </manifest>
