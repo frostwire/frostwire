@@ -232,7 +232,6 @@ public final class Engine implements IEngineService {
         fileFilter.addAction(Intent.ACTION_MEDIA_BUTTON);
         fileFilter.addAction(Intent.ACTION_MEDIA_EJECT);
         fileFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        fileFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
         fileFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
         fileFilter.addDataScheme("file");
 

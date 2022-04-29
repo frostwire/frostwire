@@ -70,9 +70,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
-            } else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
-                // heavy lifting happens in Thread()
-                Librarian.instance().syncMediaStore(Ref.weak(context));
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
                 async(this, EngineBroadcastReceiver::handleConnectivityChange, context, intent);
             }

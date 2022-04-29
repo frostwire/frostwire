@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,10 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.Locale;
 import java.util.Random;
 
@@ -67,7 +65,7 @@ public class MainApplication extends MultiDexApplication {
 
         Engine.instance().onApplicationCreate(this);
 
-        new Thread(new BTEngineInitializer(Ref.weak(this))).start();
+        new Thread(new BTEngineInitializer()).start();
 
         ImageLoader.start(this);
 
@@ -102,12 +100,9 @@ public class MainApplication extends MultiDexApplication {
     }
 
     // don't try to refactor this into an async call since this guy runs on a thread
-    // outside the Engine threadpool
+    // outside the Engine thread pool
     private static class BTEngineInitializer implements Runnable {
-        private final WeakReference<Context> mainAppRef;
-
-        BTEngineInitializer(WeakReference<Context> mainAppRef) {
-            this.mainAppRef = mainAppRef;
+        BTEngineInitializer() {
         }
 
         public void run() {
@@ -127,11 +122,6 @@ public class MainApplication extends MultiDexApplication {
             ctx.retries = port1 - port0;
 
             ctx.enableDht = ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_ENABLE_DHT);
-//            Simulate slow BTContext initialization
-//            try {
-//                Thread.sleep(60000);
-//            } catch (InterruptedException e) {
-//            }
             String[] vStrArray = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
             ctx.version[0] = Integer.parseInt(vStrArray[0]);
             ctx.version[1] = Integer.parseInt(vStrArray[1]);
@@ -141,21 +131,6 @@ public class MainApplication extends MultiDexApplication {
             BTEngine.ctx = ctx;
             BTEngine.onCtxSetupComplete();
             BTEngine.getInstance().start();
-
-            syncMediaStore();
-        }
-
-        private void syncMediaStore() {
-            if (Ref.alive(mainAppRef)) {
-                ConfigurationManager CM = ConfigurationManager.instance();
-                if (!CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
-                    LOG.info("MainApplication: syncMediaStore() aborted, wizard not done yet.");
-                    return;
-                }
-                Librarian.instance().syncMediaStore(mainAppRef);
-            } else {
-                LOG.warn("syncMediaStore() failed, lost MainApplication reference");
-            }
         }
     }
 
