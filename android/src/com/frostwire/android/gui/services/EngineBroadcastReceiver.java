@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
  */
 
 package com.frostwire.android.gui.services;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,20 +31,16 @@ import android.telephony.TelephonyManager;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import java.io.File;
-
-import static com.frostwire.android.util.Asyncs.async;
+import java.util.Objects;
 
 /**
  * Receives and controls messages from the external world. Depending on the
@@ -86,6 +84,10 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
     private void handleConnectivityChange(Context context, Intent intent) {
         NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
+        if (networkInfo == null) {
+            LOG.warn("EngineBroadcastReceiver.handleConnectivityChange() aborted, could not get NetworkInfo");
+            return;
+        }
         DetailedState detailedState = networkInfo.getDetailedState();
         switch (detailedState) {
             case CONNECTED:
@@ -162,10 +164,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
                     }
 
                     Engine.instance().startServices();
-                    if (shouldStopSeeding()) {
-                        TransferManager.instance().stopSeedingTorrents();
-                    }
-                } else if (shouldStopSeeding()) {
+                }
+                if (shouldStopSeeding()) {
                     TransferManager.instance().stopSeedingTorrents();
                 }
             }
@@ -181,36 +181,28 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
 
     private static void handleMediaMounted(final Context context, Intent intent) {
         try {
-            String path = intent.getDataString().replace("file://", "");
+            String path = Objects.requireNonNull(intent.getDataString()).replace("file://", "");
             if (!SystemUtils.isPrimaryExternalPath(new File(path))) {
                 UIUtils.broadcastAction(context, Constants.ACTION_NOTIFY_SDCARD_MOUNTED);
-
-                final File privateDir = new File(path + File.separator + "Android" + File.separator + "data" + File.separator + context.getPackageName() + File.separator + "files" + File.separator + "FrostWire");
-                if (privateDir.exists() && privateDir.isDirectory() && !SystemUtils.hasAndroid10OrNewer()) {
-                    Platforms.fileSystem().scan(privateDir);
-                }
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
         if (Engine.instance().isDisconnected()) {
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                    !NetworkManager.instance().isTunnelUp()) {
-                //don't start
-            } else {
+            if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) ||
+                    NetworkManager.instance().isTunnelUp()) {
                 Engine.instance().startServices();
             }
         }
     }
 
     /**
-     * make sure the current save location will be the primary external if
+     * Make sures the current save location will be the primary external if
      * the media being unmounted is the sd card.
      *
-     * @param intent
      */
     private void handleMediaUnmounted(Intent intent) {
-        String path = intent.getDataString().replace("file://", "");
+        String path = Objects.requireNonNull(intent.getDataString()).replace("file://", "");
         if (!SystemUtils.isPrimaryExternalPath(new File(path)) &&
                 SystemUtils.isPrimaryExternalStorageMounted()) {
             File primaryExternal = Environment.getExternalStorageDirectory();

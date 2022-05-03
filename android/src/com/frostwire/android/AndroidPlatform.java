@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ import android.os.Looper;
 
 import androidx.documentfile.provider.DocumentFile;
 
-import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.swig.libtorrent;
 import com.frostwire.jlibtorrent.swig.posix_stat_t;
@@ -108,12 +107,7 @@ public final class AndroidPlatform extends AbstractPlatform {
             //LibTorrent.setPosixWrapper(new PosixCalls(lfs));
             fs = lfs;
         } else {
-            fs = new DefaultFileSystem() {
-                @Override
-                public void scan(File file) {
-                    Librarian.instance().scan(app, file);
-                }
-            };
+            fs = new DefaultFileSystem();
         }
 
         return fs;

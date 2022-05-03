@@ -249,23 +249,6 @@ public final class Librarian {
         }
     }
 
-    /**
-     * @see com.frostwire.android.gui.transfers.UIBTDownloadListener finished() calls this when a torrent download ends
-     * on both the torrents folder and the data folder.
-     * @see com.frostwire.transfers.BaseHttpDownload moveAndComplete() for http transfers
-     * @see FileSystem scan() makes use of this function.
-     */
-    public void scan(final Context context, File file) {
-        if (Thread.currentThread() != handler.getLooper().getThread()) {
-            SystemUtils.exceptionSafePost(handler, () -> scan(context, file, Transfers.getIgnorableFiles()));
-            return;
-        }
-        scan(context, file, Transfers.getIgnorableFiles());
-        if (context == null) {
-            LOG.error("Librarian has no `context` object to scan() with.");
-        }
-    }
-
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
         if (!fd.deletable) {
             List<FWFileDescriptor> fds = getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
