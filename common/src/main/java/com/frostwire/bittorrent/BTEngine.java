@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,9 +17,40 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.*;
+import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
+import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
+import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
+
+import com.frostwire.jlibtorrent.AlertListener;
+import com.frostwire.jlibtorrent.Entry;
+import com.frostwire.jlibtorrent.ErrorCode;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.SessionManager;
+import com.frostwire.jlibtorrent.SessionParams;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.TcpEndpoint;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
+import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.swig.bdecode_node;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.session_params;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -29,16 +60,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InterfaceAddress;
-import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
-
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -99,13 +128,11 @@ public final class BTEngine extends SessionManager {
     }
 
     private static String dhtBootstrapNodes() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("dht.libtorrent.org:25401").append(",");
-        sb.append("router.bittorrent.com:6881").append(",");
-        sb.append("dht.transmissionbt.com:6881").append(",");
-        // for DHT IPv6
-        sb.append("router.silotis.us:6881");
-        return sb.toString();
+        return "dht.libtorrent.org:25401" + "," +
+                "router.bittorrent.com:6881" + "," +
+                "dht.transmissionbt.com:6881" + "," +
+                // for DHT IPv6
+                "router.silotis.us:6881";
     }
 
     private static SettingsPack defaultSettings() {
@@ -142,7 +169,7 @@ public final class BTEngine extends SessionManager {
     }
 
     /**
-     * @see com.frostwire.android.gui.MainApplication.start() for ctx.interfaces and the rest of the context
+     * @see com.frostwire.android.gui.MainApplication::onCreate() for ctx.interfaces and the rest of the context
      */
     @Override
     public void start() {
@@ -302,25 +329,23 @@ public final class BTEngine extends SessionManager {
             selection = new boolean[ti.numFiles()];
             Arrays.fill(selection, true);
         }
-        Priority[] priorities = null;
+        Priority[] priorities;
         TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
-        if (selection != null) {
-            if (th != null) {
-                priorities = th.filePriorities();
-            } else {
-                priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+        if (th != null) {
+            priorities = th.filePriorities();
+        } else {
+            priorities = Priority.array(Priority.IGNORE, ti.numFiles());
+        }
+        boolean changed = false;
+        for (int i = 0; i < selection.length; i++) {
+            if (selection[i] && priorities[i] == Priority.IGNORE) {
+                priorities[i] = Priority.NORMAL;
+                changed = true;
             }
-            boolean changed = false;
-            for (int i = 0; i < selection.length; i++) {
-                if (selection[i] && priorities[i] == Priority.IGNORE) {
-                    priorities[i] = Priority.NORMAL;
-                    changed = true;
-                }
-            }
-            if (!changed) { // nothing to do
-                return;
-            }
+        }
+        if (!changed) { // nothing to do
+            return;
         }
         download(ti, saveDir, priorities, null, null);
         if (!exists) {
@@ -414,7 +439,7 @@ public final class BTEngine extends SessionManager {
             LOG.warn("Wrong setup with BTEngine home dir");
             return;
         }
-        File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).toLowerCase().equals("torrent"));
+        File[] torrents = ctx.homeDir.listFiles((dir, name) -> name != null && FilenameUtils.getExtension(name).equalsIgnoreCase("torrent"));
         if (torrents != null) {
             for (File t : torrents) {
                 try {
@@ -485,7 +510,6 @@ public final class BTEngine extends SessionManager {
             byte[] arr = ti.toEntry().bencode();
             FileSystem fs = Platforms.get().fileSystem();
             fs.write(torrentFile, arr);
-            fs.scan(torrentFile);
         } catch (Throwable e) {
             LOG.warn("Error saving torrent info to file", e);
         }
@@ -574,13 +598,13 @@ public final class BTEngine extends SessionManager {
             File file = new File(dir, "downloads.config");
             if (file.exists()) {
                 Entry configEntry = Entry.bdecode(file);
-                List<Entry> downloads = configEntry.dictionary().get("downloads").list();
+                List<Entry> downloads = Objects.requireNonNull(configEntry.dictionary().get("downloads")).list();
                 for (Entry d : downloads) {
                     try {
                         Map<String, Entry> map = d.dictionary();
-                        File saveDir = new File(map.get("save_dir").string());
-                        File torrent = new File(map.get("torrent").string());
-                        List<Entry> filePriorities = map.get("file_priorities").list();
+                        File saveDir = new File(Objects.requireNonNull(map.get("save_dir")).string());
+                        File torrent = new File(Objects.requireNonNull(map.get("torrent")).string());
+                        List<Entry> filePriorities = Objects.requireNonNull(map.get("file_priorities")).list();
                         Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
                         for (int i = 0; i < filePriorities.size(); i++) {
                             long p = filePriorities.get(i).integer();
@@ -597,6 +621,7 @@ public final class BTEngine extends SessionManager {
                         LOG.error("Error restoring vuze torrent download", e);
                     }
                 }
+                //noinspection ResultOfMethodCallIgnored
                 file.delete();
             }
         } catch (Throwable e) {
@@ -641,7 +666,7 @@ public final class BTEngine extends SessionManager {
         }
     }
 
-    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, File resumeFile, List<TcpEndpoint> peers) {
+    private void download(TorrentInfo ti, File saveDir, Priority[] priorities, @SuppressWarnings("SameParameterValue") File resumeFile, List<TcpEndpoint> peers) {
         TorrentHandle th = find(ti.infoHash());
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
@@ -693,7 +718,7 @@ public final class BTEngine extends SessionManager {
         //LOG.info("DHT bootstrap, total nodes=" + nodes);
     }
 
-    private void printAlert(Alert alert) {
+    private void printAlert(@SuppressWarnings("rawtypes") Alert alert) {
         System.out.println("Log: " + alert);
     }
 
