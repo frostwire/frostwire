@@ -31,6 +31,7 @@ import com.frostwire.android.gui.views.RichNotification;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 /**
  * Created on 9/29/16 in Denver, CO.
@@ -59,7 +60,7 @@ public class OnFeedbackClickAdapter extends ClickAdapter<Fragment> {
         String plusOrBasic = (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) ? "basic" : "plus";
         intent.putExtra(Intent.EXTRA_SUBJECT, String.format("[Feedback - frostwire-android (%s) - v%s b%s]", plusOrBasic, Constants.FROSTWIRE_VERSION_STRING, Constants.FROSTWIRE_BUILD));
 
-        String body = String.format("FrostWire for Android %s build %s %s \n\nAndroid SDK: %d\nAndroid RELEASE: %s (%s)\nManufacturer-Model: %s - %s\nDevice: %s\nBoard: %s\nCPU ABI: %s\nCPU ABI2: %s\n\n\n\n",
+        String body = String.format(Locale.US,"FrostWire for Android %s build %s %s \n\nAndroid SDK: %d\nAndroid RELEASE: %s (%s)\nManufacturer-Model: %s - %s\nDevice: %s\nBoard: %s\nCPU ABI: %s\nCPU ABI2: %s\n\n\n\n",
                 Constants.FROSTWIRE_VERSION_STRING,
                 Constants.FROSTWIRE_BUILD,
                 Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "" : "(PLUS)",
