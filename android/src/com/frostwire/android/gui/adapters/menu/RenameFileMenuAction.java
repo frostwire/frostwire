@@ -31,7 +31,6 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.adapters.FileListAdapter;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
@@ -45,16 +44,15 @@ import org.apache.commons.io.FilenameUtils;
  */
 public class RenameFileMenuAction extends MenuAction {
     private final FWFileDescriptor fd;
-    private final FileListAdapter adapter;
+
     private final AbstractDialog.OnDialogClickListener dialogClickListener;
 
-    public RenameFileMenuAction(Context context, FileListAdapter adapter, FWFileDescriptor fd) {
-        this(context, adapter, fd, null);
+    public RenameFileMenuAction(Context context, FWFileDescriptor fd) {
+        this(context, fd, null);
     }
 
-    public RenameFileMenuAction(Context context, FileListAdapter adapter, FWFileDescriptor fd, AbstractDialog.OnDialogClickListener clickListener) {
+    public RenameFileMenuAction(Context context, FWFileDescriptor fd, AbstractDialog.OnDialogClickListener clickListener) {
         super(context, R.drawable.contextmenu_icon_rename, R.string.rename);
-        this.adapter = adapter;
         this.fd = fd;
         this.dialogClickListener = clickListener;
     }
@@ -87,9 +85,6 @@ public class RenameFileMenuAction extends MenuAction {
         if (isValidFileName(newFileName)) {
             fd.filePath = Librarian.instance().renameFile(context, fd, newFileName);
             fd.title = FilenameUtils.getBaseName(newFileName);
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
         } else {
             UIUtils.showLongMessage(context, R.string.invalid_filename);
         }

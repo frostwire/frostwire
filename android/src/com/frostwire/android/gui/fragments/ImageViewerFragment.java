@@ -347,7 +347,7 @@ public final class ImageViewerFragment extends AbstractFragment {
                     break;
                 case R.id.fragment_my_files_action_mode_menu_rename:
                     final ActionMode fMode = mode;
-                    new RenameFileMenuAction(context, null, fd, (tag, which) -> {
+                    new RenameFileMenuAction(context, fd, (tag, which) -> {
                         if (which == 1 && tag != null) {
                             onRenameFileMenuDialogOk(tag, fMode);
                         }
