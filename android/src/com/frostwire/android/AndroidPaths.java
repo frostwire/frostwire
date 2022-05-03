@@ -19,7 +19,6 @@
 package com.frostwire.android;
 
 import android.app.Application;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -128,60 +127,6 @@ public final class AndroidPaths implements SystemPaths {
         } else {
             return new File(path, STORAGE_PATH);
         }
-    }
-
-    /**
-     * For Android 10+ the collection uri will be our internal URI
-     * For older versions where we have external storage write access we use the external URI
-     * <p>
-     * These URIs are basically tables that will hold our audio, pictures, videos
-     * <p>
-     * The URL should have path names we define in filepaths.xml and provider_paths.xml
-     * so that we can map their url subpaths to folders in external storage
-     * <p>
-     * mediaStoreVolumeUri will be internal, but let's parmetroize it in case we need external for something else
-     * Valid values are MediaStore.VOLUME_INTERNAL | MediaStore.VOLUME_EXTERNAL_PRIMARY
-     */
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static Uri getMediaStoreCollectionUri(File file) {
-        byte fileType = getFileType(file.getAbsolutePath(), true);
-        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_PUBLIC_DIRECTORY_ON_OR_AFTER_ANDROID_10);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static Uri getMediaStoreCollectionUri(byte fileType, boolean useExternalStorage) {
-        String mediaStoreVolume = VOLUME_EXTERNAL_NAME;
-        if (!useExternalStorage) {
-            mediaStoreVolume = MediaStore.VOLUME_INTERNAL;
-        }
-        switch (fileType) {
-            case Constants.FILE_TYPE_AUDIO:
-                return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Audio.Media.getContentUri(mediaStoreVolume) :
-                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-            case Constants.FILE_TYPE_PICTURES:
-                return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Images.Media.getContentUri(mediaStoreVolume) :
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            case Constants.FILE_TYPE_VIDEOS:
-                return SystemUtils.hasAndroid10OrNewer() ?
-                        MediaStore.Video.Media.getContentUri(mediaStoreVolume) :
-                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-            case Constants.FILE_TYPE_APPLICATIONS:
-            case Constants.FILE_TYPE_TORRENTS:
-            case Constants.FILE_TYPE_DOCUMENTS:
-            case Constants.FILE_TYPE_FILES:
-                return SystemUtils.hasAndroid10OrNewer() ?
-                        ((!USE_MEDIASTORE_DOWNLOADS) ?
-                                MediaStore.Files.getContentUri(mediaStoreVolume) :
-                                MediaStore.Downloads.getContentUri(mediaStoreVolume)) :
-                        ((!USE_MEDIASTORE_DOWNLOADS) ?
-                                MediaStore.Files.getContentUri(VOLUME_EXTERNAL_NAME) :
-                                MediaStore.Downloads.EXTERNAL_CONTENT_URI);
-        }
-        return !USE_MEDIASTORE_DOWNLOADS && SystemUtils.hasAndroid10OrNewer() ?
-                MediaStore.Files.getContentUri(VOLUME_EXTERNAL_NAME) :
-                MediaStore.Downloads.EXTERNAL_CONTENT_URI;
     }
 
     public static byte getFileType(String filePath, boolean returnTorrentsAsDocument) {
