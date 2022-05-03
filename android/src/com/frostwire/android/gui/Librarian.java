@@ -22,13 +22,11 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
-import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
 
@@ -45,13 +43,10 @@ import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
-import com.frostwire.util.MimeDetector;
-import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -62,7 +57,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 
@@ -253,10 +247,6 @@ public final class Librarian {
             } catch (Throwable ignored) {
             }
         }
-
-        UIUtils.broadcastAction(context,
-                Constants.ACTION_FILE_ADDED_OR_REMOVED,
-                new UIUtils.IntentByteExtra(Constants.EXTRA_REFRESH_FILE_TYPE, fileType));
     }
 
     /**
@@ -273,13 +263,10 @@ public final class Librarian {
         scan(context, file, Transfers.getIgnorableFiles());
         if (context == null) {
             LOG.error("Librarian has no `context` object to scan() with.");
-            return;
         }
-        UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
-
         if (!fd.deletable) {
             List<FWFileDescriptor> fds = getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_AUDIO, FilenameUtils.getPath(fd.filePath), false);
 
@@ -412,13 +399,7 @@ public final class Librarian {
             if (ignorableFiles.contains(file)) {
                 return;
             }
-            if (SystemUtils.hasAndroid10OrNewer()) {
-                // Can't use Media Scanner after Android 10 Scoped storage changes.
-                // MediaScanner is supposedly invoked internally when we perform MediaStore inserts/updates
-                // it will set the DATA field for us, so don't try to write it manually, doesn't keep
-                // whatever path you put in there
-                mediaStoreInsert(context, file);
-            } else {
+            if (!SystemUtils.hasAndroid10OrNewer()) {
                 new UniversalScanner(context).scan(file.getAbsolutePath());
             }
         } else if (file.isDirectory() && file.canRead()) {
@@ -429,9 +410,7 @@ public final class Librarian {
             }
 
             if (!flattenedFiles.isEmpty()) {
-                if (SystemUtils.hasAndroid10OrNewer()) {
-                    flattenedFiles.forEach(f -> mediaStoreInsert(context, f));
-                } else {
+                if (!SystemUtils.hasAndroid10OrNewer()) {
                     new UniversalScanner(context).scan(flattenedFiles);
                 }
             }
@@ -460,161 +439,6 @@ public final class Librarian {
         values.clear();
         values.put(MediaColumns.IS_PENDING, 0);
         contentResolver.update(insertedUri, values, null, null);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void mediaStoreInsert(Context context, File srcFile) {
-        if (srcFile.isDirectory()) {
-            return;
-        }
-        Uri audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-
-        // Add to MediaStore
-        ContentResolver resolver = context.getContentResolver();
-        byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
-        TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
-            LOG.info("mediaStoreInsert -> fetcher unknown for " + srcFile.getAbsolutePath() + ", skipping");
-            return;
-        }
-
-        Uri mediaStoreCollectionUri = Objects.requireNonNull(fetcher).getExternalContentUri();
-        String relativeFolderPath = AndroidPaths.getRelativeFolderPath(srcFile);
-
-        if (alreadyInMediaStore(context, fetcher, srcFile.getName(), relativeFolderPath)) {
-            LOG.info("mediaStoreInsert: alreadyInMediaStore skipping " + srcFile.getAbsolutePath());
-            return;
-        }
-
-        LOG.info("mediaStoreInsert -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI = " + audioUri);
-        LOG.info("mediaStoreInsert -> mediaStoreCollectionUri = " + mediaStoreCollectionUri);
-        LOG.info("mediaStoreInsert -> relativeFolderPath: " + relativeFolderPath);
-
-        ContentValues values = new ContentValues();
-        values.put(MediaColumns.IS_PENDING, 1);
-
-        if (!StringUtils.isNullOrEmpty(relativeFolderPath)) {
-            values.put(MediaColumns.RELATIVE_PATH, relativeFolderPath);
-        } else {
-            LOG.info("WARNING, relative relativeFolderPath is null for " + srcFile.getAbsolutePath());
-        }
-
-        values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
-        values.put(MediaColumns.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(srcFile.getName())));
-        values.put(MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
-        values.put(MediaColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000);
-        values.put(MediaColumns.SIZE, srcFile.length());
-
-        if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(srcFile.getAbsolutePath());
-            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
-            if (title != null) {
-                values.put(MediaColumns.TITLE, title);
-                values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
-            }
-        } else {
-            values.put(MediaColumns.TITLE, srcFile.getName());
-        }
-        Uri insertedUri = resolver.insert(mediaStoreCollectionUri, values);
-        if (insertedUri == null) {
-            LOG.error("mediaStoreInsert -> could not perform media store insertion");
-            return;
-        }
-        LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
-        copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
-    }
-
-    private boolean alreadyInMediaStore(Context context, TableFetcher fetcher, final String displayName, final String relativeFolderPath) {
-        // relativePath looks like:
-        // Documents/FrostWire/storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/Torrents/
-        // but the database may have relative paths stored like:
-        // Documents/FrostWire/(invalid)/storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/Torrents/
-        // let's fix our relativePath search to be only from "com.frostwire.android/..."
-        String normalizedRelativePath = relativeFolderPath;
-
-        if (normalizedRelativePath.contains("com.frostwire.android")) {
-            normalizedRelativePath = relativeFolderPath.substring(relativeFolderPath.indexOf("com.frostwire.android"));
-        }
-
-        String normalizedDisplayName = displayName;
-        String extension = FilenameUtils.getExtension(displayName);
-        if (extension != null && !"".equals(extension)) {
-            normalizedDisplayName = displayName.replace("." + extension, "");
-        }
-
-        // Depending on file type we use different search fields for the file title (see mediaStoreInsert)
-        String[] projection_audio_video = new String[]{MediaColumns._ID, MediaColumns.DISPLAY_NAME, MediaColumns.RELATIVE_PATH};
-        String[] projection_other = new String[]{MediaColumns._ID, MediaColumns.TITLE, MediaColumns.RELATIVE_PATH};
-
-        String selection_audio_video = MediaColumns.DISPLAY_NAME + " LIKE ? AND " + MediaColumns.RELATIVE_PATH + " LIKE ?";
-        String selection_other = MediaColumns.TITLE + " LIKE ? AND " + MediaColumns.RELATIVE_PATH + " LIKE ?";
-
-        Uri volumeUri = fetcher.getExternalContentUri();
-        byte fileType = AndroidPaths.getFileType(displayName, true);
-        if (fileType == Constants.FILE_TYPE_UNKNOWN) {
-            return false;
-        }
-
-        String[] projection = projection_other;
-        String selection = selection_other;
-
-        if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
-            projection = projection_audio_video;
-            selection = selection_audio_video;
-        }
-
-        try {
-            ContentResolver cr = context.getContentResolver();
-            Cursor cursor = null;
-            try {
-                cursor = cr.query(volumeUri, projection, selection, new String[]{"%" + normalizedDisplayName + "%", "%" + normalizedRelativePath}, null);
-            } catch (Throwable t) {
-                LOG.error("alreadyInMediaStore: " + t.getMessage(), t);
-            }
-            if (cursor == null) {
-                return false;
-            }
-
-            int totalResults = cursor.getCount();
-            if (totalResults == 0) {
-                IOUtils.closeQuietly(cursor);
-                return false;
-            }
-
-            cursor.moveToFirst();
-
-            List<Long> fileIdsToDelete = new ArrayList<>();
-            do {
-                int displayNameColIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
-                if (displayNameColIndex == -1) {
-                    displayNameColIndex = cursor.getColumnIndex(MediaColumns.TITLE);
-                }
-
-                // Check if there are repeated entries for the file we're looking for/
-                // If the display name without the extension is a prefix of the current row, we have a duplicate
-                // <normalized display name> (N).<ext>
-                String currentDisplayName = cursor.getString(displayNameColIndex);
-                if (!currentDisplayName.equals(displayName) && currentDisplayName.startsWith(normalizedDisplayName)) {
-                    int idColumnIndex = cursor.getColumnIndex(MediaColumns._ID);
-                    long fileId = cursor.getLong(idColumnIndex);
-                    fileIdsToDelete.add(fileId);
-                }
-            } while (cursor.moveToNext());
-            boolean result = cursor.getCount() > 0;
-            IOUtils.closeQuietly(cursor);
-            // delete any found duplicates
-            if (fileIdsToDelete.size() > 1) {
-                fileIdsToDelete.forEach(fileId -> cr.delete(volumeUri, "_id = ?", new String[]{String.valueOf(fileId)}));
-                fileIdsToDelete.clear();
-            }
-            return result;
-        } catch (Throwable e) {
-            LOG.error(e.getMessage() + " volumeUri=" + volumeUri, e);
-        }
-        return false;
     }
 
     private void initHandler() {
