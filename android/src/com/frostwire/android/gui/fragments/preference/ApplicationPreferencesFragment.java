@@ -24,6 +24,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreference;
@@ -326,7 +327,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     private static final class DoNothingOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
 
         @Override
-        public boolean onPreferenceClick(Preference preference) {
+        public boolean onPreferenceClick(@NonNull Preference preference) {
             return true;
         }
     }
@@ -396,7 +397,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         }
 
         @Override
-        public boolean onPreferenceClick(Preference preference) {
+        public boolean onPreferenceClick(@NonNull Preference preference) {
             // reset reward video timer
             LOG.info("onPreferenceClick() clicks left: " + clicksLeft);
             if (adsPaused() && --clicksLeft <= 0) {

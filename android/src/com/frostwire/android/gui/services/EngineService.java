@@ -90,7 +90,7 @@ public class EngineService extends JobIntentService implements IEngineService {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(@SuppressWarnings("NullableProblems") Intent intent) {
         return binder;
     }
 

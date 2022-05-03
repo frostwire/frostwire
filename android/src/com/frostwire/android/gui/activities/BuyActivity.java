@@ -433,6 +433,7 @@ public final class BuyActivity extends AbstractActivity {
         card.updateData(prodSubs);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {

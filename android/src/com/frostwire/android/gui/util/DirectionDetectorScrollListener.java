@@ -20,6 +20,8 @@ package com.frostwire.android.gui.util;
 
 import android.widget.AbsListView;
 
+import androidx.annotation.NonNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -181,6 +183,7 @@ public final class DirectionDetectorScrollListener implements AbsListView.OnScro
             return downs;
         }
 
+        @NonNull
         public String toString() {
             return "ScrollDirectionVotes: total=" + total() + " ups=" + ups + " downs=" + downs + " delta=" + delta();
         }

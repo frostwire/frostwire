@@ -131,11 +131,8 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
         }
 
         // final to effectively hide it
-        protected final void onPrepareDialogBuilder(android.app.AlertDialog.Builder builder) {
+        protected final void onPrepareDialogBuilder(@NonNull android.app.AlertDialog.Builder builder) {
         }
-
-//        protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-//        }
 
         @SuppressWarnings("unchecked")
         private <T> T getValue(String name) {

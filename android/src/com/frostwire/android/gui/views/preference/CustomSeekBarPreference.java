@@ -66,7 +66,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
     }
 
     @Override
-    public void onBindViewHolder(PreferenceViewHolder holder) {
+    public void onBindViewHolder(@NonNull PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
         TextView summaryView = (TextView) holder.findViewById(android.R.id.summary);
@@ -196,7 +196,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
         }
 
         @Override
-        protected void onBindDialogView(View view) {
+        protected void onBindDialogView(@NonNull View view) {
             super.onBindDialogView(view);
             mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
