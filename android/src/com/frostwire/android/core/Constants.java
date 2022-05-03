@@ -142,7 +142,7 @@ public final class Constants {
     public static final String ACTION_MEDIA_PLAYER_PAUSED = "com.frostwire.android.ACTION_MEDIA_PLAYER_PAUSED";
     public static final String ACTION_REFRESH_FINGER = "com.frostwire.android.ACTION_REFRESH_FINGER";
     public static final String ACTION_NOTIFY_SDCARD_MOUNTED = "com.frostwire.android.ACTION_NOTIFY_SDCARD_MOUNTED";
-    public static final String ACTION_FILE_ADDED_OR_REMOVED = "com.frostwire.android.ACTION_FILE_ADDED_OR_REMOVED";
+
     public static final String ACTION_NOTIFY_UPDATE_AVAILABLE = "com.frostwire.android.NOTIFY_UPDATE_AVAILABLE";
     public static final String ACTION_NOTIFY_DATA_INTERNET_CONNECTION = "com.frostwire.android.NOTIFY_CHECK_INTERNET_CONNECTION";
     //public static final String ACTION_PACKAGE_INSTALLED = "com.frostwire.android.ACTION_PACKAGE_INSTALLED";
