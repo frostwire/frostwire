@@ -32,8 +32,10 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         File torrentSaveFolder = dl.getContentSavePath();
         finalCleanup(dl, dl.getIncompleteFiles());
         fixBinPaths(torrentSaveFolder);
-        Platforms.fileSystem().scan(torrentSaveFolder);
-        Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
+        //REMEMBER TO UNCOMMENT IF FILES ARE NOT APPEARING
+        //REMEMBER TO DELETE IF FILES ARE BEING SCANNED BY THE OS INSIDE DOWNLOADS FOLDER AUTOMATICALLY
+        //Platforms.fileSystem().scan(torrentSaveFolder);
+        //Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
     }
 
     // The torrent's folder,e.g. Torrent Data/<foo folder>, not Torrent Data.

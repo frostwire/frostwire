@@ -32,6 +32,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -46,12 +47,10 @@ import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
-import com.frostwire.util.Ref;
 import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -59,7 +58,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -280,13 +278,6 @@ public final class Librarian {
         UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
     }
 
-    public void syncMediaStore(final WeakReference<Context> contextRef) {
-        if (!SystemUtils.hasAndroid10OrNewer() && !SystemUtils.isPrimaryExternalStorageMounted()) {
-            return;
-        }
-        SystemUtils.exceptionSafePost(handler, () -> syncMediaStoreSupport(contextRef));
-    }
-
     public EphemeralPlaylist createEphemeralPlaylist(final Context context, FWFileDescriptor fd) {
 
         if (!fd.deletable) {
@@ -308,73 +299,6 @@ public final class Librarian {
             playlist.setNextItem(new PlaylistItem(fd));
 
             return playlist;
-        }
-    }
-
-    private void syncMediaStoreSupport(final WeakReference<Context> contextRef) {
-        if (!Ref.alive(contextRef)) {
-            return;
-        }
-        Context context = contextRef.get();
-        Set<File> ignorableFiles = Transfers.getIgnorableFiles();
-        syncMediaStore(context, Constants.FILE_TYPE_AUDIO, ignorableFiles);
-        syncMediaStore(context, Constants.FILE_TYPE_PICTURES, ignorableFiles);
-        syncMediaStore(context, Constants.FILE_TYPE_VIDEOS, ignorableFiles);
-        syncMediaStore(context, Constants.FILE_TYPE_RINGTONES, ignorableFiles);
-        syncMediaStore(context, Constants.FILE_TYPE_DOCUMENTS, ignorableFiles);
-        Platforms.fileSystem().scan(Platforms.torrents());
-        Platforms.fileSystem().scan(BTEngine.ctx.dataDir);
-    }
-
-    private void syncMediaStore(final Context context, byte fileType, Set<File> ignorableFiles) {
-        TableFetcher fetcher = TableFetchers.getFetcher(fileType);
-
-        if (fetcher == TableFetchers.UNKNOWN_TABLE_FETCHER) {
-            return;
-        }
-
-        try {
-            ContentResolver cr = context.getContentResolver();
-            deleteIgnorableFilesFromVolume(cr, fetcher.getExternalContentUri(), ignorableFiles);
-        } catch (Throwable e) {
-            LOG.error("General failure during sync of MediaStore", e);
-        }
-    }
-
-    private void deleteIgnorableFilesFromVolume(ContentResolver cr, Uri volumeUri, Set<File> ignorableFiles) {
-        if (volumeUri == null) {
-            return;
-        }
-        String where = MediaColumns.DATA + " LIKE ?";
-        String[] whereArgs = new String[]{Platforms.data() + "%"};
-
-        Cursor c = cr.query(volumeUri, new String[]{MediaColumns._ID, MediaColumns.DATA}, where, whereArgs, null);
-        if (c == null) {
-            return;
-        }
-
-        int idCol = c.getColumnIndex(MediaColumns._ID);
-        int pathCol = c.getColumnIndex(MediaColumns.DATA);
-
-        List<Integer> ids = new ArrayList<>(0);
-
-        while (c.moveToNext()) {
-            int id = Integer.parseInt(c.getString(idCol));
-            String path = c.getString(pathCol);
-
-            if (ignorableFiles.contains(new File(path))) {
-                ids.add(id);
-            }
-        }
-
-        try {
-            if (ids.size() > 0) {
-                cr.delete(volumeUri, MediaColumns._ID + " IN " + buildSet(ids), null);
-            }
-        } catch (Throwable e) {
-            LOG.error("General failure during sync of MediaStore", e);
-        } finally {
-            c.close();
         }
     }
 
@@ -482,7 +406,7 @@ public final class Librarian {
         return false;
     }
 
-    private void scan(final Context context, File file, Set<File> ignorableFiles) {
+    private void scan(final Context context, @NonNull File file, Set<File> ignorableFiles) {
         //if we just have a single file, do it the old way
         if (file.isFile()) {
             if (ignorableFiles.contains(file)) {
