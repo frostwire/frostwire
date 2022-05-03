@@ -197,9 +197,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     /**
-     * Make sures the current save location will be the primary external if
+     * Makes sure the current save location will be the primary external if
      * the media being unmounted is the sd card.
-     *
      */
     private void handleMediaUnmounted(Intent intent) {
         String path = Objects.requireNonNull(intent.getDataString()).replace("file://", "");

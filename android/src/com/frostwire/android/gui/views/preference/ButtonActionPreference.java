@@ -25,6 +25,7 @@ import android.widget.Button;
 
 import com.frostwire.android.R;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
@@ -58,7 +59,7 @@ public final class ButtonActionPreference extends Preference {
     }
 
     @Override
-    public void onBindViewHolder(PreferenceViewHolder holder) {
+    public void onBindViewHolder(@NonNull PreferenceViewHolder holder) {
         super.onBindViewHolder(holder);
 
         button = (Button) holder.findViewById(R.id.view_preference_button_action_button);

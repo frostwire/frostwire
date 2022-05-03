@@ -1,21 +1,8 @@
-/*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 package com.frostwire.android.gui.adapters.menu;
+
+import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -52,8 +39,6 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -95,10 +80,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
      * object so we're able to replace it with the new BittorrentDownload that will be created
      * <p>
      * Reminder: Currently disabled when using SD Card.
-     *
-     * @param context
-     * @param fd
-     * @param transferToClear
      */
     public SeedAction(Context context, FWFileDescriptor fd, Transfer transferToClear) {
         this(context, fd, null, transferToClear);
@@ -107,9 +88,6 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     /**
      * Seed an existing torrent transfer that's finished and paused.
      * It's not disabled since it exists for existing torrent transfers.
-     *
-     * @param context
-     * @param download
      */
     public SeedAction(Context context, BittorrentDownload download) {
         this(context, null, download, null);
