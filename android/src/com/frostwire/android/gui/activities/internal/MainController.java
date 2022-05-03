@@ -19,6 +19,11 @@ package com.frostwire.android.gui.activities.internal;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.widget.Toast;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -29,9 +34,13 @@ import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
+import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
@@ -110,13 +119,42 @@ public final class MainController {
         if (!Ref.alive(activityRef)) {
             return;
         }
-        MainActivity activity = activityRef.get();
-        if (!(activity.getCurrentFragment() instanceof MyFilesFragment)) {
-            activity.runOnUiThread(() -> {
-                MyFilesFragment fragment = (MyFilesFragment) activity.getFragmentByNavMenuId(R.id.menu_main_library);
-                switchFragment(R.id.menu_main_library);
-            });
+
+        File dataFolder = Platforms.get().systemPaths().data();
+        File torrentsFolder = Platforms.get().systemPaths().torrents();
+        Uri dataFolderUri = Uri.parse(dataFolder.getParentFile().getParentFile().getAbsolutePath());
+        dataFolderUri = Uri.parse(activityRef.get().getExternalFilesDir(Environment.DIRECTORY_MUSIC).getPath());
+
+        //String externalPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        //Uri externalPathUri = Uri.parse(externalPath);
+
+        // This opens com.google.android.apps.docs but not on the given folder
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.setDataAndType(dataFolderUri, DocumentsContract.Document.MIME_TYPE_DIR);
+        //intent.putExtra("org.openintents.extra.ABSOLUTE_PATH", dataFolder.getAbsolutePath());
+
+        // this doesn't work at all
+        // Intent intent = new Intent("com.google.android.apps.docs.DRIVE_OPEN");
+        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        // intent.setDataAndType(dataFolderUri, DocumentsContract.Document.MIME_TYPE_DIR);
+
+        ActivityInfo resolvedActivityInfo = intent.resolveActivityInfo(activityRef.get().getPackageManager(), 0);
+        if (resolvedActivityInfo != null) {
+            LOG.info("showMyFiles: resolved package name=" + resolvedActivityInfo.packageName);
+            LOG.info("showMyFiles: uri=" + dataFolderUri);
+            activityRef.get().startActivity(intent);
+        } else {
+            UIUtils.showToastMessage(activityRef.get(),"Could not find a file explorer", Toast.LENGTH_SHORT);
         }
+
+//        MainActivity activity = activityRef.get();
+//        if (!(activity.getCurrentFragment() instanceof MyFilesFragment)) {
+//            activity.runOnUiThread(() -> {
+//                MyFilesFragment fragment = (MyFilesFragment) activity.getFragmentByNavMenuId(R.id.menu_main_library);
+//                switchFragment(R.id.menu_main_library);
+//            });
+//        }
     }
 
     public void startWizardActivity() {

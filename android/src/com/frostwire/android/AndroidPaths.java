@@ -57,16 +57,17 @@ public final class AndroidPaths implements SystemPaths {
     private final Application app;
     private final File internalFilesDir;
 
-    private static final boolean USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 = true;
+    /**
+     * Saves to shared public storage using Environment.getExternalStoragePublicDirectory() [deprecated, but fkcu it! this is what we need].
+     * This is where the user will typically place and manage their own files, so we'll try to save to Downloads/FrostWire/
+     */
+    private static final boolean USE_EXTERNAL_STORAGE_PUBLIC_DIRECTORY_ON_OR_AFTER_ANDROID_10 = true;
 
     private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
             MediaStore.VOLUME_EXTERNAL_PRIMARY :
             MediaStore.VOLUME_EXTERNAL;
 
-    /**
-     * If true uses MediaStore.Files, otherwise uses MediaStore.Downloads
-     */
-    private static final boolean USE_FILES_MEDIA_STORE = false;
+    private static final boolean USE_MEDIASTORE_DOWNLOADS = true;
 
     private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
     private static final Object fileTypeFoldersLock = new Object();
@@ -79,7 +80,10 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     /**
+     * With USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 : getExternalFilesDir() ...
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData
+     *
+     * With
      */
     @Override
     public File data() {
@@ -109,10 +113,11 @@ public final class AndroidPaths implements SystemPaths {
      */
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
-            File externalDir = app.getExternalFilesDir(null);
-            return new File(USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 ?
-                    externalDir : app.getFilesDir(),
-                    STORAGE_PATH);
+            if (USE_EXTERNAL_STORAGE_PUBLIC_DIRECTORY_ON_OR_AFTER_ANDROID_10) {
+                return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), STORAGE_PATH);
+            } else {
+                return new File(STORAGE_PATH);
+            }
         }
         /* For Older versions of Android where we used to have access to write to external storage
          *  <externalStoragePath>/FrostWire/
@@ -140,7 +145,7 @@ public final class AndroidPaths implements SystemPaths {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static Uri getMediaStoreCollectionUri(File file) {
         byte fileType = getFileType(file.getAbsolutePath(), true);
-        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10);
+        return getMediaStoreCollectionUri(fileType, USE_EXTERNAL_STORAGE_PUBLIC_DIRECTORY_ON_OR_AFTER_ANDROID_10);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -167,14 +172,14 @@ public final class AndroidPaths implements SystemPaths {
             case Constants.FILE_TYPE_DOCUMENTS:
             case Constants.FILE_TYPE_FILES:
                 return SystemUtils.hasAndroid10OrNewer() ?
-                        ((USE_FILES_MEDIA_STORE) ?
+                        ((!USE_MEDIASTORE_DOWNLOADS) ?
                                 MediaStore.Files.getContentUri(mediaStoreVolume) :
                                 MediaStore.Downloads.getContentUri(mediaStoreVolume)) :
-                        ((USE_FILES_MEDIA_STORE) ?
+                        ((!USE_MEDIASTORE_DOWNLOADS) ?
                                 MediaStore.Files.getContentUri(VOLUME_EXTERNAL_NAME) :
                                 MediaStore.Downloads.EXTERNAL_CONTENT_URI);
         }
-        return USE_FILES_MEDIA_STORE && SystemUtils.hasAndroid10OrNewer() ?
+        return !USE_MEDIASTORE_DOWNLOADS && SystemUtils.hasAndroid10OrNewer() ?
                 MediaStore.Files.getContentUri(VOLUME_EXTERNAL_NAME) :
                 MediaStore.Downloads.EXTERNAL_CONTENT_URI;
     }
@@ -206,7 +211,7 @@ public final class AndroidPaths implements SystemPaths {
 
         // "Music/FrostWire"
         String mediaStoreFolderPrefix = fileTypeSubfolder + "/FrostWire";
-        mediaStoreFolderPrefix = mediaStoreFolderPrefix.replace("//","/");
+        mediaStoreFolderPrefix = mediaStoreFolderPrefix.replace("//", "/");
 
         String fullOriginalFilePath = f.getAbsolutePath();
 
@@ -221,7 +226,7 @@ public final class AndroidPaths implements SystemPaths {
         }
 
         String fileFoldersWithoutDataPath = removedDataPathFromFilePath.replace(f.getName(), "");
-        return (mediaStoreFolderPrefix + "/" + fileFoldersWithoutDataPath).replace("//","/");
+        return (mediaStoreFolderPrefix + "/" + fileFoldersWithoutDataPath).replace("//", "/");
     }
 
     /**

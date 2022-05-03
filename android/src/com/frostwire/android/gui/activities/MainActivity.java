@@ -662,8 +662,6 @@ public class MainActivity extends AbstractActivity implements
     public Fragment getFragmentByNavMenuId(int id) {
         if (id == R.id.menu_main_search) {
             return search;
-        } else if (id == R.id.menu_main_library) {
-            return library;
         } else if (id == R.id.menu_main_transfers) {
             return transfers;
         }

@@ -50,7 +50,9 @@ public final class AndroidPlatform extends AbstractPlatform {
     private static final int VERSION_CODE_LOLLIPOP = 21;
 
     public AndroidPlatform(Application app) {
-        super(buildFileSystem(app), new AndroidPaths(app), new AndroidSettings());
+        super(buildFileSystem(app), //FileSystem
+              new AndroidPaths(app),  //SystemPaths
+              new AndroidSettings()); //AppSettings
     }
 
     @Override
