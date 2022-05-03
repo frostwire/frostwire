@@ -86,9 +86,6 @@ public final class CancelMenuAction extends MenuAction {
             transfer.remove(deleteData);
         }
         if (context != null) {
-            UIUtils.broadcastAction(context, Constants.ACTION_FILE_ADDED_OR_REMOVED);
-        }
-        if (context != null) {
             MainActivity.refreshTransfers(context);
         }
     }
@@ -118,7 +115,7 @@ public final class CancelMenuAction extends MenuAction {
         protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
 
             int yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question;
-            if (transfer instanceof SoundcloudDownload || transfer instanceof HttpDownload) {
+            if (transfer instanceof HttpDownload) {
                 yes_no_cancel_transfer_id = R.string.yes_no_cancel_transfer_question_cloud;
             }
 
@@ -161,8 +158,6 @@ public final class CancelMenuAction extends MenuAction {
         private final boolean deleteTorrent;
         private final boolean deleteData;
         private final Dialog dlg;
-        @SuppressWarnings("unused")
-        private final CancelMenuAction cancelMenuAction;
 
         PositiveButtonOnClickListener(Transfer transfer,
                                       boolean deleteTorrent,
@@ -172,7 +167,6 @@ public final class CancelMenuAction extends MenuAction {
             this.transfer = transfer;
             this.deleteTorrent = deleteTorrent;
             this.deleteData = deleteData;
-            this.cancelMenuAction = cancelMenuAction;
             this.dlg = dialog;
         }
 
