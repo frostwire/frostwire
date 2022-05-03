@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.fragments.MainFragment;
-import com.frostwire.android.gui.fragments.MyFilesFragment;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
@@ -116,13 +115,12 @@ public class MainActivity extends AbstractActivity implements
     private NavigationMenu navigationMenu;
     private Fragment currentFragment;
     private SearchFragment search;
-    private MyFilesFragment library;
     private TransfersFragment transfers;
     private BroadcastReceiver mainBroadcastReceiver;
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
 
-    private AtomicBoolean shuttingDown = new AtomicBoolean(false);
+    private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
     public MainActivity() {
         super(R.layout.activity_main);
@@ -548,7 +546,6 @@ public class MainActivity extends AbstractActivity implements
 
     private void setupFragments() {
         search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        library = (MyFilesFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_my_files);
         transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
 
@@ -559,7 +556,7 @@ public class MainActivity extends AbstractActivity implements
             LOG.warn(t.getMessage(), t);
         }
         FragmentTransaction tx = getFragmentManager().beginTransaction();
-        tx.hide(search).hide(library).hide(transfers);
+        tx.hide(search).hide(transfers);
         try {
             tx.commit();
         } catch (IllegalStateException e) {
@@ -672,8 +669,6 @@ public class MainActivity extends AbstractActivity implements
         int menuId = -1;
         if (fragment == search) {
             menuId = R.id.menu_main_search;
-        } else if (fragment == library) {
-            menuId = R.id.menu_main_library;
         } else if (fragment == transfers) {
             menuId = R.id.menu_main_transfers;
         }
