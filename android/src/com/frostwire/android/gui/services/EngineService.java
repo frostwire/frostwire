@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.services;
 
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -54,8 +56,6 @@ import com.frostwire.util.http.OkHttpClientWrapper;
 import java.io.File;
 
 import okhttp3.ConnectionPool;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron

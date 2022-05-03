@@ -23,11 +23,11 @@ import android.util.AttributeSet;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-import com.frostwire.android.R;
-
 import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
+
+import com.frostwire.android.R;
 
 /**
  * @author gubatron

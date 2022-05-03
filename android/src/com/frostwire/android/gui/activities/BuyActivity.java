@@ -47,7 +47,6 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.PaymentOptionsVisibility;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
-import com.frostwire.android.offers.AppLovinAdNetwork;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
