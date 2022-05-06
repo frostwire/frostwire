@@ -227,40 +227,26 @@ public class HexHiveView<T> extends View {
          */
         Rect dimensions;
 
-        /**
-         * Drawing area width
-         */
-        private int width;
-
-        /**
-         * Drawing area height
-         */
-        private int height;
         // Hexagon Geometry Helpers
         /**
          * Number of hexagons to draw
          */
-        private int numHexs;
+        private final int numHexs;
 
         /**
          * Side length of each hexagon
          */
-        private float hexSideLength;
+        private final float hexSideLength;
 
         /**
          * Height of each hexagon
          */
-        private float hexHeight;
+        private final float hexHeight;
 
         /**
          * Width of each hexagon
          */
-        private float hexWidth;
-
-        /**
-         * Hexagon border stroke width, has to be converted to pixels depending on screen density
-         */
-        private float hexBorderStrokeWidth;
+        private final float hexWidth;
 
         private final Point evenRowOrigin;
 
@@ -283,23 +269,32 @@ public class HexHiveView<T> extends View {
          */
         private final Path fillPathBuffer = new Path();
 
+        @SuppressWarnings("rawtypes")
         DrawingProperties(HexDataAdapter adapter, float hexBorderWidth, int left, int top, int right, int bottom) {
             if (adapter == null) {
                 throw new RuntimeException("check your logic, you need a data adapter before calling initDrawingProperties");
             }
             // The canvas can paint the entire view, if padding has been defined,
             // we won't draw outside the padded area.
-            hexBorderStrokeWidth = hexBorderWidth;
+            /*
+              Hexagon border stroke width, has to be converted to pixels depending on screen density
+             */
             dimensions = new Rect(left, top, right, bottom);
             origin = new Point(dimensions.left, dimensions.top);
             center = new Point(dimensions.centerX(), dimensions.centerY());
             end = new Point(dimensions.right, dimensions.bottom);
-            width = dimensions.width();
-            height = dimensions.height();
+            /*
+              Drawing area width
+             */
+            int width = dimensions.width();
+            /*
+              Drawing area height
+             */
+            int height = dimensions.height();
             numHexs = adapter.getTotalHexagonsCount();
             hexSideLength = getHexagonSideLength(width, height, numHexs);
-            hexHeight = getHexHeight(hexSideLength) + 2 * hexBorderStrokeWidth;
-            hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderStrokeWidth);
+            hexHeight = getHexHeight(hexSideLength) + 2 * hexBorderWidth;
+            hexWidth = getHexWidth(hexSideLength) + (2 * hexBorderWidth);
             evenRowOrigin = new Point(
                     (int) (origin.x + (hexWidth / 2)),
                     (int) (origin.y + (hexHeight / 2)));
@@ -310,6 +305,7 @@ public class HexHiveView<T> extends View {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     private void asyncDraw(int canvasWidth, int canvasHeight, HexDataAdapter adapter) {
         // with DP we don't need to think about padding offsets. We just use DP numbers for our calculations
         DP.hexCenterBuffer.set(DP.evenRowOrigin.x, DP.evenRowOrigin.y);
