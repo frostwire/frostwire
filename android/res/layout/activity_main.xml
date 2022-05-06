@@ -53,12 +53,6 @@
                     android:tag="search_fragment" />
 
                 <fragment
-                    android:id="@+id/activity_main_fragment_my_files"
-                    android:name="com.frostwire.android.gui.fragments.MyFilesFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <fragment
                     android:id="@+id/activity_main_fragment_transfers"
                     android:name="com.frostwire.android.gui.fragments.TransfersFragment"
                     android:layout_width="match_parent"

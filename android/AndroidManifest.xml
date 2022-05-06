@@ -174,9 +174,6 @@
                 android:name="com.frostwire.android.gui.activities.AboutActivity"
                 android:label="@string/about" />
         <activity
-                android:name="com.frostwire.android.gui.activities.ImageViewerActivity"
-                android:label="@string/picture" />
-        <activity
                 android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
                 android:configChanges="screenSize"
                 android:label="@string/playing" />
