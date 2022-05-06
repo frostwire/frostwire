@@ -47,7 +47,6 @@ import java.util.Map;
 public final class AndroidPaths implements SystemPaths {
     private static final Logger LOG = Logger.getLogger(AndroidPaths.class);
     private static final String STORAGE_PATH = "FrostWire";
-    public static final String TORRENT_DATA_PATH = "TorrentsData";
     public static final String TORRENTS_PATH = "Torrents";
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
@@ -79,16 +78,18 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     /**
-     * With USE_EXTERNAL_STORAGE_DIR_ON_OR_AFTER_ANDROID_10 : getExternalFilesDir() ...
-     * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData
-     *
-     * With
+     * Downloads/FrostWire
+     * (Used to be FrostWire/TorrentData)
      */
     @Override
     public File data() {
-        return new File(storage(app), TORRENT_DATA_PATH);
+        return storage(app);
     }
 
+    /**
+     * Downloads/FrostWire/Torrents
+     * @return
+     */
     @Override
     public File torrents() {
         return new File(storage(app), TORRENTS_PATH);
@@ -107,7 +108,7 @@ public final class AndroidPaths implements SystemPaths {
     private static final boolean APP_PATHS_SHOWN = false;
 
     /**
-     * getExternalFilesDir() + "/FrostWire"
+     * Environment.getExternalStoragePublicDirectory() + "/FrostWire"
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
      */
     private static File storage(Application app) {
