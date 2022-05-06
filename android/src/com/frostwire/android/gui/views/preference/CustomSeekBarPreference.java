@@ -35,6 +35,8 @@ import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
+import java.util.Objects;
+
 /**
  * Support version of a custom dialog preference
  *
@@ -146,7 +148,6 @@ public final class CustomSeekBarPreference extends DialogPreference {
         private SeekBar mSeekbar;
         private CheckBox mUnlimitedCheckbox;
         private TextView mCurrentValueTextView;
-        private TextView mDialogTitleTextView;
 
         public static CustomSeekBarPreferenceDialog newInstance(final CustomSeekBarPreference preference) {
             CustomSeekBarPreferenceDialog fragment = new CustomSeekBarPreferenceDialog();
@@ -201,7 +202,7 @@ public final class CustomSeekBarPreference extends DialogPreference {
             mSeekbar = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_seekbar);
             mSeekbar.setMax(mEndRange);
 
-            int previousValue = (int) getPreference().getSharedPreferences().getLong(getKey(), mDefault);
+            int previousValue = (int) Objects.requireNonNull(getPreference().getSharedPreferences()).getLong(getKey(), mDefault);
             if (getArguments() != null) {
                 int curVal = getArguments().getInt(CURRENT_VALUE);
                 if (curVal != -1) {
@@ -227,9 +228,9 @@ public final class CustomSeekBarPreference extends DialogPreference {
             mUnlimitedCheckbox = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_unlimited_checkbox);
 
             Bundle arguments = getArguments();
-            mDialogTitleTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_title);
+            TextView dialogTitleTextView = view.findViewById(R.id.dialog_preference_seekbar_with_checkbox_title);
             if (arguments != null) {
-                mDialogTitleTextView.setText(arguments.getCharSequence(DIALOG_TITLE));
+                dialogTitleTextView.setText(arguments.getCharSequence(DIALOG_TITLE));
                 mUnlimitedCheckbox.setChecked(arguments.getBoolean(UNLIMITED_CHECKED));
             } else {
                 mUnlimitedCheckbox.setChecked(false);
