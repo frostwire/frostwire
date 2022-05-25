@@ -34,9 +34,11 @@ import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
@@ -116,18 +118,20 @@ public final class MainController {
             return;
         }
 
-        Uri downloadsFolderUri = Uri.parse(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath());
+        /*
+         Downloads/FrostWire
+         (used to be Downloads/FrostWire/TorrentData)
+         */
+        File data = Platforms.get().systemPaths().data();
+
+        Uri downloadsFolderUri = Uri.parse(data.getAbsolutePath());
 
         // This opens com.google.android.apps.docs but not on the given folder
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        intent.setDataAndType(downloadsFolderUri, DocumentsContract.Document.MIME_TYPE_DIR);
-        //intent.putExtra("org.openintents.extra.ABSOLUTE_PATH", dataFolder.getAbsolutePath());
-
-        // this doesn't work at all
-        // Intent intent = new Intent("com.google.android.apps.docs.DRIVE_OPEN");
-        // intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        // intent.setDataAndType(dataFolderUri, DocumentsContract.Document.MIME_TYPE_DIR);
+        intent.setDataAndType(downloadsFolderUri, "*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra("org.openintents.extra.ABSOLUTE_PATH", data.getAbsolutePath());
 
         ActivityInfo resolvedActivityInfo = intent.resolveActivityInfo(activityRef.get().getPackageManager(), 0);
         if (resolvedActivityInfo != null) {
