@@ -80,7 +80,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Activity activity = activityRef.get();
         String[] permissions = null;
         if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
-            if (SystemUtils.hasAndroid10OrNewer()) {
+            if (SystemUtils.hasAndroid11OrNewer()) {
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             } else {
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
