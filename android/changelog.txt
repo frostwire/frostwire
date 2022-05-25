@@ -1,3 +1,11 @@
+FrostWire 2.5.0 build 693 - MAY/25/2022
+ - Removal of "My Files", impossible to maintain with the file management quicksand on android
+ - "My Files" opens the user's favorite Android File Explorer
+ - Fixes issues where finished downloads would get re-inserted into the MediaStore
+   giving users the impression the file had been downloaded multiple times
+ - Major code cleanup after removal of "My Files" fragments and activities
+ - com.android.tools.build:gradle:7.2.0
+
 FrostWire 2.4.8 build 691 - APR/20/2022
  - TorLock search fixed
  - Removed torrent-paradise.ml, moved to IPFS, no longer works with JSON api
