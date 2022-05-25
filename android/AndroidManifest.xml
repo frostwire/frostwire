@@ -50,10 +50,10 @@
          -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!-- we gotta leave this here for Android 7.0 (24), 7.1.1 (25), 8.0 (26), 8.1 (27) and 9 (28) -->
+    <!-- we gotta leave this here for Android 7.0 (24), 7.1.1 (25), 8.0 (26), 8.1 (27), 9 (28) and 10 (29) -->
     <uses-permission
             android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-            android:maxSdkVersion="28"
+            android:maxSdkVersion="29"
             android:requestLegacyExternalStorage="true"
             tools:ignore="ScopedStorage" />
 
