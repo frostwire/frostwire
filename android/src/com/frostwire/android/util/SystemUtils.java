@@ -51,7 +51,9 @@ public final class SystemUtils {
 
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
-    private static final int VERSION_SDK_NOUGAT_7_0 = 24;
+    private static final int VERSION_SDK_NOUGAT_7_0_N = 24;
+    private static final int VERSION_SDK_ANDROID_10_Q = 29;
+    private static final int VERSION_SDK_ANDROID_11_R = 30;
 
     private SystemUtils() {
     }
@@ -123,6 +125,10 @@ public final class SystemUtils {
         return Build.VERSION.SDK_INT >= versionCode;
     }
 
+    private static boolean hasSdk(int versionCode) {
+        return Build.VERSION.SDK_INT == versionCode;
+    }
+
     /**
      * Used to determine if the device is running
      * Nougat (Android 7.0) or greater.
@@ -138,14 +144,18 @@ public final class SystemUtils {
      * Used to determine if the device is running Android11 or greater
      */
     public static boolean hasAndroid10OrNewer() {
-        return hasSdkOrNewer(Build.VERSION_CODES.Q);
+        return hasSdkOrNewer(VERSION_SDK_ANDROID_10_Q);
+    }
+
+    public static boolean hasAndroid10() {
+        return hasSdk(VERSION_SDK_ANDROID_10_Q);
     }
 
     /**
      * Used to determine if the device is running Android11 or greater
      */
     public static boolean hasAndroid11OrNewer() {
-        return hasSdkOrNewer(30); //Build.VERSION_CODES.R
+        return hasSdkOrNewer(VERSION_SDK_ANDROID_11_R);
     }
 
     public static void waitWhileServicesAreRunning(Context context, long timeout, Class<?>... serviceClasses) {
