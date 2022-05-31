@@ -39,16 +39,6 @@
         name="torrents"
         path="Torrents/" />
 
-    <!-- IDEA FOR 3RD OPTION, STORE TO EXTERNAL MEDIA -->
-    <!--
-    Represents files in the root of your app's external media area.
-    The root path of this subdirectory is the same as the value returned
-    by the first result of Context.getExternalMediaDirs().
-    -->
-    <!--    <external-media-path-->
-    <!--        name="torrent_data"-->
-    <!--        path="TorrentsData/"/>-->
-
     <!-- APP's EXTERNAL FOLDERS -->
 
     <!-- Represents files in the root of the external storage area.
