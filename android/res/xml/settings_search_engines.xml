@@ -54,10 +54,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />
     <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_torrent_paradise"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_torrent_paradise" />
-    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentz2"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentz2" />

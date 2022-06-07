@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,6 +44,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
     private final Map<CheckBoxPreference, SearchEngine> activeSearchEnginePreferences;
 
     public SearchEnginesPreferenceFragment() {
+        // See settings_search_engines.xml if you're looking for the layout that has all the checkboxes
         super(R.xml.settings_search_engines);
         activeSearchEnginePreferences = new HashMap<>();
     }

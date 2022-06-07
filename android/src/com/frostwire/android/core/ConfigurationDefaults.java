@@ -111,7 +111,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MAGNETDL, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENT_PARADISE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);

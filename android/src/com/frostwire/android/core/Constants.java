@@ -80,7 +80,6 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
     public static final String PREF_KEY_SEARCH_USE_IDOPE = "frostwire.prefs.search.use_idope";
     public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
-    public static final String PREF_KEY_SEARCH_USE_TORRENT_PARADISE = "frostwire.prefs.search.use_torrent_paradise";
     public static final String PREF_KEY_SEARCH_USE_GLOTORRENTS = "frostwire.prefs.search.use_glotorrents";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
