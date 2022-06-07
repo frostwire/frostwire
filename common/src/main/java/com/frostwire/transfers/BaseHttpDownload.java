@@ -288,6 +288,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     protected void moveAndComplete(File src, File dst) {
+        LOG.info("BaseHttpDownload::moveAndComplete from " + src.getAbsolutePath() + " to " + dst.getAbsolutePath());
         FileSystem fs = Platforms.fileSystem();
         if (fs.copy(src, dst)) {
             if (!fs.delete(src)) {

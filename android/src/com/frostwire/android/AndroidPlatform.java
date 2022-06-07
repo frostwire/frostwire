@@ -106,7 +106,11 @@ public final class AndroidPlatform extends AbstractPlatform {
             libtorrent.set_posix_wrapper(w);
             //LibTorrent.setPosixWrapper(new PosixCalls(lfs));
             fs = lfs;
-        } else {
+        }
+        else if (SystemUtils.hasAndroid10()) {
+            fs = new Android10QFileSystem(app);
+        }
+        else {
             fs = new DefaultFileSystem();
         }
 
