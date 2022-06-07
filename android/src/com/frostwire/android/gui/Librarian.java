@@ -22,11 +22,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.provider.BaseColumns;
+import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.system.Os;
 
@@ -46,7 +49,10 @@ import com.frostwire.android.gui.transfers.Transfers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
+import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
+import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -401,7 +407,60 @@ public final class Librarian {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private void copyFileBytesToMediaStore(ContentResolver contentResolver,
+    public boolean mediaStoreSaveToDownloads(Context context, File src, File dest) {
+        LOG.info("Librarian::mediaStoreSaveToDownloads trying to save " + src.getAbsolutePath() + " into " + dest.getAbsolutePath());
+        String relativePath = AndroidPaths.getRelativeFolderPath(dest);
+        return mediaStoreInsert(context, src, relativePath);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath) {
+        if (srcFile.isDirectory()) {
+            return false;
+        }
+        // Add to MediaStore
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(MediaColumns.IS_PENDING, 1);
+
+        if (!StringUtils.isNullOrEmpty(relativeFolderPath)) {
+            values.put(MediaColumns.RELATIVE_PATH, relativeFolderPath);
+        } else {
+            LOG.info("WARNING, relative relativeFolderPath is null for " + srcFile.getAbsolutePath());
+        }
+
+        values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
+        values.put(MediaColumns.MIME_TYPE, MimeDetector.getMimeType(FilenameUtils.getExtension(srcFile.getName())));
+        values.put(MediaColumns.DATE_ADDED, System.currentTimeMillis() / 1000);
+        values.put(MediaColumns.DATE_MODIFIED, System.currentTimeMillis() / 1000);
+        values.put(MediaColumns.SIZE, srcFile.length());
+
+        byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
+        if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
+            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+            mmr.setDataSource(srcFile.getAbsolutePath());
+            String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
+            if (title != null) {
+                values.put(MediaColumns.TITLE, title);
+                values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
+            }
+        } else {
+            values.put(MediaColumns.TITLE, srcFile.getName());
+        }
+        Uri downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
+        //Uri downloadsExternalUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        Uri insertedUri = resolver.insert(downloadsExternalUri, values);
+        if (insertedUri == null) {
+            LOG.error("mediaStoreInsert -> could not perform media store insertion");
+            return false;
+        }
+        LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
+        return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private boolean copyFileBytesToMediaStore(ContentResolver contentResolver,
                                            File srcFile,
                                            ContentValues values,
                                            Uri insertedUri) {
@@ -409,7 +468,7 @@ public final class Librarian {
             OutputStream outputStream = contentResolver.openOutputStream(insertedUri);
             if (outputStream == null) {
                 LOG.error("copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" + insertedUri);
-                return;
+                return false;
             }
             BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
             sink.writeAll(Okio.source(srcFile));
@@ -417,11 +476,12 @@ public final class Librarian {
             sink.close();
         } catch (Throwable t) {
             LOG.error("copyFileBytesToMediaStore error: " + t.getMessage(), t);
-            return;
+            return false;
         }
         values.clear();
         values.put(MediaColumns.IS_PENDING, 0);
         contentResolver.update(insertedUri, values, null, null);
+        return true;
     }
 
     private void initHandler() {
