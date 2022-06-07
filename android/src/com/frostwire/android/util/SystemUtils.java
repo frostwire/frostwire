@@ -137,7 +137,7 @@ public final class SystemUtils {
      * {@code false} otherwise
      */
     public static boolean hasNougatOrNewer() {
-        return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0);
+        return hasSdkOrNewer(VERSION_SDK_NOUGAT_7_0_N);
     }
 
     /**
