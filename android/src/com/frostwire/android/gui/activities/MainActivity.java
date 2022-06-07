@@ -413,8 +413,6 @@ public class MainActivity extends AbstractActivity implements
         if (isShutdown()) {
             return;
         }
-
-        checkExternalStoragePermissions();//OrBindMusicService();
     }
 
     private void checkExternalStoragePermissions() {
