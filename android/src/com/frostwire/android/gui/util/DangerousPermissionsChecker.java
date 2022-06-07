@@ -81,8 +81,12 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         String[] permissions = null;
         if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
             if (SystemUtils.hasAndroid11OrNewer()) {
+                // no more need for WRITE_EXTERNAL_STORAGE permission on Android 11,
+                // android:requestLegacyExternalStorage does nothing for android11 and up
+                // and it's ok because they finally let you use File API on the public downloads folders
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             } else {
+                // Android 10 (29) + android:requestLegacyExternalStorage should make it work
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
             }
         }
