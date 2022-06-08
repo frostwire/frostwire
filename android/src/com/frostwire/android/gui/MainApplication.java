@@ -30,6 +30,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
@@ -54,6 +55,8 @@ import java.util.Random;
 public class MainApplication extends MultiDexApplication {
 
     private static final Logger LOG = Logger.getLogger(MainApplication.class);
+
+    private static Context appContext;
 
     @Override
     public void onCreate() {

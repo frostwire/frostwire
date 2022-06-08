@@ -110,8 +110,12 @@ public final class AndroidPaths implements SystemPaths {
      */
     private static File storage(Application app) {
         if (SystemUtils.hasAndroid10OrNewer()) {
+            if (SystemUtils.hasAndroid10()) {
+                return app.getExternalFilesDir(null);
+            }
+
             // On Android 11 and up, they finally let us use File objects in the public download directory as long as we have permission from the user
-            return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), STORAGE_PATH);
+            return android11AndUpStorage();
         }
 
         /* For Older versions of Android where we used to have access to write to external storage
@@ -123,6 +127,10 @@ public final class AndroidPaths implements SystemPaths {
         } else {
             return new File(path, STORAGE_PATH);
         }
+    }
+
+    public static File android11AndUpStorage() {
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), STORAGE_PATH);
     }
 
     public static byte getFileType(String filePath, boolean returnTorrentsAsDocument) {
