@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,17 +17,12 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
 
-import com.frostwire.android.core.Constants;
-import com.frostwire.android.core.FWFileDescriptor;
-import com.frostwire.android.core.providers.TableFetcher;
-import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.bittorrent.PaymentOptions;
@@ -185,43 +180,27 @@ public final class UIBittorrentDownload implements BittorrentDownload {
 
         if (Ref.alive(contextRef) && deleteData && isComplete()) {
             // Let's remove all the file descriptors from the fetchers
-            deleteFilesFromContentResolver(contextRef.get(), deleteTorrent);
+            //deleteFilesFromContentResolver(contextRef.get(), deleteTorrent);
+
+            getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
+
+                if (SystemUtils.hasAndroid10()) {
+                    Librarian.mediaStoreDeleteFromDownloads(item.getFile());
+                }
+
+                // delete from the internal folder
+                try {
+                    if (item.getFile().isFile()) {
+                        item.getFile().delete();
+                    }
+                } catch (Throwable t) {
+                    LOG.error("UIBittorrentDownload::remove failed to delete the internal file -> " + item.getFile().getAbsolutePath());
+                }
+            });
+
         }
 
         dl.remove(deleteTorrent, deleteData);
-    }
-
-    private void deleteFilesFromContentResolver(Context context, boolean deleteTorrent) {
-        final List<TransferItem> items = getItems();
-        final ContentResolver cr = context.getContentResolver();
-        Librarian librarian = Librarian.instance();
-        if (librarian == null) {
-            return;
-        }
-        for (TransferItem item : items) {
-            final List<FWFileDescriptor> FWFileDescriptors = librarian.getFilesInAndroidMediaStore(context, item.getFile().getAbsolutePath(), true);
-            for (FWFileDescriptor fd : FWFileDescriptors) {
-                File file = new File(fd.filePath);
-                if (file.isFile()) {
-                    try {
-                        TableFetcher fetcher = TableFetchers.getFetcher(fd.fileType);
-                        if (fetcher != null) {
-                            cr.delete(fetcher.getExternalContentUri(), MediaStore.MediaColumns._ID + " = " + fd.id, null);
-                        }
-                    } catch (Throwable e) {
-                        LOG.error("Failed to delete file from media store. (" + fd.filePath + ")", e);
-                    }
-                }
-            }
-        }
-
-        if (deleteTorrent) {
-            File torrent = dl.getTorrentFile();
-            if (torrent != null) {
-                final List<FWFileDescriptor> fds = librarian.getFilesInAndroidMediaStore(context, Constants.FILE_TYPE_TORRENTS, torrent.getAbsolutePath(), true);
-                librarian.deleteFiles(context, Constants.FILE_TYPE_TORRENTS, fds);
-            }
-        }
     }
 
     @Override
