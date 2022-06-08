@@ -18,16 +18,24 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.content.Context;
+
+import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadListener;
+import com.frostwire.platform.Platforms;
+import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 public final class UIBTDownloadListener implements BTDownloadListener {
@@ -46,6 +54,59 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         File torrentSaveFolder = dl.getContentSavePath();
         finalCleanup(dl, dl.getIncompleteFiles());
         fixBinPaths(torrentSaveFolder);
+
+
+        if (SystemUtils.hasAndroid10()) {
+            moveFinishedTransferItemsToMediaStoreAsync(dl);
+        }
+    }
+
+    /**
+     * We only use this method for Android 10.
+     * The actual file copying to the Downloads/FrostWire folder
+     * is done with the MediaStore API the main thread pool as to not block
+     * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
+    */
+    private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl) {
+        // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
+        // on Android10, therefore we need to use the media store to move
+        // the downloaded files to the public Downloads/FrostWire folder
+        List<TransferItem> items = dl.getItems();
+        items.stream().filter(TransferItem::isComplete).forEach(item -> {
+            // /storage/emulated/0/Android/data/com.frostwire.android/files/FOO_FOLDER/bar.ext
+            final File sourceFile = item.getFile();
+            String fullSourcePath = item.getFile().getAbsolutePath();
+
+            // bar.ext
+            String filename = item.getFile().getName();
+
+            // Subtract data path from android 10
+            // "/storage/emulated/0/Android/data/com.frostwire.android/files" ->
+            String dataPath = Platforms.get().systemPaths().data().getAbsolutePath();
+
+            String possiblyFolderAndFileName = fullSourcePath.replace(dataPath, "");
+            String possiblyFolderName = possiblyFolderAndFileName.replace(filename, "");
+
+            File android11StorageFolder = AndroidPaths.android11AndUpStorage();
+            File destinationFolder = android11StorageFolder;
+
+            if (!possiblyFolderName.equals("/") && possiblyFolderName.length() > 1) {
+                destinationFolder = new File(android11StorageFolder, possiblyFolderName);
+            }
+            final File destinationFile = new File(destinationFolder, filename);
+
+            // disk IO sent to main threadpool
+            Engine.instance().getThreadPool().execute(() -> {
+                        Context applicationContext =
+                                Engine.instance().getApplication().getApplicationContext();
+                        Librarian.instance().
+                                mediaStoreSaveToDownloads(
+                                        applicationContext,
+                                        sourceFile,
+                                        destinationFile);
+                    }
+            );
+        });
     }
 
     // The torrent's folder,e.g. Torrent Data/<foo folder>, not Torrent Data.
@@ -56,18 +117,18 @@ public final class UIBTDownloadListener implements BTDownloadListener {
                 return;
             }
             for (File f : files) {
-              if (f.isDirectory()) {
-                  fixBinPaths(f);
-              } else if (f.getAbsolutePath().endsWith(".bin")) {
-                  String fileNameWithoutBin = f.getName().replace(".bin", "");
-                  File renamed = new File(torrentContentsFolder, fileNameWithoutBin);
-                  boolean renameSuccess = f.renameTo(renamed);
-                  if (!renameSuccess) {
-                      LOG.error("UIBTDownloadListener.fixBinPaths: failed to rename " + fileNameWithoutBin + " to " + renamed.getName());
-                  } else {
-                      LOG.info("UIBTDownloadListener.fixBinPaths: success renaming " + fileNameWithoutBin + " to " + renamed.getName());
-                  }
-              }
+                if (f.isDirectory()) {
+                    fixBinPaths(f);
+                } else if (f.getAbsolutePath().endsWith(".bin")) {
+                    String fileNameWithoutBin = f.getName().replace(".bin", "");
+                    File renamed = new File(torrentContentsFolder, fileNameWithoutBin);
+                    boolean renameSuccess = f.renameTo(renamed);
+                    if (!renameSuccess) {
+                        LOG.error("UIBTDownloadListener.fixBinPaths: failed to rename " + fileNameWithoutBin + " to " + renamed.getName());
+                    } else {
+                        LOG.info("UIBTDownloadListener.fixBinPaths: success renaming " + fileNameWithoutBin + " to " + renamed.getName());
+                    }
+                }
             }
         }
     }
