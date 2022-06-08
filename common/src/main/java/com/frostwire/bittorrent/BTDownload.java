@@ -445,6 +445,7 @@ public final class BTDownload implements BittorrentDownload {
     private void torrentFinished() {
         if (listener != null) {
             try {
+                LOG.info("BTDownload::torrentFinished", true);
                 listener.finished(this);
             } catch (Throwable e) {
                 LOG.error("Error calling listener (finished)", e);

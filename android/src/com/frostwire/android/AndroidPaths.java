@@ -30,6 +30,7 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.platform.Platforms;
 import com.frostwire.platform.SystemPaths;
 import com.frostwire.util.Logger;
 
@@ -105,7 +106,7 @@ public final class AndroidPaths implements SystemPaths {
     /**
      * Environment.getExternalStoragePublicDirectory() + "/Downloads/FrostWire" (This path won't work on android 10 even with legacy flag on)
      * /storage/emulated/0/Download/FrostWire/
-     *
+     * <p>
      * /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/
      */
     private static File storage(Application app) {
@@ -150,17 +151,17 @@ public final class AndroidPaths implements SystemPaths {
     }
 
     /**
-     *  /storage/emulated/0/Download/FrostWire/foo.png -> "Download/FrostWire"
-     *  /storage/emulated/0/Download/FrostWire/SomeFolder/bar.gif -> "Download/FrostWire/SomeTorrentFolder"
-     *
-     *  Should not have any trailing slashes, nor double slashes.
+     * /storage/emulated/0/Download/FrostWire/foo.png -> "Download/FrostWire"
+     * /storage/emulated/0/Download/FrostWire/SomeFolder/bar.gif -> "Download/FrostWire/SomeTorrentFolder"
+     * <p>
+     * Should not have any trailing slashes, nor double slashes.
      */
-    public static String getRelativeFolderPath(File f) {
+    public static String getRelativeFolderPathFromFileInDownloads(File f) {
         if (BTEngine.ctx.dataDir == null) {
             throw new RuntimeException("AndroidPaths.getRelativeFolderPath() BTEngine.ctx.dataDir is null, check your logic");
         }
-        byte fileType = AndroidPaths.getFileType(f.getAbsolutePath(), true);
 
+        // "Download/FrostWire"
         String commonRelativePrefix = Environment.DIRECTORY_DOWNLOADS + "/FrostWire";
         commonRelativePrefix = commonRelativePrefix.replace("//", "/").replaceAll("/\\z", "");
 
@@ -168,14 +169,52 @@ public final class AndroidPaths implements SystemPaths {
 
         // Let's remove this from the fullOriginalFilePath and we should now have only either the file name by itself
         // or the torrent folders and sub-folders containing it
-        String removedDataPathFromFilePath = fullOriginalFilePath.replace(BTEngine.ctx.dataDir.getAbsolutePath() + "/", "");
+        String removedDataPathFromFilePath = fullOriginalFilePath;
+        if (SystemUtils.hasAndroid10()) {
+            // in case it's an internal file (android 10)
+            removedDataPathFromFilePath = fullOriginalFilePath.
+                    replace(BTEngine.ctx.dataDir.getAbsolutePath() + "/", "");
+        }
+
+        // this is the most likely prefix (android 11+)
+        removedDataPathFromFilePath = removedDataPathFromFilePath.
+                replace("/storage/emulated/0/", "");
+
 
         // Single file download, not contained by folders or sub-folders
         if (removedDataPathFromFilePath.equals(f.getName())) {
             return commonRelativePrefix;
         }
 
-        String fileFoldersWithoutDataPath = removedDataPathFromFilePath.replace(f.getName(), "");
-        return (commonRelativePrefix + "/" + fileFoldersWithoutDataPath).replace("//", "/").replaceAll("/\\z", "");
+        String result = removedDataPathFromFilePath.replace(f.getName(), "").
+                replaceAll("/\\z", ""); // remove trailing slash
+        return result;
+    }
+
+    /**
+     * /storage/emulated/0/Android/data/com.frostwire.android/files/myfile.ext -> /storage/emulated/0/Download/FrostWire/myfile.ext
+     * /storage/emulated/0/Android/data/com.frostwire.android/files/folder/myfile.ext -> /storage/emulated/0/Download/FrostWire/folder/myfile.ext
+     */
+    public static File getDestinationFileFromInternalFileInAndroid10(File internalSourceFile) {
+        String fullSourcePath = internalSourceFile.getAbsolutePath();
+
+        // bar.ext
+        String filename = internalSourceFile.getName();
+
+        // Subtract data path from android 10
+        // "/storage/emulated/0/Android/data/com.frostwire.android/files" ->
+        String dataPath = Platforms.get().systemPaths().data().getAbsolutePath();
+
+        String possiblyFolderAndFileName = fullSourcePath.replace(dataPath, "");
+        String possiblyFolderName = possiblyFolderAndFileName.replace(filename, "");
+
+        File android11StorageFolder = AndroidPaths.android11AndUpStorage();
+        File destinationFolder = android11StorageFolder;
+
+        if (!possiblyFolderName.equals("/") && possiblyFolderName.length() > 1) {
+            destinationFolder = new File(android11StorageFolder, possiblyFolderName);
+        }
+        final File destinationFile = new File(destinationFolder, filename);
+        return destinationFile;
     }
 }
