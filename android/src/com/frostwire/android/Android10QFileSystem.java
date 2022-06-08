@@ -32,6 +32,6 @@ public class Android10QFileSystem extends DefaultFileSystem {
     }
 
     public boolean copy(File src, File dest) {
-        return Librarian.instance().mediaStoreSaveToDownloads(app.getApplicationContext(), src, dest);
+        return Librarian.mediaStoreSaveToDownloads(src, dest);
     }
 }

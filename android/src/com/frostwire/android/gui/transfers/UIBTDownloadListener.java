@@ -71,40 +71,15 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
         // on Android10, therefore we need to use the media store to move
         // the downloaded files to the public Downloads/FrostWire folder
-        List<TransferItem> items = dl.getItems();
-        items.stream().filter(TransferItem::isComplete).forEach(item -> {
+        dl.getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
             // /storage/emulated/0/Android/data/com.frostwire.android/files/FOO_FOLDER/bar.ext
             final File sourceFile = item.getFile();
-            String fullSourcePath = item.getFile().getAbsolutePath();
+            // /storage/emulated/0/Download/FrostWire/FOO_FOLDER/bar.ext
+            final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
 
-            // bar.ext
-            String filename = item.getFile().getName();
-
-            // Subtract data path from android 10
-            // "/storage/emulated/0/Android/data/com.frostwire.android/files" ->
-            String dataPath = Platforms.get().systemPaths().data().getAbsolutePath();
-
-            String possiblyFolderAndFileName = fullSourcePath.replace(dataPath, "");
-            String possiblyFolderName = possiblyFolderAndFileName.replace(filename, "");
-
-            File android11StorageFolder = AndroidPaths.android11AndUpStorage();
-            File destinationFolder = android11StorageFolder;
-
-            if (!possiblyFolderName.equals("/") && possiblyFolderName.length() > 1) {
-                destinationFolder = new File(android11StorageFolder, possiblyFolderName);
-            }
-            final File destinationFile = new File(destinationFolder, filename);
-
-            // disk IO sent to main threadpool
-            Engine.instance().getThreadPool().execute(() -> {
-                        Context applicationContext =
-                                Engine.instance().getApplication().getApplicationContext();
-                        Librarian.instance().
-                                mediaStoreSaveToDownloads(
-                                        applicationContext,
-                                        sourceFile,
-                                        destinationFile);
-                    }
+            // disk IO sent to main thread pool
+            Engine.instance().getThreadPool().
+                    execute(() -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile)
             );
         });
     }
