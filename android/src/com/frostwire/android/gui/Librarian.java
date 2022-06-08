@@ -105,12 +105,6 @@ public final class Librarian {
         }
     }
 
-    // Called by MyFileFragment.loadInBackground() -> createLoaderFiles() -> CreateLoaderFilesAsyncTaskLoader.loadInBackground()
-    //
-    public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, int offset, int pageSize) {
-        return getFilesInAndroidMediaStore(context, offset, pageSize, TableFetchers.getFetcher(fileType));
-    }
-
     public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String where, String[] whereArgs) {
         return getFilesInAndroidMediaStore(context, 0, Integer.MAX_VALUE, TableFetchers.getFetcher(fileType), where, whereArgs);
     }
@@ -362,6 +356,7 @@ public final class Librarian {
      */
     public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
+        filepath = filepath.replace(Platforms.get().systemPaths().data().getAbsolutePath(),"");
         String[] whereArgs = new String[]{(exactPathMatch) ? filepath : "%" + filepath + "%"};
         return getFilesInAndroidMediaStore(context, fileType, where, whereArgs);
     }
@@ -531,7 +526,7 @@ public final class Librarian {
         try {
             OutputStream outputStream = contentResolver.openOutputStream(insertedUri);
             if (outputStream == null) {
-                LOG.error("copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" + insertedUri);
+                LOG.error("Librarian::copyFileBytesToMediaStore failed, could not get an output stream from insertedUri=" + insertedUri);
                 return false;
             }
             BufferedSink sink = Okio.buffer(Okio.sink(outputStream));
@@ -539,13 +534,40 @@ public final class Librarian {
             sink.flush();
             sink.close();
         } catch (Throwable t) {
-            LOG.error("copyFileBytesToMediaStore error: " + t.getMessage(), t);
+            LOG.error("Librarian::copyFileBytesToMediaStore error: " + t.getMessage(), t);
             return false;
         }
         values.clear();
         values.put(MediaColumns.IS_PENDING, 0);
         contentResolver.update(insertedUri, values, null, null);
         return true;
+    }
+
+    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
+    public static void mediaStoreDeleteFromDownloads(File fileBittorrentTransferItem) {
+        File destinationFileInDownloads = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(fileBittorrentTransferItem);
+        String relativeFolderPath = AndroidPaths.getRelativeFolderPathFromFileInDownloads(destinationFileInDownloads);
+        String displayName = fileBittorrentTransferItem.getName();
+        ContentResolver contentResolver = Engine.instance().getApplication().getContentResolver();
+        Uri externalUri = MediaStore.Downloads.getContentUri("external");
+        String[] projection = {MediaStore.Downloads._ID};
+        String selection = MediaStore.Downloads.DISPLAY_NAME + " = ? and " + MediaStore.Downloads.RELATIVE_PATH + " LIKE ?";
+        String[] selectionArgs = {displayName, "%" + relativeFolderPath + "%"};
+        // first we need to get the file URL in the media store, we'll do so with the relative path and display name
+        Cursor query = contentResolver.query(externalUri, projection, selection, selectionArgs, null);
+        if (query != null && query.getCount() > 0) {
+            query.moveToFirst();
+            int columnIndex = query.getColumnIndex(projection[0]);
+            long fileId = query.getLong(columnIndex);
+            query.close();
+
+            Uri fileUri = Uri.parse(externalUri.toString() + "/" + fileId);
+
+            int deleted = contentResolver.delete(fileUri, selection, selectionArgs);
+            LOG.info("Librarian::mediaStoreDeleteFromDownloads deleted " + deleted + " files -> " + fileUri + " : " + displayName);
+        } else {
+            LOG.info("Librarian::mediaStoreDeleteFromDownloads could not delete " + displayName);
+        }
     }
 
     private void initHandler() {
