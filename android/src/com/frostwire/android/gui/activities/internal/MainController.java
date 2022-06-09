@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.activities.internal;
 
+import android.app.DownloadManager;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -117,30 +118,10 @@ public final class MainController {
         if (!Ref.alive(activityRef)) {
             return;
         }
-
-        /*
-         Downloads/FrostWire
-         (used to be Downloads/FrostWire/TorrentData)
-         */
-        File data = Platforms.get().systemPaths().data();
-
-        Uri downloadsFolderUri = Uri.parse(data.getAbsolutePath());
-
         // This opens com.google.android.apps.docs but not on the given folder
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        intent.setDataAndType(downloadsFolderUri, "*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra("org.openintents.extra.ABSOLUTE_PATH", data.getAbsolutePath());
-
-        ActivityInfo resolvedActivityInfo = intent.resolveActivityInfo(activityRef.get().getPackageManager(), 0);
-        if (resolvedActivityInfo != null) {
-            LOG.info("showMyFiles: resolved package name=" + resolvedActivityInfo.packageName);
-            LOG.info("showMyFiles: uri=" + downloadsFolderUri);
-            activityRef.get().startActivity(intent);
-        } else {
-            UIUtils.showToastMessage(activityRef.get(),"Could not find a file explorer", Toast.LENGTH_SHORT);
-        }
+        activityRef.get().startActivity(intent);
     }
 
     public void startWizardActivity() {
