@@ -150,7 +150,6 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     public void onBackPressed() {
-        boolean lastBackDialogShown = false;
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
@@ -162,22 +161,12 @@ public class MainActivity extends AbstractActivity implements
             } catch (Throwable e) {
                 // don't break the app
                 showLastBackDialog();
-                lastBackDialogShown = true;
             }
         } else {
             showLastBackDialog();
-            lastBackDialogShown = true;
         }
         syncNavigationMenu();
         updateHeader(getCurrentFragment());
-        if (!lastBackDialogShown) {
-            Offers.showInterstitialOfferIfNecessary(
-                    this,
-                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                    false,
-                    false,
-                    true);
-        }
     }
 
     public void shutdown() {
@@ -467,10 +456,6 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE) {
-            Offers.showInterstitialOfferIfNecessary(this, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false, true);
-        }
-
         // the filetype and audio id parameters are passed via static hack
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
