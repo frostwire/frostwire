@@ -60,16 +60,13 @@ public final class UIBTDownloadListener implements BTDownloadListener {
 
         if (SystemUtils.hasAndroid10()) {
             moveFinishedTransferItemsToMediaStoreAsync(dl);
-        } else {
-            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
-                    new String[]{savePath.getAbsolutePath(),
-                            dl.getSavePath().getAbsolutePath(),
-                            Platforms.get().systemPaths().data().getAbsolutePath()},
-                    new String[]{"*/*"},
-                    (path, uri) -> {
-                        LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + path);
-                    });
         }
+        MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                new String[]{savePath.getAbsolutePath(),
+                        dl.getSavePath().getAbsolutePath(),
+                        Platforms.get().systemPaths().data().getAbsolutePath()},
+                new String[]{"*/*"},
+                (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + path));
     }
 
     /**
@@ -88,10 +85,8 @@ public final class UIBTDownloadListener implements BTDownloadListener {
             // /storage/emulated/0/Download/FrostWire/FOO_FOLDER/bar.ext
             final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
 
-            // disk IO sent to main thread pool
-            Engine.instance().getThreadPool().
-                    execute(() -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile)
-                    );
+            // disk IO sent to DOWNLOADER handler thread
+            SystemUtils.HandlerFactory.postTo(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile));
         });
     }
 
