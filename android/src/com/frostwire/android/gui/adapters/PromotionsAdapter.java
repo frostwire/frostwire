@@ -86,7 +86,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         }
 
         final Slide theSlide = viewItem;
-        View.OnClickListener downloadPromoClickListener = view -> startPromotionDownlaod(theSlide);
+        View.OnClickListener downloadPromoClickListener = view -> startPromotionDownload(theSlide);
 
         View.OnClickListener previewClickListener = view -> startVideoPreview(theSlide.videoURL);
 
@@ -130,7 +130,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         ((MainActivity) getContext()).startActivityForResult(i, MainActivity.PROMO_VIDEO_PREVIEW_RESULT_CODE);
     }
 
-    private void startPromotionDownlaod(Slide theSlide) {
+    private void startPromotionDownload(Slide theSlide) {
         promotionDownloader.startPromotionDownload(theSlide);
         Offers.showInterstitialOfferIfNecessary((MainActivity) getContext(), Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
     }
