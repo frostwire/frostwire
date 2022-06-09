@@ -145,6 +145,7 @@ public final class Engine implements IEngineService {
         }
     }
 
+    /** Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if possible */
     public ExecutorService getThreadPool() {
         return MAIN_THREAD_POOL;
     }
