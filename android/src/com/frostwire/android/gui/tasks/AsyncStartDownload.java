@@ -30,6 +30,7 @@ import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.transfers.ExistingDownload;
 import com.frostwire.android.gui.transfers.InvalidDownload;
 import com.frostwire.android.gui.transfers.InvalidTransfer;
+import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
@@ -37,12 +38,15 @@ import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.transfers.BaseHttpDownload;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -126,11 +130,7 @@ public class AsyncStartDownload {
     private static void onPostExecute(final Context ctx, final SearchResult sr, final String message, final Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
-                SystemUtils.postDelayed(() -> {
-                    if (transfer.isDownloading()) {
-                        Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
-                    }
-                }, 15000);
+                SystemUtils.postDelayed(() -> tryShowingInterstitialIfActuallyDownloading(ctx, transfer), 15000);
             }
 
             if (!(transfer instanceof InvalidTransfer)) {
@@ -150,6 +150,37 @@ public class AsyncStartDownload {
                 UIUtils.showTransfersOnDownloadStart(ctx);
             } else if (!(transfer instanceof ExistingDownload)) {
                 UIUtils.showLongMessage(ctx, ((InvalidTransfer) transfer).getReasonResId());
+            }
+        }
+    }
+
+    private static void tryShowingInterstitialIfActuallyDownloading(final Context ctx, Transfer transfer) {
+        if (transfer instanceof BaseHttpDownload) {
+            Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
+            return;
+        }
+
+        if (transfer instanceof BittorrentDownload) {
+            String infoHash = ((TorrentFetcherDownload) transfer).getInfoHash();
+            // our transfer instance is a stale copy at this point, let's ask the transfer manager
+            // for a fresh version.
+
+            List<Transfer> transfers = TransferManager.instance().getTransfers();
+            Transfer currentVersionOfTransfer = null;
+            for (Transfer t : transfers) {
+                if (t instanceof BittorrentDownload &&
+                        ((BittorrentDownload) t).getInfoHash() != null &&
+                        ((BittorrentDownload) t).getInfoHash().equalsIgnoreCase(infoHash)) {
+                    currentVersionOfTransfer = t;
+                    break;
+                }
+            }
+            if (currentVersionOfTransfer == null) {
+                return;
+            }
+            TransferState state = currentVersionOfTransfer.getState();
+            if (state.equals(TransferState.DOWNLOADING) || state.equals(TransferState.DOWNLOADING_TORRENT)) {
+                Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
             }
         }
     }
