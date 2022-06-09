@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui;
 
+import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -356,7 +357,7 @@ public final class Librarian {
      */
     public List<FWFileDescriptor> getFilesInAndroidMediaStore(final Context context, byte fileType, String filepath, boolean exactPathMatch) {
         String where = MediaColumns.DATA + " LIKE ?";
-        filepath = filepath.replace(Platforms.get().systemPaths().data().getAbsolutePath(),"");
+        filepath = filepath.replace(Platforms.get().systemPaths().data().getAbsolutePath(), "");
         String[] whereArgs = new String[]{(exactPathMatch) ? filepath : "%" + filepath + "%"};
         return getFilesInAndroidMediaStore(context, fileType, where, whereArgs);
     }
@@ -410,6 +411,17 @@ public final class Librarian {
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads) {
         LOG.info("Librarian::mediaStoreSaveToDownloads trying to save " + src.getAbsolutePath() + " into " + destInDownloads.getAbsolutePath());
+
+        Application application = Engine.instance().getApplication();
+        if (application == null) {
+            LOG.info("Librarian::mediaStoreSaveToDownloads aborting. Application reference is null, not ready yet.");
+            return false;
+        }
+        if (application.getApplicationContext() == null) {
+            LOG.info("Librarian::mediaStoreSaveToDownloads aborting. ApplicationContext reference is null, not ready yet.");
+            return false;
+        }
+
         String relativePath = AndroidPaths.getRelativeFolderPathFromFileInDownloads(destInDownloads);
         if (destInDownloads.exists()) {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. " + relativePath + "/" + destInDownloads.getName() + " already exists on disk");
@@ -420,9 +432,6 @@ public final class Librarian {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. " + relativePath + "/" + destInDownloads.getName() + " already exists on the media store db");
             return false;
         }
-
-        Librarian.queryFilesInMediaStoreDownloads();
-
         return mediaStoreInsert(Engine.instance().getApplication().getApplicationContext(), src, relativePath);
     }
 
