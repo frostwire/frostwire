@@ -132,7 +132,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     private void startPromotionDownload(Slide theSlide) {
         promotionDownloader.startPromotionDownload(theSlide);
-        Offers.showInterstitialOfferIfNecessary((MainActivity) getContext(), Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
     }
 
     @Override
