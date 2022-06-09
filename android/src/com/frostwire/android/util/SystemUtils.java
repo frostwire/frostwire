@@ -321,6 +321,14 @@ public final class SystemUtils {
             }
         }
 
+        public static void postDelayedTo(final HandlerThreadName threadName, final Runnable r, long delayMillis) {
+            try {
+                get(threadName.name()).postDelayed(r, delayMillis);
+            } catch (Throwable t) {
+                LOG.error(t.getMessage(), t);
+            }
+        }
+
         public static Handler get(@NonNull final String threadName) {
             if (!handlers.containsKey(threadName)) {
                 HandlerThread handlerThread = new HandlerThread("SystemUil::HandlerThread - " + threadName);
