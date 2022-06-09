@@ -7,6 +7,7 @@ FrostWire 2.5.0 build 693 - JUN/09/2022
  - Major code cleanup after removal of "My Files" fragments and activities
  - com.android.tools.build:gradle:7.2.0
  - com.google.android.material:material:1.6.1
+ - com.google.firebase:firebase-crashlytics-gradle:2.9.0
 
 FrostWire 2.4.8 build 691 - APR/20/2022
  - TorLock search fixed

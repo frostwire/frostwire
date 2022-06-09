@@ -17,6 +17,9 @@
 
 package com.frostwire.android.offers;
 
+import static com.frostwire.android.offers.Products.toDays;
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
@@ -59,9 +62,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import static com.frostwire.android.offers.Products.toDays;
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
