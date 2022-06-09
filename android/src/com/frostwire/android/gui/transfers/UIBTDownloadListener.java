@@ -19,6 +19,8 @@
 package com.frostwire.android.gui.transfers;
 
 import android.content.Context;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 
 import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.ConfigurationManager;
@@ -48,7 +50,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         // time, right after it's done resuming transfers
         boolean paused = pauseSeedingIfNecessary(dl);
         TransferManager.instance().incrementDownloadsToReview();
-        File savePath = dl.getSavePath().getAbsoluteFile(); // e.g. "Torrent Data"
+        File savePath = dl.getSavePath().getAbsoluteFile(); // e.g. "Downloads/FrostWire"
         Engine engine = Engine.instance();
         engine.notifyDownloadFinished(dl.getDisplayName(), savePath, dl.getInfoHash());
         File torrentSaveFolder = dl.getContentSavePath();
@@ -58,6 +60,15 @@ public final class UIBTDownloadListener implements BTDownloadListener {
 
         if (SystemUtils.hasAndroid10()) {
             moveFinishedTransferItemsToMediaStoreAsync(dl);
+        } else {
+            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                    new String[]{savePath.getAbsolutePath(),
+                            dl.getSavePath().getAbsolutePath(),
+                            Platforms.get().systemPaths().data().getAbsolutePath()},
+                    new String[]{"*/*"},
+                    (path, uri) -> {
+                        LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + path);
+                    });
         }
     }
 
@@ -66,7 +77,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
      * The actual file copying to the Downloads/FrostWire folder
      * is done with the MediaStore API the main thread pool as to not block
      * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
-    */
+     */
     private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl) {
         // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
         // on Android10, therefore we need to use the media store to move
@@ -80,7 +91,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
             // disk IO sent to main thread pool
             Engine.instance().getThreadPool().
                     execute(() -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile)
-            );
+                    );
         });
     }
 
