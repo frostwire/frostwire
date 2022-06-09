@@ -48,9 +48,9 @@ import java.lang.ref.WeakReference;
  * @author gubatron
  * @author marcelinkaaa
  */
-public final class SearchHeaderBanner extends LinearLayout {
+public final class HeaderBanner extends LinearLayout {
 
-    private static final Logger LOG = Logger.getLogger(SearchHeaderBanner.class);
+    private static final Logger LOG = Logger.getLogger(HeaderBanner.class);
 
     public enum BannerType {
         APPLOVIN,
@@ -67,13 +67,13 @@ public final class SearchHeaderBanner extends LinearLayout {
 
     private HeaderBannerListener moPubBannerListener;
 
-    public SearchHeaderBanner(Context context, AttributeSet attrs) {
+    public HeaderBanner(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (inflater != null) {
             try {
-                inflater.inflate(R.layout.view_search_header_banner, this, true);
+                inflater.inflate(R.layout.view_header_banner, this, true);
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
                 t.printStackTrace();
@@ -238,11 +238,11 @@ public final class SearchHeaderBanner extends LinearLayout {
     }
 
     private static final class HeaderBannerListener implements MaxAdViewAdListener {
-        private final WeakReference<SearchHeaderBanner> searchHeaderBannerRef;
+        private final WeakReference<HeaderBanner> searchHeaderBannerRef;
         private long lastDismissed = 0L;
         private final int dismissIntervalInMs;
 
-        HeaderBannerListener(SearchHeaderBanner searchFragment) {
+        HeaderBannerListener(HeaderBanner searchFragment) {
             searchHeaderBannerRef = Ref.weak(searchFragment);
             dismissIntervalInMs = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS);
         }
@@ -269,11 +269,11 @@ public final class SearchHeaderBanner extends LinearLayout {
                 LOG.warn("HeaderBannerListener.onDestroy(): check your logic. Could not correctly destroy moPubView, banner reference lost");
                 return;
             }
-            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            HeaderBanner headerBanner = searchHeaderBannerRef.get();
             try {
-                searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
-                if (searchHeaderBanner.maxAdView != null) {
-                    searchHeaderBanner.maxAdView.destroy();
+                headerBanner.setBannerViewVisibility(BannerType.ALL, false);
+                if (headerBanner.maxAdView != null) {
+                    headerBanner.maxAdView.destroy();
                     LOG.info("HeaderBannerListener.onDestroy() success");
                 }
             } catch (Throwable throwable) {
@@ -301,15 +301,15 @@ public final class SearchHeaderBanner extends LinearLayout {
                 LOG.info("onBannerLoaded() aborted, searchHeaderBanner reference lost");
                 return;
             }
-            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
-            searchHeaderBanner.dismissBannerButton.setVisibility(View.VISIBLE);
-            if (searchHeaderBanner.getCurrentQuery() == null) {
+            HeaderBanner headerBanner = searchHeaderBannerRef.get();
+            headerBanner.dismissBannerButton.setVisibility(View.VISIBLE);
+            if (headerBanner.getCurrentQuery() == null) {
                 LOG.info("onBannerLoaded() hiding, no ongoing query available");
-                searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
+                headerBanner.setBannerViewVisibility(BannerType.ALL, false);
                 return;
             }
-            searchHeaderBanner.setBannerViewVisibility(BannerType.FALLBACK, false);
-            searchHeaderBanner.setBannerViewVisibility(BannerType.APPLOVIN, true);
+            headerBanner.setBannerViewVisibility(BannerType.FALLBACK, false);
+            headerBanner.setBannerViewVisibility(BannerType.APPLOVIN, true);
         }
 
         @Override
@@ -328,16 +328,16 @@ public final class SearchHeaderBanner extends LinearLayout {
                 LOG.info("onAdClicked() aborted, searchHeaderBanner reference lost");
                 return;
             }
-            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            HeaderBanner headerBanner = searchHeaderBannerRef.get();
             if (!Ref.alive(searchHeaderBannerRef)) {
                 LOG.info("onAdClicked() aborted, searchHeaderBanner reference lost");
                 return;
             }
-            if (searchHeaderBanner.maxAdView != null) {
-                searchHeaderBanner.setBannerViewVisibility(BannerType.APPLOVIN, false);
+            if (headerBanner.maxAdView != null) {
+                headerBanner.setBannerViewVisibility(BannerType.APPLOVIN, false);
             }
-            if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
-                searchHeaderBanner.loadFallbackBanner();
+            if (headerBanner.fallbackBannerView.getVisibility() == View.GONE) {
+                headerBanner.loadFallbackBanner();
             }
         }
 
@@ -353,14 +353,14 @@ public final class SearchHeaderBanner extends LinearLayout {
                 LOG.info("onBannerFailed() aborted, searchHeaderBanner reference lost");
                 return;
             }
-            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
-            searchHeaderBanner.dismissBannerButton.setVisibility(View.INVISIBLE);
-            if (searchHeaderBanner.maxAdView != null) {
-                searchHeaderBanner.setBannerViewVisibility(BannerType.APPLOVIN, false);
-                searchHeaderBanner.maxAdView.destroy();
+            HeaderBanner headerBanner = searchHeaderBannerRef.get();
+            headerBanner.dismissBannerButton.setVisibility(View.INVISIBLE);
+            if (headerBanner.maxAdView != null) {
+                headerBanner.setBannerViewVisibility(BannerType.APPLOVIN, false);
+                headerBanner.maxAdView.destroy();
             }
-            if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.GONE) {
-                searchHeaderBanner.loadFallbackBanner();
+            if (headerBanner.fallbackBannerView.getVisibility() == View.GONE) {
+                headerBanner.loadFallbackBanner();
             }
         }
 
@@ -371,10 +371,10 @@ public final class SearchHeaderBanner extends LinearLayout {
     }
 
     private static final class DismissBannerButtonClickListener implements OnClickListener {
-        private final WeakReference<SearchHeaderBanner> searchHeaderBannerRef;
+        private final WeakReference<HeaderBanner> searchHeaderBannerRef;
 
-        DismissBannerButtonClickListener(SearchHeaderBanner searchHeaderBanner) {
-            searchHeaderBannerRef = Ref.weak(searchHeaderBanner);
+        DismissBannerButtonClickListener(HeaderBanner headerBanner) {
+            searchHeaderBannerRef = Ref.weak(headerBanner);
         }
 
         @Override
@@ -383,21 +383,21 @@ public final class SearchHeaderBanner extends LinearLayout {
                 return;
             }
             searchHeaderBannerRef.get().dismissBannerButton.setVisibility(View.INVISIBLE);
-            SearchHeaderBanner searchHeaderBanner = searchHeaderBannerRef.get();
+            HeaderBanner headerBanner = searchHeaderBannerRef.get();
             BannerType bannerType = BannerType.APPLOVIN;
-            if (searchHeaderBanner.fallbackBannerView.getVisibility() == View.VISIBLE &&
-                    searchHeaderBanner.maxAdView.getVisibility() == View.GONE) {
+            if (headerBanner.fallbackBannerView.getVisibility() == View.VISIBLE &&
+                    headerBanner.maxAdView.getVisibility() == View.GONE) {
                 bannerType = BannerType.FALLBACK;
             }
-            searchHeaderBanner.onBannerDismiss(bannerType);
+            headerBanner.onBannerDismiss(bannerType);
         }
     }
 
     private static final class FallbackBannerOnClickListener implements OnClickListener {
-        private final WeakReference<SearchHeaderBanner> searchHeaderBanner;
+        private final WeakReference<HeaderBanner> searchHeaderBanner;
 
 
-        FallbackBannerOnClickListener(SearchHeaderBanner searchFragment) {
+        FallbackBannerOnClickListener(HeaderBanner searchFragment) {
             this.searchHeaderBanner = Ref.weak(searchFragment);
         }
 
@@ -406,11 +406,11 @@ public final class SearchHeaderBanner extends LinearLayout {
             if (!Ref.alive(searchHeaderBanner)) {
                 return;
             }
-            SearchHeaderBanner searchHeaderBanner = this.searchHeaderBanner.get();
-            searchHeaderBanner.setBannerViewVisibility(BannerType.ALL, false);
+            HeaderBanner headerBanner = this.searchHeaderBanner.get();
+            headerBanner.setBannerViewVisibility(BannerType.ALL, false);
             // basic or debug
             if (Constants.IS_BASIC_AND_DEBUG || Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-                Activity activity = (Activity) searchHeaderBanner.getContext();
+                Activity activity = (Activity) headerBanner.getContext();
                 activity.startActivity(new Intent(view.getContext(), BuyActivity.class));
             }
             // plus (donate)

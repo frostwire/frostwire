@@ -132,7 +132,7 @@ public final class PlayStore extends StoreBase {
             if (instance == null) {
                 instance = new PlayStore(context.getApplicationContext());
             }
-            AVAILABLE = instance != null;
+            AVAILABLE = true;
             return instance;
         }
     }
@@ -233,7 +233,7 @@ public final class PlayStore extends StoreBase {
     /**
      * This method is used only for internal tests.
      */
-    public final void consume(Product product) {
+    public void consume(Product product) {
         if (product.subscription() || !product.purchased()) {
             throw new IllegalArgumentException("Only inapp purchases can be consumed");
         }

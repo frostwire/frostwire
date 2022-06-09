@@ -71,7 +71,7 @@ import com.frostwire.android.gui.views.SearchInputView;
 import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.SearchHeaderBanner;
+import com.frostwire.android.offers.HeaderBanner;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.frostclick.SlideList;
@@ -113,7 +113,7 @@ public final class SearchFragment extends AbstractFragment implements
     private String currentQuery;
     private final FileTypeCounter fileTypeCounter;
     private OnClickListener headerClickListener;
-    private SearchHeaderBanner searchHeaderBanner;
+    private HeaderBanner headerBanner;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -212,10 +212,10 @@ public final class SearchFragment extends AbstractFragment implements
                     )
             );
         }
-        if (searchHeaderBanner != null) {
-            searchHeaderBanner.setSearchFragmentReference(this);
+        if (headerBanner != null) {
+            headerBanner.setSearchFragmentReference(this);
             if (getCurrentQuery() == null || Offers.disabledAds()) {
-                searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
+                headerBanner.setBannerViewVisibility(HeaderBanner.BannerType.ALL, false);
             }
         }
         if (getCurrentQuery() == null) {
@@ -232,9 +232,9 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     public void destroyHeaderBanner() {
-        if (searchHeaderBanner != null) {
-            searchHeaderBanner.setSearchFragmentReference(this);
-            searchHeaderBanner.onDestroy();
+        if (headerBanner != null) {
+            headerBanner.setSearchFragmentReference(this);
+            headerBanner.onDestroy();
         }
     }
 
@@ -250,8 +250,8 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     protected void initComponents(final View view, Bundle savedInstanceState) {
-        searchHeaderBanner = findView(view, R.id.fragment_search_header_banner);
-        searchHeaderBanner.setSearchFragmentReference(this);
+        headerBanner = findView(view, R.id.fragment_header_banner);
+        headerBanner.setSearchFragmentReference(this);
         searchInput = findView(view, R.id.fragment_search_input);
         searchInput.setShowKeyboardOnPaste(true);
         searchInput.setOnSearchListener(new SearchInputOnSearchListener((LinearLayout) view, this));
@@ -427,7 +427,7 @@ public final class SearchFragment extends AbstractFragment implements
         searchProgress.setProgressEnabled(false);
         showSearchView(getView());
         showRatingsReminder(getView());
-        searchHeaderBanner.setBannerViewVisibility(SearchHeaderBanner.BannerType.ALL, false);
+        headerBanner.setBannerViewVisibility(HeaderBanner.BannerType.ALL, false);
     }
 
     private void showSearchView(View view) {
@@ -674,8 +674,8 @@ public final class SearchFragment extends AbstractFragment implements
                 return;
             }
             SearchFragment fragment = fragmentRef.get();
-            fragment.searchHeaderBanner.setSearchFragmentReference(fragment);
-            fragment.searchHeaderBanner.updateComponents();
+            fragment.headerBanner.setSearchFragmentReference(fragment);
+            fragment.headerBanner.updateComponents();
             fragment.searchInput.selectTabByMediaType((byte) mediaTypeId);
             if (query.contains("://m.soundcloud.com/") || query.contains("://soundcloud.com/")) {
                 fragment.cancelSearch();

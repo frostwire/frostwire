@@ -24,8 +24,8 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <com.frostwire.android.offers.SearchHeaderBanner
-        android:id="@+id/fragment_search_header_banner"
+    <com.frostwire.android.offers.HeaderBanner
+        android:id="@+id/fragment_header_banner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
