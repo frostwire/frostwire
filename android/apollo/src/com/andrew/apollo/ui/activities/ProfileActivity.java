@@ -508,14 +508,6 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
             }
             finish();
         }
-        else if (!MusicUtils.isPlaying()) {
-            Offers.showInterstitialOfferIfNecessary(
-                    this,
-                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                    false,
-                    true
-            );
-        }
     }
 
     /**
