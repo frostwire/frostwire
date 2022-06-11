@@ -160,8 +160,8 @@ public final class NavigationMenu {
                 case R.id.menu_main_my_music:
                     controller.launchMyMusic();
                     break;
-                case R.id.menu_main_library:
-                    controller.showMyFiles();
+                case R.id.menu_downloads:
+                    controller.openOSFileExplorer();
                     break;
                 case R.id.menu_main_transfers:
                     controller.showTransfers(TransfersFragment.TransferStatus.ALL);
@@ -181,18 +181,6 @@ public final class NavigationMenu {
         }
 
         hide();
-
-        if ((menuActionId == R.id.menu_main_my_music ||
-                menuActionId == R.id.menu_main_search ||
-                menuActionId == R.id.menu_main_library) &&
-                controller.getActivity() != null) {
-            Offers.showInterstitialOfferIfNecessary(
-                    controller.getActivity(),
-                    Offers.PLACEMENT_INTERSTITIAL_MAIN,
-                    false,
-                    false,
-                    true);
-        }
     }
 
     private void onUpdateButtonClicked(MainActivity mainActivity) {
