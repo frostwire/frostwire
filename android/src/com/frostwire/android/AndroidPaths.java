@@ -120,14 +120,9 @@ public final class AndroidPaths implements SystemPaths {
         }
 
         /* For Older versions of Android where we used to have access to write to external storage
-         *  <externalStoragePath>/FrostWire/
+         *  <externalStoragePath>/Download/FrostWire/
          */
-        String path = ConfigurationManager.instance().getString(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath());
-        if (path.toLowerCase().endsWith("/" + STORAGE_PATH.toLowerCase())) {
-            return new File(path);
-        } else {
-            return new File(path, STORAGE_PATH);
-        }
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(), STORAGE_PATH);
     }
 
     public static File android11AndUpStorage() {
