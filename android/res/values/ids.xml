@@ -29,7 +29,7 @@
     <!-- main menu items -->
     <item name="menu_main_search" type="id"/>
     <item name="menu_main_my_music" type="id"/>
-    <item name="menu_main_library" type="id"/>
+    <item name="menu_downloads" type="id"/>
     <item name="menu_main_transfers" type="id"/>
     <item name="menu_main_support" type="id"/>
     <item name="menu_main_settings" type="id"/>
