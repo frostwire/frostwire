@@ -114,7 +114,7 @@ public final class MainController {
         }
     }
 
-    void showMyFiles() {
+    void openOSFileExplorer() {
         if (!Ref.alive(activityRef)) {
             return;
         }
