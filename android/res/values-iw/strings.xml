@@ -66,7 +66,7 @@
     <string name="torrent_max_total_connections">חיבורים סה"כ מקסימאליים</string>
     <string name="activity_preferences_name">הגדרות</string>
     <string name="use_torrentdownloads">השתמש TorrentDownloads</string>
-    <string name="my_files">הקבצים שלי</string>
+    <string name="downloads">הורדות</string>
     <string name="saving_to_internal_memory">שמירת זיכרון פנימי</string>
     <string name="choose_email_app">בחר יישום דוא"ל…</string>
     <string name="vibrate_on_finished_download">רטט בעת ההורדה מסיים</string>

@@ -45,7 +45,7 @@
     <string name="update_message">FrostWire가 업데이트 되었습니다. 지금 새 버전을 다운로드 하시기 원하시면 “OK” 버튼을 눌러주세요.</string>
     <string name="about">어바웃</string>
     <string name="send_file_using">다음을 사용해 파일 보내기</string>
-    <string name="my_files">내 파일</string>
+    <string name="downloads">다운로드</string>
     <string name="settings">환경설정</string>
     <string name="files">파일</string>
     <string name="minimize_frostwire">FrostWire 최소화</string>

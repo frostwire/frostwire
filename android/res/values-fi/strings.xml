@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Suurin Yhteensä Liitännät</string>
     <string name="activity_preferences_name">Asetukset</string>
     <string name="use_torrentdownloads">Käytä TorrentDownloads</string>
-    <string name="my_files">Tiedostoni</string>
+    <string name="downloads">Lataukset</string>
     <string name="saving_to_internal_memory">Tallennus Sisäinen muisti</string>
     <string name="choose_email_app">Valitse sähköpostisovellus…</string>
     <string name="vibrate_on_finished_download">Värinä lataus on valmis</string>

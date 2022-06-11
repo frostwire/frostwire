@@ -45,7 +45,7 @@
     <string name="update_message">FrostWire ha scaricato un nuovo AGGIORNAMENTO per te, tocca il pulsante OK se vuoi installarlo ora</string>
     <string name="about">FrostWire</string>
     <string name="send_file_using">Invia file utilizzando</string>
-    <string name="my_files">I miei file</string>
+    <string name="downloads">Downloads</string>
     <string name="settings">Preferenze</string>
     <string name="files">file</string>
     <string name="minimize_frostwire">Riduci FrostWire</string>

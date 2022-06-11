@@ -43,7 +43,7 @@
     <string name="update_message">FrostWire sizin için yeni bir PERFORMANS GÜNCELLEMESİ İndirdi, eğer şimdi kurmak istiyorsanız lütfen OK butonuna dokunup kuruluma devam ediniz.</string>
     <string name="about">Hakkında</string>
     <string name="send_file_using">Dosyayı şunu kullanarak gönder:</string>
-    <string name="my_files">Dosyalarım</string>
+    <string name="downloads">İndirilenler</string>
     <string name="settings">Tercihler</string>
     <string name="files">dosyalar</string>
     <string name="minimize_frostwire">FrostWire\'ı Küçültün</string>

@@ -43,7 +43,7 @@
     <string name="update_message">FrostWire je preuzeo novu nadogradnju za performanse, molimo kliknite OK gumb ukoliko ga želite preuzeti sada.</string>
     <string name="about">O FrostWire-u</string>
     <string name="send_file_using">Poslati datoteku koristeći</string>
-    <string name="my_files">Moji dokumenti</string>
+    <string name="downloads">Preuzimanja</string>
     <string name="settings">Postavke</string>
     <string name="files">datoteke</string>
     <string name="minimize_frostwire">Sakriti FrostWire</string>

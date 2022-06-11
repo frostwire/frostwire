@@ -66,8 +66,8 @@
     <string name="torrent_max_total_connections">Max Totalt Anslutningar</string>
     <string name="activity_preferences_name">Inställningar</string>
     <string name="use_torrentdownloads">Använda TorrentDownloads</string>
-    <string name="my_files">Mina filer</string>
-    <string name="saving_to_internal_memory">Spara till internminnet</string>
+    <string name="downloads">Mina filer</string>
+    <string name="saving_to_internal_memory">Nedladdningar</string>
     <string name="choose_email_app">Välj ett e-postprogram…</string>
     <string name="vibrate_on_finished_download">Vibrera när nedladdningen är klar</string>
     <string name="my_filetype">Mitt %s</string>

@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Maximális teljes kapcsolatok</string>
     <string name="activity_preferences_name">Beállítások</string>
     <string name="use_torrentdownloads">Használja TorrentDownloads</string>
-    <string name="my_files">A fájljaim</string>
+    <string name="downloads">Letöltések</string>
     <string name="saving_to_internal_memory">Mentése a belső memóriába</string>
     <string name="choose_email_app">Válasszon egy e-mail alkalmazás…</string>
     <string name="vibrate_on_finished_download">Rezegjen letöltés befejeződik</string>

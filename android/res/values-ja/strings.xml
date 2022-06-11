@@ -45,7 +45,7 @@
     <string name="update_message">FrostWireが新しいパフォーマンスアップデートをダウンロードしました。今すぐインストールする場合は、OKボタンを押して下さい。</string>
     <string name="about">FrostWireについて</string>
     <string name="send_file_using">以下を使用してファイルを送信する</string>
-    <string name="my_files">マイファイル</string>
+    <string name="downloads">ダウンロード</string>
     <string name="settings">設定</string>
     <string name="files">ファイル</string>
     <string name="minimize_frostwire">FrostWireを最小化する</string>

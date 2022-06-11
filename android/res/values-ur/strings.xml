@@ -94,7 +94,7 @@
     <string name="show_transfers_on_download_start">ٹرانسفر ڈاؤن لوڈ شروع پر شو</string>
     <string name="send_feedback">رائے بھیجیں</string>
     <string name="use_torrentdownloads">استعمال TorrentDownloads</string>
-    <string name="my_files">میری فائلوں</string>
+    <string name="downloads">ڈاؤن لوڈ</string>
     <string name="saving_to_internal_memory">اندرونی میموری محفوظ کر رہا ہے</string>
     <string name="choose_email_app">ایک ای میل اپلی کیشن کا انتخاب کریں</string>
     <string name="vibrate_on_finished_download">لوڈ فارغ ہونے پر مرتعش</string>

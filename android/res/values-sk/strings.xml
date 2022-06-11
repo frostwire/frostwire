@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Maximálna celková Pripojenie</string>
     <string name="activity_preferences_name">Nastavenie</string>
     <string name="use_torrentdownloads">Použiť TorrentDownloads</string>
-    <string name="my_files">Moje súbory</string>
+    <string name="downloads">K stiahnutiu</string>
     <string name="saving_to_internal_memory">Ukladanie do internej pamäte</string>
     <string name="choose_email_app">Vyberte e-mailovú aplikáciu…</string>
     <string name="vibrate_on_finished_download">Vibrujú, keď dokončí sťahovanie</string>

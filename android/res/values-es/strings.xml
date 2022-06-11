@@ -48,7 +48,7 @@
     <string name="update_message">FrostWire te ha descargado una ACTUALIZACIÓN DEL RENDIMIENTO nueva. Por favor, toca el botón de OK si quieres instalarla ahora.</string>
     <string name="about">Acerca de</string>
     <string name="send_file_using">Enviar el archivo usando</string>
-    <string name="my_files">Mis archivos</string>
+    <string name="downloads">Descargas</string>
     <string name="settings">Preferencias</string>
     <string name="files">archivos</string>
     <string name="minimize_frostwire">Minimizar FrostWire</string>

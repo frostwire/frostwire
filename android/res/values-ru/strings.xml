@@ -46,7 +46,7 @@
     <string name="update_message">FrostWire скачал новое ПОЛЕЗНОЕ ОБНОВЛЕНИЕ. Пожалуйста, нажмите кнопку ОК, если Вы хотите установить его прямо сейчас.</string>
     <string name="about">О приложении</string>
     <string name="send_file_using">Отправить файл с помощью</string>
-    <string name="my_files">Мои файлы</string>
+    <string name="downloads">Загрузки</string>
     <string name="settings">Настройки</string>
     <string name="files">файлов</string>
     <string name="or_enter_url">или введите URL</string>

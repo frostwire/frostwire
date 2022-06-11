@@ -45,7 +45,7 @@
     <string name="update_message">Το FrostWire κατέβασε για σένα μία ΠΙΟ ΓΡΗΓΟΡΗ ΕΝΗΜΕΡΩΣΗ. Άγγιξε το OK για να την εγκαταστήσεις τώρα.</string>
     <string name="about">Πληροφορίες</string>
     <string name="send_file_using">Αποστολή αρχείου χρησιμοποιώντας</string>
-    <string name="my_files">Τα αρχεία μου</string>
+    <string name="downloads">Λήψεις</string>
     <string name="settings">Προτιμήσεις</string>
     <string name="files">αρχεία</string>
     <string name="minimize_frostwire">Ελαχιστοποίηση FrostWire</string>

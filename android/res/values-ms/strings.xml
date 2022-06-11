@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Maksimum Jumlah Sambungan</string>
     <string name="activity_preferences_name">Tetapan</string>
     <string name="use_torrentdownloads">Gunakan TorrentDownloads</string>
-    <string name="my_files">Fail-fail saya</string>
+    <string name="downloads">Muat turun</string>
     <string name="saving_to_internal_memory">Menyimpan ke Memori Dalaman</string>
     <string name="choose_email_app">Pilih Email Aplikasi…</string>
     <string name="vibrate_on_finished_download">Bergetar apabila muat turun selesai</string>

@@ -76,7 +76,7 @@
     <string name="torrent_max_total_connections">గరిష్ట మొత్తం కనెక్షన్లు</string>
     <string name="activity_preferences_name">సెట్టింగులు</string>
     <string name="use_torrentdownloads">TorrentDownloads ఉపయోగించండి</string>
-    <string name="my_files">నా ఫైళ్ళు</string>
+    <string name="downloads">డౌన్‌లోడ్‌లు</string>
     <string name="pieces">పీసెస్</string>
     <string name="saving_to_internal_memory">అంతర్గత మెమరీకు సేవ్ చేస్తోంది</string>
     <string name="storage_picker_treeuri_not_directory">ఎంచుకున్న మార్గం డైరెక్టరీ కాదు</string>

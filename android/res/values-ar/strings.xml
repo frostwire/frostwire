@@ -43,7 +43,7 @@
     <string name="update_message">لقد قام فروست واير بتنزيل تحديث للأداء من أجلك,يرجى الاستمرار والضغط على موافق إذا كنت ترغب في تثبيته.</string>
     <string name="about">حول</string>
     <string name="send_file_using">ارسال الملف باستخدام</string>
-    <string name="my_files">ملفاتيs</string>
+    <string name="downloads">التحميلات</string>
     <string name="settings">التفضيلات</string>
     <string name="files">ملفات</string>
     <string name="minimize_frostwire">تصغير فروست واير</string>

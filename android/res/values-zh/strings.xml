@@ -45,7 +45,7 @@
     <string name="update_message">FrostWire已为您下载强力更新包，如想现在安装，请按确定。</string>
     <string name="about">关于</string>
     <string name="send_file_using">发送文件使用</string>
-    <string name="my_files">我的文件</string>
+    <string name="downloads">下载</string>
     <string name="settings">首选项</string>
     <string name="files">文件</string>
     <string name="minimize_frostwire">FrostWire最小化</string>

@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Максімальныя агульныя злучэння</string>
     <string name="activity_preferences_name">Налады</string>
     <string name="use_torrentdownloads">Выкарыстоўвайце TorrentDownloads</string>
-    <string name="my_files">Мае файлы</string>
+    <string name="downloads">Спампоўкі</string>
     <string name="saving_to_internal_memory">Захаванне ва ўнутраную памяць</string>
     <string name="choose_email_app">Выберыце Email App…</string>
     <string name="vibrate_on_finished_download">Вібруе, калі загрузка заканчваецца</string>

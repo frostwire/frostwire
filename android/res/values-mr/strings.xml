@@ -78,7 +78,7 @@
     <string name="torrent_max_total_connections">मॅक्स कमाल कनेक्शन</string>
     <string name="activity_preferences_name">सेटिंग्ज</string>
     <string name="use_torrentdownloads">TorrentDownloads वापरा</string>
-    <string name="my_files">माझ्या फायली</string>
+    <string name="downloads">डाउनलोडी</string>
     <string name="pieces">तुकडे</string>
     <string name="saving_to_internal_memory">अंतर्गत मेमरी जतन करणे</string>
     <string name="storage_picker_treeuri_not_directory">निवडलेला पथ निर्देशिका नाही</string>

@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">Максимална обща връзки</string>
     <string name="activity_preferences_name">Настройки</string>
     <string name="use_torrentdownloads">Използвайте TorrentDownloads</string>
-    <string name="my_files">Моите файлове</string>
+    <string name="downloads">Изтегляния</string>
     <string name="saving_to_internal_memory">Спасяването на вътрешна памет</string>
     <string name="choose_email_app">Избери Електронна поща на приложението…</string>
     <string name="vibrate_on_finished_download">Вибрира при изтегляне завършва</string>

@@ -64,7 +64,7 @@
     <string name="torrent_max_total_connections">การเชื่อมต่อสูงสุดรวม</string>
     <string name="activity_preferences_name">การตั้งค่า</string>
     <string name="use_torrentdownloads">ใช้ TorrentDownloads</string>
-    <string name="my_files">ไฟล์ของฉัน</string>
+    <string name="downloads">ดาวน์โหลด</string>
     <string name="saving_to_internal_memory">บันทึกลงหน่วยความจำภายใน</string>
     <string name="choose_email_app">เลือกโปรแกรมอีเมล…</string>
     <string name="vibrate_on_finished_download">สั่นเมื่อดาวน์โหลดเสร็จสิ้น</string>

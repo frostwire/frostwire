@@ -62,7 +62,7 @@
     <string name="torrent_max_total_connections">Maxima total conexiuni</string>
     <string name="activity_preferences_name">Setările</string>
     <string name="use_torrentdownloads">Utilizați TorrentDownloads</string>
-    <string name="my_files">Fișierele mele</string>
+    <string name="downloads">Descărcări</string>
     <string name="saving_to_internal_memory">Se salvează în memoria internă</string>
     <string name="choose_email_app">Alege un e-mail App…</string>
     <string name="vibrate_on_finished_download">Vibrează când se termină descărcarea</string>

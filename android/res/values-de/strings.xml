@@ -45,7 +45,7 @@
     <string name="update_message">FrostWire hat eine neues PERFORMANCE UPDATE für dich heruntergeladen. Tippe die OK-Schaltfläche an, wenn du die Update jetzt installieren willst.</string>
     <string name="about">Über</string>
     <string name="send_file_using">Datei senden mit</string>
-    <string name="my_files">Meine Dateien</string>
+    <string name="downloads">Downloads</string>
     <string name="settings">Einstellungen</string>
     <string name="files">Dateien</string>
     <string name="minimize_frostwire">FrostWire minimieren</string>
