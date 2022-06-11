@@ -29,9 +29,9 @@
             android:icon="@drawable/menu_icon_my_music"
             android:title="@string/my_music"/>
         <item
-            android:id="@+id/menu_main_library"
+            android:id="@+id/menu_downloads"
             android:icon="@drawable/menu_icon_library"
-            android:title="@string/my_files"/>
+            android:title="@string/downloads"/>
         <item
             android:id="@+id/menu_main_transfers"
             android:icon="@drawable/menu_icon_transfers"
