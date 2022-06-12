@@ -67,6 +67,8 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.TransfersNoSeedsView;
+import com.frostwire.android.offers.HeaderBanner;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.transfers.Transfer;
@@ -77,10 +79,8 @@ import com.frostwire.util.StringUtils;
 import com.frostwire.util.TaskThrottle;
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -112,6 +112,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private final Handler vpnRichToastHandler;
     private boolean showTorrentSettingsOnClick;
     private TransfersNoSeedsView transfersNoSeedsView;
+    private HeaderBanner headerBanner;
 
     public TransfersFragment() {
         super(R.layout.fragment_transfers);
@@ -210,44 +211,49 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         boolean bittorrentDisconnected = TransferManager.instance().isBittorrentDisconnected();
         // Handle item selection
         setupAdapter(getActivity());
-        switch (item.getItemId()) {
-            case R.id.fragment_transfers_menu_add_transfer:
-                toggleAddTransferControls();
-                getActivity().invalidateOptionsMenu();
-                return true;
-            case R.id.fragment_transfers_menu_clear_all:
-                TransferManager.instance().clearComplete();
-                getActivity().invalidateOptionsMenu();
-                return true;
-            case R.id.fragment_transfers_menu_pause_stop_all:
-                TransferManager.instance().stopHttpTransfers();
-                TransferManager.instance().pauseTorrents();
-                return true;
-            case R.id.fragment_transfers_menu_resume_all:
-                if (bittorrentDisconnected) {
-                    UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+        int itemId = item.getItemId();
+        if (itemId == R.id.fragment_transfers_menu_add_transfer) {
+            toggleAddTransferControls();
+            getActivity().invalidateOptionsMenu();
+            return true;
+        } else if (itemId == R.id.fragment_transfers_menu_clear_all) {
+            TransferManager.instance().clearComplete();
+            getActivity().invalidateOptionsMenu();
+            return true;
+        } else if (itemId == R.id.fragment_transfers_menu_pause_stop_all) {
+            TransferManager.instance().stopHttpTransfers();
+            TransferManager.instance().pauseTorrents();
+            return true;
+        } else if (itemId == R.id.fragment_transfers_menu_resume_all) {
+            if (bittorrentDisconnected) {
+                UIUtils.showLongMessage(getActivity(), R.string.cant_resume_torrent_transfers);
+            } else {
+                if (NetworkManager.instance().isInternetDataConnectionUp()) {
+                    TransferManager.instance().resumeResumableTransfers();
                 } else {
-                    if (NetworkManager.instance().isInternetDataConnectionUp()) {
-                        TransferManager.instance().resumeResumableTransfers();
-                    } else {
-                        UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
-                    }
+                    UIUtils.showShortMessage(getActivity(), R.string.please_check_connection_status_before_resuming_download);
                 }
-                return true;
-            case R.id.fragment_transfers_menu_seed_all:
-                new SeedAction(getActivity()).onClick();
-                return true;
-            case R.id.fragment_transfers_menu_stop_seeding_all:
-                TransferManager.instance().stopSeedingTorrents();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+            }
+            return true;
+        } else if (itemId == R.id.fragment_transfers_menu_seed_all) {
+            new SeedAction(getActivity()).onClick();
+            return true;
+        } else if (itemId == R.id.fragment_transfers_menu_stop_seeding_all) {
+            TransferManager.instance().stopSeedingTorrents();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        if (headerBanner != null) {
+            if (Offers.disabledAds()) {
+                headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
+            }
+        }
+        headerBanner.updateComponents();
         initTimerServiceSubscription();
         onTime();
     }
@@ -259,6 +265,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             subscription.unsubscribe();
         }
         adapter = null;
+        destroyHeaderBanner();
     }
 
     @Override
@@ -289,7 +296,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     private TransfersHolder sortSelectedStatusTransfersInBackground() {
         List<Transfer> allTransfers = TransferManager.instance().getTransfers();
         final List<Transfer> selectedStatusTransfers = filter(allTransfers, selectedStatus);
-        Collections.sort(selectedStatusTransfers, transferComparator);
+        selectedStatusTransfers.sort(transferComparator);
         return new TransfersHolder(allTransfers, selectedStatusTransfers);
     }
 
@@ -415,7 +422,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
 
     private StatusBarData getStatusBarDataBackground() {
         //  format strings
-        return new StatusBarData(UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() / 1024),
+        return new StatusBarData(UIUtils.rate2speed(TransferManager.instance().getDownloadsBandwidth() >> 10),
                 UIUtils.rate2speed(TransferManager.instance().getUploadsBandwidth() / 1024),
                 // number of uploads (seeding) and downloads
                 TransferManager.instance().getActiveDownloads(),
@@ -594,6 +601,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         vpnRichToast.setOnClickListener(v1 -> vpnRichToast.setVisibility(View.GONE));
         initVPNStatusButton(v);
         transfersNoSeedsView = findView(v, R.id.fragment_transfers_no_seeds_view);
+        headerBanner = findView(v, R.id.fragment_header_banner);
     }
 
     private void initVPNStatusButton(View v) {
@@ -615,7 +623,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             return;
         }
         List<Transfer> transfers = filter(TransferManager.instance().getTransfers(), selectedStatus);
-        Collections.sort(transfers, transferComparator);
+        transfers.sort(transferComparator);
         adapter = new TransferListAdapter(context, transfers);
         list.setLayoutManager(recyclerViewLayoutManager);
         list.setAdapter(adapter);
@@ -832,36 +840,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    /**
-     * Iterates over all the secondary external storage roots and returns the one with the most bytes available.
-     */
-    private static File getBiggestSDCardDir(Context context) {
-        try {
-            final File externalFilesDir = context.getExternalFilesDir(null);
-            // this occurs on the android emulator
-            if (externalFilesDir == null) {
-                return null;
-            }
-            String primaryPath = externalFilesDir.getParent();
-            long biggestBytesAvailable = -1;
-            File result = null;
-            for (File f : com.frostwire.android.util.SystemUtils.getExternalFilesDirs(context)) {
-                if (primaryPath != null && !f.getAbsolutePath().startsWith(primaryPath)) {
-                    long bytesAvailable = com.frostwire.android.util.SystemUtils.getAvailableStorageSize(f);
-                    if (bytesAvailable > biggestBytesAvailable) {
-                        biggestBytesAvailable = bytesAvailable;
-                        result = f;
-                    }
-                }
-            }
-            //System.out.println("FW.SystemUtils.getSDCardDir() -> " + result.getAbsolutePath());
-            // -> /storage/extSdCard/Android/data/com.frostwire.android/files
-            return result;
-        } catch (Throwable e) {
-            // the context could be null due to a UI bad logic or context.getExternalFilesDir(null) could be null
-            LOG.error("Error getting the biggest SD card", e);
+    public void destroyHeaderBanner() {
+        if (headerBanner != null) {
+            headerBanner.onDestroy();
         }
-        return null;
     }
 
     private static final class TransferComparator implements Comparator<Transfer> {
