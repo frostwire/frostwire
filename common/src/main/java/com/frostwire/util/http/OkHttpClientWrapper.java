@@ -57,7 +57,7 @@ import okio.Okio;
  * @author aldenml
  */
 public class OkHttpClientWrapper extends AbstractHttpClient {
-    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(5, 30, TimeUnit.SECONDS);
+    public static final ConnectionPool CONNECTION_POOL = new ConnectionPool(8, 30, TimeUnit.SECONDS);
     private static final Logger LOG = Logger.getLogger(OkHttpClientWrapper.class);
     private final ThreadPool pool;
 
@@ -90,8 +90,6 @@ public class OkHttpClientWrapper extends AbstractHttpClient {
         searchClient.followRedirects(true);
         searchClient.connectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
         searchClient = configNullSsl(searchClient);
-        // Maybe we should use a custom connection pool here. Using default.
-        //searchClient.setConnectionPool(?);
         return searchClient;
     }
 
