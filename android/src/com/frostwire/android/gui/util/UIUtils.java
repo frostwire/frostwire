@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -554,7 +554,6 @@ public final class UIUtils {
      */
     public static boolean diceRollPassesThreshold(ConfigurationManager cm, String thresholdPreferenceKey) {
         int thresholdValue = cm.getInt(thresholdPreferenceKey);
-        int diceRoll = new Random().nextInt(100) + 1; //1-100
         if (thresholdValue <= 0) {
             LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> false");
             return false;
@@ -563,6 +562,7 @@ public final class UIUtils {
             LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ") -> true (always)");
             return true;
         }
+        int diceRoll = new Random().nextInt(100) + 1; //1-100
         LOG.info("diceRollPassesThreshold(" + thresholdPreferenceKey + "=" + thresholdValue + ", roll=" + diceRoll + ") -> " + (diceRoll <= thresholdValue));
         return diceRoll <= thresholdValue;
     }
