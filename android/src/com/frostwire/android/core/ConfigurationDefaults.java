@@ -70,7 +70,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false); // full blown implementation, turned off as it's handled by mopub mediation
         defaultValues.put(Constants.PREF_KEY_GUI_USE_UNITY, true); // this implementation just starts the sdk, it's all done through mopub
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
-        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 80);
+        defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 100);
         defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, 60000); // 1 min
         defaultValues.put(Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD, 50);
         defaultValues.put(Constants.PREF_KEY_GUI_INTERSTITIAL_OFFERS_TRANSFER_STARTS, 3);
