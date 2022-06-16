@@ -137,7 +137,6 @@ public final class HeaderBanner extends LinearLayout {
         }
 
         try {
-            //maxAdView.setPlacement(FWBannerView.UNIT_ID_SEARCH_HEADER);
             maxAdView.setListener(getHeaderBannerListener());
             maxAdView.loadAd();
             maxAdView.startAutoRefresh();
