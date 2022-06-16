@@ -75,6 +75,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private final PreviewClickListener previewClickListener;
     private final ImageLoader thumbLoader;
     private int fileType;
+    private FilteredSearchResults filteredSearchResults;
 
     protected SearchResultListAdapter(Context context) {
         super(context, R.layout.view_bittorrent_search_result_list_item);
@@ -88,21 +89,30 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return fileType;
     }
 
+    /**
+     * Changes the fileType, extracts all the file search results, then filters them by type
+     * and updates (FilteredSearchResults) filteredSearchResults (see getFilteredSearchResults())
+     *
+     * @param fileType
+     */
     public void setFileType(final int fileType) {
         this.fileType = fileType;
         SystemUtils.HandlerFactory.postTo(
                 SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
                 () -> {
+                    // Extract all FileSearchResult from full list
                     List<FileSearchResult> fileSearchResults;
                     synchronized (listLock) {
                         fileSearchResults = extractFileSearchResults(getFullList());
                     }
-                    FilteredSearchResults filteredSearchResults =
-                            newFilteredSearchResults(fileSearchResults, fileType);
-                    postToUIThread(() ->
-                            updateVisualListWithAllMediaTypeFilteredSearchResults(
-                                    filteredSearchResults.mediaTypeFiltered));
+                    // Filter the entire list by file type
+                    filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
+                    postToUIThread(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
                 });
+    }
+
+    public FilteredSearchResults getFilteredSearchResults() {
+        return filteredSearchResults;
     }
 
     public void addResults(List<? extends SearchResult> allNewResults) {

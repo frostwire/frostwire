@@ -126,10 +126,10 @@ public final class LocalSearchEngine {
     }
 
     public void cancelSearch() {
-        manager.stop();
         currentSearchToken = 0;
         currentSearchTokens = null;
         searchFinished = true;
+        manager.stop();
     }
 
     public boolean isSearchStopped() {

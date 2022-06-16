@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 
 package com.frostwire.android.gui.fragments;
 
-import static com.frostwire.android.gui.adapters.SearchResultListAdapter.extractFileSearchResults;
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
+import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
@@ -428,6 +428,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void showSearchView(View view) {
+        ensureUIThreadOrCrash("SearchFragment::showSearchView");
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
         if (LocalSearchEngine.instance().isSearchStopped()) {
             switchView(view, R.id.fragment_search_promos);
@@ -442,7 +443,7 @@ public final class SearchFragment extends AbstractFragment implements
                 deepSearchProgress.setVisibility(View.GONE);
             }
         }
-        getActivity().runOnUiThread(() -> searchProgress.setProgressEnabled(!searchFinished));
+        searchProgress.setProgressEnabled(!searchFinished);
     }
 
     private void switchView(View v, int id) {
@@ -611,16 +612,10 @@ public final class SearchFragment extends AbstractFragment implements
 
             // Add new newResults to the adapter
             searchFragment.adapter.addResults(newResults);
-
-            // Extract all FileSearchResult from full list
-            List<FileSearchResult> fileSearchResultsFromFullList =
-                    extractFileSearchResults(searchFragment.adapter.getFullList());
-
-            // Filter the entire list by file type
-            FilteredSearchResults fsr =
-                    searchFragment.adapter.
-                            newFilteredSearchResults(fileSearchResultsFromFullList, fileType);
-
+            // Sets the file type in the adapter and filters search results by file type
+            searchFragment.adapter.setFileType(fileType);
+            // Ask the adapter for the filtered search results
+            FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
             // Time to report to the UI, let the adapter know about the new newResults
             searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
             postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
