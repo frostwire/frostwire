@@ -48,7 +48,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -116,7 +115,6 @@ public class MainActivity extends AbstractActivity implements
     private Fragment currentFragment;
     private SearchFragment search;
     private TransfersFragment transfers;
-    private BroadcastReceiver mainBroadcastReceiver;
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
 
@@ -182,7 +180,7 @@ public class MainActivity extends AbstractActivity implements
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
         OkHttpClientWrapper.cancelAllRequests();
-        SystemUtils.HandlerFactory.stopAll();
+        SystemUtils.stopAllHandlerThreads();
         Engine.instance().shutdown();
     }
 
@@ -361,14 +359,6 @@ public class MainActivity extends AbstractActivity implements
     protected void onPause() {
         super.onPause();
         localBroadcastReceiver.unregister(this);
-        if (mainBroadcastReceiver != null) {
-            try {
-                unregisterReceiver(mainBroadcastReceiver);
-            } catch (Throwable ignored) {
-                //oh well (the api doesn't provide a way to know if it's been registered before,
-                //seems like overkill keeping track of these ourselves.)
-            }
-        }
     }
 
     private SparseArray<DangerousPermissionsChecker> initPermissionsCheckers() {
@@ -395,13 +385,6 @@ public class MainActivity extends AbstractActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_FrostWire);
         super.onCreate(savedInstanceState);
-        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
-            // we are still in the wizard.
-            return;
-        }
-        if (isShutdown()) {
-            return;
-        }
     }
 
     private void checkExternalStoragePermissions() {
@@ -732,12 +715,6 @@ public class MainActivity extends AbstractActivity implements
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-    public void performYTSearch(String ytUrl) {
-        SearchFragment searchFragment = (SearchFragment) getFragmentByNavMenuId(R.id.menu_main_search);
-        switchContent(searchFragment);
-        searchFragment.performYTSearch(ytUrl);
-    }
-
     public static void refreshTransfers(Context context) {
         Intent intent = new Intent(context,
                 MainActivity.class).
@@ -770,24 +747,6 @@ public class MainActivity extends AbstractActivity implements
             }
         } catch (Throwable e) {
             LOG.warn("Error handling download complete notification", e);
-        }
-    }
-
-    /**
-     * @return true if the SD Permission dialog must be shown
-     */
-    private boolean checkSDPermission() {
-        if (!AndroidPlatform.saf()) {
-            return false;
-        }
-        try {
-            File data = Platforms.data();
-            File parent = data.getParentFile();
-            return AndroidPlatform.saf(parent) && (!Platforms.fileSystem().canWrite(parent));
-        } catch (Throwable e) {
-            // we can't do anything about this
-            LOG.error("Unable to detect if we have SD permissions", e);
-            return false;
         }
     }
 
@@ -848,7 +807,7 @@ public class MainActivity extends AbstractActivity implements
                 if (mainActivityIntent != null) {
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
-                SystemUtils.postToUIThread(() -> updateNavigationMenu(value));
+                SystemUtils.postToUIThreadDelayed(() -> updateNavigationMenu(value));
             }
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
@@ -856,7 +815,7 @@ public class MainActivity extends AbstractActivity implements
                     UIUtils.showDismissableMessage(findView(android.R.id.content),
                             R.string.no_data_check_internet_connection);
                 }
-                SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
+                SystemUtils.postToUIThreadDelayed(() -> search.setDataUp(isDataUp));
             }
         }
     }

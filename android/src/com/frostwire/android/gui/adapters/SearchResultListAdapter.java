@@ -20,7 +20,8 @@ package com.frostwire.android.gui.adapters;
 
 import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
-import static com.frostwire.android.util.SystemUtils.postToUIThread;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
+import static com.frostwire.android.util.SystemUtils.postToUIThreadDelayed;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -70,7 +71,6 @@ import java.util.stream.Collectors;
  */
 public abstract class SearchResultListAdapter extends AbstractListAdapter<SearchResult> {
     private static final int NO_FILE_TYPE = -1;
-    private static final Logger LOG = Logger.getLogger(SearchResultListAdapter.class);
     private final OnLinkClickListener linkListener;
     private final PreviewClickListener previewClickListener;
     private final ImageLoader thumbLoader;
@@ -97,7 +97,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
      */
     public void setFileType(final int fileType) {
         this.fileType = fileType;
-        SystemUtils.HandlerFactory.postTo(
+        postToHandler(
                 SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
                 () -> {
                     // Extract all FileSearchResult from full list
@@ -107,7 +107,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                     }
                     // Filter the entire list by file type
                     filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
-                    postToUIThread(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
+                    postToUIThreadDelayed(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
                 });
     }
 

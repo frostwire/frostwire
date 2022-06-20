@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 package com.frostwire.android.gui.fragments;
 
 import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -320,7 +320,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (adapter != null) {
             if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::sortSelectedStatusTransfersInBackground", (TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000) - 100)) {
                 WeakReference<TransfersFragment> contextRef = Ref.weak(this);
-                postTo(SystemUtils.HandlerThreadName.DOWNLOADER,
+                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
                         () -> {
                             if (!Ref.alive(contextRef)) {
                                 Ref.free(contextRef);

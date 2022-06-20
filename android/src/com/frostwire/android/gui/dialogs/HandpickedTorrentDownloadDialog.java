@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 package com.frostwire.android.gui.dialogs;
 
-import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -140,7 +140,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
 
     @Override
     public ConfirmListDialogDefaultAdapter<TorrentFileEntry> createAdapter(Context context, List<TorrentFileEntry> listData, SelectionMode selectionMode, Bundle bundle) {
-        Collections.sort(listData, new NameComparator());
+        listData.sort(new NameComparator());
         return new HandpickedTorrentFileEntriesDialogAdapter(context, listData, selectionMode);
     }
 
@@ -238,7 +238,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         }
     }
 
-    private class HandpickedTorrentFileEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
+    private static class HandpickedTorrentFileEntriesDialogAdapter extends ConfirmListDialogDefaultAdapter<TorrentFileEntry> {
 
         HandpickedTorrentFileEntriesDialogAdapter(Context context,
                                                   List<TorrentFileEntry> list,
@@ -281,14 +281,17 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
 
     private static class OnStartDownloadsClickListener implements View.OnClickListener {
         private final WeakReference<Context> ctxRef;
+        @SuppressWarnings("rawtypes")
         private WeakReference<AbstractConfirmListDialog> dlgRef;
         private final static Logger LOG = Logger.getLogger(OnStartDownloadsClickListener.class);
 
+        @SuppressWarnings("rawtypes")
         OnStartDownloadsClickListener(Context ctx, AbstractConfirmListDialog dlg) {
             ctxRef = new WeakReference<>(ctx);
             dlgRef = new WeakReference<>(dlg);
         }
 
+        @SuppressWarnings("rawtypes")
         public void setDialog(AbstractConfirmListDialog dlg) {
             dlgRef = new WeakReference<>(dlg);
         }
@@ -296,7 +299,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         @Override
         public void onClick(View v) {
             if (Ref.alive(ctxRef) && Ref.alive(dlgRef)) {
-                final AbstractConfirmListDialog dlg = dlgRef.get();
+                @SuppressWarnings("rawtypes") final AbstractConfirmListDialog dlg = dlgRef.get();
 
                 final AbstractConfirmListDialog.SelectionMode selectionMode = dlg.getSelectionMode();
                 List<TorrentFileEntry> checked = (selectionMode == AbstractConfirmListDialog.SelectionMode.NO_SELECTION) ?
@@ -336,7 +339,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 selection[selectedFileEntry.getIndex()] = true;
             }
 
-            postTo(SystemUtils.HandlerThreadName.DOWNLOADER,
+            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER,
                     () -> {
                         try {
                             // there is a still a chance of reference getting null, this is in

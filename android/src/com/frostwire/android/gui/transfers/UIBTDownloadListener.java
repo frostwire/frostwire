@@ -18,9 +18,12 @@
 
 package com.frostwire.android.gui.transfers;
 
-import android.content.Context;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
+
 import android.media.MediaScannerConnection;
-import android.net.Uri;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.ConfigurationManager;
@@ -37,7 +40,6 @@ import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 
 public final class UIBTDownloadListener implements BTDownloadListener {
@@ -48,7 +50,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
     public void finished(BTDownload dl) {
         // this method will be called for all finished transfers even right after the app has been opened the first
         // time, right after it's done resuming transfers
-        boolean paused = pauseSeedingIfNecessary(dl);
+        pauseSeedingIfNecessary(dl);
         TransferManager.instance().incrementDownloadsToReview();
         File savePath = dl.getSavePath().getAbsoluteFile(); // e.g. "Downloads/FrostWire"
         Engine engine = Engine.instance();
@@ -75,6 +77,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
      * is done with the MediaStore API the main thread pool as to not block
      * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
      */
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl) {
         // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
         // on Android10, therefore we need to use the media store to move
@@ -86,7 +89,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
             final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
 
             // disk IO sent to DOWNLOADER handler thread
-            SystemUtils.HandlerFactory.postTo(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile));
+            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile));
         });
     }
 
@@ -119,7 +122,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         finalCleanup(dl, incompleteFiles);
     }
 
-    private boolean pauseSeedingIfNecessary(BTDownload dl) {
+    private void pauseSeedingIfNecessary(BTDownload dl) {
         ConfigurationManager CM = ConfigurationManager.instance();
         boolean seedFinishedTorrents = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS);
         boolean seedFinishedTorrentsOnWifiOnly = CM.getBoolean(Constants.PREF_KEY_TORRENT_SEED_FINISHED_TORRENTS_WIFI_ONLY);
@@ -128,7 +131,6 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         if (seedingDisabled) {
             dl.pause();
         }
-        return seedingDisabled;
     }
 
     private void finalCleanup(BTDownload dl, Set<File> incompleteFiles) {

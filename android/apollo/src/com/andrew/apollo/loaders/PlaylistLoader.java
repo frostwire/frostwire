@@ -121,7 +121,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> imple
                 return null;
             }
         } else {
-            SystemUtils.postToUIThread(() -> {
+            SystemUtils.postToUIThreadDelayed(() -> {
                 try {
                     ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 111010);
                 } catch (Throwable t) {

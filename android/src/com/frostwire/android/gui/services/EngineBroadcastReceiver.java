@@ -17,7 +17,7 @@
 
 package com.frostwire.android.gui.services;
 
-import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -62,14 +62,14 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             String action = intent.getAction();
 
             if (Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
-                async(context, EngineBroadcastReceiver::handleMediaMounted, intent);
+                postToHandler(SystemUtils.HandlerThreadName.MISC, () -> EngineBroadcastReceiver.handleMediaMounted(context, intent));
             } else if (Intent.ACTION_MEDIA_UNMOUNTED.equals(action)) {
-                async(this, EngineBroadcastReceiver::handleMediaUnmounted, intent);
+                postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleMediaUnmounted(intent));
             } else if (TelephonyManager.ACTION_PHONE_STATE_CHANGED.equals(action)) {
                 // doesn't do anything except log, no need for async
                 handleActionPhoneStateChanged(intent);
             } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-                async(this, EngineBroadcastReceiver::handleConnectivityChange, context, intent);
+                postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleConnectivityChange(context, intent));
             }
         } catch (Throwable e) {
             LOG.error("Error processing broadcast message", e);
@@ -121,7 +121,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             //don't stop
             return;
         }
-        async(Engine.instance()::stopServices, true);
+
+        postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.instance().stopServices(true));
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {

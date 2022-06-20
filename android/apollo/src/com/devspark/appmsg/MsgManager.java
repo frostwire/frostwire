@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 Evgeny Shishkin, Angel Leon
+ * Copyright 2012-2022 Evgeny Shishkin, Angel Leon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,18 +85,6 @@ class MsgManager extends Handler {
     }
 
     /**
-     * Removes all {@link AppMsg} from the queue.
-     */
-    void clearAllMsg() {
-        if (msgQueue != null) {
-            msgQueue.clear();
-        }
-        removeMessages(MESSAGE_DISPLAY);
-        removeMessages(MESSAGE_ADD_VIEW);
-        removeMessages(MESSAGE_REMOVE);
-    }
-
-    /**
      * Displays the next {@link AppMsg} within the queue.
      */
     private void displayMsg() {
@@ -104,7 +92,7 @@ class MsgManager extends Handler {
             return;
         }
         if (!SystemUtils.isUIThread()) {
-            SystemUtils.postToUIThread(this::displayMsg);
+            SystemUtils.postToUIThreadDelayed(this::displayMsg);
             return;
         }
 
@@ -138,7 +126,7 @@ class MsgManager extends Handler {
      */
     private void removeMsg(final AppMsg appMsg) {
         if (!SystemUtils.isUIThread()) {
-            SystemUtils.postToUIThread(() -> removeMsg(appMsg));
+            SystemUtils.postToUIThreadDelayed(() -> removeMsg(appMsg));
             return;
         }
 

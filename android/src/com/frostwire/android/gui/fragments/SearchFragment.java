@@ -19,10 +19,10 @@
 package com.frostwire.android.gui.fragments;
 
 import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.SystemUtils.HandlerFactory.postTo;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
-import static com.frostwire.android.util.SystemUtils.postToUIThread;
+import static com.frostwire.android.util.SystemUtils.postToUIThreadDelayed;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -168,7 +168,6 @@ public final class SearchFragment extends AbstractFragment implements
         TextView title = header.findViewById(R.id.view_search_header_text_title);
         title.setText(R.string.search);
         title.setOnClickListener(getHeaderClickListener());
-        TextView filterCounter = header.findViewById(R.id.view_search_header_search_filter_counter);
         return header;
     }
 
@@ -382,14 +381,6 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.hideTextInput();
     }
 
-    private void updateFileTypeCounter(FilteredSearchResults filteredSearchResults) {
-        if (filteredSearchResults != null) {
-            fileTypeCounter.clear();
-            fileTypeCounter.add(filteredSearchResults);
-        }
-        refreshFileTypeCounters(adapter != null && adapter.getFullList() != null && adapter.getFullList().size() > 0, fileTypeCounter.fsr);
-    }
-
     private void refreshFileTypeCounters(boolean fileTypeCountersVisible, FilteredSearchResults fsr) {
         searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fsr.numApplications);
@@ -407,7 +398,7 @@ public final class SearchFragment extends AbstractFragment implements
             searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
             searchInput.setText("youtube:" + ytId);
             prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
-            postTo(
+            postToHandler(
                     SEARCH_PERFORMER,
                     () -> LocalSearchEngine.instance().performSearch(ytId));
         }
@@ -415,7 +406,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void cancelSearch() {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
-        postTo(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
+        postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
         adapter.clear();
         searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
@@ -618,7 +609,7 @@ public final class SearchFragment extends AbstractFragment implements
             FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
             // Time to report to the UI, let the adapter know about the new newResults
             searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-            postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
+            postToUIThreadDelayed(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
         }
 
         @Override
@@ -679,7 +670,7 @@ public final class SearchFragment extends AbstractFragment implements
                 fragment.currentQuery = null;
                 fragment.searchInput.setText("");
             } else {
-                postToUIThread(() -> {
+                postToUIThreadDelayed(() -> {
                     if (Ref.alive(fragmentRef)) {
                         View view = fragmentRef.get().getView();
                         if (view != null) {
@@ -689,7 +680,7 @@ public final class SearchFragment extends AbstractFragment implements
                 });
 
                 fragment.prepareUIForSearch(mediaTypeId);
-                postTo(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().performSearch(query));
+                postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().performSearch(query));
             }
         }
 
@@ -699,7 +690,7 @@ public final class SearchFragment extends AbstractFragment implements
             }
             SearchFragment fragment = fragmentRef.get();
             if (fragment.adapter.getFileType() != mediaTypeId) {
-                postTo(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
+                postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
                 fragment.adapter.setFileType(mediaTypeId);
             }
             fragment.showSearchView(rootViewRef.get());
@@ -803,7 +794,7 @@ public final class SearchFragment extends AbstractFragment implements
             if (LocalSearchEngine.instance().isSearchFinished()) {
                 final String query = searchInput.getText();
                 searchFragment.prepareUIForSearch(adapter.getFileType());
-                postTo(SEARCH_PERFORMER,
+                postToHandler(SEARCH_PERFORMER,
                         () -> LocalSearchEngine.instance().performSearch(query));
                 searchProgress.setProgressEnabled(true);
             }

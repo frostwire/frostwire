@@ -100,8 +100,6 @@ public class FWBannerView extends LinearLayout {
     private TextView removeAdsTextView;
     private OnBannerLoadedListener onBannerLoadedListener;
     private OnBannerDismissedListener onBannerDismissedListener;
-    private OnBannerLoadedListener onFallbackBannerLoadedListener;
-    private OnBannerDismissedListener onFallbackBannerDismissedListener;
     private long lastInitAlbumArtBanner;
     private boolean isHidden;
     private boolean isLoaded;
@@ -143,6 +141,7 @@ public class FWBannerView extends LinearLayout {
 
                 this.showRemoveAdsTextView = typedArray.getBoolean(R.styleable.FWBannerView_showRemoveAdsTextView, this.showRemoveAdsTextView);
                 onFinishInflate();
+                typedArray.recycle();
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);
                 t.printStackTrace();
@@ -174,14 +173,6 @@ public class FWBannerView extends LinearLayout {
 
     public void setOnBannerDismissedListener(OnBannerDismissedListener onBannerDismissedListener) {
         this.onBannerDismissedListener = onBannerDismissedListener;
-    }
-
-    public void setOnFallbackBannerLoadedListener(OnBannerLoadedListener onFallbackBannerLoadedListener) {
-        this.onFallbackBannerLoadedListener = onFallbackBannerLoadedListener;
-    }
-
-    public void setOnFallbackBannerDismissedListener(OnBannerDismissedListener onFallbackBannerDismissedListener) {
-        this.onFallbackBannerDismissedListener = onFallbackBannerDismissedListener;
     }
 
     @Override
@@ -264,7 +255,7 @@ public class FWBannerView extends LinearLayout {
     }
 
     public void loadFallbackBanner(final String adUnitId) {
-        SystemUtils.postToUIThread(() ->
+        SystemUtils.postToUIThreadDelayed(() ->
                 {
                     try {
                         InHouseBannerFactory.AdFormat adFormat;
@@ -272,7 +263,6 @@ public class FWBannerView extends LinearLayout {
                                 FWBannerView.UNIT_ID_HOME.equals(adUnitId)) {
                             adFormat = InHouseBannerFactory.AdFormat.BIG_300x250;
                         } else if (FWBannerView.UNIT_ID_SEARCH_HEADER.equals(adUnitId) ||
-                                FWBannerView.UNIT_ID_PREVIEW_PLAYER_VERTICAL.equals(adUnitId) ||
                                 FWBannerView.UNIT_ID_AUDIO_PLAYER.equals(adUnitId)) {
                             adFormat = InHouseBannerFactory.AdFormat.SMALL_320x50;
                         } else {
@@ -298,13 +288,6 @@ public class FWBannerView extends LinearLayout {
                         }
                         setLayersVisibility(Layers.FALLBACK, true);
                         dismissBannerButton.setVisibility(showDismissButton ? View.VISIBLE : View.INVISIBLE);
-                        if (onFallbackBannerLoadedListener != null) {
-                            try {
-                                onFallbackBannerLoadedListener.dispatch();
-                            } catch (Throwable t) {
-                                t.printStackTrace();
-                            }
-                        }
                     } catch (Throwable t) {
                         LOG.error("loadFallbackBanner() error " + t.getMessage(), t);
                         if (BuildConfig.DEBUG) {
@@ -431,7 +414,7 @@ public class FWBannerView extends LinearLayout {
                 try {
                     onBannerLoadedListener.dispatch();
                 } catch (Throwable t) {
-                    onFallbackBannerLoadedListener.dispatch();
+//                    onFallbackBannerLoadedListener.dispatch();
                     t.printStackTrace();
                 }
             }
@@ -478,13 +461,6 @@ public class FWBannerView extends LinearLayout {
             }
         } else if (fallbackBannerView.getVisibility() == View.VISIBLE) {
             setLayersVisibility(Layers.ALL, false);
-            if (onFallbackBannerDismissedListener != null) {
-                try {
-                    onFallbackBannerDismissedListener.dispatch();
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-            }
         }
     };
 

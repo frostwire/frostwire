@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -71,8 +71,6 @@ public final class ImageLoader {
 
     private static final String SCHEME_IMAGE = "image";
 
-    private static final String SCHEME_IMAGE_SLASH = SCHEME_IMAGE + "://";
-
     private static final String APPLICATION_AUTHORITY = "application";
 
     private static final String ALBUM_AUTHORITY = "album";
@@ -81,13 +79,9 @@ public final class ImageLoader {
 
     private static final String METADATA_AUTHORITY = "metadata";
 
-    private static final Uri APPLICATION_THUMBNAILS_URI = Uri.parse(SCHEME_IMAGE_SLASH + APPLICATION_AUTHORITY);
-
     private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
     private static final Uri ARTIST_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/artists");
-
-    private static final Uri METADATA_THUMBNAILS_URI = Uri.parse("content//:media/external/audio/metadata");//Uri.parse(SCHEME_IMAGE_SLASH + METADATA_AUTHORITY);
 
     private static final boolean DEBUG_ERRORS = false;
 
@@ -134,10 +128,6 @@ public final class ImageLoader {
         return bitmap;
     }
 
-    public static Uri getApplicationArtUri(String packageName) {
-        return Uri.withAppendedPath(APPLICATION_THUMBNAILS_URI, packageName);
-    }
-
     public static Uri getAlbumArtUri(long albumId) {
         return ContentUris.withAppendedId(ALBUM_THUMBNAILS_URI, albumId);
         //return ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"),albumId);
@@ -145,10 +135,6 @@ public final class ImageLoader {
 
     public static Uri getArtistArtUri(String artistName) {
         return Uri.withAppendedPath(ARTIST_THUMBNAILS_URI, artistName);
-    }
-
-    public static Uri getMetadataArtUri(Uri uri) {
-        return Uri.withAppendedPath(METADATA_THUMBNAILS_URI, Uri.encode(uri.toString()));
     }
 
     private ImageLoader(Context context) {
@@ -279,7 +265,7 @@ public final class ImageLoader {
         private final boolean shutdown;
         private final WeakReference<Picasso> picasso;
 
-        <T> AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
+        AsyncLoader(int resourceId, Uri uri, WeakReference<ImageView> targetRef, Params p, boolean shutdown, WeakReference<Picasso> picassoRef) {
             this.resourceId = resourceId;
             this.uri = uri;
             this.targetRef = targetRef;
@@ -331,7 +317,7 @@ public final class ImageLoader {
             if (p.filter != null) {
                 rc.transform(new FilterWrapper(p.filter));
             }
-            SystemUtils.postToUIThread(
+            SystemUtils.postToUIThreadDelayed(
                     () -> {
                         try {
                             if (!Ref.alive(targetRef)) {

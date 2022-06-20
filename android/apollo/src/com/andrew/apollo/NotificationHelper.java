@@ -11,6 +11,8 @@
 
 package com.andrew.apollo;
 
+import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -27,8 +29,6 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.util.Logger;
 
-import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER_STATUS;
-
 /**
  * Builds the notification for Apollo's service. Jelly Bean and higher uses the
  * expanded notification by default.
@@ -38,11 +38,6 @@ import static com.frostwire.android.core.Constants.NOTIFICATION_FROSTWIRE_PLAYER
 public class NotificationHelper {
     private static final Logger LOG = Logger.getLogger(NotificationHelper.class);
     private static final String INTENT_AUDIO_PLAYER = "com.frostwire.android.AUDIO_PLAYER";
-
-    /**
-     * Used to allow player controls on lock screen notification on API 21+ phones
-     */
-    private static final int VISIBILITY_PUBLIC = 1;
 
     /**
      * NotificationManager
@@ -184,15 +179,11 @@ public class NotificationHelper {
                     mService.onNotificationCreated(mNotification);
                 }
             }
-        } catch (SecurityException t) {
+        }  // possible java.lang.NullPointerException: Attempt to read from field 'android.os.Bundle android.app.Notification.extras' on a null object reference
+        // when closing the player notification with the 'X' icon.
+        catch (Throwable t) {
             // java.lang.SecurityException
             LOG.error("updatePlayState() " + t.getMessage(), t);
-        } catch (NullPointerException t2) {
-            // possible java.lang.NullPointerException: Attempt to read from field 'android.os.Bundle android.app.Notification.extras' on a null object reference
-            // when closing the player notification with the 'X' icon.
-            LOG.error("updatePlayState() " + t2.getMessage(), t2);
-        } catch (Throwable t3) {
-            LOG.error("updatePlayState() " + t3.getMessage(), t3);
         }
     }
 

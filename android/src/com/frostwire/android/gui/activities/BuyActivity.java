@@ -94,7 +94,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
-        SystemUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThreadDelayed(() -> {
             try {
                 if (Ref.alive(buyActivityRef)) {
                     buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
@@ -159,7 +159,7 @@ public final class BuyActivity extends AbstractActivity {
 
         Engine.instance().getThreadPool().execute(() -> {
             boolean paused = Offers.adsPausedAsync();
-            SystemUtils.postToUIThread(() -> onAdsPausedAsyncFinished(paused, activityRef));
+            SystemUtils.postToUIThreadDelayed(() -> onAdsPausedAsyncFinished(paused, activityRef));
         });
     }
 
@@ -241,8 +241,6 @@ public final class BuyActivity extends AbstractActivity {
 
     private void onInterstitialActionBarDismiss() {
         if (isInterstitial()) {
-            Intent intent = getIntent();
-
             Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(
                     this,
                     false,
@@ -526,16 +524,12 @@ public final class BuyActivity extends AbstractActivity {
             throw new IllegalArgumentException("BuyActivity::getSelectedProductCard(productCardViewId=" + productCardViewId + ", buyActivity=null!!!)");
         }
         ProductCardView productCard;
-        switch (productCardViewId) {
-            case R.id.activity_buy_product_card_30_days:
-                productCard = buyActivity.card30days;
-                break;
-            case R.id.activity_buy_product_card_reward:
-                productCard = buyActivity.cardNminutes;
-                break;
-            case R.id.activity_buy_product_card_1_year:
-            default:
-                productCard = buyActivity.card1year;
+        if (productCardViewId == R.id.activity_buy_product_card_30_days) {
+            productCard = buyActivity.card30days;
+        } else if (productCardViewId == R.id.activity_buy_product_card_reward) {
+            productCard = buyActivity.cardNminutes;
+        } else {
+            productCard = buyActivity.card1year;
         }
         return productCard;
     }

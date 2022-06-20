@@ -140,7 +140,7 @@ public final class UIUtils {
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
-        SystemUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThreadDelayed(() -> {
             final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
         });
@@ -234,27 +234,6 @@ public final class UIUtils {
      */
     public static String rate2speed(double rate) {
         return NUMBER_FORMAT0.format(rate) + " " + GENERAL_UNIT_KBPSEC;
-    }
-
-    public static String getFileTypeAsString(Resources resources, byte fileType) {
-        switch (fileType) {
-            case Constants.FILE_TYPE_APPLICATIONS:
-                return resources.getString(R.string.applications);
-            case Constants.FILE_TYPE_AUDIO:
-                return resources.getString(R.string.audio);
-            case Constants.FILE_TYPE_DOCUMENTS:
-                return resources.getString(R.string.documents);
-            case Constants.FILE_TYPE_PICTURES:
-                return resources.getString(R.string.pictures);
-            case Constants.FILE_TYPE_RINGTONES:
-                return resources.getString(R.string.ringtones);
-            case Constants.FILE_TYPE_VIDEOS:
-                return resources.getString(R.string.video);
-            case Constants.FILE_TYPE_TORRENTS:
-                return resources.getString(R.string.media_type_torrents);
-            default:
-                return resources.getString(R.string.unknown);
-        }
     }
 
     public static boolean openFile(Context context, String filePath, String mime) {
@@ -603,9 +582,9 @@ public final class UIUtils {
                     EphemeralPlaylist ephemeralPlaylist = Librarian.instance().createEphemeralPlaylist(context, fd);
                     mediaPlayer.play(ephemeralPlaylist);
                 }
-            } catch (Throwable ignored) {
+            } catch (Throwable t) {
                 // possible Runtime error thrown by Librarian.instance()
-                LOG.error(ignored.getMessage(), ignored);
+                LOG.error(t.getMessage(), t);
             }
         }
     }

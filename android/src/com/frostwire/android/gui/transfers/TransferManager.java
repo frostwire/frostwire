@@ -19,7 +19,6 @@ package com.frostwire.android.gui.transfers;
 
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.StatFs;
 
 import com.frostwire.android.R;
@@ -55,6 +54,7 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.frostwire.android.util.Asyncs.async;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 /**
  * @author gubatron
@@ -131,16 +131,16 @@ public final class TransferManager {
         this.downloadsToReview = 0;
     }
 
-    /**
-     * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
-     * downloaded files?
-     */
-    public static boolean isUsingSDCardPrivateStorage() {
-        String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String currentPath = ConfigurationManager.instance().getStoragePath();
-
-        return !primaryPath.equals(currentPath);
-    }
+//    /**
+//     * Is it using the SD Card's private (non-persistent after uninstall) app folder to save
+//     * downloaded files?
+//     */
+//    public static boolean isUsingSDCardPrivateStorage() {
+//        String primaryPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+//        String currentPath = ConfigurationManager.instance().getStoragePath();
+//
+//        return !primaryPath.equals(currentPath);
+//    }
 
     public List<Transfer> getTransfers() {
         List<Transfer> transfers = new ArrayList<>();
@@ -335,10 +335,7 @@ public final class TransferManager {
         }
     }
 
-    public BittorrentDownload downloadTorrent(String uri) {
-        return downloadTorrent(uri, null, null);
-    }
-
+    @SuppressWarnings("UnusedReturnValue")
     public BittorrentDownload downloadTorrent(String uri, TorrentFetcherListener fetcherListener) {
         return downloadTorrent(uri, fetcherListener, null);
     }
@@ -361,7 +358,7 @@ public final class TransferManager {
                     !scheme.equalsIgnoreCase("http") &&
                     !scheme.equalsIgnoreCase("https") &&
                     !scheme.equalsIgnoreCase("magnet")) {
-                LOG.warn("Invalid URI scheme: " + u.toString());
+                LOG.warn("Invalid URI scheme: " + u);
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
             }
 
@@ -492,6 +489,7 @@ public final class TransferManager {
         return ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_TORRENT_DELETE_STARTED_TORRENT_FILES);
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isResumable(BittorrentDownload bt) {
         // torrents that are finished because seeding is
         // not enabled, are actually paused
@@ -572,8 +570,8 @@ public final class TransferManager {
         }
     }
 
-    public int incrementStartedTransfers() {
-        return ++startedTransfers;
+    public void incrementStartedTransfers() {
+        ++startedTransfers;
     }
 
     public void resetStartedTransfers() {
@@ -625,7 +623,7 @@ public final class TransferManager {
 
     private void unregisterPreferencesChangeListener() {
         if (SystemUtils.isUIThread()) {
-            SystemUtils.HandlerFactory.postTo(SystemUtils.HandlerThreadName.CONFIG_MANAGER,
+            postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER,
                     () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
 
         } else {

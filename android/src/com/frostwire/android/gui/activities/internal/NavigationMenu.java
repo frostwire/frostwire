@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,27 +156,18 @@ public final class NavigationMenu {
         if (fragment != null) {
             controller.switchContent(fragment);
         } else {
-            switch (menuActionId) {
-                case R.id.menu_main_my_music:
-                    controller.launchMyMusic();
-                    break;
-                case R.id.menu_downloads:
-                    controller.openOSFileExplorer();
-                    break;
-                case R.id.menu_main_transfers:
-                    controller.showTransfers(TransfersFragment.TransferStatus.ALL);
-                    break;
-                case R.id.menu_main_support:
-                    UIUtils.openURL(controller.getActivity(), Constants.SUPPORT_URL);
-                    break;
-                case R.id.menu_main_settings:
-                    controller.showPreferences();
-                    break;
-                case R.id.menu_main_shutdown:
-                    controller.showShutdownDialog();
-                    break;
-                default:
-                    break;
+            if (menuActionId == R.id.menu_main_my_music) {
+                controller.launchMyMusic();
+            } else if (menuActionId == R.id.menu_downloads) {
+                controller.openOSFileExplorer();
+            } else if (menuActionId == R.id.menu_main_transfers) {
+                controller.showTransfers(TransfersFragment.TransferStatus.ALL);
+            } else if (menuActionId == R.id.menu_main_support) {
+                UIUtils.openURL(controller.getActivity(), Constants.SUPPORT_URL);
+            } else if (menuActionId == R.id.menu_main_settings) {
+                controller.showPreferences();
+            } else if (menuActionId == R.id.menu_main_shutdown) {
+                controller.showShutdownDialog();
             }
         }
 
@@ -203,7 +194,7 @@ public final class NavigationMenu {
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        SystemUtils.postToUIThread(() -> {
+        SystemUtils.postToUIThreadDelayed(() -> {
             try {
                 menuRemoveAdsItem.setVisibility(visibility);
             } catch (Throwable t) {
