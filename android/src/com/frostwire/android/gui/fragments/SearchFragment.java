@@ -22,7 +22,7 @@ import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
-import static com.frostwire.android.util.SystemUtils.postToUIThreadDelayed;
+import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -609,7 +609,7 @@ public final class SearchFragment extends AbstractFragment implements
             FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
             // Time to report to the UI, let the adapter know about the new newResults
             searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-            postToUIThreadDelayed(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
+            SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
         }
 
         @Override
@@ -670,7 +670,7 @@ public final class SearchFragment extends AbstractFragment implements
                 fragment.currentQuery = null;
                 fragment.searchInput.setText("");
             } else {
-                postToUIThreadDelayed(() -> {
+                SystemUtils.postToUIThread(() -> {
                     if (Ref.alive(fragmentRef)) {
                         View view = fragmentRef.get().getView();
                         if (view != null) {

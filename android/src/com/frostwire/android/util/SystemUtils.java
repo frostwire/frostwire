@@ -144,7 +144,7 @@ public final class SystemUtils {
         }
     }
 
-    public static void postToUIThreadDelayed(Runnable runnable) {
+    public static void postToUIThread(Runnable runnable) {
         try {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(runnable);
@@ -153,7 +153,7 @@ public final class SystemUtils {
         }
     }
 
-    public static void postToUIThreadDelayed(Runnable runnable, long delayMillis) {
+    public static void postToUIThread(Runnable runnable, long delayMillis) {
         try {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(runnable, delayMillis);

@@ -94,7 +94,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
-        SystemUtils.postToUIThreadDelayed(() -> {
+        SystemUtils.postToUIThread(() -> {
             try {
                 if (Ref.alive(buyActivityRef)) {
                     buyActivityRef.get().refreshPaymentOptionsViewRewardMinutesTextView();
@@ -159,7 +159,7 @@ public final class BuyActivity extends AbstractActivity {
 
         Engine.instance().getThreadPool().execute(() -> {
             boolean paused = Offers.adsPausedAsync();
-            SystemUtils.postToUIThreadDelayed(() -> onAdsPausedAsyncFinished(paused, activityRef));
+            SystemUtils.postToUIThread(() -> onAdsPausedAsyncFinished(paused, activityRef));
         });
     }
 

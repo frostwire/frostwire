@@ -255,7 +255,7 @@ public class FWBannerView extends LinearLayout {
     }
 
     public void loadFallbackBanner(final String adUnitId) {
-        SystemUtils.postToUIThreadDelayed(() ->
+        SystemUtils.postToUIThread(() ->
                 {
                     try {
                         InHouseBannerFactory.AdFormat adFormat;

@@ -209,7 +209,7 @@ public final class Engine implements IEngineService {
             }, 0);
         } catch (SecurityException execution) {
             WeakReference<Context> contextRef = Ref.weak(context);
-            SystemUtils.postToUIThreadDelayed(() -> {
+            SystemUtils.postToUIThread(() -> {
                 try {
                     if (Ref.alive(contextRef)) {
                         UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);

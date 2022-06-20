@@ -807,7 +807,7 @@ public class MainActivity extends AbstractActivity implements
                 if (mainActivityIntent != null) {
                     mainActivityIntent.putExtra("updateAvailable", value);
                 }
-                SystemUtils.postToUIThreadDelayed(() -> updateNavigationMenu(value));
+                SystemUtils.postToUIThread(() -> updateNavigationMenu(value));
             }
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
@@ -815,7 +815,7 @@ public class MainActivity extends AbstractActivity implements
                     UIUtils.showDismissableMessage(findView(android.R.id.content),
                             R.string.no_data_check_internet_connection);
                 }
-                SystemUtils.postToUIThreadDelayed(() -> search.setDataUp(isDataUp));
+                SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
             }
         }
     }

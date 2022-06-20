@@ -194,7 +194,7 @@ public final class NavigationMenu {
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
                 View.GONE;
-        SystemUtils.postToUIThreadDelayed(() -> {
+        SystemUtils.postToUIThread(() -> {
             try {
                 menuRemoveAdsItem.setVisibility(visibility);
             } catch (Throwable t) {

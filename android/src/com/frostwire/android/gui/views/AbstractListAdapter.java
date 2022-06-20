@@ -161,7 +161,7 @@ public abstract class AbstractListAdapter<T> extends BaseAdapter implements Filt
     public void clearChecked() {
         if (checked != null && checked.size() > 0) {
             checked.clear();
-            SystemUtils.postToUIThreadDelayed(this::notifyDataSetChanged);
+            SystemUtils.postToUIThread(this::notifyDataSetChanged);
         }
     }
 

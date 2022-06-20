@@ -92,7 +92,7 @@ class MsgManager extends Handler {
             return;
         }
         if (!SystemUtils.isUIThread()) {
-            SystemUtils.postToUIThreadDelayed(this::displayMsg);
+            SystemUtils.postToUIThread(this::displayMsg);
             return;
         }
 
@@ -126,7 +126,7 @@ class MsgManager extends Handler {
      */
     private void removeMsg(final AppMsg appMsg) {
         if (!SystemUtils.isUIThread()) {
-            SystemUtils.postToUIThreadDelayed(() -> removeMsg(appMsg));
+            SystemUtils.postToUIThread(() -> removeMsg(appMsg));
             return;
         }
 

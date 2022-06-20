@@ -21,7 +21,7 @@ package com.frostwire.android.gui.adapters;
 import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
-import static com.frostwire.android.util.SystemUtils.postToUIThreadDelayed;
+import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -107,7 +107,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                     }
                     // Filter the entire list by file type
                     filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
-                    postToUIThreadDelayed(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
+                    SystemUtils.postToUIThread(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
                 });
     }
 

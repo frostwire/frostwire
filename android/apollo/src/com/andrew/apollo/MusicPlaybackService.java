@@ -160,24 +160,24 @@ public class MusicPlaybackService extends JobIntentService {
     public void handleCommandIntent(Intent intent) {
         Asserts.checkNotNull(intent);
         // can't handleCommandIntent until service is fully started
-        LOG.info("handleCommandIntent waiting for initServiceLatch...", true);
+        LOG.info("MusicPlaybackService::handleCommandIntent waiting for initServiceLatch...", true);
         try {
             initServiceLatch.await();
         } catch (InterruptedException e) {
             LOG.error("handleCommandIntent: " + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
-        LOG.info("handleCommandIntent done waiting for initServiceLatch", true);
+        LOG.info("MusicPlaybackService::handleCommandIntent done waiting for initServiceLatch", true);
 
         // FOREGROUND_STATE_CHANGED should probably be handled, this might be culprit for issues
 
         final String action = intent.getAction();
         final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
-        LOG.info("handleCommandIntent: action = " + action + ", command = " + command, true);
+        LOG.info("MusicPlaybackService::handleCommandIntent: action = " + action + ", command = " + command, true);
 
         if (action == null) {
-            LOG.info("handleCommandIntent: nothing to be done here, exiting.");
+            LOG.info("MusicPlaybackService::handleCommandIntent: nothing to be done here, exiting.");
             return;
         }
 
@@ -804,7 +804,7 @@ public class MusicPlaybackService extends JobIntentService {
 
     public void updateNotification() {
         if (mNotificationHelper == null) {
-            LOG.error("updateNotification() failed, mNotificationHelper == null");
+            LOG.error("MusicPlaybackService::updateNotification() failed, mNotificationHelper == null");
             return;
         }
 
@@ -816,7 +816,7 @@ public class MusicPlaybackService extends JobIntentService {
                         try {
                             buildNotificationWithAlbumArtPost(albumArt);
                         } catch (Throwable t) {
-                            LOG.error("updateNotification() error " + t.getMessage(), t, true);
+                            LOG.error("MusicPlaybackService::updateNotification() error " + t.getMessage(), t, true);
                         }
                     });
                 });
@@ -1628,17 +1628,17 @@ public class MusicPlaybackService extends JobIntentService {
      */
     private void updateRemoteControlClient(final String what) {
         if (mRemoteControlClient == null) {
-            LOG.info("updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
+            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. mRemoteControlClient is null, review your logic");
             return;
         }
 
         if (what == null) {
-            LOG.info("updateRemoteControlClient() aborted. what is null, review your logic");
+            LOG.info("MusicPlaybackService::updateRemoteControlClient() aborted. what is null, review your logic");
             return;
         }
 
 
-        LOG.info("updateRemoteControlClient(what=" + what + ")");
+        LOG.info("MusicPlaybackService::updateRemoteControlClient(what=" + what + ")");
 
         int playState;
         final boolean isPlaying = isPlaying();
@@ -1653,7 +1653,7 @@ public class MusicPlaybackService extends JobIntentService {
             playState = RemoteControlClient.PLAYSTATE_STOPPED;
         }
 
-        if (isStopped && mNotificationHelper != null) {
+        if (isStopped && !isPlaying && mNotificationHelper != null) {
             mNotificationHelper.killNotification();
         }
         final int playStateFinalCopy = playState;
@@ -1895,7 +1895,7 @@ public class MusicPlaybackService extends JobIntentService {
      * @param path The path of the file to open
      */
     public boolean openFile(final String path) {
-        if (D) LOG.info("openFile: path = " + path);
+        if (D) LOG.info("MusicPlaybackService::openFile: path = " + path);
         if (path == null) {
             return false;
         }

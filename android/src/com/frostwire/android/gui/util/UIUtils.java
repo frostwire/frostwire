@@ -140,7 +140,7 @@ public final class UIUtils {
     }
 
     public static void showDismissableMessage(View view, int resourceId) {
-        SystemUtils.postToUIThreadDelayed(() -> {
+        SystemUtils.postToUIThread(() -> {
             final Snackbar snackbar = Snackbar.make(view, resourceId, Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(R.string.dismiss, v -> snackbar.dismiss()).show();
         });

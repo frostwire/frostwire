@@ -317,7 +317,7 @@ public final class ImageLoader {
             if (p.filter != null) {
                 rc.transform(new FilterWrapper(p.filter));
             }
-            SystemUtils.postToUIThreadDelayed(
+            SystemUtils.postToUIThread(
                     () -> {
                         try {
                             if (!Ref.alive(targetRef)) {
