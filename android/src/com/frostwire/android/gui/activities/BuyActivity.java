@@ -109,6 +109,7 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private void refreshPaymentOptionsViewRewardMinutesTextView() {
+        SystemUtils.ensureUIThreadOrCrash("BuyActivity::refreshPaymentOptionsViewRewardMinutesTextView");
         if (paymentOptionsView != null) {
             TextView textView = paymentOptionsView.findViewById(R.id.view_product_payment_options_temporary_ad_removal_description_textview);
             String temporary_ad_removal_description = textView.getResources().getString(R.string.temporary_ad_removal_description, REWARD_FREE_AD_MINUTES);
@@ -164,6 +165,7 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private static void onAdsPausedAsyncFinished(boolean adsPaused, WeakReference<AppCompatActivity> activityRef) {
+        SystemUtils.ensureUIThreadOrCrash("BuyActivity::onAdsPausedAsyncFinished");
         if (adsPaused) {
             // we shouldn't be here if ads have been paused, do not load rewarded videos
             return;

@@ -118,6 +118,7 @@ public final class UIUtils {
     }
 
     private static void showToastMessage(Context context, String message, int duration, int gravity, int xOffset, int yOffset) {
+        SystemUtils.ensureUIThreadOrCrash("UIUtils::showToastMessage");
         if (context != null && message != null) {
             Toast toast = Toast.makeText(context, message, duration);
             if (gravity != (Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM)) {

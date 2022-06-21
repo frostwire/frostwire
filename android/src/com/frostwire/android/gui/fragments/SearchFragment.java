@@ -576,6 +576,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     public void setDataUp(boolean value) {
+        SystemUtils.ensureUIThreadOrCrash("SearchFragment::setDataUp");
         searchProgress.setDataUp(value);
     }
 

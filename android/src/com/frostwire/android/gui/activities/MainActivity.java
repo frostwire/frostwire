@@ -244,6 +244,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void updateNavigationMenu(boolean updateAvailable) {
+        SystemUtils.ensureUIThreadOrCrash("MainActivity::onAdsPausedAsyncFinished");
         LOG.info("updateNavigationMenu(" + updateAvailable + ")");
         if (navigationMenu == null) {
             setupDrawer();
