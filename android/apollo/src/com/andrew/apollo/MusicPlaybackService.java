@@ -48,6 +48,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -90,6 +91,8 @@ import static com.frostwire.android.util.RunStrict.runStrict;
  * - assertInMusicPlayerHandlerThread()
  */
 public class MusicPlaybackService extends JobIntentService {
+    private Object cursorLock = new Object();
+
     public static void safePost(Runnable runnable) {
         if (MusicPlaybackService.mPlayerHandler == null) {
             LOG.error("Check your logic, trying to safePost and mPlayerHandler hasn't yet been created");
@@ -796,6 +799,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
         try {
             stopSelf();
+            initServiceLatch = new CountDownLatch(1);
         } catch (Throwable ignored) {
         }
         INSTANCE = null;
@@ -880,7 +884,7 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
     // private methods
-    private final CountDownLatch initServiceLatch = new CountDownLatch(1);
+    private CountDownLatch initServiceLatch = new CountDownLatch(1);
 
     private void initService() {
         if (mPlayerHandler == null) {
@@ -1089,6 +1093,7 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
     private void buildNotificationWithAlbumArtPost(final Bitmap bitmap) {
+        SystemUtils.ensureUIThreadOrCrash("MusicPlaybackService::buildNotificationWithAlbumArtPost");
         mNotificationHelper.buildNotification(
                 getAlbumName(),
                 getArtistName(),
@@ -1311,11 +1316,16 @@ public class MusicPlaybackService extends JobIntentService {
 
     private void updateCursor(final Uri uri) {
         closeCursor();
-        mCursor = openCursorAndGoToFirst(
+
+        Cursor cursor = openCursorAndGoToFirst(
                 uri,
                 PROJECTION,
                 null,
                 null);
+
+        synchronized (cursorLock) {
+            mCursor = cursor;
+        }
         updateAlbumCursor();
     }
 
@@ -1359,7 +1369,9 @@ public class MusicPlaybackService extends JobIntentService {
                 mCursor.close();
             } catch (Throwable ignored) {
             }
-            mCursor = null;
+            synchronized (cursorLock) {
+                mCursor = null;
+            }
         }
         if (mAlbumCursor != null) {
             try {
@@ -1553,6 +1565,12 @@ public class MusicPlaybackService extends JobIntentService {
         // Update the lock screen controls
         musicPlaybackService.updateRemoteControlClient(change);
         if (POSITION_CHANGED.equals(change) && musicPlaybackService.position() != 0) {
+            return;
+        }
+        if (SHUFFLEMODE_CHANGED.equals(change)) {
+            return;
+        }
+        if (REPEATMODE_CHANGED.equals(change)) {
             return;
         }
         final Intent intent = new Intent(change);
@@ -1882,7 +1900,7 @@ public class MusicPlaybackService extends JobIntentService {
         Uri uri = Uri.parse(path);
         long id = -1;
         try {
-            id = Long.parseLong(uri.getLastPathSegment());
+            id = Long.parseLong(uri.getLastPathSegment().replace("msf:", ""));
         } catch (NumberFormatException ex) {
             // Ignore
         }
@@ -1899,7 +1917,15 @@ public class MusicPlaybackService extends JobIntentService {
         if (path == null) {
             return false;
         }
-        long id = getIdFromContextUri(path);
+
+        long id;
+
+        if (path.startsWith("content://")) {
+            String fileIdString = DocumentsContract.getDocumentId(Uri.parse(path)).split(":")[1];
+            id = Long.parseLong(fileIdString);
+        } else {
+            id = getIdFromContextUri(path);
+        }
         // Are we talking about a regular file path?
         if (path.startsWith("/storage") || path.startsWith("content://")) {
             mPlayer.setCurrentDataSource(path);
@@ -2142,7 +2168,7 @@ public class MusicPlaybackService extends JobIntentService {
      * @return The current song album ID
      */
     public long getAlbumId() {
-        //synchronized (cursorLock) {
+//        synchronized (cursorLock) {
         try {
             if (mCursor == null || mCursor.isClosed()) {
                 return -1;
@@ -2151,10 +2177,12 @@ public class MusicPlaybackService extends JobIntentService {
         } catch (IllegalStateException | StaleDataException e) {
             // this is what happens when a cursor is stored as a state
             LOG.error("Error using db cursor to get album id", e);
-            mCursor = null;
+            synchronized (cursorLock) {
+                mCursor = null;
+            }
             return -1;
         }
-        //}
+//        }
     }
 
     /**
@@ -2965,9 +2993,10 @@ public class MusicPlaybackService extends JobIntentService {
 
         private boolean trySettingDataSourceManyWays(final MediaPlayer player,
                                                      final Uri pathUri) {
-            return setDataSourceUsingAFileDescriptor(player, pathUri) ||
-                   setDataSourceUsingContentPathURI(player, pathUri) ||
-                   setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri);
+            return setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri) ||
+                    setDataSourceUsingAFileDescriptor(player, pathUri) ||
+                    setDataSourceUsingContentPathURI(player, pathUri);
+
         }
 
         private boolean setDataSourceUsingContentPathURI(
@@ -2988,8 +3017,8 @@ public class MusicPlaybackService extends JobIntentService {
         private boolean setDatasourceUsingDataPathFromMediaStoreContentURI(
                 final MediaPlayer player,
                 final Uri pathUri) {
-            String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, pathUri);
             try {
+                String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, pathUri);
                 player.reset();
                 LOG.info("setDatasourceUsingDataPathFromMediaStoreContentURI: dataPath = " + dataPath);
                 Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);

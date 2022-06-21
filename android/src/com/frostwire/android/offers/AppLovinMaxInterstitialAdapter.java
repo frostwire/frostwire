@@ -113,7 +113,7 @@ public class AppLovinMaxInterstitialAdapter implements InterstitialListener, Max
         // AppLovin recommends that you retry with exponentially higher delays up to a maximum delay (in this case 64 seconds)
         retryAttempt++;
         long delayMillis = TimeUnit.SECONDS.toMillis((long) Math.pow(2, Math.min(6, retryAttempt)));
-        SystemUtils.postToUIThread(interstitialAd::loadAd, delayMillis);
+        SystemUtils.postToUIThreadDelayed(interstitialAd::loadAd, delayMillis);
     }
 
     @Override

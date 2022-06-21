@@ -22,7 +22,6 @@ import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
-import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

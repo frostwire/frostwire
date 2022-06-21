@@ -153,12 +153,12 @@ public final class SystemUtils {
         }
     }
 
-    public static void postToUIThread(Runnable runnable, long delayMillis) {
+    public static void postToUIThreadDelayed(Runnable runnable, long delayMillis) {
         try {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(runnable, delayMillis);
         } catch (Throwable t) {
-            LOG.error("UIUtils.postToUIThread error: " + t.getMessage());
+            LOG.error("UIUtils.postToUIThreadDelayed error: " + t.getMessage());
         }
     }
 

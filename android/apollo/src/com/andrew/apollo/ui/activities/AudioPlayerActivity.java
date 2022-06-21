@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2012 Andrew Neal
- * Copyright (c) 2012-2020, FrostWire(R)
+ * Copyright (c) 2012-2022, FrostWire(R)
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,6 +79,7 @@ import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.SwipeLayout;
 import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.TaskThrottle;
@@ -195,8 +196,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         try {
             super.onCreate(savedInstanceState);
         } catch (Throwable t) {
-            LOG.error("onCreate() (handled) " + t.getMessage(), t);
+            LOG.error("AudioPlayerActivity::onCreate() (handled) " + t.getMessage(), t);
         }
+        LOG.info("AudioPlayerActivity::onCreate -> intent:" + getIntent());
 
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -227,14 +229,28 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         waitingToInitAlbumArtBanner.set(false);
 
-        loadCurrentAlbumArt();
+        if (MusicPlaybackService.getInstance() == null) {
+            MusicUtils.startMusicPlaybackService(
+                    this,
+                    MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
+                    () -> {
+                        if (getIntent() != null && getIntent().getData() != null) {
+                            //Uri fileUri = getIntent().getData();
+                            //MusicUtils.playFileFromUri(fileUri);
+                            onNewIntent(getIntent());
+                        }
+
+                        loadCurrentAlbumArt();
+                    });
+        }
     }
 
     @Override
     public void onNewIntent(Intent intent) {
+        LOG.info("AudioPlayerActivity::onNewIntent -> intent:" + intent, true);
         super.onNewIntent(intent);
         setIntent(intent);
-        initPlaybackControls();
+        SystemUtils.postToUIThread(this::initPlaybackControls);
         startPlayback();
     }
 
@@ -338,47 +354,40 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_player_shuffle:
-                // Shuffle all the songs
-                MusicUtils.shuffleAll(this);
-                // Refresh the queue
-                ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-                return true;
-            case R.id.menu_player_favorite:
-                // Toggle the current track as a favorite and update the menu
-                // item
-                toggleFavorite();
-                return true;
-            case R.id.menu_player_audio_player_share:
-                // Share the current meta data
-                shareCurrentTrack();
-                return true;
-            case R.id.menu_player_audio_player_equalizer:
-                // Sound effects
-                NavUtils.openEffectsPanel(this);
-                return true;
-            case R.id.menu_player_audio_player_stop:
-                try {
-                    MusicUtils.getMusicPlaybackService().stop();
-                } catch (Throwable e) {
-                    // ignore
-                }
-                finish();
-                return true;
-            case R.id.menu_player_audio_player_delete:
-                // Delete current song
-                DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
-                        MusicUtils.getCurrentAudioId()
-                }, null).show(getFragmentManager(), "DeleteDialog");
-                return true;
-            case R.id.menu_player_audio_player_add_to_playlist:
-                AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{
-                        MusicUtils.getCurrentAudioId()
-                });
-                menuAction.onClick();
-            default:
-                break;
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_player_shuffle) {// Shuffle all the songs
+            MusicUtils.shuffleAll(this);
+            // Refresh the queue
+            ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+            return true;
+        } else if (itemId == R.id.menu_player_favorite) {// Toggle the current track as a favorite and update the menu
+            // item
+            toggleFavorite();
+            return true;
+        } else if (itemId == R.id.menu_player_audio_player_share) {// Share the current meta data
+            shareCurrentTrack();
+            return true;
+        } else if (itemId == R.id.menu_player_audio_player_equalizer) {// Sound effects
+            NavUtils.openEffectsPanel(this);
+            return true;
+        } else if (itemId == R.id.menu_player_audio_player_stop) {
+            try {
+                MusicUtils.getMusicPlaybackService().stop();
+            } catch (Throwable e) {
+                // ignore
+            }
+            finish();
+            return true;
+        } else if (itemId == R.id.menu_player_audio_player_delete) {// Delete current song
+            DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
+                    MusicUtils.getCurrentAudioId()
+            }, null).show(getFragmentManager(), "DeleteDialog");
+            return true;
+        } else if (itemId == R.id.menu_player_audio_player_add_to_playlist) {
+            AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{
+                    MusicUtils.getCurrentAudioId()
+            });
+            menuAction.onClick();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -411,6 +420,31 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     protected void onResume() {
         super.onResume();
 
+        Intent intentFromFileExplorer = getIntent();
+        if (intentFromFileExplorer != null) {
+            Uri dataUri = intentFromFileExplorer.getData();
+
+            if (MusicUtils.getMusicPlaybackService() == null) {
+                MusicUtils.startMusicPlaybackService(getApplicationContext(),
+                        MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
+                        () -> preparePlaybackFromFileContainingIntent(intentFromFileExplorer));
+            } else {
+                preparePlaybackFromFileContainingIntent(intentFromFileExplorer);
+            }
+        } else {
+            waitingToInitAlbumArtBanner.set(false);
+            // Set the playback drawables
+            updatePlaybackControls();
+            // Current info
+            updateNowPlayingInfo();
+            // Refresh the queue
+            ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
+            initPlaybackControls();
+            loadCurrentAlbumArt();
+        }
+    }
+
+    void preparePlaybackFromFileContainingIntent(Intent intentFromFileExplorer) {
         waitingToInitAlbumArtBanner.set(false);
         // Set the playback drawables
         updatePlaybackControls();
@@ -418,21 +452,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         updateNowPlayingInfo();
         // Refresh the queue
         ((QueueFragment) mPagerAdapter.getFragment(0)).refreshQueue();
-        initPlaybackControls();
         loadCurrentAlbumArt();
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            Uri dataUri = intent.getData();
-
-            if (MusicUtils.getMusicPlaybackService() == null) {
-                MusicUtils.startMusicPlaybackService(getApplicationContext(),
-                        MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
-                        () -> onNewIntent(intent));
-            } else {
-                onNewIntent(intent);
-            }
-        }
+        onNewIntent(intentFromFileExplorer);
     }
 
     @Override
@@ -507,6 +529,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
      * Initializes the items in the now playing screen
      */
     private void initPlaybackControls() {
+        SystemUtils.ensureUIThreadOrCrash("AudioPlayerActivity::initPlaybackControls");
         // ViewPager container
         mPageContainer = findView(R.id.audio_player_pager_container);
         // Theme the pager container background
@@ -708,13 +731,13 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             if (lastKnownIsPlaying && position < minPassedPosition) {
                 LOG.error("deferredInitAlbumArtBanner() callback failed: Position@" +
                         position + " < " + minPassedPosition + "??? THIS SHOULD NOT HAPPEN");
+                waitingToInitAlbumArtBanner.set(false);
                 return;
             }
             waitingToInitAlbumArtBanner.set(false);
             activityRef.get().initAlbumArtBanner();
         }, 8000);
     }
-
 
     private void initAlbumArtBanner() {
         if (UIUtils.isScreenLocked(this)) {

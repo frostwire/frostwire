@@ -21,7 +21,6 @@ package com.frostwire.android.gui.adapters;
 import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
-import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;

@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.io.File;
@@ -49,6 +50,8 @@ import java.security.NoSuchAlgorithmException;
  * This class holds the memory and disk bitmap caches.
  */
 public final class ImageCache {
+
+    public static Logger LOG = Logger.getLogger(ImageCache.class);
 
     private static final String TAG = ImageCache.class.getSimpleName();
 
@@ -110,6 +113,7 @@ public final class ImageCache {
      * @return A new instance of this class.
      */
     public static ImageCache getInstance(final Context context) {
+        LOG.info("ImageCache.getInstance()...", true);
         if (sInstance == null) {
             sInstance = new ImageCache(context.getApplicationContext());
         }

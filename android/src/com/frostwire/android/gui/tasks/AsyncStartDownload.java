@@ -130,7 +130,7 @@ public class AsyncStartDownload {
     private static void onPostExecute(final Context ctx, final SearchResult sr, final String message, final Transfer transfer) {
         if (transfer != null) {
             if (ctx instanceof Activity) {
-                SystemUtils.postToUIThread(() -> tryShowingInterstitialIfActuallyDownloading(ctx, transfer), 15000);
+                SystemUtils.postToUIThreadDelayed(() -> tryShowingInterstitialIfActuallyDownloading(ctx, transfer), 15000);
             }
 
             if (!(transfer instanceof InvalidTransfer)) {

@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.ArtistColumns;
@@ -103,6 +104,8 @@ public final class MusicUtils {
 
     private static final Object startMusicPlaybackServiceLock = new Object();
 
+    private static final Object getStartMusicPlaybackServiceLock = new Object();
+
     static {
         sEmptyList = new long[0];
     }
@@ -123,12 +126,12 @@ public final class MusicUtils {
         // MusicPlaybackService has to be a foreground service
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LOG.info("startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+                LOG.info("MusicUtils::startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
                 // should end with a android.app.Service#startForeground(int, android.app.Notification) call
                 // otherwise if in 5 seconds it's not invoked, the system will crash the app
                 context.startForegroundService(intent);
             } else {
-                LOG.info("startMusicPlaybackService() startService(MusicPlaybackService)", true);
+                LOG.info("MusicUtils::startMusicPlaybackService() startService(MusicPlaybackService)", true);
                 context.startService(intent);
             }
         } catch (Throwable t) {
@@ -138,9 +141,11 @@ public final class MusicUtils {
             synchronized (startMusicPlaybackServiceLock) {
                 serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
             }
+            LOG.info("MusicUtils::startMusicPlaybackService() let's bind the ServiceConnectionListener...");
             context.getApplicationContext().bindService(intent, serviceConnectionListener, Context.BIND_AUTO_CREATE);
+            LOG.info("MusicUtils::startMusicPlaybackService() ServiceConnectionListener bound");
         } catch (Throwable t) {
-            LOG.error("startMusicPlaybackService() error " + t.getMessage(), t);
+            LOG.error("MusicUtils::startMusicPlaybackService() error, ServiceConnectionListener not bound " + t.getMessage(), t);
         }
     }
 
@@ -158,16 +163,17 @@ public final class MusicUtils {
         } else {
             sForegroundActivities--;
         }
+        LOG.info("notifyForegroundStateChanged, inForeground=" + inForeground + " oldForegroundActivities=" + old + ", sForegroundActivities=" + sForegroundActivities, true);
         if (old == 0 || sForegroundActivities == 0) {
             boolean startedServiceNow = false;
             LOG.info("notifyForegroundStateChanged trying to start the MusicPlaybackService");
             final Intent intent = new Intent(context, MusicPlaybackService.class);
             intent.setAction(MusicPlaybackService.FOREGROUND_STATE_CHANGED);
-            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities != 0);
+            intent.putExtra(MusicPlaybackService.NOW_IN_FOREGROUND, sForegroundActivities > 0);
             try {
                 if (MusicUtils.isMusicPlaybackServiceRunning()) {
                     // no need to be calling start service to make it do what we want if it's already there
-                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent", true);
+                    LOG.info("notifyForegroundStateChanged() -> telling existing MusicPlaybackService to handle our intent (intent=" + intent + ")", true);
                     MusicUtils.getMusicPlaybackService().handleCommandIntent(intent);
                 }
             } catch (Throwable t) {
@@ -181,11 +187,13 @@ public final class MusicUtils {
     }
 
     public static MusicPlaybackService getMusicPlaybackService() {
-        return musicPlaybackService;
+        synchronized (getStartMusicPlaybackServiceLock) {
+            return musicPlaybackService;
+        }
     }
 
     public static boolean isMusicPlaybackServiceRunning() {
-        return musicPlaybackService != null;
+        return getMusicPlaybackService() != null;
     }
 
 
@@ -247,17 +255,18 @@ public final class MusicUtils {
                 throw t;
             }
             try {
-                LOG.info("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
+                LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") -> MusicPlaybackService::updateNotification()!", true);
                 musicPlaybackService.updateNotification();
             } catch (Throwable e) {
-                LOG.error("ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
+                LOG.error("MusicUtils::ServiceConnectionListener::onServiceConnected(componentName=" + name + ") " + e.getMessage(), e, true);
             }
 
             if (callback != null) {
                 try {
+                    LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected() posting callback...");
                     MusicPlaybackService.safePost(callback);
                 } catch (Throwable t) {
-                    LOG.info("onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
+                    LOG.info("MusicUtils::ServiceConnectionListener::onServiceConnected() listener threw an exception -> " + t.getMessage(), t);
                 }
             }
 
@@ -803,8 +812,13 @@ public final class MusicUtils {
             // The cursor loader can only be created in a Looper Thread.
             Looper.prepare();
         }
+
+        String fileIdString = DocumentsContract.getDocumentId(contentUri).split(":")[1];
+        String selection = "_id = ?";
+        String[] selectionArgs = {fileIdString};
         String[] projection = {MediaStore.Downloads.DATA};
-        CursorLoader loader = new CursorLoader(context, contentUri, projection, null, null, null);
+        Uri uri = Uri.parse("content://media/external_primary/audio/media/");
+        CursorLoader loader = new CursorLoader(context, uri, projection, selection, selectionArgs, null);
         Cursor cursor = loader.loadInBackground();
         int column_index;
         if (cursor != null) {
@@ -1836,7 +1850,7 @@ public final class MusicUtils {
         if (adapter.getViewTypeCount() > 1 && position == 0) {
             return;
         }
-        final long[] list = MusicUtils.getSongListForAdapter(adapter);
+        final long[] list = MusicUtils.getSongListFromAdapter(adapter);
         int pos = adapter.getViewTypeCount() > 1 ? position - 1 : position;
         if (list.length == 0) {
             pos = 0;
@@ -1865,7 +1879,7 @@ public final class MusicUtils {
         }
     }
 
-    private static long[] getSongListForAdapter(final ArrayAdapter<Song> adapter) {
+    private static long[] getSongListFromAdapter(final ArrayAdapter<Song> adapter) {
         if (adapter == null) {
             return sEmptyList;
         }

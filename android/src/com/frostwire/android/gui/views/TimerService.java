@@ -31,7 +31,7 @@ public final class TimerService {
         //LOG.info("subscribe(" + observer.getClass().getCanonicalName() + ") has created a new TimerSubscription@" + subscription.hashCode());
         long interval = intervalSec * 1000L;
 
-        SystemUtils.postToUIThread(new TimerTask(subscription, interval), interval);
+        SystemUtils.postToUIThreadDelayed(new TimerTask(subscription, interval), interval);
         return subscription;
     }
 
@@ -39,7 +39,7 @@ public final class TimerService {
         mTimerSubscription.setObserver(observer);
         //LOG.info("reSubscribe(mTimerSubscription=@" + mTimerSubscription.hashCode() + ", intervalSec=" + intervalSec + ")");
         long intervalInMs = intervalSec * 1000L;
-        SystemUtils.postToUIThread(new TimerTask(mTimerSubscription, intervalInMs), intervalInMs);
+        SystemUtils.postToUIThreadDelayed(new TimerTask(mTimerSubscription, intervalInMs), intervalInMs);
     }
 
     private static final class TimerTask implements Runnable {
@@ -56,7 +56,7 @@ public final class TimerService {
             if (subscription.isSubscribed()) {
                 //LOG.info("TimerTask.run() TimerSubscription@" + subscription.hashCode() + " is still subscribed. Observer=" + subscription.observerClassName);
                 subscription.onTime();
-                SystemUtils.postToUIThread(this, interval);
+                SystemUtils.postToUIThreadDelayed(this, interval);
             }
         }
     }
