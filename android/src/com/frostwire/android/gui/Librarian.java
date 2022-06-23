@@ -519,7 +519,7 @@ public final class Librarian {
                 values.put(MediaColumns.TITLE, title);
                 values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
 
-                if (SystemUtils.hasAndroid11OrNewer()) {
+                if (SystemUtils.hasAndroid11OrNewer() && fileType == Constants.FILE_TYPE_AUDIO) {
                     values.put(MediaColumns.ARTIST, artistName);
                     values.put(MediaColumns.ALBUM_ARTIST, albumArtistName);
                     values.put(MediaColumns.ALBUM, albumName);
