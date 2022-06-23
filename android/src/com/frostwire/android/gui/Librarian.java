@@ -51,6 +51,7 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -508,10 +509,25 @@ public final class Librarian {
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
             mmr.setDataSource(srcFile.getAbsolutePath());
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            String artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            String albumArtistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+            String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String durationString = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
             LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
+
             if (title != null) {
                 values.put(MediaColumns.TITLE, title);
                 values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
+
+                if (SystemUtils.hasAndroid11OrNewer()) {
+                    values.put(MediaColumns.ARTIST, artistName);
+                    values.put(MediaColumns.ALBUM_ARTIST, albumArtistName);
+                    values.put(MediaColumns.ALBUM, albumName);
+                    if (!StringUtils.isNullOrEmpty(durationString)) {
+                        values.put(MediaColumns.DURATION, Long.parseLong(durationString));
+                    }
+                }
+
             }
         } else {
             values.put(MediaColumns.TITLE, srcFile.getName());
