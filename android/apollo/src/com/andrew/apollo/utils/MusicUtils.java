@@ -917,10 +917,13 @@ public final class MusicUtils {
 
         try {
             musicPlaybackService.stopPlayer();
-            if (!musicPlaybackService.openFile(filename)) {
+            long fileId = musicPlaybackService.openFile(filename);
+            if (fileId == -1) {
                 return false;
             }
+            musicPlaybackService.open(new long[] { fileId}, 0);
             musicPlaybackService.play();
+
             return true;
         } catch (final Throwable t) {
             LOG.error(t.getMessage(), t);

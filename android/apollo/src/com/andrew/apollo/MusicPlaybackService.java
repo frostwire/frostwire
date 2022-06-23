@@ -1428,7 +1428,7 @@ public class MusicPlaybackService extends JobIntentService {
             }
             final String path = String.format("%s/%d", contentUri, fileId);
             LOG.info("openCurrentAndMaybeNext(openNext=" + openNext + ") path=" + path);
-            if (openFile(path)) {
+            if (openFile(path) > 0) {
                 if (openNext) {
                     setNextTrack();
                 }
@@ -1454,7 +1454,7 @@ public class MusicPlaybackService extends JobIntentService {
                             setNextTrack();
                         }
                     } else {
-                        if (openFile(path)) {
+                        if (openFile(path)> 0) {
                             // should do something on positive?
                             // there used to be some sort of recursive callback
                             LOG.info("openCurrentAndMaybeNext(): openFile(path=" + path + ") succeeded");
@@ -1912,30 +1912,35 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @param path The path of the file to open
      */
-    public boolean openFile(final String path) {
+    public long openFile(final String path) {
         if (D) LOG.info("MusicPlaybackService::openFile: path = " + path);
         if (path == null) {
-            return false;
+            return -1;
         }
 
-        long id;
+        long id = -1;
 
-        if (path.startsWith("content://")) {
+        if (path.startsWith("content://com.android.provider")) {
             String fileIdString = DocumentsContract.getDocumentId(Uri.parse(path)).split(":")[1];
             id = Long.parseLong(fileIdString);
-        } else {
+        }
+        else if (path.startsWith("content://media/external_primary/audio/media")) {
+            id = Long.parseLong(Uri.parse(path).getLastPathSegment());
+        }
+        else if (path.contains("msf")) {
             id = getIdFromContextUri(path);
         }
         // Are we talking about a regular file path?
         if (path.startsWith("/storage") || path.startsWith("content://")) {
             mPlayer.setCurrentDataSource(path);
+            ensurePlayListCapacity(1);
             if (mPlayer != null && mPlayer.isInitialized()) {
                 mOpenFailedCounter = 0;
-                return true;
+                return id;
             } else {
                 mOpenFailedCounter++;
                 stopPlayer();
-                return false;
+                return -1;
             }
         }
         // If mCursor is null, try to associate path with a database cursor
@@ -1959,10 +1964,10 @@ public class MusicPlaybackService extends JobIntentService {
                 }
             } catch (UnsupportedOperationException e) {
                 LOG.error("Error while opening file for play", e);
-                return false;
+                return -1;
             } catch (StaleDataException | IllegalStateException e) {
                 LOG.error("Error with database cursor while opening file for play", e);
-                return false;
+                return -1;
             }
         }
 
@@ -1975,11 +1980,11 @@ public class MusicPlaybackService extends JobIntentService {
         mPlayer.setCurrentDataSource(path);
         if (mPlayer != null && mPlayer.isInitialized()) {
             mOpenFailedCounter = 0;
-            return true;
+            return id;
         } else {
             mOpenFailedCounter++;
             stopPlayer();
-            return false;
+            return id;
         }
     }
 
