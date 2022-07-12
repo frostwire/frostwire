@@ -12,6 +12,8 @@
 
 package com.andrew.apollo;
 
+import static com.frostwire.android.util.RunStrict.runStrict;
+
 import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -48,7 +50,6 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -75,13 +76,12 @@ import com.frostwire.util.TaskThrottle;
 import com.google.android.gms.common.internal.Asserts;
 
 import java.io.FileDescriptor;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
-
-import static com.frostwire.android.util.RunStrict.runStrict;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -1454,7 +1454,7 @@ public class MusicPlaybackService extends JobIntentService {
                             setNextTrack();
                         }
                     } else {
-                        if (openFile(path)> 0) {
+                        if (openFile(path) > 0) {
                             // should do something on positive?
                             // there used to be some sort of recursive callback
                             LOG.info("openCurrentAndMaybeNext(): openFile(path=" + path + ") succeeded");
@@ -1920,14 +1920,21 @@ public class MusicPlaybackService extends JobIntentService {
 
         long id = -1;
 
-        if (path.startsWith("content://com.android.provider")) {
-            String fileIdString = DocumentsContract.getDocumentId(Uri.parse(path)).split(":")[1];
-            id = Long.parseLong(fileIdString);
+        if (path.startsWith("content://com.android.providers.downloads.documents/document/raw")) {
+            try {
+                id = MusicUtils.getFileIdFromComAndroidProvidersDownloadsDocumentsPath(this, path);
+            } catch (Throwable t) {
+            }
         }
-        else if (path.startsWith("content://media/external_primary/audio/media")) {
-            id = Long.parseLong(Uri.parse(path).getLastPathSegment());
+        if (id == -1 && path.startsWith("content://media/external_primary/audio/media")) {
+            try {
+                id = Long.parseLong(Uri.parse(path).getLastPathSegment());
+            } catch (Throwable t) {
+
+            }
         }
-        else if (path.contains("msf")) {
+
+        if (id == -1 && path.contains("msf")) {
             id = getIdFromContextUri(path);
         }
         // Are we talking about a regular file path?
@@ -1936,12 +1943,11 @@ public class MusicPlaybackService extends JobIntentService {
             ensurePlayListCapacity(1);
             if (mPlayer != null && mPlayer.isInitialized()) {
                 mOpenFailedCounter = 0;
-                return id;
             } else {
                 mOpenFailedCounter++;
                 stopPlayer();
-                return -1;
             }
+            return id;
         }
         // If mCursor is null, try to associate path with a database cursor
         else if (mCursor == null) {
@@ -2998,10 +3004,35 @@ public class MusicPlaybackService extends JobIntentService {
 
         private boolean trySettingDataSourceManyWays(final MediaPlayer player,
                                                      final Uri pathUri) {
-            return setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri) ||
-                    setDataSourceUsingAFileDescriptor(player, pathUri) ||
-                    setDataSourceUsingContentPathURI(player, pathUri);
+            if (pathUri == null) {
+                return false;
+            }
+            String path = pathUri.toString();
+            if (path.startsWith("content://media/external")) {
+                if (!setDatasourceUsingDataPathFromMediaStoreContentURI(player, pathUri)) {
+                    return setDataSourceUsingContentPathURI(player, pathUri);
+                }
+            } else if (path.startsWith("content://com.android.providers.downloads.documents")) {
+                if (!setDataSourceUsingFilePathFromComAndroidProvidersDownloadsDocumentsPath(player, pathUri)) {
+                    return setDataSourceUsingAFileDescriptor(player, pathUri);
+                }
+            }
+            return setDataSourceUsingAFileDescriptor(player, pathUri);
+        }
 
+        private boolean setDataSourceUsingFilePathFromComAndroidProvidersDownloadsDocumentsPath(final MediaPlayer player,
+                                                        final Uri pathUri) {
+            String dirtyPath = pathUri.toString();
+            String cleanPath = MusicUtils.getFilePathFromComAndroidProvidersDownloadsDocumentsPath(MusicPlaybackService.INSTANCE, dirtyPath);
+            Uri cleanUri = Uri.parse(cleanPath);
+            try {
+                player.reset();
+                player.setDataSource(MusicPlaybackService.INSTANCE, cleanUri);
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
         }
 
         private boolean setDataSourceUsingContentPathURI(
@@ -3024,7 +3055,6 @@ public class MusicPlaybackService extends JobIntentService {
                 final Uri pathUri) {
             try {
                 String dataPath = MusicUtils.getDataPathFromMediaStoreContentURI(MusicPlaybackService.INSTANCE, pathUri);
-                player.reset();
                 LOG.info("setDatasourceUsingDataPathFromMediaStoreContentURI: dataPath = " + dataPath);
                 Uri dataPathUri = UIUtils.getFileUri(MusicPlaybackService.INSTANCE, dataPath);
                 LOG.info("setDatasourceUsingDataPathFromMediaStoreContentURI: dataPathUri = " + dataPathUri);

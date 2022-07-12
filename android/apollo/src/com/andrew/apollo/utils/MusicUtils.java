@@ -808,6 +808,9 @@ public final class MusicUtils {
      * to content://com.frostwire.android.fileprovider/external_files/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentsData/looklikeyou-soundcloud.mp3
      */
     public static String getDataPathFromMediaStoreContentURI(Context context, Uri contentUri) {
+        if (!contentUri.getPath().startsWith("content://media/")) {
+            return null;
+        }
         if (Looper.myLooper() == null) {
             // The cursor loader can only be created in a Looper Thread.
             Looper.prepare();
@@ -830,6 +833,39 @@ public final class MusicUtils {
             return result;
         }
         return null;
+    }
+
+    // content://com.android.providers.downloads.documents/document/raw -> /storage/emulated/...
+    public static String getFilePathFromComAndroidProvidersDownloadsDocumentsPath(Context context, String path) {
+        if (path != null && path.startsWith("/storage")) {
+            return path;
+        }
+        if (path != null && path.startsWith("content://media/external_primary")) {
+            return MusicUtils.getDataPathFromMediaStoreContentURI(context, Uri.parse(path));
+        }
+        String cleanFilePath = DocumentsContract.getDocumentId(Uri.parse(path)).split(":")[1];
+        return cleanFilePath;
+    }
+
+    public static long getFileIdFromComAndroidProvidersDownloadsDocumentsPath(Context context, String path) {
+        // remove the raw: from the result with the split "raw:/storage/emulated/... -> /storage/emulated
+
+        String selection = MediaColumns.DATA + " = ?";
+        String[] selectionArgs = {getFilePathFromComAndroidProvidersDownloadsDocumentsPath(context, path)};
+        String[] projection = {MediaColumns._ID};
+        Uri uri = Uri.parse("content://media/external_primary/audio/media/");
+        CursorLoader loader = new CursorLoader(context, uri, projection, selection, selectionArgs, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index;
+        if (cursor != null) {
+            column_index = cursor.getColumnIndexOrThrow(MediaColumns._ID);
+            cursor.moveToFirst();
+            long result = cursor.getLong(column_index);
+            cursor.close();
+
+            return result;
+        }
+        return -1;
     }
 
     /**
@@ -921,7 +957,7 @@ public final class MusicUtils {
             if (fileId == -1) {
                 return false;
             }
-            musicPlaybackService.open(new long[] { fileId}, 0);
+            musicPlaybackService.open(new long[]{fileId}, 0);
             musicPlaybackService.play();
 
             return true;
