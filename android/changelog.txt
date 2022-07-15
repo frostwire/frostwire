@@ -1,9 +1,12 @@
-FrostWire 2.5.0 build 693 - JUN/09/2022
- - Removal of annoying Interstitial ad display logic, only shown after a few downloads have actually started
+FrostWire 2.5.0 build 694 - JUL/15/2022
+ - LESS IS MORE. The FrostWire we'd like to use.
+ - Removal of annoying Interstitial ad display logic, only shown when user wants to remove ads for 30 minutes
  - Removal of "My Files", impossible to maintain with the file management quicksand on android
  - "My Files" opens the user's favorite Android File Explorer
  - Fixes issues where finished downloads would get re-inserted into the MediaStore
    giving users the impression the file had been downloaded multiple times
+ - FrostWire will correctly handle opening music files from different file explorers as long as
+   the music files have been scanned by the Android Media Store
  - Major code cleanup after removal of "My Files" fragments and activities
  - com.android.tools.build:gradle:7.2.0
  - com.google.android.material:material:1.6.1
