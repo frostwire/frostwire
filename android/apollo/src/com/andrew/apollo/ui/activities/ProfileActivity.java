@@ -507,6 +507,8 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
                 NavUtils.openArtistProfile(this, mArtistName, tracksHolder.tracks);
             }
             finish();
+        } else {
+            finish();
         }
     }
 
