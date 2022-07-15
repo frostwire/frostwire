@@ -129,10 +129,6 @@ public class AsyncStartDownload {
 
     private static void onPostExecute(final Context ctx, final SearchResult sr, final String message, final Transfer transfer) {
         if (transfer != null) {
-            if (ctx instanceof Activity) {
-                SystemUtils.postToUIThreadDelayed(() -> tryShowingInterstitialIfActuallyDownloading(ctx, transfer), 15000);
-            }
-
             if (!(transfer instanceof InvalidTransfer)) {
                 TransferManager tm = TransferManager.instance();
                 if (tm.isBittorrentDownloadAndMobileDataSavingsOn(transfer)) {
@@ -150,37 +146,6 @@ public class AsyncStartDownload {
                 UIUtils.showTransfersOnDownloadStart(ctx);
             } else if (!(transfer instanceof ExistingDownload)) {
                 UIUtils.showLongMessage(ctx, ((InvalidTransfer) transfer).getReasonResId());
-            }
-        }
-    }
-
-    private static void tryShowingInterstitialIfActuallyDownloading(final Context ctx, Transfer transfer) {
-        if (transfer instanceof BaseHttpDownload) {
-            Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
-            return;
-        }
-
-        if (transfer instanceof BittorrentDownload) {
-            String infoHash = ((TorrentFetcherDownload) transfer).getInfoHash();
-            // our transfer instance is a stale copy at this point, let's ask the transfer manager
-            // for a fresh version.
-
-            List<Transfer> transfers = TransferManager.instance().getTransfers();
-            Transfer currentVersionOfTransfer = null;
-            for (Transfer t : transfers) {
-                if (t instanceof BittorrentDownload &&
-                        ((BittorrentDownload) t).getInfoHash() != null &&
-                        ((BittorrentDownload) t).getInfoHash().equalsIgnoreCase(infoHash)) {
-                    currentVersionOfTransfer = t;
-                    break;
-                }
-            }
-            if (currentVersionOfTransfer == null) {
-                return;
-            }
-            TransferState state = currentVersionOfTransfer.getState();
-            if (state.equals(TransferState.DOWNLOADING) || state.equals(TransferState.DOWNLOADING_TORRENT)) {
-                Offers.showInterstitialOfferIfNecessary((Activity) ctx, Offers.PLACEMENT_INTERSTITIAL_MAIN, false, false);
             }
         }
     }
