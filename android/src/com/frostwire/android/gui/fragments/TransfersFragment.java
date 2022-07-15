@@ -251,9 +251,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         if (headerBanner != null) {
             if (Offers.disabledAds()) {
                 headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
+            } else {
+                headerBanner.updateComponents();
             }
         }
-        headerBanner.updateComponents();
         initTimerServiceSubscription();
         onTime();
     }
