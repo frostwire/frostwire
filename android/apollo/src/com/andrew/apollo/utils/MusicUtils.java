@@ -31,6 +31,7 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -837,7 +838,7 @@ public final class MusicUtils {
 
     // content://com.android.providers.downloads.documents/document/raw -> /storage/emulated/...
     public static String getFilePathFromComAndroidProvidersDownloadsDocumentsPath(Context context, String path) {
-        if (path != null && path.startsWith("/storage")) {
+        if (path != null && (path.startsWith("/storage") || path.startsWith("/root"))) {
             return path;
         }
         if (path != null && path.startsWith("content://media/external_primary")) {
@@ -849,11 +850,12 @@ public final class MusicUtils {
 
     public static long getFileIdFromComAndroidProvidersDownloadsDocumentsPath(Context context, String path) {
         // remove the raw: from the result with the split "raw:/storage/emulated/... -> /storage/emulated
-
+        LOG.info("MusicUtils.getFileIdFromComAndroidProvidersDownloadsDocumentsPath(path=" + path);
         String selection = MediaColumns.DATA + " = ?";
         String[] selectionArgs = {getFilePathFromComAndroidProvidersDownloadsDocumentsPath(context, path)};
         String[] projection = {MediaColumns._ID};
         Uri uri = Uri.parse("content://media/external_primary/audio/media/");
+
         CursorLoader loader = new CursorLoader(context, uri, projection, selection, selectionArgs, null);
         Cursor cursor = loader.loadInBackground();
         int column_index;

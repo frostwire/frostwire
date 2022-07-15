@@ -460,27 +460,6 @@ public final class Librarian {
         return fileFound;
     }
 
-    @androidx.annotation.RequiresApi(api = Build.VERSION_CODES.Q)
-    public static void queryFilesInMediaStoreDownloads() {
-        ContentResolver contentResolver =
-                Engine.instance().
-                        getApplication().
-                        getApplicationContext().
-                        getContentResolver();
-        Uri downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
-        Cursor query = contentResolver.query(downloadsExternalUri,
-                new String[]{MediaColumns.DISPLAY_NAME, MediaColumns.RELATIVE_PATH},
-                null,
-                null,
-                null);
-        if (query != null && query.getCount() > 0) {
-            query.moveToFirst();
-            do {
-                LOG.info("Librarian::queryFilesInMediaStoreDownloads displayName=" + query.getString(0) + " , relativePath=" + query.getString(1));
-            } while (query.moveToNext());
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.Q)
     private static boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath) {
         if (srcFile.isDirectory()) {

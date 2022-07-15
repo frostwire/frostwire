@@ -845,6 +845,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         Intent intent = getIntent();
 
         if (intent == null || MusicUtils.getMusicPlaybackService() == null) {
+            LOG.info("AudioPlayerActivity.startPlayback aborted, intent null or music playback service null", true);
             return;
         }
 

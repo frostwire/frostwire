@@ -50,6 +50,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -72,10 +73,17 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.frostwire.util.StringUtils;
 import com.frostwire.util.TaskThrottle;
+import com.frostwire.util.UrlUtils;
 import com.google.android.gms.common.internal.Asserts;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -104,7 +112,7 @@ public class MusicPlaybackService extends JobIntentService {
     // public methods
     // these first methods are here for convenience when maintaining the code, they're all related to the creation
     // lifecycle of this service, and they are called in the order they're declared
-    // 1st onCreate -> invokes initService in handler thread
+    // 1st onCreate -> invokes initService in (MusicPlayerHandler) handler thread
     // 2nd onStartCommand
     // 3rd handleCommandIntent
 
@@ -119,7 +127,7 @@ public class MusicPlaybackService extends JobIntentService {
         if (permissionGranted) {
             // Initialize the notification helper
             mNotificationHelper = new NotificationHelper(this);
-            setupMPlayerHandler();
+            mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
         } else {
             LOG.warn("onCreate: service couldn't be initialized correctly, READ_EXTERNAL_STORAGE permission not granted");
@@ -638,21 +646,24 @@ public class MusicPlaybackService extends JobIntentService {
         notifyChangeIntervals.put(REPEATMODE_CHANGED, 150L);
         notifyChangeIntervals.put(SHUFFLEMODE_CHANGED, 150L);
         notifyChangeIntervals.put(REFRESH, 1000L);
-        setupMPlayerHandler();
+        mPlayerHandler = setupMPlayerHandler();
     }
 
     // public static methods
 
-    private static void setupMPlayerHandler() {
+    private static MusicPlayerHandler setupMPlayerHandler() {
         // Start up the handlerThread running the service. Note that we create a
         // separate handlerThread because the service normally runs in the process's
         // main handlerThread, which we don't want to block. We also make it
         // background priority so CPU-intensive work will not disrupt the UI.
         if (mPlayerHandler != null) {
-            mPlayerHandler.removeCallbacksAndMessages(null);
-            HandlerThread oldThread = (HandlerThread) mPlayerHandler.getLooper().getThread();
-            oldThread.quitSafely();
-            mPlayerHandler = null;
+            try {
+                mPlayerHandler.removeCallbacksAndMessages(null);
+                HandlerThread oldThread = (HandlerThread) mPlayerHandler.getLooper().getThread();
+                oldThread.quitSafely();
+                mPlayerHandler = null;
+            } catch (Throwable ignore) {
+            }
         }
 
         final HandlerThread handlerThread = new HandlerThread(
@@ -662,6 +673,7 @@ public class MusicPlaybackService extends JobIntentService {
 
         // Initialize the handler
         mPlayerHandler = new MusicPlayerHandler(handlerThread.getLooper());
+        return mPlayerHandler;
     }
 
     private static void initRepeatModeAndShuffleTask(MusicPlaybackService service) {
@@ -1912,7 +1924,7 @@ public class MusicPlaybackService extends JobIntentService {
      *
      * @param path The path of the file to open
      */
-    public long openFile(final String path) {
+    public long openFile(String path) {
         if (D) LOG.info("MusicPlaybackService::openFile: path = " + path);
         if (path == null) {
             return -1;
@@ -1923,13 +1935,22 @@ public class MusicPlaybackService extends JobIntentService {
         if (path.startsWith("content://com.android.providers.downloads.documents/document/raw")) {
             try {
                 id = MusicUtils.getFileIdFromComAndroidProvidersDownloadsDocumentsPath(this, path);
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
             }
         }
         if (id == -1 && path.startsWith("content://media/external_primary/audio/media")) {
             try {
                 id = Long.parseLong(Uri.parse(path).getLastPathSegment());
-            } catch (Throwable t) {
+            } catch (Throwable ignored) {
+
+            }
+        }
+
+        // Google "Files"
+        if (id == -1 && path.startsWith("content://com.google.android.apps.nbu.files.provider")) {
+            try {
+                id = Long.parseLong(Uri.parse(path).getLastPathSegment());
+            } catch (Throwable ignored) {
 
             }
         }
@@ -1937,8 +1958,18 @@ public class MusicPlaybackService extends JobIntentService {
         if (id == -1 && path.contains("msf")) {
             id = getIdFromContextUri(path);
         }
+
+        // OnePlus File Explorer
+        if (id == -1 && path.startsWith("content://com.oneplus.filemanager/root/storage/emulated/0/")) {
+            path = path.replace("content://com.oneplus.filemanager/root","");
+        }
+
         // Are we talking about a regular file path?
         if (path.startsWith("/storage") || path.startsWith("content://")) {
+            if (path.startsWith("/storage")) {
+                path = UrlUtils.decode(path);
+                LOG.info("MusicPlaybackService.openFile decoded path -> " + path);
+            }
             mPlayer.setCurrentDataSource(path);
             ensurePlayListCapacity(1);
             if (mPlayer != null && mPlayer.isInitialized()) {
@@ -2992,7 +3023,15 @@ public class MusicPlaybackService extends JobIntentService {
                     }
                 } else {
                     // /storage/emulated/0/Android/data/com.frostwire.android/files/FrostWire/TorrentData/...
-                    player.setDataSource(path);
+                    try {
+                        File f = new File(UrlUtils.decode(path));
+                        FileInputStream fis = new FileInputStream(f);
+                        player.setDataSource(fis.getFD());
+                    } catch (Throwable t) {
+                        LOG.info("MusicPlaybackService.setDataSource player.setDataSource(fileInputStream.getFD() failed -> " + t.getMessage(), true);
+                        player.setDataSource(path);
+                    }
+
                 }
                 player.prepare();
             } catch (Throwable e) {
