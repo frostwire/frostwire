@@ -65,6 +65,22 @@ public final class HeaderBanner extends LinearLayout {
 
     private HeaderBannerListener moPubBannerListener;
 
+    public static void onResumeHideOrUpdate(HeaderBanner component) {
+        if (component != null) {
+            if (Offers.disabledAds()) {
+                component.setBannerViewVisibility(VisibleBannerType.ALL, false);
+            } else {
+                component.updateComponents();
+            }
+        }
+    }
+
+    public static void destroy(HeaderBanner component) {
+        if (component != null) {
+            component.onDestroy();
+        }
+    }
+
     public HeaderBanner(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater inflater = (LayoutInflater) context
