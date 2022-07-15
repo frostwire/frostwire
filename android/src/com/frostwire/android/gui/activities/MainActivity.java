@@ -409,9 +409,6 @@ public class MainActivity extends AbstractActivity implements
             // TODO: make a unique call for these destroys
             search.destroyPromotionsBanner();
         }
-        if (transfers != null) {
-            transfers.destroyHeaderBanner();
-        }
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
         }

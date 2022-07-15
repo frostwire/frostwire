@@ -159,13 +159,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
-        if (headerBanner != null) {
-            if (Offers.disabledAds()) {
-                headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
-            } else {
-                headerBanner.updateComponents();
-            }
-        }
+        HeaderBanner.onResumeHideOrUpdate(headerBanner);
         if (subscription != null) {
             if (subscription.isSubscribed()) {
                 subscription.unsubscribe();
@@ -180,9 +174,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (headerBanner != null) {
-            headerBanner.onDestroy();
-        }
+        HeaderBanner.destroy(headerBanner);
     }
 
     @Override

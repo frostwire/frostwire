@@ -248,13 +248,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     @Override
     public void onResume() {
         super.onResume();
-        if (headerBanner != null) {
-            if (Offers.disabledAds()) {
-                headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
-            } else {
-                headerBanner.updateComponents();
-            }
-        }
+        HeaderBanner.onResumeHideOrUpdate(headerBanner);
         initTimerServiceSubscription();
         onTime();
     }
@@ -266,7 +260,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             subscription.unsubscribe();
         }
         adapter = null;
-        destroyHeaderBanner();
+        HeaderBanner.destroy(headerBanner);
     }
 
     @Override
@@ -838,12 +832,6 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         InputMethodManager imm = (InputMethodManager) addTransferUrlTextView.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(addTransferUrlTextView.getWindowToken(), 0);
-        }
-    }
-
-    public void destroyHeaderBanner() {
-        if (headerBanner != null) {
-            headerBanner.onDestroy();
         }
     }
 
