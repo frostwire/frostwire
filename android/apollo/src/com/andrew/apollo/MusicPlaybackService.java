@@ -1956,20 +1956,26 @@ public class MusicPlaybackService extends JobIntentService {
             id = getIdFromContextUri(path);
         }
 
-        // OnePlus File Explorer
-        if (id == -1 && path.startsWith("content://com.oneplus.filemanager/root/storage/emulated/0/")) {
-            String fixedPath = path.replace("content://com.oneplus.filemanager/root", "");
+        // Explorers that pass the file path like
+        // OnePlus File Explorer (content://com.oneplus.filemanager/.../storage/emulated/...)
+        // Paths can be /root/storage/ or /storage
+        if (id == -1 && path.startsWith("content://") && path.contains("/storage/emulated/0/")) {
+            //debugPrintAllFilesInDownloads();
+            String prefix = path.substring(0, path.indexOf("/storage"));
+            LOG.info("MusicPlaybackService::openFile prefix=" + prefix, true);
+            String fixedPath = path.replace(prefix, "");
             try {
                 fixedPath =  URLDecoder.decode(fixedPath, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 LOG.error("MusicPlaybackService::openFile decoding error " + e.getMessage(), e, true);
             }
-
             LOG.info("MusicPlaybackService::openFile - updated path -> " + fixedPath);
             id = getFileIdFromPath(fixedPath, Uri.parse("content://media/external/downloads"), false);
             if (id == -1) {
                 id = getFileIdFromPath(fixedPath, Uri.parse("content://media/internal/downloads"), false);
-                LOG.info("MusicPlaybackService::openFile got an ID from media internal URI, id = " + id);
+                if (id != -1) {
+                    LOG.info("MusicPlaybackService::openFile got an ID from media internal URI, id = " + id);
+                }
             }
             LOG.info("MusicPlaybackService::openFile got an ID? id = " + id);
         }
