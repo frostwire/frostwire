@@ -55,6 +55,8 @@ import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.offers.HeaderBanner;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.Asyncs;
 
 import java.lang.ref.WeakReference;
@@ -109,6 +111,7 @@ public abstract class BaseActivity extends AbstractActivity {
      */
     private PlaybackStatus mPlaybackStatus;
 
+    private HeaderBanner headerBanner;
 
     public BaseActivity(int layoutResId) {
         super(layoutResId);
@@ -127,6 +130,7 @@ public abstract class BaseActivity extends AbstractActivity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        headerBanner = findViewById(R.id.activity_base_header_banner);
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         // Bind Apollo's service
@@ -197,6 +201,7 @@ public abstract class BaseActivity extends AbstractActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        HeaderBanner.onResumeHideOrUpdate(headerBanner);
         // Set the playback drawables
         initBottomActionBar();
         updatePlaybackControls();
@@ -241,6 +246,7 @@ public abstract class BaseActivity extends AbstractActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        HeaderBanner.destroy(headerBanner);
         // Unregister the receiver
         try {
             unregisterReceiver(mPlaybackStatus);

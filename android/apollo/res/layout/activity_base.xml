@@ -3,7 +3,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
+
+    <com.frostwire.android.offers.HeaderBanner
+            android:id="@+id/activity_base_header_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"/>
 
     <FrameLayout
         android:id="@+id/activity_base_content"
