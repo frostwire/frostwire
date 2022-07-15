@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.android.offers.HeaderBanner;
+import com.frostwire.android.offers.Offers;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.transfers.BittorrentDownload;
 import com.google.android.material.tabs.TabLayout;
@@ -58,6 +60,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
     private AbstractTransferDetailFragment[] detailFragments;
     private TransferDetailFragment transferDetailFragment;
     private int lastSelectedTabIndex;
+    private HeaderBanner headerBanner;
 
     public TransferDetailActivity() {
         super(R.layout.activity_transfer_detail);
@@ -71,6 +74,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             finish();
             return;
         }
+        headerBanner = findView(R.id.transfer_detail_header_banner);
         transferDetailFragment = findFragment(R.id.fragment_transfer_detail);
         if (transferDetailFragment != null) {
             transferDetailFragment.setUiBittorrentDownload(uiBittorrentDownload);
@@ -155,6 +159,13 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         if (uiBittorrentDownload == null) {
             throw new RuntimeException("No UIBittorrent download, unacceptable");
         }
+        if (headerBanner != null) {
+            if (Offers.disabledAds()) {
+                headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
+            } else {
+                headerBanner.updateComponents();
+            }
+        }
         if (subscription != null) {
             if (subscription.isSubscribed()) {
                 subscription.unsubscribe();
@@ -164,6 +175,14 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
             subscription = TimerService.subscribe(this, TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS);
         }
         onTime();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (headerBanner != null) {
+            headerBanner.onDestroy();
+        }
     }
 
     @Override

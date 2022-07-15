@@ -28,6 +28,12 @@
 
     <include layout="@layout/toolbar_main" />
 
+    <com.frostwire.android.offers.HeaderBanner
+            android:id="@+id/transfer_detail_header_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible"/>
+
     <View
         style="@style/divider_line_dark"
         android:layout_width="match_parent"
