@@ -50,7 +50,6 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
@@ -73,19 +72,17 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.frostwire.util.StringUtils;
 import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.UrlUtils;
 import com.google.android.gms.common.internal.Asserts;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
@@ -1961,7 +1958,20 @@ public class MusicPlaybackService extends JobIntentService {
 
         // OnePlus File Explorer
         if (id == -1 && path.startsWith("content://com.oneplus.filemanager/root/storage/emulated/0/")) {
-            path = path.replace("content://com.oneplus.filemanager/root","");
+            String fixedPath = path.replace("content://com.oneplus.filemanager/root", "");
+            try {
+                fixedPath =  URLDecoder.decode(fixedPath, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                LOG.error("MusicPlaybackService::openFile decoding error " + e.getMessage(), e, true);
+            }
+
+            LOG.info("MusicPlaybackService::openFile - updated path -> " + fixedPath);
+            id = getFileIdFromPath(fixedPath, Uri.parse("content://media/external/downloads"), false);
+            if (id == -1) {
+                id = getFileIdFromPath(fixedPath, Uri.parse("content://media/internal/downloads"), false);
+                LOG.info("MusicPlaybackService::openFile got an ID from media internal URI, id = " + id);
+            }
+            LOG.info("MusicPlaybackService::openFile got an ID? id = " + id);
         }
 
         // Are we talking about a regular file path?
@@ -2269,9 +2279,9 @@ public class MusicPlaybackService extends JobIntentService {
         //synchronized (cursorLock) {
         long id = -1;
         if (mSimplePlayerPlayingFile != null) {
-            id = getIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
+            id = getFileIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.INTERNAL_CONTENT_URI);
             if (id == -1) {
-                id = getIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+                id = getFileIdFromPath(mSimplePlayerPlayingFile, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
             }
         }
         return id;
@@ -2279,13 +2289,21 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
     /**
+     * Uses exact data path match when querying the media store db.
+     * See getFileIdFromPath to use LIKE %<my path>% by passing exact=false parameter.
+     */
+    private long getFileIdFromPath(String path, Uri uri) {
+        return getFileIdFromPath(path, uri, true);
+    }
+
+    /**
      * Returns the current id of file at given path in Selected uri or -1 if not found
      *
      * @return File id
      */
-    private long getIdFromPath(String path, Uri uri) {
-        String selectionClause = MediaStore.Audio.Media.DATA + " = ?";
-        String[] selectionArgs = {path};
+    private long getFileIdFromPath(String path, Uri uri, boolean exact) {
+        String selectionClause = MediaStore.Audio.Media.DATA + (exact ? " = ?" : " LIKE ?");
+        String[] selectionArgs = {(exact) ? path : "%" + path + "%"};
         Cursor cursor = getContentResolver().query(uri, SIMPLE_PROJECTION, selectionClause, selectionArgs, null);
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToNext();
@@ -2296,6 +2314,28 @@ public class MusicPlaybackService extends JobIntentService {
         return -1;
     }
 
+    @SuppressWarnings("unused")
+    /** Use this to print all the _id and _data of the files in Downloads as stored by the Media Store
+     * Useful for debugging */
+    private void debugPrintAllFilesInDownloads() {
+        ContentResolver contentResolver = getContentResolver();
+        Uri downloadsExternalUri = Uri.parse("content://media/external/downloads");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
+        }
+        Cursor query = contentResolver.query(downloadsExternalUri,
+                SIMPLE_PROJECTION,
+                "_data LIKE ?",
+                new String[]{"%/Download/%"},
+                null, null);
+        if (query != null && query.moveToFirst()) {
+            do {
+                LOG.info("MusicPlaybackService::debugPrintAllFilesInDownloads _id: " + query.getLong(0) + " _data:" + query.getString(1));
+            } while (query.moveToNext());
+            query.close();
+        }
+    }
 
     /**
      * Seeks the current track to a specific time
@@ -3060,7 +3100,7 @@ public class MusicPlaybackService extends JobIntentService {
         }
 
         private boolean setDataSourceUsingFilePathFromComAndroidProvidersDownloadsDocumentsPath(final MediaPlayer player,
-                                                        final Uri pathUri) {
+                                                                                                final Uri pathUri) {
             String dirtyPath = pathUri.toString();
             String cleanPath = MusicUtils.getFilePathFromComAndroidProvidersDownloadsDocumentsPath(MusicPlaybackService.INSTANCE, dirtyPath);
             Uri cleanUri = Uri.parse(cleanPath);
