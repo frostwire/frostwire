@@ -252,9 +252,9 @@ public final class UIUtils {
                         Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
 
                 // The mime type makes it match AudioPlayerActivity see AndroidManifest.xml
-                LOG.info("openFile(filePath=" + filePath + ", mime=" + mime + ")", true);
+                LOG.info("UIUtils.openFile(filePath=" + filePath + ", mime=" + mime + ")", false);
                 Uri fileUri = getFileUri(context, filePath, useFileProvider);
-                LOG.info("openFile(...) -> fileUri=" + fileUri.toString(), true);
+                LOG.info("UIUtils.openFile(...) -> fileUri=" + fileUri.toString(), false);
 
                 i.setDataAndType(fileUri, Intent.normalizeMimeType(mime));
 
@@ -381,8 +381,8 @@ public final class UIUtils {
 
     private static boolean openAudioInternal(final Context context, String filePath) {
         try {
-            List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, true);
-            if (fds.size() == 1 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
+            List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, false);
+            if (fds.size() > 0 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
                 return true;
             } else {

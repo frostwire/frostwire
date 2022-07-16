@@ -1929,6 +1929,11 @@ public class MusicPlaybackService extends JobIntentService {
 
         long id = -1;
 
+        // content://com.frostwire.android.fileprovider/external/Download/FrostWire/...audiofile.ext
+        if (path.startsWith("content://com.frostwire.android.fileprovider/external")) {
+            path = path.replace("content://com.frostwire.android.fileprovider/external","/storage/emulated/0");
+        }
+
         if (path.startsWith("content://com.android.providers.downloads.documents/document/raw")) {
             try {
                 id = MusicUtils.getFileIdFromComAndroidProvidersDownloadsDocumentsPath(this, path);
