@@ -13,6 +13,7 @@ FrostWire 2.5.0 build 694 - JUL/16/2022
  - com.google.firebase:firebase-crashlytics-gradle:2.9.1
  - com.google.gms:google-services:4.3.13
  - androidx.annotation:annotation:1.4.0
+ - com.unity3d.ads:unity-ads:4.2.1
 
 FrostWire 2.4.8 build 691 - APR/20/2022
  - TorLock search fixed
