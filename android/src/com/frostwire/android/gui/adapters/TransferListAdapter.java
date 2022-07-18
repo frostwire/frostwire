@@ -167,7 +167,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
         List<MenuAction> items = new ArrayList<>();
         if (tag instanceof Transfer && ((Transfer) tag).getState().name().contains("ERROR")) {
             if (tag instanceof InvalidTransfer || tag instanceof TorrentFetcherDownload) {
-               items.add(new RetryDownloadAction(contextRef.get(), (Transfer) tag));
+                items.add(new RetryDownloadAction(contextRef.get(), (Transfer) tag));
             }
         }
         if (tag instanceof BittorrentDownload) {
@@ -548,9 +548,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 }
             } else if (tag instanceof File) {
                 File path = (File) tag;
-                if (path.exists()) {
-                    UIUtils.openFile(ctx, path);
-                } else {
+                if (!UIUtils.openFile(ctx, path)) {
                     UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
                 }
             }
