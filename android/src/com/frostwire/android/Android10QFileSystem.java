@@ -18,8 +18,12 @@
 package com.frostwire.android;
 
 import android.app.Application;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.platform.DefaultFileSystem;
 
 import java.io.File;
@@ -31,7 +35,8 @@ public class Android10QFileSystem extends DefaultFileSystem {
         this.app = app;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public boolean copy(File src, File dest) {
-        return Librarian.mediaStoreSaveToDownloads(src, dest);
+        return Librarian.mediaStoreSaveToDownloads(src, dest, SystemUtils.hasAndroid10());
     }
 }

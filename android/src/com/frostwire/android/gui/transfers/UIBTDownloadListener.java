@@ -37,6 +37,10 @@ import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,16 +63,27 @@ public final class UIBTDownloadListener implements BTDownloadListener {
         finalCleanup(dl, dl.getIncompleteFiles());
         fixBinPaths(torrentSaveFolder);
 
-
         if (SystemUtils.hasAndroid10()) {
-            moveFinishedTransferItemsToMediaStoreAsync(dl);
+            // Only on Android10 it should copy the source file to the download folder via the media store
+            // byte/stream mechanism, otherwise on Android 11 and up, the file api should work fine to copy the files.
+            moveFinishedTransferItemsToMediaStoreAsync(dl, SystemUtils.hasAndroid10());
+        } else {
+            dl.getItems().stream().filter(TransferItem::isComplete).forEach(item -> {
+                if (item.getFile().isDirectory()) {
+                    return;
+                }
+                // /storage/emulated/0/Android/data/com.frostwire.android/files/FOO_FOLDER/bar.ext
+                final File sourceFile = item.getFile();
+                // /storage/emulated/0/Download/FrostWire/FOO_FOLDER/bar.ext
+                final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
+                // MediaScanner disk IO sent to DOWNLOADER handler thread
+                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
+                        MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                                new String[]{destinationFile.getAbsolutePath()},
+                                new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
+                                (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath())));
+            });
         }
-        MediaScannerConnection.scanFile(Engine.instance().getApplication(),
-                new String[]{savePath.getAbsolutePath(),
-                        dl.getSavePath().getAbsolutePath(),
-                        Platforms.get().systemPaths().data().getAbsolutePath()},
-                new String[]{"*/*"},
-                (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + path));
     }
 
     /**
@@ -78,7 +93,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
      * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl) {
+    private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl, boolean copyBytesToMediaStore) {
         // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
         // on Android10, therefore we need to use the media store to move
         // the downloaded files to the public Downloads/FrostWire folder
@@ -89,7 +104,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
             final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
 
             // disk IO sent to DOWNLOADER handler thread
-            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile));
+            postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(sourceFile, destinationFile, copyBytesToMediaStore));
         });
     }
 

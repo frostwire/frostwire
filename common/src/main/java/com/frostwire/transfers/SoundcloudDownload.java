@@ -18,12 +18,19 @@
 
 package com.frostwire.transfers;
 
+import android.media.MediaScannerConnection;
+
+import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.mp3.ID3Wrapper;
 import com.frostwire.mp3.ID3v1Tag;
 import com.frostwire.mp3.ID3v23Tag;
 import com.frostwire.mp3.Mp3File;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
+
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -99,5 +106,16 @@ public class SoundcloudDownload extends HttpDownload {
     protected void onFinishing() {
         downloadAndUpdateCoverArt(sr, tempPath);
         super.onFinishing();
+    }
+
+    @Override
+    protected void moveAndComplete(File src, File dst) {
+        super.moveAndComplete(src, dst);
+        if (SystemUtils.hasAndroid11OrNewer()) {
+            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                    new String[]{dst.getAbsolutePath()},
+                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
+                    (path, uri) -> LOG.info("SoundCloudDownload::moveAndComplete() -> mediaScan complete on " + dst));
+        }
     }
 }

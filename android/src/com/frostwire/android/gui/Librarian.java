@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui;
 
+import static com.frostwire.android.util.SystemUtils.postToHandler;
+
 import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -47,8 +49,10 @@ import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
+import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.OSUtils;
@@ -410,7 +414,7 @@ public final class Librarian {
      * @return
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads) {
+    public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads, boolean copyBytesToMediaStore) {
         LOG.info("Librarian::mediaStoreSaveToDownloads trying to save " + src.getAbsolutePath() + " into " + destInDownloads.getAbsolutePath());
 
         Application application = Engine.instance().getApplication();
@@ -424,16 +428,13 @@ public final class Librarian {
         }
 
         String relativePath = AndroidPaths.getRelativeFolderPathFromFileInDownloads(destInDownloads);
-        if (destInDownloads.exists()) {
-            LOG.info("Librarian::mediaStoreSaveToDownloads aborting. " + relativePath + "/" + destInDownloads.getName() + " already exists on disk");
-            return false;
-        }
 
         if (Librarian.mediaStoreFileExists(destInDownloads)) {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. " + relativePath + "/" + destInDownloads.getName() + " already exists on the media store db");
             return false;
         }
-        return mediaStoreInsert(Engine.instance().getApplication().getApplicationContext(), src, relativePath);
+
+        return mediaStoreInsert(Engine.instance().getApplication().getApplicationContext(), src, relativePath, copyBytesToMediaStore);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -447,8 +448,8 @@ public final class Librarian {
                         getApplicationContext().
                         getContentResolver();
         String selection = MediaColumns.DISPLAY_NAME + " = ? AND " +
-                MediaColumns.RELATIVE_PATH + " = ?";
-        String[] selectionArgs = new String[]{displayName, relativePath};
+                MediaColumns.RELATIVE_PATH + " LIKE ?";
+        String[] selectionArgs = new String[]{displayName, '%' + relativePath + '%'};
         Cursor query = contentResolver.query(downloadsExternalUri, null, selection, selectionArgs, null);
         if (query == null) {
             LOG.info("Librarian::mediaStoreFileExists -> null query for " + displayName);
@@ -461,14 +462,14 @@ public final class Librarian {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath) {
+    private static boolean mediaStoreInsert(Context context, File srcFile, String relativeFolderPath, boolean copyBytesToMediaStore) {
         if (srcFile.isDirectory()) {
             return false;
         }
         // Add to MediaStore
         ContentResolver resolver = context.getContentResolver();
         ContentValues values = new ContentValues();
-        values.put(MediaColumns.IS_PENDING, 1);
+        values.put(MediaColumns.IS_PENDING, copyBytesToMediaStore ? 1 : 0);
 
         if (!StringUtils.isNullOrEmpty(relativeFolderPath)) {
             LOG.info("Librarian::mediaStoreInsert using relative path " + relativeFolderPath);
@@ -512,14 +513,18 @@ public final class Librarian {
             values.put(MediaColumns.TITLE, srcFile.getName());
         }
         Uri downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
-        //Uri downloadsExternalUri = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
         Uri insertedUri = resolver.insert(downloadsExternalUri, values);
         if (insertedUri == null) {
             LOG.error("mediaStoreInsert -> could not perform media store insertion");
             return false;
         }
         LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
-        return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
+
+        if (copyBytesToMediaStore) {
+            return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
+        }
+
+        return true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)

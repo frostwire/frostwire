@@ -18,12 +18,19 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.media.MediaScannerConnection;
+
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.transfers.HttpDownload;
+import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
 
 import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
 
 /**
  * @author aldenml
@@ -32,6 +39,7 @@ import org.apache.commons.io.FilenameUtils;
 public class UIHttpDownload extends HttpDownload {
 
     private final TransferManager manager;
+    private final Logger LOG = Logger.getLogger(UIHttpDownload.class);
 
     public UIHttpDownload(TransferManager manager, HttpSearchResult sr) {
         super(convert(sr));
@@ -54,6 +62,18 @@ public class UIHttpDownload extends HttpDownload {
     protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
+    }
+
+    @Override
+    protected void moveAndComplete(File src, File dst) {
+        super.moveAndComplete(src, dst);
+        if (SystemUtils.hasAndroid11OrNewer()) {
+            //postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> Librarian.mediaStoreSaveToDownloads(dst, dst, true));
+            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                    new String[]{dst.getAbsolutePath()},
+                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
+                    (path, uri) -> LOG.info("UIHttpDownload::moveAndComplete() -> mediaScan complete on " + dst));
+        }
     }
 
     private static Info convert(HttpSearchResult sr) {
