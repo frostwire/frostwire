@@ -40,9 +40,11 @@ public final class SystemUtils {
 
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
 
+    // TIP: https://apilevels.com/
     private static final int VERSION_SDK_NOUGAT_7_0_N = 24;
     private static final int VERSION_SDK_ANDROID_10_Q = 29;
     private static final int VERSION_SDK_ANDROID_11_R = 30;
+    private static final int VERSION_SDK_ANDROID_12_S = 31;
 
     private SystemUtils() {
     }
@@ -89,7 +91,7 @@ public final class SystemUtils {
     }
 
     /**
-     * Used to determine if the device is running Android11 or greater
+     * Used to determine if the device is running Android10 or greater
      */
     public static boolean hasAndroid10OrNewer() {
         return hasSdkOrNewer(VERSION_SDK_ANDROID_10_Q);
@@ -104,6 +106,13 @@ public final class SystemUtils {
      */
     public static boolean hasAndroid11OrNewer() {
         return hasSdkOrNewer(VERSION_SDK_ANDROID_11_R);
+    }
+
+    /**
+     * Used to determine if the device is running Android12 or greater
+     */
+    public static boolean hasAndroid12OrNewer() {
+        return hasSdkOrNewer(VERSION_SDK_ANDROID_12_S);
     }
 
     /**
