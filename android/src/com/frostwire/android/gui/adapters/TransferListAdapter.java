@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -77,6 +78,7 @@ import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -548,6 +550,12 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
                 }
             } else if (tag instanceof File) {
                 File path = (File) tag;
+
+                // Usually happens with internal paths
+                if (path.getAbsolutePath().contains("Android/data/com.frostwire.android") && !path.exists()) {
+                    path = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(path);
+                }
+
                 if (!UIUtils.openFile(ctx, path)) {
                     UIUtils.showShortMessage(ctx, R.string.cant_open_file_does_not_exist, path.getName());
                 }

@@ -46,6 +46,7 @@ import androidx.annotation.StringRes;
 import androidx.core.content.FileProvider;
 
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -247,6 +248,12 @@ public final class UIUtils {
      */
     public static boolean openFile(Context context, String filePath, String mime, boolean useFileProvider) {
         try {
+            File file = new File(filePath);
+
+            if (!file.exists() && filePath.contains("Android/data/com.frostwire.android")) {
+                // Try using the
+                filePath = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(file).getAbsolutePath();
+            }
             if (filePath != null && !openAudioInternal(context, filePath)) {
                 Intent i = new Intent(Constants.MIME_TYPE_ANDROID_PACKAGE_ARCHIVE.equals(mime) ?
                         Intent.ACTION_INSTALL_PACKAGE : Intent.ACTION_VIEW);
