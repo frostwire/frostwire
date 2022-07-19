@@ -106,6 +106,7 @@ public class DefaultFileSystem implements FileSystem {
     public boolean copy(File src, File dest) {
         try {
             FileUtils.copyFile(src, dest);
+            LOG.info("Success: DefaultFileSystem.copy(src=" + src + ", dest=" + dest + ")");
             return true;
         } catch (Throwable e) {
             LOG.error("Error in copy file: " + src + " -> " + dest, e);
