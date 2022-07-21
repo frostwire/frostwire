@@ -487,15 +487,19 @@ public final class Librarian {
         byte fileType = AndroidPaths.getFileType(srcFile.getAbsolutePath(), true);
         if (fileType == Constants.FILE_TYPE_AUDIO || fileType == Constants.FILE_TYPE_VIDEOS) {
             MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(srcFile.getAbsolutePath());
+            boolean illegalArgumentCaught = false;
+            try {
+                mmr.setDataSource(srcFile.getAbsolutePath());
+            } catch (IllegalArgumentException ignored) {
+                illegalArgumentCaught = true;
+            }
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
             String artistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
             String albumArtistName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
             String albumName = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
             String durationString = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-            LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
-
             if (title != null) {
+                LOG.info("mediaStoreInsert title (MediaDataRetriever): " + title);
                 values.put(MediaColumns.TITLE, title);
                 values.put(MediaColumns.DISPLAY_NAME, srcFile.getName());
 
@@ -507,7 +511,13 @@ public final class Librarian {
                         values.put(MediaColumns.DURATION, Long.parseLong(durationString));
                     }
                 }
-
+            } else if (illegalArgumentCaught && title == null) {
+                // Something went wrong with mmr.setDataSource()
+                // Happens in Android 10
+                String fileNameWithoutExtension = srcFile.getName().replace(
+                        FilenameUtils.getExtension(srcFile.getName()),"");
+                values.put(MediaColumns.TITLE, fileNameWithoutExtension);
+                values.put(MediaColumns.DISPLAY_NAME, fileNameWithoutExtension);
             }
         } else {
             values.put(MediaColumns.TITLE, srcFile.getName());
