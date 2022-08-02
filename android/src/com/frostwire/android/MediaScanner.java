@@ -79,7 +79,11 @@ final class MediaScanner {
                 } else {
                     LOG.info("scanFiles: Scan success for path: " + path + ", uri: " + uri);
                 }
-            } finally {
+            }
+            catch (Throwable t) {
+                LOG.info("MediaScanner::scanFiles callback failed: " + t.getMessage(), t);
+            }
+            finally {
                 finishSignal.countDown();
             }
         });
