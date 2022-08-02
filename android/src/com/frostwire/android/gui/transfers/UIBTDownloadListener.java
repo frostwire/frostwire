@@ -77,11 +77,13 @@ public final class UIBTDownloadListener implements BTDownloadListener {
                 // /storage/emulated/0/Download/FrostWire/FOO_FOLDER/bar.ext
                 final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
                 // MediaScanner disk IO sent to DOWNLOADER handler thread
-                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
-                        MediaScannerConnection.scanFile(Engine.instance().getApplication(),
-                                new String[]{destinationFile.getAbsolutePath()},
-                                new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
-                                (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath())));
+                if (Engine.instance().getApplication() != null) {
+                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
+                            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                                    new String[]{destinationFile.getAbsolutePath()},
+                                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
+                                    (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath())));
+                }
             });
         }
     }
