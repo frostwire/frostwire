@@ -376,6 +376,10 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                             }
                         }
                     }
+                } else {
+                    if (gotProducts) {
+                        UIUtils.openURL(preference.getContext(), "https://play.google.com/store/account/subscriptions");
+                    }
                 }
                 return true; // true = click was handled.
             } else {

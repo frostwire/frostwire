@@ -63,13 +63,14 @@
         style="@style/BuyNoAdsCardDescription"
         android:layout_below="@+id/view_product_card_price"/>
 
-    <TextView android:id="@+id/view_product_card_hint_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/dummy_hint"
-        style="@style/BuyNoAdsCardHint"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:gravity="end" />
+    <TextView
+            android:id="@+id/view_product_card_hint_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy_hint"
+            style="@style/BuyNoAdsCardHint"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:gravity="end" />
 
 </RelativeLayout>

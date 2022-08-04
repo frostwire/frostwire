@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -41,7 +42,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.PaymentOptionsVisibility;
@@ -140,7 +140,7 @@ public final class BuyActivity extends AbstractActivity {
     @Override
     protected void initComponents(Bundle savedInstanceState) {
         WeakReference<AppCompatActivity> activityRef = Ref.weak(this);
-        Engine.instance().getThreadPool().execute(() -> Offers.preLoadRewardedVideoAsync(activityRef));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Offers.preLoadRewardedVideoAsync(activityRef));
         final boolean interstitialMode = isInterstitial();
         offerAccepted = savedInstanceState != null &&
                 savedInstanceState.containsKey(OFFER_ACCEPTED) &&
@@ -148,6 +148,8 @@ public final class BuyActivity extends AbstractActivity {
         if (interstitialMode) {
             initInterstitialModeActionBar(getActionBarTitle());
         }
+
+        initSubscriptionsButton();
         initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
@@ -158,10 +160,22 @@ public final class BuyActivity extends AbstractActivity {
             cardNminutes.performClick();
         }
 
-        Engine.instance().getThreadPool().execute(() -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             boolean paused = Offers.adsPausedAsync();
             SystemUtils.postToUIThread(() -> onAdsPausedAsyncFinished(paused, activityRef));
         });
+    }
+
+    private void initSubscriptionsButton() {
+        // Only for Google Play version
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
+            return;
+
+        Button subscriptionsButton = findView(R.id.activity_buy_products_subscriptions_button);
+        if (subscriptionsButton != null) {
+            subscriptionsButton.setVisibility(View.VISIBLE);
+            subscriptionsButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), "https://play.google.com/store/account/subscriptions"));
+        }
     }
 
     private static void onAdsPausedAsyncFinished(boolean adsPaused, WeakReference<AppCompatActivity> activityRef) {
@@ -175,7 +189,7 @@ public final class BuyActivity extends AbstractActivity {
             return;
         }
         LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
-        Engine.instance().getThreadPool().execute(() -> Offers.preLoadRewardedVideoAsync(activityRef));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Offers.preLoadRewardedVideoAsync(activityRef));
     }
 
     private String getActionBarTitle() {

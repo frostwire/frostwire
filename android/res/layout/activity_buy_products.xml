@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Marcelina Knitter (@marcelinkaaa)
  * Alden Torres (aldenml)
@@ -19,107 +18,120 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:frostwire="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+        xmlns:frostwire="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <include layout="@layout/toolbar_main"/>
+    <include layout="@layout/toolbar_main" />
 
-    <LinearLayout android:id="@+id/activity_buy_actionbar_interstitial"
-                  android:orientation="horizontal"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:padding="8dp"
-                  android:weightSum="1.0"
-                  android:background="@color/app_toolbar_background"
-                  android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                  android:visibility="gone">
+    <LinearLayout
+            android:id="@+id/activity_buy_actionbar_interstitial"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:weightSum="1.0"
+            android:background="@color/app_toolbar_background"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            android:visibility="gone">
 
-        <TextView android:id="@+id/activity_buy_actionbar_interstitial_buy_activity_title"
-                  android:layout_weight="1.0"
-                  android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:text="@string/remove_ads"
-                  android:textColor="@color/basic_white"
-                  android:layout_marginLeft="10dp"
-                  android:layout_gravity="center_vertical" />
+        <TextView
+                android:id="@+id/activity_buy_actionbar_interstitial_buy_activity_title"
+                android:layout_weight="1.0"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/remove_ads"
+                android:textColor="@color/basic_white"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_vertical" />
 
-        <ImageButton android:id="@+id/activity_buy_actionbar_interstitial_buy_activity_dismiss_button"
-                     android:src="@drawable/ic_ab_close_clear_cancel"
-                     android:background="@color/transparent"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:layout_weight="0"
-                     android:paddingRight="2dp"
-                     android:layout_gravity="center_vertical|right"
-                     android:contentDescription="@null"/>
+        <ImageButton
+                android:id="@+id/activity_buy_actionbar_interstitial_buy_activity_dismiss_button"
+                android:src="@drawable/ic_ab_close_clear_cancel"
+                android:background="@color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:paddingRight="2dp"
+                android:layout_gravity="center_vertical|right"
+                android:contentDescription="@null" />
 
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/activity_buy_scrollview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/basic_gray_light">
+            android:id="@+id/activity_buy_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/basic_gray_light">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/basic_gray_light"
-            android:orientation="vertical">
-
-            <com.frostwire.android.gui.views.ProductCardView
-                android:id="@+id/activity_buy_product_card_30_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                frostwire:product_card_description="@string/dummy_content_description"
-                frostwire:product_card_hint_button_visible="false"
-                frostwire:product_card_price="$0.99"
-                frostwire:product_card_title_bold="@string/thirty_days"
-                frostwire:product_card_title_normal="@string/ad_free" />
+                android:background="@color/basic_gray_light"
+                android:orientation="vertical">
 
             <com.frostwire.android.gui.views.ProductCardView
-                android:id="@+id/activity_buy_product_card_1_year"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                frostwire:product_card_description="@string/dummy_content_description"
-                frostwire:product_card_hint_button_caption="@string/best_value"
-                frostwire:product_card_hint_button_visible="true"
-                frostwire:product_card_price="$5.94"
-                frostwire:product_card_selected="true"
-                frostwire:product_card_title_bold="@string/one_year"
-                frostwire:product_card_title_normal="@string/ad_free" />
+                    android:id="@+id/activity_buy_product_card_30_days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_visible="false"
+                    frostwire:product_card_price="$0.99"
+                    frostwire:product_card_title_bold="@string/thirty_days"
+                    frostwire:product_card_title_normal="@string/ad_free" />
+
+            <com.frostwire.android.gui.views.ProductCardView
+                    android:id="@+id/activity_buy_product_card_1_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_caption="@string/best_value"
+                    frostwire:product_card_hint_button_visible="true"
+                    frostwire:product_card_price="$5.94"
+                    frostwire:product_card_selected="true"
+                    frostwire:product_card_title_bold="@string/one_year"
+                    frostwire:product_card_title_normal="@string/ad_free" />
 
             <com.frostwire.android.gui.views.ProductPaymentOptionsView
-                android:id="@+id/activity_buy_product_payment_options_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleY="0"
-                android:transformPivotY="0dp"
-                android:visibility="gone" />
+                    android:id="@+id/activity_buy_product_payment_options_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleY="0"
+                    android:transformPivotY="0dp"
+                    android:visibility="gone" />
 
             <com.frostwire.android.gui.views.ProductCardView
-                android:id="@+id/activity_buy_product_card_6_months"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                frostwire:product_card_description="@string/dummy_content_description"
-                frostwire:product_card_hint_button_visible="false"
-                frostwire:product_card_price="$4.45"
-                frostwire:product_card_title_bold="@string/six_months"
-                frostwire:product_card_title_normal="@string/ad_free" />
+                    android:id="@+id/activity_buy_product_card_6_months"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_visible="false"
+                    frostwire:product_card_price="$4.45"
+                    frostwire:product_card_title_bold="@string/six_months"
+                    frostwire:product_card_title_normal="@string/ad_free" />
 
             <com.frostwire.android.gui.views.ProductCardView
-                android:id="@+id/activity_buy_product_card_reward"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                frostwire:product_card_description="@string/dummy_content_description"
-                frostwire:product_card_hint_button_caption="@string/free"
-                frostwire:product_card_hint_button_visible="true"
-                frostwire:product_card_price="@string/reward_product_price"
-                frostwire:product_card_title_bold="@string/reward_product_title"
-                frostwire:product_card_title_normal="@string/ad_free" />
+                    android:id="@+id/activity_buy_product_card_reward"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_caption="@string/free"
+                    frostwire:product_card_hint_button_visible="true"
+                    frostwire:product_card_price="@string/reward_product_price"
+                    frostwire:product_card_title_bold="@string/reward_product_title"
+                    frostwire:product_card_title_normal="@string/ad_free" />
+
+            <Button
+                    android:id="@+id/activity_buy_products_subscriptions_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    style="@style/BuyNoAdsCardHint"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/subscriptions"
+                    android:visibility="gone"/>
 
         </LinearLayout>
 
