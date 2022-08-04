@@ -22,6 +22,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
+
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
