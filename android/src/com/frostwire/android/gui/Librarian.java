@@ -490,7 +490,9 @@ public final class Librarian {
             boolean illegalArgumentCaught = false;
             try {
                 mmr.setDataSource(srcFile.getAbsolutePath());
-            } catch (IllegalArgumentException ignored) {
+            } catch (Throwable ignored) {
+                // at first we tried catching illegal argument exception
+                // then we started seeing Runtime Exception errors being thrown here.
                 illegalArgumentCaught = true;
             }
             String title = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);

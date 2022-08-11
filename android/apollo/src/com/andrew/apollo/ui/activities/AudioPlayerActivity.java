@@ -1026,7 +1026,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void musicServiceRequestTask(AudioPlayerActivity activity,
+    private static void  musicServiceRequestTask(AudioPlayerActivity activity,
                                                 MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:
