@@ -1,4 +1,4 @@
-FrostWire 2.5.0 build 697 - AUG/03/2022
+FrostWire 2.5.0 build 698 - AUG/11/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.
  - Removal of annoying Interstitial ad display logic, video ads are only shown when user wants to remove ads for 30 minutes
  - Removal of "My Files", it's impossible to maintain across so many android versions and devices with the file management quicksand on android
@@ -10,12 +10,13 @@ FrostWire 2.5.0 build 697 - AUG/03/2022
  - Major code cleanup after removal of "My Files" fragments and activities
  - Finished download scanning issues solved for Android 10, 11 and 12.
  - Easy access to Google Play Subscriptions management.
- - com.android.tools.build:gradle:7.2.0
+ - com.android.tools.build:gradle:7.2.2
  - com.google.android.material:material:1.6.1
  - com.google.firebase:firebase-crashlytics-gradle:2.9.1
  - com.google.gms:google-services:4.3.13
  - androidx.annotation:annotation:1.4.0
  - com.unity3d.ads:unity-ads:4.2.1
+
 
 FrostWire 2.4.8 build 691 - APR/20/2022
  - TorLock search fixed

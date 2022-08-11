@@ -156,11 +156,11 @@ public abstract class FragmentPagerAdapter extends PagerAdapter {
     public void finishUpdate(ViewGroup container) {
         if (mCurTransaction != null) {
             // aldenml: using code from v13, since we are still in API 21
-            //mCurTransaction.commitNowAllowingStateLoss();
-            //mCurTransaction = null;
-            mCurTransaction.commitAllowingStateLoss();
-            mCurTransaction = null;
-            mFragmentManager.executePendingTransactions();
+            try {
+                mCurTransaction.commitAllowingStateLoss();
+                mCurTransaction = null;
+                mFragmentManager.executePendingTransactions();
+            } catch (Throwable ignored) {}
         }
     }
 
