@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
+import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.os.Build;
 
@@ -29,6 +30,7 @@ import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
+import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
@@ -79,12 +81,25 @@ public final class UIBTDownloadListener implements BTDownloadListener {
                 // MediaScanner disk IO sent to DOWNLOADER handler thread
                 if (Engine.instance().getApplication() != null) {
                     postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
-                            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                    {
+                        Context context;
+                        try {
+                            context = Engine.instance().getApplication();
+                            if (context == null) {
+                                context = MainApplication.context();
+                            }
+                        } catch (Throwable ignored) {
+                            context = MainApplication.context();
+                        }
+                        if (context != null) {
+                            MediaScannerConnection.scanFile(context,
                                     new String[]{destinationFile.getAbsolutePath()},
                                     new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
-                                    (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath())));
-                }
-            });
+                                    (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath()));
+                        }
+                    });
+                } // if
+            }); // forEach
         }
     }
 
@@ -95,7 +110,8 @@ public final class UIBTDownloadListener implements BTDownloadListener {
      * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl, boolean copyBytesToMediaStore) {
+    private static void moveFinishedTransferItemsToMediaStoreAsync(BTDownload dl,
+                                                                   boolean copyBytesToMediaStore) {
         // We write to /storage/emulated/0/Android/data/com.frostwire.android/files/
         // on Android10, therefore we need to use the media store to move
         // the downloaded files to the public Downloads/FrostWire folder

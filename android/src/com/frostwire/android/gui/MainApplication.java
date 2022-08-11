@@ -56,11 +56,19 @@ public class MainApplication extends MultiDexApplication {
 
     private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
+    private static final Object appContextLock = new Object();
+
     private static Context appContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        synchronized (appContextLock) {
+            if (appContext == null) {
+                appContext = this;
+            }
+        }
 
         runStrict(this::onCreateSafe);
 
@@ -77,6 +85,10 @@ public class MainApplication extends MultiDexApplication {
         async(LocalSearchEngine::instance);
 
         async(MainApplication::cleanTemp);
+    }
+
+    public static Context context() {
+        return appContext;
     }
 
     @Override
