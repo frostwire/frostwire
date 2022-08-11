@@ -525,17 +525,19 @@ public final class Librarian {
             values.put(MediaColumns.TITLE, srcFile.getName());
         }
         Uri downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
-        Uri insertedUri = resolver.insert(downloadsExternalUri, values);
-        if (insertedUri == null) {
-            LOG.error("mediaStoreInsert -> could not perform media store insertion");
+        try {
+            Uri insertedUri = resolver.insert(downloadsExternalUri, values);
+            if (insertedUri == null) {
+                LOG.error("mediaStoreInsert -> could not perform media store insertion");
+                return false;
+            }
+            LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
+            if (copyBytesToMediaStore) {
+                return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
+            }
+        } catch (Throwable t) {
             return false;
         }
-        LOG.info("mediaStoreInsert -> insertedUri = " + insertedUri);
-
-        if (copyBytesToMediaStore) {
-            return copyFileBytesToMediaStore(resolver, srcFile, values, insertedUri);
-        }
-
         return true;
     }
 
