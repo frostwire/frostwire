@@ -18,6 +18,7 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.content.Context;
 import android.media.MediaScannerConnection;
 
 import com.frostwire.android.gui.services.Engine;
@@ -62,7 +63,11 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     protected void moveAndComplete(File src, File dst) {
         super.moveAndComplete(src, dst);
         if (SystemUtils.hasAndroid11OrNewer()) {
-            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+            Context context = SystemUtils.getApplicationContext();
+            if (context == null) {
+                return;
+            }
+            MediaScannerConnection.scanFile(context,
                     new String[]{dst.getAbsolutePath()},
                     new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
                     (path, uri) -> LOG.info("UISoundCloudDownload::moveAndComplete() -> mediaScan complete on " + dst));

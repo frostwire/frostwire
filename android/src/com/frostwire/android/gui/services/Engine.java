@@ -17,6 +17,9 @@
 
 package com.frostwire.android.gui.services;
 
+import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
+import static com.frostwire.android.util.Asyncs.async;
+
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
@@ -43,9 +46,6 @@ import com.frostwire.util.Ref;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
-
-import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -145,7 +145,9 @@ public final class Engine implements IEngineService {
         }
     }
 
-    /** Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if possible */
+    /**
+     * Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if possible
+     */
     public ExecutorService getThreadPool() {
         return MAIN_THREAD_POOL;
     }

@@ -69,21 +69,14 @@ public class UIHttpDownload extends HttpDownload {
     protected void moveAndComplete(File src, File dst) {
         super.moveAndComplete(src, dst);
         if (SystemUtils.hasAndroid11OrNewer()) {
-            Context context;
-            try {
-                context = Engine.instance().getApplication();
-                if (context == null) {
-                    context = MainApplication.context();
-                }
-            } catch (Throwable ignored) {
-                context = MainApplication.context();
+            Context context = SystemUtils.getApplicationContext();
+            if (context == null) {
+                return;
             }
-            if (context != null) {
-                MediaScannerConnection.scanFile(context,
-                        new String[]{dst.getAbsolutePath()},
-                        new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
-                        (path, uri) -> LOG.info("UIHttpDownload::moveAndComplete() -> mediaScan complete on " + dst));
-            }
+            MediaScannerConnection.scanFile(context,
+                    new String[]{dst.getAbsolutePath()},
+                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
+                    (path, uri) -> LOG.info("UIHttpDownload::moveAndComplete() -> mediaScan complete on " + dst));
         }
     }
 

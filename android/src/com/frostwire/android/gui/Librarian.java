@@ -18,9 +18,6 @@
 
 package com.frostwire.android.gui;
 
-import static com.frostwire.android.util.SystemUtils.postToHandler;
-
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -47,15 +44,11 @@ import com.frostwire.android.core.player.EphemeralPlaylist;
 import com.frostwire.android.core.player.PlaylistItem;
 import com.frostwire.android.core.providers.TableFetcher;
 import com.frostwire.android.core.providers.TableFetchers;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
-import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
-import com.frostwire.util.OSUtils;
 import com.frostwire.util.StringUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -417,12 +410,8 @@ public final class Librarian {
     public static boolean mediaStoreSaveToDownloads(File src, File destInDownloads, boolean copyBytesToMediaStore) {
         LOG.info("Librarian::mediaStoreSaveToDownloads trying to save " + src.getAbsolutePath() + " into " + destInDownloads.getAbsolutePath());
 
-        Application application = Engine.instance().getApplication();
-        if (application == null) {
-            LOG.info("Librarian::mediaStoreSaveToDownloads aborting. Application reference is null, not ready yet.");
-            return false;
-        }
-        if (application.getApplicationContext() == null) {
+        Context context = SystemUtils.getApplicationContext();
+        if (context == null) {
             LOG.info("Librarian::mediaStoreSaveToDownloads aborting. ApplicationContext reference is null, not ready yet.");
             return false;
         }
@@ -434,7 +423,7 @@ public final class Librarian {
             return false;
         }
 
-        return mediaStoreInsert(Engine.instance().getApplication().getApplicationContext(), src, relativePath, copyBytesToMediaStore);
+        return mediaStoreInsert(context, src, relativePath, copyBytesToMediaStore);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -442,11 +431,7 @@ public final class Librarian {
         String relativePath = AndroidPaths.getRelativeFolderPathFromFileInDownloads(destInDownloads);
         String displayName = destInDownloads.getName();
         Uri downloadsExternalUri = MediaStore.Downloads.getContentUri("external");
-        ContentResolver contentResolver =
-                Engine.instance().
-                        getApplication().
-                        getApplicationContext().
-                        getContentResolver();
+        ContentResolver contentResolver = SystemUtils.getApplicationContext().getContentResolver();
         String selection = MediaColumns.DISPLAY_NAME + " = ? AND " +
                 MediaColumns.RELATIVE_PATH + " LIKE ?";
         String[] selectionArgs = new String[]{displayName, '%' + relativePath + '%'};
@@ -517,7 +502,7 @@ public final class Librarian {
                 // Something went wrong with mmr.setDataSource()
                 // Happens in Android 10
                 String fileNameWithoutExtension = srcFile.getName().replace(
-                        FilenameUtils.getExtension(srcFile.getName()),"");
+                        FilenameUtils.getExtension(srcFile.getName()), "");
                 values.put(MediaColumns.TITLE, fileNameWithoutExtension);
                 values.put(MediaColumns.DISPLAY_NAME, fileNameWithoutExtension);
             }
@@ -571,7 +556,7 @@ public final class Librarian {
         File destinationFileInDownloads = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(fileBittorrentTransferItem);
         String relativeFolderPath = AndroidPaths.getRelativeFolderPathFromFileInDownloads(destinationFileInDownloads);
         String displayName = fileBittorrentTransferItem.getName();
-        ContentResolver contentResolver = Engine.instance().getApplication().getContentResolver();
+        ContentResolver contentResolver = SystemUtils.getApplicationContext().getContentResolver();
         Uri externalUri = MediaStore.Downloads.getContentUri("external");
         String[] projection = {MediaStore.Downloads._ID};
         String selection = MediaStore.Downloads.DISPLAY_NAME + " = ? and " + MediaStore.Downloads.RELATIVE_PATH + " LIKE ?";

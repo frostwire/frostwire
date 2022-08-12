@@ -26,6 +26,8 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
+import com.frostwire.android.gui.MainApplication;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 
@@ -47,6 +49,19 @@ public final class SystemUtils {
     private static final int VERSION_SDK_ANDROID_12_S = 31;
 
     private SystemUtils() {
+    }
+
+    public static Context getApplicationContext() {
+        Context context;
+        try {
+            context = Engine.instance().getApplication().getApplicationContext();
+            if (context == null) {
+                context = MainApplication.context();
+            }
+        } catch (Throwable ignored) {
+            context = MainApplication.context();
+        }
+        return context;
     }
 
     public static File getCacheDir(Context context, String directory) {

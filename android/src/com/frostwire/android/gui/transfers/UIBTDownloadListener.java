@@ -30,18 +30,15 @@ import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.Librarian;
-import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.BTDownloadListener;
-import com.frostwire.platform.Platforms;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -79,26 +76,19 @@ public final class UIBTDownloadListener implements BTDownloadListener {
                 // /storage/emulated/0/Download/FrostWire/FOO_FOLDER/bar.ext
                 final File destinationFile = AndroidPaths.getDestinationFileFromInternalFileInAndroid10(sourceFile);
                 // MediaScanner disk IO sent to DOWNLOADER handler thread
-                if (Engine.instance().getApplication() != null) {
-                    postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
-                    {
-                        Context context;
-                        try {
-                            context = Engine.instance().getApplication();
-                            if (context == null) {
-                                context = MainApplication.context();
-                            }
-                        } catch (Throwable ignored) {
-                            context = MainApplication.context();
-                        }
-                        if (context != null) {
-                            MediaScannerConnection.scanFile(context,
-                                    new String[]{destinationFile.getAbsolutePath()},
-                                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
-                                    (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath()));
-                        }
-                    });
-                } // if
+
+                postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () ->
+                {
+                    Context context = SystemUtils.getApplicationContext();
+                    if (context == null) {
+                        return;
+                    }
+                    MediaScannerConnection.scanFile(context,
+                            new String[]{destinationFile.getAbsolutePath()},
+                            new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(destinationFile.getName()))},
+                            (path, uri) -> LOG.info("UIBTDownloadListener::finished() -> mediaScan complete on " + destinationFile.getAbsolutePath()));
+                });
+
             }); // forEach
         }
     }
