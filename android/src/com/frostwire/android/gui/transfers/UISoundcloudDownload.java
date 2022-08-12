@@ -18,9 +18,18 @@
 
 package com.frostwire.android.gui.transfers;
 
+import android.media.MediaScannerConnection;
+
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.SoundcloudDownload;
+import com.frostwire.util.Logger;
+import com.frostwire.util.MimeDetector;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
 
 /**
  * @author aldenml
@@ -29,6 +38,7 @@ import com.frostwire.transfers.SoundcloudDownload;
 public class UISoundcloudDownload extends SoundcloudDownload {
 
     private final TransferManager manager;
+    private static final Logger LOG = Logger.getLogger(UISoundcloudDownload.class);
 
     public UISoundcloudDownload(TransferManager manager, SoundcloudSearchResult sr) {
         super(sr);
@@ -46,5 +56,16 @@ public class UISoundcloudDownload extends SoundcloudDownload {
     protected void onComplete() {
         manager.incrementDownloadsToReview();
         Engine.instance().notifyDownloadFinished(getDisplayName(), savePath);
+    }
+
+    @Override
+    protected void moveAndComplete(File src, File dst) {
+        super.moveAndComplete(src, dst);
+        if (SystemUtils.hasAndroid11OrNewer()) {
+            MediaScannerConnection.scanFile(Engine.instance().getApplication(),
+                    new String[]{dst.getAbsolutePath()},
+                    new String[]{MimeDetector.getMimeType(FilenameUtils.getExtension(dst.getName()))},
+                    (path, uri) -> LOG.info("UISoundCloudDownload::moveAndComplete() -> mediaScan complete on " + dst));
+        }
     }
 }
