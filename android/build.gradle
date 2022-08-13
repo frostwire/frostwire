@@ -96,13 +96,13 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 
 android {
 
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
         minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
-        targetSdkVersion 30 // Android 11
+        targetSdkVersion 32 // Android 12
         multiDexEnabled true
     }
 
@@ -202,8 +202,8 @@ dependencies {
     implementation 'com.android.billingclient:billing:4.1.0'
 
     // couldn't update to 20.<5|6>.0 -> ERROR: R8: Type com.google.android.gms.common.GooglePlayServicesUtil is defined multiple times
-    implementation 'com.google.android.gms:play-services-ads:20.4.0'
-    //implementation 'com.google.android.gms:play-services-ads:21.0.0'
+    //implementation 'com.google.android.gms:play-services-ads:20.4.0'
+    //implementation 'com.google.android.gms:play-services-ads:21.1.0'
 
     implementation 'com.squareup.picasso:picasso:3.0.0-SNAPSHOT'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
