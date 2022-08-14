@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.util.ImageLoader;
 
 /**
  * A subclass of {@link ImageWorker} that fetches images from a URL.
@@ -69,6 +70,14 @@ public class ImageFetcher extends ImageWorker {
         String albumName = MusicUtils.getAlbumName();
         String artistName = MusicUtils.getArtistName();
         long currentAlbumId = MusicUtils.getCurrentAlbumId();
+
+        if (currentAlbumId == 0) {
+            Context context = imageView.getContext();
+            Bitmap defaultArtwork = ImageFetcher.getInstance(context).getDefaultArtwork();
+            imageView.setImageBitmap(defaultArtwork);
+            return;
+        }
+
         String albumCacheKey = generateAlbumCacheKey(albumName, artistName);
         loadImage(albumCacheKey, artistName, currentAlbumId, imageView, ImageType.ALBUM);
     }
