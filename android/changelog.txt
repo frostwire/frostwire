@@ -1,4 +1,4 @@
-FrostWire 2.5.0 build 698 - AUG/12/2022
+FrostWire 2.5.0 build 701 - AUG/14/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.
  - Removal of annoying Interstitial ad display logic, video ads are only shown when user wants to remove ads for 30 minutes
  - Removal of "My Files", it's impossible to maintain across so many android versions and devices with the file management quicksand on android
