@@ -55,6 +55,7 @@ import android.provider.MediaStore.Audio.AlbumColumns;
 import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 import androidx.core.content.ContextCompat;
 
@@ -87,6 +88,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A background {@link Service} used to keep music playing between activities
@@ -113,6 +116,7 @@ public class MusicPlaybackService extends JobIntentService {
     // 2nd onStartCommand
     // 3rd handleCommandIntent
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public void onCreate() {
         INSTANCE = this;
@@ -165,15 +169,27 @@ public class MusicPlaybackService extends JobIntentService {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     public void handleCommandIntent(Intent intent) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> handleCommandIntent(intent));
+            return;
+        }
+
+        SystemUtils.ensureBackgroundThreadOrCrash("MusicPlaybackService.handleCommandIntent");
+
+        if (!serviceInitialized.get()) {
+            SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
+        }
+
         Asserts.checkNotNull(intent);
         // can't handleCommandIntent until service is fully started
         LOG.info("MusicPlaybackService::handleCommandIntent waiting for initServiceLatch...", true);
         try {
-            initServiceLatch.await();
+            initServiceLatch.await(4, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            LOG.error("handleCommandIntent: " + e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            LOG.error("handleCommandIntent aborted: " + e.getMessage(), e);
+            return;
         }
         LOG.info("MusicPlaybackService::handleCommandIntent done waiting for initServiceLatch", true);
 
@@ -894,7 +910,9 @@ public class MusicPlaybackService extends JobIntentService {
 
     // private methods
     private CountDownLatch initServiceLatch = new CountDownLatch(1);
+    private AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void initService() {
         if (mPlayerHandler == null) {
             throw new RuntimeException("check your logic, can't init service without mPlayerHandler.");
@@ -976,6 +994,7 @@ public class MusicPlaybackService extends JobIntentService {
         notifyChange(META_CHANGED);
 
         updateNotification();
+        serviceInitialized.set(true);
         initServiceLatch.countDown();
     }
 
@@ -1004,12 +1023,13 @@ public class MusicPlaybackService extends JobIntentService {
     /**
      * Initializes the remote control client
      */
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void setUpRemoteControlClient() {
         final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         mediaButtonIntent.setComponent(mMediaButtonReceiverComponent);
         mRemoteControlClient = new RemoteControlClient(
                 PendingIntent.getBroadcast(getApplicationContext(), 0, mediaButtonIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT));
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
 
         try {
             if (mAudioManager != null) {

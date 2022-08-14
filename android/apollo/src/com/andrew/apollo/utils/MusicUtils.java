@@ -183,10 +183,6 @@ public final class MusicUtils {
         }
     }
 
-    public static ServiceConnectionListener getServiceConnectionListener() {
-        return serviceConnectionListener;
-    }
-
     public static MusicPlaybackService getMusicPlaybackService() {
         synchronized (getStartMusicPlaybackServiceLock) {
             return musicPlaybackService;
