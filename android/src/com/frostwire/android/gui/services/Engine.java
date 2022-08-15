@@ -35,6 +35,9 @@ import android.telephony.TelephonyManager;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.player.CoreMediaPlayer;
@@ -129,6 +132,15 @@ public final class Engine implements IEngineService {
         if (service != null || wasShutdown) {
             if (service != null) {
                 service.startServices(wasShutdown);
+                if (!Python.isStarted()) {
+                    AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
+                    Python.start(androidPlatform);
+
+                    Python python = Python.getInstance();
+                    PyObject module_time = python.getModule("time");
+                    PyObject time_result = module_time.callAttr("time");
+                    LOG.info("Engine::startServices: python -> time.time() -> " + time_result.toDouble());
+                }
             }
             if (wasShutdown) {
                 async(new EngineApplicationRefsHolder(this, getApplication()),

@@ -17,16 +17,17 @@ import groovy.xml.Namespace
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-apply plugin: 'com.android.application'
 
+apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.chaquo.python'
 
 buildscript {
     repositories {
         google()
-
         mavenCentral()
+        maven { url "https://chaquo.com/maven" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.2'
@@ -39,6 +40,8 @@ buildscript {
 
         classpath 'androidx.annotation:annotation:1.4.0'
         classpath 'com.android.billingclient:billing:4.1.0'
+
+        classpath 'com.chaquo.python:gradle:12.0.0'
     }
 }
 
@@ -47,7 +50,6 @@ repositories {
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
-
 
 def manifestVersionCode() {
     def manifestFile = new File(project.projectDir.absolutePath + '/AndroidManifest.xml')
@@ -104,6 +106,10 @@ android {
         minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
         targetSdkVersion 32 // Android 12
         multiDexEnabled true
+
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
 
     compileOptions {
