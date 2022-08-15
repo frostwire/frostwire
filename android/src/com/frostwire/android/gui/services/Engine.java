@@ -40,6 +40,7 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
@@ -142,26 +143,18 @@ public final class Engine implements IEngineService {
                 service.startServices(wasShutdown);
                 if (!Python.isStarted()) {
                     SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        long a = System.currentTimeMillis();
                         AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
                         Python.start(androidPlatform);
                         Python python = Python.getInstance();
+                        long b = System.currentTimeMillis();
+                        LOG.info("Engine::startServices Python runtime first instantiated in " + (b-a) + " ms");
                         PyObject module_youtubedl_version = python.getModule("youtube_dl.version");
                         PyObject youtube_dl_version = module_youtubedl_version.get("__version__");
-                        PyObject telluride_module = python.getModule("telluride");
-                        String url = "https://www.youtube.com/watch?v=GfxvsHpTZWk";
-                        LOG.info("Engine::startServices: python: youtube_dl.version.__version__=" + youtube_dl_version.toString());
-                        PyObject query_video_result = telluride_module.callAttr("query_video", "https://www.youtube.com/watch?v=ye2CLllRO8I");
-                        String json_query_video_result = query_video_result.toString();
-                        Gson gson = new GsonBuilder().create();
-                        List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json_query_video_result, gson, null, -1, "https://www.youtube.com/watch?v=ye2CLllRO8I");
-                        LOG.info("Engine::startServices: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
-                        validResults.forEach(r -> {
-                            LOG.info("Engine::startServices: displayName " + r.getDisplayName());
-                            LOG.info("Engine::startServices: fileName " + r.getFilename());
-                            LOG.info("Engine::startServices: download url: " + r.getDownloadUrl() + "\n");
-                        });
 
                     });
+                } else {
+                    LOG.info("Engine::startServices Python already instantiated before");
                 }
             }
             if (wasShutdown) {
@@ -179,6 +172,7 @@ public final class Engine implements IEngineService {
         if (service != null) {
             service.stopServices(disconnected);
         }
+        TellurideCourier.abortQueries();
     }
 
     /**
