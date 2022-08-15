@@ -133,13 +133,14 @@ public final class Engine implements IEngineService {
             if (service != null) {
                 service.startServices(wasShutdown);
                 if (!Python.isStarted()) {
-                    AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
-                    Python.start(androidPlatform);
-
-                    Python python = Python.getInstance();
-                    PyObject module_time = python.getModule("time");
-                    PyObject time_result = module_time.callAttr("time");
-                    LOG.info("Engine::startServices: python -> time.time() -> " + time_result.toDouble());
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                        AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
+                        Python.start(androidPlatform);
+                        Python python = Python.getInstance();
+                        PyObject module_time = python.getModule("time");
+                        PyObject time_result = module_time.callAttr("time");
+                        LOG.info("Engine::startServices: python -> time.time() -> " + time_result.toDouble());
+                    });
                 }
             }
             if (wasShutdown) {
