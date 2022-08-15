@@ -51,6 +51,7 @@ import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SoftwareUpdater;
@@ -180,6 +181,7 @@ public class MainActivity extends AbstractActivity implements
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
         OkHttpClientWrapper.cancelAllRequests();
+        TellurideCourier.abortQueries();
         SystemUtils.stopAllHandlerThreads();
         Engine.instance().shutdown();
     }
