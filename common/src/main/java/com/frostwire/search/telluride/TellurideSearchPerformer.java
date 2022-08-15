@@ -100,17 +100,17 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         // TellurideSearchResults aren't crawleable, this won't be called, no crawl tasks will be spawned for each result.
     }
 
-    List<TellurideSearchResult> getValidResults(String jsonMeta) {
+    public static List<TellurideSearchResult> getValidResults(String jsonMeta, Gson gson, TellurideSearchPerformerListener performerListener, long token, String debugUrl) {
         TellurideJSONResult result = gson.fromJson(jsonMeta, TellurideJSONResult.class);
 
         if (performerListener != null) {
-            performerListener.onTellurideJSONResult(getToken(), result);
+            performerListener.onTellurideJSONResult(token, result);
         }
 
         // From these formats we pick the best video and best audio available to always return 2 search results.
         ArrayList<TellurideSearchResult> results = new ArrayList<>();
         if (result.formats == null) {
-            LOG.info("formats are null, no valid search results for " + url);
+            LOG.info("formats are null, no valid search results for " + debugUrl);
             return results;
         }
         int originalResultCount = result.formats.size();
@@ -178,10 +178,13 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     }
 
     //20200324
-    private long dateStringToTimestamp(String YYYY_MM_DD) {
+    private static long dateStringToTimestamp(String YYYY_MM_DD) {
         int YEAR = Integer.parseInt(YYYY_MM_DD.substring(0, 4));
         int MONTH = Integer.parseInt(YYYY_MM_DD.substring(4, 6));
         int DATE = Integer.parseInt(YYYY_MM_DD.substring(6));
+        if (calendar == null) {
+            calendar = Calendar.getInstance();
+        }
         calendar.set(Calendar.YEAR, YEAR);
         calendar.set(Calendar.MONTH, MONTH - 1);
         calendar.set(Calendar.DAY_OF_MONTH, DATE);
@@ -189,7 +192,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     }
 
     private void onMeta(String json) {
-        List<TellurideSearchResult> results = getValidResults(json);
+        List<TellurideSearchResult> results = getValidResults(json, gson, performerListener, getToken(), url);
         onResults(results);
 
         if (performerListener != null) {
@@ -208,7 +211,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         performerLatch.countDown();
     }
 
-    private boolean noCodec(String codec) {
+    private static boolean noCodec(String codec) {
         return codec == null || "none".equals(codec);
     }
 
