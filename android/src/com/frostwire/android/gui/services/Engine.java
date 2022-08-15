@@ -45,11 +45,19 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
+import com.frostwire.search.telluride.TellurideSearchResult;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -137,9 +145,22 @@ public final class Engine implements IEngineService {
                         AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
                         Python.start(androidPlatform);
                         Python python = Python.getInstance();
-                        PyObject module_time = python.getModule("time");
-                        PyObject time_result = module_time.callAttr("time");
-                        LOG.info("Engine::startServices: python -> time.time() -> " + time_result.toDouble());
+                        PyObject module_youtubedl_version = python.getModule("youtube_dl.version");
+                        PyObject youtube_dl_version = module_youtubedl_version.get("__version__");
+                        PyObject telluride_module = python.getModule("telluride");
+                        String url = "https://www.youtube.com/watch?v=GfxvsHpTZWk";
+                        LOG.info("Engine::startServices: python: youtube_dl.version.__version__=" + youtube_dl_version.toString());
+                        PyObject query_video_result = telluride_module.callAttr("query_video", "https://www.youtube.com/watch?v=ye2CLllRO8I");
+                        String json_query_video_result = query_video_result.toString();
+                        Gson gson = new GsonBuilder().create();
+                        List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json_query_video_result, gson, null, -1, "https://www.youtube.com/watch?v=ye2CLllRO8I");
+                        LOG.info("Engine::startServices: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
+                        validResults.forEach(r -> {
+                            LOG.info("Engine::startServices: displayName " + r.getDisplayName());
+                            LOG.info("Engine::startServices: fileName " + r.getFilename());
+                            LOG.info("Engine::startServices: download url: " + r.getDownloadUrl() + "\n");
+                        });
+
                     });
                 }
             }

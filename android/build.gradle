@@ -41,7 +41,7 @@ buildscript {
         classpath 'androidx.annotation:annotation:1.4.0'
         classpath 'com.android.billingclient:billing:4.1.0'
 
-        classpath 'com.chaquo.python:gradle:12.0.0'
+        classpath 'com.chaquo.python:gradle:12.0.1'
     }
 }
 
@@ -109,6 +109,12 @@ android {
 
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+
+        python {
+            pip {
+                install "youtube_dl"
+            }
         }
     }
 
