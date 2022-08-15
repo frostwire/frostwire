@@ -28,9 +28,11 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 
 import com.frostwire.android.BuildConfig;
@@ -152,12 +154,15 @@ public final class Engine implements IEngineService {
         return MAIN_THREAD_POOL;
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.S)
     public void notifyDownloadFinished(String displayName, File file, String optionalInfoHash) {
         if (service != null) {
             service.notifyDownloadFinished(displayName, file, optionalInfoHash);
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     public void notifyDownloadFinished(String displayName, File file) {
         notifyDownloadFinished(displayName, file, null);
     }

@@ -219,7 +219,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                         MainActivity.class).
                         setAction(Constants.ACTION_SHOW_TRANSFERS).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                0);
+                PendingIntent.FLAG_IMMUTABLE);
     }
 
     private PendingIntent createShutdownIntent() {
@@ -229,7 +229,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                         MainActivity.class).
                         setAction(Constants.ACTION_REQUEST_SHUTDOWN).
                         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK),
-                0);
+                PendingIntent.FLAG_IMMUTABLE);
     }
 
     @Override

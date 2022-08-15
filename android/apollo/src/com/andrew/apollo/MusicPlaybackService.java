@@ -825,6 +825,7 @@ public class MusicPlaybackService extends JobIntentService {
         try {
             stopSelf();
             initServiceLatch = new CountDownLatch(1);
+            serviceInitialized.set(false);
         } catch (Throwable ignored) {
         }
         INSTANCE = null;

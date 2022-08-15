@@ -27,9 +27,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
@@ -196,6 +198,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         LOG.info("stopServices() Engine stopped, state:" + getStateString());
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     public void notifyDownloadFinished(String displayName, File file, String infoHash) {
         try {
             if (notifiedStorage.contains(infoHash)) {
@@ -210,7 +213,7 @@ public class EngineService extends JobIntentService implements IEngineService {
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION, true);
             i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
-            PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             Notification notification = new NotificationCompat.Builder(context, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
                     .setWhen(System.currentTimeMillis())
