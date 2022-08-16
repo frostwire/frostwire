@@ -28,6 +28,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
 public final class TellurideCourier {
@@ -43,10 +44,36 @@ public final class TellurideCourier {
         }
     }
 
-    public interface TellurideCourierCallback {
-        void onResults(List<TellurideSearchResult> results, boolean errored);
-        void abort();
-        boolean aborted();
+    public abstract class TellurideCourierCallback {
+        private boolean hasAborted = false;
+        private String url = null;
+
+        abstract void onResults(List<TellurideSearchResult> results, boolean errored);
+
+        final void abort() {
+            hasAborted = true;
+        }
+
+        final boolean aborted() {
+            return hasAborted;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TellurideCourierCallback that = (TellurideCourierCallback) o;
+            return Objects.equals(url, that.url);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(url);
+        }
+
+        private void setUrl(String url) {
+            this.url = url;
+        }
     }
 
     // runs on SEARCH_PERFORMER HandlerThread
@@ -56,6 +83,7 @@ public final class TellurideCourier {
             return;
         }
         if (callback != null) {
+            callback.setUrl(url);
             knownCallbacks.add(callback);
         }
         SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::queryPage");
