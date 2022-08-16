@@ -35,7 +35,6 @@ import android.telephony.TelephonyManager;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 
-import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
@@ -46,19 +45,11 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
-import com.frostwire.search.telluride.TellurideSearchPerformer;
-import com.frostwire.search.telluride.TellurideSearchResult;
-import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -149,9 +140,6 @@ public final class Engine implements IEngineService {
                         Python python = Python.getInstance();
                         long b = System.currentTimeMillis();
                         LOG.info("Engine::startServices Python runtime first instantiated in " + (b-a) + " ms");
-                        PyObject module_youtubedl_version = python.getModule("youtube_dl.version");
-                        PyObject youtube_dl_version = module_youtubedl_version.get("__version__");
-
                     });
                 } else {
                     LOG.info("Engine::startServices Python already instantiated before");

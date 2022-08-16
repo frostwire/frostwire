@@ -98,11 +98,11 @@ public final class TellurideCourier {
         }
 
         List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json_query_video_result, gson, null, -1, url);
-        LOG.info("Engine::startServices: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
+        LOG.info("TellurideCourier::queryPage: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
         validResults.forEach(r -> {
-            LOG.info("Engine::startServices: displayName " + r.getDisplayName());
-            LOG.info("Engine::startServices: fileName " + r.getFilename());
-            LOG.info("Engine::startServices: download url: " + r.getDownloadUrl() + "\n");
+            LOG.info("TellurideCourier::queryPage: displayName " + r.getDisplayName());
+            LOG.info("TellurideCourier::queryPage: fileName " + r.getFilename());
+            LOG.info("TellurideCourier::queryPage: download url: " + r.getDownloadUrl() + "\n");
         });
 
         if (callback != null && !callback.aborted()) {
