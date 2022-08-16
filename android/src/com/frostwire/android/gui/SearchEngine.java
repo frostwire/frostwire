@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
@@ -310,6 +311,12 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
+    public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
+        public SearchPerformer getPerformer(long token, String pageUrl) {
+            return new TellurideCourier.SearchPerformer(token, pageUrl);
         }
     };
 

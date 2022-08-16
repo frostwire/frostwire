@@ -200,8 +200,9 @@ public class SearchInputView extends LinearLayout {
     }
 
     private void updateHint() {
-        final String searchFiles = getContext().getString(R.string.search_label) + " " + getContext().getString(R.string.files);
-        final String orEnterYTorSCUrl = getContext().getString(R.string.or_enter_url);
+        Context context = getContext();
+        final String searchFiles = context.getString(R.string.search_label) + " ";
+        final String orEnterYTorSCUrl = context.getString(R.string.or_enter_url);
         textInput.setHint(searchFiles + " " + orEnterYTorSCUrl);
     }
 

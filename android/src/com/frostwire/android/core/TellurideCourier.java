@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ package com.frostwire.android.core;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.AbstractSearchPerformer;
+import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
@@ -44,37 +46,6 @@ public final class TellurideCourier {
         }
     }
 
-    public abstract class TellurideCourierCallback {
-        private boolean hasAborted = false;
-        private String url = null;
-
-        abstract void onResults(List<TellurideSearchResult> results, boolean errored);
-
-        final void abort() {
-            hasAborted = true;
-        }
-
-        final boolean aborted() {
-            return hasAborted;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            TellurideCourierCallback that = (TellurideCourierCallback) o;
-            return Objects.equals(url, that.url);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(url);
-        }
-
-        private void setUrl(String url) {
-            this.url = url;
-        }
-    }
 
     // runs on SEARCH_PERFORMER HandlerThread
     public static void queryPage(String url, TellurideCourierCallback callback) {
@@ -83,7 +54,6 @@ public final class TellurideCourier {
             return;
         }
         if (callback != null) {
-            callback.setUrl(url);
             knownCallbacks.add(callback);
         }
         SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::queryPage");
@@ -136,6 +106,41 @@ public final class TellurideCourier {
         if (callback != null && !callback.aborted()) {
             knownCallbacks.remove(callback);
             callback.onResults(validResults, error);
+        }
+    }
+
+
+    public static class SearchPerformer extends AbstractSearchPerformer {
+        private final String pageUrl;
+        private final TellurideCourierCallback courierCallback;
+
+        public SearchPerformer(long token, String pageUrl) {
+            super(token);
+            this.pageUrl = pageUrl;
+            final SearchPerformer sp = this;
+            this.courierCallback = new TellurideCourierCallback(pageUrl) {
+                @Override
+                void onResults(List<TellurideSearchResult> results, boolean errored) {
+                    sp.onResults(results);
+                }
+            };
+        }
+
+        @Override
+        public void perform() {
+            TellurideCourier.queryPage(pageUrl, courierCallback);
+        }
+
+        @Override
+        public void crawl(CrawlableSearchResult sr) {
+            // nothing to crawl
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            courierCallback.abort();
+            TellurideCourier.knownCallbacks.remove(courierCallback);
         }
     }
 }

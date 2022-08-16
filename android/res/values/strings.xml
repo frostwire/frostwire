@@ -235,7 +235,7 @@
     <string name="seed_stop">Stop seeding</string>
     <string name="dummy_author" translatable="false">[Author]</string>
     <string name="cant_resume_torrent_transfers">Cannot resume torrent transfers. Check status of "Settings" > "BitTorrent Connection Status"</string>
-    <string name="or_enter_url">or enter URL</string>
+    <string name="or_enter_url">or enter URL (video, torrent, magnet)</string>
     <string name="confirm_download">Confirm Download</string>
     <string name="track">track</string>
     <string name="playlist">playlist</string>
@@ -508,4 +508,5 @@
     <string name="comma">,</string>
     <string name="permission_denied">Permission denied</string>
     <string name="subscriptions">Subscriptions</string>
+    <string name="youtube_not_supported_on_basic">YouTube downloads are not supported by FrostWire Basic. Go to FrostWire.com for information on FrostWire Plus (also free)</string>
 </resources>

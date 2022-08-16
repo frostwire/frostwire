@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public final class SearchManager {
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
-    private final Object executorLock = new Object();
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;

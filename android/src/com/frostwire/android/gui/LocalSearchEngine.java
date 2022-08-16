@@ -270,9 +270,7 @@ public final class LocalSearchEngine {
 
     private List<String> tokenize(String keywords) {
         keywords = sanitize(keywords);
-
         Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
-
         return new ArrayList<>(normalizeTokens(tokens));
     }
 
@@ -291,5 +289,19 @@ public final class LocalSearchEngine {
             seed.append(((TorrentSearchResult) sr).getHash());
         }
         return StringUtils.quickHash(seed.toString());
+    }
+
+    public void performTellurideSearch(String pageUrl) {
+        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
+        if (StringUtils.isNullOrEmpty(pageUrl, true)) {
+            return;
+        }
+        manager.stop();
+        currentSearchToken = Math.abs(System.nanoTime());
+        currentSearchTokens = tokenize(pageUrl);
+        searchFinished = false;
+        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
+        Collections.shuffle(shuffledEngines);
+        manager.perform(SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl));
     }
 }

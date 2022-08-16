@@ -19,9 +19,9 @@
 package com.frostwire.android.gui.fragments;
 
 import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -44,6 +44,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
@@ -90,8 +91,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author gubatron
@@ -291,17 +290,6 @@ public final class SearchFragment extends AbstractFragment implements
                 new HandpickedTorrentDownloadDialogOnFetch(getActivity(), false));
     }
 
-    private static String extractYTId(String ytUrl) {
-        String vId = null;
-        //noinspection RegExpRedundantEscape
-        Pattern pattern = Pattern.compile(".*(?:youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=)([^#\\&\\?]*).*");
-        Matcher matcher = pattern.matcher(ytUrl);
-        if (matcher.matches()) {
-            vId = matcher.group(1);
-        }
-        return vId;
-    }
-
     private void setupAdapter() {
         if (adapter == null) {
             adapter = new SearchResultListAdapter(getActivity()) {
@@ -390,22 +378,24 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, fsr.numVideo);
     }
 
-    public void performYTSearch(String query) {
-        final String ytId = extractYTId(query);
-        if (ytId != null) {
+    public void performTellurideSearch(String pageUrl) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG) {
+            UIUtils.showLongMessage(getContext(), R.string.youtube_not_supported_on_basic);
             searchInput.setText("");
-            searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
-            searchInput.setText("youtube:" + ytId);
-            prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
-            postToHandler(
-                    SEARCH_PERFORMER,
-                    () -> LocalSearchEngine.instance().performSearch(ytId));
+            return;
         }
+        searchInput.setText("");
+        searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
+        prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
+        postToHandler(
+                SEARCH_PERFORMER,
+                () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl));
     }
 
     private void cancelSearch() {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
         postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
+        postToHandler(SEARCH_PERFORMER, TellurideCourier::abortQueries);
         adapter.clear();
         searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
@@ -663,12 +653,15 @@ public final class SearchFragment extends AbstractFragment implements
                 fragment.cancelSearch();
                 new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query);
                 fragment.searchInput.setText("");
-            } else if (query.contains("youtube.com/")) {
-                fragment.performYTSearch(query);
-            } else if (query.startsWith("magnet:?xt=urn:btih:")) {
+            } else if (query.contains("youtube.com/") || query.contains("youtu.be/")) {
+                fragment.performTellurideSearch(query);
+            } else if (query.startsWith("magnet:?xt=urn:btih:") ||
+                    (query.startsWith("http") && query.endsWith(".torrent"))) {
                 fragment.startMagnetDownload(query);
                 fragment.currentQuery = null;
                 fragment.searchInput.setText("");
+            } else if (query.startsWith("http") && !query.endsWith(".torrent")) {
+                fragment.performTellurideSearch(query);
             } else {
                 SystemUtils.postToUIThread(() -> {
                     if (Ref.alive(fragmentRef)) {
