@@ -58,6 +58,7 @@ public final class LocalSearchEngine {
     private long currentSearchToken;
     private List<String> currentSearchTokens;
     private boolean searchFinished;
+    private SearchPerformer lastTellurideCourier;
 
     public static LocalSearchEngine instance() {
         if (instance != null) {
@@ -125,11 +126,28 @@ public final class LocalSearchEngine {
         }
     }
 
+    public void performTellurideSearch(String pageUrl) {
+        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
+        if (StringUtils.isNullOrEmpty(pageUrl, true)) {
+            return;
+        }
+        manager.stop();
+        currentSearchToken = Math.abs(System.nanoTime());
+        currentSearchTokens = tokenize(pageUrl);
+        searchFinished = false;
+        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl);
+        manager.perform(lastTellurideCourier);
+    }
+
+
     public void cancelSearch() {
         currentSearchToken = 0;
         currentSearchTokens = null;
         searchFinished = true;
         manager.stop();
+        if (lastTellurideCourier != null) {
+            lastTellurideCourier.stop();
+        }
     }
 
     public boolean isSearchStopped() {
@@ -289,19 +307,5 @@ public final class LocalSearchEngine {
             seed.append(((TorrentSearchResult) sr).getHash());
         }
         return StringUtils.quickHash(seed.toString());
-    }
-
-    public void performTellurideSearch(String pageUrl) {
-        SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
-        if (StringUtils.isNullOrEmpty(pageUrl, true)) {
-            return;
-        }
-        manager.stop();
-        currentSearchToken = Math.abs(System.nanoTime());
-        currentSearchTokens = tokenize(pageUrl);
-        searchFinished = false;
-        ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
-        Collections.shuffle(shuffledEngines);
-        manager.perform(SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl));
     }
 }

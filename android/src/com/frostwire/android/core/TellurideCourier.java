@@ -19,6 +19,7 @@ package com.frostwire.android.core;
 
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
+import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
@@ -121,14 +122,16 @@ public final class TellurideCourier {
             this.courierCallback = new TellurideCourierCallback(pageUrl) {
                 @Override
                 void onResults(List<TellurideSearchResult> results, boolean errored) {
-                    sp.onResults(results);
+                    SystemUtils.postToUIThread(() -> sp.onResults(results));
+                    LocalSearchEngine.instance().getListener().onStopped(token);
                 }
             };
         }
 
         @Override
         public void perform() {
-            TellurideCourier.queryPage(pageUrl, courierCallback);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () ->
+                    TellurideCourier.queryPage(pageUrl, courierCallback));
         }
 
         @Override

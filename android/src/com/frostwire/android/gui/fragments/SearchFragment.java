@@ -112,11 +112,13 @@ public final class SearchFragment extends AbstractFragment implements
     private final FileTypeCounter fileTypeCounter;
     private OnClickListener headerClickListener;
     private HeaderBanner headerBanner;
+    private static SearchFragment lastSearchFragmentInstance = null;
 
     public SearchFragment() {
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
+        lastSearchFragmentInstance = this;
     }
 
     @Override
@@ -274,6 +276,29 @@ public final class SearchFragment extends AbstractFragment implements
         showSearchView(view);
     }
 
+    private void performTellurideSearch(String pageUrl) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG) {
+            UIUtils.showLongMessage(getContext(), R.string.youtube_not_supported_on_basic);
+            LocalSearchEngine.instance().cancelSearch();
+            searchInput.setText("");
+            return;
+        }
+        searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
+        setupAdapter();
+        LocalSearchEngine.instance().cancelSearch();
+        prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
+        postToHandler(
+                SEARCH_PERFORMER,
+                () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl));
+        try {
+            Thread.sleep(400);
+        } catch (Throwable t) {
+
+        }
+        //prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
+    }
+
+
     private void prepareUIForSearch(int fileType) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::prepareForSearch");
         showSearchView(getView());
@@ -376,20 +401,6 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_PICTURES, fsr.numPictures);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_TORRENTS, fsr.numTorrents);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_VIDEOS, fsr.numVideo);
-    }
-
-    public void performTellurideSearch(String pageUrl) {
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG) {
-            UIUtils.showLongMessage(getContext(), R.string.youtube_not_supported_on_basic);
-            searchInput.setText("");
-            return;
-        }
-        searchInput.setText("");
-        searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
-        prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
-        postToHandler(
-                SEARCH_PERFORMER,
-                () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl));
     }
 
     private void cancelSearch() {
@@ -571,7 +582,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private static class LocalSearchEngineListener implements SearchListener {
 
-        private final WeakReference<SearchFragment> searchFragmentRef;
+        private WeakReference<SearchFragment> searchFragmentRef;
 
         LocalSearchEngineListener(SearchFragment searchFragment) {
             searchFragmentRef = Ref.weak(searchFragment);
@@ -580,8 +591,14 @@ public final class SearchFragment extends AbstractFragment implements
         @Override
         public void onResults(long token, final List<? extends SearchResult> newResults) {
             if (!Ref.alive(searchFragmentRef)) {
+                LOG.info("SearchFragment::onResults aborted. Check your logic, searchFragmentRef lost");
                 Ref.free(searchFragmentRef);
-                return;
+
+                if (lastSearchFragmentInstance == null) {
+                    return;
+                }
+                searchFragmentRef = Ref.weak(lastSearchFragmentInstance);
+                LocalSearchEngine.instance().setListener(this);
             }
 
             final SearchFragment searchFragment = searchFragmentRef.get();
@@ -654,6 +671,14 @@ public final class SearchFragment extends AbstractFragment implements
                 new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query);
                 fragment.searchInput.setText("");
             } else if (query.contains("youtube.com/") || query.contains("youtu.be/")) {
+                SystemUtils.postToUIThread(() -> {
+                    if (Ref.alive(fragmentRef)) {
+                        View view = fragmentRef.get().getView();
+                        if (view != null) {
+                            fragmentRef.get().showSearchView(view);
+                        }
+                    }
+                });
                 fragment.performTellurideSearch(query);
             } else if (query.startsWith("magnet:?xt=urn:btih:") ||
                     (query.startsWith("http") && query.endsWith(".torrent"))) {
@@ -661,6 +686,14 @@ public final class SearchFragment extends AbstractFragment implements
                 fragment.currentQuery = null;
                 fragment.searchInput.setText("");
             } else if (query.startsWith("http") && !query.endsWith(".torrent")) {
+                SystemUtils.postToUIThread(() -> {
+                    if (Ref.alive(fragmentRef)) {
+                        View view = fragmentRef.get().getView();
+                        if (view != null) {
+                            fragmentRef.get().showSearchView(view);
+                        }
+                    }
+                });
                 fragment.performTellurideSearch(query);
             } else {
                 SystemUtils.postToUIThread(() -> {
