@@ -20,9 +20,11 @@ package com.frostwire.android.core;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.search.SearchListener;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
@@ -114,16 +116,25 @@ public final class TellurideCourier {
     public static class SearchPerformer extends AbstractSearchPerformer {
         private final String pageUrl;
         private final TellurideCourierCallback courierCallback;
+        private SearchResultListAdapter adapter;
 
         public SearchPerformer(long token, String pageUrl) {
             super(token);
             this.pageUrl = pageUrl;
-            final SearchPerformer sp = this;
             this.courierCallback = new TellurideCourierCallback(pageUrl) {
                 @Override
                 void onResults(List<TellurideSearchResult> results, boolean errored) {
-                    SystemUtils.postToUIThread(() -> sp.onResults(results));
-                    LocalSearchEngine.instance().getListener().onStopped(token);
+                    // This comes in too fast, gotta let the UI get there
+                    SystemUtils.postToUIThread(() -> {
+                        // Screw our listener, go straight to the one that matters
+                        SearchListener listener = LocalSearchEngine.instance().getListener();
+                        if (listener != null) {
+                            listener.onResults(token, results);
+                            adapter.setFileType(Constants.FILE_TYPE_VIDEOS);
+                            adapter.notifyDataSetChanged();
+                            listener.onStopped(token);
+                        }
+                    });
                 }
             };
         }
@@ -144,6 +155,10 @@ public final class TellurideCourier {
             super.stop();
             courierCallback.abort();
             TellurideCourier.knownCallbacks.remove(courierCallback);
+        }
+
+        public void setAdapter(SearchResultListAdapter adapter) {
+            this.adapter = adapter;
         }
     }
 }

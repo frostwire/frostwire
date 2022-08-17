@@ -315,6 +315,7 @@ public abstract class SearchEngine {
     };
 
     public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
+        @Override
         public SearchPerformer getPerformer(long token, String pageUrl) {
             return new TellurideCourier.SearchPerformer(token, pageUrl);
         }

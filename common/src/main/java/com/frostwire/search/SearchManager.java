@@ -17,6 +17,7 @@
 
 package com.frostwire.search;
 
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.search.filter.SearchTable;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -262,6 +263,10 @@ public final class SearchManager {
                 LOG.warn("Error performing search: " + performer + ", e=" + e.getMessage());
             } finally {
                 if (manager.tasks.remove(this)) {
+                    if (performer instanceof TellurideCourier.SearchPerformer) {
+                        LOG.info("SearchManager::run TellurideCourier.SearchPerformer, don't check if finished when running.");
+                        return;
+                    }
                     manager.checkIfFinished(performer.getToken());
                 }
             }

@@ -19,6 +19,8 @@ package com.frostwire.android.gui;
 
 import android.text.Html;
 
+import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
@@ -58,7 +60,7 @@ public final class LocalSearchEngine {
     private long currentSearchToken;
     private List<String> currentSearchTokens;
     private boolean searchFinished;
-    private SearchPerformer lastTellurideCourier;
+    private TellurideCourier.SearchPerformer lastTellurideCourier;
 
     public static LocalSearchEngine instance() {
         if (instance != null) {
@@ -73,24 +75,31 @@ public final class LocalSearchEngine {
         }
     }
 
+    public static class LocalSearchEngineSearchListener implements SearchListener {
+        final LocalSearchEngine lse;
+
+        public LocalSearchEngineSearchListener(LocalSearchEngine lse) {
+            this.lse = lse;
+        }
+
+        @Override
+        public void onResults(long token, List<? extends SearchResult> results) {
+            lse.onResults(token, results);
+        }
+
+        @Override
+        public void onError(long token, SearchError error) {
+        }
+
+        @Override
+        public void onStopped(long token) {
+            lse.onFinished(token);
+        }
+    }
+
     private LocalSearchEngine() {
         this.manager = SearchManager.getInstance();
-        this.manager.setListener(new SearchListener() {
-            @Override
-            public void onResults(long token, List<? extends SearchResult> results) {
-                LocalSearchEngine.this.onResults(token, results);
-            }
-
-            @Override
-            public void onError(long token, SearchError error) {
-
-            }
-
-            @Override
-            public void onStopped(long token) {
-                LocalSearchEngine.this.onFinished(token);
-            }
-        });
+        this.manager.setListener(new LocalSearchEngineSearchListener(this));
     }
 
     @SuppressWarnings("unused")
@@ -126,16 +135,18 @@ public final class LocalSearchEngine {
         }
     }
 
-    public void performTellurideSearch(String pageUrl) {
+    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
         SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
         if (StringUtils.isNullOrEmpty(pageUrl, true)) {
             return;
         }
         manager.stop();
         currentSearchToken = Math.abs(System.nanoTime());
-        currentSearchTokens = tokenize(pageUrl);
+        currentSearchTokens = new ArrayList<>();
+        currentSearchTokens.add(pageUrl);
         searchFinished = false;
-        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl);
+        lastTellurideCourier = (TellurideCourier.SearchPerformer) SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl);
+        lastTellurideCourier.setAdapter(adapter);
         manager.perform(lastTellurideCourier);
     }
 
