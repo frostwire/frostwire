@@ -94,7 +94,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
      *
      * @param fileType
      */
-    public void setFileType(final int fileType) {
+    public void setFileType(final int fileType, boolean appendToPreviouslyFilteredResults) {
         this.fileType = fileType;
         postToHandler(
                 SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
@@ -105,9 +105,21 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                         fileSearchResults = extractFileSearchResults(getFullList());
                     }
                     // Filter the entire list by file type
-                    filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
+                    if (!appendToPreviouslyFilteredResults || filteredSearchResults == null) {
+                        if (filteredSearchResults != null) {
+                            filteredSearchResults.clear();
+                            filteredSearchResults = null;
+                        }
+                        filteredSearchResults = newFilteredSearchResults(fileSearchResults, fileType);
+                    } else {
+                        appendFilteredSearchResults(filteredSearchResults, fileSearchResults, fileType);
+                    }
                     SystemUtils.postToUIThread(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
                 });
+    }
+
+    public void setFileType(final int fileType) {
+        setFileType(fileType, false);
     }
 
     public FilteredSearchResults getFilteredSearchResults() {
@@ -159,7 +171,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         seeds.setText("");
         TextView age = findView(view, R.id.view_bittorrent_ssearch_result_list_item_text_age);
         age.setText("");
-        String license = sr.getLicense().equals(Licenses.UNKNOWN) ? "" : " - " + sr.getLicense();
+        String license = "";
+        if (sr.getLicense() != null) {
+            license = sr.getLicense().equals(Licenses.UNKNOWN) ? "" : " - " + sr.getLicense();
+        }
         TextView sourceLink = findView(view, R.id.view_bittorrent_search_result_list_item_text_source);
         sourceLink.setText(sr.getSource() + license); // TODO: ask for design
         sourceLink.setTag(sr.getDetailsUrl());
@@ -274,6 +289,11 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public FilteredSearchResults newFilteredSearchResults(List<FileSearchResult> allFileSearchResults, int fileType) {
         ensureBackgroundThreadOrCrash("SearchResultListAdapter::newFilteredResults(results, fileType)");
         FilteredSearchResults fsr = new FilteredSearchResults();
+        return appendFilteredSearchResults(fsr, allFileSearchResults, fileType);
+    }
+
+    public FilteredSearchResults appendFilteredSearchResults(FilteredSearchResults fsr, List<FileSearchResult> allFileSearchResults, int fileType) {
+        ensureBackgroundThreadOrCrash("SearchResultListAdapter::appendFilteredSearchResults(results, fileType)");
         allFileSearchResults.forEach(fileSearchResult -> {
                     String fileExtension = FilenameUtils.getExtension(fileSearchResult.getFilename());
                     MediaType mediaTypeForExtension = MediaType.getMediaTypeForExtension(fileExtension);

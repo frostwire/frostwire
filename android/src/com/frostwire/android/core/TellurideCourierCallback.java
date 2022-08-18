@@ -17,20 +17,49 @@
 
 package com.frostwire.android.core;
 
+import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
 
 import java.util.List;
 import java.util.Objects;
 
-public abstract class TellurideCourierCallback {
+public class TellurideCourierCallback {
+    private final SearchResultListAdapter adapter;
+    private final String url;
+    private final TellurideCourier.SearchPerformer searchPerformer;
     private boolean hasAborted = false;
-    private String url = null;
 
-    public TellurideCourierCallback(String pageUrl) {
-        setUrl(pageUrl);
+    public TellurideCourierCallback(TellurideCourier.SearchPerformer searchPerformer, String pageUrl, SearchResultListAdapter adapter) {
+        this.searchPerformer = searchPerformer;
+        this.url = pageUrl;
+        this.adapter = adapter;
     }
 
-    abstract void onResults(List<TellurideSearchResult> results, boolean errored);
+    void onResults(List<TellurideSearchResult> results, boolean errored) {
+        // This comes in too fast, gotta let the UI get there
+        SystemUtils.postToUIThread(() -> {
+            // Screw our listener, make the adapter do what we want.
+            adapter.clear();
+
+            if (results != null) {
+                adapter.addResults(results); // adds to full list of results
+                adapter.setFileType(Constants.FILE_TYPE_AUDIO);
+                adapter.setFileType(Constants.FILE_TYPE_VIDEOS, true);
+                SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
+                adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {
+
+                }
+                LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+            } else if (results == null || errored) {
+                LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+            }
+        });
+    }
 
     final void abort() {
         hasAborted = true;
@@ -51,9 +80,5 @@ public abstract class TellurideCourierCallback {
     @Override
     public int hashCode() {
         return Objects.hash(url);
-    }
-
-    private void setUrl(String url) {
-        this.url = url;
     }
 }

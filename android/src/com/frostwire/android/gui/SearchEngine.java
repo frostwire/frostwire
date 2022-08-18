@@ -24,6 +24,8 @@ import androidx.annotation.NonNull;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
@@ -83,6 +85,11 @@ public abstract class SearchEngine {
     }
 
     public abstract SearchPerformer getPerformer(long token, String keywords);
+
+    public TellurideCourier.SearchPerformer getTelluridePerformer(long currentSearchToken, String pageUrl, SearchResultListAdapter adapter) {
+        // override me
+        return null;
+    }
 
     public String getPreferenceKey() {
         return preferenceKey;
@@ -316,8 +323,13 @@ public abstract class SearchEngine {
 
     public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
         @Override
-        public SearchPerformer getPerformer(long token, String pageUrl) {
-            return new TellurideCourier.SearchPerformer(token, pageUrl);
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return null;
+        }
+
+        @Override
+        public TellurideCourier.SearchPerformer getTelluridePerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
+            return new TellurideCourier.SearchPerformer(token, pageUrl, adapter);
         }
     };
 

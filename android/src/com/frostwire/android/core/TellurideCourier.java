@@ -21,6 +21,7 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
@@ -31,6 +32,7 @@ import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +41,6 @@ import java.util.Queue;
 public final class TellurideCourier {
     private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
     private static Gson gson = null;
-
     private static final Queue<TellurideCourierCallback> knownCallbacks = new LinkedList<>();
 
     public static void abortQueries() {
@@ -48,7 +49,6 @@ public final class TellurideCourier {
             courierCallback.abort();
         }
     }
-
 
     // runs on SEARCH_PERFORMER HandlerThread
     public static void queryPage(String url, TellurideCourierCallback callback) {
@@ -116,27 +116,13 @@ public final class TellurideCourier {
     public static class SearchPerformer extends AbstractSearchPerformer {
         private final String pageUrl;
         private final TellurideCourierCallback courierCallback;
-        private SearchResultListAdapter adapter;
+        private final SearchResultListAdapter adapter;
 
-        public SearchPerformer(long token, String pageUrl) {
+        public SearchPerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
             super(token);
             this.pageUrl = pageUrl;
-            this.courierCallback = new TellurideCourierCallback(pageUrl) {
-                @Override
-                void onResults(List<TellurideSearchResult> results, boolean errored) {
-                    // This comes in too fast, gotta let the UI get there
-                    SystemUtils.postToUIThread(() -> {
-                        // Screw our listener, go straight to the one that matters
-                        SearchListener listener = LocalSearchEngine.instance().getListener();
-                        if (listener != null) {
-                            listener.onResults(token, results);
-                            adapter.setFileType(Constants.FILE_TYPE_VIDEOS);
-                            adapter.notifyDataSetChanged();
-                            listener.onStopped(token);
-                        }
-                    });
-                }
-            };
+            this.adapter = adapter;
+            this.courierCallback = new TellurideCourierCallback(this, pageUrl, adapter);
         }
 
         @Override
@@ -155,10 +141,6 @@ public final class TellurideCourier {
             super.stop();
             courierCallback.abort();
             TellurideCourier.knownCallbacks.remove(courierCallback);
-        }
-
-        public void setAdapter(SearchResultListAdapter adapter) {
-            this.adapter = adapter;
         }
     }
 }

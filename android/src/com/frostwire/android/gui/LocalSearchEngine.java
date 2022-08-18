@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import android.text.Html;
 
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
@@ -102,7 +103,6 @@ public final class LocalSearchEngine {
         this.manager.setListener(new LocalSearchEngineSearchListener(this));
     }
 
-    @SuppressWarnings("unused")
     public SearchListener getListener() {
         return listener;
     }
@@ -135,7 +135,7 @@ public final class LocalSearchEngine {
         }
     }
 
-    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
+    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter, SearchFragment searchFragment) {
         SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
         if (StringUtils.isNullOrEmpty(pageUrl, true)) {
             return;
@@ -145,8 +145,11 @@ public final class LocalSearchEngine {
         currentSearchTokens = new ArrayList<>();
         currentSearchTokens.add(pageUrl);
         searchFinished = false;
-        lastTellurideCourier = (TellurideCourier.SearchPerformer) SearchEngine.TELLURIDE_COURIER.getPerformer(currentSearchToken, pageUrl);
-        lastTellurideCourier.setAdapter(adapter);
+        lastTellurideCourier = (TellurideCourier.SearchPerformer)
+                SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(
+                        currentSearchToken,
+                        pageUrl,
+                        adapter);
         manager.perform(lastTellurideCourier);
     }
 
