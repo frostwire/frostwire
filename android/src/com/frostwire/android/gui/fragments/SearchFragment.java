@@ -282,10 +282,6 @@ public final class SearchFragment extends AbstractFragment implements
             searchInput.setText("");
             return;
         }
-//        View view = getView();
-//        if (view != null) {
-//            showSearchView(view);
-//        }
         searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
         setupAdapter();
         prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
