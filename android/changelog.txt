@@ -1,3 +1,7 @@
+FrostWire 2.6.0 build 702 - AUG/17/2022
+ - Telluride Video Page Search is here.
+ - Faster more responsive keyword search.
+
 FrostWire 2.5.0 build 701 - AUG/14/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.
  - Removal of annoying Interstitial ad display logic, video ads are only shown when user wants to remove ads for 30 minutes
