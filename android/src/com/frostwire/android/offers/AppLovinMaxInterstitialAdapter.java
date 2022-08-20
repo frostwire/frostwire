@@ -48,7 +48,10 @@ public class AppLovinMaxInterstitialAdapter implements InterstitialListener, Max
         this.app = parentActivity.getApplication();
         interstitialAd = new MaxInterstitialAd(FWBannerView.UNIT_ID_INTERSTITIAL_MOBILE, activityRef.get());
         interstitialAd.setListener(this);
-        interstitialAd.loadAd();
+        try {
+            interstitialAd.loadAd();
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override
@@ -98,7 +101,10 @@ public class AppLovinMaxInterstitialAdapter implements InterstitialListener, Max
     @Override
     public void onAdHidden(MaxAd ad) {
         Offers.AdNetworkHelper.dismissAndOrShutdownIfNecessary(activityRef.get(), finishAfterDismiss, shutdownAfter, true, app);
-        interstitialAd.loadAd();
+        try {
+            interstitialAd.loadAd();
+        } catch (Throwable ignored) {
+        }
         resumeMusicPlaybackIfNeeded();
     }
 
@@ -113,13 +119,21 @@ public class AppLovinMaxInterstitialAdapter implements InterstitialListener, Max
         // AppLovin recommends that you retry with exponentially higher delays up to a maximum delay (in this case 64 seconds)
         retryAttempt++;
         long delayMillis = TimeUnit.SECONDS.toMillis((long) Math.pow(2, Math.min(6, retryAttempt)));
-        SystemUtils.postToUIThreadDelayed(interstitialAd::loadAd, delayMillis);
+        SystemUtils.postToUIThreadDelayed(() -> {
+            try {
+                interstitialAd.loadAd();
+            } catch (Throwable ignored) {
+            }
+        }, delayMillis);
     }
 
     @Override
     public void onAdDisplayFailed(MaxAd ad, MaxError error) {
         // Interstitial ad failed to display. AppLovin recommends that you load the next ad.
-        interstitialAd.loadAd();
+        try {
+            interstitialAd.loadAd();
+        } catch (Throwable ignored) {
+        }
     }
 
     private void resumeMusicPlaybackIfNeeded() {
