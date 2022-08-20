@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.ClearableEditTextView.OnActionListener;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
@@ -130,6 +131,11 @@ public class SearchInputView extends LinearLayout {
         textInput.setOnKeyListener(textInputListener);
         textInput.setOnActionListener(textInputListener);
         textInput.setOnItemClickListener(textInputListener);
+        textInput.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                UIUtils.autoPasteMagnetOrURL(getContext(), textInput);
+            }
+        });
 
         if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             textInput.setAdapter(adapter);

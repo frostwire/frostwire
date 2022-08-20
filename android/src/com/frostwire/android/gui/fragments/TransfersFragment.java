@@ -48,6 +48,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.activities.SettingsActivity;
 import com.frostwire.android.gui.activities.VPNStatusDetailActivity;
 import com.frostwire.android.gui.adapters.TransferListAdapter;
@@ -605,8 +606,8 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             Context ctx = v1.getContext();
             Intent i = new Intent(ctx, VPNStatusDetailActivity.class);
             i.setAction(isVPNactive ?
-                    Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
-                    Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
+                            Constants.ACTION_SHOW_VPN_STATUS_PROTECTED :
+                            Constants.ACTION_SHOW_VPN_STATUS_UNPROTECTED).
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             i.putExtra("from", "transfers");
             ctx.startActivity(i);
@@ -751,15 +752,23 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     private void startTransferFromURL() {
+        //magnets and urls
+        // are automatically started if found on the clipboard by autoPasteMagnetOrURL
         String url = addTransferUrlTextView.getText();
         if (!StringUtils.isNullOrEmpty(url) && (url.startsWith("magnet") || url.startsWith("http"))) {
             toggleAddTransferControls();
             if (url.startsWith("http") && (url.contains("soundcloud.com/"))) {
                 startCloudTransfer(url);
-            } else if (url.startsWith("http")) { //magnets are automatically started if found on the clipboard by autoPasteMagnetOrURL
+            } else if (url.startsWith("magnet:?xt=urn:btih:") ||
+                    (url.startsWith("http") && url.endsWith(".torrent"))) {
                 TransferManager.instance().downloadTorrent(url.trim(),
                         new HandpickedTorrentDownloadDialogOnFetch(getActivity(), true));
                 UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
+            } else if (url.startsWith("http") && !url.endsWith(".torrent")) {
+                if (MainActivity.instance() != null && SearchFragment.instance() != null) {
+                    MainActivity.instance().switchContent(SearchFragment.instance());
+                    SearchFragment.instance().performTellurideSearch(url);
+                }
             }
             addTransferUrlTextView.setText("");
         } else {
@@ -775,45 +784,12 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
     }
 
-    private void autoPasteMagnetOrURL() {
-        ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard == null) {
-            return;
-        }
-        ClipData primaryClip = clipboard.getPrimaryClip();
-        if (primaryClip != null) {
-            Item itemAt = primaryClip.getItemAt(0);
-            try {
-                CharSequence charSequence = itemAt.getText();
-                if (charSequence != null) {
-                    String text;
-                    if (charSequence instanceof String) {
-                        text = (String) charSequence;
-                    } else {
-                        text = charSequence.toString();
-                    }
-                    if (!StringUtils.isNullOrEmpty(text)) {
-                        if (text.startsWith("http")) {
-                            addTransferUrlTextView.setText(text.trim());
-                        } else if (text.startsWith("magnet")) {
-                            addTransferUrlTextView.setText(text.trim());
-                            TransferManager.instance().downloadTorrent(text.trim(),
-                                    new HandpickedTorrentDownloadDialogOnFetch(getActivity(), true));
-                            UIUtils.showLongMessage(getActivity(), R.string.magnet_url_added);
-                            clipboard.setPrimaryClip(ClipData.newPlainText("", ""));
-                            toggleAddTransferControls();
-                        }
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
-        }
-    }
+
 
     private void toggleAddTransferControls() {
         if (addTransferUrlTextView.getVisibility() == View.GONE) {
             addTransferUrlTextView.setVisibility(View.VISIBLE);
-            autoPasteMagnetOrURL();
+            UIUtils.autoPasteMagnetOrURL(getContext(), addTransferUrlTextView);
             showAddTransfersKeyboard();
         } else {
             addTransferUrlTextView.setVisibility(View.GONE);

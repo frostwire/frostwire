@@ -101,6 +101,7 @@ public final class SearchFragment extends AbstractFragment implements
         OnDialogClickListener,
         SearchProgressView.CurrentQueryReporter, PromotionDownloader {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
+    private static SearchFragment lastInstance = null;
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
     private SearchInputView searchInput;
@@ -117,6 +118,11 @@ public final class SearchFragment extends AbstractFragment implements
         super(R.layout.fragment_search);
         fileTypeCounter = new FileTypeCounter();
         currentQuery = null;
+        lastInstance = this;
+    }
+
+    public static SearchFragment instance() {
+        return lastInstance;
     }
 
     @Override
@@ -125,6 +131,7 @@ public final class SearchFragment extends AbstractFragment implements
         setupAdapter();
         setupPromoSlides();
         setRetainInstance(true);
+        lastInstance = this;
     }
 
     private void setupPromoSlides() {
@@ -172,6 +179,7 @@ public final class SearchFragment extends AbstractFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        lastInstance = this;
         // getHeader was conceived for quick update of main fragments headers,
         // mainly in a functional style, but it is ill suited to extract from
         // it a mutable state, like filterButton.
@@ -225,6 +233,7 @@ public final class SearchFragment extends AbstractFragment implements
         destroyHeaderBanner();
         destroyPromotionsBanner();
         super.onDestroy();
+        lastInstance = null;
     }
 
     public void destroyHeaderBanner() {
@@ -274,7 +283,7 @@ public final class SearchFragment extends AbstractFragment implements
         showSearchView(view);
     }
 
-    private void performTellurideSearch(String pageUrl) {
+    public void performTellurideSearch(String pageUrl) {
         boolean itsYTURL = pageUrl.contains("youtube.com/") || pageUrl.contains("youtu.be/");
         if (itsYTURL && Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG) {
             UIUtils.showLongMessage(getContext(), R.string.youtube_not_supported_on_basic);

@@ -118,6 +118,7 @@ public class MainActivity extends AbstractActivity implements
     private TransfersFragment transfers;
     private final LocalBroadcastReceiver localBroadcastReceiver;
     private static TimerSubscription playerSubscription;
+    private static MainActivity lastInstance = null;
 
     private final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
@@ -127,6 +128,12 @@ public class MainActivity extends AbstractActivity implements
         fragmentsStack = new Stack<>();
         permissionsCheckers = initPermissionsCheckers();
         localBroadcastReceiver = new LocalBroadcastReceiver();
+        lastInstance = this;
+    }
+
+
+    public static MainActivity instance() {
+        return lastInstance;
     }
 
     @Override
@@ -338,6 +345,7 @@ public class MainActivity extends AbstractActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        lastInstance = this;
         localBroadcastReceiver.register(this);
         setupDrawer();
         ConfigurationManager CM = ConfigurationManager.instance();
@@ -388,6 +396,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.Theme_FrostWire);
         super.onCreate(savedInstanceState);
+        lastInstance = this;
     }
 
     private void checkExternalStoragePermissions() {
@@ -414,6 +423,7 @@ public class MainActivity extends AbstractActivity implements
         if (playerSubscription != null) {
             playerSubscription.unsubscribe();
         }
+        lastInstance = null;
     }
 
     private void saveLastFragment(Bundle outState) {

@@ -114,7 +114,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                     } else {
                         appendFilteredSearchResults(filteredSearchResults, fileSearchResults, fileType);
                     }
-                    SystemUtils.postToUIThread(() -> updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered));
+                    if (filteredSearchResults != null) {
+                        SystemUtils.postToUIThread(() -> {
+                            if (filteredSearchResults != null) {
+                                updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
+                            }
+                        });
+                    }
                 });
     }
 

@@ -67,7 +67,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-
         String tag = fragment.getTag();
         if (tag != null && !fragmentTags.contains(tag)) {
             fragmentTags.add(tag);
@@ -135,6 +134,11 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     protected void onTitleChanged(CharSequence title, int color) {
         super.onTitleChanged(title, color);
         Toolbar toolbar = findToolbar();
@@ -145,13 +149,11 @@ public abstract class AbstractActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -206,7 +208,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
         return super.findViewById(id);
     }
 
-    @SuppressWarnings("unchecked")
     protected final <T extends Fragment> T findFragment(@IdRes int id) {
         return (T) getFragmentManager().findFragmentById(id);
     }
@@ -225,7 +226,6 @@ public abstract class AbstractActivity extends AppCompatActivity {
      * @param <T>   the type of the fragment to lookup
      * @return the first fragment of type T if found.
      */
-    @SuppressWarnings("unchecked")
     public final <T extends Fragment> T findFragment(Class<T> clazz) {
         for (Fragment f : getFragments()) {
             if (clazz.isInstance(f)) {

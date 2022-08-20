@@ -25,6 +25,8 @@ import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -58,11 +60,13 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.views.ClearableEditTextView;
 import com.frostwire.android.gui.views.EditTextDialog;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.MimeDetector;
 import com.frostwire.util.Ref;
+import com.frostwire.util.StringUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.apache.commons.io.FilenameUtils;
@@ -608,4 +612,30 @@ public final class UIUtils {
         return km.isKeyguardLocked();
     }
 
+    public static void autoPasteMagnetOrURL(Context context, ClearableEditTextView targetTextView) {
+        ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            return;
+        }
+        ClipData primaryClip = clipboard.getPrimaryClip();
+        if (primaryClip != null) {
+            ClipData.Item itemAt = primaryClip.getItemAt(0);
+            try {
+                CharSequence charSequence = itemAt.getText();
+                if (charSequence != null) {
+                    String text;
+                    if (charSequence instanceof String) {
+                        text = (String) charSequence;
+                    } else {
+                        text = charSequence.toString();
+                    }
+                    if (!StringUtils.isNullOrEmpty(text) && (text.startsWith("http") || text.startsWith("magnet")))
+                    {
+                        targetTextView.setText(text.trim());
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+    }
 }
