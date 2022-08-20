@@ -3213,9 +3213,9 @@ public class MusicPlaybackService extends JobIntentService {
 
         private boolean initMediaPlayer(@NonNull MediaPlayer mediaPlayer) {
             if (MusicPlaybackService.getInstance() != null) {
-                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mediaPlayer.setWakeMode(MusicPlaybackService.getInstance(), PowerManager.PARTIAL_WAKE_LOCK);
                 try {
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.setWakeMode(MusicPlaybackService.getInstance(), PowerManager.PARTIAL_WAKE_LOCK);
                     mediaPlayer.setAudioSessionId(getAudioSessionId());
                     return true;
                 } catch (Throwable e) {
