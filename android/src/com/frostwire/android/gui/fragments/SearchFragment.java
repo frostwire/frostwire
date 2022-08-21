@@ -301,7 +301,7 @@ public final class SearchFragment extends AbstractFragment implements
         switchView(view, R.id.fragment_search_search_progress);
         adapter.clear();
         fileTypeCounter.clear();
-        adapter.setFileType(Constants.FILE_TYPE_VIDEOS);
+        adapter.setFileType(Constants.FILE_TYPE_VIDEOS, false, null);
         fileTypeCounter.clear();
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         deepSearchProgress.setVisibility(View.VISIBLE);
@@ -322,9 +322,10 @@ public final class SearchFragment extends AbstractFragment implements
         currentQuery = searchInput.getText();
         adapter.clear();
         fileTypeCounter.clear();
-        adapter.setFileType(fileType);
-        refreshFileTypeCounters(false, fileTypeCounter.fsr);
-        showSearchView(getView());
+        adapter.setFileType(fileType, false, () -> {
+            refreshFileTypeCounters(false, fileTypeCounter.fsr);
+            showSearchView(getView());
+        });
     }
 
     private void startMagnetDownload(String magnet) {
@@ -427,31 +428,40 @@ public final class SearchFragment extends AbstractFragment implements
         showSearchView(getView());
     }
 
-    /**
-     * If you call when a search is stopped it will show the promos.
-     */
     private void showSearchView(View view) {
         ensureUIThreadOrCrash("SearchFragment::showSearchView");
         try {
-            // Let the adapter visual list catch up, so adapter.getCount() won't give us false 0 numbers.
-            Thread.sleep(200);
+            // Let the adapter's visual list catch up, so adapter.getCount() won't give us false 0 numbers.
+            Thread.sleep(100);
         } catch (Throwable ignore) {
         }
-        boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
-        if (LocalSearchEngine.instance().isSearchStopped() && adapter != null && adapter.getCount() == 0) {
+        if (LocalSearchEngine.instance() == null) {
             switchView(view, R.id.fragment_search_promos);
-            deepSearchProgress.setVisibility(View.GONE);
-        } else {
-            boolean adapterHasResults = adapter != null && adapter.getCount() > 0;
-            if (adapterHasResults) {
+            LOG.info("SearchFragment::showSearchView no search instance available, going back to promos.");
+            return;
+        }
+
+        boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
+        boolean searchStopped = LocalSearchEngine.instance().isSearchStopped();
+        boolean searchCancelled = searchStopped && adapter.getTotalCount() == 0;
+        boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
+        boolean currentTypeHasResults = adapter != null && adapter.getCount() > 0;
+
+        deepSearchProgress.setVisibility((!searchFinished || !searchStopped || !searchCancelled) ? View.VISIBLE : View.GONE);
+
+        if (searchCancelled) {
+            switchView(view, R.id.fragment_search_promos);
+            return;
+        }
+
+        if (adapterHasResults) {
+            if (currentTypeHasResults) {
                 switchView(view, R.id.fragment_search_list);
-                deepSearchProgress.setVisibility(searchFinished ? View.GONE : View.VISIBLE);
             } else {
                 switchView(view, R.id.fragment_search_search_progress);
-                deepSearchProgress.setVisibility(View.GONE);
             }
+            searchProgress.setEnabled(!searchFinished && !currentTypeHasResults);
         }
-        searchProgress.setProgressEnabled(!searchFinished);
     }
 
     private void switchView(View v, int id) {
@@ -614,12 +624,14 @@ public final class SearchFragment extends AbstractFragment implements
             // Add new newResults to the adapter
             searchFragment.adapter.addResults(newResults);
             // Sets the file type in the adapter and filters search results by file type
-            searchFragment.adapter.setFileType(fileType);
-            // Ask the adapter for the filtered search results
-            FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
-            // Time to report to the UI, let the adapter know about the new newResults
-            searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-            SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered));
+            searchFragment.adapter.setFileType(fileType,
+                    () -> {
+                        // Ask the adapter for the filtered search results
+                        FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
+                        // Time to report to the UI, let the adapter know about the new newResults
+                        searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
+                        SystemUtils.postToUIThreadDelayed(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered), 200);
+                    }); //background call
         }
 
         @Override
@@ -689,11 +701,13 @@ public final class SearchFragment extends AbstractFragment implements
             }
             SearchFragment fragment = fragmentRef.get();
             if (fragment.adapter.getFileType() != mediaTypeId) {
-                postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
-                fragment.adapter.setFileType(mediaTypeId);
+                postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () ->
+                        ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
+                fragment.adapter.setFileType(mediaTypeId, false, () ->
+                        fragment.showSearchView(rootViewRef.get()));
+            } else {
+                fragment.showSearchView(rootViewRef.get());
             }
-
-            fragment.showSearchView(rootViewRef.get());
         }
 
         public void onClear(View v) {
