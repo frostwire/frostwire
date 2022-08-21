@@ -312,10 +312,6 @@ public class SearchInputView extends LinearLayout {
             }
         }
 
-//        @Override
-//        public void onTextChanged(View v, String str) {
-//        }
-
         @Override
         public void onClear(View v) {
             if (Ref.alive(ownerRef)) {
