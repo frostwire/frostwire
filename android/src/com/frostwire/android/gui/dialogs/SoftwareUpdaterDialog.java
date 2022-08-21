@@ -61,11 +61,9 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
         return dlg;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
         Bundle args = getArguments();
-        final String apkDownloadURL = args.getString("apkDownloadURL");
         HashMap<String, String> updateMessages = (HashMap<String, String>) args.getSerializable("updateMessages");
         ArrayList<String> changelog = args.getStringArrayList("changelog");
 
@@ -84,7 +82,7 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
             for (int i = 0; i < values.length; i++) {
                 values[i] = String.valueOf(Html.fromHtml("&#8226; " + changelog.get(i)));
             }
-            final ArrayAdapter adapter = new ArrayAdapter<>(getActivity(),
+            final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                     R.layout.dialog_update_bullet,
                     R.id.dialog_update_bullets_checked_text_view,
                     values);

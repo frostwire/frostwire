@@ -429,6 +429,11 @@ public final class SearchFragment extends AbstractFragment implements
      */
     private void showSearchView(View view) {
         ensureUIThreadOrCrash("SearchFragment::showSearchView");
+        try {
+            // Let the adapter visual list catch up, so adapter.getCount() won't give us false 0 numbers.
+            Thread.sleep(200);
+        } catch (Throwable ignore) {
+        }
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
         if (LocalSearchEngine.instance().isSearchStopped() && adapter != null && adapter.getCount() == 0) {
             switchView(view, R.id.fragment_search_promos);
@@ -684,6 +689,7 @@ public final class SearchFragment extends AbstractFragment implements
                 postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
                 fragment.adapter.setFileType(mediaTypeId);
             }
+
             fragment.showSearchView(rootViewRef.get());
         }
 
