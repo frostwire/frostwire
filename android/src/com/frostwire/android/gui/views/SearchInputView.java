@@ -134,6 +134,9 @@ public class SearchInputView extends LinearLayout {
         textInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
                 UIUtils.autoPasteMagnetOrURL(getContext(), textInput);
+                showTextInput();
+            } else {
+                hideSoftInput(textInput);
             }
         });
 
@@ -196,6 +199,7 @@ public class SearchInputView extends LinearLayout {
         if (onSearchListener != null) {
             onSearchListener.onClear(this);
         }
+        showTextInput();
     }
 
     private void hideSoftInput(View v) {

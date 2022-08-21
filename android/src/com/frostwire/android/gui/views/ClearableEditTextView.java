@@ -199,12 +199,6 @@ public class ClearableEditTextView extends RelativeLayout {
         });
     }
 
-//    private void onTextChanged(String str) {
-//        if (listener != null) {
-//            listener.onTextChanged(this, str.trim());
-//        }
-//    }
-
     private void onClear() {
         if (listener != null) {
             listener.onClear(this);

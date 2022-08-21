@@ -145,11 +145,10 @@ public final class LocalSearchEngine {
         currentSearchTokens = new ArrayList<>();
         currentSearchTokens.add(pageUrl);
         searchFinished = false;
-        lastTellurideCourier = (TellurideCourier.SearchPerformer)
-                SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(
-                        currentSearchToken,
-                        pageUrl,
-                        adapter);
+        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(
+                currentSearchToken,
+                pageUrl,
+                adapter);
         manager.perform(lastTellurideCourier);
     }
 

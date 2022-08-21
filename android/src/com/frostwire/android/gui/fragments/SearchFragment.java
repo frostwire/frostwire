@@ -22,6 +22,7 @@ import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
+import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -280,7 +281,7 @@ public final class SearchFragment extends AbstractFragment implements
                 switchToThe(false);
             }
         });
-        showSearchView(view);
+        switchView(view, R.id.fragment_search_promos);
     }
 
     public void performTellurideSearch(String pageUrl) {
@@ -293,13 +294,28 @@ public final class SearchFragment extends AbstractFragment implements
         }
         searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
         setupAdapter();
-        prepareUIForSearch(Constants.FILE_TYPE_VIDEOS);
+
+        // manually prepare UI for telluride results
+        View view = getView();
+        switchView(view, R.id.fragment_search_search_progress);
+        adapter.clear();
+        fileTypeCounter.clear();
+        adapter.setFileType(Constants.FILE_TYPE_VIDEOS);
+        fileTypeCounter.clear();
+        refreshFileTypeCounters(false, fileTypeCounter.fsr);
+        deepSearchProgress.setVisibility(View.VISIBLE);
+
         postToHandler(
                 SEARCH_PERFORMER,
                 () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl, adapter, this));
+        searchInput.setText(" "); // an empty space so the 'x' button is shown.
+        switchView(view, R.id.fragment_search_list);
     }
 
 
+    /**
+     * Call only after search starts
+     */
     private void prepareUIForSearch(int fileType) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::prepareForSearch");
         showSearchView(getView());
@@ -383,7 +399,7 @@ public final class SearchFragment extends AbstractFragment implements
         searchInput.hideTextInput();
     }
 
-    private void refreshFileTypeCounters(boolean fileTypeCountersVisible, FilteredSearchResults fsr) {
+    public void refreshFileTypeCounters(boolean fileTypeCountersVisible, FilteredSearchResults fsr) {
         searchInput.setFileTypeCountersVisible(fileTypeCountersVisible);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_APPLICATIONS, fsr.numApplications);
         searchInput.updateFileTypeCounter(Constants.FILE_TYPE_AUDIO, fsr.numAudio);
@@ -408,10 +424,13 @@ public final class SearchFragment extends AbstractFragment implements
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
     }
 
+    /**
+     * If you call when a search is stopped it will show the promos.
+     */
     private void showSearchView(View view) {
         ensureUIThreadOrCrash("SearchFragment::showSearchView");
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
-        if (LocalSearchEngine.instance().isSearchStopped()) {
+        if (LocalSearchEngine.instance().isSearchStopped() && adapter != null && adapter.getCount() == 0) {
             switchView(view, R.id.fragment_search_promos);
             deepSearchProgress.setVisibility(View.GONE);
         } else {
@@ -647,13 +666,12 @@ public final class SearchFragment extends AbstractFragment implements
                 // URls that are no torrents, Telluride Search
                 fragment.performTellurideSearch(query);
             } else {
-                // Regular search
-                View view = fragment.getView();
-                if (view != null) {
-                    fragment.showSearchView(view);
-                }
-                fragment.prepareUIForSearch(mediaTypeId);
-                postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().performSearch(query));
+                postToHandler(SEARCH_PERFORMER, () ->
+                        {
+                            LocalSearchEngine.instance().performSearch(query);
+                            postToUIThread(() -> fragment.prepareUIForSearch(mediaTypeId));
+                        }
+                );
             }
         }
 
@@ -766,10 +784,12 @@ public final class SearchFragment extends AbstractFragment implements
             // retry
             if (LocalSearchEngine.instance().isSearchFinished()) {
                 final String query = searchInput.getText();
-                searchFragment.prepareUIForSearch(adapter.getFileType());
                 searchProgress.setProgressEnabled(true);
                 postToHandler(SEARCH_PERFORMER,
-                        () -> LocalSearchEngine.instance().performSearch(query));
+                        () -> {
+                            LocalSearchEngine.instance().performSearch(query);
+                            postToUIThread(() -> searchFragment.prepareUIForSearch(adapter.getFileType()));
+                        });
             }
             // cancel
             else {

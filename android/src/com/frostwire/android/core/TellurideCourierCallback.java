@@ -19,6 +19,7 @@ package com.frostwire.android.core;
 
 import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
 
@@ -49,6 +50,7 @@ public class TellurideCourierCallback {
                 adapter.setFileType(Constants.FILE_TYPE_VIDEOS, true);
                 SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
                 adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
+                SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ignored) {

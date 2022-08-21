@@ -116,19 +116,17 @@ public final class TellurideCourier {
     public static class SearchPerformer extends AbstractSearchPerformer {
         private final String pageUrl;
         private final TellurideCourierCallback courierCallback;
-        private final SearchResultListAdapter adapter;
 
         public SearchPerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
             super(token);
             this.pageUrl = pageUrl;
-            this.adapter = adapter;
             this.courierCallback = new TellurideCourierCallback(this, pageUrl, adapter);
         }
 
         @Override
         public void perform() {
-            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () ->
-                    TellurideCourier.queryPage(pageUrl, courierCallback));
+            SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourirer.SearchPerformer.perform");
+            TellurideCourier.queryPage(pageUrl, courierCallback);
         }
 
         @Override
