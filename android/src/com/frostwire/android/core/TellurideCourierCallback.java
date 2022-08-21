@@ -58,7 +58,9 @@ public class TellurideCourierCallback {
                 }
                 LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
             } else if (results == null || errored) {
-                LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                if (LocalSearchEngine.instance().getListener() != null && searchPerformer != null) {
+                    LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                }
             }
         });
     }
