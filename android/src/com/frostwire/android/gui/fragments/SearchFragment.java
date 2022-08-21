@@ -102,6 +102,7 @@ public final class SearchFragment extends AbstractFragment implements
         OnDialogClickListener,
         SearchProgressView.CurrentQueryReporter, PromotionDownloader {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
+    @SuppressLint("StaticFieldLeak")
     private static SearchFragment lastInstance = null;
     private SearchResultListAdapter adapter;
     private List<Slide> slides;
@@ -318,12 +319,12 @@ public final class SearchFragment extends AbstractFragment implements
      */
     private void prepareUIForSearch(int fileType) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::prepareForSearch");
-        showSearchView(getView());
         currentQuery = searchInput.getText();
         adapter.clear();
         fileTypeCounter.clear();
         adapter.setFileType(fileType);
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
+        showSearchView(getView());
     }
 
     private void startMagnetDownload(String magnet) {
@@ -348,10 +349,12 @@ public final class SearchFragment extends AbstractFragment implements
     private void updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults)");
         if (isAdded()) {
-            showSearchView(getView());
             try {
-                adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(allFilteredSearchResults);
+                if (adapter != null) {
+                    adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(allFilteredSearchResults);
+                }
                 refreshFileTypeCounters(true, fileTypeCounter.fsr);
+                showSearchView(getView());
             } catch (Throwable t) {
                 if (BuildConfig.DEBUG) {
                     throw t;
@@ -419,9 +422,9 @@ public final class SearchFragment extends AbstractFragment implements
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         currentQuery = null;
         searchProgress.setProgressEnabled(false);
-        showSearchView(getView());
         showRatingsReminder(getView());
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
+        showSearchView(getView());
     }
 
     /**
