@@ -46,17 +46,14 @@ public class TellurideCourierCallback {
 
             if (results != null) {
                 adapter.addResults(results); // adds to full list of results
-                adapter.setFileType(Constants.FILE_TYPE_AUDIO);
-                adapter.setFileType(Constants.FILE_TYPE_VIDEOS, true);
-                SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
-                adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
-                SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {
-
-                }
-                LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                adapter.setFileType(Constants.FILE_TYPE_AUDIO, false, null);
+                adapter.setFileType(Constants.FILE_TYPE_VIDEOS, true,
+                        () -> {
+                            SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
+                            adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
+                            SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
+                            LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                        });
             } else if (results == null || errored) {
                 if (LocalSearchEngine.instance().getListener() != null && searchPerformer != null) {
                     LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
