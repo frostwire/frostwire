@@ -19,23 +19,18 @@ package com.frostwire.android.core;
 
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
-import com.frostwire.android.gui.LocalSearchEngine;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
-import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.search.SearchListener;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 
 public final class TellurideCourier {
@@ -100,11 +95,6 @@ public final class TellurideCourier {
 
         List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json_query_video_result, gson, null, -1, url);
         LOG.info("TellurideCourier::queryPage: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
-        validResults.forEach(r -> {
-            LOG.info("TellurideCourier::queryPage: displayName " + r.getDisplayName());
-            LOG.info("TellurideCourier::queryPage: fileName " + r.getFilename());
-            LOG.info("TellurideCourier::queryPage: download url: " + r.getDownloadUrl() + "\n");
-        });
 
         if (callback != null && !callback.aborted()) {
             knownCallbacks.remove(callback);
