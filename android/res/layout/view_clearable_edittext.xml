@@ -38,7 +38,7 @@
         android:paddingRight="38dp"
         android:textColor="@color/app_text_primary"
         android:textColorHint="@color/app_text_light"
-        android:textSize="17sp" />
+        android:textSize="15sp" />
 
     <ImageView
         android:id="@+id/view_clearable_edit_text_image_search"

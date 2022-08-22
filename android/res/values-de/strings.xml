@@ -415,4 +415,7 @@
     <string name="community">Gemeinschaft</string>
     <string name="use_nyaa">Benutze Nyaa</string>
     <string name="free">Kostenlos</string>
+    <string name="information">Information</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">YouTube-Downloads sind mit FrostWire Basic aufgrund der Google Play-Regeln nicht erlaubt.\n\nFür eine kostenlose Kopie von FrostWire Plus besuchen Sie unsere offizielle Website frostwire.com</string>
 </resources>

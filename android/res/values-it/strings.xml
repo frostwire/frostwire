@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -412,4 +412,7 @@
     <string name="contact_us">Contattaci</string>
     <string name="use_nyaa">Utilizzare Nyaa</string>
     <string name="free">Gratuito</string>
+    <string name="information">Informazione</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">I download di YouTube non sono consentiti con FrostWire Basic a causa delle regole di Google Play.\n\nPer una copia gratuita di FrostWire Plus visita il nostro sito ufficiale frostwire.com</string>
 </resources>

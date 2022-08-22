@@ -52,11 +52,11 @@
             android:background="@color/app_background_white" />
 
         <Button
-            android:id="@+id/dialog_default_button_yes"
-            style="@style/DefaultDialogTheme.Buttons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:background="@color/app_background_white" />
+                android:id="@+id/dialog_default_button_yes"
+                style="@style/DefaultDialogTheme.Buttons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@color/app_background_white" />
     </RelativeLayout>
 </LinearLayout>

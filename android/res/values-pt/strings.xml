@@ -2,7 +2,7 @@
 <!--
 /*
  * Criado por Angel Leon (@gubatron), Alden Torres (aldenml)
- * Direitos Autorais (c) 2011-2020, FrostWire(R). Todos os direitos reservados.
+ * Direitos Autorais (c) 2011-2022, FrostWire(R). Todos os direitos reservados.
  *
  * Este programa é um software gratuito: você pode redistribui-lo e/ou modifica-lo
  * sob os termos de GNU General Public License como publicado por 
@@ -411,4 +411,7 @@
     <string name="use_nyaa">Usar Nyaa</string>
     <string name="use_torrentz2">Usar Torrentz2</string>
     <string name="free">Livre</string>
+    <string name="information">Em formação</string>
+    <string name="ok">OK</string>
+    <string name="yt_not_supported_on_basic">Os downloads do YouTube não são permitidos com o FrostWire Basic devido às regras do Google Play.\n\nPara obter uma cópia gratuita do FrostWire Plus, visite nosso site oficial frostwire.com</string>
 </resources>
