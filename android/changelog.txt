@@ -1,4 +1,4 @@
-FrostWire 2.6.0 build 702 - AUG/17/2022
+FrostWire 2.6.0 build 702 - AUG/21/2022
  - Telluride Video Page Search is here.
  - Faster more responsive keyword search.
 
