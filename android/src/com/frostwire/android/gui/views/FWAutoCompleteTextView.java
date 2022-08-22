@@ -23,16 +23,8 @@ public class FWAutoCompleteTextView extends androidx.appcompat.widget.AppCompatA
     public boolean onTextContextMenuItem(int id) {
         // Do your thing:
         boolean consumed = super.onTextContextMenuItem(id);
-        // React:
-        switch (id){
-//            case android.R.id.cut:
-//                onTextCut();
-//                break;
-            case android.R.id.paste:
-                onTextPaste();
-                break;
-//            case android.R.id.copy:
-//                onTextCopy();
+        if (id == android.R.id.paste) {
+            onTextPaste();
         }
         return consumed;
     }
