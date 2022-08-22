@@ -133,14 +133,7 @@ public final class Engine implements IEngineService {
             if (service != null) {
                 service.startServices(wasShutdown);
                 if (!Python.isStarted()) {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                        long a = System.currentTimeMillis();
-                        AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
-                        Python.start(androidPlatform);
-                        Python python = Python.getInstance();
-                        long b = System.currentTimeMillis();
-                        LOG.info("Engine::startServices Python runtime first instantiated in " + (b-a) + " ms");
-                    });
+                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::startPython);
                 } else {
                     LOG.info("Engine::startServices Python already instantiated before");
                 }
@@ -153,6 +146,25 @@ public final class Engine implements IEngineService {
         } else {
             // save pending startServices call
             pendingStartServices = true;
+        }
+    }
+
+    private void startPython() {
+        if (Python.isStarted()) {
+            LOG.info("Engine::startPython aborted, already started.");
+            return;
+        }
+        try {
+            long a = System.currentTimeMillis();
+            AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
+            Python.start(androidPlatform);
+            long b = System.currentTimeMillis();
+            LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
+        } catch (Throwable t) {
+            // keep trying every 10 seconds until Python is started
+            if (!Python.isStarted()) {
+                SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, this::startPython, 10000);
+            }
         }
     }
 
