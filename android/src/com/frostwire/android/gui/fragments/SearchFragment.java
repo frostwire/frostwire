@@ -35,6 +35,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -62,6 +63,7 @@ import com.frostwire.android.gui.util.DirectionDetectorScrollListener;
 import com.frostwire.android.gui.util.ScrollListeners.ComposedOnScrollListener;
 import com.frostwire.android.gui.util.ScrollListeners.FastScrollDisabledWhenIdleOnScrollListener;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
@@ -285,12 +287,35 @@ public final class SearchFragment extends AbstractFragment implements
         switchView(view, R.id.fragment_search_promos);
     }
 
+    public static class NotAvailableDialog extends AbstractDialog {
+        public NotAvailableDialog() {
+            super(R.layout.dialog_default);
+        }
+
+        @Override
+        protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
+            TextView defaultDialogTitle = findView(dlg, R.id.dialog_default_title);
+            defaultDialogTitle.setText(R.string.information);
+
+            TextView defaultDialogText = findView(dlg, R.id.dialog_default_text);
+            defaultDialogText.setText(R.string.yt_not_supported_on_basic);
+
+            Button button = findView(dlg, R.id.dialog_default_button_no);
+            button.setVisibility(View.GONE);
+
+            Button okButton = findView(dlg, R.id.dialog_default_button_yes);
+            okButton.setText(R.string.ok);
+            okButton.setOnClickListener((l) -> dismiss());
+        }
+    }
+
     public void performTellurideSearch(String pageUrl) {
         boolean itsYTURL = pageUrl.contains("youtube.com/") || pageUrl.contains("youtu.be/");
         if (itsYTURL && Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !BuildConfig.DEBUG) {
-            UIUtils.showLongMessage(getContext(), R.string.youtube_not_supported_on_basic);
-            LocalSearchEngine.instance().cancelSearch();
+            cancelSearch();
             searchInput.setText("");
+            NotAvailableDialog dialog = new NotAvailableDialog();
+            dialog.show(getFragmentManager());
             return;
         }
         searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
