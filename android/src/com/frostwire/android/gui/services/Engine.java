@@ -132,11 +132,7 @@ public final class Engine implements IEngineService {
         if (service != null || wasShutdown) {
             if (service != null) {
                 service.startServices(wasShutdown);
-                if (!Python.isStarted()) {
-                    SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::startPython);
-                } else {
-                    LOG.info("Engine::startServices Python already instantiated before");
-                }
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
             }
             if (wasShutdown) {
                 async(new EngineApplicationRefsHolder(this, getApplication()),
@@ -149,21 +145,25 @@ public final class Engine implements IEngineService {
         }
     }
 
-    private void startPython() {
+    public static void startPython() {
         if (Python.isStarted()) {
             LOG.info("Engine::startPython aborted, already started.");
             return;
         }
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
+            return;
+        }
         try {
             long a = System.currentTimeMillis();
-            AndroidPlatform androidPlatform = new AndroidPlatform(service.getApplicationContext());
+            AndroidPlatform androidPlatform = new AndroidPlatform(SystemUtils.getApplicationContext());
             Python.start(androidPlatform);
             long b = System.currentTimeMillis();
             LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
         } catch (Throwable t) {
             // keep trying every 10 seconds until Python is started
             if (!Python.isStarted()) {
-                SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, this::startPython, 10000);
+                SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, Engine::startPython, 10000);
             }
         }
     }
@@ -172,7 +172,7 @@ public final class Engine implements IEngineService {
         if (service != null) {
             service.stopServices(disconnected);
         }
-        TellurideCourier.abortQueries();
+        TellurideCourier.abortCurrentQuery();
     }
 
     /**

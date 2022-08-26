@@ -188,7 +188,7 @@ public class MainActivity extends AbstractActivity implements
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
         finish();
         OkHttpClientWrapper.cancelAllRequests();
-        TellurideCourier.abortQueries();
+        TellurideCourier.abortCurrentQuery();
         SystemUtils.stopAllHandlerThreads();
         Engine.instance().shutdown();
     }

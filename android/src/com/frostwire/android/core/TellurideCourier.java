@@ -20,6 +20,7 @@ package com.frostwire.android.core;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
+import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
@@ -36,13 +37,14 @@ import java.util.Queue;
 public final class TellurideCourier {
     private static final Logger LOG = Logger.getLogger(TellurideCourier.class);
     private static Gson gson = null;
-    private static final Queue<TellurideCourierCallback> knownCallbacks = new LinkedList<>();
+    private static TellurideCourierCallback lastKnownCallback = null;
 
-    public static void abortQueries() {
-        while (!knownCallbacks.isEmpty()) {
-            TellurideCourierCallback courierCallback = knownCallbacks.poll();
-            courierCallback.abort();
+    public static void abortCurrentQuery() {
+        if (lastKnownCallback == null) {
+            return;
         }
+
+        lastKnownCallback.abort();
     }
 
     // runs on SEARCH_PERFORMER HandlerThread
@@ -52,30 +54,33 @@ public final class TellurideCourier {
             return;
         }
         if (callback != null) {
-            knownCallbacks.add(callback);
+            lastKnownCallback = callback;
         }
         SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::queryPage");
         boolean error = false;
         long a = System.currentTimeMillis();
+        if (!Python.isStarted()) {
+            Engine.startPython();
+        }
         Python python = Python.getInstance();
         long b = System.currentTimeMillis();
         long pythonInstanceFetchTime = b - a;
         if (callback != null && callback.aborted()) {
-            knownCallbacks.remove(callback);
+            lastKnownCallback = null;
             LOG.info("TellurideCourier::queryPage aborted by TellurideCourierCallback (stage 1)");
             return;
         }
         LOG.info("TellurideCourier::queryPage - Got Python instance in " + pythonInstanceFetchTime + " ms");
         PyObject telluride_module = python.getModule("telluride");
         if (callback != null && callback.aborted()) {
-            knownCallbacks.remove(callback);
+            lastKnownCallback = null;
             LOG.info("TellurideCourier::queryPage aborted by TellurideCourierCallback (stage 2)");
             return;
         }
         PyObject query_video_result = telluride_module.callAttr("query_video", url);
         if (query_video_result == null && callback != null) {
-            knownCallbacks.remove(callback);
             callback.onResults(null, true);
+            lastKnownCallback = null;
             return;
         }
         if (query_video_result == null) {
@@ -83,22 +88,21 @@ public final class TellurideCourier {
         }
         String json_query_video_result = query_video_result.toString();
         if (callback != null && callback.aborted()) {
-            knownCallbacks.remove(callback);
+            lastKnownCallback = null;
             LOG.info("TellurideCourier::queryPage aborted by TellurideCourierCallback (stage 3)");
             return;
         }
-        synchronized (knownCallbacks) {
-            if (gson == null) {
-                gson = new GsonBuilder().create();
-            }
+
+        if (gson == null) {
+            gson = new GsonBuilder().create();
         }
 
         List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json_query_video_result, gson, null, -1, url);
         LOG.info("TellurideCourier::queryPage: TellurideSearchPerformer.getValidResults() -> " + validResults.size());
 
         if (callback != null && !callback.aborted()) {
-            knownCallbacks.remove(callback);
             callback.onResults(validResults, error);
+            lastKnownCallback = null;
         }
     }
 
@@ -128,7 +132,7 @@ public final class TellurideCourier {
         public void stop() {
             super.stop();
             courierCallback.abort();
-            TellurideCourier.knownCallbacks.remove(courierCallback);
+            lastKnownCallback = null;
         }
     }
 }

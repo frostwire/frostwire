@@ -23,6 +23,7 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +55,7 @@ public class TellurideCourierCallback {
                             SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
                             LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
                         });
-            } else if (results == null || errored) {
+            } else if (results == null || results.isEmpty() || errored) {
                 if (LocalSearchEngine.instance().getListener() != null && searchPerformer != null) {
                     LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
                 }

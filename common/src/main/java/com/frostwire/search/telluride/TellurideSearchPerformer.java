@@ -115,7 +115,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
         int originalResultCount = result.formats.size();
         for (TellurideJSONMediaFormat format : result.formats) {
-            if (format.url.contains(".m3u8")) {
+            if (format.url.endsWith(".m3u8")) {
                 // skip playlists for now
                 // TODO: Implement .m3u8 telluride downloader
                 continue;

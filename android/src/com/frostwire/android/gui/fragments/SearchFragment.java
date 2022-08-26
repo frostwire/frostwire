@@ -441,7 +441,7 @@ public final class SearchFragment extends AbstractFragment implements
     private void cancelSearch() {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
         postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
-        postToHandler(SEARCH_PERFORMER, TellurideCourier::abortQueries);
+        postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
         adapter.clear();
         searchInput.setFileTypeCountersVisible(false);
         fileTypeCounter.clear();
