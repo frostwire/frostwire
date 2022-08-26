@@ -48,6 +48,7 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -671,6 +672,16 @@ public final class SearchFragment extends AbstractFragment implements
                     try {
                         searchFragment.searchProgress.setProgressEnabled(false);
                         searchFragment.deepSearchProgress.setVisibility(View.GONE);
+
+                        if (searchFragment.adapter.getTotalCount() == 0) {
+                            Context context = searchFragment.getContext();
+                            if (context != null) {
+                                UIUtils.showLongMessage(context, R.string.no_results_feedback);
+                                //searchFragment.switchView(searchFragment.getView(), R.id.fragment_search_promos);
+                                searchFragment.cancelSearch();
+                                searchFragment.searchInput.setText("");
+                            }
+                        }
                     } catch (Throwable t) {
                         if (BuildConfig.DEBUG) {
                             throw t;
