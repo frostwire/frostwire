@@ -110,7 +110,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         // From these formats we pick the best video and best audio available to always return 2 search results.
         ArrayList<TellurideSearchResult> results = new ArrayList<>();
         if (result.formats == null) {
-            LOG.info("formats are null, no valid search results for " + debugUrl);
+            LOG.info("getValidResults formats are null, no valid search results for " + debugUrl);
             return results;
         }
         int originalResultCount = result.formats.size();
@@ -118,29 +118,30 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             if (format.url.contains(".m3u8")) {
                 // skip playlists for now
                 // TODO: Implement .m3u8 telluride downloader
+                LOG.info("getValidResults format.url contains .m3u8");
                 continue;
             }
             if (originalResultCount > 1 && format.height != 0 && format.width > format.height && format.width < 320) {
                 // skip low quality horizontal videos
-                LOG.info("very low quality horizontal video, skipped");
+                LOG.info("getValidResults very low quality horizontal video, skipped");
                 continue;
             }
 
             if (originalResultCount > 1 && format.height > format.width && format.height < 480) {
                 // skip too low quality vertical videos
-                LOG.info("very low quality vertical video, skipped");
+                LOG.info("getValidResults very low quality vertical video, skipped");
                 continue;
             }
 
             String videoFormatParenthesis = "";
             if (result.webpage_url.contains("youtu")) {
                 if (noCodec(format.acodec)) {
-                    LOG.info("acodec is null, skipped");
+                    LOG.info("getValidResults acodec is null, skipped");
                     continue;
                 }
 
                 if (noCodec(format.vcodec) && noCodec(format.acodec)) {
-                    LOG.info("acodec + vcodec are null, skipped");
+                    LOG.info("getValidResults acodec + vcodec are null, skipped");
                     continue;
                 }
             }
@@ -156,12 +157,12 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             } else if (noCodec(format.acodec) && noCodec(format.vcodec) && format.height > 240) {
                 videoFormatParenthesis = "(" + format.height + "p)";
             }
-            LOG.info("acodec=" + format.acodec + ", vcodec=" + format.vcodec + ", ext=" + result.ext + ", url=" + format.url);
+            LOG.info("getValidResults acodec=" + format.acodec + ", vcodec=" + format.vcodec + ", ext=" + result.ext + ", url=" + format.url);
             String domainName = UrlUtils.extractDomainName(format.url);
             if (domainName != null) {
                 Ssl.addValidDomain(domainName);
             }
-
+            LOG.info("TellurideSearchPerformer.getValidResults format.url added: " + format.url);
             results.add(new TellurideSearchResult(
                     result.id,
                     videoFormatParenthesis + " " + result.title,
