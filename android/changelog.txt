@@ -1,6 +1,9 @@
-FrostWire 2.6.0 build 702 - AUG/21/2022
+FrostWire 2.6.0 build 703 - AUG/25/2022
  - Telluride Video Page Search is here.
  - Faster more responsive keyword search.
+ - 703: Simpler, more robust Python runtime startup
+ - 703: More video sites supported
+ - 703: Better handling of no search results on video url
 
 FrostWire 2.5.0 build 701 - AUG/14/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.
