@@ -35,7 +35,7 @@ import com.applovin.mediation.ads.MaxRewardedAd;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -56,10 +56,10 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         if (shouldWeAbortInitialize(activity)) {
             return;
         }
-        final Context applicationContext = activity.getApplicationContext();
+        final Context applicationContext = SystemUtils.getApplicationContext();
         WeakReference<Activity> activityRef = Ref.weak(activity);
         WeakReference<Context> appContextRef = Ref.weak(applicationContext);
-        Engine.instance().getThreadPool().execute(() -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 if (!started() && Ref.alive(appContextRef) && Ref.alive(activityRef)) {
                     Context appContext = appContextRef.get();
@@ -70,8 +70,6 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                     AppLovinSdk.getInstance(appContext).getSettings().setVerboseLogging(DEBUG_MODE);
                     LOG.info("AppLovin initialized.");
                     start();
-                    loadNewInterstitial(activity1);
-
                 }
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
@@ -109,6 +107,9 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         if (enabled() && started()) {
             // make sure video ads are always muted, it's very annoying (regardless of playback status)
             AppLovinSdk.getInstance(activity).getSettings().setMuted(true);
+            if (interstitialAdapter == null) {
+                loadNewInterstitial(activity);
+            }
             interstitialAdapter.shutdownAppAfter(shutdownAfterwards);
             interstitialAdapter.dismissActivityAfterwards(dismissAfterward);
             try {
