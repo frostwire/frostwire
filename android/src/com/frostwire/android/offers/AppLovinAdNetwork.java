@@ -34,10 +34,10 @@ import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxRewardedAd;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
+import com.applovin.sdk.AppLovinSdkSettings;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
@@ -56,20 +56,18 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         if (shouldWeAbortInitialize(activity)) {
             return;
         }
-        final Context applicationContext = SystemUtils.getApplicationContext();
-        WeakReference<Activity> activityRef = Ref.weak(activity);
-        WeakReference<Context> appContextRef = Ref.weak(applicationContext);
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
-                if (!started() && Ref.alive(appContextRef) && Ref.alive(activityRef)) {
-                    Context appContext = appContextRef.get();
-                    Activity activity1 = activityRef.get();
+                if (!started()) {
+                    Context appContext = SystemUtils.getApplicationContext();
                     AppLovinSdk.initializeSdk(appContext);
-                    AppLovinSdk.getInstance(activity1).setMediationProvider(AppLovinMediationProvider.MAX);
-                    AppLovinSdk.getInstance(activity1).getSettings().setMuted(!DEBUG_MODE);
-                    AppLovinSdk.getInstance(appContext).getSettings().setVerboseLogging(DEBUG_MODE);
-                    LOG.info("AppLovin initialized.");
+                    AppLovinSdk sdk = AppLovinSdk.getInstance(appContext);
+                    sdk.setMediationProvider(AppLovinMediationProvider.MAX);
+                    AppLovinSdkSettings sdkSettings = sdk.getSettings();
+                    sdkSettings.setMuted(!DEBUG_MODE);
+                    sdkSettings.setVerboseLogging(DEBUG_MODE);
                     start();
+                    LOG.info("AppLovin initialized.");
                 }
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
