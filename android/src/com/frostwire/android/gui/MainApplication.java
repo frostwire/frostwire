@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui;
 
-import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.content.Context;
@@ -30,10 +29,10 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.gui.services.EngineService;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.platform.Platforms;
@@ -80,11 +79,11 @@ public class MainApplication extends MultiDexApplication {
 
         ImageLoader.start(this);
 
-        async(this, this::initializeCrawlPagedWebSearchPerformer);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> this.initializeCrawlPagedWebSearchPerformer(this));
 
-        async(LocalSearchEngine::instance);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, LocalSearchEngine::instance);
 
-        async(MainApplication::cleanTemp);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
     }
 
     public static Context context() {
@@ -106,7 +105,8 @@ public class MainApplication extends MultiDexApplication {
         PlayStore.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);
-        async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                () -> NetworkManager.queryNetworkStatusBackground(NetworkManager.instance()));
     }
 
     private void initializeCrawlPagedWebSearchPerformer(Context context) {
