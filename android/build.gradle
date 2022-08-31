@@ -230,9 +230,13 @@ dependencies {
     implementation 'androidx.media2:media2-widget:1.2.1'
     implementation 'androidx.media2:media2-player:1.2.1'
 
-    // AppLovin Max Mediation Partners
-    implementation 'com.applovin:applovin-sdk:11.3.3'
-    implementation 'com.unity3d.ads:unity-ads:4.2.1'
+    // AppLovin Max
+    implementation 'com.applovin:applovin-sdk:11.4.2'
+
+    // AppLovin + Unity
+    implementation 'com.applovin.mediation:unityads-adapter:4.3.0.0'
+
+    // AppLovin + MobileFuse
     implementation 'com.mobilefuse.sdk:mobilefuse-adapter-applovin:1.2.5.0'
 
     def jlibtorrent_version = '1.2.16.0'

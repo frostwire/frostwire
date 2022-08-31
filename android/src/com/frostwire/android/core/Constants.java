@@ -97,7 +97,6 @@ public final class Constants {
     public static final String PREF_KEY_GUI_USE_APPLOVIN = "frostwire.prefs.gui.use_applovin";
     public static final String PREF_KEY_GUI_USE_REMOVEADS = "frostwire.prefs.gui.use_removeads";
     public static final String PREF_KEY_GUI_USE_MOPUB = "frostwire.prefs.gui.use_mopub";
-    public static final String PREF_KEY_GUI_USE_UNITY = "frostwire.prefs.gui.use_unity";
     public static final String PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD = "frostwire.prefs.gui.removeads_back_to_back_threshold";
     public static final String PREF_KEY_GUI_MOPUB_ALBUM_ART_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_album_art_banner_threshold";
     public static final String PREF_KEY_GUI_MOPUB_PREVIEW_BANNER_THRESHOLD = "frostwire.prefs.gui.mopub_preview_banner_threshold";
@@ -198,7 +197,6 @@ public final class Constants {
     public static final String CHANGELOG_URL = "https://github.com/frostwire/frostwire/blob/master/android/changelog.txt";
 
     public static final String AD_NETWORK_SHORTCODE_APPLOVIN = "AL";
-    public static final String AD_NETWORK_SHORTCODE_UNITY = "UN";
     public static final String AD_NETWORK_SHORTCODE_MOPUB = "MP";
     public static final String AD_NETWORK_SHORTCODE_REMOVEADS = "RA";
 

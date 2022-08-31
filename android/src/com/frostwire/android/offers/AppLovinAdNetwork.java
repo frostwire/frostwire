@@ -67,7 +67,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                     sdkSettings.setMuted(!DEBUG_MODE);
                     sdkSettings.setVerboseLogging(DEBUG_MODE);
                     start();
-                    LOG.info("AppLovin initialized.");
+                    LOG.info("AppLovin initialized. AppLovinAdNetwork.DEBUG_MODE=" + DEBUG_MODE);
                 }
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);

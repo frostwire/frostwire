@@ -1,9 +1,10 @@
-FrostWire 2.6.0 build 704 - AUG/30/2022
+FrostWire 2.6.0 build 704 - AUG/31/2022
  - Telluride Video Page Search is here.
  - Faster more responsive keyword search.
  - 703: Simpler, more robust Python runtime startup
  - 703: Better handling of no search results on video url
- - 704: com.applovin:applovin-sdk:11.3.3
+ - 704: com.applovin:applovin-sdk:11.4.2
+ - 704: com.mobilefuse.sdk:mobilefuse-adapter-applovin:1.2.5.0 (new)
 
 FrostWire 2.5.0 build 701 - AUG/14/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.

@@ -20,7 +20,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         package="com.frostwire.android"
         android:installLocation="auto"
-        android:versionCode="703"
+        android:versionCode="704"
         android:versionName="2.6.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
@@ -331,8 +331,5 @@
         <meta-data
                 android:name="applovin.sdk.key"
                 android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
-        <meta-data
-                android:name="applovin.sdk.verbose_logging"
-                android:value="false" />
     </application>
 </manifest>

@@ -61,7 +61,6 @@ public final class Offers {
     public static final String PLACEMENT_INTERSTITIAL_MAIN = "interstitial_main";
     private static Map<String, AdNetwork> AD_NETWORKS;
     private final static AppLovinAdNetwork APP_LOVIN = AppLovinAdNetwork.getInstance();
-    private final static UnityAdNetwork UNITY = new UnityAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
     private static long lastInitAdNetworksInvocationTimestamp = 0;
@@ -227,7 +226,6 @@ public final class Offers {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();
             AD_NETWORKS.put(APP_LOVIN.getShortCode(), APP_LOVIN);
-            AD_NETWORKS.put(UNITY.getShortCode(), UNITY);
             AD_NETWORKS.put(REMOVE_ADS.getShortCode(), REMOVE_ADS);
         }
         return AD_NETWORKS;
