@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,9 @@ import static com.frostwire.android.util.Asyncs.async;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.andrew.apollo.utils.MusicUtils;
-import com.applovin.mediation.MaxAd;
-import com.applovin.mediation.MaxError;
-import com.applovin.mediation.MaxReward;
-import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxRewardedAd;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -68,7 +62,7 @@ public final class Offers {
     private final static UnityAdNetwork UNITY = new UnityAdNetwork();
     private final static RemoveAdsNetwork REMOVE_ADS = new RemoveAdsNetwork();
     private final static Long STARTUP_TIME = System.currentTimeMillis();
-    private static long lastInitAdnetworksInvocationTimestamp = 0;
+    private static long lastInitAdNetworksInvocationTimestamp = 0;
     private static boolean FORCED_DISABLED = false;
     private static boolean PAUSED;
     private static final ReentrantLock pausedCheckLock = new ReentrantLock();
@@ -87,11 +81,11 @@ public final class Offers {
             return;
         }
         long now = System.currentTimeMillis();
-        if ((now - lastInitAdnetworksInvocationTimestamp) < 5000) {
+        if ((now - lastInitAdNetworksInvocationTimestamp) < 5000) {
             LOG.info("Offers.initAdNetworks() aborted, too soon to reinitialize networks.");
             return;
         }
-        lastInitAdnetworksInvocationTimestamp = now;
+        lastInitAdNetworksInvocationTimestamp = now;
         for (AdNetwork adNetwork : getActiveAdNetworks()) {
             if (adNetwork != null) { // because of a typo on config file this can happen
                 try {
@@ -162,12 +156,6 @@ public final class Offers {
             }
         }
         // otherwise it's up to the interstitial and its listener to dismiss or shutdown if necessary.
-    }
-
-    public static void showInterstitialOfferIfNecessary(Activity ctx, String placement,
-                                                        final boolean shutdownAfterwards,
-                                                        final boolean dismissAfterwards) {
-        showInterstitialOfferIfNecessary(ctx, placement, shutdownAfterwards, dismissAfterwards, false);
     }
 
     static void pauseAdsAsync(int minutes) {
@@ -257,12 +245,8 @@ public final class Offers {
             //LOG.info("checkIfPausedAsync: UnPausing Offers, Reward has expired");
             CM.setInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
             CM.setLong(Constants.FW_REWARDED_VIDEO_LAST_PLAYBACK_TIMESTAMP, -1);
-            pausedCheckLock.unlock();
-        } else {
-            pausedCheckLock.unlock();
-            int minutes_left = (int) ((pause_duration - time_on_pause) / 60_000);
-            //LOG.info("checkIfPausedAsync: PAUSED (" + minutes_left + " minutes left)");
         }
+        pausedCheckLock.unlock();
     }
 
     private static class InterstitialLogicParams {
@@ -422,9 +406,10 @@ public final class Offers {
     /**
      * Used for hard coded tests only
      */
+    @SuppressWarnings("unused")
     public static void forceDisabledAds(Context context) {
         FORCED_DISABLED = true;
-        if (lastInitAdnetworksInvocationTimestamp != 0) {
+        if (lastInitAdNetworksInvocationTimestamp != 0) {
             stopAdNetworks(context);
         }
     }
