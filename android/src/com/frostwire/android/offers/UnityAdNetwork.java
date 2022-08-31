@@ -22,6 +22,7 @@ import static com.frostwire.android.util.Asyncs.async;
 import android.app.Activity;
 
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.unity3d.ads.IUnityAdsInitializationListener;
@@ -44,7 +45,7 @@ public class UnityAdNetwork extends AbstractAdNetwork {
         }
         final String GAME_ID = "3351589";
         unityAdsListener = new UnityAdsListener(this);
-        UnityAds.initialize(activity.getApplicationContext(), GAME_ID, isDebugOn(), unityAdsListener);
+        UnityAds.initialize(SystemUtils.getApplicationContext(), GAME_ID, isDebugOn(), unityAdsListener);
         start();
     }
 
