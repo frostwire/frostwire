@@ -5,6 +5,8 @@ FrostWire 2.6.0 build 704 - AUG/31/2022
  - 703: Better handling of no search results on video url
  - 704: com.applovin:applovin-sdk:11.4.2
  - 704: com.mobilefuse.sdk:mobilefuse-adapter-applovin:1.2.5.0 (new)
+ - 704: removed some unity dependencies lowering installer size by almost 3mb
+ - 704: slightly faster app startup
 
 FrostWire 2.5.0 build 701 - AUG/14/2022
  - LESS IS MORE. The FrostWire we'd like to use is here.
