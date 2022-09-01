@@ -68,7 +68,6 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_MOPUB, true);
         defaultValues.put(Constants.PREF_KEY_GUI_USE_APPLOVIN, false); // full blown implementation, turned off as it's handled by mopub mediation
-        defaultValues.put(Constants.PREF_KEY_GUI_USE_UNITY, true); // this implementation just starts the sdk, it's all done through mopub
         defaultValues.put(Constants.PREF_KEY_GUI_USE_REMOVEADS, true);
         defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD, 100);
         defaultValues.put(Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_DISMISS_INTERVAL_IN_MS, 60000); // 1 min
@@ -83,7 +82,6 @@ final class ConfigurationDefaults {
                 new String[]{
                         Constants.AD_NETWORK_SHORTCODE_MOPUB,
                         Constants.AD_NETWORK_SHORTCODE_APPLOVIN,
-                        Constants.AD_NETWORK_SHORTCODE_UNITY,
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);

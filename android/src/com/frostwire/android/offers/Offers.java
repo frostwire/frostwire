@@ -215,8 +215,7 @@ public final class Offers {
     public static void initDataPrivacy() {
         MobileFusePrivacyPreferences privacyPrefs = new MobileFusePrivacyPreferences.Builder()
                 .setSubjectToCoppa(false)
-                .setUsPrivacyConsentString("1YNN")
-                .setIabConsentString("<IAB Consent String>")
+                .setUsPrivacyConsentString("1YN-")
                 .build();
 
         MobileFuse.setPrivacyPreferences(privacyPrefs);
