@@ -714,6 +714,7 @@ public class MusicPlaybackService extends JobIntentService {
 
     @Override
     public IBinder onBind(@NonNull Intent intent) {
+        updateNotification();
         return binder;
     }
 
