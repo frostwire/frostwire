@@ -1,3 +1,20 @@
+frostwire (6.9.9) stable; urgency=high
+  * jlibtorrent 1.2.17.0 (boost 1.80, openssl 1.1.1q)
+  * dev: gradle 7.5.1 upgrade
+  * jlibtorrent: libtorrent update to RC_1_2 b5873f23b40ef9054b2bd6a4db2a2d327a56d4b1
+  * lt:fix wanted_done/done accounting when force-rechecking
+  * lt:expose userdata via torrent_handle (back-port from 2.0)
+  * lt:fix renaming of filenames that are too long for the filesystem
+  * lt:made UPnP and LSD code avoid using select_reactor
+  * lt:fixed tracker connections spinning when hostname lookups stall
+  * lt:fixed error in pkg-config file generation in Jamfile
+  * lt:improve backwards compatibility with loading magnet link resume files
+  * lt:fix bind-to-device for tracker announces and UPnP
+  * lt:rename peer_tos setting to peer_dscp
+  * lt:fix bdecode support for large strings (>= 100 MB)
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 11 Sep 2022 15:20:00 -0600
+
 frostwire (6.9.8) stable; urgency=high
   * Java Runtime Environment 18.0.1 update
   * TorLock search fixed
