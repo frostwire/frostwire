@@ -1,5 +1,6 @@
 FrostWire 2.6.1 build 706 - SEP/11/2022
  - jlibtorrent 1.2.17.0 upgrade
+ - Android NDK r25b
  - jlt:boost 1.80 upgrade
  - jlt:openssl 1.1.1q upgrade
  - jlt:gradle 7.5.1 upgrade
