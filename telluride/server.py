@@ -1,6 +1,6 @@
 '''
 Telluride Cloud Video Downloader.
-Copyright 2020-2021 FrostWire LLC.
+Copyright 2020-2022 FrostWire LLC.
 Author: @gubatron
 
 A portable and easy to use youtube_dl wrapper by FrostWire.
@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
+import os
+import signal
 import urllib
 import youtube_dl
 from flask import Flask
@@ -37,6 +39,12 @@ def query_video(page_url):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
         return jsonify(info_dict)
+
+def shutdown_process():
+    try:
+        os.kill(os.getpid(), signal.SIGTERM)
+    except:
+        print("telluride::server::shutdown_process() os.kill failed")
 
 def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
     '''
@@ -68,9 +76,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
         query = request.args.to_dict()
         print(query)
         if 'shutdown' in query and (query['shutdown'] == '1' or query['shutdown'].lower() == 'true'):
-            shutdown_function = request.environ.get('werkzeug.server.shutdown')
-            if shutdown_function is not None:
-                shutdown_function()
+            shutdown_process()
             return jsonify({'message':'shutdown'})
         if 'url' in query:
             return query_video(query['url']), 200
