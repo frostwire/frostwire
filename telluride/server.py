@@ -41,10 +41,11 @@ def query_video(page_url):
         return jsonify(info_dict)
 
 def shutdown_process():
+    '''Tries to shutdown the telluride server process with a SIGTERM signal'''
     try:
         os.kill(os.getpid(), signal.SIGTERM)
-    except:
-        print("telluride::server::shutdown_process() os.kill failed")
+    except OSError as error:
+        print(f"telluride::server::shutdown_process() os.kill failed. Error={error.errno} {error.strerror}")
 
 def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
     '''
