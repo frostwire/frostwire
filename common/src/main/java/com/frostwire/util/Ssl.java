@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -92,7 +92,6 @@ public final class Ssl {
     }
 
     static final class FWHostnameVerifier implements HostnameVerifier {
-
         private static final String[] validDomains = {
                 "api-v2.soundcloud.com",
                 "sndcdn.com",
@@ -101,6 +100,9 @@ public final class Ssl {
                 "clients1.google.com",
                 "dl.frostwire.com",
                 "eztv.re",
+                "github.com",
+                "githubusercontent.com",
+                "github.io",
                 "gtdb.to",
                 "idope.se",
                 "nyaa.si",
@@ -137,7 +139,6 @@ public final class Ssl {
                 "magnetdl.com",
                 "www.magnetdl.com"
         };
-
         private static final HashSet<String> validDomainsSet = new HashSet<>();
 
         static {
@@ -159,7 +160,6 @@ public final class Ssl {
         @Override
         public boolean verify(String s, SSLSession sslSession) {
             if (!validDomainsSet.contains(s)) {
-
                 // check if the s is a subdomain
                 for (String baseDomain : validDomainsSet) {
                     if (s.contains(baseDomain)) {
