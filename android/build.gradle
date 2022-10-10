@@ -236,9 +236,6 @@ dependencies {
     // AppLovin + Unity
     implementation 'com.applovin.mediation:unityads-adapter:4.3.0.0'
 
-    // AppLovin + MobileFuse
-    implementation 'com.mobilefuse.sdk:mobilefuse-adapter-applovin:1.2.5.0'
-
     def jlibtorrent_version = '1.2.17.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
 

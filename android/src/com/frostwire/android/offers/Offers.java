@@ -38,8 +38,6 @@ import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
-import com.mobilefuse.sdk.MobileFuse;
-import com.mobilefuse.sdk.privacy.MobileFusePrivacyPreferences;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -213,12 +211,8 @@ public final class Offers {
     }
 
     public static void initDataPrivacy() {
-        MobileFusePrivacyPreferences privacyPrefs = new MobileFusePrivacyPreferences.Builder()
-                .setSubjectToCoppa(false)
-                .setUsPrivacyConsentString("1YN-")
-                .build();
-
-        MobileFuse.setPrivacyPreferences(privacyPrefs);
+        // Add here any applovin sdk adapter privacy initialization code
+        // formerly used by MobileFuse's adapter
     }
 
     private static Map<String, AdNetwork> getAllAdNetworks() {
