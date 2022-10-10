@@ -3,7 +3,7 @@ Telluride Cloud Video Downloader.
 Copyright 2020-2022 FrostWire LLC.
 Author: @gubatron
 
-A portable and easy to use youtube_dl wrapper by FrostWire.
+A portable and easy to use yt_dlp wrapper by FrostWire.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ limitations under the License.
 import os
 import signal
 import urllib
-import youtube_dl
+import yt_dlp
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -29,14 +29,14 @@ DEFAULT_HTTP_PORT = 47999
 
 def query_video(page_url):
     '''
-    query_video: queries metadata for the video in page_url using youtube_dl
+    query_video: queries metadata for the video in page_url using yt_dlp
     '''
     ydl_opts = {'nocheckcertificate' : True,
                 'quiet': True,
                 'restrictfilenames': True,
                 'format': 'bestaudio/best'
                }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
         return jsonify(info_dict)
 

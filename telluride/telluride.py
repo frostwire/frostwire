@@ -3,7 +3,7 @@ Telluride Cloud Video Downloader.
 Copyright 2020-2022 FrostWire LLC.
 Author: @gubatron
 
-A portable and easy to use youtube_dl wrapper by FrostWire.
+A portable and easy to use yt_dlp wrapper by FrostWire.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from datetime import datetime
 import argparse
 import json
 import sys
-import youtube_dl
+import yt_dlp
 
 # our imports
 import server
@@ -104,29 +104,29 @@ def main():
         print('Please pass a video page URL or "--help" for instructions\n')
         sys.exit(1)
 
-    youtube_dl_opts = {
+    yt_dlp_opts = {
         'nocheckcertificate': True,
         'quiet': False,
         'restrictfilenames': True
     }
     if meta_only:
-        youtube_dl_opts['quiet'] = True
-        youtube_dl_opts['format'] = 'bestaudio/best'
-        with youtube_dl.YoutubeDL(youtube_dl_opts) as ydl:
+        yt_dlp_opts['quiet'] = True
+        yt_dlp_opts['format'] = 'bestaudio/best'
+        with yt_dlp.YoutubeDL(yt_dlp_opts) as ydl:
             info_dict = ydl.extract_info(page_url, download=False)
             print(json.dumps(info_dict, indent=2))
             sys.exit(0)
 
     if audio_only:
         print("Audio-only download.")
-        youtube_dl_opts['format'] = 'bestaudio/best'
-        youtube_dl_opts['postprocessors'] = [{
+        yt_dlp_opts['format'] = 'bestaudio/best'
+        yt_dlp_opts['postprocessors'] = [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }]
 
-    with youtube_dl.YoutubeDL(youtube_dl_opts) as ydl:
+    with yt_dlp.YoutubeDL(yt_dlp_opts) as ydl:
         ydl.download([page_url])
 
 

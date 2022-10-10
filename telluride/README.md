@@ -2,12 +2,12 @@
 
 ![Telluride Logo](logo/1024X1024-white-telluride-logo.png)
 
-### A portable and easy to use youtube_dl wrapper by FrostWire.    
+### A portable and easy to use yt_dlp wrapper by FrostWire.
 
 ## Usage
 ```
-Telluride Cloud Video Downloader. Build 14
-Copyright 2020-2021 FrostWire LLC. Licensed under Apache 2.0.
+Telluride Cloud Video Downloader. Build 23
+Copyright 2020-2022 FrostWire LLC. Licensed under Apache 2.0.
 
 usage: telluride[.exe|_macos|_linux] [-h] [--server] [--port PORT] [--audio-only] [--meta-only]
                     [page_url]
@@ -55,7 +55,7 @@ You should end up with a stand-alone executable for the platform you are on:
  - `bash`
  - `python3`, `pip`, `pylint`
  - `ffmpeg` (for audio-only downloads. audio is extracted from the downloaded video)
- - `youtube_dl`, `pycryptodome`, `pyinstaller`
+ - `yt_dlp`, `pycryptodome`, `pyinstaller`
 
 ## Web Server Mode
 

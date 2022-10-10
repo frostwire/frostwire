@@ -40,8 +40,8 @@ ${PIP_CMD} cache info
 ${PIP_CMD} ${PIP_OPTIONS} pip
 ${PIP_CMD} ${PIP_OPTIONS} astroid
 ${PIP_CMD} ${PIP_OPTIONS} pylint
-${PIP_CMD} ${PIP_OPTIONS} youtube_dl
+${PIP_CMD} ${PIP_OPTIONS} yt_dlp
 ${PIP_CMD} ${PIP_OPTIONS} flask
 ${PIP_CMD} ${PIP_OPTIONS} ${PYINSTALLER_PACKAGE}
 
-${PIP_CMD} show pip astroid pylint youtube_dl pyinstaller flask werkzeug
+${PIP_CMD} show pip astroid pylint yt_dlp pyinstaller flask werkzeug
