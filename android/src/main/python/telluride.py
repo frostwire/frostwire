@@ -1,10 +1,10 @@
-import youtube_dl
+import yt_dlp
 import urllib
 import json
 
 def query_video(page_url):
     '''
-    query_video: queries metadata for the video in page_url using youtube_dl
+    query_video: queries metadata for the video in page_url using yt_dlp
     Returns 'None' on error
     '''
     ydl_opts = {'nocheckcertificate' : True,
@@ -12,7 +12,7 @@ def query_video(page_url):
                 'restrictfilenames': True,
                 'format': 'bestaudio/best'
                }
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         try:
             info_dict = ydl.extract_info(urllib.parse.unquote(page_url), download=False)
             return json.dumps(info_dict, indent=4)

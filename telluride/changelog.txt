@@ -1,6 +1,6 @@
 build 23 - oct/10/2022
  - replaced youtube_dl for yt_dlp fork
- - supports Instagram Reels and YouTube Stories
+ - supports TikTok, Instagram Reels and YouTube Stories
  - yt-dlp-2022.10.4
  - python 3.10.7
  - pip-22.2.2

@@ -113,7 +113,7 @@ android {
 
         python {
             pip {
-                install "youtube_dl"
+                install "yt_dlp"
             }
         }
     }
