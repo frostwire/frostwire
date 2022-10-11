@@ -20,8 +20,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         package="com.frostwire.android"
         android:installLocation="auto"
-        android:versionCode="706"
-        android:versionName="2.6.1">
+        android:versionCode="707"
+        android:versionName="2.6.2">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -88,7 +88,6 @@
 
         <activity
                 android:name="com.frostwire.android.gui.activities.MainActivity"
-                android:label="@string/application_label"
                 android:launchMode="singleTask"
                 android:protectionLevel="dangerous"
                 android:theme="@style/SplashScreenTheme"
@@ -150,7 +149,6 @@
         </activity>
         <activity
                 android:name="com.frostwire.android.gui.activities.WizardActivity"
-                android:label="@string/application_label"
                 android:theme="@style/WizardActivity" />
         <activity
                 android:name="com.frostwire.android.gui.activities.SettingsActivity"

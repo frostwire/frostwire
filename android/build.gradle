@@ -35,10 +35,10 @@ buildscript {
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
 
-        classpath 'com.google.gms:google-services:4.3.13'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
+        classpath 'com.google.gms:google-services:4.3.14'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.2'
 
-        classpath 'androidx.annotation:annotation:1.4.0'
+        classpath 'androidx.annotation:annotation:1.5.0'
         classpath 'com.android.billingclient:billing:4.1.0'
 
         classpath 'com.chaquo.python:gradle:12.0.1'
@@ -200,14 +200,14 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.re2j:re2j:1.6'
-    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.google.re2j:re2j:1.7'
+    implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
     implementation 'androidx.browser:browser:1.4.0'
-    implementation 'androidx.exifinterface:exifinterface:1.3.3'
+    implementation 'androidx.exifinterface:exifinterface:1.3.4'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
