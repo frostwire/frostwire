@@ -2,6 +2,7 @@ frostwire (6.9.10) stable; urgency=high
   * telluride build 23
   * supports TikTok, IG Reels, YT Stories backups
   * com.google.re2j:re2j:1.7
+  * com.google.code.gson:gson:2.9.0
 
  -- FrostWire Team <contact@frostwire.com>  Mon, 10 Oct 2022 18:00:00 -0600
 
