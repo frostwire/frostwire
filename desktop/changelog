@@ -1,3 +1,10 @@
+frostwire (6.9.10) stable; urgency=high
+  * telluride build 23
+  * supports TikTok, IG Reels, YT Stories backups
+  * com.google.re2j:re2j:1.7
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 10 Oct 2022 18:00:00 -0600
+
 frostwire (6.9.9) stable; urgency=high
   * jlibtorrent 1.2.17.0 (boost 1.80, openssl 1.1.1q)
   * dev: gradle 7.5.1 upgrade
