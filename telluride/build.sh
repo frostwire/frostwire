@@ -17,7 +17,7 @@
 ##########################################################################
 #set -x
 PYINSTALLER_CMD="pyinstaller"
-PYLINT_CMD="pylint"
+PYLINT_CMD="pylint3"
 source ./common.sh
 
 if [[ ismac -eq ${TRUE} || iswindows -eq ${TRUE} ]]
@@ -35,7 +35,7 @@ if isdocker == ${TRUE}
 then
     #echo "isdocker: true, setting pylint command to 'pylint3'"
     PYINSTALLER_CMD=/usr/local/bin/pyinstaller
-    PYLINT_CMD="pylint3"
+    PYLINT_CMD="pylint"
 fi
 
 echo PYINSTALLER_CMD=${PYINSTALLER_CMD}
