@@ -61,7 +61,7 @@ dependencies {
     implementation 'com.h2database:h2:1.4.200'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
-    implementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+    implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 
 sourceSets {
