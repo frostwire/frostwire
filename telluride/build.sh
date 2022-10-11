@@ -17,7 +17,7 @@
 ##########################################################################
 #set -x
 PYINSTALLER_CMD="pyinstaller"
-PYLINT_CMD="pylint3"
+PYLINT_CMD="pylint"
 source ./common.sh
 
 if [[ ismac -eq ${TRUE} || iswindows -eq ${TRUE} ]]
