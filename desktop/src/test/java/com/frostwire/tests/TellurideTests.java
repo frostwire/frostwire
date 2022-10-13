@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2007-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,14 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
+/**
+ * Set FW_WORKSPACE_PATH=<path to the folder containing the "frostwire" repository folder>
+ * otherwise it will assume your workspace folder is ${HOME}/workspace
+ * */
 public class TellurideTests {
     static String executableSuffix = ".exe";
+
+    static String workspacePath = System.getenv("FW_WORKSPACE_PATH") != null ? System.getenv("FW_WORKSPACE_PATH") : System.getenv("HOME") + "/workspace";
 
     static {
         if (OSUtils.isAnyMac()) {
@@ -40,8 +46,9 @@ public class TellurideTests {
             executableSuffix = "_linux";
         }
 
-        File data = new File("/Users/gubatron/FrostWire/Torrent Data", "Video_by_gubatron-CDC5ludJazw.mp4");
+        File data = new File(System.getenv("HOME") + "/FrostWire/Torrent Data", "Video_by_gubatron-CDC5ludJazw.mp4");
         if (data.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             data.delete();
         }
     }
@@ -102,9 +109,9 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File("/Users/gubatron/workspace.frostwire/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
                 "https://www.youtube.com/watch?v=fail",
-                new File("/Users/gubatron/FrostWire/Torrent Data"),
+                new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
                 false,
                 true,
@@ -173,9 +180,9 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File("/Users/gubatron/workspace.frostwire/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
                 "https://www.instagram.com/p/CTF5pA0jNZ8/", // Tristan de Crusher, IG
-                new File("/Users/gubatron/FrostWire/Torrent Data"),
+                new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
                 false,
                 true,
@@ -232,9 +239,9 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File("/Users/gubatron/workspace.frostwire/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
                 "https://www.youtube.com/watch?v=1kaQP9XL6L4", // Alone Together - Mona Wonderlick · [Free Copyright-safe Music]
-                new File("/Users/gubatron/FrostWire/Torrent Data"),
+                new File(System.getenv("HOME")+ "/FrostWire/Torrent Data"),
                 false,
                 true,
                 true,
@@ -253,11 +260,9 @@ public class TellurideTests {
         File launcherBinary = FrostWireUtils.getTellurideLauncherFile();
         if (launcherBinary == null) {
             fail("[TellurideTests][testGettingLauncherFile] no launcher found");
-            return;
         }
         if (!launcherBinary.canExecute()) {
             fail("[TellurideTests][testGettingLauncherFile] launcher is not executable (" + launcherBinary.getAbsolutePath() + ")");
-            return;
         }
     }
 }
