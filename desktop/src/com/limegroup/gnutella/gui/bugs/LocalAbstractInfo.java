@@ -37,7 +37,7 @@ abstract class LocalAbstractInfo {
     String _fatalError;
     String _peakThreads;
     String _loadAverage;
-    String _pendingObjects;
+
     String _settingsFreeSpace;
     String _incompleteFreeSpace;
     String _heapUsage;
@@ -90,7 +90,6 @@ abstract class LocalAbstractInfo {
         pw.println("Active Threads: " + _threadCount);
         append(pw, "Peak Number of Thread", _peakThreads);
         append(pw, "System Load Avg", _loadAverage);
-        append(pw, "Objects Pending GC", _pendingObjects);
         append(pw, "Free Space In Settings", _settingsFreeSpace);
         append(pw, "Free Space In Incomplete", _incompleteFreeSpace);
         append(pw, "Heap Memory Usage", _heapUsage);
@@ -135,7 +134,7 @@ abstract class LocalAbstractInfo {
         return _fatalError != null && _fatalError.equalsIgnoreCase("true");
     }
 
-    public final class SystemInfoWriters {
+    public static final class SystemInfoWriters {
         public final StringWriter sw;
         final PrintWriter pw;
 
