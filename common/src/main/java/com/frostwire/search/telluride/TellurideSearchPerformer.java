@@ -26,6 +26,7 @@ import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.limegroup.gnutella.gui.search.SearchEngine;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,7 +38,6 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static Gson gson = null;
     private static Calendar calendar = null;
     private final CountDownLatch performerLatch;
-    private final int TELLURIDE_RPC_PORT = 47999;
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
 
@@ -68,6 +68,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         while (!TellurideLauncher.SERVER_UP.get() && seconds_to_wait_for_telluride_server > 0) {
             LOG.info("perform(): waiting for Telluride Server to be up... (" + seconds_to_wait_for_telluride_server + " secs left to time out)");
             try {
+                //noinspection BusyWait
                 Thread.sleep(1000);
                 seconds_to_wait_for_telluride_server--;
             } catch (InterruptedException e) {
@@ -76,12 +77,14 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
 
         if (seconds_to_wait_for_telluride_server == 0) {
-            LOG.info("perform(): timed out waiting for telluride server to start. finished.");
+            LOG.info("perform(): timed out waiting for telluride server to start. finished. Invoking SearchEngine.startTellurideRPCServer()");
+            SearchEngine.startTellurideRPCServer();
             return;
         }
 
         try {
             HttpClient httpClient = HttpClientFactory.newInstance();
+            int TELLURIDE_RPC_PORT = 47999;
             String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",
                     TELLURIDE_RPC_PORT,
                     UrlUtils.encode(url));
@@ -228,6 +231,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     }
 
     public static class TellurideJSONMediaFormat {
+        @SuppressWarnings("unused")
         public String format_id;
         public String url;
         public String ext;

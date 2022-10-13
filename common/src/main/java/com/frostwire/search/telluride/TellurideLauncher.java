@@ -37,14 +37,34 @@ public final class TellurideLauncher {
 
     public static AtomicBoolean SERVER_UP = new AtomicBoolean(false);
 
+    public static boolean checkIfUpAlready(int port) {
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        try {
+            LOG.info("TellurideLauncher.checkIfUpAlready() checking...");
+            String json = httpClient.get(String.format("http://127.0.0.1:%d/ping", port), 1000);
+            Gson gson = new GsonBuilder().create();
+            TelluridePong telluridePong = gson.fromJson(json, TelluridePong.class);
+            LOG.info("TellurideLauncher::checkIfUpAlready(port=" + port + ") got a Pong (telluride build=" + telluridePong.build + "): " + json);
+            //noinspection ConstantConditions
+            boolean gotValidPong = telluridePong != null && telluridePong.message.equalsIgnoreCase("pong");
+            SERVER_UP.set(gotValidPong);
+            return gotValidPong;
+        } catch (Throwable e) {
+            LOG.error("TellurideLauncher.checkIfUpAlready() failed.\n" + e.getMessage(), e);
+            SERVER_UP.set(false);
+            return false;
+        }
+    }
+
     public static void shutdownServer(final int port) {
         ThreadExecutor.startThread(() -> {
             HttpClient httpClient = HttpClientFactory.newInstance();
+            final String shutdownURL = String.format("http://127.0.0.1:%d/?shutdown=1", port);
             try {
-                httpClient.get(String.format("http://127.0.0.1:%d/?shutdown=1", port));
+                httpClient.get(shutdownURL, 1000);
                 SERVER_UP.set(false);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("TellurideLauncher::shutdownServer failed (" + shutdownURL + "):", e);
             }
         }, "TellurideLauncher::shutDownServer(" + port + ")");
     }
@@ -61,6 +81,7 @@ public final class TellurideLauncher {
             throw new IllegalArgumentException("TellurideLauncher::launchServer Please use a port greater or equal to 8080 (do not run frostwire as root). Telluride's default port number is 47999");
         }
         ThreadExecutor.startThread(() -> {
+            LOG.info("TellurideLauncher::launchServer::ThreadExecutor.startThread with ProcessBuilder");
                     ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), "--server", String.valueOf(port));
                     processBuilder.redirectErrorStream(true);
                     if (saveDirectory != null && saveDirectory.isDirectory() && saveDirectory.canWrite()) {
@@ -71,11 +92,11 @@ public final class TellurideLauncher {
                         // The telluride process doesn't start right away, we wait 8 seconds to be safe before
                         // pinging to set the SERVER_UP flag to true.
                         // TellurideSearchPerformer waits for up to 10 seconds to give up
-                        Thread.currentThread().sleep(8000);
+                        Thread.sleep(8000);
                         LOG.info("TellurideLauncher::launchServer is process alive: " + process.isAlive());
-                        LOG.info("TellurideLauncher::launchServer RPC server should be up at http://127.0.0.1:" + port);
+                        LOG.info("TellurideLauncher::launchServer RPC server should be up at http://127.0.0.1:" + port + "/ping");
                         LOG.info("TellurideLauncher::launchServer pinging...");
-                        SERVER_UP.set(TellurideLauncher.checkIfUpAlready(port));
+                        TellurideLauncher.checkIfUpAlready(port);
                         if (!SERVER_UP.get()) {
                             LOG.info("TellurideLauncher::launchServer could not get a pong back from Telluride");
                         } else {
@@ -84,7 +105,7 @@ public final class TellurideLauncher {
 
                     } catch (Throwable e) {
                         SERVER_UP.set(false);
-                        LOG.error("TellurideLauncher::launchServer error: " + e.getMessage(),e);
+                        LOG.error("TellurideLauncher::launchServer error: " + e.getMessage(), e);
                     }
                 },
                 "telluride-server-on-port-" + port);
@@ -193,19 +214,5 @@ public final class TellurideLauncher {
     private static class TelluridePong {
         int build;
         String message;
-    }
-
-    public static boolean checkIfUpAlready(int port) {
-        HttpClient httpClient = HttpClientFactory.newInstance();
-        try {
-            LOG.info("TellurideLauncher.checkIfUpAlready() checking...");
-            String json = httpClient.get(String.format("http://127.0.0.1:%d/ping", port), 250);
-            Gson gson = new GsonBuilder().create();
-            TelluridePong telluridePong = gson.fromJson(json, TelluridePong.class);
-            return telluridePong != null && telluridePong.message.equalsIgnoreCase("pong");
-        } catch (IOException e) {
-            LOG.info("TellurideLauncher.checkIfUpAlready() not up, let's go.\n" + e.getMessage());
-            return false;
-        }
     }
 }
