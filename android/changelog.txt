@@ -1,4 +1,4 @@
-FrostWire 2.6.2 build 707 - OCT/10/2022
+FrostWire 2.6.2 build 708 - OCT/14/2022
  - removed MobileFuse adapter
  - telluride build 23
  - supports downloads of IG Reels, YT Stories and TikToks
@@ -8,6 +8,7 @@ FrostWire 2.6.2 build 707 - OCT/10/2022
  - com.google.gms:google-services:4.3.14
  - com.google.firebase:firebase-crashlytics-gradle:2.9.2
  - androidx.annotation:annotation:1.5.0
+ - com.android.tools.build:gradle:7.3.1
 
 FrostWire 2.6.1 build 706 - SEP/11/2022
  - jlibtorrent 1.2.17.0 upgrade

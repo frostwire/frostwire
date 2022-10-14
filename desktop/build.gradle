@@ -19,8 +19,8 @@ apply plugin: 'application'
 
 import org.gradle.internal.os.OperatingSystem
 
-sourceCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_17 : JavaVersion.VERSION_11
-targetCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_17 : JavaVersion.VERSION_11
+sourceCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_18 : JavaVersion.VERSION_11
+targetCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_18 : JavaVersion.VERSION_11
 
 compileJava {
     options.encoding = '8859_1'
