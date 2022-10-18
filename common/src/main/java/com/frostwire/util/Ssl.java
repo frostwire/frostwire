@@ -18,6 +18,7 @@
 package com.frostwire.util;
 
 import javax.net.ssl.*;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -96,6 +97,8 @@ public final class Ssl {
                 "api-v2.soundcloud.com",
                 "api.frostclick.com",
                 "archive.org",
+                "cdninstagram.com",
+                "cdninstagram.com",
                 "clients1.google.com",
                 "cloudflaressl.com",
                 "dl.frostwire.com",
@@ -106,6 +109,9 @@ public final class Ssl {
                 "githubusercontent.com",
                 "gtdb.to",
                 "idope.se",
+                "igcdn.com",
+                "igsonar.com",
+                "instagram.com",
                 "magnetdl.com",
                 "nyaa.si",
                 "pirate-bay.info",
