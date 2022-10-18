@@ -48,6 +48,10 @@ public final class Logger {
         return new Logger(java.util.logging.Logger.getLogger(clazz.getSimpleName()));
     }
 
+    /**
+     * TODO: When Android's Java has Thread.threadId() we'll be able to fix this warning
+     * @return
+     */
     private static String getCallingMethodInfo() {
         Thread currentThread = Thread.currentThread();
         StackTraceElement[] stackTrace = currentThread.getStackTrace();
@@ -58,7 +62,7 @@ public final class Logger {
         }
         if (stackTrace.length >= 6) {
             StackTraceElement stackElement = stackTrace[6];
-            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
+            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.threadId() + ")>";
         }
         return caller;
     }
