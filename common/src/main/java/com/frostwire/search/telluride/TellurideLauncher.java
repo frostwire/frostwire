@@ -37,6 +37,35 @@ public final class TellurideLauncher {
 
     public static AtomicBoolean SERVER_UP = new AtomicBoolean(false);
 
+
+    public static void startTellurideRPCServer(File tellurideLauncher, int port, File torrentsDir) {
+        if (tellurideLauncher != null) {
+            LOG.info("TELLURIDE_LAUNCHER: File -> " + tellurideLauncher.getAbsolutePath());
+
+            // Trust but verify,
+            if (TellurideLauncher.checkIfUpAlready(port)) {
+                LOG.info("SearchEngine.startTellurideRPCServer() Telluride was up already, previously bad shutdown. Let's shut it down and restart it...");
+                TellurideLauncher.shutdownServer(port);
+                TellurideLauncher.SERVER_UP.set(false);
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!TellurideLauncher.SERVER_UP.get()) {
+                LOG.info("Launching Telluride RPC Server on " + port + "...");
+                TellurideLauncher.launchServerProcess(
+                        tellurideLauncher,
+                        port,
+                        torrentsDir);
+            }
+        } else {
+            LOG.warn("TELLURIDE_LAUNCHER could not be found");
+        }
+    }
+
     public static boolean checkIfUpAlready(int port) {
         HttpClient httpClient = HttpClientFactory.newInstance();
         try {
@@ -69,9 +98,9 @@ public final class TellurideLauncher {
         }, "TellurideLauncher::shutDownServer(" + port + ")");
     }
 
-    public static void launchServer(final File executable,
-                                    final int port,
-                                    final File saveDirectory) {
+    private static void launchServerProcess(final File executable,
+                                           final int port,
+                                           final File saveDirectory) {
         if (SERVER_UP.get()) {
             LOG.info("TellurideLauncher::launchServer aborted, server already up.");
             return;

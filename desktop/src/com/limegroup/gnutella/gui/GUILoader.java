@@ -21,7 +21,8 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.bugs.FatalBugManager;
-import com.limegroup.gnutella.gui.search.SearchEngine;
+import com.limegroup.gnutella.settings.SearchSettings;
+import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 
 import javax.swing.*;
@@ -60,7 +61,10 @@ class GUILoader {
             Initializer initializer = new Initializer();
             initializer.initialize(args, frame);
 
-            SearchEngine.startTellurideRPCServer();
+            TellurideLauncher.startTellurideRPCServer(
+                    FrostWireUtils.getTellurideLauncherFile(),
+                    SearchSettings.TELLURIDE_RPC_PORT.getValue(),
+                    SharingSettings.TORRENTS_DIR_SETTING.getValue());
         } catch (Throwable err) {
             hideSplash(frame);
             try {

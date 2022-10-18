@@ -29,7 +29,6 @@ import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
-import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
@@ -38,33 +37,30 @@ import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
-import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
+import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
-import static com.limegroup.gnutella.settings.SearchSettings.TELLURIDE_RPC_PORT;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 public abstract class SearchEngine {
-    private static final Logger LOG = Logger.getLogger(SearchEngine.class);
+    //private static final Logger LOG = Logger.getLogger(SearchEngine.class);
     private static final int DEFAULT_TIMEOUT = 5000;
 
     private static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
-    private static File TELLURIDE_LAUNCHER = null;
 
     enum SearchEngineID {
         TPB_ID,
@@ -224,43 +220,15 @@ public abstract class SearchEngine {
         }
     };
 
-    public static void startTellurideRPCServer() {
-        if (TELLURIDE_LAUNCHER == null) {
-            TELLURIDE_LAUNCHER = FrostWireUtils.getTellurideLauncherFile();
-        }
-        if (TELLURIDE_LAUNCHER != null) {
-            LOG.info("TELLURIDE_LAUNCHER: File -> " + TELLURIDE_LAUNCHER.getAbsolutePath());
-
-            // Trust but verify,
-            if (TellurideLauncher.checkIfUpAlready(TELLURIDE_RPC_PORT.getValue())) {
-                LOG.info("SearchEngine.startTellurideRPCServer() Telluride was up already, previously bad shutdown. Let's shut it down and restart it...");
-                TellurideLauncher.shutdownServer(TELLURIDE_RPC_PORT.getValue());
-                TellurideLauncher.SERVER_UP.set(false);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (!TellurideLauncher.SERVER_UP.get()) {
-                LOG.info("Launching Telluride RPC Server on " + TELLURIDE_RPC_PORT.getValue() + "...");
-                TellurideLauncher.launchServer(
-                        TELLURIDE_LAUNCHER,
-                        TELLURIDE_RPC_PORT.getValue(),
-                        SharingSettings.TORRENTS_DIR_SETTING.getValue());
-            }
-        } else {
-            LOG.warn("TELLURIDE_LAUNCHER could not be found");
-        }
-    }
-
     private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", TELLURIDE_ENABLED, "*") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TellurideSearchPerformer(token,
                     keywords,
-                    new TellurideSearchPerformerDesktopListener());
+                    new TellurideSearchPerformerDesktopListener(),
+                    FrostWireUtils.getTellurideLauncherFile(),
+                    SearchSettings.TELLURIDE_RPC_PORT.getValue(),
+                    SharingSettings.TORRENTS_DIR_SETTING.getValue());
         }
     };
 

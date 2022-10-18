@@ -26,13 +26,18 @@ import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.limegroup.gnutella.gui.search.SearchEngine;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * This search performer only launches the RPC backend on desktop since we don't include
+ * a standalone Python VM for desktop.
+ * In Android, a new Python VM is used for search and then some methods here are used, like getValidResults()
+ */
 public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private static final Logger LOG = Logger.getLogger(TellurideSearchPerformer.class);
     private static Gson gson = null;
@@ -40,19 +45,30 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private final CountDownLatch performerLatch;
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
+    private final File tellurideLauncher;
+    private final int rpcPort;
+    private final File torrentsDir;
+
+
 
     public TellurideSearchPerformer(long token,
                                     String _url,
-                                    TellurideSearchPerformerListener _performerListener) {
+                                    TellurideSearchPerformerListener _performerListener,
+                                    File _tellurideLauncher,
+                                    int _rpcPort,
+                                    File _torrentsDir) {
         super(token);
 
         // Many of these could turn into a URL fix method.
         if (_url.contains("instagram.com/reel")) {
             _url = _url.replace("reel/", "p/");
         }
-
         url = _url;
         performerListener = _performerListener;
+        tellurideLauncher = _tellurideLauncher;
+        rpcPort = _rpcPort;
+        torrentsDir = _torrentsDir;
+
         performerLatch = new CountDownLatch(1);
         if (gson == null) {
             gson = new GsonBuilder().create();
@@ -78,7 +94,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
         if (seconds_to_wait_for_telluride_server == 0) {
             LOG.info("perform(): timed out waiting for telluride server to start. finished. Invoking SearchEngine.startTellurideRPCServer()");
-            SearchEngine.startTellurideRPCServer();
+            TellurideLauncher.startTellurideRPCServer(tellurideLauncher, rpcPort, torrentsDir);
             return;
         }
 
