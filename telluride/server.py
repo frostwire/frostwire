@@ -60,6 +60,7 @@ def start(build_number, http_port_number=DEFAULT_HTTP_PORT):
     def reject_remote_requests():
         #pylint: disable=unused-variable
         if request.remote_addr not in ('127.0.0.1', 'localhost'):
+            print(f"telluride::server::start::reject_remote_request: rejecting request from remote_addr={request.remote_addr}")
             return jsonify({'build': build_number, 'message': 'gtfo'}), 403
         return None
     @app.route('/')
