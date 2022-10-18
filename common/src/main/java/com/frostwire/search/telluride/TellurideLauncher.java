@@ -44,7 +44,7 @@ public final class TellurideLauncher {
 
             // Trust but verify,
             if (TellurideLauncher.checkIfUpAlready(port)) {
-                LOG.info("SearchEngine.startTellurideRPCServer() Telluride was up already, previously bad shutdown. Let's shut it down and restart it...");
+                LOG.info("TellurideLauncher.startTellurideRPCServer() Telluride was up already, previously bad shutdown. Let's shut it down and restart it...");
                 TellurideLauncher.shutdownServer(port);
                 TellurideLauncher.SERVER_UP.set(false);
                 try {
@@ -55,14 +55,14 @@ public final class TellurideLauncher {
             }
 
             if (!TellurideLauncher.SERVER_UP.get()) {
-                LOG.info("Launching Telluride RPC Server on " + port + "...");
+                LOG.info("TellurideLauncher: Launching Telluride RPC Server on " + port + "...");
                 TellurideLauncher.launchServerProcess(
                         tellurideLauncher,
                         port,
                         torrentsDir);
             }
         } else {
-            LOG.warn("TELLURIDE_LAUNCHER could not be found");
+            LOG.warn("TellurideLauncher: TELLURIDE_LAUNCHER could not be found");
         }
     }
 
@@ -113,6 +113,7 @@ public final class TellurideLauncher {
             LOG.info("TellurideLauncher::launchServer::ThreadExecutor.startThread with ProcessBuilder");
                     ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), "--server", String.valueOf(port));
                     processBuilder.redirectErrorStream(true);
+                    processBuilder.redirectOutput();
                     if (saveDirectory != null && saveDirectory.isDirectory() && saveDirectory.canWrite()) {
                         processBuilder.directory(saveDirectory);
                     }
@@ -124,6 +125,8 @@ public final class TellurideLauncher {
                         Thread.sleep(8000);
                         LOG.info("TellurideLauncher::launchServer is process alive: " + process.isAlive());
                         LOG.info("TellurideLauncher::launchServer RPC server should be up at http://127.0.0.1:" + port + "/ping");
+                        LOG.info("TellurideLauncher::launcheServer waiting 5 seconds to check if it's up...");
+                        Thread.sleep(5000);
                         LOG.info("TellurideLauncher::launchServer pinging...");
                         TellurideLauncher.checkIfUpAlready(port);
                         if (!SERVER_UP.get()) {
