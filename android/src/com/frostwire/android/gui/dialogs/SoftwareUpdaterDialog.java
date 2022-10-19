@@ -20,6 +20,7 @@ package com.frostwire.android.gui.dialogs;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -95,11 +96,16 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
 
         Button yesButton = findView(dlg, R.id.dialog_default_update_button_yes);
         yesButton.setText(android.R.string.ok);
-        yesButton.setOnClickListener(v -> {
-            UIUtils.openURL(getActivity(),Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
-            //Asyncs.async(this, SoftwareUpdaterDialog::onUpdateAcceptedTask, apkDownloadURL);
-            dismiss();
-        });
+        yesButton.setOnClickListener(this::onYesClick);
         noButton.setOnClickListener(v -> dismiss());
+    }
+
+    private void onYesClick(View v) {
+        // Google Play distribution (even if it's a dev. build)
+        UIUtils.openURL(getActivity(),
+                Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
+                        Constants.FROSTWIRE_ANDROID_GOOGLE_PLAY_URL :
+                        Constants.FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL);
+        dismiss();
     }
 }

@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,18 +30,12 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.Asyncs;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
 
@@ -84,20 +78,17 @@ public final class SoftwareUpdater {
             return;
         }
         updateTimestamp = now;
-        Asyncs.async(activity, SoftwareUpdater::checkUpdateAsyncTask, this, SoftwareUpdater::checkUpdateAsyncPost);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                    final boolean result = SoftwareUpdater.checkUpdateAsyncTask(activity, this);
+                    SystemUtils.postToUIThread(() -> SoftwareUpdater.checkUpdateAsyncPost(activity, this, result));
+                });
     }
 
     /**
      * @return true if there's an update available.
      */
-    private boolean handleOTAUpdate() {
-        if (update.a != null && !UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                LOG.info("handleOTAUpdate(): it's Google Play, aborting -> false");
-                return false;
-            }
-        }
-
+    private boolean shouldHandleOTAUpdate() {
         if (UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
             LOG.info("handleOTAUpdate() overriding, take update from OTA message");
             update.a = UPDATE_ACTION_OTA;
@@ -113,29 +104,6 @@ public final class SoftwareUpdater {
                 // we won't download the apk, we'll let the user download it with the
                 // web browser.
                 return true;
-////// START OF DOWNLOAD INSTALLER LOGIC SECTION
-//                // did we download the newest already?
-//                if (downloadedLatestFrostWire(update.md5)) {
-//                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
-//                    return true;
-//                }
-//                // didn't download it? go get it now
-//                else {
-//                    File apkDirectory = getUpdateApk().getParentFile();
-//                    if (!apkDirectory.exists()) {
-//                        apkDirectory.mkdirs();
-//                    }
-//
-//                    LOG.info("handleOTAUpdate(): Downloading update... (" + update.md5 + ")");
-//                    HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).save(update.u, getUpdateApk());
-//                    LOG.info("handleOTAUpdate(): Finished downloading update... (" + update.md5 + ")");
-//                    if (downloadedLatestFrostWire(update.md5)) {
-//                        LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> true");
-//                        return true;
-//                    }
-//                    LOG.info("handleOTAUpdate(): downloadedLatestFrostWire(" + update.md5 + ") -> false");
-//                }
-////// END OF DOWNLOAD INSTALLER LOGIC SECTION
             } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
                 return update.m != null;
             }
@@ -150,13 +118,6 @@ public final class SoftwareUpdater {
             }
 
             if (update.a.equals(UPDATE_ACTION_OTA)) {
-////// START OF DOWNLOAD INSTALLER LOGIC SECTION
-// Commenting out until we figure out PackageInstaller interaction
-//                if (!ALWAYS_SHOW_UPDATE_DIALOG && !getUpdateApk().exists()) {
-//                    LOG.info("notifyUserAboutUpdate(): " + getUpdateApk().getAbsolutePath() + " not found. Aborting.");
-//                    return;
-//                }
-////// END OF DOWNLOAD INSTALLER LOGIC SECTION
                 // Fresh runs with fast connections might send the broadcast intent before
                 // MainActivity has had a chance to register the broadcast receiver (onResume)
                 // therefore, the menu update icon will only show on the 2nd run only
@@ -212,38 +173,6 @@ public final class SoftwareUpdater {
         return result;
     }
 
-    private static String getMD5(File f) {
-        try {
-            MessageDigest m = MessageDigest.getInstance("MD5");
-
-            // We read the file in buffers so we don't
-            // eat all the memory in case we have a huge plugin.
-            byte[] buf = new byte[65536];
-            int num_read;
-
-            InputStream in = new BufferedInputStream(new FileInputStream(f));
-
-            while ((num_read = in.read(buf)) != -1) {
-                m.update(buf, 0, num_read);
-            }
-
-            in.close();
-
-            StringBuilder result = new StringBuilder(new BigInteger(1, m.digest()).toString(16));
-
-            // pad with zeros if until it's 32 chars long.
-            if (result.length() < 32) {
-                int paddingSize = 32 - result.length();
-                for (int i = 0; i < paddingSize; i++) {
-                    result.insert(0, "0");
-                }
-            }
-            return result.toString();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     private void updateConfiguration(Update update, MainActivity mainActivity) {
         if (update.config == null) {
             return;
@@ -283,20 +212,6 @@ public final class SoftwareUpdater {
 
         // This has to be invoked once again here. It gets invoked by main activity on resume before we're done on this thread.
         Offers.initAdNetworks(mainActivity);
-    }
-
-    private static boolean checkMD5(File f, String expectedMD5) {
-        if (expectedMD5 == null) {
-            return false;
-        }
-
-        if (expectedMD5.length() != 32) {
-            return false;
-        }
-
-        String checkedMD5 = getMD5(f);
-        LOG.info("checkMD5(expected=" + expectedMD5 + ", checked=" + checkedMD5 + ")");
-        return checkedMD5 != null && checkedMD5.trim().equalsIgnoreCase(expectedMD5.trim());
     }
 
     private static byte[] buildVersion() {
@@ -370,6 +285,7 @@ public final class SoftwareUpdater {
 
     private static boolean checkUpdateAsyncTask(MainActivity activity,
                                                 final SoftwareUpdater softwareUpdater) {
+        SystemUtils.ensureBackgroundThreadOrCrash("SoftwareUpdater::checkUpdateAsyncTask");
         try {
             byte[] jsonBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC).
                     getBytes(Constants.SERVER_UPDATE_URL, 5000, Constants.USER_AGENT, null);
@@ -390,7 +306,7 @@ public final class SoftwareUpdater {
             } else {
                 LOG.warn("Could not fetch update information from " + Constants.SERVER_UPDATE_URL);
             }
-            return softwareUpdater.handleOTAUpdate();
+            return softwareUpdater.shouldHandleOTAUpdate();
         } catch (Throwable e) {
             LOG.error("Failed to check/retrieve/update the update information", e);
         }
@@ -399,6 +315,7 @@ public final class SoftwareUpdater {
 
     private static void checkUpdateAsyncPost(MainActivity activity,
                                              final SoftwareUpdater softwareUpdater, boolean result) {
+        SystemUtils.ensureUIThreadOrCrash("SoftwareUpdater::checkUpdateAsyncPost");
         //nav menu or other components always needs to be updated after we read the config.
         Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
         intent.putExtra("value", result);

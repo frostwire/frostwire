@@ -178,6 +178,7 @@ public final class Constants {
     public static final String ALL_FEATURED_DOWNLOADS_URL = "https://www.frostwire.com/featured-downloads/";
     public static final String FROSTWIRE_PREVIEW_DOT_COM_URL = "https://www.frostwire-preview.com/";
     public static final String FROSTWIRE_ANDROID_DOWNLOAD_PAGE_URL = "https://www.frostwire.com/download/?os=android&from=OTA";
+    public static final String FROSTWIRE_ANDROID_GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id=com.frostwire.android";
 
     public static final String USER_AGENT = "FrostWire/android-" + (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? "basic" : "plus") + "/" + Constants.FROSTWIRE_VERSION_STRING + "/" + Constants.FROSTWIRE_BUILD;
 
