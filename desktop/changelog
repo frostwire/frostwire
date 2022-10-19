@@ -1,4 +1,5 @@
 frostwire (6.9.10) stable; urgency=high
+  * Java Runtime Environment 19.0.1
   * telluride build 23
   * supports TikTok, IG Reels, YT Stories backups
   * com.google.re2j:re2j:1.7
@@ -6,7 +7,7 @@ frostwire (6.9.10) stable; urgency=high
   * com.squareup.okhttp:4.10.0
   * dev: org.junit.jupiter:junit-jupiter:5.9.0
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 10 Oct 2022 18:00:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 18 Oct 2022 21:38:00 -0600
 
 frostwire (6.9.9) stable; urgency=high
   * jlibtorrent 1.2.17.0 (boost 1.80, openssl 1.1.1q)
