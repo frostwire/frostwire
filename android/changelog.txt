@@ -1,7 +1,8 @@
-FrostWire 2.6.2 build 708 - OCT/14/2022
+FrostWire 2.6.2 build 708 - OCT/19/2022
  - removed MobileFuse adapter
  - telluride build 23
  - supports downloads of IG Reels, YT Stories and TikToks
+ - basic uses update dialog when OTA message available
  - com.google.re2j:re2j:1.7
  - com.google.code.gson:gson:2.9.0
  - androidx.exifinterface:exifinterface:1.3.4
