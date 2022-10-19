@@ -65,8 +65,7 @@ public class LanguageUtils {
         } else {
             LOG.warn("Could not find bundle jar to determine locales");
         }
-        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(
-                o2.getDisplayName(o2)));
+        locales.sort((o1, o2) -> o1.getDisplayName(o1).compareToIgnoreCase(o2.getDisplayName(o2)));
         locales.remove(Locale.ENGLISH);
         locales.add(0, Locale.ENGLISH);
         // remove languages that cannot be displayed using this font
@@ -84,12 +83,10 @@ public class LanguageUtils {
             Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
-                if (!name.startsWith(BUNDLE_PREFIX) || !name.endsWith(BUNDLE_POSTFIX)
-                        || name.contains("$")) {
+                if (!name.startsWith(BUNDLE_PREFIX) || !name.endsWith(BUNDLE_POSTFIX) || name.contains("$")) {
                     continue;
                 }
-                String iso = name.substring(BUNDLE_PREFIX.length(), name.length()
-                        - BUNDLE_POSTFIX.length());
+                String iso = name.substring(BUNDLE_PREFIX.length(), name.length() - BUNDLE_POSTFIX.length());
                 List<String> tokens = new ArrayList<>(Arrays.asList(iso.split("_", 3)));
                 if (tokens.size() < 1) {
                     continue;
@@ -97,7 +94,21 @@ public class LanguageUtils {
                 while (tokens.size() < 3) {
                     tokens.add("");
                 }
-                Locale locale = new Locale.Builder().setLanguage(tokens.get(0)).setRegion(tokens.get(1)).setVariant(tokens.get(2)).build();
+                String language = tokens.get(0);
+                String region = tokens.get(1);
+                if (region.length() > 3 ||
+                        (region.length() == 3 && region.matches("[a-zA-Z]+"))) {
+                    region = "";
+                }
+                String variant = tokens.get(2);
+
+                LOG.info("LanguageUtils.addLocalesFromJar: name=%s, language=%s, region=%s, variant=%s".formatted(name, language, region, variant));
+
+                Locale locale = new Locale.Builder().
+                        setLanguage(language).
+                        setRegion(region).
+                        setVariant(variant).
+                        build();
                 locales.add(locale);
             }
         } catch (IOException e) {
@@ -146,9 +157,7 @@ public class LanguageUtils {
      */
     static boolean matchesDefaultLocale(Locale locale) {
         Locale systemLocale = Locale.getDefault();
-        return matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage())
-                && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry())
-                && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
+        return matchesOrIsMoreSpecific(systemLocale.getLanguage(), locale.getLanguage()) && matchesOrIsMoreSpecific(systemLocale.getCountry(), locale.getCountry()) && matchesOrIsMoreSpecific(systemLocale.getVariant(), locale.getVariant());
     }
 
     private static boolean matchesOrIsMoreSpecific(String detailed, String generic) {
