@@ -62,7 +62,7 @@ public final class Logger {
         }
         if (stackTrace.length >= 6) {
             StackTraceElement stackElement = stackTrace[6];
-            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.threadId() + ")>";
+            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
         }
         return caller;
     }
