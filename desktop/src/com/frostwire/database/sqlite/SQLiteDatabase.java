@@ -245,6 +245,7 @@ public class SQLiteDatabase {
                 try {
                     statement.close();
                 } catch (Throwable ignored) {
+                    LOG.info("Ignored error closing statement", ignored);
                 }
             }
         }
