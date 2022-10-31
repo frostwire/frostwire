@@ -95,7 +95,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                         }
                     } else {
                         LOG.error("TorrentRegexSearchPerformer.crawlSearchResult(" + sr.getClass().getPackage().getName() + "): Update Necessary: Search broken.\n(please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)\n" +
-                                "pattern: " + htmlDetailPagePattern.toString() + "\n" +
+                                "pattern: " + htmlDetailPagePattern + "\n" +
                                 sr.getDetailsUrl() + "\n\n");
                         // comment this when in production
                         //LOG.info("================================================================\n\n"+html);

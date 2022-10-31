@@ -98,7 +98,7 @@ class InstallerUpdater implements Runnable {
         }
         buf.append(" TO:");
         buf.append(th.savePath());
-        System.out.println(buf.toString());
+        System.out.println(buf);
     }
 
     static String getLastMD5() {

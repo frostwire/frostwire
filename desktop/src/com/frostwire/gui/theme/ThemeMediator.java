@@ -82,9 +82,11 @@ public final class ThemeMediator {
             });
         } catch (Throwable e) {
             if (e instanceof InvocationTargetException) {
-                e = ((InvocationTargetException) e).getTargetException();
+                throw new RuntimeException("Unable to change the L&F",
+                        ((InvocationTargetException) e).getTargetException());
+            } else {
+                throw new RuntimeException("Unable to change the L&F", e);
             }
-            throw new RuntimeException("Unable to change the L&F", e);
         }
     }
 

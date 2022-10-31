@@ -684,7 +684,7 @@ public class FileUtils {
                     } finally {
                         if (bytes.position() > 0) {
                             bytes.flip();
-                            buffer.append(UTF8.decode(bytes).toString());
+                            buffer.append(UTF8.decode(bytes));
                             bytes.clear();
                         }
                     }

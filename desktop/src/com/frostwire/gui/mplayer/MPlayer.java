@@ -50,16 +50,21 @@ public class MPlayer extends BaseMediaPlayer {
     private static final String ID_EXIT = "ID_EXIT=";
     private static final String ICY_INFO = "ICY Info:";
     private static final Pattern v_timeInfo = Pattern
-            .compile("A:\\s*([0-9\\.]+) V:\\s*[0-9\\.]* .*");
+            .compile("A:\\s*([\\d\\.]+) V:\\s*[\\d\\.]* .*");
     private static final Pattern a_timeInfo = Pattern
             .compile("A:\\s*([0-9\\.]+) .*");
     private static final Logger LOG = Logger.getLogger(MPlayer.class);
+    public static final String ID_AID = "ID_AID_";
+    public static final String ID_SID = "ID_SID_";
+    public static final String NAME = "_NAME=";
+    public static final String LANG = "_LANG=";
+    public static final String LOCATION = "Location";
     private final List<String> output;
     private volatile boolean disposed = false;
     private Dimension videoSize = null;
     private boolean firstLengthReceived = false;
     private boolean firstVolumeReceived = false;
-    private MPlayerInstance current_instance;
+    private MPlayerInstance mPlayerInstance;
     private boolean parsingLanguage;
     private boolean isAudioTrack;
     private Language language;
@@ -78,8 +83,8 @@ public class MPlayer extends BaseMediaPlayer {
     private MPlayer(PlayerPreferences preferences) {
         super(preferences);
         output = new LinkedList<>();
-        // System.out.println(line);
         Thread outputParser = new Thread("MPlayer output parser") {
+            @Override
             public void run() {
                 try {
                     while (!disposed) {
@@ -92,15 +97,14 @@ public class MPlayer extends BaseMediaPlayer {
                             }
                         }
                         if (line != null) {
-                            // System.out.println(line);
                             try {
                                 parseOutput(line);
-                            } catch (Throwable e) {
+                            } catch (Exception e) {
                                 LOG.error(e.getMessage(), e);
                             }
                         }
                     }
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     LOG.error(e.getMessage(), e);
                 }
             }
@@ -115,20 +119,18 @@ public class MPlayer extends BaseMediaPlayer {
 
     private void parseOutput(String line) {
         boolean stillParsing = false;
-        // if ( !line.startsWith( "A:")){
-        // System.out.println(line);
-        // }
-        Matcher v_matcher = v_timeInfo.matcher(line);
-        Matcher a_matcher = a_timeInfo.matcher(line);
-        if (v_matcher.matches()) {
-            float time = Float.parseFloat(v_matcher.group(1));
+
+        Matcher vMatcher = v_timeInfo.matcher(line);
+        Matcher aMatcher = a_timeInfo.matcher(line);
+        if (vMatcher.matches()) {
+            float time = Float.parseFloat(vMatcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
             if (instance != null) {
                 instance.positioned(time);
             }
             reportPosition(time);
-        } else if (a_matcher.matches()) {
-            float time = Float.parseFloat(a_matcher.group(1));
+        } else if (aMatcher.matches()) {
+            float time = Float.parseFloat(aMatcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
             if (instance != null) {
                 instance.positioned(time);
@@ -254,43 +256,32 @@ public class MPlayer extends BaseMediaPlayer {
                 e.printStackTrace();
             }
         } else if (parsingLanguage && (line.startsWith(ID_FILE_SUB_FILENAME))) {
+            String fileName = line.substring(ID_FILE_SUB_FILENAME.length());
             try {
-                String fileName = line.substring(ID_FILE_SUB_FILENAME.length());
-                try {
-                    File f = new File(fileName);
-                    language.setSourceInfo(f.getAbsolutePath());
-                    fileName = f.getName();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                language.setName(fileName);
-                // Locale locale =
-                // OpenSubtitlesAPI.getLocalSubtitleLanguage(getOpenedFile(),
-                // fileName);
-                // if(locale != null) {
-                // language.setLanguage(locale);
-                // }
-                stillParsing = false;
+                File f = new File(fileName);
+                language.setSourceInfo(f.getAbsolutePath());
+                fileName = f.getName();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            language.setName(fileName);
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId() + "_NAME=") || line
-                .startsWith("ID_SID_" + language.getId() + "_NAME="))) {
-            String key = "ID_AID_" + language.getId() + "_NAME=";
+                && (line.startsWith(ID_AID + language.getId() + NAME) || line
+                .startsWith(ID_SID + language.getId() + NAME))) {
+            String key = ID_AID + language.getId() + NAME;
             String name = line.substring(key.length());
             language.setName(name);
             stillParsing = true;
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId() + "_LANG=") || line
-                .startsWith("ID_SID_" + language.getId() + "_LANG="))) {
-            String key = "ID_AID_" + language.getId() + "_LANG=";
+                && (line.startsWith(ID_AID + language.getId() + LANG) || line
+                .startsWith(ID_SID + language.getId() + LANG))) {
+            String key = ID_AID + language.getId() + LANG;
             String isoCode = line.substring(key.length());
             language.setLanguage(isoCode);
             stillParsing = true;
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId()) || line
-                .startsWith("ID_SID_" + language.getId()))) {
+                && (line.startsWith(ID_AID + language.getId()) || line
+                .startsWith(ID_SID + language.getId()))) {
             stillParsing = true;
         } else if (line.startsWith(ID_AUDIO_TRACK)) {
             try {
@@ -324,16 +315,14 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.contains("VO: ")) {
             parseVideoSize(line);
         }
-        // else System.out.println(line);
+
         if (parsingLanguage && !stillParsing) {
             Language parsed = language;
             reportParsingDone();
             MPlayerInstance instance = getCurrentInstance();
-            if (instance != null) {
-                if (instance.activateNextSubtitleLoaded) {
+            if (instance != null && instance.activateNextSubtitleLoaded) {
                     instance.activateNextSubtitleLoaded = false;
                     setSubtitles(parsed);
-                }
             }
         }
     }
@@ -389,7 +378,7 @@ public class MPlayer extends BaseMediaPlayer {
         MPlayerInstance instance;
         synchronized (this) {
             doStop(false);
-            instance = current_instance = new MPlayerInstance();
+            instance = mPlayerInstance = new MPlayerInstance();
         }
         reportNewState(MediaPlaybackState.Opening);
         firstLengthReceived = false;
@@ -401,9 +390,9 @@ public class MPlayer extends BaseMediaPlayer {
             try {
                 int responseCode = httpClient.head(fileOrUrl, 5000, responseHeaders);
                 if (responseCode == 302 &&
-                        responseHeaders.containsKey("Location") &&
-                        responseHeaders.get("Location").get(0) != null) {
-                    fileOrUrl = responseHeaders.get("Location").get(0);
+                        responseHeaders.containsKey(LOCATION) &&
+                        responseHeaders.get(LOCATION).get(0) != null) {
+                    fileOrUrl = responseHeaders.get(LOCATION).get(0);
                 }
             } catch (IOException e) {
                 LOG.error(e.getMessage(), e);
@@ -419,7 +408,7 @@ public class MPlayer extends BaseMediaPlayer {
 
     private MPlayerInstance getCurrentInstance() {
         synchronized (this) {
-            return (current_instance);
+            return (mPlayerInstance);
         }
     }
 
@@ -473,22 +462,22 @@ public class MPlayer extends BaseMediaPlayer {
         doStop(true);
     }
 
-    private void doStop(boolean report_state) {
+    private void doStop(boolean reportState) {
         synchronized (this) {
-            if (current_instance != null) {
+            if (mPlayerInstance != null) {
                 if (preferences != null) {
                     preferences.setPositionForFile(getOpenedFile(),
                             getPositionInSecs());
                 }
-                current_instance.doStop();
-                current_instance = null;
+                mPlayerInstance.doStop();
+                mPlayerInstance = null;
             }
             synchronized (output) {
                 output.clear();
                 output.notifyAll();
             }
         }
-        if (report_state) {
+        if (reportState) {
             reportNewState(MediaPlaybackState.Stopped);
         }
     }

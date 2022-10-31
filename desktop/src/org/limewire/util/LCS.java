@@ -280,7 +280,7 @@ public class LCS {
             if (type != null) {
                 buf.append("<b>");
             }
-            return "<html>" + buf.toString() + "</html>";
+            return "<html>" + buf + "</html>";
         }
 
         private String escapeHtml(Character ch) {

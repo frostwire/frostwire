@@ -45,8 +45,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
@@ -58,8 +56,8 @@ import java.util.Vector;
  * @author Jeff Dinkins
  */
 public class BaseFileChooserUI extends BasicFileChooserUI {
-    private final static int space = 10;
-    private static final Dimension hstrut5 = new Dimension(5, 1);
+    private final static int SPACE = 10;
+    private static final Dimension HSTRUT5 = new Dimension(5, 1);
     //private static final Dimension hstrut11 = new Dimension(11, 1);
     private static final Dimension vstrut5 = new Dimension(1, 5);
     private static final Insets shrinkwrap = new Insets(0, 0, 0, 0);
@@ -141,10 +139,12 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         }
     }
 
+    @Override
     public void installUI(JComponent c) {
         super.installUI(c);
     }
 
+    @Override
     public void uninstallComponents(JFileChooser fc) {
         fc.removeAll();
         bottomPanel = null;
@@ -204,7 +204,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         upFolderButton.setAlignmentY(JComponent.CENTER_ALIGNMENT);
         upFolderButton.setMargin(shrinkwrap);
         topButtonPanel.add(upFolderButton);
-        topButtonPanel.add(Box.createRigidArea(hstrut5));
+        topButtonPanel.add(Box.createRigidArea(HSTRUT5));
         // Home Button
         File homeDir = fsv.getHomeDirectory();
         String toolTipText = homeFolderToolTipText;
@@ -220,7 +220,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
         b.setMargin(shrinkwrap);
         b.addActionListener(getGoHomeAction());
         topButtonPanel.add(b);
-        topButtonPanel.add(Box.createRigidArea(hstrut5));
+        topButtonPanel.add(Box.createRigidArea(HSTRUT5));
         // New Directory Button
         if (!UIManager.getBoolean("FileChooser.readOnly")) {
             b = new JButton(filePane.getNewFolderAction());
@@ -234,7 +234,7 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
             b.setMargin(shrinkwrap);
         }
         topButtonPanel.add(b);
-        topButtonPanel.add(Box.createRigidArea(hstrut5));
+        topButtonPanel.add(Box.createRigidArea(HSTRUT5));
         // View button group
         ButtonGroup viewButtonGroup = new ButtonGroup();
         // List Button
@@ -957,14 +957,14 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
         public void paintIcon(Component c, Graphics g, int x, int y) {
             if (c.getComponentOrientation().isLeftToRight()) {
-                icon.paintIcon(c, g, x + depth * space, y);
+                icon.paintIcon(c, g, x + depth * SPACE, y);
             } else {
                 icon.paintIcon(c, g, x, y);
             }
         }
 
         public int getIconWidth() {
-            return icon.getIconWidth() + depth * space;
+            return icon.getIconWidth() + depth * SPACE;
         }
 
         public int getIconHeight() {
@@ -1135,10 +1135,10 @@ public class BaseFileChooserUI extends BasicFileChooserUI {
 
         public void propertyChange(PropertyChangeEvent e) {
             String prop = e.getPropertyName();
-            if (prop == JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY) {
+            if (prop.equals(JFileChooser.CHOOSABLE_FILE_FILTER_CHANGED_PROPERTY)) {
                 filters = (FileFilter[]) e.getNewValue();
                 fireContentsChanged(this, -1, -1);
-            } else if (prop == JFileChooser.FILE_FILTER_CHANGED_PROPERTY) {
+            } else if (prop.equals(JFileChooser.FILE_FILTER_CHANGED_PROPERTY)) {
                 fireContentsChanged(this, -1, -1);
             }
         }

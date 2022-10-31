@@ -205,8 +205,8 @@ public class MultiLineLabel extends JTextArea {
             if (word.equals(" "))
                 continue;
             isNewLine = word.equals("\n");
-            if (isNewLine || fm.stringWidth(cursb.toString() + word) > newWidth) {
-                sb.append(cursb.toString());
+            if (isNewLine || fm.stringWidth(cursb + word) > newWidth) {
+                sb.append(cursb);
                 sb.append("\n");
                 cursb = new StringBuilder();
             }
@@ -215,7 +215,7 @@ public class MultiLineLabel extends JTextArea {
                 cursb.append(" ");
             }
         }
-        sb.append(cursb.toString());
+        sb.append(cursb);
         return sb.toString();
     }
 

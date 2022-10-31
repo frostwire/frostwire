@@ -136,7 +136,7 @@ public class IPFilterPaneItem extends AbstractPaneItem {
                 http.setListener(new IPFilterHttpListener(this, new File(CommonUtils.getUserSettingsDir(), "downloaded_blocklist.temp")));
                 httpExecutor.execute(() -> {
                             try {
-                                LOG.info("http.get() -> " + uri.toURL().toString());
+                                LOG.info("http.get() -> " + uri.toURL());
                                 http.get(uri.toURL().toString());
                             } catch (IOException e) {
                                 e.printStackTrace();

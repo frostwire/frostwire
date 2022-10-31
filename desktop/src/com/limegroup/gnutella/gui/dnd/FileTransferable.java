@@ -108,7 +108,7 @@ public class FileTransferable implements Transferable {
                 if (sb.length() > 0) {
                     sb.append(lineSep);
                 }
-                sb.append(uri.toString());
+                sb.append(uri);
             }
             return sb.toString();
         } else {

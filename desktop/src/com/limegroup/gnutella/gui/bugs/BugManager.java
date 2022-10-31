@@ -198,7 +198,7 @@ public final class BugManager {
             classPath.append("  ").append(classpath).append("\n");
         }
         // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
-        detail = detail + "\nCLASSPATH:\n" + classPath.toString() + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
+        detail = detail + "\nCLASSPATH:\n" + classPath + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
                 "    ALPHA FEATURES: " + UISettings.ALPHA_FEATURES_ENABLED.getValue() + "\n" +
                 "    BETA FEATURES: " + UISettings.BETA_FEATURES_ENABLED.getValue() + "\n";
         bug.printStackTrace();
@@ -239,7 +239,7 @@ public final class BugManager {
                 }
                 os = new BufferedOutputStream(
                         new FileOutputStream(f.getPath(), true));
-                os.write((new Date().toString() + "\n").getBytes());
+                os.write((new Date() + "\n").getBytes());
                 os.write(info.toBugReport().getBytes());
                 os.write(SEPARATOR);
                 os.flush();

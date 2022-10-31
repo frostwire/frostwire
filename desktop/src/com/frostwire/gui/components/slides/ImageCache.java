@@ -110,7 +110,7 @@ public class ImageCache {
                 HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
                 byte[] data = newInstance.getBytes(url.toString());
                 if (data == null) {
-                    throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
+                    throw new IOException("ImageCache.loadUrl() got nothing at " + url);
                 }
                 if (data != null) {
                     image = ImageIO.read(new ByteArrayInputStream(data));
