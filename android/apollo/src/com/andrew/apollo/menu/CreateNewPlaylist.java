@@ -61,7 +61,7 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
         mPlaylistList = getArguments().getLongArray("playlist_list");
         mDefaultname = savedInstanceState != null ? savedInstanceState.getString("defaultname")
                 : makePlaylistName();
-        if (mDefaultname == null) {
+        if (mDefaultname == null && getDialog() != null) {
             getDialog().dismiss();
         }
     }
