@@ -76,11 +76,11 @@ be part of the development team._
 
 # How to build
 
-To build you will need the [Java Developer Kit 12](https://jdk.java.net/12/), [Apache Ant](http://ant.apache.org/) and [Gradle](http://gradle.org/)
+To build you will need the [Java Developer Kit 19](https://jdk.java.net/19/)
 
 ### Desktop
-Go inside the `desktop` directory and type:
-`gradle build`
+Go inside the [`desktop`](/desktop) directory and follow the build instructions in the [README.md](/desktop/README.md) file.
+
 
 **Additional Desktop requirements**
 
@@ -115,9 +115,10 @@ Frostwire Desktop and Frostwire Android are offered under the [GNU General Publi
 
 ### Official FrostWire sites
 
-[Main Website Frostwire.com](http://www.frostwire.com) |
-[Facebook](http://www.facebook.com/FrostWireOfficial) |
+[Main Website Frostwire.com](https://www.frostwire.com) |
+[Reddit](https://reddit.com/r/frostwire)
 [Twitter @frostwire](https://twitter.com/frostwire) |
+[Facebook](https://www.facebook.com/FrostWireOfficial) |
 [Discord Chatrooms](https://www.facebook.com/chat) |
 [Tumblr](http://tumblr.frostwire.com)
 
