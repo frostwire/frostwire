@@ -92,12 +92,14 @@ myGithubAccount git@github.com:/myGithubAccount/frostwire.git (push)
 
 Be sure that you're in the project root, else then execute:
 
-    cd frostwire/desktop
-    gradle clean build
+```bash
+cd frostwire/desktop
+./gradlew clean build
+```
 
 Then run the project with:
 
-    gradle run
+`./gradlew run`
     
 If you are using Windows, run the project with `run.bat`.
 
