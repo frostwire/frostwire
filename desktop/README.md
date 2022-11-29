@@ -6,8 +6,7 @@ FrostWire is a file sharing client and media management tool that was made using
 lots of cool open source projects. It was born from the legendary *LimeWire
 Gnutella* client, but it's evolved a hell of a lot since then.
 
-FrostWire no longer supports Gnutella,** it's a BitTorrent client, an Internet
-Radio client and Media Player.**
+**FrostWire is a BitTorrent client, Web Video Downloader and Media Player**, it no longer connects to the Gnutella network.
 
 Unlike most BitTorrent clients out there, FrostWire focuses on searching files
 and tries hard to make it as easy and convenient as possible to users.
@@ -31,6 +30,7 @@ The main software architecture (how things are organized) depends on the late
 layout has been simplified enourmously for FrostWire 6.
 
 - The BitTorrent power comes from the [frostwire-jlibtorrent](https://github.com/frostwire/frostwire-jlibtorrent) library.
+- Video downloading from hundreds of websites comes from [Telluride](/telluride) a [yt_dlp](https://github.com/yt-dlp/yt-dlp/) wrapper.
 - Media playback comes from the [MPlayer](http://www.mplayerhq.hu/design7/news.html) project
 - The good looks and skinning system comes from the Substance skinning project (which we've had to maintain on our repo to make it fit FrostWire needs)
 - HTTP interaction comes from the [Apache Commons](http://commons.apache.org/) project
@@ -39,7 +39,7 @@ layout has been simplified enourmously for FrostWire 6.
 
 # Installers
 
-If you're just looking for a FrostWire installer here are the latest official builds for [Windows, MacOSX, Linux](http://www.frostwire.com/downloads) and [Android](http://www.frostwire.com/android)
+If you're just looking for a FrostWire installer here are the latest official builds for [Windows, MacOSX, Linux](https://www.frostwire.com/downloads) and [Android](https://www.frostwire.com/android)
 
 # Build Requirements
 
@@ -47,16 +47,16 @@ Introductions aside, here's how you build this.
 
 Pre-requisites:
 
-* JDK 11 or later ([OpenJDK](http://openjdk.java.net/) or [Oracle JDK](http://www.oracle.com/technetwork/java/index.html))
+* JDK 19 or later ([OpenJDK](http://openjdk.java.net/) or [Oracle JDK](http://www.oracle.com/technetwork/java/index.html))
+* [Gradle](http://www.gradle.org/) (included with the `gradlew` Gradle Wrapper script)
 * [Apache Ant](http://ant.apache.org/)
-* [Gradle](http://www.gradle.org/)
 * [Git](http://www.git-scm.com/) to clone, check out the project to your machine.
 
 Make sure your `CLASSPATH`, `JAVA_HOME` and your `PATH` environment variables are set correctly.
 
 Example on a Ubuntu system's .bashrc file:
 
-    JAVA_HOME=/usr/lib/jvm/java-7-sun
+    JAVA_HOME=/usr/src/jdk-19
     CLASSPATH=${CLASSPATH}:${JAVA_HOME}/lib
     PATH=${PATH}:${JAVA_HOME}/bin
     export JAVA_HOME CLASSPATH PATH
@@ -64,7 +64,7 @@ Example on a Ubuntu system's .bashrc file:
 Most build problems are usually solved by having those environment variables set
 correctly. If you are a Windows or Mac user the process is fairly similar.
 
-We recommend using [IntelliJ Idea](http://www.jetbrains.com/idea/) as your development environment.
+We recommend using [IntelliJ Idea](https://www.jetbrains.com/idea/) as your development environment.
 
 # Git cloning instructions
 
@@ -145,8 +145,6 @@ If the build is not broken, hit us up at the [Developer Forum](http://forum.fros
 
 # Contribution Guidelines
 
-Every countribution merged to the master branch will automatically receive a tip of 1% of whatever funds are available on the [tip4commit fund](https://tip4commit.com/github/frostwire/frostwire-android).
-
 If you want to contribute code, start by looking at the [open issues on github.com](https://github.com/frostwire/frostwire/issues).
 
 If you want to fix a new issue that's not listed there, create the issue, see if
@@ -169,13 +167,17 @@ Please follow the following procedure when creating features to avoid unnecessar
 
 If your branch has taken a while to be accepted for merging into `master`, it's very likely that the `master` branch will have moved forward while you work. In this case, make sure to sync your `master`.
 
-    git checkout master
-    git pull upstream master
+```bash
+git checkout master
+git pull upstream master
+```
 
 and then rebase your branch to bring it up to speed so it can be merged properly (do not merge `master` into your branch):
 
-    git checkout my-branch
-    git rebase master
+```bash
+git checkout my-branch
+git rebase master
+```
 
 As you do this you may have to fix any possible conflicts, just follow the instruction git gives you if this is your first time.
 
@@ -191,12 +193,12 @@ be part of the development team._
 
 ### License
 
-Frostwire Desktop is offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html). Available [here](LICENSE.txt).
+Frostwire Desktop is offered under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 
 ### Official FrostWire sites
 
-[Main Website Frostwire.com](https://www.frostwire.com) |
+[Main Website Frostwire.com](httpss://www.frostwire.com) |
 [FrostWire SubReddit](https://reddit.com/frostwire) |
 [FrostWire Discord Chatrooms](https://www.frostwire.com/chat) |
 [Facebook](http://www.facebook.com/FrostWireOfficial) |
