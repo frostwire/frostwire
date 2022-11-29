@@ -2,7 +2,7 @@
 
 **A file sharing client, media player and simple file manager for your Android devices.**
 
-FrostWire for Android lets you search and download files from the BitTorrent network and several popular cloud services.
+FrostWire for Android lets you search and download files from the BitTorrent network and several popular cloud video services.
 
 All the BitTorrent functionality is done using FrostWire's [jlibtorrent](https://github.com/frostwire/frostwire-jlibtorrent) library, a set of high level [libtorrent](https://github.com/arvidn/libtorrent) wrappers.
 
@@ -55,12 +55,6 @@ git rebase master
 - Make sure to `squash` any cosmetic commits into the body of your work so that we don't pollute the history and you don't get more bitcoins than you should from the rest of the collaborators for things like fixing a typo you just introduced on your branch.
 
 
-# Tip4Commit
-
-You can donate for development, thereby encouraging some developers or you can participate and get a tip for commits we approve of.
-
-[![tip for next commit](https://tip4commit.com/projects/200.svg)](https://tip4commit.com/github/frostwire/frostwire-android)
-
 # Build instructions
 
 ## Android Studio
@@ -69,6 +63,12 @@ You can donate for development, thereby encouraging some developers or you can p
 2. Open the project in Android Studio.
 3. Wait for gradle sync and indices to update.
 4. Should work out of the box.
+
+## Command line
+
+```bash
+./gradlew assembleDebug
+```
 
 Happy coding.
 
