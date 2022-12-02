@@ -10,12 +10,13 @@
  gradle gettextBundle  - create messages.jar with the extracted strings.
 
 */
+plugins {
+  id 'java'
+  id 'application'
+}
 
 group 'com.frostwire'
 version '1.0-SNAPSHOT'
-
-apply plugin: 'java'
-apply plugin: 'application'
 
 import org.gradle.internal.os.OperatingSystem
 
