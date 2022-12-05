@@ -109,7 +109,7 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
                 "https://www.youtube.com/watch?v=fail",
                 new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
@@ -180,7 +180,7 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
                 "https://www.instagram.com/p/CTF5pA0jNZ8/", // Tristan de Crusher, IG
                 new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
@@ -239,7 +239,7 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(new File(workspacePath + "/frostwire/telluride/telluride" + executableSuffix),
+        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
                 "https://www.youtube.com/watch?v=1kaQP9XL6L4", // Alone Together - Mona Wonderlick · [Free Copyright-safe Music]
                 new File(System.getenv("HOME")+ "/FrostWire/Torrent Data"),
                 false,

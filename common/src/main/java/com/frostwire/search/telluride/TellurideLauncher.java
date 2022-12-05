@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A Java process builder and parser for the telluride cloud downloader.
- * Launches the process passing the appropiate options, parses its output to dispatch events to a TellurideListener
+ * Launches the process passing the appropriate options, parses its output to dispatch events to a TellurideListener
  */
 public final class TellurideLauncher {
 
