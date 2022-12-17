@@ -2,7 +2,7 @@
 
 ![Telluride Logo](logo/1024X1024-white-telluride-logo.png)
 
-### A portable and easy to use yt_dlp wrapper by FrostWire.
+### A portable and easy to use [yt_dlp](https://github.com/yt-dlp/yt-dlp) wrapper by FrostWire.
 
 ## Usage
 ```
