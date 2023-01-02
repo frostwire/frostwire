@@ -27,7 +27,7 @@ import yt_dlp
 # our imports
 import server
 
-BUILD = 23
+BUILD = 24
 
 
 def welcome():

@@ -1,3 +1,10 @@
+build 24 - jan/01/2023
+ - yt_dlp-2022.11.11
+ - astroid-2.12.13
+ - dev: pip-22.3.1
+ - dev: pyinstaller-5.7.0
+ - dev: pylint-2.15.9
+
 build 23 - oct/11/2022
  - replaced youtube_dl for yt_dlp fork
  - supports TikTok, Instagram Reels and YouTube Stories
