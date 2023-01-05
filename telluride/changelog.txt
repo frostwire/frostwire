@@ -1,5 +1,5 @@
 build 24 - jan/04/2023
- - yt_dlp-2022.11.11
+ - yt_dlp-2023.1.2
  - python 3.11.1
  - astroid-2.12.13
  - dev: pip-22.3.1
