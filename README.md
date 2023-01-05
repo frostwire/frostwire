@@ -8,10 +8,6 @@ Here you will find the sources necessary to build [FrostWire for Android](http:/
  * [/common](https://github.com/frostwire/frostwire/tree/master/common) Common sources for the desktop and android client
  * [/telluride](https://github.com/frostwire/frostwire/tree/master/telluride) Sources for our Telluride cloud video downloader
 
-In the past these sources were held at [frostwire-android](https://github.com/frostwire/frostwire-android), 
-[frostwire-desktop](https://github.com/frostwire/frostwire-desktop) and [frostwire-common](https://github.com/frostwire/frostwire-common) respectively.
-**These repositories will no longer be used.**
-
 # Coding Guidelines
 
 [5 Object Oriented Programming Principles learned during the last 15 years](http://bit.ly/y0hdR4)
