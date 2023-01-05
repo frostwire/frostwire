@@ -66,9 +66,12 @@ then
   EXTRA_FLAGS="--osx-bundle-identifier com.frostwire.Telluride"
 fi
 
+echo "Cleaning up..."
 cleanup
+echo "Running ${PYLINT_CMD}..."
 ${PYLINT_CMD} --max-line-length=350 telluride.py server.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
+echo "Running ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py"
 ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py
 
 if [ -f dist/telluride ]
