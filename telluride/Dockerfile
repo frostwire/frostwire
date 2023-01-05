@@ -1,5 +1,6 @@
 FROM --platform=linux/amd64 ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
+ARG PYTHON_VERSION_MAJOR=3.11
 ARG PYTHON_VERSION=3.11.1
 RUN apt update -y
 RUN apt upgrade -y
@@ -31,8 +32,8 @@ RUN cd Python-${PYTHON_VERSION} && \
  make -j4 build_all &&\
  make altinstall
 RUN rm Python-${PYTHON_VERSION}.tar.xz
-RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python3.10 /usr/bin/python3
-RUN ln -s /usr/local/bin/pip3.10 /usr/bin/pip3
+RUN rm /usr/bin/python3 && ln -s /usr/local/bin/python${PYTHON_VERSION_MAJOR} /usr/bin/python3
+RUN ln -s /usr/local/bin/pip${PYTHON_VERSION_MAJOR} /usr/bin/pip3
 RUN pip3 install --upgrade pip
 RUN pip3 install pyinstaller
 RUN pip3 install pylint
