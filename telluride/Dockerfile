@@ -1,6 +1,6 @@
 FROM --platform=linux/amd64 ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
-ARG PYTHON_VERSION=3.10.8
+ARG PYTHON_VERSION=3.11.1
 RUN apt update -y
 RUN apt upgrade -y
 RUN apt install libssl1.1 -y
