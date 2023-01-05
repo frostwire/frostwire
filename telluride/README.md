@@ -6,31 +6,33 @@
 
 ## Usage
 ```
-Telluride Cloud Video Downloader. Build 23
-Copyright 2020-2022 FrostWire LLC. Licensed under Apache 2.0.
+Telluride Cloud Video Downloader. Build 24
+Copyright 2020-2023 FrostWire LLC. Licensed under Apache 2.0.
+Python 3.11.1 (v3.11.1:a7a450f84a, Dec  6 2022, 15:24:06) [Clang 13.0.0 (clang-1300.0.29.30)]
+sys.version_info(major=3, minor=11, micro=1, releaselevel='final', serial=0)
 
-usage: telluride[.exe|_macos|_linux] [-h] [--server] [--port PORT] [--audio-only] [--meta-only]
-                    [page_url]
+usage: telluride_macos.x86_64 [-h] [--server] [--port PORT] [--audio-only]
+                              [--meta-only]
+                              [page_url]
 
 positional arguments:
   page_url              The URL of the page that hosts the video you need to
                         backup locally
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --server, -s          Launches Telluride as a web server to perform URL
-                        queries and return meta data as JSON. There's only one
-                        endpoint at the root path. Possible parameters are
-                        url=<video_page_url> and shutdown=1 to shutdown the
-                        server. The server will only answer to requests from
-                        localhost
-                        when the request comes from localhost
+                        queries and return meta data as JSON. There's only
+                        one endpoint at the root path. Possible parameters
+                        are url=<video_page_url> and shutdown=1 to shutdown
+                        the server. The server will only answer to requests
+                        from localhost
   --port PORT, -p PORT  HTTP port when running on server mode. Default port
                         number is 47999. This parameter is only taken into
                         account if --server or -s passed
   --audio-only, -a      Downloads the video and keeps only a separate audio
-                        file usually a .mp3. (requires ffmpeg installed in the
-                        system)
+                        file usually a .mp3. (requires ffmpeg installed in
+                        the system)
   --meta-only, -m       Prints a JSON dictionary with all the metadata
                         available on the video file found in the page_url.
                         Does not download the video file
@@ -39,15 +41,17 @@ optional arguments:
 ## Building
 
 ```bash
-$ ./configure_pudate.sh # tries to install (or update) all dependencies
+$ ./configure_update.sh # tries to install (or update) all dependencies
 $ ./build.sh     # runs pylint on the code, pauses, performs binary packaging
 ```
 
 You should end up with a stand-alone executable for the platform you are on:
 
  - telluride.exe (Windows)
- - telluride_macos (macOS)
- - telluride_linux (Linux)
+ - telluride_linux (Linux) 
+ - telluride_macos.x86_64 (macOS x86_64)
+ - telluride_macos.arm64 (macOS apple chips)
+
 
 ## Requirements
  Aside from `bash`,`python3` and `ffmpeg`, the rest should be installed by the `configure.sh` script.
@@ -71,7 +75,7 @@ Telluride will receive your HTTP requests at the root path and it will expect on
 
 ## License
 ```
-Copyright 2020-2021 FrostWire LLC.
+Copyright 2020-2023 FrostWire LLC.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
