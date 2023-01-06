@@ -1,0 +1,15 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/common"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gradle"
+    directory: "/desktop"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+
