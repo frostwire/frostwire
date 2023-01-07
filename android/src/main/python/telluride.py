@@ -2,6 +2,9 @@ import yt_dlp
 import urllib
 import json
 
+def yt_dlp_version():
+    return yt_dlp.version.__version__
+
 def query_video(page_url):
     '''
     query_video: queries metadata for the video in page_url using yt_dlp

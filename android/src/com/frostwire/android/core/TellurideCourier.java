@@ -17,6 +17,8 @@
 
 package com.frostwire.android.core;
 
+import androidx.annotation.NonNull;
+
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -104,6 +106,30 @@ public final class TellurideCourier {
             callback.onResults(validResults, error);
             lastKnownCallback = null;
         }
+    }
+
+    public interface OnYtDlpVersionCallback {
+        void onVersion(String version);
+    }
+
+    public static void ytDlpVersion(@NonNull OnYtDlpVersionCallback callback) {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> ytDlpVersion(callback));
+            return;
+        }
+        SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier::ytDlpVersion");
+        if (!Python.isStarted()) {
+            Engine.startPython();
+        }
+        Python python = Python.getInstance();
+        PyObject telluride_module = python.getModule("telluride");
+        PyObject ytDlpVersionString = telluride_module.callAttr("yt_dlp_version");
+        if (ytDlpVersionString == null) {
+            LOG.error("TellurideCourier::ytDlpVersion could got a null result when invoking telluride.yt_dlp_version() in Pythonland");
+            callback.onVersion("<unavailable>");
+            return;
+        }
+        callback.onVersion(ytDlpVersionString.toString());
     }
 
 

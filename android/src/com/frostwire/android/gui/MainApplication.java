@@ -28,6 +28,7 @@ import com.frostwire.android.AndroidPlatform;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.PlayStore;
@@ -84,6 +85,10 @@ public class MainApplication extends MultiDexApplication {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, LocalSearchEngine::instance);
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
+
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            TellurideCourier.ytDlpVersion((version) -> LOG.info("MainApplication::onCreate -> yt_dlp version: " + version));
+        });
     }
 
     public static Context context() {
