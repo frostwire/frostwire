@@ -64,6 +64,15 @@
                 android:textColor="@color/app_text_secondary"
                 android:textSize="@dimen/text_x_medium" />
 
+            <TextView
+                    android:id="@+id/fragment_about_yt_dlp_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/dummy_build"
+                    android:textColor="@color/app_text_secondary"
+                    android:textSize="@dimen/text_x_medium" />
+
 
             <Button
                 android:id="@+id/fragment_about_love_frostwire"

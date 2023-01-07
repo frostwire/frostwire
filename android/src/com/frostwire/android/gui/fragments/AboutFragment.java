@@ -31,8 +31,10 @@ import android.widget.TextView;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractFragment;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.jlibtorrent.LibTorrent;
 
 import org.apache.commons.io.IOUtils;
@@ -66,6 +68,13 @@ public final class AboutFragment extends AbstractFragment {
 
         TextView jlibtorrentVersion = findView(rootView, R.id.fragment_about_jlibtorrent_version);
         jlibtorrentVersion.setText(jlibtorrentVersion());
+
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,
+                () -> TellurideCourier.ytDlpVersion(
+                        (version) -> SystemUtils.postToUIThread(() -> {
+                            TextView ytDlpVersion = findView(rootView, R.id.fragment_about_yt_dlp_version);
+                            ytDlpVersion.setText(String.format("yt_dlp %s", version));
+                        })));
 
         TextView changelog = findView(rootView, R.id.fragment_about_changelog);
         setupClickUrl(changelog, Constants.CHANGELOG_URL);
