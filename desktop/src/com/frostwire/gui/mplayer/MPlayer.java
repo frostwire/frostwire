@@ -23,7 +23,6 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -54,12 +53,18 @@ public class MPlayer extends BaseMediaPlayer {
     private static final Pattern a_timeInfo = Pattern
             .compile("A:\\s*([0-9\\.]+) .*");
     private static final Logger LOG = Logger.getLogger(MPlayer.class);
+    public static final String ID_AID = "ID_AID_";
+    public static final String NAME = "_NAME=";
+    public static final String LANG = "_LANG=";
+    public static final String ID_SID = "ID_SID_";
+    public static final String ID_ = "ID_";
+    public static final String ID_CLIP_INFO_VALUE = "ID_CLIP_INFO_VALUE";
+    public static final String ID_CLIP_INFO_NAME = "ID_CLIP_INFO_NAME";
     private final List<String> output;
     private volatile boolean disposed = false;
-    private Dimension videoSize = null;
     private boolean firstLengthReceived = false;
     private boolean firstVolumeReceived = false;
-    private MPlayerInstance current_instance;
+    private MPlayerInstance currentInstance;
     private boolean parsingLanguage;
     private boolean isAudioTrack;
     private Language language;
@@ -115,20 +120,17 @@ public class MPlayer extends BaseMediaPlayer {
 
     private void parseOutput(String line) {
         boolean stillParsing = false;
-        // if ( !line.startsWith( "A:")){
-        // System.out.println(line);
-        // }
-        Matcher v_matcher = v_timeInfo.matcher(line);
-        Matcher a_matcher = a_timeInfo.matcher(line);
-        if (v_matcher.matches()) {
-            float time = Float.parseFloat(v_matcher.group(1));
+        Matcher vMatcher = v_timeInfo.matcher(line);
+        Matcher aMatcher = a_timeInfo.matcher(line);
+        if (vMatcher.matches()) {
+            float time = Float.parseFloat(vMatcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
             if (instance != null) {
                 instance.positioned(time);
             }
             reportPosition(time);
-        } else if (a_matcher.matches()) {
-            float time = Float.parseFloat(a_matcher.group(1));
+        } else if (aMatcher.matches()) {
+            float time = Float.parseFloat(aMatcher.group(1));
             MPlayerInstance instance = getCurrentInstance();
             if (instance != null) {
                 instance.positioned(time);
@@ -264,33 +266,26 @@ public class MPlayer extends BaseMediaPlayer {
                     e.printStackTrace();
                 }
                 language.setName(fileName);
-                // Locale locale =
-                // OpenSubtitlesAPI.getLocalSubtitleLanguage(getOpenedFile(),
-                // fileName);
-                // if(locale != null) {
-                // language.setLanguage(locale);
-                // }
-                stillParsing = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId() + "_NAME=") || line
-                .startsWith("ID_SID_" + language.getId() + "_NAME="))) {
-            String key = "ID_AID_" + language.getId() + "_NAME=";
+                && (line.startsWith(ID_AID + language.getId() + NAME) || line
+                .startsWith(ID_SID + language.getId() + NAME))) {
+            String key = ID_AID + language.getId() + NAME;
             String name = line.substring(key.length());
             language.setName(name);
             stillParsing = true;
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId() + "_LANG=") || line
-                .startsWith("ID_SID_" + language.getId() + "_LANG="))) {
-            String key = "ID_AID_" + language.getId() + "_LANG=";
+                && (line.startsWith(ID_AID + language.getId() + LANG) || line
+                .startsWith(ID_SID + language.getId() + LANG))) {
+            String key = ID_AID + language.getId() + LANG;
             String isoCode = line.substring(key.length());
             language.setLanguage(isoCode);
             stillParsing = true;
         } else if (parsingLanguage
-                && (line.startsWith("ID_AID_" + language.getId()) || line
-                .startsWith("ID_SID_" + language.getId()))) {
+                && (line.startsWith(ID_AID + language.getId()) || line
+                .startsWith(ID_SID + language.getId()))) {
             stillParsing = true;
         } else if (line.startsWith(ID_AUDIO_TRACK)) {
             try {
@@ -321,9 +316,9 @@ public class MPlayer extends BaseMediaPlayer {
         } else if (line.startsWith(ICY_INFO)) {
             String data = line.substring(ICY_INFO.length()).trim();
             reportIcyInfo(data);
-        } else if (line.contains("VO: ")) {
-            parseVideoSize(line);
-        }
+        } //else if (line.contains("VO: ")) {
+//            parseVideoSize(line);
+//        }
         // else System.out.println(line);
         if (parsingLanguage && !stillParsing) {
             Language parsed = language;
@@ -342,16 +337,12 @@ public class MPlayer extends BaseMediaPlayer {
         return f > 0 ? f : -f;
     }
 
-    private void parseVideoSize(String line) {
-        String[] arr = line.split(" ")[2].split("x");
-        int w = Integer.parseInt(arr[0]);
-        int h = Integer.parseInt(arr[1]);
-        videoSize = new Dimension(w, h);
-    }
-
-    public Dimension getVideoSize() {
-        return videoSize;
-    }
+//    private void parseVideoSize(String line) {
+//        String[] arr = line.split(" ")[2].split("x");
+//        int w = Integer.parseInt(arr[0]);
+//        int h = Integer.parseInt(arr[1]);
+//        Dimension videoSize = new Dimension(w, h);
+//    }
 
     public void doLoadSubtitlesFile(String file, boolean autoPlay) {
         MPlayerInstance instance = getCurrentInstance();
@@ -389,12 +380,12 @@ public class MPlayer extends BaseMediaPlayer {
         MPlayerInstance instance;
         synchronized (this) {
             doStop(false);
-            instance = current_instance = new MPlayerInstance();
+            instance = currentInstance = new MPlayerInstance();
         }
         reportNewState(MediaPlaybackState.Opening);
         firstLengthReceived = false;
         firstVolumeReceived = false;
-        if (fileOrUrl.startsWith("http://")) {
+        if (fileOrUrl.startsWith("http://") || fileOrUrl.startsWith("https://")) {
             // perform a 302 check, mplayer having issues with redirects.
             final HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
             Map<String, List<String>> responseHeaders = new HashMap<>();
@@ -419,7 +410,7 @@ public class MPlayer extends BaseMediaPlayer {
 
     private MPlayerInstance getCurrentInstance() {
         synchronized (this) {
-            return (current_instance);
+            return (currentInstance);
         }
     }
 
@@ -454,12 +445,12 @@ public class MPlayer extends BaseMediaPlayer {
         reportVolume(volume);
     }
 
-    public void mute(boolean on) {
-        MPlayerInstance instance = getCurrentInstance();
-        if (instance != null) {
-            instance.doMute(on);
-        }
-    }
+//    public void mute(boolean on) {
+//        MPlayerInstance instance = getCurrentInstance();
+//        if (instance != null) {
+//            instance.doMute(on);
+//        }
+//    }
 
     private void setSubtitles(Language language) {
         MPlayerInstance instance = getCurrentInstance();
@@ -475,13 +466,13 @@ public class MPlayer extends BaseMediaPlayer {
 
     private void doStop(boolean report_state) {
         synchronized (this) {
-            if (current_instance != null) {
+            if (currentInstance != null) {
                 if (preferences != null) {
                     preferences.setPositionForFile(getOpenedFile(),
                             getPositionInSecs());
                 }
-                current_instance.doStop();
-                current_instance = null;
+                currentInstance.doStop();
+                currentInstance = null;
             }
             synchronized (output) {
                 output.clear();
@@ -572,14 +563,14 @@ public class MPlayer extends BaseMediaPlayer {
                         if (line.split("=").length < 2) {
                             return;
                         }
-                        if (line.startsWith("ID_CLIP_INFO_NAME")) {
+                        if (line.startsWith(ID_CLIP_INFO_NAME)) {
                             lastKey = line.split("=")[1];
-                        } else if (line.startsWith("ID_CLIP_INFO_VALUE")) {
+                        } else if (line.startsWith(ID_CLIP_INFO_VALUE)) {
                             if (lastKey != null) {
                                 properties.put(lastKey, line.split("=")[1]);
                                 lastKey = null;
                             }
-                        } else if (line.startsWith("ID_")) {
+                        } else if (line.startsWith(ID_)) {
                             String[] kv = line.split("=");
                             properties.put(kv[0], kv[1]);
                         }
