@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui;
@@ -45,7 +47,7 @@ public class MultiLineLabel extends JTextArea {
      */
     private ResizeHandler resizeHandler = null;
     /**
-     * Whether or not a resize handler should be installed.
+     * Whether a resize handler should be installed.
      */
     private boolean resizable = false;
 
@@ -61,7 +63,7 @@ public class MultiLineLabel extends JTextArea {
 
     public MultiLineLabel(String s, boolean resizable) {
         if (s == null) {
-            throw new NullPointerException("null string in multilinelabel");
+            throw new NullPointerException("null string in MultilineLabel");
         }
         this.setOpaque(false);
         setText(s);
@@ -81,7 +83,7 @@ public class MultiLineLabel extends JTextArea {
 
     public MultiLineLabel(String s, int pixels, boolean resizable) {
         if (s == null) {
-            throw new NullPointerException("null string in multilinelabel");
+            throw new NullPointerException("null string in MultilineLabel");
         }
         this.setOpaque(false);
         setText(s, pixels);
@@ -115,7 +117,7 @@ public class MultiLineLabel extends JTextArea {
     public MultiLineLabel(String s, int pixels, int rows, int cols) {
         super(rows, cols);
         if (s == null) {
-            throw new NullPointerException("null string in multilinelabel");
+            throw new NullPointerException("null string in MultilineLabel");
         }
         this.setOpaque(false);
         setText(s, pixels);
@@ -150,7 +152,7 @@ public class MultiLineLabel extends JTextArea {
     }
 
     /**
-     * Tells the look and feel to reset some of the  values for this
+     * Tells the look and feel to reset some values for this
      * component so that it doesn't use JTextArea's default values.
      * <p>
      * DO NOT CALL THIS METHOD YOURSELF!
@@ -205,8 +207,8 @@ public class MultiLineLabel extends JTextArea {
             if (word.equals(" "))
                 continue;
             isNewLine = word.equals("\n");
-            if (isNewLine || fm.stringWidth(cursb.toString() + word) > newWidth) {
-                sb.append(cursb.toString());
+            if (isNewLine || fm.stringWidth(cursb + word) > newWidth) {
+                sb.append(cursb);
                 sb.append("\n");
                 cursb = new StringBuilder();
             }
@@ -215,7 +217,7 @@ public class MultiLineLabel extends JTextArea {
                 cursb.append(" ");
             }
         }
-        sb.append(cursb.toString());
+        sb.append(cursb);
         return sb.toString();
     }
 
