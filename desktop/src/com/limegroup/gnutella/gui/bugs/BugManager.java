@@ -1,15 +1,31 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.limegroup.gnutella.gui.bugs;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.settings.BugSettings;
 import com.limegroup.gnutella.settings.UISettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.apache.commons.io.IOUtils;
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import org.limewire.util.FileUtils;
-import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
@@ -129,7 +145,7 @@ public final class BugManager {
      *
      * @return true if we could handle the error.
      */
-    private static boolean handleException(IOException ioe, ErrorType errorType) {
+    private static boolean handleException(IOException ioe) {
         Throwable e = ioe;
         while (e != null) {
             String msg = e.getMessage();
@@ -156,27 +172,21 @@ public final class BugManager {
                     detailType = DetailErrorType.BAD_CHARS;
                 }
                 if (detailType != null) {
-                    MessageService.instance().showError(errorDescs.get(errorType).get(detailType));
+                    MessageService.instance().showError(errorDescs.get(ErrorType.GENERIC).get(detailType));
                     return true;
                 }
             }
             e = e.getCause();
         }
-        // dunno what to do, let the outer world handle it.
+        // don't know what to do, let the outer world handle it.
         return false;
-    }
-
-    /**
-     * Shuts down the BugManager.
-     */
-    public void shutdown() {
     }
 
     /**
      * Handles a single bug report.
      * If bug is a ThreadDeath, rethrows it.
      * If the user wants to ignore all bugs, this effectively does nothing.
-     * The the server told us to stop reporting this (or any) bug(s) for
+     * The server told us to stop reporting this (or any) bug(s) for
      * awhile, this effectively does nothing.
      * Otherwise, it will either send the bug directly to the servlet
      * or ask the user to review it before sending.
@@ -187,7 +197,7 @@ public final class BugManager {
         }
         // Try to dispatch the bug to a friendly handler.
         if (bug instanceof IOException &&
-                handleException((IOException) bug, ErrorType.GENERIC)) {
+                handleException((IOException) bug)) {
             return; // handled already.
         }
         //Get the classpath
@@ -198,7 +208,7 @@ public final class BugManager {
             classPath.append("  ").append(classpath).append("\n");
         }
         // Add CLASSPATH and EXPERIMENTAL FEATURE SETTINGS to the report
-        detail = detail + "\nCLASSPATH:\n" + classPath.toString() + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
+        detail = detail + "\nCLASSPATH:\n" + classPath + "\nEXPERIMENTAL FEATURES SETTINGS:\n" +
                 "    ALPHA FEATURES: " + UISettings.ALPHA_FEATURES_ENABLED.getValue() + "\n" +
                 "    BETA FEATURES: " + UISettings.BETA_FEATURES_ENABLED.getValue() + "\n";
         bug.printStackTrace();
@@ -235,11 +245,12 @@ public final class BugManager {
         try {
             synchronized (WRITE_LOCK) {
                 if (f.length() > BugSettings.MAX_BUGFILE_SIZE.getValue()) {
+                    //noinspection ResultOfMethodCallIgnored
                     f.delete();
                 }
                 os = new BufferedOutputStream(
                         new FileOutputStream(f.getPath(), true));
-                os.write((new Date().toString() + "\n").getBytes());
+                os.write((new Date() + "\n").getBytes());
                 os.write(info.toBugReport().getBytes());
                 os.write(SEPARATOR);
                 os.flush();
@@ -266,7 +277,7 @@ public final class BugManager {
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setLayout(new GridBagLayout());
         String msg = warning() + "\n\n" +
-                I18n.tr("FrostWire has encountered an internal error. It is possible for FrostWire to recover and continue running normally. To aid with debugging, please click \'Send\' to notify FrostWire about the problem. If desired, you can click \'Review\' to look at the information that will be sent. Thank you.");
+                I18n.tr("FrostWire has encountered an internal error. It is possible for FrostWire to recover and continue running normally. To aid with debugging, please click 'Send' to notify FrostWire about the problem. If desired, you can click 'Review' to look at the information that will be sent. Thank you.");
         MultiLineLabel label = new MultiLineLabel(msg, 400);
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new GridBagLayout());
@@ -373,18 +384,22 @@ public final class BugManager {
         mainPanel.add(buttonPanel, constraints);
         DIALOG.getContentPane().add(mainPanel);
         DIALOG.pack();
-        if (GUIMediator.isAppVisible())
-            DIALOG.setLocationRelativeTo(MessageService.getParentComponent());
-        else {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            Dimension dialogSize = DIALOG.getSize();
-            DIALOG.setLocation((screenSize.width - dialogSize.width) / 2,
-                    (screenSize.height - dialogSize.height) / 2);
-        }
+        centerDialog(DIALOG);
         try {
             DIALOG.setVisible(true);
         } catch (InternalError | ArrayIndexOutOfBoundsException ie) {
             //happens occasionally, ignore.
+        }
+    }
+
+    private void centerDialog(JDialog dlg) {
+        if (GUIMediator.isAppVisible())
+            dlg.setLocationRelativeTo(MessageService.getParentComponent());
+        else {
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            Dimension dialogSize = dlg.getSize();
+            dlg.setLocation((screenSize.width - dialogSize.width) / 2,
+                    (screenSize.height - dialogSize.height) / 2);
         }
     }
 
@@ -403,7 +418,7 @@ public final class BugManager {
         JPanel mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        MultiLineLabel label = new MultiLineLabel(I18n.tr("FrostWire was unable to connect to the bug server in order to send the below bug report. For further help and to aid with debugging, please visit www.frostwire.com and click \'Support\'. Thank you."), 400);
+        MultiLineLabel label = new MultiLineLabel(I18n.tr("FrostWire was unable to connect to the bug server in order to send the below bug report. For further help and to aid with debugging, please visit www.frostwire.com and click 'Support'. Thank you."), 400);
         JPanel labelPanel = new JPanel();
         JPanel innerPanel = new JPanel();
         labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
@@ -453,14 +468,7 @@ public final class BugManager {
             // we couldn't put this dialog together, discard it entirely.
             return;
         }
-        if (GUIMediator.isAppVisible())
-            DIALOG.setLocationRelativeTo(MessageService.getParentComponent());
-        else {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            Dimension dialogSize = DIALOG.getSize();
-            DIALOG.setLocation((screenSize.width - dialogSize.width) / 2,
-                    (screenSize.height - dialogSize.height) / 2);
-        }
+        centerDialog(DIALOG);
         DIALOG.setVisible(true);
     }
 

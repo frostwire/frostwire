@@ -1,9 +1,9 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.mplayer.MediaPlaybackState;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.LimeWireCore;
-import com.limegroup.gnutella.gui.bugs.BugManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 
@@ -48,10 +48,11 @@ final class Finalizer {
                     //LOG.info("SearchMediator shutting down...");
                     SearchMediator.instance().shutdown();
                     //LOG.info("MediaPlayer stopping...");
-                    MediaPlayer.instance().stop();
-                    //LOG.info("BugManager stopping...");
-                    BugManager.instance().shutdown();
-                    sleep(3000);
+                    MediaPlaybackState state = MediaPlayer.instance().getState();
+                    if (state == MediaPlaybackState.Playing || state == MediaPlaybackState.Paused) {
+                        MediaPlayer.instance().stop();
+                        sleep(3000);
+                    }
                     //LOG.info("Shutting down [updateCommand=" + toExecute + "]");
                     LimeWireCore.instance().getLifecycleManager().shutdown(null);
                     LOG.info("System exit");
