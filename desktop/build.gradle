@@ -20,8 +20,8 @@ version '1.0-SNAPSHOT'
 
 import org.gradle.internal.os.OperatingSystem
 
-sourceCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_19 : JavaVersion.VERSION_11
-targetCompatibility = (!OperatingSystem.current().isLinux()) ? JavaVersion.VERSION_19 : JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_19
+targetCompatibility = JavaVersion.VERSION_19
 
 compileJava {
     options.encoding = '8859_1'
