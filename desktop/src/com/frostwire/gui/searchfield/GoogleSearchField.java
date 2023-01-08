@@ -20,6 +20,7 @@ package com.frostwire.gui.searchfield;
 
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
@@ -34,13 +35,11 @@ import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SearchSettings;
 import com.limegroup.gnutella.util.URLDecoder;
 import org.limewire.util.LCS;
-import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -137,7 +136,6 @@ public class GoogleSearchField extends SearchField {
                 }
                 if (s.startsWith("http") || s.startsWith("magnet")) {
                     cloudSearchField.setText(s);
-                    StringSelection stringSelection = new StringSelection("");
                     lastClipboardSearchQuery = s;
                     cloudSearchField.getActionListeners()[0].actionPerformed(null);
                     cloudSearchField.setText("");
