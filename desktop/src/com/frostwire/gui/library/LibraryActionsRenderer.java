@@ -38,12 +38,9 @@ public final class LibraryActionsRenderer extends AbstractActionsRenderer {
             if (dataLine instanceof LibraryFilesTableDataLine) {
                 mediaSource = new MediaSource(((LibraryFilesTableDataLine) dataLine).getFile());
                 filesView = LibraryFilesTableMediator.instance().getFilesView();
-            } else if (dataLine instanceof LibraryPlaylistsTableDataLine) {
-                mediaSource = new MediaSource(((LibraryPlaylistsTableDataLine) dataLine).getPlayListItem());
-                filesView = LibraryPlaylistsTableMediator.instance().getFilesView();
             }
             if (mediaSource != null && !actionsHolder.isPlaying()) {
-                MediaPlayer.instance().asyncLoadMedia(mediaSource, true, null, filesView);
+                MediaPlayer.instance().asyncLoadMedia(mediaSource, true, filesView);
             }
         }
     }

@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.PlaylistItem;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.dnd.FileTransferable;
@@ -56,23 +55,6 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
         if (!canImport(support, false)) {
             return fallbackTransferHandler.importData(support);
         }
-        try {
-            Transferable transferable = support.getTransferable();
-            if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-                PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferable
-                        .getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY));
-                LibraryUtils.createNewPlaylist(playlistItems);
-            } else {
-                File[] files = DNDUtils.getFiles(support.getTransferable());
-                if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                    LibraryUtils.createNewPlaylist(files[0]);
-                } else {
-                    LibraryUtils.createNewPlaylist(files);
-                }
-            }
-        } catch (Throwable e) {
-            return fallbackTransferHandler.importData(support);
-        }
         return false;
     }
 
@@ -96,6 +78,7 @@ class LibraryFilesTableTransferHandler extends TransferHandler {
         if (!mediator.getMediaType().equals(MediaType.getAudioMediaType())) {
             return fallback && fallbackTransferHandler.canImport(support);
         }
-        return DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, fallbackTransferHandler, fallback);
+
+        return DNDUtils.supportCanImport(support.getDataFlavors()[0], support, fallbackTransferHandler, fallback);
     }
 }

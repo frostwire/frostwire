@@ -18,8 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.db.LibraryDatabase;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.MediaType;
@@ -59,13 +57,8 @@ class LibraryIconTree extends JTree {
             if (playerState != MediaPlaybackState.Stopped &&
                     playerState != MediaPlaybackState.Closed &&
                     playerState != MediaPlaybackState.Failed) {
-                if (player.getCurrentMedia() != null && player.getCurrentPlaylist() == null && player.getPlaylistFilesView() != null) {
+                if (player.getCurrentMedia() != null) {
                     TreePath path = getAudioPath();
-                    if (path != null) {
-                        paintIcon(g, speaker, path);
-                    }
-                } else if (player.getCurrentMedia() != null && player.getCurrentPlaylist() != null && player.getPlaylistFilesView() != null) {
-                    TreePath path = getPlaylistPath(player.getCurrentPlaylist());
                     if (path != null) {
                         paintIcon(g, speaker, path);
                     }
@@ -97,22 +90,6 @@ class LibraryIconTree extends JTree {
                 DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
                 if (holder instanceof MediaTypeSavedFilesDirectoryHolder && ((MediaTypeSavedFilesDirectoryHolder) holder).getMediaType().equals(MediaType.getAudioMediaType())) {
                     return new TreePath(node.getPath());
-                }
-            }
-        }
-        return null;
-    }
-
-    private TreePath getPlaylistPath(Playlist playlist) {
-        if (playlist.getId() == LibraryDatabase.STARRED_PLAYLIST_ID) {
-            Enumeration<?> e = ((LibraryNode) getModel().getRoot()).depthFirstEnumeration();
-            while (e.hasMoreElements()) {
-                LibraryNode node = (LibraryNode) e.nextElement();
-                if (node instanceof DirectoryHolderNode) {
-                    DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
-                    if (holder instanceof StarredDirectoryHolder) {
-                        return new TreePath(node.getPath());
-                    }
                 }
             }
         }

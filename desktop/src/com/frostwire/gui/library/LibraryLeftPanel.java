@@ -34,13 +34,11 @@ class LibraryLeftPanel extends JPanel {
     static final int MIN_WIDTH = 155;
     static final int MAX_WIDTH = 300;
     private final LibraryExplorer libraryExplorer;
-    private final LibraryPlaylists libraryPlaylists;
     private final LibraryCoverArtPanel libraryCoverArtPanel;
     private final JSplitPane splitPane;
 
-    LibraryLeftPanel(LibraryExplorer libraryExplorer, LibraryPlaylists libraryPlaylists, LibraryCoverArtPanel libraryCoverArtPanel) {
+    LibraryLeftPanel(LibraryExplorer libraryExplorer, LibraryCoverArtPanel libraryCoverArtPanel) {
         this.libraryExplorer = libraryExplorer;
-        this.libraryPlaylists = libraryPlaylists;
         this.libraryCoverArtPanel = libraryCoverArtPanel;
         splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         setupUI();
@@ -50,7 +48,6 @@ class LibraryLeftPanel extends JPanel {
         setLayout(new BorderLayout());
         //Prepare a split pane with explorers
         splitPane.setTopComponent(libraryExplorer);
-        splitPane.setBottomComponent(libraryPlaylists);
         splitPane.setAutoscrolls(true);
         add(splitPane, BorderLayout.CENTER);
         Dimension minSize = new Dimension(MIN_WIDTH, MIN_WIDTH);

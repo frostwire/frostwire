@@ -24,14 +24,7 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.alexandria.Library;
-import com.frostwire.alexandria.Playlist;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.gui.bittorrent.BTDownloadActions.AddToPlaylistAction;
-import com.frostwire.gui.bittorrent.BTDownloadActions.CreateNewPlaylistAction;
-import com.frostwire.gui.library.LibraryMediator;
-import com.frostwire.gui.library.LibraryUtils;
-import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.ThemeMediator;
@@ -47,7 +40,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -127,38 +119,6 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         return menuAdvanced;
     }
 
-    static SkinMenu createAddToPlaylistSubMenu() {
-        BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-        if (downloaders.length == 0) {
-            return null;
-        }
-        for (BTDownload dler : downloaders) {
-            if (!dler.isCompleted()) {
-                return null;
-            }
-            File saveLocation = dler.getSaveLocation();
-            if (saveLocation.isDirectory()) {
-                //If the file(s) is(are) inside a folder
-                if (!LibraryUtils.directoryContainsAudio(saveLocation)) {
-                    return null;
-                }
-            } else if (!MediaPlayer.isPlayableFile(saveLocation)) {
-                return null;
-            }
-        }
-        SkinMenu menu = new SkinMenu(I18n.tr("Add to playlist"));
-        menu.add(new SkinMenuItem(new CreateNewPlaylistAction()));
-        Library library = LibraryMediator.getLibrary();
-        List<Playlist> playlists = library.getPlaylists();
-        if (playlists.size() > 0) {
-            menu.addSeparator();
-            for (Playlist playlist : library.getPlaylists()) {
-                menu.add(new SkinMenuItem(new AddToPlaylistAction(playlist)));
-            }
-        }
-        return menu;
-    }
-
     private static SkinMenu createTrackerMenu() {
         com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();
         if (dms == null) {
@@ -210,7 +170,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         menuAdvanced.add(menuDownSpeed);
         final SkinMenuItem itemCurrentDownSpeed = new SkinMenuItem();
         itemCurrentDownSpeed.setEnabled(false);
-        StringBuffer speedText = new StringBuffer();
+        StringBuilder speedText = new StringBuilder();
         String separator = "";
         //itemDownSpeed.                   
         if (downSpeedDisabled) {
@@ -231,8 +191,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         menuDownSpeed.addSeparator();
         final SkinMenuItem[] itemsDownSpeed = new SkinMenuItem[menuEntries];
         ActionListener itemsDownSpeedListener = e -> {
-            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
-                SkinMenuItem item = (SkinMenuItem) e.getSource();
+            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem item) {
                 int speed = item.getClientProperty("maxdl") == null ? 0 : (Integer) item.getClientProperty("maxdl");
                 adapter.setDownSpeed(speed);
             }
@@ -243,24 +202,22 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemsDownSpeed[1].addActionListener(itemsDownSpeedListener);
         menuDownSpeed.add(itemsDownSpeed[1]);
 
-        if (true) {
-            //using 1024KiB/s as the default limit when no limit set.
-            if (maxDownload == 0) {
-                if (downSpeedSetMax == 0) {
-                    maxDownload = 1024 * 1024;
-                } else {
-                    maxDownload = 4 * (downSpeedSetMax / 1024) * 1024;
-                }
+        //using 1024KiB/s as the default limit when no limit set.
+        if (maxDownload == 0) {
+            if (downSpeedSetMax == 0) {
+                maxDownload = 1024 * 1024;
+            } else {
+                maxDownload = 4 * (downSpeedSetMax / 1024) * 1024;
             }
-            for (int i = 2; i < menuEntries; i++) {
-                itemsDownSpeed[i] = new SkinMenuItem();
-                itemsDownSpeed[i].addActionListener(itemsDownSpeedListener);
-                // dms.length has to be > 0 when hasSelection
-                int limit = (int) (maxDownload / (10 * num_entries) * (menuEntries - i));
-                itemsDownSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
-                itemsDownSpeed[i].putClientProperty("maxdl", limit);
-                menuDownSpeed.add(itemsDownSpeed[i]);
-            }
+        }
+        for (int i = 2; i < menuEntries; i++) {
+            itemsDownSpeed[i] = new SkinMenuItem();
+            itemsDownSpeed[i].addActionListener(itemsDownSpeedListener);
+            // dms.length has to be > 0 when hasSelection
+            int limit = (int) (maxDownload / (10 * num_entries) * (menuEntries - i));
+            itemsDownSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec((long) limit * num_entries));
+            itemsDownSpeed[i].putClientProperty("maxdl", limit);
+            menuDownSpeed.add(itemsDownSpeed[i]);
         }
 
         // advanced >Upload Speed Menu //
@@ -269,7 +226,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         final SkinMenuItem itemCurrentUpSpeed = new SkinMenuItem();
         itemCurrentUpSpeed.setEnabled(false);
         separator = "";
-        speedText = new StringBuffer();
+        speedText = new StringBuilder();
         //itemUpSpeed.                   
         if (upSpeedDisabled) {
             speedText.append(I18n.tr("Disabled"));
@@ -290,8 +247,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         menuUpSpeed.addSeparator();
         final SkinMenuItem[] itemsUpSpeed = new SkinMenuItem[menuEntries];
         ActionListener itemsUpSpeedListener = e -> {
-            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem) {
-                SkinMenuItem item = (SkinMenuItem) e.getSource();
+            if (e.getSource() != null && e.getSource() instanceof SkinMenuItem item) {
                 int speed = item.getClientProperty("maxul") == null ? 0 : (Integer) item.getClientProperty("maxul");
                 adapter.setUpSpeed(speed);
             }
@@ -316,7 +272,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             itemsUpSpeed[i] = new SkinMenuItem();
             itemsUpSpeed[i].addActionListener(itemsUpSpeedListener);
             int limit = (int) (maxUpload / (10 * num_entries) * (menuEntries - i));
-            itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec(limit * num_entries));
+            itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec((long) limit * num_entries));
             itemsUpSpeed[i].putClientProperty("maxul", limit);
             menuUpSpeed.add(itemsUpSpeed[i]);
         }

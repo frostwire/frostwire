@@ -18,8 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.gui.library.LibraryPlaylists.LibraryPlaylistsListCell;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -47,14 +45,7 @@ class LibraryIconList extends JList<Object> {
         if (player.getState() != MediaPlaybackState.Stopped &&
                 player.getState() != MediaPlaybackState.Closed &&
                 player.getState() != MediaPlaybackState.Failed) {
-            if (player.getCurrentMedia() != null && player.getCurrentPlaylist() != null && player.getPlaylistFilesView() != null) {
-                int index = getPlaylistIndex(player.getCurrentPlaylist());
-                if (index != -1) {
-                    paintIcon(g, speaker, index);
-                }
-            }
         }
-        paintImportingIcons(g);
     }
 
     private void loadIcons() {
@@ -69,32 +60,5 @@ class LibraryIconList extends JList<Object> {
         g.drawImage(image, llocation.x + lsize.width - speaker.getWidth(null) - 4, llocation.y + (lsize.height - speaker.getHeight(null)) / 2, null);
     }
 
-    private int getPlaylistIndex(Playlist playlist) {
-        int n = getModel().getSize();
-        for (int i = 0; i < n; i++) {
-            Object value = getModel().getElementAt(i);
-            if (value instanceof LibraryPlaylistsListCell) {
-                Playlist p = ((LibraryPlaylistsListCell) value).getPlaylist();
-                if (p != null && p.equals(playlist)) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
 
-    private void paintImportingIcons(Graphics g) {
-        int n = getModel().getSize();
-        for (int i = 0; i < n; i++) {
-            Object value = getModel().getElementAt(i);
-            if (value instanceof LibraryPlaylistsListCell) {
-                Playlist p = ((LibraryPlaylistsListCell) value).getPlaylist();
-                if (LibraryMediator.instance().getLibraryPlaylists().isPlaylistImporting(p)) {
-                    paintIcon(g, loading, i);
-                }
-            } else {
-                return;
-            }
-        }
-    }
 }

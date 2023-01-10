@@ -59,7 +59,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    implementation 'com.h2database:h2:1.4.200'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
     implementation 'org.junit.jupiter:junit-jupiter:5.9.0'

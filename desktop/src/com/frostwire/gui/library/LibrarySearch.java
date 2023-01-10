@@ -1,25 +1,22 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.searchfield.JXSearchField.SearchMode;
 import com.frostwire.gui.searchfield.SearchField;
@@ -41,6 +38,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.Serial;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.*;
@@ -143,7 +141,7 @@ public class LibrarySearch extends JPanel {
             @Override
             public void focusGained(FocusEvent e) {
                 //if there's nothing selected for search, select Audio directory holder.
-                if (LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder() == null && LibraryMediator.instance().getLibraryPlaylists().getSelectedPlaylist() == null) {
+                if (LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder() == null) {
                     LibraryMediator.instance().getLibraryExplorer().selectAudio();
                 }
             }
@@ -169,11 +167,6 @@ public class LibrarySearch extends JPanel {
             return accept(pathname, true);
         }
 
-        /**
-         * @param pathname
-         * @param includeAllDirectories - if true, it will say TRUE to any directory
-         * @return
-         */
         boolean accept(File pathname, boolean includeAllDirectories) {
             if (!pathname.exists()) {
                 return false;
@@ -199,6 +192,7 @@ public class LibrarySearch extends JPanel {
     }
 
     private class SearchLibraryAction extends AbstractAction {
+        @Serial
         private static final long serialVersionUID = -2182314529781104010L;
 
         SearchLibraryAction() {
@@ -206,15 +200,8 @@ public class LibrarySearch extends JPanel {
         }
 
         boolean validate(SearchInformation info) {
-            switch (SearchMediator.validateInfo(info)) {
-                case SearchMediator.QUERY_EMPTY:
-                    return false;
-                case SearchMediator.QUERY_XML_TOO_LONG:
-                    // cannot happen
-                case SearchMediator.QUERY_VALID:
-                default:
-                    return true;
-            }
+            int i = SearchMediator.validateInfo(info);
+            return i != SearchMediator.QUERY_EMPTY;
         }
 
         void perform(String query) {
@@ -232,18 +219,8 @@ public class LibrarySearch extends JPanel {
                 currentSearchRunnable.cancel();
             }
             DirectoryHolder directoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
-            if (directoryHolder != null && !(directoryHolder instanceof StarredDirectoryHolder)) {
+            if (directoryHolder != null) {
                 currentSearchRunnable = new SearchFilesRunnable(query);
-                BackgroundExecutorService.schedule(currentSearchRunnable);
-            }
-            Playlist playlist;
-            if (directoryHolder instanceof StarredDirectoryHolder) {
-                playlist = LibraryMediator.getLibrary().getStarredPlaylist();
-            } else {
-                playlist = LibraryMediator.instance().getLibraryPlaylists().getSelectedPlaylist();
-            }
-            if (playlist != null) {
-                currentSearchRunnable = new SearchPlaylistItemsRunnable(query, playlist);
                 BackgroundExecutorService.schedule(currentSearchRunnable);
             }
         }
@@ -258,7 +235,7 @@ public class LibrarySearch extends JPanel {
         }
     }
 
-    private abstract class SearchRunnable implements Runnable {
+    private abstract static class SearchRunnable implements Runnable {
         boolean canceled;
 
         void cancel() {
@@ -336,11 +313,8 @@ public class LibrarySearch extends JPanel {
 
         /**
          * It searches _query in haystackDir.
-         *
-         * @param haystackDir
-         * @param excludeFiles - Usually a list of incomplete files.
          */
-        private void search(File haystackDir, Set<File> excludeFiles, Set<File> exludedSubFolders) {
+        private void search(File haystackDir, Set<File> excludeFiles, Set<File> excludedSubFolders) {
             if (canceled) {
                 return;
             }
@@ -367,7 +341,7 @@ public class LibrarySearch extends JPanel {
                 if (child.isHidden()) {
                     continue;
                 }
-                if (child.isDirectory() && !exludedSubFolders.contains(child)) {
+                if (child.isDirectory() && !excludedSubFolders.contains(child)) {
                     directories.add(child);
                 } else if (child.isFile()) {
                     if (directoryHolder instanceof FileSettingDirectoryHolder) {
@@ -387,7 +361,7 @@ public class LibrarySearch extends JPanel {
             };
             GUIMediator.safeInvokeLater(r);
             for (File directory : directories) {
-                search(directory, excludeFiles, exludedSubFolders);
+                search(directory, excludeFiles, excludedSubFolders);
             }
         }
 
@@ -419,84 +393,4 @@ public class LibrarySearch extends JPanel {
         }
     }
 
-    private final class SearchPlaylistItemsRunnable extends SearchRunnable {
-        private final String query;
-        private final Playlist playlist;
-
-        SearchPlaylistItemsRunnable(String query, Playlist playlist) {
-            this.query = query;
-            this.playlist = playlist;
-            // weird case
-            canceled = playlist == null;
-        }
-
-        public void run() {
-            try {
-                if (canceled) {
-                    return;
-                }
-                GUIMediator.safeInvokeAndWait(() -> {
-                    LibraryPlaylistsTableMediator.instance().clearTable();
-                    setStatus("");
-                    statusLabel.setText("");
-                    resultsCount = 0;
-                });
-                search();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-        }
-
-        private void search() {
-            if (canceled || playlist == null) {
-                return;
-            }
-            final List<PlaylistItem> results = new ArrayList<>();
-            //Show everything
-            if (StringUtils.isNullOrEmpty(query, true) || query.equals(".")) {
-                if (playlist.isStarred()) {
-                    LibraryMediator.instance().getLibraryExplorer().selectStarred();
-                } else {
-                    LibraryMediator.instance().getLibraryPlaylists().selectPlaylist(playlist);
-                }
-                return;
-            } else {
-                List<PlaylistItem> items = playlist.getItems();
-                String[] needles = query.toLowerCase().split("\\s");
-                for (PlaylistItem item : items) {
-                    String haystack = item.getTrackArtist().toLowerCase() + " " +
-                            item.getTrackTitle().toLowerCase() + " " +
-                            item.getTrackAlbum().toLowerCase() + " " +
-                            item.getTrackYear().toLowerCase();
-                    if (needles.length == 1 && haystack.contains(query)) {
-                        results.add(item);
-                    } else {
-                        boolean matchesAll = true;
-                        for (String needle : needles) {
-                            if (!haystack.contains(needle)) {
-                                matchesAll = false;
-                                break;
-                            }
-                        }
-                        if (matchesAll) {
-                            results.add(item);
-                        }
-                    }
-                    if (results.size() > 100) {
-                        Runnable r = () -> {
-                            LibraryMediator.instance().addItemsToLibraryTable(results);
-                            results.clear();
-                        };
-                        GUIMediator.safeInvokeLater(r);
-                    }
-                }
-                Runnable r = () -> {
-                    LibraryMediator.instance().addItemsToLibraryTable(results);
-                    results.clear();
-                };
-                GUIMediator.safeInvokeLater(r);
-            }
-            GUIMediator.safeInvokeLater(() -> LibraryMediator.instance().addItemsToLibraryTable(results));
-        }
-    }
 }

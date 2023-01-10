@@ -1,23 +1,21 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.player;
-
-import com.frostwire.alexandria.PlaylistItem;
 
 import java.io.File;
 
@@ -30,11 +28,11 @@ public class MediaSource {
      */
     private final File file;
     private final String url;
-    private final PlaylistItem playlistItem;
+
     // NOTE: these can be initialized by derived classes
     // to customize display text
-    String titleText = "";
-    String toolTipText = "";
+    String titleText;
+    String toolTipText;
 
     public MediaSource(File file) {
         if (file == null) {
@@ -42,7 +40,6 @@ public class MediaSource {
         }
         this.file = file;
         this.url = null;
-        this.playlistItem = null;
         // initialize display text (File)
         titleText = this.file.getName();
         toolTipText = this.file.getAbsolutePath();
@@ -54,26 +51,10 @@ public class MediaSource {
         }
         this.file = null;
         this.url = url;
-        this.playlistItem = null;
+
         // initialize display text (URL)
         titleText = "internet "; // generic internet stream
         toolTipText = "";
-    }
-
-    public MediaSource(PlaylistItem playlistItem) {
-        if (playlistItem == null) {
-            throw new NullPointerException("PlaylistItem cannot be null");
-        }
-        this.file = null;
-        this.url = null;
-        this.playlistItem = playlistItem;
-        // initialize display text (playlist)
-        String artistName = playlistItem.getTrackArtist();
-        String songTitle = playlistItem.getTrackTitle();
-        String albumToolTip = (playlistItem.getTrackAlbum() != null && playlistItem.getTrackAlbum().length() > 0) ? " - " + playlistItem.getTrackAlbum() : "";
-        String yearToolTip = (playlistItem.getTrackYear() != null && playlistItem.getTrackYear().length() > 0) ? " (" + playlistItem.getTrackYear() + ")" : "";
-        titleText = artistName + " - " + songTitle;
-        toolTipText = artistName + " - " + songTitle + albumToolTip + yearToolTip;
     }
 
     @Override
@@ -95,27 +76,18 @@ public class MediaSource {
         return url;
     }
 
-    public PlaylistItem getPlaylistItem() {
-        return playlistItem;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MediaSource)) {
+        if (!(obj instanceof MediaSource o)) {
             return false;
         }
-        MediaSource o = (MediaSource) obj;
         if (file != null && o.file != null) {
             return file.equals(o.file);
         }
         if (url != null && o.url != null) {
             return url.equals(o.url);
         }
-        return playlistItem != null && o.playlistItem != null && playlistItem.equals(o.playlistItem);
-    }
-
-    public String getTitleText() {
-        return titleText;
+        return false;
     }
 
     @SuppressWarnings("unused")
@@ -129,9 +101,5 @@ public class MediaSource {
 
     public boolean isURL() {
         return url != null;
-    }
-
-    public boolean isPlaylistItem() {
-        return playlistItem != null;
     }
 }

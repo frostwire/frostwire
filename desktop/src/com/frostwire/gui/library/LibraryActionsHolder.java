@@ -38,7 +38,8 @@ public final class LibraryActionsHolder extends AbstractActionsHolder {
         Object dl = getDataLine();
         if (dl instanceof LibraryFilesTableDataLine) {
             return MediaPlayer.isPlayableFile(((LibraryFilesTableDataLine) dl).getFile());
-        } else return dl instanceof LibraryPlaylistsTableDataLine;
+        }
+        return false;
     }
 
     @Override

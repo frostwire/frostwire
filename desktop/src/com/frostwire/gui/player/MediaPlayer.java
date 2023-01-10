@@ -17,8 +17,6 @@
 
 package com.frostwire.gui.player;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.tags.TagsReader;
@@ -65,7 +63,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     private final List<MediaPlayerListener> listenerList = new CopyOnWriteArrayList<>();
     private final MPlayer mplayer;
     private MediaSource currentMedia;
-    private Playlist currentPlaylist;
     private MediaSource[] playlistFilesView;
     private RepeatMode repeatMode;
     private boolean shuffle;
@@ -142,8 +139,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             return false;
         } else if (mediaSource.getFile() != null) {
             return mediaSource.getFile().exists() && isPlayableFile(mediaSource.getFile());
-        } else if (mediaSource.getPlaylistItem() != null) {
-            return new File(mediaSource.getPlaylistItem().getFilePath()).exists() && isPlayableFile(mediaSource.getPlaylistItem().getFilePath());
         } else return mediaSource instanceof StreamMediaSource;
     }
 
@@ -155,10 +150,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
 
     public MediaSource getCurrentMedia() {
         return currentMedia;
-    }
-
-    public Playlist getCurrentPlaylist() {
-        return currentPlaylist;
     }
 
     public MediaSource[] getPlaylistFilesView() {
@@ -201,7 +192,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     /**
      * Loads a MediaSource into the player to play next
      */
-    private void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong, Playlist currentPlaylist, List<MediaSource> playlistFilesView) {
+    private void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong, List<MediaSource> playlistFilesView) {
         try {
             if (source == null) {
                 return;
@@ -210,8 +201,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             MediaType mt = null; // = MediaType.getMediaTypeForExtension();
             if (source.isFile()) {
                 mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(source.getFile().getName()));
-            } else if (source.isPlaylistItem()) {
-                mt = MediaType.getMediaTypeForExtension(FilenameUtils.getExtension(source.getPlaylistItem().getFileName()));
             } else if (source.isURL()) {
                 GUIMediator.instance().playInOS(source);
                 return;
@@ -229,7 +218,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             }
             currentMedia = source;
             this.playNextMedia = playNextSong;
-            this.currentPlaylist = currentPlaylist;
+
             if (playlistFilesView != null) {
                 this.playlistFilesView = playlistFilesView.toArray(new MediaSource[0]);
             } else {
@@ -241,11 +230,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
                 LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
                 calculateDurationInSecs(currentMedia.getFile());
                 playMedia();
-            } else if (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null) {
-                TagsReader tagsReader = new TagsReader(new File(currentMedia.getPlaylistItem().getFilePath()));
-                LibraryMediator.instance().getLibraryCoverArtPanel().setTagsReader(tagsReader).asyncRetrieveImage();
-                playMedia();
-                durationInSeconds = (long) currentMedia.getPlaylistItem().getTrackDurationInSecs();
             } else if (currentMedia instanceof StreamMediaSource) {
                 LibraryMediator.instance().getLibraryCoverArtPanel().setDefault();
                 playMedia();
@@ -297,12 +281,12 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         return -1;
     }
 
-    public void asyncLoadMedia(final MediaSource source, final boolean playNextSong, final Playlist currentPlaylist, final List<MediaSource> playlistFilesView) {
-        playExecutor.execute(() -> loadMedia(source, false, playNextSong, currentPlaylist, playlistFilesView));
+    public void asyncLoadMedia(final MediaSource source, final boolean playNextSong, final List<MediaSource> playlistFilesView) {
+        playExecutor.execute(() -> loadMedia(source, false, playNextSong, playlistFilesView));
     }
 
     public void loadMedia(MediaSource source, boolean isPreview, boolean playNextSong) {
-        loadMedia(source, isPreview, playNextSong, currentPlaylist, (playlistFilesView != null) ? Arrays.asList(playlistFilesView) : null);
+        loadMedia(source, isPreview, playNextSong, (playlistFilesView != null) ? Arrays.asList(playlistFilesView) : null);
     }
 
     public void asyncLoadMedia(final MediaSource source, final boolean isPreview, final boolean playNextSong) {
@@ -319,8 +303,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
                     filename = currentMedia.getFile().getAbsolutePath();
                 } else if (currentMedia.getURL() != null) {
                     filename = currentMedia.getURL();
-                } else if (currentMedia.getPlaylistItem() != null) {
-                    filename = currentMedia.getPlaylistItem().getFilePath();
                 }
             }
         } catch (Throwable e) {
@@ -493,9 +475,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         if (!playNextMedia) {
             return;
         }
-        if (currentPlaylist != null && currentPlaylist.isDeleted()) {
-            return;
-        }
         MediaSource media;
         if (getRepeatMode() == RepeatMode.SONG) {
             media = currentMedia;
@@ -508,7 +487,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         }
         if (media != null) {
             //System.out.println(song.getFile());
-            asyncLoadMedia(media, true, currentPlaylist, Arrays.asList(playlistFilesView));
+            asyncLoadMedia(media, true, Arrays.asList(playlistFilesView));
         }
     }
 
@@ -526,10 +505,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
             return false;
         }
         File currentMediaFile = currentMedia.getFile();
-        if (file.equals(currentMediaFile))
-            return true;
-        PlaylistItem playlistItem = currentMedia.getPlaylistItem();
-        return playlistItem != null && new File(playlistItem.getFilePath()).equals(file);
+        return file.equals(currentMediaFile);
     }
 
     public boolean isThisBeingPlayed(String file) {
@@ -542,18 +518,6 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
         }
         String currentMediaUrl = currentMedia.getURL();
         return file.equalsIgnoreCase(currentMediaUrl);
-    }
-
-    public boolean isThisBeingPlayed(PlaylistItem playlistItem) {
-        if (isPlayerStoppedClosedFailed()) {
-            return false;
-        }
-        MediaSource currentMedia = getCurrentMedia();
-        if (currentMedia == null) {
-            return false;
-        }
-        PlaylistItem currentMediaFile = currentMedia.getPlaylistItem();
-        return playlistItem.equals(currentMediaFile);
     }
 
     private MediaSource getNextRandomSong(MediaSource currentMedia) {

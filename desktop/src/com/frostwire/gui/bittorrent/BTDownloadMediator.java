@@ -466,10 +466,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         }
         menu.add(new SkinMenuItem(copyMagnetAction));
         menu.add(new SkinMenuItem(copyHashAction));
-        SkinMenu addToPlaylistMenu = BTDownloadMediatorAdvancedMenuFactory.createAddToPlaylistSubMenu();
-        if (addToPlaylistMenu != null) {
-            menu.add(addToPlaylistMenu);
-        }
         menu.addSeparator();
         menu.add(new SkinMenuItem(removeAction));
         menu.add(new SkinMenuItem(BTDownloadActions.REMOVE_TORRENT_ACTION));

@@ -15,8 +15,6 @@
 
 package com.frostwire.gui.player;
 
-import com.frostwire.alexandria.Playlist;
-import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.gui.bittorrent.SendFileProgressDialog;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
@@ -196,7 +194,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         trackTitle.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (MediaPlayer.instance().getCurrentMedia().getFile() != null || MediaPlayer.instance().getCurrentMedia().getPlaylistItem() != null) {
+                if (MediaPlayer.instance().getCurrentMedia().getFile() != null) {
                     showCurrentMedia();
                 } else if (MediaPlayer.instance().getCurrentMedia() instanceof StreamMediaSource) {
                     StreamMediaSource mediaSource = (StreamMediaSource) MediaPlayer.instance().getCurrentMedia();
@@ -392,18 +390,10 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
             /* update controls */
             updateShareButtonVisibility(mediaSource);
-            PlaylistItem playlistItem = mediaSource.getPlaylistItem();
+
             String currentText = null;
             if (mediaSource instanceof StreamMediaSource) {
                 currentText = ((StreamMediaSource) mediaSource).getTitle();
-            } else if (playlistItem != null) {
-                //Playing from Playlist.
-                String artistName = playlistItem.getTrackArtist();
-                String songTitle = playlistItem.getTrackTitle();
-                String albumToolTip = (playlistItem.getTrackAlbum() != null && playlistItem.getTrackAlbum().length() > 0) ? " - " + playlistItem.getTrackAlbum() : "";
-                String yearToolTip = (playlistItem.getTrackYear() != null && playlistItem.getTrackYear().length() > 0) ? " (" + playlistItem.getTrackYear() + ")" : "";
-                currentText = artistName + " - " + songTitle;
-                trackTitle.setToolTipText(artistName + " - " + songTitle + albumToolTip + yearToolTip);
             } else if (mediaSource != null && mediaSource.getFile() != null) {
                 //playing from Audio.
                 currentText = mediaSource.getFile().getName();
@@ -423,8 +413,8 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     }
 
     private void updateShareButtonVisibility(MediaSource currentMedia) {
-        boolean isLocalOrPlaylistFiles = (currentMedia != null && (currentMedia.getFile() != null || (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null && new File(currentMedia.getPlaylistItem().getFilePath()).exists())));
-        boolean showShareButton = currentMedia != null && (isLocalOrPlaylistFiles);
+        boolean isLocalFile = currentMedia != null && currentMedia.getFile() != null;
+        boolean showShareButton = currentMedia != null && (isLocalFile);
         shareButton.setVisible(showShareButton);
     }
 
@@ -529,13 +519,10 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
             @Override
             protected Void doInBackground() {
-                if (currentMedia != null && (currentMedia.getFile() != null || currentMedia.getPlaylistItem() != null)) {
+                if (currentMedia != null && currentMedia.getFile() != null) {
                     String commentToParse = "";
                     if (currentMedia.getFile() != null) {
                         commentToParse = getCommentFromMP3(currentMedia);
-                    } else if (currentMedia.getPlaylistItem() != null) {
-                        PlaylistItem playlistItem = currentMedia.getPlaylistItem();
-                        commentToParse = playlistItem.getTrackComment();
                     }
                     parseSocialLink(commentToParse);
                 }
@@ -601,7 +588,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
     private void updateMediaSourceButton(final MediaSource currentMedia) {
         SwingWorker<Void, Void> swingWorker = new SwingWorker<>() {
             private boolean isLocalFile;
-            private boolean isPlaylistItem;
             private boolean isSC;
             private boolean isAR;
             private String playlistName;
@@ -614,10 +600,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 if (currentMedia.getFile() != null) {
                     //won't be shown in 5.6.x, code here for 6.x
                     isLocalFile = true;
-                } else if (currentMedia.getPlaylistItem() != null) {
-                    //won't be shown in 5.6.x, code here for 6.x
-                    isPlaylistItem = true;
-                    setupPlaylistName(currentMedia);
                 }
                 if (currentMedia instanceof StreamMediaSource) {
                     StreamMediaSource streamMedia = (StreamMediaSource) currentMedia;
@@ -637,9 +619,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 if (isLocalFile) { //won't be shown in 5.6.x, code here for 6.x
                     tooltipText = I18n.tr("Playing local file");
                     iconUpName = iconDownName = "speaker_light";
-                } else if (isPlaylistItem) { //won't be shown in 5.6.x, code here for 6.x
-                    tooltipText = I18n.tr("Playing track from") + " " + playlistName;
-                    iconUpName = iconDownName = "playlist";
                 } else if (isSC) {
                     tooltipText = I18n.tr("Open SoundCloud source page");
                     iconUpName = "soundcloud_off";
@@ -656,15 +635,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     mediaSourceButton.init(tooltipText, iconUpName, iconDownName);
                 }
                 mediaSourceButton.setVisible(mediaSourceButtonVisible);
-            }
-
-            private void setupPlaylistName(final MediaSource currentMedia) {
-                Playlist playlist = currentMedia.getPlaylistItem().getPlaylist();
-                if (playlist != null && playlist.getName() != null) {
-                    playlistName = playlist.getName();
-                } else {
-                    playlistName = I18n.tr("playlist");
-                }
             }
         };
         swingWorker.execute();
@@ -694,8 +664,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     artist = tagData.getArtist();
                 }
             }
-        } else if (currentMedia.getPlaylistItem() != null && !StringUtils.isNullOrEmpty(currentMedia.getPlaylistItem().getTrackArtist())) {
-            artist = currentMedia.getPlaylistItem().getTrackArtist();
         }
         return artist;
     }
@@ -770,8 +738,6 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             File file = null;
             if (currentMedia.getFile() != null) {
                 file = currentMedia.getFile();
-            } else if (currentMedia.getPlaylistItem() != null && currentMedia.getPlaylistItem().getFilePath() != null) {
-                file = new File(currentMedia.getPlaylistItem().getFilePath());
             }
             if (file == null) {
                 return;

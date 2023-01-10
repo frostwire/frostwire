@@ -1,13 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +17,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.Playlist;
 import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
@@ -78,15 +76,8 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
         LibraryMediator.instance().clearLibraryTable();
         DirectoryHolder directoryHolder = getSelectedDirectoryHolder();
-        //STARRED
-        if (directoryHolder instanceof StarredDirectoryHolder) {
-            Playlist playlist = LibraryMediator.getLibrary().getStarredPlaylist();
-            LibraryMediator.instance().updateTableItems(playlist);
-            String status = LibraryUtils.getPlaylistDurationInDDHHMMSS(playlist) + ", " + playlist.getItems().size() + " " + I18n.tr("tracks");
-            LibraryMediator.instance().getLibrarySearch().setStatus(status);
-        }
         //TORRENTS
-        else if (directoryHolder instanceof TorrentDirectoryHolder) {
+        if (directoryHolder instanceof TorrentDirectoryHolder) {
             LibraryMediator.instance().updateTableFiles(directoryHolder);
         }
         //SAVED FILES FOLDER
@@ -229,30 +220,6 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType.getAudioMediaType());
     }
 
-    void selectStarred() {
-        try {
-            if (selectionListenerForSameItem(StarredDirectoryHolder.class)) {
-                return;
-            }
-            Enumeration<?> e = root.depthFirstEnumeration();
-            while (e.hasMoreElements()) {
-                final LibraryNode node = (LibraryNode) e.nextElement();
-                if (node instanceof DirectoryHolderNode) {
-                    DirectoryHolder holder = ((DirectoryHolderNode) node).getDirectoryHolder();
-                    if (holder instanceof StarredDirectoryHolder) {
-                        GUIMediator.safeInvokeAndWait(() -> {
-                            tree.setSelectionPath(new TreePath(node.getPath()));
-                            tree.scrollPathToVisible(new TreePath(node.getPath()));
-                        });
-                        return;
-                    }
-                }
-            }
-        } finally {
-            executePendingRunnables();
-        }
-    }
-
     public void selectDirectoryHolderAt(final int index) {
         if (index >= 0 && index < tree.getRowCount()) {
             GUIMediator.safeInvokeLater(() -> {
@@ -345,7 +312,6 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
             if (node == null) {
                 return;
             }
-            LibraryMediator.instance().getLibraryPlaylists().clearSelection();
             refreshSelection(false);
         }
     }

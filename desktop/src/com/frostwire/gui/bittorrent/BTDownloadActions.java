@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.alexandria.Playlist;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
@@ -35,8 +34,6 @@ import com.limegroup.gnutella.gui.iTunesMediator;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author gubatron
@@ -375,29 +372,6 @@ final class BTDownloadActions {
         }
     }
 
-    static class CreateNewPlaylistAction extends AbstractAction {
-        CreateNewPlaylistAction() {
-            super(I18n.tr("Create New Playlist"));
-            putValue(Action.LONG_DESCRIPTION, I18n.tr("Create and add to a new playlist"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-            List<File> playlistFiles = new ArrayList<>(downloaders.length);
-            for (BTDownload d : downloaders) {
-                if (!d.isCompleted()) {
-                    return;
-                }
-                File downloadFolder = new File(d.getSaveLocation(), d.getDisplayName());
-                if (downloadFolder.exists()) {
-                    playlistFiles.add(downloadFolder);
-                }
-            }
-            LibraryUtils.createNewPlaylist(playlistFiles.toArray(new File[0]));
-        }
-    }
-
     static final class PlaySingleMediaFileAction extends AbstractAction {
         PlaySingleMediaFileAction() {
             super(I18n.tr("Play file"));
@@ -420,38 +394,4 @@ final class BTDownloadActions {
         }
     }
 
-    /**
-     * NOTE: Make sure to check out AbstractLibraryTableMediator.AddToPlaylistAction, which is a similar action to this one.
-     *
-     * @author gubatron
-     */
-    static class AddToPlaylistAction extends AbstractAction {
-        private static final int MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU = 80;
-        private final Playlist playlist;
-
-        AddToPlaylistAction(Playlist playlist) {
-            super(getTruncatedString(playlist.getName()));
-            putValue(Action.LONG_DESCRIPTION, I18n.tr("Add to playlist") + " \"" + getValue(Action.NAME) + "\"");
-            System.out.println("Truncated playlist name was:" + " " + getValue(Action.NAME));
-            this.playlist = playlist;
-        }
-
-        private static String getTruncatedString(String string) {
-            return string.length() > AddToPlaylistAction.MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU ? (string.substring(0, AddToPlaylistAction.MAX_VISIBLE_PLAYLIST_NAME_LENGTH_IN_MENU - 1) + "...") : string;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-            List<File> playlistFiles = new ArrayList<>(downloaders.length);
-            for (BTDownload d : downloaders) {
-                if (!d.isCompleted()) {
-                    return;
-                }
-                playlistFiles.add(d.getSaveLocation());
-            }
-            LibraryUtils.asyncAddToPlaylist(playlist, playlistFiles.toArray(new File[0]));
-            GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-        }
-    }
 }

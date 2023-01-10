@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.PlaylistItem;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -65,7 +64,7 @@ final class LibraryFilesTransferHandler extends TransferHandler {
             MediaTypeSavedFilesDirectoryHolder mediaTypeSavedFilesDirHolder = (MediaTypeSavedFilesDirectoryHolder) dirHolder;
             MediaType mt = mediaTypeSavedFilesDirHolder.getMediaType();
             return mt.equals(MediaType.getAudioMediaType()) &&
-                    DNDUtils.supportCanImport(LibraryPlaylistsTableTransferable.ITEM_ARRAY, support, null, false);
+                    DNDUtils.supportCanImport(support.getDataFlavors()[0], support, null, false);
         } catch (Throwable e) {
             LOG.error("Error in LibraryFilesTransferHandler processing", e);
         }
@@ -124,16 +123,6 @@ final class LibraryFilesTransferHandler extends TransferHandler {
                             e.printStackTrace();
                         }
                     }
-                } else if (DNDUtils.contains(transferable.getTransferDataFlavors(), LibraryPlaylistsTableTransferable.ITEM_ARRAY)) {
-                    PlaylistItem[] playlistItems = LibraryUtils.convertToPlaylistItems((LibraryPlaylistsTableTransferable.Item[]) transferable.getTransferData(LibraryPlaylistsTableTransferable.ITEM_ARRAY));
-                    LibraryUtils.createNewPlaylist(playlistItems, isStarredDirectoryHolder(support.getDropLocation()));
-                } else {
-                    File[] files = DNDUtils.getFiles(support.getTransferable());
-                    if (files.length == 1 && files[0].getAbsolutePath().endsWith(".m3u")) {
-                        LibraryUtils.createNewPlaylist(files[0], isStarredDirectoryHolder(support.getDropLocation()));
-                    } else {
-                        LibraryUtils.createNewPlaylist(files, isStarredDirectoryHolder(support.getDropLocation()));
-                    }
                 }
             }
         } catch (Throwable e) {
@@ -157,16 +146,6 @@ final class LibraryFilesTransferHandler extends TransferHandler {
     @Override
     public int getSourceActions(JComponent c) {
         return COPY_OR_MOVE | LINK;
-    }
-
-    private boolean isStarredDirectoryHolder(DropLocation location) {
-        LibraryNode node = getNodeFromLocation(location);
-        if (node instanceof DirectoryHolderNode) {
-            DirectoryHolder dirHolder = ((DirectoryHolderNode) node).getDirectoryHolder();
-            return dirHolder instanceof StarredDirectoryHolder;
-        } else {
-            return false;
-        }
     }
 
     private LibraryNode getNodeFromLocation(DropLocation location) {

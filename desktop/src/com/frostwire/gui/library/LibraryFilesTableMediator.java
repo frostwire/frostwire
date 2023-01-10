@@ -18,7 +18,6 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.alexandria.Playlist;
 import com.frostwire.bittorrent.PaymentOptions;
 import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.library.tags.TagsReader;
@@ -128,8 +127,9 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     /**
      * Split a collection in Lists of up to partitionSize elements.
      */
-    private static <T> List<List<T>> split(int partitionSize, List<T> collection) {
+    private static <T> List<List<T>> split(List<T> collection) {
         List<List<T>> lists = new LinkedList<>();
+        final int partitionSize = 100;
         for (int i = 0; i < collection.size(); i += partitionSize) {
             //the compiler might not know if the collection has changed size
             //so it might not optimize this by itself.
@@ -214,9 +214,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             DEMUX_MP4_AUDIO_ACTION.setEnabled(!((DemuxMP4AudioAction) DEMUX_MP4_AUDIO_ACTION).isDemuxing());
         }
         menu.add(new SkinMenuItem(CREATE_TORRENT_ACTION));
-        if (areAllSelectedFilesPlayable()) {
-            menu.add(createAddToPlaylistSubMenu());
-        }
         menu.add(new SkinMenuItem(SEND_TO_FRIEND_ACTION));
         menu.add(new SkinMenuItem(SEND_TO_ITUNES_ACTION));
         menu.addSeparator();
@@ -333,7 +330,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             setMediaType(MediaType.getAnyTypeMediaType());
         }
         clearTable();
-        List<List<File>> partitionedFiles = split(100, Arrays.asList(dirHolder.getFiles()));
+        List<List<File>> partitionedFiles = split(Arrays.asList(dirHolder.getFiles()));
         for (List<File> partition : partitionedFiles) {
             final List<File> fPartition = partition;
             BackgroundExecutorService.schedule(() -> {
@@ -493,7 +490,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
             return;
         }
         if (getMediaType().equals(MediaType.getAudioMediaType()) && MediaPlayer.isPlayableFile(line.getFile())) {
-            MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, null, getFilesView());
+            MediaPlayer.instance().asyncLoadMedia(new MediaSource(line.getFile()), true, getFilesView());
             return;
         }
         launch(true);
@@ -628,10 +625,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     void resetAudioPlayerFileView() {
-        Playlist playlist = MediaPlayer.instance().getCurrentPlaylist();
-        if (playlist == null) {
-            MediaPlayer.instance().setPlaylistFilesView(getFilesView());
-        }
     }
 
     @Override
@@ -671,11 +664,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private final class LaunchAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 949208465372392591L;
-
         LaunchAction() {
             putValue(Action.NAME, I18n.tr("Launch"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Launch Selected Files"));
@@ -688,11 +676,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private final class LaunchOSAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 949208465372392592L;
-
         LaunchOSAction() {
             String os = "OS";
             if (OSUtils.isWindows()) {
@@ -713,11 +696,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private final class OpenInFolderAction extends AbstractAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = 1693310684299300459L;
-
         OpenInFolderAction() {
             putValue(Action.NAME, I18n.tr("Explore"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
@@ -738,8 +716,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private final class CreateTorrentAction extends AbstractAction {
-        private static final long serialVersionUID = 1898917632888388860L;
-
         CreateTorrentAction() {
             super(I18n.tr("Create New Torrent"));
             putValue(Action.LONG_DESCRIPTION, I18n.tr("Create a new .torrent file"));
@@ -778,8 +754,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private class SendAudioFilesToiTunes extends AbstractAction {
-        private static final long serialVersionUID = 4726989286129406765L;
-
         SendAudioFilesToiTunes() {
             if (!OSUtils.isLinux()) {
                 String actionName = I18n.tr("Send to iTunes");
@@ -807,7 +781,6 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
     }
 
     private class DemuxMP4AudioAction extends AbstractAction {
-        private static final long serialVersionUID = 2994040746359495494L;
         private final ArrayList<File> demuxedFiles;
         private boolean isDemuxing = false;
 

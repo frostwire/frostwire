@@ -449,11 +449,9 @@ public final class GUIMediator {
             // us to get LimeWire to the foreground after it's run from
             // the startup folder with all the nice little animations
             // that we want
-            // cache whether or not to use our little hack, since setAppVisible
+            // cache whether to use our little hack, since setAppVisible
             // changes the value of _visibleOnce
-            boolean doHack = false;
-            if (!_visibleOnce)
-                doHack = true;
+            boolean doHack = !_visibleOnce;
             GUIMediator.setAppVisible(true);
             if (ApplicationSettings.DISPLAY_TRAY_ICON.getValue())
                 GUIMediator.showTrayIcon();
@@ -507,7 +505,6 @@ public final class GUIMediator {
      */
     public static void shutdown() {
         TellurideLauncher.shutdownServer(SearchSettings.TELLURIDE_RPC_PORT.getValue());
-        LibraryMediator.getLibrary().close();
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
         Finalizer.shutdown();
     }
@@ -1000,7 +997,7 @@ public final class GUIMediator {
      *
      * @return the <tt>MainFrame</tt> instance
      */
-    public final MainFrame getMainFrame() {
+    public MainFrame getMainFrame() {
         return MAIN_FRAME;
     }
 
@@ -1017,7 +1014,7 @@ public final class GUIMediator {
     /**
      * Refreshes the various gui components that require refreshing.
      */
-    final void refreshGUI() {
+    void refreshGUI() {
         for (RefreshListener listener : REFRESH_LIST) {
             try {
                 listener.refresh();
@@ -1130,15 +1127,15 @@ public final class GUIMediator {
      * @return the total number of downloads for this session
      */
     @SuppressWarnings("unused")
-    public final int getTotalDownloads() {
+    public int getTotalDownloads() {
         return getBTDownloadMediator().getTotalDownloads();
     }
 
-    final int getCurrentDownloads() {
+    int getCurrentDownloads() {
         return getBTDownloadMediator().getActiveDownloads();
     }
 
-    public final void openTorrentFile(File torrentFile, boolean partialSelection) {
+    public void openTorrentFile(File torrentFile, boolean partialSelection) {
         BTDownloadMediator btDownloadMediator = getBTDownloadMediator();
         List<BTDownload> downloads = getBTDownloadMediator().getDownloads();
         Runnable onOpenRunnable = () -> {
@@ -1158,7 +1155,7 @@ public final class GUIMediator {
         showTransfers(TransfersTab.FilterMode.ALL);
     }
 
-    public final void openTorrentURI(String uri, boolean partialDownload) {
+    public void openTorrentURI(String uri, boolean partialDownload) {
         showTransfers(TransfersTab.FilterMode.ALL);
         getBTDownloadMediator().openTorrentURI(uri, partialDownload);
     }
@@ -1177,10 +1174,10 @@ public final class GUIMediator {
 
     public void showTransfers(TransfersTab.FilterMode mode) {
         Tabs tabEnum = Tabs.TRANSFERS;
-        if (Tabs.TRANSFERS.isEnabled()) {
-            tabEnum = Tabs.TRANSFERS;
-        } else if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
-            tabEnum = Tabs.SEARCH_TRANSFERS;
+        if (!Tabs.TRANSFERS.isEnabled()) {
+            if (Tabs.SEARCH_TRANSFERS.isEnabled()) {
+                tabEnum = Tabs.SEARCH_TRANSFERS;
+            }
         }
         setWindow(tabEnum);
         ((TransfersTab) getMainFrame().getTab(Tabs.TRANSFERS)).showTransfers(mode);
@@ -1206,10 +1203,7 @@ public final class GUIMediator {
                 e.printStackTrace();
             }
         //MediaPlayer.instance().loadSong(song);
-        boolean playNextSong = true;
-        if (song.getFile() != null && MediaType.getVideoMediaType().matches(song.getFile().getAbsolutePath())) {
-            playNextSong = false;
-        }
+        boolean playNextSong = song.getFile() == null || !MediaType.getVideoMediaType().matches(song.getFile().getAbsolutePath());
         MediaPlayer.instance().asyncLoadMedia(song, isPreview, playNextSong);
     }
 
@@ -1315,8 +1309,6 @@ public final class GUIMediator {
         }
         if (source.getFile() != null) {
             GUIMediator.launchFile(source.getFile());
-        } else if (source.getPlaylistItem() != null) {
-            GUIMediator.launchFile(new File(source.getPlaylistItem().getFilePath()));
         } else if (source.getURL() != null) {
             GUIMediator.openURL(source.getURL());
         }
