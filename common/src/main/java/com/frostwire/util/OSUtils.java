@@ -35,16 +35,16 @@ public class OSUtils {
     private static boolean _isWindowsVista;
     private static boolean _isWindows7;
     /**
-     * Variable for whether or not the operating system allows the
+     * Variable for whether the operating system allows the
      * application to be reduced to the system tray.
      */
     private static boolean _supportsTray;
     /**
-     * Variable for whether or not we're on Mac OS X.
+     * Variable for whether we're on Mac OS X.
      */
     private static boolean _isMacOSX;
     /**
-     * Variable for whether or not we're on Linux.
+     * Variable for whether we're on Linux.
      */
     private static boolean _isLinux;
 
@@ -57,19 +57,19 @@ public class OSUtils {
       10.12 - Sierra
      */
     /**
-     * Variable for whether or not we're on Ubuntu
+     * Variable for whether we're on Ubuntu
      */
     private static boolean _isUbuntu;
     /**
-     * Variable for whether or not we're on Fedora
+     * Variable for whether we're on Fedora
      */
     private static boolean _isFedora;
     /**
-     * Variable for whether or not we're on Solaris.
+     * Variable for whether we're on Solaris.
      */
     private static boolean _isSolaris;
     /**
-     * Variable for whether or not we're on OS/2.
+     * Variable for whether we're on OS/2.
      */
     private static boolean _isOS2;
 
@@ -153,7 +153,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is some version of Windows.
+     * Returns whether the OS is some version of Windows.
      *
      * @return <tt>true</tt> if the application is running on some Windows
      * version, <tt>false</tt> otherwise
@@ -163,7 +163,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is WinXP.
+     * Returns whether the OS is WinXP.
      *
      * @return <tt>true</tt> if the application is running on WinXP,
      * <tt>false</tt> otherwise
@@ -223,7 +223,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is OS/2.
+     * Returns whether the OS is OS/2.
      *
      * @return <tt>true</tt> if the application is running on OS/2,
      * <tt>false</tt> otherwise
@@ -233,7 +233,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is Mac OS X.
+     * Returns whether the OS is Mac OS X.
      *
      * @return <tt>true</tt> if the application is running on Mac OS X,
      * <tt>false</tt> otherwise
@@ -243,7 +243,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is any Mac OS.
+     * Returns whether the OS is any macOS.
      *
      * @return <tt>true</tt> if the application is running on Mac OSX
      * or any previous mac version, <tt>false</tt> otherwise
@@ -253,7 +253,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is Solaris.
+     * Returns whether the OS is Solaris.
      *
      * @return <tt>true</tt> if the application is running on Solaris,
      * <tt>false</tt> otherwise
@@ -263,7 +263,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is Linux.
+     * Returns whether the OS is Linux.
      *
      * @return <tt>true</tt> if the application is running on Linux,
      * <tt>false</tt> otherwise
@@ -273,7 +273,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the Linux distribution is Ubuntu or Debian.
+     * Returns whether the Linux distribution is Ubuntu or Debian.
      *
      * @return <tt>true</tt> if the application is running on Ubuntu or Debian distributions,
      * <tt>false</tt> otherwise
@@ -283,7 +283,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the Linux distribution is Fedora or Red Hat
+     * Returns whether the Linux distribution is Fedora or Red Hat
      *
      * @return <tt>true</tt> if the application is running on Fedora or Red Hat distributions,
      * <tt>false</tt> otherwise
@@ -293,7 +293,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not the OS is some version of
+     * Returns whether the OS is some version of
      * Unix, defined here as only Solaris or Linux.
      */
     public static boolean isUnix() {
@@ -301,7 +301,7 @@ public class OSUtils {
     }
 
     /**
-     * Returns whether or not this operating system is considered
+     * Returns whether this operating system is considered
      * capable of meeting the requirements of a high load server.
      *
      * @return <tt>true</tt> if this OS meets high load server requirements,

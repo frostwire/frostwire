@@ -9,7 +9,7 @@ import com.limegroup.gnutella.settings.QuestionsHandler;
 import java.util.Collection;
 
 /**
- * Stores all the LimeAssociationOptions that LimeWire is set to use.
+ * Stores all the LimeAssociationOptions that FrostWire is set to use.
  */
 public class ShellAssociationManager {
     private final Collection<LimeAssociationOption> associations;
