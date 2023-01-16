@@ -1,4 +1,4 @@
-frostwire (6.9.11) stable; urgency=high
+frostwire (6.10.0) stable; urgency=high
   * Telluride build 24 with Python 3.11, faster web video searches
   * Misc Screen bugfix for Linux
   * Default audio/video player setting for Linux is mplayer
