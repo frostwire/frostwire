@@ -1,6 +1,14 @@
+frostwire (6.9.11) stable; urgency=high
+  * Telluride build 24 with Python 3.11, faster web video searches
+  * Misc Screen bugfix for Linux
+  * Default audio/video player setting for Linux is mplayer
+  * Removed audio player playlists along with H2 database dependency
+
+ -- FrostWire Team <contact@frostwire.com>  Mon, 16 Jan 2023 13:10:00 -0600
+
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1
-  * telluride build 23
+  * Telluride build 23
   * supports TikTok, IG Reels, YT Stories backups
   * com.google.re2j:re2j:1.7
   * com.google.code.gson:gson:2.9.0
