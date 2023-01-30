@@ -1,10 +1,11 @@
-FrostWire 2.6.3 build 709 - JAN/01/2023
+FrostWire 2.6.3 build 710 - JAN/30/2023
  - com.chaquo.python:gradle:13.0.0
  - python:yt_dlp-2023.1.2
  - python:Brotli-1.0.7
  - python: pycryptodomex-3.9.4
  - python: websockets-10.4
  - com.google.android.material:material:1.7.0
+ - com.android.tools.build:gradle:7.4.0
  - explicit declared androidx.lifecycle:lifecycle-viewmodel:2.5.1 to avoid conflicts
  - explicit declared androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1 to avoid conflicts
  - androidx.exifinterface:exifinterface:1.3.5
