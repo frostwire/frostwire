@@ -133,6 +133,7 @@ public final class Ssl {
                 "www.1377x.to",
                 "www.frostwire.com",
                 "www.limetorrents.info",
+                "www.limetorrents.lol",
                 "www.limetorrents.pro",
                 "www.magnetdl.com",
                 "www.pirate-bay.net",
