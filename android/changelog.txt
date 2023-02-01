@@ -1,6 +1,6 @@
-FrostWire 2.6.3 build 710 - JAN/30/2023
- - com.chaquo.python:gradle:13.0.0
- - python:yt_dlp-2023.1.2
+FrostWire 2.6.3 build 711 - JAN/31/2023
+ - com.chaquo.python:gradle:14.0.2
+ - python:yt_dlp-2023.1.6
  - python:Brotli-1.0.7
  - python: pycryptodomex-3.9.4
  - python: websockets-10.4
