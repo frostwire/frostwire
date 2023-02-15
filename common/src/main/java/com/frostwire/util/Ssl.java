@@ -143,6 +143,7 @@ public final class Ssl {
                 "www.yify-torrent.org",
                 "www.youtube.com",
                 "yify-torrent.cc",
+                "yts-movie.cc",
                 "youtu.be",
                 "zoink.ch",
                 "zooqle.com",
