@@ -77,11 +77,9 @@ public final class JdkHttpClient extends AbstractHttpClient {
         try {
             baos = new ByteArrayOutputStream();
             get(url, baos, timeout, userAgent, referrer, cookie, -1, -1, customHeaders);
-            result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
-        } catch (java.net.SocketTimeoutException timeoutException) {
+            result = baos.toString(StandardCharsets.UTF_8);
+        } catch (IOException timeoutException) {
             throw timeoutException;
-        } catch (IOException e) {
-            throw e;
         } finally {
             closeQuietly(baos);
         }
@@ -116,7 +114,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
         try {
             baos = new ByteArrayOutputStream();
             post(url, baos, timeout, userAgent, formData);
-            result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+            result = baos.toString(StandardCharsets.UTF_8);
         } catch (Throwable e) {
             LOG.error("Error posting data via http: " + e.getMessage(), e);
         } finally {
