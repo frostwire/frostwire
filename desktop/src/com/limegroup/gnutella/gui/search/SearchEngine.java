@@ -35,7 +35,6 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
@@ -195,12 +194,6 @@ public abstract class SearchEngine {
             return new IdopeSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine ZOOQLE = new SearchEngine(SearchEngineID.ZOOQLE_ID, "Zooqle", SearchEnginesSettings.ZOOQLE_SEARCH_ENABLED, "zooqle.com") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new ZooqleSearchPerformer(ZOOQLE.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
     private static final SearchEngine TORRENTZ2 = new SearchEngine(SearchEngineID.TORRENTZ2_ID, "Torrentz2", SearchEnginesSettings.TORRENTZ2_SEARCH_ENABLED, "torrentz2.eu") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -256,12 +249,16 @@ public abstract class SearchEngine {
         return TELLURIDE;
     }
 
+
+    public static SearchEngine getFrostClickEngine() {
+        return FROSTCLICK;
+    }
+
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         List<SearchEngine> candidates = Arrays.asList(
                 MAGNETDL,
                 TORRENTZ2,
-                ZOOQLE,
                 IDOPE,
                 TPB,
                 SOUNDCLOUD,
