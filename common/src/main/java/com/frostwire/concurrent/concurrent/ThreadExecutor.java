@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2007-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class ThreadExecutor {
                 Thread.currentThread().setName(name);
                 runner.run();
             } catch (Throwable t) {
-                // Forward throwables to the handler,
+                // Forward throwable to the handler,
                 // and reset the name back to idle.
                 Thread.currentThread().
                         getUncaughtExceptionHandler().
