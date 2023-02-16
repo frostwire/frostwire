@@ -125,7 +125,7 @@ public final class TellurideLauncher {
                         Thread.sleep(8000);
                         LOG.info("TellurideLauncher::launchServer is process alive: " + process.isAlive());
                         LOG.info("TellurideLauncher::launchServer RPC server should be up at http://127.0.0.1:" + port + "/ping");
-                        LOG.info("TellurideLauncher::launcheServer waiting 5 seconds to check if it's up...");
+                        LOG.info("TellurideLauncher::launchServer waiting 5 seconds to check if it's up...");
                         Thread.sleep(5000);
                         LOG.info("TellurideLauncher::launchServer pinging...");
                         TellurideLauncher.checkIfUpAlready(port);

@@ -35,7 +35,6 @@ public final class TellurideParser {
 
     final TellurideListener processListener;
     final boolean metaOnly;
-    boolean pageUrlRead;
     final StringBuilder sb;
 
     TellurideParser(TellurideListener listener, boolean pMetaOnly) {
@@ -45,14 +44,7 @@ public final class TellurideParser {
     }
 
     public void parse(String line) {
-        if (!pageUrlRead && line.contains("PAGE_URL:")) {
-            pageUrlRead = true;
-            return;
-        }
-        if (!pageUrlRead) {
-            return;
-        }
-        if (line.contains("] ERROR:")) {
+        if (line.contains("ERROR:")) {
             processListener.onError(line);
             return;
         }
