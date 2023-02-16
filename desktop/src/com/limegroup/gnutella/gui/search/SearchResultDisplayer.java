@@ -270,7 +270,8 @@ public final class SearchResultDisplayer implements RefreshListener {
      * this and restarts the spinning lime.
      */
     void addQueryResult(long token, UISearchResult line, SearchResultMediator rp) {
-        if (rp.isStopped()) {
+        boolean isTellurideSearch = line.getSearchEngine().getId() == SearchEngine.SearchEngineID.TELLURIDE_ID;
+        if (!isTellurideSearch && rp.isStopped()) {
             return;
         }
         //Actually add the line.   Must obtain rp's monitor first.

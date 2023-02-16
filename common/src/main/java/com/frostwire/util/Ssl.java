@@ -98,7 +98,6 @@ public final class Ssl {
                 "api.frostclick.com",
                 "archive.org",
                 "cdninstagram.com",
-                "cdninstagram.com",
                 "clients1.google.com",
                 "cloudflaressl.com",
                 "dl.frostwire.com",

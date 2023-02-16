@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,10 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.GUIConstants;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.PaddedPanel;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
@@ -731,8 +734,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
     }
 
     private final class RepeatSearchAction extends AbstractAction {
-        private static final long serialVersionUID = -209446182720400951L;
-
         RepeatSearchAction() {
             putValue(Action.NAME, SearchMediator.REPEAT_SEARCH_STRING);
             setEnabled(isRepeatSearchEnabled());
@@ -743,7 +744,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         }
     }
 
-    private final class CloseTabAction extends AbstractAction {
+    private static final class CloseTabAction extends AbstractAction {
         CloseTabAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_TAB_STRING);
         }
@@ -754,7 +755,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         }
     }
 
-    private final class CloseAllTabsAction extends AbstractAction {
+    private static final class CloseAllTabsAction extends AbstractAction {
         CloseAllTabsAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_ALL_TABS);
             setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 0);
@@ -766,7 +767,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         }
     }
 
-    private final class CloseOtherTabsAction extends AbstractAction {
+    private static final class CloseOtherTabsAction extends AbstractAction {
         CloseOtherTabsAction() {
             putValue(Action.NAME, SearchMediator.CLOSE_OTHER_TABS_STRING);
             setEnabled(SearchMediator.getSearchResultDisplayer().tabCount() > 1);
@@ -778,7 +779,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         }
     }
 
-    private final class CloseTabsToTheRight extends AbstractAction {
+    private static final class CloseTabsToTheRight extends AbstractAction {
         CloseTabsToTheRight() {
             putValue(Action.NAME, SearchMediator.CLOSE_TABS_TO_THE_RIGHT);
             final SearchResultDisplayer searchResultDisplayer = SearchMediator.getSearchResultDisplayer();

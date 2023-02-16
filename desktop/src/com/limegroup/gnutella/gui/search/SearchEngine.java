@@ -40,8 +40,6 @@ import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.settings.SearchEnginesSettings;
-import com.limegroup.gnutella.settings.SearchSettings;
-import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
@@ -219,9 +217,7 @@ public abstract class SearchEngine {
             return new TellurideSearchPerformer(token,
                     keywords,
                     new TellurideSearchPerformerDesktopListener(),
-                    FrostWireUtils.getTellurideLauncherFile(),
-                    SearchSettings.TELLURIDE_RPC_PORT.getValue(),
-                    SharingSettings.TORRENTS_DIR_SETTING.getValue());
+                    FrostWireUtils.getTellurideLauncherFile());
         }
     };
 

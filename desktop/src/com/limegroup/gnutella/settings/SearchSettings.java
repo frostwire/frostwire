@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,6 @@ import java.io.File;
  * Settings for searches.
  */
 public final class SearchSettings extends LimeProps {
-    public static final IntSetting TELLURIDE_RPC_PORT = (IntSetting) FACTORY.createIntSetting("TELLURIDE_RPC_PORT", 47999).setAlwaysSave(true);
-
     /**
      * Amount of time to wait in milliseconds before showing details page
      */

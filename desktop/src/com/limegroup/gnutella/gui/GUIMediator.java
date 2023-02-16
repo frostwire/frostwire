@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.HideExitDialog;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
@@ -28,8 +29,10 @@ import com.frostwire.gui.tabs.Tab;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.service.ErrorService;
+import com.frostwire.service.Switch;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.ThreadPool;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
@@ -39,14 +42,13 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
-import com.limegroup.gnutella.settings.*;
+import com.limegroup.gnutella.settings.ApplicationSettings;
+import com.limegroup.gnutella.settings.LibrarySettings;
+import com.limegroup.gnutella.settings.QuestionsHandler;
+import com.limegroup.gnutella.settings.StartupSettings;
 import com.limegroup.gnutella.util.LaunchException;
 import com.limegroup.gnutella.util.Launcher;
-import com.frostwire.concurrent.concurrent.ThreadExecutor;
-import com.frostwire.service.ErrorService;
-import com.frostwire.service.Switch;
 import org.limewire.setting.IntSetting;
-import com.frostwire.util.OSUtils;
 import org.limewire.util.StringUtils;
 
 import javax.swing.*;
@@ -504,7 +506,6 @@ public final class GUIMediator {
      * Shutdown the program cleanly.
      */
     public static void shutdown() {
-        TellurideLauncher.shutdownServer(SearchSettings.TELLURIDE_RPC_PORT.getValue());
         instance().timer.stopTimer(); // TODO: refactor this singleton pattern
         Finalizer.shutdown();
     }

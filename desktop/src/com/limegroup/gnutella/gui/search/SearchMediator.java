@@ -393,11 +393,13 @@ public final class SearchMediator {
         if (StringUtils.isNullOrEmpty(query, true)) {
             return;
         }
-        manager.stop();
+
+        if (!query.startsWith("http")) {
+            manager.stop();
+        }
 
         if (query.startsWith("http") && !query.endsWith(".torrent")) {
             manager.perform(SearchEngine.getTellurideEngine().getPerformer(token, query));
-
             manager.perform(SearchEngine.getFrostClickEngine().getPerformer(token, query));
             return;
         }
@@ -501,7 +503,8 @@ public final class SearchMediator {
 
     private void onResults(final long token, List<? extends SearchResult> results) {
         final SearchResultMediator rp = getResultPanelForGUID(token);
-        if (rp != null && !rp.isStopped()) {
+        boolean isTellurideSearchResult = results.get(0).getSource().startsWith("Cloud:"); // will be stopped
+        if (rp != null && (isTellurideSearchResult || !rp.isStopped())) {
             @SuppressWarnings("unchecked")
             List<SearchResult> filtered = filter((List<SearchResult>) results, rp.getSearchTokens());
             if (filtered != null && !filtered.isEmpty()) {

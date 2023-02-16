@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,9 @@ package com.frostwire.search.telluride;
 
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ssl;
 import com.frostwire.util.UrlUtils;
-import com.frostwire.util.http.HttpClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -46,17 +44,11 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
     private final String url;
     private final TellurideSearchPerformerListener performerListener;
     private final File tellurideLauncher;
-    private final int rpcPort;
-    private final File torrentsDir;
-
-
 
     public TellurideSearchPerformer(long token,
                                     String _url,
                                     TellurideSearchPerformerListener _performerListener,
-                                    File _tellurideLauncher,
-                                    int _rpcPort,
-                                    File _torrentsDir) {
+                                    File _tellurideLauncher) {
         super(token);
 
         // Many of these could turn into a URL fix method.
@@ -66,8 +58,6 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         url = _url;
         performerListener = _performerListener;
         tellurideLauncher = _tellurideLauncher;
-        rpcPort = _rpcPort;
-        torrentsDir = _torrentsDir;
 
         performerLatch = new CountDownLatch(1);
         if (gson == null) {
@@ -78,40 +68,15 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         }
     }
 
-    @Override
+
     public void perform() {
-        int seconds_to_wait_for_telluride_server = 15;
-        while (!TellurideLauncher.SERVER_UP.get() && seconds_to_wait_for_telluride_server > 0) {
-            LOG.info("perform(): waiting for Telluride Server to be up... (" + seconds_to_wait_for_telluride_server + " secs left to time out)");
-            try {
-                //noinspection BusyWait
-                Thread.sleep(1000);
-                seconds_to_wait_for_telluride_server--;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (seconds_to_wait_for_telluride_server == 0) {
-            LOG.info("perform(): timed out waiting for telluride server to start. finished. Invoking SearchEngine.startTellurideRPCServer()");
-            TellurideLauncher.startTellurideRPCServer(tellurideLauncher, rpcPort, torrentsDir);
-            return;
-        }
-
-        try {
-            HttpClient httpClient = HttpClientFactory.newInstance();
-            int TELLURIDE_RPC_PORT = 47999;
-            String queryUrl = String.format("http://127.0.0.1:%d/?url=%s",
-                    TELLURIDE_RPC_PORT,
-                    UrlUtils.encode(url));
-            LOG.info("perform(): working on " + queryUrl);
-            String tellurideJSON = httpClient.get(queryUrl);
-            TellurideSearchPerformer.this.onMeta(tellurideJSON);
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-            TellurideSearchPerformer.this.onError(e.getMessage());
-        }
-        LOG.info("perform(): finished.");
+        TellurideLauncher.launch(tellurideLauncher,
+                url,
+                null, // saveDirectory
+                false, // audioOnly
+                true, // metaOnly
+                false, // verboseOutput
+                new TellurideProcessListener(this));
     }
 
     @Override
@@ -137,30 +102,30 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
             if (format.url.contains(".m3u8")) {
                 // skip playlists for now
                 // TODO: Implement .m3u8 telluride downloader
-                LOG.info("getValidResults format.url contains .m3u8");
+                //LOG.info("getValidResults format.url contains .m3u8");
                 continue;
             }
             if (originalResultCount > 1 && format.height != 0 && format.width > format.height && format.width < 320) {
                 // skip low quality horizontal videos
-                LOG.info("getValidResults very low quality horizontal video, skipped");
+                //LOG.info("getValidResults very low quality horizontal video, skipped");
                 continue;
             }
 
             if (originalResultCount > 1 && format.height > format.width && format.height < 480) {
                 // skip too low quality vertical videos
-                LOG.info("getValidResults very low quality vertical video, skipped");
+                //LOG.info("getValidResults very low quality vertical video, skipped");
                 continue;
             }
 
             String videoFormatParenthesis = "";
             if (result.webpage_url.contains("youtu")) {
                 if (noCodec(format.acodec)) {
-                    LOG.info("getValidResults acodec is null, skipped");
+                    //LOG.info("getValidResults acodec is null, skipped");
                     continue;
                 }
 
                 if (noCodec(format.vcodec) && noCodec(format.acodec)) {
-                    LOG.info("getValidResults acodec + vcodec are null, skipped");
+                    //LOG.info("getValidResults acodec + vcodec are null, skipped");
                     continue;
                 }
             }
@@ -256,5 +221,23 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         public String vcodec;
         public int height;
         public int width;
+    }
+
+    private static class TellurideProcessListener extends TellurideAbstractListener {
+        private final TellurideSearchPerformer performer;
+
+        public TellurideProcessListener(TellurideSearchPerformer performer) {
+            this.performer = performer;
+        }
+
+        @Override
+        public void onMeta(String json) {
+            performer.onMeta(json);
+        }
+
+        @Override
+        public void onError(String errorMessage) {
+            performer.onError(errorMessage);
+        }
     }
 }
