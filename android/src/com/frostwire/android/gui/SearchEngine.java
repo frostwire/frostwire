@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
-import com.frostwire.search.zooqle.ZooqleSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
@@ -151,13 +150,6 @@ public abstract class SearchEngine {
     static String getOSVersionString() {
         return Build.VERSION.CODENAME + "_" + Build.VERSION.INCREMENTAL + "_" + Build.VERSION.RELEASE + "_" + Build.VERSION.SDK_INT;
     }
-
-    public static final SearchEngine ZOOQLE = new SearchEngine("Zooqle", Constants.PREF_KEY_SEARCH_USE_ZOOQLE) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new ZooqleSearchPerformer("zooqle.com", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
 
     public static final SearchEngine SOUNCLOUD = new SearchEngine("Soundcloud", Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD) {
         @Override
@@ -339,7 +331,6 @@ public abstract class SearchEngine {
             ONE337X,
             IDOPE,
             FROSTCLICK,
-            ZOOQLE,
             TPB,
             SOUNCLOUD,
             ARCHIVE,
