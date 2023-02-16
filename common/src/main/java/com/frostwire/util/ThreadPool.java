@@ -34,10 +34,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author aldenml
  */
 public class ThreadPool extends ThreadPoolExecutor {
-    private static final long THREAD_STACK_SIZE = 1024*4;
+    private static boolean DEBUG_MODE_ON = false;
+    private static final long THREAD_STACK_SIZE = 1024 * 4;
     private final AtomicInteger threadNumber = new AtomicInteger(1);
     private final String name;
-
+    private static Logger LOG = Logger.getLogger(ThreadPool.class);
 
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
         super(maximumPoolSize, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
@@ -75,10 +76,21 @@ public class ThreadPool extends ThreadPoolExecutor {
             threadName = thread.getName();
         }
         t.setName(name + "-thread-" + threadNumber.getAndIncrement() + "-" + (threadName != null ? threadName : "@" + r.hashCode()));
+
+        if (DEBUG_MODE_ON && name.startsWith("SearchManager")) {
+            LOG.info("ThreadPool(" + name + "): beforeExecute: " + t.getName());
+            LOG.info("ThreadPool(" + name + "): pool size: " + getPoolSize());
+            LOG.info("ThreadPool(" + name + "): active count: " + getActiveCount());
+            LOG.info("ThreadPool(" + name + "): queue size: " + getQueue().size());
+            LOG.info("ThreadPool(" + name + "): task count: " + getTaskCount());
+            LOG.info("ThreadPool(" + name + "): completed task count: " + getCompletedTaskCount());
+            LOG.info("ThreadPool(" + name + "): end of beforeExecute: " + t.getName());
+        }
     }
 
     @Override
-    protected void afterExecute(Runnable r, Throwable t) {
+    protected void afterExecute(Runnable r, Throwable throwable) {
+        Thread t = Thread.currentThread();
         Thread.currentThread().setName(name + "-thread-idle");
     }
 
@@ -92,7 +104,7 @@ public class ThreadPool extends ThreadPoolExecutor {
 
         @Override
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(threadGroup, r,"", THREAD_STACK_SIZE);
+            Thread t = new Thread(threadGroup, r, "", THREAD_STACK_SIZE);
             t.setDaemon(daemon);
             return t;
         }
