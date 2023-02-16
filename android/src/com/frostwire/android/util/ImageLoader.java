@@ -589,7 +589,11 @@ public final class ImageLoader {
                 LOG.error("Error extracting album art", e);
             } finally {
                 if (retriever != null) {
-                    retriever.release();
+                    try {
+                        retriever.release();
+                    } catch (Throwable ignored) {
+
+                    }
                 }
             }
             if (bitmap != null) {
