@@ -19,7 +19,11 @@ package com.frostwire.tests;
 
 import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideListener;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.OSUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.junit.jupiter.api.Test;
 
@@ -231,6 +235,11 @@ public class TellurideTests {
             public void onMeta(String json) {
                 System.out.println("[TellurideTests][testMetaOnly] GOT JSON!");
                 System.out.println(json);
+                Gson gson = new GsonBuilder().create();
+                List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json, gson, null, -1, "https://www.youtube.com/watch?v=RWVBoK4idas");
+                if (validResults.size() == 0) {
+                    failedTests.add("[TellurideTests][testMetaOnly] onMeta(json=" + json + ") no valid results found.");
+                }
             }
 
             @Override

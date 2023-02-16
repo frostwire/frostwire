@@ -87,7 +87,7 @@ public final class TellurideParser {
         if (metaOnly) {
             String JSON = sb.toString();
             if (JSON != null && JSON.length() > 0) {
-                processListener.onMeta(JSON);
+                processListener.onMeta(JSON.substring(JSON.indexOf("{")));
             } else {
                 processListener.onError("No metadata returned by telluride");
             }
