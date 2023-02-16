@@ -254,30 +254,47 @@ public abstract class SearchEngine {
         return FROSTCLICK;
     }
 
+    private static List<SearchEngine> getCrawleableEngines() {
+        return Arrays.asList(
+                ARCHIVEORG,
+                EZTV,
+                GLOTORRENTS,
+                IDOPE,
+                LIMETORRENTS,
+                MAGNETDL,
+                NYAA,
+                ONE337X,
+                TPB,
+                TORLOCK);
+    }
+
+    private static List<SearchEngine> getSinglePageEngines() {
+        return Arrays.asList(
+                TORRENTZ2,
+                YIFY,
+                TORRENTDOWNLOADS,
+                SOUNDCLOUD,
+                FROSTCLICK);
+    }
+
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        List<SearchEngine> candidates = Arrays.asList(
-                MAGNETDL,
-                TORRENTZ2,
-                IDOPE,
-                TPB,
-                SOUNDCLOUD,
-                FROSTCLICK,
-                ARCHIVEORG,
-                TORLOCK,
-                NYAA,
-                YIFY,
-                ONE337X,
-                EZTV,
-                TORRENTDOWNLOADS,
-                LIMETORRENTS,
-                GLOTORRENTS);
+        List<SearchEngine> singlePageEngines = getSinglePageEngines();
+        List<SearchEngine> crawleableEngines = getCrawleableEngines();
         var list = new ArrayList<SearchEngine>();
-        candidates.forEach(candidate -> {
+
+        // Make sure single page engines are first so they go through the SearchManager's single search pool first
+        singlePageEngines.forEach(candidate -> {
             if (candidate.isReady()) {
                 list.add(candidate);
             }
         });
+        crawleableEngines.forEach(candidate -> {
+            if (candidate.isReady()) {
+                list.add(candidate);
+            }
+        });
+
         // ensure that at least one is enabled
         var oneEnabled = list.stream().anyMatch(SearchEngine::isEnabled);
         if (!oneEnabled) {
