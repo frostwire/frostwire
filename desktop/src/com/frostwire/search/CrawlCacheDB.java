@@ -43,15 +43,7 @@ public final class CrawlCacheDB {
     private static final String DEFAULT_SORT_ORDER = Columns.DATE_ADDED + " DESC";
     private final static CrawlCacheDB instance = new CrawlCacheDB();
 
-    static {
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private DatabaseHelper databaseHelper;
+    private final DatabaseHelper databaseHelper;
 
     private CrawlCacheDB() {
         databaseHelper = new DatabaseHelper(new Context());
@@ -126,7 +118,7 @@ public final class CrawlCacheDB {
     private static class DatabaseHelper extends SQLiteOpenHelper {
         // 4MB cache size and scan-resistant cache algorithm "Two Queue" (2Q) with second level soft reference
         DatabaseHelper(Context context) {
-            super(context, DATABASE_NAME, DATABASE_VERSION, "CACHE_SIZE=4096;CACHE_TYPE=SOFT_TQ");
+            super(context, DATABASE_NAME, DATABASE_VERSION, null);
         }
 
         @Override
