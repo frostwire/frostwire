@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,12 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <!-- storage -->
+
+    <!-- new in Android 13, sdk 33 -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
     <!-- External refers not to SD Cards, but to SHARED files outside our app's
          internal storage -->
 

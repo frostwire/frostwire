@@ -48,7 +48,7 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     /**
      * Asks for both READ_EXTERNAL_STORAGE and WRITE_EXTERNAL_STORAGE
      */
-    public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A;
+    public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A; // 10
 
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
@@ -80,7 +80,11 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
         Activity activity = activityRef.get();
         String[] permissions = null;
         if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
-            if (SystemUtils.hasAndroid11OrNewer()) {
+            if (SystemUtils.hasAndroid13OrNewer()) {
+                // As of Android13 the geniuses at Android decided yet another change
+                // on how to ask for permissions, now we have to be more granular about it
+                permissions = new String[]{Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_IMAGES};
+            } else if (SystemUtils.hasAndroid11OrNewer()) {
                 // no more need for WRITE_EXTERNAL_STORAGE permission on Android 11,
                 // android:requestLegacyExternalStorage does nothing for android11 and up
                 // and it's ok because they finally let you use File API on the public downloads folders

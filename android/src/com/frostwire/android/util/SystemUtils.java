@@ -47,6 +47,7 @@ public final class SystemUtils {
     private static final int VERSION_SDK_ANDROID_10_Q = 29;
     private static final int VERSION_SDK_ANDROID_11_R = 30;
     private static final int VERSION_SDK_ANDROID_12_S = 31;
+    private static final int VERSION_SDK_ANDROID_13_TIRAMISU = 33;
 
     private SystemUtils() {
     }
@@ -129,6 +130,8 @@ public final class SystemUtils {
     public static boolean hasAndroid12OrNewer() {
         return hasSdkOrNewer(VERSION_SDK_ANDROID_12_S);
     }
+
+    public static boolean hasAndroid13OrNewer() { return hasSdkOrNewer(VERSION_SDK_ANDROID_13_TIRAMISU); }
 
     /**
      * We call it "safe" because if any exceptions are thrown,
