@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HttpClientFactory {
     private static Map<HttpContext, ThreadPool> okHttpClientPools = null;
 
+    private static final boolean FORCE_JDK_HTTP_CLIENT = false;
+
     private static final Map<HttpContext, OkHttpClientWrapper> fwOKHTTPClients = new HashMap<>();
     private static final Object okHTTPClientLock = new Object();
 
@@ -44,6 +46,10 @@ public class HttpClientFactory {
     }
 
     public static HttpClient getInstance(HttpContext context) {
+        if (FORCE_JDK_HTTP_CLIENT) {
+            return new JdkHttpClient();
+        }
+
         if (isWindowsXP()) {
             return new JdkHttpClient();
         }
@@ -60,9 +66,9 @@ public class HttpClientFactory {
 
     private static Map<HttpContext, ThreadPool> buildThreadPools() {
         final HashMap<HttpContext, ThreadPool> map = new HashMap<>();
-        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 4, 16, 10, new LinkedBlockingQueue<>(), true));
-        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 4, 16, 30, new LinkedBlockingQueue<>(), true));
-        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 4, 16, 30, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 2, 2, 2, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 2, 2, 2, new LinkedBlockingQueue<>(), true));
+        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 2, 2, new LinkedBlockingQueue<>(), true));
         return map;
     }
 
