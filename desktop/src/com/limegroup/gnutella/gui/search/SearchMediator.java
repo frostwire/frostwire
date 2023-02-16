@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.search.*;
 import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
+import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -57,10 +57,6 @@ public final class SearchMediator {
      * Query text is empty.
      */
     public static final int QUERY_EMPTY = 1;
-    /**
-     * Query xml is too long.
-     */
-    public static final int QUERY_XML_TOO_LONG = 4;
     static final String DOWNLOAD_STRING = I18n.tr("Download");
     static final String REPEAT_SEARCH_STRING = I18n.tr("Repeat Search");
     static final String SEARCH_FOR_KEYWORDS = I18n.tr("Search for Keywords: {0}");
@@ -401,6 +397,8 @@ public final class SearchMediator {
 
         if (query.startsWith("http") && !query.endsWith(".torrent")) {
             manager.perform(SearchEngine.getTellurideEngine().getPerformer(token, query));
+
+            manager.perform(SearchEngine.getFrostClickEngine().getPerformer(token, query));
             return;
         }
 
