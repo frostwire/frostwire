@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author gubatron
@@ -37,13 +37,22 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public final class SearchManager {
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
+    /**
+     * Executor for one off searches that don't need any crawling of results
+     */
     private final ExecutorService executor;
+    /**
+     * Executor for temp search results that need to be crawled page by page
+     */
+    private final ExecutorService crawlExecutor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;
     private SearchListener listener;
 
-    private SearchManager(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", 4, nThreads, 10L, new PriorityBlockingQueue<>(), true);
+    private SearchManager(int instantResultsThreads, int crawlResultsThreads) {
+        LOG.info("SearchManager: instantResultsThreads: " + instantResultsThreads + " crawlExecutorThreads: " + crawlResultsThreads);
+        this.executor = new ThreadPool("SearchManager-executor", instantResultsThreads, instantResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
+        this.crawlExecutor = new ThreadPool("SearchManager-crawlExecutor", crawlResultsThreads, crawlResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<>());
         this.tables = Collections.synchronizedList(new LinkedList<>());
     }
@@ -78,7 +87,7 @@ public final class SearchManager {
                 }
             });
             SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
-            submit(task);
+            submitSimpleSearchTask(task);
         } else {
             LOG.warn("Search performer is null, review your logic");
         }
@@ -97,9 +106,14 @@ public final class SearchManager {
         this.listener = listener;
     }
 
-    private void submit(SearchTask task) {
+    private void submitSimpleSearchTask(SearchTask task) {
         tasks.add(task);
         executor.execute(task);
+    }
+
+    private void submitCrawlTask(CrawlTask task) {
+        tasks.add(task);
+        crawlExecutor.execute(task);
     }
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
@@ -164,8 +178,8 @@ public final class SearchManager {
     private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
         if (performer != null && !performer.isStopped()) {
             try {
-                SearchTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
-                submit(task);
+                CrawlTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
+                submitCrawlTask(task);
             } catch (Throwable e) {
                 LOG.warn("Error scheduling crawling of search result: " + sr);
             }
@@ -214,7 +228,7 @@ public final class SearchManager {
     }
 
     private static class Loader {
-        static final SearchManager INSTANCE = new SearchManager(8);
+        static final SearchManager INSTANCE = new SearchManager(3, 6);
     }
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
