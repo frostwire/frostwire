@@ -1,3 +1,12 @@
+FrostWire 2.6.4 build 712 - FEB/15/2023
+- SearchManager optimizations
+- Less aggressive okhttpclient thread pools to not exhaust http connections
+- dev:com.android.tools.build:gradle:7.4.1
+- dev:com.google.firebase:firebase-crashlytics-gradle:2.9.4
+- com.google.android.material:material:1.8.0
+- androidx.exifinterface:exifinterface:1.3.6
+- Zooqle search removed, service defunct
+
 FrostWire 2.6.3 build 711 - JAN/31/2023
  - com.chaquo.python:gradle:14.0.2
  - python:yt_dlp-2023.1.6
