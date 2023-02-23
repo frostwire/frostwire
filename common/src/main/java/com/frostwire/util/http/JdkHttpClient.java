@@ -77,6 +77,8 @@ public final class JdkHttpClient extends AbstractHttpClient {
         try {
             baos = new ByteArrayOutputStream();
             get(url, baos, timeout, userAgent, referrer, cookie, -1, -1, customHeaders);
+            //NOTE: This is an innefficient bytearray conversion but we gotta keep it
+            // because the optimization isn't available in the Android JDK yet.
             result = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         } catch (IOException timeoutException) {
             throw timeoutException;
