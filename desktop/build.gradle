@@ -8,11 +8,10 @@
  Make sure ${ANT_HOME} is properly set for these tasks to work
  gradle gettextExtract - extract all the strings from the sourcecode into frostwire.pot
  gradle gettextBundle  - create messages.jar with the extracted strings.
-
 */
 plugins {
-  id 'java'
-  id 'application'
+    id 'java'
+    id 'application'
 }
 
 group 'com.frostwire'
@@ -20,8 +19,10 @@ version '1.0-SNAPSHOT'
 
 import org.gradle.internal.os.OperatingSystem
 
-sourceCompatibility = JavaVersion.VERSION_19
-targetCompatibility = JavaVersion.VERSION_19
+java {
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
+}
 
 compileJava {
     options.encoding = '8859_1'
