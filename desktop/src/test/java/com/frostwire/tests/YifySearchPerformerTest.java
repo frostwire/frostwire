@@ -22,6 +22,7 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.yify.YifySearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
@@ -31,18 +32,22 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class YifySearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(YifySearchPerformerTest.class);
+
     @Test
     public void yifiSearchTest() {
-    //public static void main(String[] args) {
+        //public static void main(String[] args) {
         String TEST_SEARCH_TERM = "one";
+        String domain = "www.yify-torrent.cc";
+        String searchURL = "https://" + domain + "/search/" + TEST_SEARCH_TERM;
         HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
-        String fileStr = null;
+        String fileStr;
         try {
-            fileStr = httpClient.get("https://www.yify-torrent.org/search/" + TEST_SEARCH_TERM);
+            LOG.info("Fething search results from " + searchURL + " ...");
+            fileStr = httpClient.get(searchURL);
         } catch (IOException e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -54,10 +59,10 @@ public final class YifySearchPerformerTest {
         int found = 0;
         while (searchResultsMatcher.find() && found < 5) {
             found++;
-            System.out.println("\nfound " + found);
-            System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
-            String detailUrl = "https://www.yify-torrent.org/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
-            System.out.println("Fetching details from " + detailUrl + " ....");
+            LOG.info("\nfound " + found);
+            LOG.info("result_url: [" + searchResultsMatcher.group(1) + "]");
+            String detailUrl = "https://" + domain + "/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
+            LOG.info("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage = null;
             try {
@@ -67,41 +72,41 @@ public final class YifySearchPerformerTest {
                 fail(e.getMessage());
             }
             if (detailPage == null) {
-                System.out.println("Error fetching from " + detailUrl);
+                LOG.info("Error fetching from " + detailUrl);
                 continue;
             }
             long downloadTime = System.currentTimeMillis() - start;
-            System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
+            LOG.info("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
-                System.out.println("displayname: [" + sm.group("displayName") + "]");
-                System.out.println("size: [" + sm.group("size") + "]");
-                System.out.println("creationDate: [" + sm.group("creationDate") + "]");
-                System.out.println("seeds: [" + sm.group("seeds") + "]");
-                System.out.println("magnet: [" + sm.group("magnet") + "]");
+                LOG.info("displayname: [" + sm.group("displayName") + "]");
+                LOG.info("size: [" + sm.group("size") + "]");
+                LOG.info("creationDate: [" + sm.group("creationDate") + "]");
+                LOG.info("seeds: [" + sm.group("seeds") + "]");
+                LOG.info("magnet: [" + sm.group("magnet") + "]");
 
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("displayName")),"displayName null or empty");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("creationDate")),"creationDate null or empty");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("seeds")),"seeds null or empty");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("magnet")),"magnet null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("displayName")), "displayName null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("creationDate")), "creationDate null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("magnet")), "magnet null or empty");
 
                 YifySearchResult sr = new YifySearchResult(detailUrl, sm);
-                System.out.println(sr);
+                LOG.info(sr.getDetailsUrl());
             } else {
-                System.out.println("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
+                LOG.info("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
                 fail("TORRENT_DETAILS_PAGE_REGEX broken");
             }
-            System.out.println("===");
-            System.out.println("Sleeping 4 seconds...");
+            LOG.info("===");
+            LOG.info("Sleeping 4 seconds...");
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("-done-");
+        LOG.info("-done-");
         if (found == 0) {
-            System.out.println(fileStr);
+            LOG.info(fileStr);
             fail("No search results");
         }
     }
