@@ -47,7 +47,7 @@ public final class SearchSettings extends LimeProps {
      */
     public static final BooleanSetting ENABLE_SPAM_FILTER =
             FACTORY.createBooleanSetting("ENABLE_SPAM_FILTER", true);
-    public static final FileSetting SMART_SEARCH_DATABASE_FOLDER = FACTORY.createFileSetting("SMART_SEARCH_DATABASE_FOLDER", new File(CommonUtils.getUserSettingsDir(), "search_db"));
+    public static final FileSetting SMART_SEARCH_DATABASE_FOLDER = FACTORY.createFileSetting("SMART_SEARCH_DATABASE_FOLDER", new File(CommonUtils.getUserSettingsDir(), "crawldb"));
     public static final StringSetting LAST_MEDIA_TYPE_USED = FACTORY.createStringSetting("LAST_MEDIA_TYPE_USED", MediaType.getAudioMediaType().getMimeType());
     public static final BooleanSetting SMART_SEARCH_ENABLED = FACTORY.createBooleanSetting("SMART_SEARCH_ENABLED", true);
     public static final BooleanSetting SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START = FACTORY.createBooleanSetting("SHOW_DETAIL_PAGE_AFTER_DOWNLOAD_START", false);

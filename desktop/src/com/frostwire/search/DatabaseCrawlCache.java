@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
-
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -96,12 +96,10 @@ public class DatabaseCrawlCache implements CrawlCache {
         long size = 0;
         Cursor c = null;
         try {
-            String[] columns = new String[]{Columns.ID};
-            String where = "";
-            String[] whereArgs = new String[]{};
-            c = db.query(columns, where, whereArgs, null);
+            String[] projection = new String[]{"count(*) as total"};
+            c = db.query(projection, null, null, null);
             if (c != null) {
-                size = c.getCount();
+                size = c.getInt(1);
             }
         } catch (Exception e) {
             LOG.warn("Failed to get num of shared files", e);

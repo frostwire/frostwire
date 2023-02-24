@@ -3,9 +3,10 @@ frostwire (6.10.0) stable; urgency=high
   * Misc Screen bugfix for Linux
   * Default audio/video player setting for Linux is mplayer
   * Removed audio player playlists along with H2 database dependency
+  * Search cache now works with sqlite database
   * MPlayer 1.5.0 with FFmpeg snapshot and OpenSSL 1.1.1s
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 16 Jan 2023 20:19:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Feb 2023 13:18:00 -0600
 
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1

@@ -95,7 +95,25 @@ public abstract class SQLiteOpenHelper {
             if (extraArgs != null) {
                 sb.append(";").append(extraArgs);
             }
-            boolean create = !(new File(folderpath).exists());
+            boolean dbFolderExists = new File(folderpath).exists();
+            boolean dbFileExists = new File(fullpath).exists();
+            boolean create =  !dbFolderExists || !dbFileExists;
+            if (create) {
+                if (!dbFolderExists) {
+                    if (!new File(folderpath).mkdirs()) {
+                        LOG.error("SQLiteOpenHelper.openDatabase(): Error creating database folder: " + folderpath);
+                        throw new RuntimeException("SQLiteOpenHelper.openDatabase(): Could not create database folder: " + folderpath);
+                    }
+                }
+                if (!dbFileExists) {
+                    try {
+                        new File(fullpath).createNewFile();
+                    } catch (Throwable e) {
+                        LOG.error("SQLiteOpenHelper.openDatabase(): Error creating database file: " + fullpath, e);
+                        throw new RuntimeException("SQLiteOpenHelper.openDatabase(): Could not create database file: " + fullpath, e);
+                    }
+                }
+            }
             Connection connection = DriverManager.getConnection(sb.toString(), "SA", "");
             SQLiteDatabase db = new SQLiteDatabase(fullpath, connection);
             if (create) {
@@ -103,7 +121,7 @@ public abstract class SQLiteOpenHelper {
             }
             return db;
         } catch (Throwable e) {
-            LOG.error("Error opening the database", e);
+            LOG.error("SQLiteOpenHelper.openDatabase(): Error opening the database", e);
             throw new RuntimeException(e);
         }
     }
