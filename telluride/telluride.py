@@ -1,6 +1,6 @@
 '''
 Telluride Cloud Video Downloader.
-Copyright 2020-2022 FrostWire LLC.
+Copyright 2020-2023 FrostWire LLC.
 Author: @gubatron
 
 A portable and easy to use yt_dlp wrapper by FrostWire.
@@ -24,10 +24,7 @@ import json
 import sys
 import yt_dlp
 
-# our imports
-import server
-
-BUILD = 24
+BUILD = 25
 
 
 def welcome():
@@ -48,19 +45,6 @@ def prepare_options_parser(parser):
     '''
     Initialize all the possible program options
     '''
-    parser.add_argument(
-        "--server",
-        "-s",
-        action="store_true",
-        help="Launches Telluride as a web server to perform URL queries and return meta data as JSON. There's only one endpoint at the root path. Possible parameters are url=<video_page_url> and shutdown=1 to shutdown the server. The server will only answer to requests from localhost"
-    )
-    parser.add_argument(
-        "--port",
-        "-p",
-        default=server.DEFAULT_HTTP_PORT,
-        type=int,
-        help='HTTP port when running on server mode. Default port number is 47999. This parameter is only taken into account if --server or -s passed'
-    )
     parser.add_argument(
         "--audio-only",
         "-a",
@@ -89,16 +73,9 @@ def main():
     prepare_options_parser(arg_parser)
     args, _ = arg_parser.parse_known_args()
 
-    server_mode = args.server
-    server_port = args.port
     audio_only = args.audio_only
     meta_only = args.meta_only
     page_url = args.page_url
-
-    if server_mode:
-        print(f"Starting Telluride Web Server on port {server_port}")
-        server.start(BUILD, server_port)
-        sys.exit(0)
 
     if page_url is None:
         print('Please pass a video page URL or "--help" for instructions\n')
