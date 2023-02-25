@@ -106,7 +106,7 @@ android {
         applicationId 'com.frostwire.android'
         versionName project.ext.versionName
         minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
-        targetSdkVersion 33 // Android 12
+        targetSdkVersion 33 // Android 13
         multiDexEnabled true
 
         ndk {
@@ -231,10 +231,10 @@ dependencies {
     implementation 'androidx.media2:media2-player:1.2.1'
 
     // AppLovin Max
-    implementation 'com.applovin:applovin-sdk:11.4.2'
+    implementation 'com.applovin:applovin-sdk:11.7.1'
 
     // AppLovin + Unity
-    implementation 'com.applovin.mediation:unityads-adapter:4.3.0.0'
+    implementation 'com.applovin.mediation:unityads-adapter:4.6.0.0'
 
     def jlibtorrent_version = '1.2.17.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
