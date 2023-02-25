@@ -77,7 +77,6 @@ public final class TellurideLauncher {
                                            TellurideListener processListener) {
         return () -> {
             ProcessBuilder processBuilder = new ProcessBuilder(executable.getAbsolutePath(), downloadUrl);
-            processBuilder.redirectErrorStream(true); // merge stderr into stdout
             if (audioOnly) {
                 processBuilder = new ProcessBuilder(
                         executable.getAbsolutePath(),
@@ -93,6 +92,7 @@ public final class TellurideLauncher {
             if (saveDirectory != null && saveDirectory.isDirectory() && saveDirectory.canWrite()) {
                 processBuilder.directory(saveDirectory);
             }
+            processBuilder.redirectErrorStream(true); // merge stderr into stdout
             try {
                 final Process process = processBuilder.start();
                 final InputStream stdOut = process.getInputStream();
