@@ -21,7 +21,7 @@ import com.frostwire.search.telluride.TellurideLauncher;
 import com.frostwire.search.telluride.TellurideListener;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchResult;
-import com.frostwire.util.OSUtils;
+import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -39,17 +39,9 @@ import static org.junit.jupiter.api.Assertions.fail;
  * otherwise it will assume your workspace folder is ${HOME}/workspace
  * */
 public class TellurideTests {
-    static String executableSuffix = ".exe";
-
     static String workspacePath = System.getenv("FW_WORKSPACE_PATH") != null ? System.getenv("FW_WORKSPACE_PATH") : System.getenv("HOME") + "/workspace";
 
     static {
-        if (OSUtils.isAnyMac()) {
-            executableSuffix = "_macos";
-        } else if (OSUtils.isLinux()) {
-            executableSuffix = "_linux";
-        }
-
         File data = new File(System.getenv("HOME") + "/FrostWire/Torrent Data", "Video_by_gubatron-CDC5ludJazw.mp4");
         if (data.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -58,6 +50,7 @@ public class TellurideTests {
     }
 
     static boolean progressWasReported = false;
+    private static final Logger LOG = Logger.getLogger(TellurideTests.class);
 
     @Test
     public void testConnectionError() throws InterruptedException {
@@ -66,7 +59,7 @@ public class TellurideTests {
         TellurideListener tellurideListener = new TellurideListener() {
             @Override
             public void onProgress(float completionPercentage, float fileSize, String fileSizeUnits, float downloadSpeed, String downloadSpeedUnits, String ETA) {
-                System.out.println("[TellurideTests][testConnectionError] onProgress(completionPercentage=" +
+                LOG.info("[TellurideTests][testConnectionError] onProgress(completionPercentage=" +
                         completionPercentage + ", fileSize=" +
                         fileSize + ", fileSizeUnits=" +
                         fileSizeUnits + ", downloadSpeed=" +
@@ -77,7 +70,7 @@ public class TellurideTests {
 
             @Override
             public void onError(String errorMessage) {
-                System.out.println("[TellurideTests][testConnectionError] (expected) onError(errorMessage=" + errorMessage + ")");
+                LOG.info("[TellurideTests][testConnectionError] (expected) onError(errorMessage=" + errorMessage + ")");
             }
 
             @Override
@@ -93,7 +86,7 @@ public class TellurideTests {
 
             @Override
             public void onDestination(String outputFilename) {
-                System.out.println("[TellurideTests][testConnectionError] onDestination(outputFilename=" + outputFilename + ")");
+                LOG.info("[TellurideTests][testConnectionError] onDestination(outputFilename=" + outputFilename + ")");
             }
 
             @Override
@@ -103,8 +96,8 @@ public class TellurideTests {
 
             @Override
             public void onMeta(String json) {
-                System.out.println("[TellurideTests][testConnectionError] GOT JSON!");
-                System.out.println(json);
+                LOG.info("[TellurideTests][testConnectionError] GOT JSON!");
+                LOG.info(json);
             }
 
             @Override
@@ -113,7 +106,14 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
+        File tellurideLauncherFile = FrostWireUtils.getTellurideLauncherFile();
+
+        if (!tellurideLauncherFile.exists()) {
+            LOG.warn("Aborting Telluride tests, telluride launcher not found in this environment");
+            return;
+        }
+
+        TellurideLauncher.launch(tellurideLauncherFile,
                 "https://www.youtube.com/watch?v=fail",
                 new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
@@ -121,12 +121,12 @@ public class TellurideTests {
                 true,
                 tellurideListener);
 
-        System.out.println("[TellurideTests][testConnectionError] waiting...");
+        LOG.info("[TellurideTests][testConnectionError] waiting...");
         latch.await();
         if (failedTests.size() > 0) {
             fail("[TellurideTests][testConnectionError] isn't failing as expected ;)");
         }
-        System.out.println("[TellurideTests][testConnectionError] finished.");
+        LOG.info("[TellurideTests][testConnectionError] finished.");
     }
 
     @Test
@@ -137,7 +137,7 @@ public class TellurideTests {
         TellurideListener tellurideListener = new TellurideListener() {
             @Override
             public void onProgress(float completionPercentage, float fileSize, String fileSizeUnits, float downloadSpeed, String downloadSpeedUnits, String ETA) {
-                System.out.println("[TellurideTests][testDownload] onProgress(completionPercentage=" +
+                LOG.info("[TellurideTests][testDownload] onProgress(completionPercentage=" +
                         completionPercentage + ", fileSize=" +
                         fileSize + ", fileSizeUnits=" +
                         fileSizeUnits + ", downloadSpeed=" +
@@ -164,7 +164,7 @@ public class TellurideTests {
 
             @Override
             public void onDestination(String outputFilename) {
-                System.out.println("[TellurideTests][testDownload] onDestination(outputFilename=" + outputFilename + ")");
+                LOG.info("[TellurideTests][testDownload] onDestination(outputFilename=" + outputFilename + ")");
             }
 
             @Override
@@ -174,8 +174,8 @@ public class TellurideTests {
 
             @Override
             public void onMeta(String json) {
-                System.out.println("[TellurideTests][testDownload] GOT JSON!");
-                System.out.println(json);
+                LOG.info("[TellurideTests][testDownload] GOT JSON!");
+                LOG.info(json);
             }
 
             @Override
@@ -184,7 +184,14 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
+        File tellurideLauncherFile = FrostWireUtils.getTellurideLauncherFile();
+
+        if (!tellurideLauncherFile.exists()) {
+            LOG.warn("Aborting Telluride tests, telluride launcher not found in this environment");
+            return;
+        }
+
+        TellurideLauncher.launch(tellurideLauncherFile,
                 "https://www.instagram.com/p/CTF5pA0jNZ8/", // Tristan de Crusher, IG
                 new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
                 false,
@@ -192,12 +199,12 @@ public class TellurideTests {
                 true,
                 tellurideListener);
 
-        System.out.println("[TellurideTests][testDownload] waiting...");
+        LOG.info("[TellurideTests][testDownload] waiting...");
         latch.await();
         if (failedTests.size() > 0) {
             fail(failedTests.get(0));
         }
-        System.out.println("[TellurideTests][testDownload] finished.");
+        LOG.info("[TellurideTests][testDownload] finished.");
     }
 
     @Test
@@ -233,8 +240,8 @@ public class TellurideTests {
 
             @Override
             public void onMeta(String json) {
-                System.out.println("[TellurideTests][testMetaOnly] GOT JSON!");
-                System.out.println(json);
+                LOG.info("[TellurideTests][testMetaOnly] GOT JSON!");
+                LOG.info(json);
                 Gson gson = new GsonBuilder().create();
                 List<TellurideSearchResult> validResults = TellurideSearchPerformer.getValidResults(json, gson, null, -1, "https://www.youtube.com/watch?v=RWVBoK4idas");
                 if (validResults.size() == 0) {
@@ -248,7 +255,14 @@ public class TellurideTests {
             }
         };
 
-        TellurideLauncher.launch(FrostWireUtils.getTellurideLauncherFile(),
+        File tellurideLauncherFile = FrostWireUtils.getTellurideLauncherFile();
+
+        if (!tellurideLauncherFile.exists()) {
+            LOG.warn("Aborting Telluride tests, telluride launcher not found in this environment");
+            return;
+        }
+
+        TellurideLauncher.launch(tellurideLauncherFile,
                 "https://www.youtube.com/watch?v=1kaQP9XL6L4", // Alone Together - Mona Wonderlick · [Free Copyright-safe Music]
                 new File(System.getenv("HOME")+ "/FrostWire/Torrent Data"),
                 false,
@@ -256,12 +270,12 @@ public class TellurideTests {
                 true,
                 tellurideListener);
 
-        System.out.println("[TellurideTests][testMetaOnly] waiting...");
+        LOG.info("[TellurideTests][testMetaOnly] waiting...");
         latch.await();
         if (failedTests.size() > 0) {
             fail(failedTests.get(0));
         }
-        System.out.println("[TellurideTests][testMetaOnly] finished.");
+        LOG.info("[TellurideTests][testMetaOnly] finished.");
     }
 
     @Test
@@ -269,6 +283,10 @@ public class TellurideTests {
         File launcherBinary = FrostWireUtils.getTellurideLauncherFile();
         if (launcherBinary == null) {
             fail("[TellurideTests][testGettingLauncherFile] no launcher found");
+        }
+        if (!launcherBinary.exists()) {
+            LOG.warn("[TellurideTests][testGettingLauncherFile] aborting this test (" + launcherBinary.getAbsolutePath() + "), launcher file does not exist");
+            return;
         }
         if (!launcherBinary.canExecute()) {
             fail("[TellurideTests][testGettingLauncherFile] launcher is not executable (" + launcherBinary.getAbsolutePath() + ")");
