@@ -123,15 +123,19 @@ public class MusicPlaybackService extends JobIntentService {
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
         prepareAudioFocusRequest();
+        String permission = SystemUtils.hasAndroid13OrNewer() ?
+                Manifest.permission.READ_MEDIA_AUDIO :
+                Manifest.permission.READ_EXTERNAL_STORAGE;
         boolean permissionGranted = runStrict(() ->
-                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE));
+                PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)
+        );
         if (permissionGranted) {
             // Initialize the notification helper
             mNotificationHelper = new NotificationHelper(this);
             mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
         } else {
-            LOG.warn("onCreate: service couldn't be initialized correctly, READ_EXTERNAL_STORAGE permission not granted");
+            LOG.warn("onCreate: service couldn't be initialized correctly, " + permission + "not granted");
         }
     }
 
@@ -1953,7 +1957,7 @@ public class MusicPlaybackService extends JobIntentService {
 
         // content://com.frostwire.android.fileprovider/external/Download/FrostWire/...audiofile.ext
         if (path.startsWith("content://com.frostwire.android.fileprovider/external")) {
-            path = path.replace("content://com.frostwire.android.fileprovider/external","/storage/emulated/0");
+            path = path.replace("content://com.frostwire.android.fileprovider/external", "/storage/emulated/0");
         }
 
         if (path.startsWith("content://com.android.providers.downloads.documents/document/raw")) {
@@ -1992,7 +1996,7 @@ public class MusicPlaybackService extends JobIntentService {
             LOG.info("MusicPlaybackService::openFile prefix=" + prefix, true);
             String fixedPath = path.replace(prefix, "");
             try {
-                fixedPath =  URLDecoder.decode(fixedPath, "UTF-8");
+                fixedPath = URLDecoder.decode(fixedPath, "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 LOG.error("MusicPlaybackService::openFile decoding error " + e.getMessage(), e, true);
             }
@@ -3073,8 +3077,11 @@ public class MusicPlaybackService extends JobIntentService {
                 LOG.warn("setDataSourceTask() aborted, no MusicPlaybackService available");
                 return false;
             }
-            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                LOG.error("setDataSource failed, READ_EXTERNAL_STORAGE permission not granted");
+            String permission = SystemUtils.hasAndroid13OrNewer() ?
+                    Manifest.permission.READ_MEDIA_AUDIO :
+                    Manifest.permission.READ_EXTERNAL_STORAGE;
+            if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, permission)) {
+                LOG.error("setDataSource failed, " + permission + " not granted");
                 return false;
             }
             MediaPlayer player = mCurrentMediaPlayer;
