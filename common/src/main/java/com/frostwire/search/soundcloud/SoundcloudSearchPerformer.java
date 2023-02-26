@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.List;
  * @author aldenml
  */
 public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
-    private static final String SOUNDCLOUD_CLIENTID = "RfoqFLXghO6UuFNArI1Ksd17qWClDBFt";
+    private static final String SOUNDCLOUD_CLIENTID = "taLAWcuG1Ud1EWixcDx3IS0vnokXhd9J";
     private static final String SOUNDCLOUD_APP_VERSION = "1660231961";
 
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
