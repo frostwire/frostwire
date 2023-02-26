@@ -21,6 +21,7 @@ limitations under the License.
 from datetime import datetime
 import argparse
 import json
+import os
 import sys
 import yt_dlp
 
@@ -38,6 +39,7 @@ def welcome():
     )
     print(f"Python {sys.version}")
     print(sys.version_info)
+    print(f"CWD={os.getcwd()}")
     print()
 
 
