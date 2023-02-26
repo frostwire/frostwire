@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * @author gubatron
  * @author aldenml
  */
-class TPBSearchResult extends AbstractTorrentSearchResult {
+public class TPBSearchResult extends AbstractTorrentSearchResult {
     private static final Map<String, String> UNIT_MAPPER;
     private static final Pattern COMMON_DATE_PATTERN;
     private static final Pattern OLDER_DATE_PATTERN;

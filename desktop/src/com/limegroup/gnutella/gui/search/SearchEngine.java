@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public abstract class SearchEngine {
 
     private static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
 
-    enum SearchEngineID {
+    public enum SearchEngineID {
         TPB_ID,
         SOUNDCLOUD_ID,
         ARCHIVEORG_ID,
@@ -248,6 +248,10 @@ public abstract class SearchEngine {
 
     public static SearchEngine getFrostClickEngine() {
         return FROSTCLICK;
+    }
+
+    public static SearchEngine getTPBEngine() {
+        return TPB;
     }
 
     private static List<SearchEngine> getCrawleableEngines() {
