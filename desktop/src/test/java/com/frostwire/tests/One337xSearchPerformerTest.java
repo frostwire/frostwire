@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public final class One337xSearchPerformerTest {
     @Test
     public void one377xSearchTest() {
-        String TEST_SEARCH_TERM = "foo";
+        String TEST_SEARCH_TERM = "creative commons";
         HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr = null;
         try {

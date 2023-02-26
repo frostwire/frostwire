@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class NyaaSearchPerformerTest {
     @Test
     public void nyaaSearchPerformerTest() {
-        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
+        String TEST_SEARCH_TERM = UrlUtils.encode("free");
         NyaaSearchPerformer nyaa = new NyaaSearchPerformer("nyaa.si", 1, TEST_SEARCH_TERM, 5000);
         NyaaSearchListener listener = new NyaaSearchListener();
         nyaa.setListener(listener);
@@ -42,11 +42,13 @@ public class NyaaSearchPerformerTest {
             nyaa.perform();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
-            fail(t.getMessage());
+            if (!nyaa.isDDOSProtectionActive()) {
+                System.out.println("Aborting test.");
+                fail(t.getMessage());
+            }
             return;
         }
-        if (listener.failedTests.size() > 0) {
+        if (listener.failedTests.size() > 0 && !nyaa.isDDOSProtectionActive()) {
             fail(listener.getFailedMessages());
         }
     }

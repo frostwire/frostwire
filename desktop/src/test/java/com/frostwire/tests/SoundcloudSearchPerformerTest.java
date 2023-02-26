@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.search.torrentz2.Torrentz2SearchResult;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
@@ -44,6 +43,7 @@ public class SoundcloudSearchPerformerTest {
         searchPerformer.setListener(searchListener);
         try {
             searchPerformer.perform();
+            searchPerformer.stop();
         } catch (Throwable t) {
             t.printStackTrace();
             System.out.println("Aborting test.");
@@ -57,6 +57,7 @@ public class SoundcloudSearchPerformerTest {
 
     private static class SoundcloudSearchListener implements SearchListener {
         final List<String> failedTests = new ArrayList<>();
+        final List<SearchResult> searchResults = new ArrayList<>();
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
             if (results == null || results.size() == 0) {
@@ -106,6 +107,7 @@ public class SoundcloudSearchPerformerTest {
                 if (failedTests.size() > 0) {
                     return;
                 }
+                searchResults.add(result);
             }
         }
 
@@ -116,6 +118,9 @@ public class SoundcloudSearchPerformerTest {
 
         @Override
         public void onStopped(long token) {
+            if (searchResults.size() == 0) {
+                failedTests.add("No search results");
+            }
         }
 
         public String getFailedMessages() {
