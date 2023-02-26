@@ -30,6 +30,7 @@ import java.util.List;
 public class IdopeSearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(IdopeSearchPerformer.class);
     private final Pattern pattern;
+    private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
         super("idope.se", token, keywords, timeout, 1, 0);
@@ -86,9 +87,19 @@ public class IdopeSearchPerformer extends TorrentSearchPerformer {
                 IdopeSearchResult sr = fromMatcher(matcher);
                 results.add(sr);
             } else {
-                LOG.warn("IdopeSearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
+                isDDOSProtectionActive = reducedHtml.contains("Cloudflare");
+                if (!isDDOSProtectionActive) {
+                    LOG.warn("IdopeSearchPerformer search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
+                } else {
+                    LOG.warn("IdopeSearchPerformer search matcher disabled. DDOS protection active.");
+                }
             }
         } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
         return results;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
     }
 }

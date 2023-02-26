@@ -275,7 +275,7 @@ public class TellurideTests {
         }
 
         TellurideLauncher.launch(tellurideLauncherFile,
-                "https://www.youtube.com/watch?v=1kaQP9XL6L4", // Alone Together - Mona Wonderlick · [Free Copyright-safe Music]
+                "https://www.youtube.com/watch?v=1kaQP9XL6L4", // "Is FrostWire Legal?" youtube video
                 new File(System.getenv("HOME")+ "/FrostWire/Torrent Data"),
                 false,
                 true,

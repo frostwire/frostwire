@@ -34,6 +34,7 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
             "<dt>(Seeds|Seeders):</dt>.*?<dd>(?<seeds>[0-9]+).*?</dd>.*?" +
             "<a href=\"(?<magnet>.*?)\" id=\"dm\" class=\"button button-default\".*?>Download Magnet</a>.*?";
     private static final int MAX_RESULTS = 21;
+    private boolean isDDOSProtectionActive;
 
     public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
@@ -58,7 +59,13 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudflare");
+        isDDOSProtectionActive = !(html != null && !html.contains("Cloudflare"));
+        return !isDDOSProtectionActive;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
     }
 
     @Override

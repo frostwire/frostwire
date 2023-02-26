@@ -46,6 +46,8 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
                     "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
     private static final int MAX_RESULTS = 20;
 
+    private boolean isDDOSProtectionActive;
+
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
     }
@@ -86,6 +88,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     // just a simple keyword check allows to discard the page
     protected boolean isValidHtml(String html) {
         if (html == null || html.contains("Cloudflare")) {
+            isDDOSProtectionActive = true;
             return false;
         }
         String[] keywords = getKeywords().split(" ");
@@ -102,5 +105,10 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         }
         int count = StringUtils.countMatches(html.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
         return count > 9;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
     }
 }

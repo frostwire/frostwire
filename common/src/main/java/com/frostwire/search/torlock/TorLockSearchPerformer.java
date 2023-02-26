@@ -34,6 +34,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
             "<dt>SIZE</dt>.?<dd>(?<filesize>.*?) in.*?" +
             "<dt>ADDED</dt>.?<dd>Uploaded on (?<time>.*?) by.*?" +
             "<dt>SWARM</dt>.?<dd><b style=\"color:#FF5400\">(?<seeds>\\d*?)</b>";
+    private boolean isDDOSProtectionActive;
 
     public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -70,7 +71,12 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudflare");
+        isDDOSProtectionActive = !(html != null && !html.contains("Cloudflare"));
+        return !isDDOSProtectionActive;
     }
 
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
+    }
 }

@@ -35,12 +35,12 @@ public class IdopeSearchPerformerTest {
     @Test
     public void iDopeTest() {
         System.out.println("IdopeSearchPerformerTests::iDopeTest() invoked");
-        String TEST_SEARCH_TERM = UrlUtils.encode("foo");
+        String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
         IdopeSearchPerformer idope = new IdopeSearchPerformer(1, TEST_SEARCH_TERM, 5000);
 
         // We need this because assertX failing inside a callback does not make THIS test fail
         // This callback object will keep track of what failed or not and then we'll ask it if it failed.
-        IdopeSearchListener searchListener = new IdopeSearchListener();
+        IdopeSearchListener searchListener = new IdopeSearchListener(idope);
         idope.setListener(searchListener);
         try {
             idope.perform();
@@ -56,12 +56,19 @@ public class IdopeSearchPerformerTest {
     }
 
     private static class IdopeSearchListener implements SearchListener {
+        private final IdopeSearchPerformer performer;
         List<String> failedTests = new ArrayList<>();
+
+        public IdopeSearchListener(IdopeSearchPerformer performer) {
+            this.performer = performer;
+        }
 
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
             if (results == null || results.size() == 0) {
-                fail("IdopeSearchPerformerTest: no search results");
+                if (!performer.isDDOSProtectionActive()) {
+                    fail("IdopeSearchPerformerTest: no search results");
+                }
                 return;
             }
             for (SearchResult result : results) {

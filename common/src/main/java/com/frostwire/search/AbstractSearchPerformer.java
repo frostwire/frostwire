@@ -77,4 +77,9 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
             LOG.warn("Error sending results to listener: " + e.getMessage());
         }
     }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return false;
+    }
 }

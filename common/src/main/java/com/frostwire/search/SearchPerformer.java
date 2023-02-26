@@ -35,4 +35,6 @@ public interface SearchPerformer {
     SearchListener getListener();
 
     void setListener(SearchListener listener);
+
+    boolean isDDOSProtectionActive();
 }

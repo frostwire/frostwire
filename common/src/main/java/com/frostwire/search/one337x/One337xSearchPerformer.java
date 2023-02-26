@@ -38,6 +38,7 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
 
 
     private static final int MAX_RESULTS = 20;
+    private boolean isDDOSProtectionActive;
 
     public One337xSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
@@ -63,8 +64,15 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudflare");
+        isDDOSProtectionActive = !(html != null && !html.contains("Cloudflare"));
+        return !isDDOSProtectionActive;
     }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
+    }
+
 
     @Override
     protected int htmlPrefixOffset(String html) {
@@ -77,5 +85,4 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
         int offset = html.indexOf("<div class=\"torrent-detail-info\"");
         return offset > 0 ? offset : html.length();
     }
-
 }

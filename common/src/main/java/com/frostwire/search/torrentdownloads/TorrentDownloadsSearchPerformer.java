@@ -34,6 +34,7 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
             "<span>Magnet:.*?</span>.*?<a href=\"(?<magnet>.*?)\".*?" +
             "<span>Seeds:.?</span>.?(?<seeds>\\d*?)</p></div>.*?" +
             "<span>Torrent added:.?</span>.?(?<time>[0-9\\-]+).*</p></div>.*?";
+    private boolean isDDOSProtectionActive;
 
     public TorrentDownloadsSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -70,7 +71,12 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
 
     @Override
     protected boolean isValidHtml(String html) {
-        return html != null && !html.contains("Cloudflare");
+        isDDOSProtectionActive = !(html != null && !html.contains("Cloudflare"));
+        return !isDDOSProtectionActive;
+    }
+
+    @Override
+    public boolean isDDOSProtectionActive() {
+        return isDDOSProtectionActive;
     }
 }
-
