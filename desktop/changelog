@@ -6,13 +6,14 @@ frostwire (6.10.0) stable; urgency=high
   * Search cache now works with sqlite database
   * MPlayer 1.5.0 with FFmpeg snapshot and OpenSSL 1.1.1s
   * SoundCloud search fixed
+  * Torrentz2 search fixed
   * SearchManager now has 2 executors, one for crawlers another for one off requests.
   * DEV: New SearchPerformer.isDDOSProtectionActive() logic used in unit tests
   * CI: jdk19 tests
   * CI: telluride tests do not run in CI
   * CI: all search performers have tests
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 26 Feb 2023 08:34:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 26 Feb 2023 12:10:00 -0600
 
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1

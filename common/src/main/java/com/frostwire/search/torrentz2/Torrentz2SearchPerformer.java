@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,17 +40,19 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
         //https://torrentz2.eu
         //https://torrentz2.unblockninja.com/
-        super("torrentz2.unblockninja.com", token, keywords, timeout, 1, 0);
-        //pattern = Pattern.compile("(?is)<dl><dt><a href=/(?<infohash>[a-f0-9]{40})>(?<filename>.*?)</a>.*?<span title=([0-9]+)>(?<age>.*?)</span>.*?<span>(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</span><span>(?<seeds>\\d+)</span>.*?</dd></dl>");
-        //Pattern.compile("(?is)<td data-title=\"Name\">.*?<span>(?<filename>.*?)</span>.*?</td>.*?<td class=\"description-data\" data-title=\"Description\">Uploaded (?<uploaddate>.*?), Size (?<size>.*?), ULed.*?<a href=\"(?<magnet>.*?)\" target=\"_blank\" class=\"magnet-link\">");
-        pattern = Pattern.compile("(?is)<td data-title=\"Name\">.*?<span>(?<filename>.*?)</span>.*?<td class=\"age-data\" data-title=\"Last Updated\">(?<age>.*?)</td>.*?<td data-title=\"Last Updated\">(?<seeds>\\d+)</td>.*?<td data-title=\"Size\">(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</td>.*?<td class=\"file-link\" data-title=\"Magnet\">.*?<a href=\"(?<magnet>.*?)\" target=\"_blank\" class=\"magnet-link\">");
+        //https://torrentz2.nz/ 2023-02-26
+        super("torrentz2.nz", token, keywords, timeout, 1, 0);
+        //pattern = Pattern.compile("(?is).<td data-title=\"Last Updated\">(?<seeds>\\d+)</td>.*?<td data-title=\"Size\">(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</td>.*?<td class=\"file-link\" data-title=\"Magnet\">.*?<a href=\"(?<magnet>.*?)\" target=\"_blank\" class=\"magnet-link\">");
+        pattern = Pattern.compile("(?is)<dl><dt><a href=\".*?\" target=\"_blank\">(?<filename>.*?)</a></dt>"+
+                "<dd><span><a href=\"(?<magnet>.*?)\"><i class=\"fa-solid fa-magnet\"></i></a></span>" +
+                "<span title=\"\\d+\">(?<age>.*?)</span><span>(?<filesize>.*?)</span><span>(?<seeds>\\d+)</span>");
         infohashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
         unencodedKeywords = keywords;
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/kick.php?q=" + unencodedKeywords.replace(" ","+");
+        return "https://" + getDomainName() + "/search?q=" + unencodedKeywords.replace(" ","+");
     }
 
     private Torrentz2SearchResult fromMatcher(SearchMatcher matcher) {
@@ -85,7 +87,9 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
             return Collections.emptyList();
         }
         ArrayList<Torrentz2SearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((pattern.matcher(page.substring(page.indexOf("Total Results")))));
+        int ffOffset = page.indexOf("Torrents");
+        String pageString = page.substring(ffOffset > 0 ? ffOffset : 0);
+        SearchMatcher matcher = new SearchMatcher((pattern.matcher(pageString)));
         boolean matcherFound;
         int MAX_RESULTS = 100;
         do {

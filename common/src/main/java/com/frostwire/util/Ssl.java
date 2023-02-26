@@ -127,7 +127,7 @@ public final class Ssl {
                 "thepiratebay.zone",
                 "thepiratebay0.org",
                 "torrent-paradise.ml",
-                "torrentz2.unblockninja.com",
+                "torrentz2.nz",
                 "update.frostwire.com",
                 "www.1377x.to",
                 "www.frostwire.com",
