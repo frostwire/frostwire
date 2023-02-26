@@ -26,7 +26,7 @@ public final class TellurideParser {
     // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
     final static String REGEX_PROGRESS = "(?is)" +
             String.format(DECIMAL_GROUP_FORMAT, "percentage") +
-            "\\% of " +
+            "\\% of .*?" +
             String.format(DECIMAL_GROUP_FORMAT, "size") +
             "(?<unitSize>[KMGTP]iB) at.*?" +
             String.format(DECIMAL_GROUP_FORMAT, "rate") +

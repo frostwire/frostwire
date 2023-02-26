@@ -135,6 +135,7 @@ public class TellurideTests {
         CountDownLatch latch = new CountDownLatch(1);
         List<String> failedTests = new ArrayList<>();
         TellurideListener tellurideListener = new TellurideListener() {
+            private String fileName;
             @Override
             public void onProgress(float completionPercentage, float fileSize, String fileSizeUnits, float downloadSpeed, String downloadSpeedUnits, String ETA) {
                 LOG.info("[TellurideTests][testDownload] onProgress(completionPercentage=" +
@@ -156,6 +157,16 @@ public class TellurideTests {
                 if (exitCode != 0) {
                     failedTests.add("[TellurideTests][testDownload] onFinished(exitCode=" + exitCode + ")");
                 }
+                LOG.info("[TellurideTests][testDownload] onFinished: current working directory is " + System.getProperty("user.dir"));
+                if (fileName != null) {
+                    File file = new File(fileName);
+                    if (file.exists()) {
+                        LOG.info("[TellurideTests][testDownload] deleting file: " + fileName);
+                        file.delete();
+                    }
+                } else {
+                    failedTests.add("[TellurideTests][testDownload] Failed, fileName is null");
+                }
                 if (!progressWasReported) {
                     failedTests.add("[TellurideTests][testDownload] Failed, did not receive onProgress call. onFinished(exitCode=" + exitCode + ")");
                 }
@@ -165,6 +176,7 @@ public class TellurideTests {
             @Override
             public void onDestination(String outputFilename) {
                 LOG.info("[TellurideTests][testDownload] onDestination(outputFilename=" + outputFilename + ")");
+                fileName = outputFilename;
             }
 
             @Override
@@ -192,8 +204,8 @@ public class TellurideTests {
         }
 
         TellurideLauncher.launch(tellurideLauncherFile,
-                "https://www.instagram.com/p/CTF5pA0jNZ8/", // Tristan de Crusher, IG
-                new File(System.getenv("HOME") + "/FrostWire/Torrent Data"),
+                "https://www.youtube.com/watch?v=ye2CLllRO8I",
+                null,
                 false,
                 false,
                 true,
