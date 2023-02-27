@@ -85,17 +85,20 @@ public abstract class SearchEngine {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+                // from https://piratebayproxy.info/
                 String[] mirrors = {
-                        "thepiratebay.org",
-                        "www.pirate-bay.net",
-                        "pirate-bays.net",
                         "pirate-bay.info",
-                        "thepiratebay-unblocked.org",
+                        "pirate-bays.net",
                         "piratebay.live",
+                        "pirateproxy.live",
+                        "thehiddenbay.com",
+                        "thepiratebay-unblocked.org",
+                        "thepiratebay.org",
                         "thepiratebay.zone",
-                        "thepiratebay.monster",
                         "thepiratebay0.org",
-                        "thepiratebay.vip",
+                        "thepiratebay10.org",
+                        "thepiratebay7.com",
+                        "tpb.party",
                 };
                 TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
             }
