@@ -22,6 +22,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * gradle test --tests "com.frostwire.tests.Torrentz2SearchPerformerTest.torrentz2SearchTest"
  */
 public class Torrentz2SearchPerformerTest {
+    private final static Logger LOG = Logger.getLogger(Torrentz2SearchPerformerTest.class);
     @Test
     public void torrentz2SearchTest() {
         String TEST_SEARCH_TERM = UrlUtils.encode("public domain");
@@ -45,7 +47,7 @@ public class Torrentz2SearchPerformerTest {
             nyaa.perform();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             fail(t.getMessage());
             return;
         }
@@ -65,15 +67,9 @@ public class Torrentz2SearchPerformerTest {
             }
             for (SearchResult result : results) {
                 Torrentz2SearchResult sr = (Torrentz2SearchResult) result;
-                System.out.println("Torrentz2SearchPerformer.SearchListener.onResults:");
-                System.out.println("\t DisplayName: " + sr.getDisplayName());
-                System.out.println("\t Source: " + sr.getSource());
-                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                System.out.println("\t Filename: " + sr.getFilename());
-                System.out.println("\t Hash: " + sr.getHash());
-                System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
-                System.out.println("\t Seeds: " + sr.getSeeds());
-                System.out.println("\t Size: " + sr.getSize());
+                LOG.info("Torrentz2SearchPerformer.SearchListener.onResults:");
+                LOG.info("\t Hash: " + sr.getHash());
+                LOG.info("\t Size: " + sr.getSize());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("getDisplayName is null or empty");

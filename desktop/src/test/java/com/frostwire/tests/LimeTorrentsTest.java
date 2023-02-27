@@ -22,6 +22,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.List;
  * @author aldenml
  */
 public class LimeTorrentsTest {
+    private static final Logger LOG = Logger.getLogger(LimeTorrentsTest.class);
 
     public static void main(String[] args) {
         String TEST_SEARCH_TERM = UrlUtils.encode("foobar");
@@ -40,15 +42,8 @@ public class LimeTorrentsTest {
             public void onResults(long token, List<? extends SearchResult> results) {
                 for (SearchResult result : results) {
                     LimeTorrentsSearchResult sr = (LimeTorrentsSearchResult) result;
-                    System.out.println("LimeTorrentsSearchPerformer.SearchListener.onResults:");
-                    System.out.println("\t DisplayName: " + sr.getDisplayName());
-                    System.out.println("\t Source: " + sr.getSource());
-                    System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                    System.out.println("\t Filename: " + sr.getFilename());
-                    System.out.println("\t Hash: " + sr.getHash());
-                    System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
-                    System.out.println("\t Seeds: " + sr.getSeeds());
-                    System.out.println("\t Size: " + sr.getSize());
+                    LOG.info("\t Hash: " + sr.getHash());
+                    LOG.info("\t Seeds: " + sr.getSeeds());
                 }
                 limeTorrentsSearchPerformer.stop();
             }
@@ -66,9 +61,9 @@ public class LimeTorrentsTest {
             limeTorrentsSearchPerformer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             return;
         }
-        System.out.println("-done-");
+        LOG.info("-done-");
     }
 }

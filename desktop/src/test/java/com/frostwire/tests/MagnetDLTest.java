@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
 import org.limewire.util.StringUtils;
@@ -36,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class MagnetDLTest {
 
+    private static final Logger LOG = Logger.getLogger(MagnetDLTest.class);
+
     @Test
     public void main() {
         String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
@@ -47,14 +50,14 @@ public class MagnetDLTest {
             magnetDLSearchPerformer.perform();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             fail(t.getMessage());
             return;
         }
         if (magnetDLSearchListener.failedTests.size() > 0) {
             fail(magnetDLSearchListener.getFailedTestsMessages());
         }
-        System.out.println("-done-");
+        LOG.info("-done-");
     }
 
     static class MagnetDLSearchListener implements SearchListener {
@@ -68,15 +71,8 @@ public class MagnetDLTest {
             }
             for (SearchResult result : results) {
                 MagnetDLSearchResult sr = (MagnetDLSearchResult) result;
-                System.out.println("MagnetDLSearchResult.SearchListener.onResults:");
-                System.out.println("\t DisplayName: " + sr.getDisplayName());
-                System.out.println("\t Source: " + sr.getSource());
-                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                System.out.println("\t Filename: " + sr.getFilename());
-                System.out.println("\t Hash: " + sr.getHash());
-                System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
-                System.out.println("\t Seeds: " + sr.getSeeds());
-                System.out.println("\t Size: " + sr.getSize());
+                LOG.info("MagnetDLSearchResult.SearchListener.onResults:");
+                LOG.info("\t Size: " + sr.getSize());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("getDisplayName was null or empty");
@@ -96,6 +92,8 @@ public class MagnetDLTest {
 
                 if (StringUtils.isNullOrEmpty(sr.getHash())) {
                     failedTests.add("getHash was null or empty");
+                } else {
+                    LOG.info("\t Hash: " + sr.getHash());
                 }
 
                 if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
@@ -123,7 +121,7 @@ public class MagnetDLTest {
             if (failedTests.size() == 0) {
                 return "";
             }
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             for (String msg : failedTests) {
                 buffer.append(msg).append("\n");
             }

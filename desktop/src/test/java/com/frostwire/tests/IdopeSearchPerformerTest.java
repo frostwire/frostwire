@@ -22,6 +22,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.idope.IdopeSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
@@ -32,9 +33,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class IdopeSearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(IdopeSearchPerformerTest.class);
+
     @Test
     public void iDopeTest() {
-        System.out.println("IdopeSearchPerformerTests::iDopeTest() invoked");
+        LOG.info("IdopeSearchPerformerTests::iDopeTest() invoked");
         String TEST_SEARCH_TERM = UrlUtils.encode("creative commons");
         IdopeSearchPerformer idope = new IdopeSearchPerformer(1, TEST_SEARCH_TERM, 5000);
 
@@ -47,7 +50,7 @@ public class IdopeSearchPerformerTest {
             assertEquals(searchListener.failedTests.size(), 0, searchListener.getFailedMessages());
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             fail(t.getMessage());
         }
         if (searchListener.failedTests.size() > 0) {
@@ -73,35 +76,27 @@ public class IdopeSearchPerformerTest {
             }
             for (SearchResult result : results) {
                 IdopeSearchResult sr = (IdopeSearchResult) result;
-                System.out.println("IdopeSearchPerformer.SearchListener.onResults:");
-                System.out.println("\t DisplayName: " + sr.getDisplayName());
+                LOG.info("IdopeSearchPerformer.SearchListener.onResults:");
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("DisplayName was null or empty");
                 }
-                System.out.println("\t Source: " + sr.getSource());
                 if (StringUtils.isNullOrEmpty(sr.getSource())) {
                     failedTests.add("Source was null or empty");
                 }
-                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
                 if (StringUtils.isNullOrEmpty(sr.getDetailsUrl())) {
                     failedTests.add("DetailsUrl was null or empty");
                 }
-
-                System.out.println("\t Filename: " + sr.getFilename());
                 if (StringUtils.isNullOrEmpty(sr.getFilename())) {
                     failedTests.add("Filename was null or empty");
                 }
-                System.out.println("\t Hash: " + sr.getHash());
+                LOG.info("\t Hash: " + sr.getHash());
                 if (StringUtils.isNullOrEmpty(sr.getHash())) {
                     failedTests.add("Hash was null or empty");
                 }
-                System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
                 if (StringUtils.isNullOrEmpty(sr.getTorrentUrl())) {
                     failedTests.add("TorrentUrl was null or empty");
                 }
-                System.out.println("\t Seeds: " + sr.getSeeds());
-                System.out.println("\t Size: " + sr.getSize());
-
+                LOG.info("\t Size: " + sr.getSize());
                 if (failedTests.size() > 0) {
                     return;
                 }

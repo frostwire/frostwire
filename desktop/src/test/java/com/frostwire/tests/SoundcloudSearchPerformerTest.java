@@ -24,6 +24,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SoundcloudSearchPerformerTest {
+    private final static Logger LOG = Logger.getLogger(SoundcloudSearchPerformerTest.class);
+
     @Test
     public void testSoundcloudSearchPerformer() {
         Platforms.set(new DesktopPlatform());
@@ -46,7 +49,7 @@ public class SoundcloudSearchPerformerTest {
             searchPerformer.stop();
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             fail(t.getMessage());
             return;
         }
@@ -58,6 +61,7 @@ public class SoundcloudSearchPerformerTest {
     private static class SoundcloudSearchListener implements SearchListener {
         final List<String> failedTests = new ArrayList<>();
         final List<SearchResult> searchResults = new ArrayList<>();
+
         @Override
         public void onResults(long token, List<? extends SearchResult> results) {
             if (results == null || results.size() == 0) {
@@ -66,15 +70,15 @@ public class SoundcloudSearchPerformerTest {
             }
             for (SearchResult result : results) {
                 SoundcloudSearchResult sr = (SoundcloudSearchResult) result;
-                System.out.println("SoundcloudSearchListener.SearchListener.onResults:");
-                System.out.println("\t DisplayName: " + sr.getDisplayName());
-                System.out.println("\t Source: " + sr.getSource());
-                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                System.out.println("\t Filename: " + sr.getFilename());
-                System.out.println("\t Hash: " + sr.getHash());
-                System.out.println("\t DownloadUrl: " + sr.getDownloadUrl());
-                System.out.println("\t Username: " + sr.getUsername());
-                System.out.println("\t Size: " + sr.getSize());
+                LOG.info("SoundcloudSearchListener.SearchListener.onResults:");
+                LOG.info("\t DisplayName: " + sr.getDisplayName());
+                LOG.info("\t Source: " + sr.getSource());
+                LOG.info("\t DetailsUrl: " + sr.getDetailsUrl());
+                LOG.info("\t Filename: " + sr.getFilename());
+                LOG.info("\t Hash: " + sr.getHash());
+                LOG.info("\t DownloadUrl: " + sr.getDownloadUrl());
+                LOG.info("\t Username: " + sr.getUsername());
+                LOG.info("\t Size: " + sr.getSize());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("getDisplayName is null or empty");

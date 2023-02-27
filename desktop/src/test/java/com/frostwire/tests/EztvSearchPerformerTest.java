@@ -22,16 +22,18 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.eztv.EztvSearchResult;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.http.HttpClient;
 import org.junit.jupiter.api.Test;
 
 import static com.frostwire.search.eztv.EztvSearchPerformer.SEARCH_RESULTS_REGEX;
 import static com.frostwire.search.eztv.EztvSearchPerformer.TORRENT_DETAILS_PAGE_REGEX;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class EztvSearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(EztvSearchPerformerTest.class);
+
     @Test
     public void eztvSearchTest() {
         String TEST_SEARCH_TERM = "foo";
@@ -41,7 +43,7 @@ public final class EztvSearchPerformerTest {
             fileStr = httpClient.get("https://eztv.re/search/" + TEST_SEARCH_TERM);
         } catch (Throwable t) {
             t.printStackTrace();
-            System.out.println("Aborting test.");
+            LOG.info("Aborting test.");
             fail(t.getMessage());
             return;
         }
@@ -51,12 +53,12 @@ public final class EztvSearchPerformerTest {
         int found = 0;
         while (searchResultsMatcher.find() && found < 5) {
             found++;
-            System.out.println("\nfound " + found);
+            LOG.info("\nfound " + found);
             String result_url = searchResultsMatcher.group(1);
-            assertTrue(!StringUtils.isNullOrEmpty(result_url), "result_url was null or empty");
-            System.out.println("result_url: [" + result_url + "]");
+            assertFalse(StringUtils.isNullOrEmpty(result_url), "result_url was null or empty");
+            LOG.info("result_url: [" + result_url + "]");
             String detailUrl = "https://eztv.re" + result_url;
-            System.out.println("Fetching details from " + detailUrl + " ....");
+            //LOG.info("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage;
             try {
@@ -70,37 +72,34 @@ public final class EztvSearchPerformerTest {
                 continue;
             }
             long downloadTime = System.currentTimeMillis() - start;
-            System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
+            LOG.info("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
-                System.out.println("magneturl: [" + sm.group("magneturl") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("magneturl")), "magneturl was null or empty");
-                System.out.println("torrenturl: [" + sm.group("torrenturl") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("torrenturl")), "torrenturl was null or empty");
-                System.out.println("seeds: [" + sm.group("seeds") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds was null or empty");
-                System.out.println("displayname: [" + sm.group("displayname") + "]");
-                System.out.println("displayname2: [" + sm.group("displayname2") + "]");
-                System.out.println("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("magneturl")), "magneturl was null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("torrenturl")), "torrenturl was null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds was null or empty");
+//                LOG.info("displayname: [" + sm.group("displayname") + "]");
+//                LOG.info("displayname2: [" + sm.group("displayname2") + "]");
+//                LOG.info("displaynamefallback: [" + sm.group("displaynamefallback") + "]");
 
                 assertTrue(!StringUtils.isNullOrEmpty(sm.group("displayname")) ||
                                 !StringUtils.isNullOrEmpty(sm.group("displayname2")) ||
                                 !StringUtils.isNullOrEmpty(sm.group("displaynamefallback"))
                         , "displayname && displaynam2 && displaynamefallback were all null or empty");
 
-                System.out.println("infohash: [" + sm.group("infohash") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("infohash")), "infohash was null or empty");
-                System.out.println("filesize: [" + sm.group("filesize") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("filesize")), "filesize was null or empty");
-                System.out.println("creationtime: [" + sm.group("creationtime") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("creationtime")), "creationtime was null or empty");
+                LOG.info("infohash: [" + sm.group("infohash") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("infohash")), "infohash was null or empty");
+                LOG.info("filesize: [" + sm.group("filesize") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("filesize")), "filesize was null or empty");
+                LOG.info("creationtime: [" + sm.group("creationtime") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("creationtime")), "creationtime was null or empty");
                 EztvSearchResult sr = new EztvSearchResult(detailUrl, sm);
-                System.out.println(sr);
+                LOG.info("EztvSearchResult.hash=" + sr.getHash());
             } else {
                 fail("Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX (" + detailUrl + ")");
             }
-            System.out.println("===");
-            System.out.println("Sleeping 5 seconds...");
+            LOG.info("===");
+            LOG.info("Sleeping 5 seconds...");
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
@@ -110,6 +109,6 @@ public final class EztvSearchPerformerTest {
         if (found == 0) {
             fail("No search results");
         }
-        System.out.println("-done-");
+        LOG.info("-done-");
     }
 }

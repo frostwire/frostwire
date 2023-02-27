@@ -22,6 +22,7 @@ import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import org.junit.jupiter.api.Test;
 import org.limewire.util.StringUtils;
@@ -32,6 +33,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class NyaaSearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(NyaaSearchPerformerTest.class);
     @Test
     public void nyaaSearchPerformerTest() {
         String TEST_SEARCH_TERM = UrlUtils.encode("free");
@@ -43,7 +45,7 @@ public class NyaaSearchPerformerTest {
         } catch (Throwable t) {
             t.printStackTrace();
             if (!nyaa.isDDOSProtectionActive()) {
-                System.out.println("Aborting test.");
+                LOG.info("Aborting test.");
                 fail(t.getMessage());
             }
             return;
@@ -64,15 +66,9 @@ public class NyaaSearchPerformerTest {
             }
             for (SearchResult result : results) {
                 NyaaSearchResult sr = (NyaaSearchResult) result;
-                System.out.println("NyaaSearchPerformer.SearchListener.onResults:");
-                System.out.println("\t DisplayName: " + sr.getDisplayName());
-                System.out.println("\t Source: " + sr.getSource());
-                System.out.println("\t DetailsUrl: " + sr.getDetailsUrl());
-                System.out.println("\t Filename: " + sr.getFilename());
-                System.out.println("\t Hash: " + sr.getHash());
-                System.out.println("\t TorrentUrl: " + sr.getTorrentUrl());
-                System.out.println("\t Seeds: " + sr.getSeeds());
-                System.out.println("\t Size: " + sr.getSize());
+                LOG.info("NyaaSearchPerformer.SearchListener.onResults:");
+                LOG.info("\t Hash: " + sr.getHash());
+                LOG.info("\t Size: " + sr.getSize());
 
                 if (StringUtils.isNullOrEmpty(sr.getDisplayName())) {
                     failedTests.add("getDisplayName() null or empty");

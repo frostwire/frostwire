@@ -60,9 +60,9 @@ public final class YifySearchPerformerTest {
         while (searchResultsMatcher.find() && found < 5) {
             found++;
             LOG.info("\nfound " + found);
-            LOG.info("result_url: [" + searchResultsMatcher.group(1) + "]");
+            //LOG.info("result_url: [" + searchResultsMatcher.group(1) + "]");
             String detailUrl = "https://" + domain + "/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
-            LOG.info("Fetching details from " + detailUrl + " ....");
+            //LOG.info("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage = null;
             try {
@@ -79,10 +79,8 @@ public final class YifySearchPerformerTest {
             LOG.info("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
-                LOG.info("displayname: [" + sm.group("displayName") + "]");
                 LOG.info("size: [" + sm.group("size") + "]");
                 LOG.info("creationDate: [" + sm.group("creationDate") + "]");
-                LOG.info("seeds: [" + sm.group("seeds") + "]");
                 LOG.info("magnet: [" + sm.group("magnet") + "]");
 
                 assertFalse(StringUtils.isNullOrEmpty(sm.group("displayName")), "displayName null or empty");

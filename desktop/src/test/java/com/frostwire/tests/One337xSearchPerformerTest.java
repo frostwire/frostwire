@@ -22,6 +22,7 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchResult;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.HttpClient;
@@ -31,10 +32,10 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class One337xSearchPerformerTest {
+    private static final Logger LOG = Logger.getLogger(One337xSearchPerformerTest.class);
     @Test
     public void one377xSearchTest() {
         String TEST_SEARCH_TERM = "creative commons";
@@ -51,11 +52,11 @@ public final class One337xSearchPerformerTest {
         int found = 0;
         while (searchResultsMatcher.find() && found < 5) {
             found++;
-            System.out.println("\nfound " + found);
-            System.out.println("result_url: [" + searchResultsMatcher.group(1) + "]");
+            LOG.info("\nfound " + found);
+            LOG.info("result_url: [" + searchResultsMatcher.group(1) + "]");
             String detailUrl = "https://www.1377x.to/torrent/" + searchResultsMatcher.group("itemId") + "/" + searchResultsMatcher.group("htmlFileName");
             String displayName = searchResultsMatcher.group("displayName");
-            System.out.println("Fetching details from " + detailUrl + " ....");
+            //LOG.info("Fetching details from " + detailUrl + " ....");
             long start = System.currentTimeMillis();
             String detailPage = null;
             try {
@@ -68,39 +69,38 @@ public final class One337xSearchPerformerTest {
                 continue;
             }
             long downloadTime = System.currentTimeMillis() - start;
-            System.out.println("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
+            LOG.info("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
-                System.out.println("displayname: [" + displayName + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(displayName), "displayName is null or empty");
-                System.out.println("size: [" + sm.group("size") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("size")), "size is null or empty");
-                System.out.println("creationDate: [" + sm.group("creationDate") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("creationDate")), "creationDate is null or empty");
-                System.out.println("seeds: [" + sm.group("seeds") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds is null or empty");
-                System.out.println("magnet: [" + sm.group("magnet") + "]");
-                assertTrue(!StringUtils.isNullOrEmpty(sm.group("magnet")), "magnet is null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(displayName), "displayName is null or empty");
+
+                LOG.info("size: [" + sm.group("size") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("size")), "size is null or empty");
+                LOG.info("creationDate: [" + sm.group("creationDate") + "]");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("creationDate")), "creationDate is null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("seeds")), "seeds is null or empty");
+                assertFalse(StringUtils.isNullOrEmpty(sm.group("magnet")), "magnet is null or empty");
                 One337xSearchResult sr = new One337xSearchResult(detailUrl, displayName, sm);
-                System.out.println(sr);
+                // can't make this assertion, site isn't really giving magnet links
+                //assertFalse(StringUtils.isNullOrEmpty(sr.getHash()));
             } else {
-                System.err.println("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
-                System.err.println("HTML @ " + detailUrl + ":");
-                System.err.println(detailPage);
+                LOG.error("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX");
+                LOG.error("HTML @ " + detailUrl + ":");
+                LOG.error(detailPage);
                 fail("ERROR: Detail page search matcher failed, check TORRENT_DETAILS_PAGE_REGEX (" + detailUrl + ")");
                 return;
             }
-            System.out.println("===");
-            System.out.println("Sleeping 5 seconds...");
+            LOG.info("===");
+            LOG.info("Sleeping 5 seconds...");
             try {
                 Thread.sleep(4000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        System.out.println("-done-");
+        LOG.info("-done-");
         if (found == 0) {
-            System.out.println(fileStr);
+            LOG.info(fileStr);
             fail("No search results");
         }
     }

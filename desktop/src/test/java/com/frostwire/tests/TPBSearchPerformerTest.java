@@ -47,15 +47,8 @@ public class TPBSearchPerformerTest {
                 LOG.info("[TPBSearchPerformerTest] onResults() " + results.size());
                 for (SearchResult r : results) {
                     TPBSearchResult sr = (TPBSearchResult) r;
-                    LOG.info("[TPBSearchPerformerTest] onResults() displayName = " + sr.getDisplayName());
-                    LOG.info("[TPBSearchPerformerTest] onResults() detailsUrl = " + sr.getDetailsUrl());
-                    LOG.info("[TPBSearchPerformerTest] onResults() torrentUrl = " + sr.getTorrentUrl());
-                    LOG.info("[TPBSearchPerformerTest] onResults() seeds = " + sr.getSeeds());
                     LOG.info("[TPBSearchPerformerTest] onResults() size = " + sr.getSize());
-                    LOG.info("[TPBSearchPerformerTest] onResults() source = " + sr.getSource());
-                    LOG.info("[TPBSearchPerformerTest] onResults() thumbnailUrl = " + sr.getThumbnailUrl());
                     LOG.info("[TPBSearchPerformerTest] onResults() hash = " + sr.getHash());
-                    LOG.info("[TPBSearchPerformerTest] onResults() filename = " + sr.getFilename());
                     LOG.info("[TPBSearchPerformerTest] ==== ");
                     tpbResults.add(sr);
                 }
