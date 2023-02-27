@@ -18,6 +18,8 @@
 
 package com.frostwire.util;
 
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
 
 import java.io.UnsupportedEncodingException;
@@ -40,6 +42,7 @@ import java.util.concurrent.Executors;
 public final class UrlUtils {
 
     private static final Logger LOG = Logger.getLogger(UrlUtils.class);
+    private final static Pattern infoHashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
 
     public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
             "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
@@ -171,5 +174,13 @@ public final class UrlUtils {
             return null;
         }
         return uri.getHost();
+    }
+
+    public static String extractInfoHash(String url) {
+        Matcher matcher = infoHashPattern.matcher(url);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 }
