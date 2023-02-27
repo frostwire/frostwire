@@ -16,7 +16,6 @@
 
 package com.frostwire.search.torrentz2;
 
-import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentSearchPerformer;
@@ -34,7 +33,6 @@ import java.util.List;
 public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
     private final Pattern pattern;
-    private final Pattern infohashPattern;
     private final String unencodedKeywords;
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
@@ -46,7 +44,6 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         pattern = Pattern.compile("(?is)<dl><dt><a href=\".*?\" target=\"_blank\">(?<filename>.*?)</a></dt>"+
                 "<dd><span><a href=\"(?<magnet>.*?)\"><i class=\"fa-solid fa-magnet\"></i></a></span>" +
                 "<span title=\"\\d+\">(?<age>.*?)</span><span>(?<filesize>.*?)</span><span>(?<seeds>\\d+)</span>");
-        infohashPattern = Pattern.compile("([0-9A-Fa-f]{40})");
         unencodedKeywords = keywords;
     }
 
@@ -62,11 +59,7 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         String fileSizeUnit = matcher.group("unit");
         String magnetUrl = matcher.group("magnet");
 
-        String infoHash = "";
-        Matcher infohashMatcher = infohashPattern.matcher(magnetUrl);
-        if (infohashMatcher.find()) {
-            infoHash = infohashMatcher.group(1);
-        }
+        String infoHash = UrlUtils.extractInfoHash(magnetUrl);
 
         //String infoHash = matcher.group("infohash");
         String detailsURL = "https://" + getDomainName() + "/" + infoHash;

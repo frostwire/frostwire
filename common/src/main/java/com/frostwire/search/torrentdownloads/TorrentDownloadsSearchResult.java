@@ -22,6 +22,7 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.StringUtils;
+import com.frostwire.util.UrlUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -45,12 +46,12 @@ public final class TorrentDownloadsSearchResult extends AbstractTorrentSearchRes
 
     TorrentDownloadsSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
-        this.infoHash = null;
         this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
         this.size = parseSize(matcher.group("filesize") + " " + matcher.group("unit"));
         this.creationTime = parseCreationTime(matcher.group("time"));
         this.seeds = parseSeeds(matcher.group("seeds"));
         this.torrentUrl = matcher.group("magnet");
+        this.infoHash = UrlUtils.extractInfoHash(torrentUrl);
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
