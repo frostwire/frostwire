@@ -37,9 +37,10 @@ public class TPBSearchPerformerTest {
 
     @Test
     public void testTPBSearch() {
+        final List<TPBSearchResult> tpbResults = new ArrayList<>();
         TPBSearchPerformer tpbSearchPerformer = initializeSearchPerformer();
         assert (tpbSearchPerformer != null);
-        final List<TPBSearchResult> tpbResults = new ArrayList<>();
+
         tpbSearchPerformer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
@@ -72,13 +73,14 @@ public class TPBSearchPerformerTest {
         });
 
         tpbSearchPerformer.perform();
-        assertTrue(tpbResults.size() > 0);
+
+        assertTrue(tpbResults.size() > 0, "[TPBSearchPerformerTest] No results found using domain: " + tpbSearchPerformer.getDomainName());
     }
 
     private TPBSearchPerformer initializeSearchPerformer() {
         SearchEngine tpbEngine = SearchEngine.getTPBEngine();
-        int wait = 500;
-        int maxWait = 30000;
+        int wait = 250;
+        int maxWait = 15000;
         int currentWait = 0;
         while (!tpbEngine.isReady() && currentWait < maxWait) {
             try {
@@ -96,8 +98,9 @@ public class TPBSearchPerformerTest {
         }
 
         if (tpbEngine.isReady()) {
-            LOG.info("[TPBSearchPerformerTest] TPB engine is ready after " + currentWait + "ms");
-            return (TPBSearchPerformer) tpbEngine.getPerformer(1337, "free book");
+            TPBSearchPerformer searchPerformer = (TPBSearchPerformer) tpbEngine.getPerformer(1337, "free book");
+            LOG.info("[TPBSearchPerformerTest] TPB engine is ready with domain: " + searchPerformer.getDomainName() + ", after " + currentWait + "ms");
+            return searchPerformer;
         }
         return null;
     }
