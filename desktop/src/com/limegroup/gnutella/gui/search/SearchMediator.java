@@ -399,8 +399,8 @@ public final class SearchMediator {
         }
 
         if (query.startsWith("http") && !query.endsWith(".torrent")) {
-            manager.perform(SearchEngine.getTellurideEngine().getPerformer(token, query));
-            manager.perform(SearchEngine.getFrostClickEngine().getPerformer(token, query));
+            manager.perform(SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TELLURIDE_ID).getPerformer(token, query));
+            manager.perform(SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.FROSTCLICK_ID).getPerformer(token, query));
             return;
         }
 

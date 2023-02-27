@@ -73,7 +73,6 @@ public final class One337xSearchPerformerTest {
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
                 assertFalse(StringUtils.isNullOrEmpty(displayName), "displayName is null or empty");
-
                 LOG.info("size: [" + sm.group("size") + "]");
                 assertFalse(StringUtils.isNullOrEmpty(sm.group("size")), "size is null or empty");
                 LOG.info("creationDate: [" + sm.group("creationDate") + "]");

@@ -71,7 +71,7 @@ public class TPBSearchPerformerTest {
     }
 
     private TPBSearchPerformer initializeSearchPerformer() {
-        SearchEngine tpbEngine = SearchEngine.getTPBEngine();
+        SearchEngine tpbEngine = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TPB_ID);
         int wait = 250;
         int maxWait = 15000;
         int currentWait = 0;

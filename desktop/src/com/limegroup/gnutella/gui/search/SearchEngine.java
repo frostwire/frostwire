@@ -170,22 +170,22 @@ public abstract class SearchEngine {
         }
     };
     private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
-        protected void postInitWork() {
-            new Thread(() -> {
-                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                String[] mirrors = {
-                        "www.1377x.to"
-                };
-                ONE337X._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
-            }
-            ).start();
-        }
+//        protected void postInitWork() {
+//            new Thread(() -> {
+//                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+//                String[] mirrors = {
+//                        "www.1377x.to"
+//                };
+//                ONE337X._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
+//            }
+//            ).start();
+//        }
 
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            if (!isReady()) {
-                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
-            }
+//            if (!isReady()) {
+//                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
+//            }
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
@@ -242,19 +242,6 @@ public abstract class SearchEngine {
      * Override for things like picking the fastest mirror domainName
      */
     protected void postInitWork() {
-    }
-
-    public static SearchEngine getTellurideEngine() {
-        return TELLURIDE;
-    }
-
-
-    public static SearchEngine getFrostClickEngine() {
-        return FROSTCLICK;
-    }
-
-    public static SearchEngine getTPBEngine() {
-        return TPB;
     }
 
     private static List<SearchEngine> getCrawleableEngines() {
@@ -314,6 +301,16 @@ public abstract class SearchEngine {
                 filter(se -> name.startsWith(se.getName())).findFirst().
                 orElse(null);
     }
+
+    public static SearchEngine getSearchEngineByID(SearchEngineID id) {
+        for (SearchEngine engine : getEngines()) {
+            if (engine.getId() == id) {
+                return engine;
+            }
+        }
+        return null;
+    }
+
 
     public SearchEngineID getId() {
         return _id;
