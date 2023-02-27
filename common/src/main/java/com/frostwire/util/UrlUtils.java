@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ import java.util.concurrent.Executors;
  * @author aldenml
  */
 public final class UrlUtils {
+
+    private static final Logger LOG = Logger.getLogger(UrlUtils.class);
 
     public static final String USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS = "tr=udp://tracker.leechers-paradise.org:6969/announce&" +
             "tr=udp://tracker.coppersurfer.tk:6969/announce&" +
@@ -88,9 +90,10 @@ public final class UrlUtils {
     }
 
 
+    // can't use java records yet because of android 11 being the max compatible version
     private static class MirrorHeadDuration {
         private final String mirror;
-        private long duration;
+        private final long duration;
 
         public MirrorHeadDuration(String mirror, long duration) {
             this.mirror = mirror;
@@ -112,22 +115,18 @@ public final class UrlUtils {
             int httpCode = httpClient.head("https://" + url, maxWaitInMs, null);
             boolean validHttpCode = 100 <= httpCode && httpCode < 400;
             if (!validHttpCode) {
-                System.err.println("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored HTTP " + httpCode + " in " + (System.currentTimeMillis() - t_a) + "ms");
-                return maxWaitInMs * 10; // return a big number as to never consider it
+                LOG.error("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored HTTP " + httpCode + " in " + (System.currentTimeMillis() - t_a) + "ms");
+                return maxWaitInMs * 10L; // return a big number as to never consider it
             }
         } catch (Throwable t) {
-            System.err.println("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored " + t.getMessage());
+            LOG.error("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored " + t.getMessage());
         }
         return System.currentTimeMillis() - t_a;
     }
 
     public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
-        int httpCode;
-        // shuffle mirrors, keep the fastest valid one
-        long lowest_delta = minResponseTimeInMs * 10;
-        long t_a, t_delta;
-        String fastestMirror = null;
-        ArrayList<String> mirrorList = new ArrayList(Arrays.asList(mirrors));
+        String fastestMirror;
+        ArrayList<String> mirrorList = new ArrayList<>(Arrays.asList(mirrors));
         ArrayList<MirrorHeadDuration> mirrorDurations = new ArrayList<>();
         Collections.shuffle(mirrorList);
         final CountDownLatch latch = new CountDownLatch(mirrorList.size());
@@ -160,7 +159,7 @@ public final class UrlUtils {
         });
 
         fastestMirror = mirrorDurations.get(0).mirror();
-        System.out.println("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + mirrorDurations.get(0).duration() + "ms");
+        LOG.info("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + mirrorDurations.get(0).duration() + "ms");
         return fastestMirror;
     }
 
