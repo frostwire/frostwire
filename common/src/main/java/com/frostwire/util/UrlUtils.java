@@ -29,6 +29,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author gubatron
@@ -84,6 +87,40 @@ public final class UrlUtils {
         return "magnet:?xt=urn:btih:" + infoHash + "&dn=" + UrlUtils.encode(displayFilename) + "&" + trackerParameters;
     }
 
+
+    private static class MirrorHeadDuration {
+        private final String mirror;
+        private long duration;
+
+        public MirrorHeadDuration(String mirror, long duration) {
+            this.mirror = mirror;
+            this.duration = duration;
+        }
+
+        public String mirror() {
+            return mirror;
+        }
+
+        public long duration() {
+            return duration;
+        }
+    }
+
+    public static long testHeadRequestDurationInMs(final HttpClient httpClient, String url, final int maxWaitInMs) {
+        long t_a = System.currentTimeMillis();
+        try {
+            int httpCode = httpClient.head("https://" + url, maxWaitInMs, null);
+            boolean validHttpCode = 100 <= httpCode && httpCode < 400;
+            if (!validHttpCode) {
+                System.err.println("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored HTTP " + httpCode + " in " + (System.currentTimeMillis() - t_a) + "ms");
+                return maxWaitInMs * 10; // return a big number as to never consider it
+            }
+        } catch (Throwable t) {
+            System.err.println("UrlUtils.testHeadRequestDurationInMs() -> " + url + " errored " + t.getMessage());
+        }
+        return System.currentTimeMillis() - t_a;
+    }
+
     public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
         int httpCode;
         // shuffle mirrors, keep the fastest valid one
@@ -91,37 +128,40 @@ public final class UrlUtils {
         long t_a, t_delta;
         String fastestMirror = null;
         ArrayList<String> mirrorList = new ArrayList(Arrays.asList(mirrors));
+        ArrayList<MirrorHeadDuration> mirrorDurations = new ArrayList<>();
         Collections.shuffle(mirrorList);
-
+        final CountDownLatch latch = new CountDownLatch(mirrorList.size());
+        ExecutorService executor = Executors.newFixedThreadPool(4);
         for (String randomMirror : mirrorList) {
-            try {
-                t_a = System.currentTimeMillis();
-                httpCode = httpClient.head("https://" + randomMirror, minResponseTimeInMs, null);
-                boolean validHttpCode = 100 <= httpCode && httpCode < 400;
-                t_delta = System.currentTimeMillis() - t_a;
-                if (!validHttpCode) {
-                    System.err.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " errored HTTP " + httpCode + " in " + t_delta + "ms");
-                } else if (validHttpCode && t_delta < minResponseTimeInMs) {
-                    System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " responded in " + t_delta + "ms");
-                    if (t_delta < lowest_delta) {
-                        lowest_delta = t_delta;
-                        fastestMirror = randomMirror;
-                        System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " is new fastest mirror (" + t_delta + "ms)");
-                    }
-                } else {
-                    System.out.println("UrlUtils.getFastestMirrorDomain() -> " + randomMirror + " too slow, responded in " + t_delta + "ms");
-                }
-            } catch (Throwable t) {
-                System.err.println("UrlUtils.getFastestMirrorDomain(): " + randomMirror + " unreachable, not considered");
-            }
+            executor.submit(() -> {
+                mirrorDurations.add(
+                        new MirrorHeadDuration(
+                                randomMirror,
+                                testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs)
+                        )
+                );
+                latch.countDown();
+            });
         }
 
-        if (fastestMirror != null) {
-            System.out.println("UrlUtils.getFastestMirrorDomain() -> Winner: " + fastestMirror + " " + lowest_delta + " ms");
-            return fastestMirror;
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            return mirrors[0];
         }
-        System.out.println("UrlUtils.getFastestMirrorDomain() -> Falling back to: " + mirrors[0]);
-        return mirrors[0];
+
+        mirrorDurations.sort((o1, o2) -> {
+            if (o1.duration() < o2.duration()) {
+                return -1;
+            } else if (o1.duration() > o2.duration()) {
+                return 1;
+            }
+            return 0;
+        });
+
+        fastestMirror = mirrorDurations.get(0).mirror();
+        System.out.println("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + mirrorDurations.get(0).duration() + "ms");
+        return fastestMirror;
     }
 
     public static String extractDomainName(String url) {
