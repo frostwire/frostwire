@@ -38,7 +38,7 @@ public class TPBSearchPerformerTest {
     @Test
     public void testTPBSearch() {
         TPBSearchPerformer tpbSearchPerformer = initializeSearchPerformer();
-        assert(tpbSearchPerformer != null);
+        assert (tpbSearchPerformer != null);
         final List<TPBSearchResult> tpbResults = new ArrayList<>();
         tpbSearchPerformer.setListener(new SearchListener() {
             @Override
@@ -77,8 +77,8 @@ public class TPBSearchPerformerTest {
 
     private TPBSearchPerformer initializeSearchPerformer() {
         SearchEngine tpbEngine = SearchEngine.getTPBEngine();
-        int wait = 1000;
-        int maxWait = 15000;
+        int wait = 500;
+        int maxWait = 30000;
         int currentWait = 0;
         while (!tpbEngine.isReady() && currentWait < maxWait) {
             try {
@@ -87,15 +87,18 @@ public class TPBSearchPerformerTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LOG.info("[TPBSearchPerformerTest] Waiting for TPB engine to be ready...");
+            LOG.info("[TPBSearchPerformerTest] Waiting " + currentWait + "ms for TPB engine to be ready...");
         }
         if (currentWait > maxWait) {
             LOG.error("TPB engine is not ready after " + maxWait + "ms");
             fail("[TPBSearchPerformerTest] TPB engine is not ready after " + maxWait + "ms");
             return null;
-        } else {
-            LOG.info("[TPBSearchPerformerTest] TPB engine is ready after " + currentWait + "ms");
         }
-        return (TPBSearchPerformer) tpbEngine.getPerformer(1337,"free book");
+
+        if (tpbEngine.isReady()) {
+            LOG.info("[TPBSearchPerformerTest] TPB engine is ready after " + currentWait + "ms");
+            return (TPBSearchPerformer) tpbEngine.getPerformer(1337, "free book");
+        }
+        return null;
     }
 }
