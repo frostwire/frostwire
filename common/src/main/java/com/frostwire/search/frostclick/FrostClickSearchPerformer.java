@@ -37,6 +37,8 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
     private static final int MAX_RESULTS = 1;
     private final Map<String, String> customHeaders;
 
+    private boolean responseAsExpected;
+
     public FrostClickSearchPerformer(String domainName, long token, String keywords, int timeout, UserAgent userAgent) {
         super(domainName, token, keywords, timeout, MAX_RESULTS);
         this.customHeaders = buildCustomHeaders(userAgent);
@@ -53,6 +55,8 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
         String text = null;
         try {
             text = fetch(url, null, customHeaders);
+            responseAsExpected = text.contains("errors:[]");
+            //LOG.info("FrostClickSearchPerformer::searchPage() text: " + text);
         } catch (IOException e) {
             return Collections.emptyList();
         }
@@ -75,5 +79,9 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
         map.put("User-Agent", userAgent.toString());
         map.put("sessionId", userAgent.getUUID());
         return map;
+    }
+
+    public boolean wasResponseOk() {
+        return responseAsExpected;
     }
 }
