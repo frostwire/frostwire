@@ -102,4 +102,9 @@ public class IdopeSearchPerformer extends TorrentSearchPerformer {
     public boolean isDDOSProtectionActive() {
         return isDDOSProtectionActive;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

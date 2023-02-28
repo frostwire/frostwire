@@ -84,4 +84,9 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
     public boolean wasResponseOk() {
         return responseAsExpected;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
 }

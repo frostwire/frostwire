@@ -81,4 +81,9 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
         LOG.info("searchPage() got " + results.size() + " results");
         return results;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

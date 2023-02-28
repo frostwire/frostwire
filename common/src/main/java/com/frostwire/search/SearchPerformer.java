@@ -37,4 +37,6 @@ public interface SearchPerformer {
     void setListener(SearchListener listener);
 
     boolean isDDOSProtectionActive();
+
+    boolean isCrawler();
 }

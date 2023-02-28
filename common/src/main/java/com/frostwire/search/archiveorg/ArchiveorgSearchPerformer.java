@@ -133,4 +133,9 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     private boolean filter(ArchiveorgFile file) {
         return !(file.format != null && file.format.equalsIgnoreCase("metadata"));
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

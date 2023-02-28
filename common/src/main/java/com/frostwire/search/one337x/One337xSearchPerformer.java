@@ -73,6 +73,11 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
         return isDDOSProtectionActive;
     }
 
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
+
 
     @Override
     protected int htmlPrefixOffset(String html) {

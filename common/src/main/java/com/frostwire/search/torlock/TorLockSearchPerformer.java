@@ -79,4 +79,9 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
     public boolean isDDOSProtectionActive() {
         return isDDOSProtectionActive;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

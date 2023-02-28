@@ -79,4 +79,9 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexSearchPerformer
     public boolean isDDOSProtectionActive() {
         return isDDOSProtectionActive;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

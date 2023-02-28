@@ -106,4 +106,9 @@ public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
         return results;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
 }

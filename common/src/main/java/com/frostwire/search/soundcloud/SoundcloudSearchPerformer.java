@@ -83,4 +83,9 @@ public final class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         }
         return result;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
 }

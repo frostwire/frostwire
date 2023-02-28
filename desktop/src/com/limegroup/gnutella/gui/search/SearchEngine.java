@@ -46,6 +46,7 @@ import org.limewire.setting.BooleanSetting;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
 
@@ -216,8 +217,10 @@ public abstract class SearchEngine {
     protected void postInitWork() {
     }
 
-    private static List<SearchEngine> getCrawleableEngines() {
-        return Arrays.asList(
+
+    // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
+    public static List<SearchEngine> getEngines() {
+        List<SearchEngine> allEngines = Arrays.asList(
                 ARCHIVEORG,
                 EZTV,
                 GLOTORRENTS,
@@ -227,35 +230,17 @@ public abstract class SearchEngine {
                 NYAA,
                 ONE337X,
                 TPB,
-                TORLOCK);
-    }
-
-    private static List<SearchEngine> getSinglePageEngines() {
-        return Arrays.asList(
+                TORLOCK,
+                TORRENTDOWNLOADS,
                 TORRENTZ2,
                 YIFY,
-                TORRENTDOWNLOADS,
                 SOUNDCLOUD,
                 FROSTCLICK);
-    }
 
-    // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
-    public static List<SearchEngine> getEngines() {
-        List<SearchEngine> singlePageEngines = getSinglePageEngines();
-        List<SearchEngine> crawleableEngines = getCrawleableEngines();
         var list = new ArrayList<SearchEngine>();
 
         // Make sure single page engines are first so they go through the SearchManager's single search pool first
-        singlePageEngines.forEach(candidate -> {
-            if (candidate.isReady()) {
-                list.add(candidate);
-            }
-        });
-        crawleableEngines.forEach(candidate -> {
-            if (candidate.isReady()) {
-                list.add(candidate);
-            }
-        });
+        list = (ArrayList<SearchEngine>) allEngines.stream().filter(SearchEngine::isReady).collect(Collectors.toList());
 
         // ensure that at least one is enabled
         var oneEnabled = list.stream().anyMatch(SearchEngine::isEnabled);

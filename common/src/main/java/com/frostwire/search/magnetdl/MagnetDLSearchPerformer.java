@@ -109,4 +109,9 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
         String seeds = matcher.group("seeds");
         return new MagnetDLSearchResult(detailsURL, magnet, fileSizeMagnitude, fileSizeUnit, ageString, seeds, title);
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

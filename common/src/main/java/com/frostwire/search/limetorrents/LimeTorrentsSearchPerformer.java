@@ -95,4 +95,9 @@ public class LimeTorrentsSearchPerformer extends TorrentSearchPerformer {
         String seeds = matcher.group("seeds");
         return new LimeTorrentsSearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, title);
     }
+
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
 }

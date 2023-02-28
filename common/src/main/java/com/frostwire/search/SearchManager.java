@@ -40,19 +40,19 @@ public final class SearchManager {
     /**
      * Executor for one off searches that don't need any crawling of results
      */
-    private final ExecutorService executor;
+    private final ExecutorService singlePageRequestExecutor;
     /**
-     * Executor for temp search results that need to be crawled page by page
+     * Executor for first search and crawls by Performers that need crawling
      */
-    private final ExecutorService crawlExecutor;
+    private final ExecutorService crawlingExecutor;
     private final List<SearchTask> tasks;
     private final List<WeakReference<SearchTable>> tables;
     private SearchListener listener;
 
     private SearchManager(int instantResultsThreads, int crawlResultsThreads) {
         LOG.info("SearchManager: instantResultsThreads: " + instantResultsThreads + " crawlExecutorThreads: " + crawlResultsThreads);
-        this.executor = new ThreadPool("SearchManager-executor", instantResultsThreads, instantResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
-        this.crawlExecutor = new ThreadPool("SearchManager-crawlExecutor", crawlResultsThreads, crawlResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
+        this.singlePageRequestExecutor = new ThreadPool("SearchManager-executor", instantResultsThreads, instantResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
+        this.crawlingExecutor = new ThreadPool("SearchManager-crawlExecutor", crawlResultsThreads, crawlResultsThreads, 2L, new LinkedBlockingQueue<>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<>());
         this.tables = Collections.synchronizedList(new LinkedList<>());
     }
@@ -87,7 +87,7 @@ public final class SearchManager {
                 }
             });
             SearchTask task = new PerformTask(this, performer, nextOrdinal(performer.getToken()));
-            submitSimpleSearchTask(task);
+            submitSimpleSearchTask(task, performer.isCrawler() ? crawlingExecutor : singlePageRequestExecutor);
         } else {
             LOG.warn("Search performer is null, review your logic");
         }
@@ -106,14 +106,9 @@ public final class SearchManager {
         this.listener = listener;
     }
 
-    private void submitSimpleSearchTask(SearchTask task) {
+    private void submitSimpleSearchTask(SearchTask task, ExecutorService executor) {
         tasks.add(task);
         executor.execute(task);
-    }
-
-    private void submitCrawlTask(CrawlTask task) {
-        tasks.add(task);
-        crawlExecutor.execute(task);
     }
 
     private void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
@@ -179,7 +174,8 @@ public final class SearchManager {
         if (performer != null && !performer.isStopped()) {
             try {
                 CrawlTask task = new CrawlTask(this, performer, sr, nextOrdinal(performer.getToken()));
-                submitCrawlTask(task);
+                tasks.add(task);
+                crawlingExecutor.execute(task);
             } catch (Throwable e) {
                 LOG.warn("Error scheduling crawling of search result: " + sr);
             }

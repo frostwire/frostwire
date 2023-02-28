@@ -84,6 +84,11 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
         // TellurideSearchResults aren't crawleable, this won't be called, no crawl tasks will be spawned for each result.
     }
 
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
+
     public static List<TellurideSearchResult> getValidResults(String jsonMeta, Gson gson, TellurideSearchPerformerListener performerListener, long token, String debugUrl) {
         TellurideJSONResult result = gson.fromJson(jsonMeta, TellurideJSONResult.class);
 

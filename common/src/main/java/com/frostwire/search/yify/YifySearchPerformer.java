@@ -69,6 +69,11 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
     }
 
     @Override
+    public boolean isCrawler() {
+        return false;
+    }
+
+    @Override
     protected int htmlPrefixOffset(String html) {
         int offset = html.indexOf("<div id=\"content\"");
         return offset > 0 ? offset : 0;

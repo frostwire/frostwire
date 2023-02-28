@@ -111,4 +111,9 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     public boolean isDDOSProtectionActive() {
         return isDDOSProtectionActive;
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }

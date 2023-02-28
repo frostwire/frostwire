@@ -83,4 +83,9 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     protected boolean isValidHtml(String html) {
         return html != null && !html.contains("Cloudflare");
     }
+
+    @Override
+    public boolean isCrawler() {
+        return true;
+    }
 }
