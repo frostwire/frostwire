@@ -222,19 +222,7 @@ public abstract class SearchEngine {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                String[] mirrors = {
-                        "thepiratebay.org",
-                        "www.pirate-bay.net",
-                        "pirate-bays.net",
-                        "pirate-bay.info",
-                        "thepiratebay-unblocked.org",
-                        "piratebay.live",
-                        "thepiratebay.zone",
-                        "thepiratebay.monster",
-                        "thepiratebay0.org",
-                        "thepiratebay.vip",
-                };
-                domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
+                domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.mirrors, 6000, 6);
             }
             ).start();
         }
@@ -253,30 +241,9 @@ public abstract class SearchEngine {
     };
 
     public static final SearchEngine ONE337X = new SearchEngine("1337x", Constants.PREF_KEY_SEARCH_USE_ONE337X) {
-        private String domainName = null;
-
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            if (domainName == null) {
-                throw new RuntimeException("check your logic, this search performer has no domain name ready");
-            }
-            return new One337xSearchPerformer(domainName, token, keywords, DEFAULT_TIMEOUT);
-        }
-
-        protected void postInitWork() {
-            new Thread(() -> {
-                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-                String[] mirrors = {
-                        "www.1377x.to"
-                };
-                domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 7000);
-            }
-            ).start();
-        }
-
-        @Override
-        protected boolean isReady() {
-            return domainName != null;
+            return new One337xSearchPerformer("www.1377x.to", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

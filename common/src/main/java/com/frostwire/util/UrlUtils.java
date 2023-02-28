@@ -127,11 +127,14 @@ public final class UrlUtils {
         return System.currentTimeMillis() - t_a;
     }
 
-    public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs) {
+    public static String getFastestMirrorDomain(final HttpClient httpClient, final String[] mirrors, final int minResponseTimeInMs, int maxNumberOfMirrorsToTest) {
         String fastestMirror;
         ArrayList<String> mirrorList = new ArrayList<>(Arrays.asList(mirrors));
         ArrayList<MirrorHeadDuration> mirrorDurations = new ArrayList<>();
         Collections.shuffle(mirrorList);
+        if (maxNumberOfMirrorsToTest > 0 && mirrorList.size() > maxNumberOfMirrorsToTest) {
+            mirrorList = new ArrayList<>(mirrorList.subList(0, maxNumberOfMirrorsToTest));
+        }
         final CountDownLatch latch = new CountDownLatch(mirrorList.size());
         ExecutorService executor = Executors.newFixedThreadPool(4);
         for (String randomMirror : mirrorList) {

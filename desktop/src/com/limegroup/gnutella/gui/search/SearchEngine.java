@@ -86,21 +86,7 @@ public abstract class SearchEngine {
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
                 // from https://piratebayproxy.info/
-                String[] mirrors = {
-                        "pirate-bay.info",
-                        "pirate-bays.net",
-                        "piratebay.live",
-                        "pirateproxy.live",
-                        "thehiddenbay.com",
-                        "thepiratebay-unblocked.org",
-                        "thepiratebay.org",
-                        "thepiratebay.zone",
-                        "thepiratebay0.org",
-                        "thepiratebay10.org",
-                        "thepiratebay7.com",
-                        "tpb.party",
-                };
-                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
+                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.mirrors, 6000, 6);
             }
             ).start();
         }
@@ -170,22 +156,8 @@ public abstract class SearchEngine {
         }
     };
     private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
-//        protected void postInitWork() {
-//            new Thread(() -> {
-//                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
-//                String[] mirrors = {
-//                        "www.1377x.to"
-//                };
-//                ONE337X._domainName = UrlUtils.getFastestMirrorDomain(httpClient, mirrors, 6000);
-//            }
-//            ).start();
-//        }
-
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-//            if (!isReady()) {
-//                throw new RuntimeException("Check your logic, a search performer that's not ready should not be in the list of performers yet.");
-//            }
             return new One337xSearchPerformer(ONE337X.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };

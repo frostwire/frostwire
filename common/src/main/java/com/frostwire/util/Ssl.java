@@ -122,11 +122,14 @@ public final class Ssl {
                 "sni.cloudflaressl.com",
                 "static.frostclick.com",
                 "static.frostwire.com",
+                "thehiddenbay.com",
                 "thepiratebay-unblocked.org",
                 "thepiratebay.org",
+                "thepiratebay.party",
                 "thepiratebay.zone",
                 "thepiratebay0.org",
                 "thepiratebay10.org",
+                "thepiratebay7.com",
                 "torrent-paradise.ml",
                 "torrentz2.nz",
                 "tpb.party",
@@ -148,8 +151,6 @@ public final class Ssl {
                 "yts-movie.cc",
                 "zoink.ch",
                 "zooqle.com",
-                "thehiddenbay.com",
-                "thepiratebay7.com",
         };
         private static final HashSet<String> validDomainsSet = new HashSet<>();
 

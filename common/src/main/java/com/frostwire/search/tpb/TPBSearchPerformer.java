@@ -38,6 +38,22 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
     }
 
+    public static final String[] mirrors = {
+            "pirate-bay.info",
+            "pirate-bays.net",
+            "piratebay.live",
+            "pirateproxy.live",
+            "thehiddenbay.com",
+            "thepiratebay-unblocked.org",
+            "thepiratebay.org",
+            "thepiratebay.party",
+            "thepiratebay.zone",
+            "thepiratebay0.org",
+            "thepiratebay10.org",
+            "thepiratebay7.com",
+            "tpb.party",
+    };
+
     @Override
     public Pattern getPattern() {
         return PATTERN;
