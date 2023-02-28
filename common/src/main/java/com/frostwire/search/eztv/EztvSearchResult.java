@@ -21,14 +21,6 @@ package com.frostwire.search.eztv;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
-import com.frostwire.util.StringUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 /**
  * @author gubatron
@@ -44,23 +36,15 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    public EztvSearchResult(String detailsUrl, SearchMatcher matcher) {
-        this.detailsUrl = detailsUrl;
-        String dispName = null;
-        if (matcher.group("displayname") != null) {
-            dispName = matcher.group("displayname");
-        } else if (matcher.group("displayname2") != null) {
-            dispName = matcher.group("displayname2");
-        } else if (matcher.group("displaynamefallback") != null) {
-            dispName = matcher.group("displaynamefallback");
-        }
-        this.displayName = HtmlManipulator.replaceHtmlEntities(dispName).trim();
-        this.torrentUrl = buildTorrentUrl(matcher);
-        this.filename = parseFileName(FilenameUtils.getName(torrentUrl));
+    public EztvSearchResult(String domainName, SearchMatcher matcher) {
+        this.detailsUrl = domainName + matcher.group("detailUrl");
+        this.displayName = HtmlManipulator.replaceHtmlEntities(matcher.group("displayname")).trim();
+        this.torrentUrl = "magnet" + matcher.group("magnet");
+        this.filename = displayName + ".mp4";
         this.infoHash = parseInfoHash(matcher, torrentUrl);
-        this.seeds = parseSeeds(matcher.group("seeds"));
-        this.creationTime = parseCreationTime(matcher.group("creationtime"));
-        this.size = parseSize(matcher.group("filesize"));
+        this.seeds = 10;
+        this.creationTime = convertAgeStringToTimestamp(matcher.group("age"));
+        this.size = parseSize(matcher.group("size"));
     }
 
     private static String parseInfoHash(SearchMatcher matcher, String torrentUrl) {
@@ -73,17 +57,6 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
         } catch (Throwable ignored) {
         }
         return null;
-    }
-
-    private static String buildTorrentUrl(SearchMatcher matcher) {
-        String url = null;
-        if (matcher.group("torrenturl") != null) {
-            url = matcher.group("torrenturl");
-            url = url.replaceAll(" ", "%20");
-        } else if (matcher.group("magneturl") != null) {
-            url = matcher.group("magneturl");
-        }
-        return url;
     }
 
     private static int parseSeeds(String group) {
@@ -139,26 +112,46 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
         return torrentUrl;
     }
 
-    private String parseFileName(String urlEncodedFileName) {
-        String decodedFileName = null;
-        if (!StringUtils.isNullOrEmpty(urlEncodedFileName)) {
-            try {
-                decodedFileName = URLDecoder.decode(urlEncodedFileName, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+    /**
+     * @param age "2h 21m", "5d 3h", "2 weeks", "4 mo", "1 year", "2 years"
+     * @return The timestamp in milliseconds, obtained by subtracting the age from System.currentTimeMillis()
+     */
+    private long convertAgeStringToTimestamp(String age) {
+        long timestamp = System.currentTimeMillis();
+        if (age.contains("year")) {
+            String[] parts = age.split("year");
+            int years = Integer.parseInt(parts[0].trim());
+            timestamp -= years * 365 * 24 * 60 * 60 * 1000;
+            return timestamp;
         }
-        return decodedFileName;
-    }
 
-    private long parseCreationTime(String dateString) {
-        long result = System.currentTimeMillis();
-        try {
-            dateString = dateString.replaceAll("(st|nd|rd|th)", "");
-            SimpleDateFormat myFormat = new SimpleDateFormat("d MMM yyyy", Locale.US);
-            result = myFormat.parse(dateString).getTime();
-        } catch (Throwable ignored) {
+        if (age.contains("mo")) {
+            String[] parts = age.split("mo");
+            int months = Integer.parseInt(parts[0].trim());
+            timestamp -= months * 30 * 24 * 60 * 60 * 1000;
+            return timestamp;
         }
-        return result;
+
+        if (age.contains("week")) {
+            String[] parts = age.split("week");
+            int weeks = Integer.parseInt(parts[0].trim());
+            timestamp -= weeks * 7 * 24 * 60 * 60 * 1000;
+            return timestamp;
+        }
+
+        if (age.contains("d")) {
+            String[] parts = age.split("d");
+            int days = Integer.parseInt(parts[0].trim());
+            timestamp -= days * 24 * 60 * 60 * 1000;
+            return timestamp;
+        }
+
+        if (age.contains("h") && !age.contains("d")) {
+            String[] parts = age.split("h");
+            int hours = Integer.parseInt(parts[0].trim());
+            timestamp -= hours * 60 * 60 * 1000;
+            return timestamp;
+        }
+        return timestamp;
     }
 }

@@ -17,55 +17,28 @@
 
 package com.frostwire.search.eztv;
 
-import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
-import org.apache.commons.lang3.StringUtils;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
+import com.frostwire.util.Logger;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-    public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-    // This is a good example of optional regex groups when a page might have different possible formats to parse.
-    public static final String TORRENT_DETAILS_PAGE_REGEX =
-            "(?is)<td class=\"section_post_header\" colspan=\"2\"><h1><span style.*?>(?<displaynamefallback>.*?)</span></h1></td>.*?" +
-                    "Download Links.*?" +
-                    ".*<a href=\"(?<torrenturl>http(s)?.*?\\.torrent)\" (title=\"Download Torrent\"|class=\"download_.\").*?" +
-                    ".*<a href=\"(?<magneturl>magnet:\\?.*?)\" (class=\"magnet\"|title=\"Magnet Link\").*?" +
-                    "Seeds: <span.*?>(?<seeds>.*?)</span><br.*?" +
-                    "(Torrent Info.*?title=\"(?<displayname>.*?)\".*?)?" +
-                    "(<b>Torrent File:</b>\\s+(?<displayname2>.*?)<br.*?)?" +
-                    "(<b>Torrent Hash:</b>\\s+(?<infohash>.*?)<br.*?)?" +
-                    "<b>Filesize:</b>\\s+(?<filesize>.*?)<br.*?" +
-                    "<b>Released:</b>\\s+(?<creationtime>.*?)<br";
-    private static final int MAX_RESULTS = 20;
+public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
+    private static final String SEARCH_RESULTS_REGEX = "(?is)<td class=\"forum_thread_post\">.*?" + "<a href=\"(?<detailUrl>.*?)\" title=\"(?<displayname>.*?)\" alt=\".*?\" class=\"epinfo\".*?<a href=\"magnet(?<magnet>.*?)\" " + "class=\"magnet\".*?</td>.*?<td align=\"center\" class=\"forum_thread_post\">(?<size>[0-9\\. GMB]+)</td>" + ".*?<td align=\"center\" class=\"forum_thread_post\">(?<age>.*?)</td>";
+    private static final Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
+
+    private static Pattern searchPattern = null;
 
     private boolean isDDOSProtectionActive;
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, SEARCH_RESULTS_REGEX, TORRENT_DETAILS_PAGE_REGEX);
-    }
-
-    @Override
-    public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        String itemId = matcher.group(1);
-        return new EztvTempSearchResult(getDomainName(), itemId);
-    }
-
-    @Override
-    protected String fetchSearchPage(String url) {
-        Map<String, String> formData = new HashMap<>();
-        formData.put("SearchString1", getEncodedKeywords());
-        formData.put("SearchString", "");
-        formData.put("search", "Search");
-        String page = post(url, formData);
-        return page != null && isValidHtml(page) ? page : null;
+        super(domainName, token, keywords, timeout, 1, 0);
     }
 
     @Override
@@ -74,37 +47,69 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     }
 
     @Override
-    protected EztvSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        return new EztvSearchResult(sr.getDetailsUrl(), matcher);
+    protected List<EztvSearchResult> searchPage(String page) {
+        if (page == null || page.isEmpty() || !isValidHtml(page)) {
+            return new ArrayList<>();
+        }
+        if (searchPattern == null) {
+            searchPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
+        }
+        int startOffset = page.indexOf("Seeds");
+        int endOffset = page.indexOf("<img src=\"//ezimg.ch/s/1/2/ssl.png");
+        String reducedPage;
+
+        if (startOffset > 0 && endOffset > 0 && endOffset > startOffset) {
+            reducedPage = page.substring(startOffset, endOffset);
+        } else {
+            LOG.warn("EztvSearchPerformer()::searchPage() could not reduce page");
+            reducedPage = page;
+        }
+
+        SearchMatcher matcher = new SearchMatcher(searchPattern.matcher(reducedPage));
+
+        List<EztvSearchResult> results = new ArrayList<>();
+        int MAX_RESULTS = 75;
+        int maxFailures = 10;
+        boolean matcherFound = false;
+        do {
+            try {
+                matcherFound = matcher.find();
+            } catch (Throwable t) {
+                LOG.error("EztvSearchPerformer.searchPage() has failed.\n" + t.getMessage(), t);
+                //return results;
+            }
+            if (matcherFound) {
+                try {
+                    EztvSearchResult sr = new EztvSearchResult(getDomainName(), matcher);
+                    results.add(sr);
+                } catch (Throwable ignored) {
+                    LOG.error(ignored.getMessage(), ignored);
+                }
+            } else {
+                maxFailures--;
+            }
+        } while (maxFailures > 0 && !isStopped() && results.size() <= MAX_RESULTS);
+
+        if (results.isEmpty()) {
+            LOG.error("EztvSearchPerformer()::searchPage() no matches found for pattern");
+
+            if (maxFailures == 0) {
+                LOG.warn("EztvSearchPerformer search matcher broken on " + getDomainName() + ". Please notify at https://github.com/frostwire/frostwire/issues/new");
+                LOG.warn("EztvSearchPerformer trying to search with regex: [" + SEARCH_RESULTS_REGEX + "]");
+            }
+        }
+        return results;
     }
 
-    @Override
-    protected int htmlPrefixOffset(String html) {
-        int offset = html.indexOf("id=\"searchsearch_submit\"");
-        return offset > 0 ? offset : 0;
-    }
 
     // EZTV is very simplistic in the search engine
     // just a simple keyword check allows to discard the page
     protected boolean isValidHtml(String html) {
-        if (html == null || html.contains("Cloudflare")) {
+        if (html == null || html.contains("Cloudflare Ray")) {
             isDDOSProtectionActive = true;
             return false;
         }
-        String[] keywords = getKeywords().split(" ");
-        String k = null;
-        // select the first keyword with length >= 3
-        for (int i = 0; k == null && i < keywords.length; i++) {
-            String s = keywords[i];
-            if (s.length() >= 3) {
-                k = s;
-            }
-        }
-        if (k == null) {
-            k = keywords[0];
-        }
-        int count = StringUtils.countMatches(html.toLowerCase(Locale.US), k.toLowerCase(Locale.US));
-        return count > 9;
+        return true;
     }
 
     @Override
@@ -114,7 +119,6 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     @Override
     public boolean isCrawler() {
-        // TODO: Refactor to do everything as a SimpleTorrentSearchPerformer
-        return true;
+        return false;
     }
 }
