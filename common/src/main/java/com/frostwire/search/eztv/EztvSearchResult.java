@@ -40,9 +40,9 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
         this.detailsUrl = domainName + matcher.group("detailUrl");
         this.displayName = HtmlManipulator.replaceHtmlEntities(matcher.group("displayname")).trim();
         this.torrentUrl = "magnet" + matcher.group("magnet");
-        this.filename = displayName + ".mp4";
+        this.filename = displayName + ".torrent";
         this.infoHash = parseInfoHash(matcher, torrentUrl);
-        this.seeds = 10;
+        this.seeds = 500;
         this.creationTime = convertAgeStringToTimestamp(matcher.group("age"));
         this.size = parseSize(matcher.group("size"));
     }
