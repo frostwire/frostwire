@@ -19,7 +19,7 @@ package com.frostwire.search.idope;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class IdopeSearchPerformer extends TorrentSearchPerformer {
+public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(IdopeSearchPerformer.class);
     private final Pattern pattern;
     private boolean isDDOSProtectionActive;
@@ -105,6 +105,6 @@ public class IdopeSearchPerformer extends TorrentSearchPerformer {
 
     @Override
     public boolean isCrawler() {
-        return true;
+        return false;
     }
 }

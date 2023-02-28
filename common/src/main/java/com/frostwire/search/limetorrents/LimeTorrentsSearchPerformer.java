@@ -19,7 +19,7 @@ package com.frostwire.search.limetorrents;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author gubatron
  */
-public class LimeTorrentsSearchPerformer extends TorrentSearchPerformer {
+public class LimeTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Logger LOG = Logger.getLogger(LimeTorrentsSearchPerformer.class);
     private final Pattern pattern;
     private static final String SEARCH_RESULT_PAGE_REGEX =

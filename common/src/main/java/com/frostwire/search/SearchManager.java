@@ -120,6 +120,7 @@ public final class SearchManager {
                     list.add(sr);
                 }
                 crawl(performer, csr);
+                Thread.yield();
             } else {
                 list.add(sr);
             }

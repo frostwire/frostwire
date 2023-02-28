@@ -160,5 +160,10 @@ public final class TellurideCourier {
             courierCallback.abort();
             lastKnownCallback = null;
         }
+
+        @Override
+        public boolean isCrawler() {
+            return false;
+        }
     }
 }

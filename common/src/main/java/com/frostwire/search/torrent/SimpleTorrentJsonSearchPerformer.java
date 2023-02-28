@@ -28,16 +28,16 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJsonItem, R extends TorrentSearchResult> extends TorrentSearchPerformer {
+public abstract class SimpleTorrentJsonSearchPerformer<T extends ComparableTorrentJsonItem, R extends TorrentSearchResult> extends SimpleTorrentSearchPerformer {
     private static final int DEFAULT_NUM_CRAWLS = 10;
     private final Comparator<T> itemComparator;
 
-    private TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+    private SimpleTorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
         super(domainName, token, keywords, timeout, pages, numCrawls);
         this.itemComparator = (a, b) -> b.getSeeds() - a.getSeeds();
     }
 
-    public TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
+    public SimpleTorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
         this(domainName, token, keywords, timeout, pages, DEFAULT_NUM_CRAWLS);
     }
 

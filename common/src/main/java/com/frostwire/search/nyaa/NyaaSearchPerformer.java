@@ -19,14 +19,14 @@ package com.frostwire.search.nyaa;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class NyaaSearchPerformer extends TorrentSearchPerformer {
+public class NyaaSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
     private final Pattern pattern;
 
@@ -84,6 +84,6 @@ public class NyaaSearchPerformer extends TorrentSearchPerformer {
 
     @Override
     public boolean isCrawler() {
-        return true;
+        return false;
     }
 }

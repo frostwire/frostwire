@@ -20,7 +20,7 @@ package com.frostwire.search.glotorrents;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class GloTorrentsSearchPerformer extends TorrentSearchPerformer {
+public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(GloTorrentsSearchPerformer.class);
     private final Pattern pattern;
     private static final String SEARCH_RESULT_PAGE_REGEX = "(?is)" +

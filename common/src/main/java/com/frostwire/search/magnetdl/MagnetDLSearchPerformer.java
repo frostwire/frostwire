@@ -20,7 +20,7 @@ package com.frostwire.search.magnetdl;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author gubatron
  */
-public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
+public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Logger LOG = Logger.getLogger(MagnetDLSearchPerformer.class);
     private final Pattern pattern;
     private final String nonEncodedKeywords;
@@ -112,6 +112,6 @@ public class MagnetDLSearchPerformer extends TorrentSearchPerformer {
 
     @Override
     public boolean isCrawler() {
-        return true;
+        return false;
     }
 }

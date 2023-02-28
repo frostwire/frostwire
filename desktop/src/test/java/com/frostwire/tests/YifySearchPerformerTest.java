@@ -41,7 +41,7 @@ public final class YifySearchPerformerTest {
     public void yifiSearchTest() {
         //public static void main(String[] args) {
         String TEST_SEARCH_TERM = "one";
-        String domain = "www.yify-torrent.cc";
+        String domain = "yts-movie.cc";
         String searchURL = "https://" + domain + "/search/" + TEST_SEARCH_TERM;
         HttpClient httpClient = new OkHttpClientWrapper(new ThreadPool("testPool", 4, new LinkedBlockingQueue<>(), false));
         String fileStr;

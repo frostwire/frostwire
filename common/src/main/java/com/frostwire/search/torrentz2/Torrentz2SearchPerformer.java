@@ -18,7 +18,7 @@ package com.frostwire.search.torrentz2;
 
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentSearchPerformer;
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 
@@ -30,7 +30,7 @@ import java.util.List;
  * This is an example of a simple search performer, it can deduct all magnet urls and search result details right out of
  * the search result page in a single HTTP request.
  */
-public class Torrentz2SearchPerformer extends TorrentSearchPerformer {
+public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
     private final Pattern pattern;
     private final String unencodedKeywords;

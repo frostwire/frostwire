@@ -114,6 +114,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     @Override
     public boolean isCrawler() {
+        // TODO: Refactor to do everything as a SimpleTorrentSearchPerformer
         return true;
     }
 }

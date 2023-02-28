@@ -70,7 +70,7 @@ public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifyS
 
     @Override
     public boolean isCrawler() {
-        return false;
+        return true;
     }
 
     @Override
