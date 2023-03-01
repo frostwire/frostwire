@@ -246,6 +246,9 @@ public abstract class SearchEngine {
     }
 
     public static SearchEngine getSearchEngineByID(SearchEngineID id) {
+        if (id == SearchEngineID.TELLURIDE_ID) {
+            return TELLURIDE;
+        }
         for (SearchEngine engine : getEngines()) {
             if (engine.getId() == id) {
                 return engine;
