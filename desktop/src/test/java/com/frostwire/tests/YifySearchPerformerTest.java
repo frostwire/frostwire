@@ -25,6 +25,7 @@ import com.frostwire.search.yify.YifySearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
+import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.OkHttpClientWrapper;
 import org.junit.jupiter.api.Test;
@@ -79,9 +80,8 @@ public final class YifySearchPerformerTest {
             LOG.info("Downloaded " + detailPage.length() + " bytes in " + downloadTime + "ms");
             SearchMatcher sm = new SearchMatcher(detailPagePattern.matcher(detailPage));
             if (sm.find()) {
+                LOG.info("hash: [" + UrlUtils.extractInfoHash(sm.group("magnet")) + "]");
                 LOG.info("size: [" + sm.group("size") + "]");
-                LOG.info("creationDate: [" + sm.group("creationDate") + "]");
-                LOG.info("magnet: [" + sm.group("magnet") + "]");
 
                 assertFalse(StringUtils.isNullOrEmpty(sm.group("displayName")), "displayName null or empty");
                 assertFalse(StringUtils.isNullOrEmpty(sm.group("creationDate")), "creationDate null or empty");
