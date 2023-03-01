@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,10 +81,10 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
             if (matcherFound) {
                 MagnetDLSearchResult sr = fromMatcher(matcher);
                 if (sr.getSeeds() >= minSeeds) {
-                    LOG.info("Adding a new search result -> " + sr.getHash() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                    LOG.info("Adding a new search result -> " + sr.getHash());
                     results.add(sr);
                 } else {
-                    LOG.info("Not adding 0 seed search result -> " + sr.getHash() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                    LOG.info("Not adding 0 seed search result -> " + sr.getHash());
                 }
             } else {
                 LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
