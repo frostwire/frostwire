@@ -29,19 +29,17 @@ import java.util.List;
  * @author gubatron
  */
 public class LimeTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
-    private static Logger LOG = Logger.getLogger(LimeTorrentsSearchPerformer.class);
+    private static final Logger LOG = Logger.getLogger(LimeTorrentsSearchPerformer.class);
     private static Pattern pattern;
-    private static final String SEARCH_RESULT_PAGE_REGEX =
-            "(?is)<div class=\"tt-name\"><a href=\"http://itorrents.org/torrent/(?<infohash>.*?)\\.torrent\\?title=(?<filename>.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a>" +
-                    "<a href=\"/(?<detailUrl>.*?.html)\">(?<title>.*?)</.*?<div class=\"tt-options\"></div></td>.*?" +
-                    "<td class=\"tdnormal\">(?<age>.*?) -.*?</a></td>.*?" + //they do have an HTML-DOM typo there with that weird </a> inside the </td>
-                    "<td class=\"tdnormal\">(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>.*?" +
-                    "<td class=\"tdseed\">(?<seeds>.*?)</td>.*?";
 
     public LimeTorrentsSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 1);
         if (pattern == null) {
-            pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+            pattern = Pattern.compile("(?is)<div class=\"tt-name\"><a href=\"http://itorrents.org/torrent/(?<infohash>.*?)\\.torrent\\?title=(?<filename>.*?)\" rel=\"nofollow\" class=\"csprite_dl14\"></a>" +
+                    "<a href=\"/(?<detailUrl>.*?.html)\">(?<title>.*?)</.*?<div class=\"tt-options\"></div></td>.*?" +
+                    "<td class=\"tdnormal\">(?<age>.*?) -.*?</a></td>.*?" + //they do have an HTML-DOM typo there with that weird </a> inside the </td>
+                    "<td class=\"tdnormal\">(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>.*?" +
+                    "<td class=\"tdseed\">(?<seeds>.*?)</td>.*?");
         }
     }
 

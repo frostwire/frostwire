@@ -34,18 +34,16 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Pattern pattern;
     private final String nonEncodedKeywords;
     private int minSeeds = 1;
-    private static final String SEARCH_RESULT_PAGE_REGEX =
-            "(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
-                    "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
-                    "<td>(?<age>.*?)</td>" +
-                    "<td class=\"t[0-9]\">.*?</td><td>.*?</td>.*?<td>(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>" +
-                    "<td class=\"s\">(?<seeds>.*?)</td>";//.*</td><tr><td class=\"d\" colspan=\"8\"></td></tr>";
 
     public MagnetDLSearchPerformer(long token, String keywords, int timeout) {
         super("magnetdl.com", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
         if (pattern == null) {
-            pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+            pattern = Pattern.compile("(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
+                    "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
+                    "<td>(?<age>.*?)</td>" +
+                    "<td class=\"t[0-9]\">.*?</td><td>.*?</td>.*?<td>(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>" +
+                    "<td class=\"s\">(?<seeds>.*?)</td>");
         }
     }
 
@@ -83,10 +81,10 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
             if (matcherFound) {
                 MagnetDLSearchResult sr = fromMatcher(matcher);
                 if (sr.getSeeds() >= minSeeds) {
-                    LOG.info("Adding a new search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                    LOG.info("Adding a new search result -> " + sr.getHash() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
                     results.add(sr);
                 } else {
-                    LOG.info("Not adding 0 seed search result -> " + sr.getDisplayName() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
+                    LOG.info("Not adding 0 seed search result -> " + sr.getHash() + ":" + sr.getSize() + ":" + sr.getTorrentUrl());
                 }
             } else {
                 LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");

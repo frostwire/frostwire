@@ -30,7 +30,6 @@ import java.util.List;
  * @author aldenml
  */
 public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
-    private static final String SEARCH_RESULTS_REGEX = "(?is)<td class=\"forum_thread_post\">.*?" + "<a href=\"(?<detailUrl>.*?)\" title=\"(?<displayname>.*?)\" alt=\".*?\" class=\"epinfo\".*?<a href=\"magnet(?<magnet>.*?)\" " + "class=\"magnet\".*?</td>.*?<td align=\"center\" class=\"forum_thread_post\">(?<size>[0-9\\. GMB]+)</td>" + ".*?<td align=\"center\" class=\"forum_thread_post\">(?<age>.*?)</td>";
     private static final Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
 
     private static Pattern searchPattern = null;
@@ -39,6 +38,10 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 0);
+        if (searchPattern == null) {
+            searchPattern = Pattern.compile("(?is)<td class=\"forum_thread_post\">.*?" + "<a href=\"(?<detailUrl>.*?)\" title=\"(?<displayname>.*?)\" alt=\".*?\" class=\"epinfo\".*?<a href=\"magnet(?<magnet>.*?)\" " + "class=\"magnet\".*?</td>.*?<td align=\"center\" class=\"forum_thread_post\">(?<size>[0-9\\. GMB]+)</td>" + ".*?<td align=\"center\" class=\"forum_thread_post\">(?<age>.*?)</td>");
+        }
+
     }
 
     @Override
@@ -50,9 +53,6 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
     protected List<EztvSearchResult> searchPage(String page) {
         if (page == null || page.isEmpty() || !isValidHtml(page)) {
             return new ArrayList<>();
-        }
-        if (searchPattern == null) {
-            searchPattern = Pattern.compile(SEARCH_RESULTS_REGEX);
         }
         int startOffset = page.indexOf("Seeds");
         int endOffset = page.indexOf("<img src=\"//ezimg.ch/s/1/2/ssl.png");
@@ -82,8 +82,8 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
                 try {
                     EztvSearchResult sr = new EztvSearchResult(getDomainName(), matcher);
                     results.add(sr);
-                } catch (Throwable ignored) {
-                    LOG.error(ignored.getMessage(), ignored);
+                } catch (Throwable t) {
+                    LOG.error(t.getMessage(), t);
                 }
             } else {
                 maxFailures--;
@@ -95,7 +95,7 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
 
             if (maxFailures == 0) {
                 LOG.warn("EztvSearchPerformer search matcher broken on " + getDomainName() + ". Please notify at https://github.com/frostwire/frostwire/issues/new");
-                LOG.warn("EztvSearchPerformer trying to search with regex: [" + SEARCH_RESULTS_REGEX + "]");
+                LOG.warn("EztvSearchPerformer trying to search with regex: [" + searchPattern.toString() + "]");
             }
         }
         return results;

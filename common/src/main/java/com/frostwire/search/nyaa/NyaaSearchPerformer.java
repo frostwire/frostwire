@@ -27,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class NyaaSearchPerformer extends SimpleTorrentSearchPerformer {
-    private static Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
+    private static final Logger LOG = Logger.getLogger(NyaaSearchPerformer.class);
     private static Pattern pattern;
 
     public NyaaSearchPerformer(String domainName, long token, String keywords, int timeout) {

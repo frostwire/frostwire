@@ -31,16 +31,15 @@ import java.util.List;
 public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(GloTorrentsSearchPerformer.class);
     private static Pattern pattern;
-    private static final String SEARCH_RESULT_PAGE_REGEX = "(?is)" +
-            "<td class='ttable_col2' nowrap='nowrap'>.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>.*?)\"><b>.*?" +
-            "'nofollow' href=\"(?<magnet>.*?)\">.*?\"Magnet Download\".*?" +
-            "<td class='ttable_col1' align='center'>(?<filesize>\\d+\\.\\d+)\\p{Z}(?<unit>[KMGTP]B)</td>(.|\\n)*?" +
-            "<font color='green'><b>(?<seeds>.*?)</b></font>";
 
     public GloTorrentsSearchPerformer(long token, String keywords, int timeoutMillis) {
         super("www.gtdb.to", token, keywords, timeoutMillis, 1, 0);
         if (pattern == null) {
-            pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+            pattern = Pattern.compile("(?is)" +
+                    "<td class='ttable_col2' nowrap='nowrap'>.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>.*?)\"><b>.*?" +
+                    "'nofollow' href=\"(?<magnet>.*?)\">.*?\"Magnet Download\".*?" +
+                    "<td class='ttable_col1' align='center'>(?<filesize>\\d+\\.\\d+)\\p{Z}(?<unit>[KMGTP]B)</td>(.|\\n)*?" +
+                    "<font color='green'><b>(?<seeds>.*?)</b></font>");
         }
     }
 
