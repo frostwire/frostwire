@@ -88,9 +88,9 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
                 }
             } else {
                 LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
-                LOG.warn("========");
-                LOG.warn(reducedHtml);
-                LOG.warn("========");
+                //LOG.warn("========");
+                //LOG.warn(reducedHtml);
+                //LOG.warn("========");
                 if (getListener() != null && results.size() < 5) {
                     getListener().onError(getToken(), new SearchError(0, "Search Matcher Broken"));
                 }
