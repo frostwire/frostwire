@@ -25,6 +25,7 @@ import com.frostwire.util.UrlUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This is an example of a simple search performer, it can deduct all magnet urls and search result details right out of
@@ -32,7 +33,7 @@ import java.util.List;
  */
 public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(Torrentz2SearchPerformer.class);
-    private final Pattern pattern;
+    private static Pattern pattern;
     private final String unencodedKeywords;
 
     public Torrentz2SearchPerformer(long token, String keywords, int timeout) {
@@ -40,10 +41,11 @@ public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
         //https://torrentz2.unblockninja.com/
         //https://torrentz2.nz/ 2023-02-26
         super("torrentz2.nz", token, keywords, timeout, 1, 0);
-        //pattern = Pattern.compile("(?is).<td data-title=\"Last Updated\">(?<seeds>\\d+)</td>.*?<td data-title=\"Size\">(?<filesize>.*?) (?<unit>[BKMGTPEZY]+)</td>.*?<td class=\"file-link\" data-title=\"Magnet\">.*?<a href=\"(?<magnet>.*?)\" target=\"_blank\" class=\"magnet-link\">");
-        pattern = Pattern.compile("(?is)<dl><dt><a href=\".*?\" target=\"_blank\">(?<filename>.*?)</a></dt>"+
-                "<dd><span><a href=\"(?<magnet>.*?)\"><i class=\"fa-solid fa-magnet\"></i></a></span>" +
-                "<span title=\"\\d+\">(?<age>.*?)</span><span>(?<filesize>.*?)</span><span>(?<seeds>\\d+)</span>");
+        if (pattern == null) {
+            pattern = Pattern.compile("(?is)<dl><dt><a href=\".*?\" target=\"_blank\">(?<filename>.*?)</a></dt>"+
+                    "<dd><span><a href=\"(?<magnet>.*?)\"><i class=\"fa-solid fa-magnet\"></i></a></span>" +
+                    "<span title=\"\\d+\">(?<age>.*?)</span><span>(?<filesize>.*?)</span><span>(?<seeds>\\d+)</span>");
+        }
         unencodedKeywords = keywords;
     }
 
@@ -67,7 +69,7 @@ public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
 
         int seeds = 20;
         try {
-            seeds = Integer.parseInt(matcher.group("seeds"));
+            seeds = Integer.parseInt(Objects.requireNonNull(matcher.group("seeds")),20);
         } catch (Throwable ignored) {
         }
         return new Torrentz2SearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);

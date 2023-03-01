@@ -43,10 +43,8 @@ import com.limegroup.gnutella.settings.SearchEnginesSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.limewire.setting.BooleanSetting;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
 
@@ -220,7 +218,7 @@ public abstract class SearchEngine {
 
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
-        List<SearchEngine> allEngines = Arrays.asList(
+        return Arrays.asList(
                 ARCHIVEORG,
                 EZTV,
                 GLOTORRENTS,
@@ -236,18 +234,6 @@ public abstract class SearchEngine {
                 YIFY,
                 SOUNDCLOUD,
                 FROSTCLICK);
-
-        var list = new ArrayList<SearchEngine>();
-
-        // Make sure single page engines are first so they go through the SearchManager's single search pool first
-        list = (ArrayList<SearchEngine>) allEngines.stream().filter(SearchEngine::isReady).collect(Collectors.toList());
-
-        // ensure that at least one is enabled
-        var oneEnabled = list.stream().anyMatch(SearchEngine::isEnabled);
-        if (!oneEnabled) {
-            ARCHIVEORG._setting.setValue(true);
-        }
-        return list;
     }
 
     static SearchEngine getSearchEngineByName(String name) {

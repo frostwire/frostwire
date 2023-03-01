@@ -19,13 +19,13 @@ package com.frostwire.search.yify;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchResult> {
+public final class YifySearchPerformer extends TorrentRegexCrawlerSearchPerformer<YifySearchResult> {
     public static final String SEARCH_RESULTS_REGEX = "(?is)<a class=\"movielink\" href=\"/movie/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\" itemprop=\"name\">";
     public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<section id=\"(movie|torrent)\".*?" +
             "<h1( itemprop=\"name\")?>(?<displayName>.*?)</h1>.*?" +

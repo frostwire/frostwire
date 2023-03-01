@@ -29,17 +29,19 @@ import java.util.List;
 
 public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(IdopeSearchPerformer.class);
-    private final Pattern pattern;
+    private static Pattern pattern;
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
         super("idope.se", token, keywords, timeout, 1, 0);
-        pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
-                "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
-                "<div  class=\"resultdivtopname\" >[\n][\\s|\t]+(?<filename>.*?)</div>.*?" +
-                "<div class=\"resultdivbottontime\">(?<age>.*?)</div>.*?" +
-                "<div class=\"resultdivbottonlength\">(?<filesize>.*?)\\p{Z}(?<unit>.*?)</div>.*?" +
-                "<div class=\"resultdivbottonseed\">(?<seeds>.*?)</div>");
+        if (pattern == null) {
+            pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
+                    "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
+                    "<div  class=\"resultdivtopname\" >[\n][\\s|\t]+(?<filename>.*?)</div>.*?" +
+                    "<div class=\"resultdivbottontime\">(?<age>.*?)</div>.*?" +
+                    "<div class=\"resultdivbottonlength\">(?<filesize>.*?)\\p{Z}(?<unit>.*?)</div>.*?" +
+                    "<div class=\"resultdivbottonseed\">(?<seeds>.*?)</div>");
+        }
     }
 
     @Override

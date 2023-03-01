@@ -30,7 +30,7 @@ import java.util.List;
 
 public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(GloTorrentsSearchPerformer.class);
-    private final Pattern pattern;
+    private static Pattern pattern;
     private static final String SEARCH_RESULT_PAGE_REGEX = "(?is)" +
             "<td class='ttable_col2' nowrap='nowrap'>.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>.*?)\"><b>.*?" +
             "'nofollow' href=\"(?<magnet>.*?)\">.*?\"Magnet Download\".*?" +
@@ -39,7 +39,9 @@ public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
 
     public GloTorrentsSearchPerformer(long token, String keywords, int timeoutMillis) {
         super("www.gtdb.to", token, keywords, timeoutMillis, 1, 0);
-        pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+        if (pattern == null) {
+            pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+        }
     }
 
     @Override

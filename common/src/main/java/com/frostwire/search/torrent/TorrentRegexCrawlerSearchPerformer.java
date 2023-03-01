@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,19 @@ import java.util.List;
 
 /**
  * Use this search performer if you have to crawl search result links to get the data you need,
- * otherwise @see TorrentSearchPerformer to obtain everything directly from a search results page.
+ * otherwise @see SimpleTorrentSearchPerformer to obtain everything directly from a search results page.
+ *
+ * The constructor receives 2 regex patterns, one for the search results page and one for the detail page.
  *
  * @author gubatron
  * @author aldenml
  */
-public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
-    private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
+public abstract class TorrentRegexCrawlerSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
+    private final static Logger LOG = Logger.getLogger(TorrentRegexCrawlerSearchPerformer.class);
     private final Pattern preliminarySearchResultsPattern;
     private final Pattern htmlDetailPagePattern;
 
-    public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarySearchResultsRegex, String htmlDetailPagePatternRegex) {
+    public TorrentRegexCrawlerSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarySearchResultsRegex, String htmlDetailPagePatternRegex) {
         super(domainName, token, keywords, timeout, pages, numCrawls, regexMaxResults);
         this.preliminarySearchResultsPattern = Pattern.compile(preliminarySearchResultsRegex);
         this.htmlDetailPagePattern = Pattern.compile(htmlDetailPagePatternRegex);
@@ -76,7 +78,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
         }
         if (sr instanceof TorrentCrawlableSearchResult) {
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
-            list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
+            list.addAll(PerformersHelper.crawlTorrentInfo(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
         } else {
             String unreducedHtml = new String(data, StandardCharsets.UTF_8);
             if (!isValidHtml(unreducedHtml)) {

@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Logger LOG = Logger.getLogger(MagnetDLSearchPerformer.class);
-    private final Pattern pattern;
+    private static Pattern pattern;
     private final String nonEncodedKeywords;
     private int minSeeds = 1;
     private static final String SEARCH_RESULT_PAGE_REGEX =
@@ -44,7 +44,9 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     public MagnetDLSearchPerformer(long token, String keywords, int timeout) {
         super("magnetdl.com", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
-        pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+        if (pattern == null) {
+            pattern = Pattern.compile(SEARCH_RESULT_PAGE_REGEX);
+        }
     }
 
     public void setMinSeeds(int minSeeds) {
@@ -55,7 +57,7 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     protected String getUrl(int page, String encodedKeywords) {
         //disregard encoded keywords when it comes to the URL
         String transformedKeywords = nonEncodedKeywords.replace("%20", "-");
-        return "https://" + getDomainName() + "/" + transformedKeywords.subSequence(0,1) + "/" + transformedKeywords + "/";
+        return "https://" + getDomainName() + "/" + transformedKeywords.subSequence(0, 1) + "/" + transformedKeywords + "/";
     }
 
     @Override
@@ -92,7 +94,7 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
                 LOG.warn(reducedHtml);
                 LOG.warn("========");
                 if (getListener() != null && results.size() < 5) {
-                    getListener().onError(getToken(),new SearchError(0, "Search Matcher Broken"));
+                    getListener().onError(getToken(), new SearchError(0, "Search Matcher Broken"));
                 }
             }
         } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);

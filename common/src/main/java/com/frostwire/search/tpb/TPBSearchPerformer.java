@@ -31,8 +31,7 @@ import java.util.List;
  */
 public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResult> {
     private static final int MAX_RESULTS = 20;
-    private static final String REGEX = "(?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"([^\"]*?)\" class=\"detLink\" title=\"Details for ([^\"]*?)\">.*?</a>.*?<a href=\\\"(magnet:\\?xt=urn:btih:.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?</a>.*?<font class=\"detDesc\">Uploaded ([^,]*?), Size (.*?), ULed.*?<td align=\"right\">(.*?)</td>\\s*<td align=\"right\">(.*?)</td>";
-    private static final Pattern PATTERN = Pattern.compile(REGEX);
+    private static Pattern PATTERN;
 
     public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
@@ -56,12 +55,15 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     public Pattern getPattern() {
+        if (PATTERN == null) {
+            PATTERN = Pattern.compile("(?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"([^\"]*?)\" class=\"detLink\" title=\"Details for ([^\"]*?)\">.*?</a>.*?<a href=\\\"(magnet:\\?xt=urn:btih:.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?</a>.*?<font class=\"detDesc\">Uploaded ([^,]*?), Size (.*?), ULed.*?<td align=\"right\">(.*?)</td>\\s*<td align=\"right\">(.*?)</td>");
+        }
         return PATTERN;
     }
 
     @Override
     public TPBSearchResult fromMatcher(SearchMatcher matcher) {
-        return new TPBSearchResult(getDomainName(), matcher);
+        return new TPBSearchResult(matcher);
     }
 
     @Override
@@ -76,7 +78,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     protected List<? extends SearchResult> crawlResult(TPBSearchResult sr, byte[] data) {
-        return PerformersHelper.crawlTorrent(this, sr, data);
+        return PerformersHelper.crawlTorrentInfo(this, sr, data);
     }
 
     @Override
@@ -86,6 +88,10 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     public boolean isCrawler() {
-        return true;
+        /** This search performer isn't really a detail-page HTTP crawler
+         * It's however able to download magnets or .torrents and crawl the contents inside the Torrent Info
+         * to populate the search results with more info.
+         * */
+        return false;
     }
 }

@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Himanshu Sharma (HimanshuSharma789)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,14 +19,14 @@ package com.frostwire.search.one337x;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
 
 /**
  * @author gubatron
  * @author aldenml
  * @author HimanshuSharma789
  */
-public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<One337xSearchResult> {
+public final class One337xSearchPerformer extends TorrentRegexCrawlerSearchPerformer<One337xSearchResult> {
     public static final String SEARCH_RESULTS_REGEX = "(?is)<a href=\"/torrent/(?<itemId>[0-9]*)/(?<htmlFileName>.*?)\">(?<displayName>.*?)</a>";
 
     public static final String TORRENT_DETAILS_PAGE_REGEX = "(?is)<div class=\"box-info-heading clearfix\">.*?" +
@@ -82,7 +82,7 @@ public final class One337xSearchPerformer extends TorrentRegexSearchPerformer<On
     @Override
     protected int htmlPrefixOffset(String html) {
         int offset = html.indexOf("<div class=\"col-9 page-content\">");
-        return offset > 0 ? offset : 0;
+        return Math.max(offset, 0);
     }
 
     @Override

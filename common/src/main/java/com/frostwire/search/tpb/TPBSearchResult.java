@@ -56,12 +56,11 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
     private final String detailsUrl;
     private final String torrentUrl;
     private final String infoHash;
-    private final String domainName;
     private final double size;
     private final long creationTime;
     private final int seeds;
 
-    TPBSearchResult(String domainName, SearchMatcher matcher) {
+    TPBSearchResult(SearchMatcher matcher) {
         /*
          * Matcher groups cheatsheet
          * 1 -> Category (useless)
@@ -74,7 +73,6 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
          * 8 -> seeds
          */
         this.detailsUrl = matcher.group(2);
-        this.domainName = domainName;
         String temp = HtmlManipulator.replaceHtmlEntities(matcher.group(3));
         temp = HtmlManipulator.replaceHtmlEntities(temp); // because of input
         this.filename = buildFilename(temp);

@@ -42,6 +42,6 @@ public abstract class SimpleTorrentSearchPerformer extends CrawlPagedWebSearchPe
 
     @Override
     protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) {
-        return PerformersHelper.crawlTorrent(this, sr, data);
+        return PerformersHelper.crawlTorrentInfo(this, sr, data);
     }
 }

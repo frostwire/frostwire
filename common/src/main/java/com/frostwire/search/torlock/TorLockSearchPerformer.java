@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@ package com.frostwire.search.torlock;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockSearchResult> {
+public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerformer<TorLockSearchResult> {
     private static final int MAX_RESULTS = 15;
-    private static final String REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
+    private static final String PRELIMINARY_REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
     private static final String HTML_REGEX = "(?is)<a href=\".*?/tor/(?<torrentid>.*?).torrent\".*?" +
             "<dt>NAME</dt>.?<dd>(?<filename>.*?).torrent</dd>.*?" +
             "<dt>INFOHASH</dt><dd.*?>(?<infohash>.*?)</dd>.*?" +
@@ -37,7 +37,7 @@ public final class TorLockSearchPerformer extends TorrentRegexSearchPerformer<To
     private boolean isDDOSProtectionActive;
 
     public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, PRELIMINARY_REGEX, HTML_REGEX);
     }
 
     @Override
