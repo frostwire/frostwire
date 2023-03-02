@@ -52,7 +52,7 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         //disregard encoded keywords when it comes to the URL
         String transformedKeywords = nonEncodedKeywords.replace("%20", "-");
         return "https://" + getDomainName() + "/" + transformedKeywords.subSequence(0, 1) + "/" + transformedKeywords + "/";

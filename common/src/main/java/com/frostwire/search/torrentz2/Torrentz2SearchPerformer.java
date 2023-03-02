@@ -50,7 +50,7 @@ public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://" + getDomainName() + "/search?q=" + unencodedKeywords.replace(" ","+");
     }
 

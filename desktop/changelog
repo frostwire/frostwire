@@ -1,5 +1,6 @@
 frostwire (6.10.0) stable; urgency=high
   * Telluride build 25 with Python 3.11, faster web video searches
+  * New BTDigg search engine
   * Misc Screen bugfix for Linux
   * Default audio/video player setting for Linux is mplayer
   * Removed audio player playlists along with H2 database dependency
@@ -13,7 +14,7 @@ frostwire (6.10.0) stable; urgency=high
   * CI: telluride tests do not run in CI
   * CI: all search performers have tests
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 26 Feb 2023 12:10:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 1 Mar 2023 20:42:00 -0600
 
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1

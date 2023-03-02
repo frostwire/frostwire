@@ -44,7 +44,7 @@ public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://www.gtdb.to/search_results.php?search=" + encodedKeywords + "&cat=0&incldead=0&lang=0&sort=seeders&order=desc";
     }
 

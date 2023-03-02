@@ -21,6 +21,7 @@ package com.frostwire.search.eztv;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
+import com.frostwire.util.UrlUtils;
 
 /**
  * @author gubatron
@@ -52,7 +53,7 @@ public final class EztvSearchResult extends AbstractTorrentSearchResult {
             if (matcher.group("infohash") != null) {
                 return matcher.group("infohash");
             } else if (torrentUrl.startsWith("magnet:?xt=urn:btih:")) {
-                return torrentUrl.substring(20, 60).toLowerCase();
+                return UrlUtils.extractInfoHash(torrentUrl);
             }
         } catch (Throwable ignored) {
         }

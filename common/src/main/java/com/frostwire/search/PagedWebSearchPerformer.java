@@ -20,11 +20,10 @@ package com.frostwire.search;
 
 import com.frostwire.util.Logger;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
 
 /**
  * @author gubatron
@@ -53,7 +52,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         List<? extends SearchResult> result = Collections.emptyList();
         String url = null;
         try {
-            url = getUrl(page, getEncodedKeywords());
+            url = getSearchUrl(page, getEncodedKeywords());
             String text = fetchSearchPage(url);
             if (text != null) {
                 result = searchPage(text);
@@ -77,7 +76,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
     /**
      * The Search URL
      */
-    protected abstract String getUrl(int page, String encodedKeywords);
+    protected abstract String getSearchUrl(int page, String encodedKeywords);
 
     protected abstract List<? extends SearchResult> searchPage(String page);
 }

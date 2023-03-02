@@ -19,6 +19,7 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.btdigg.BTDiggSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -59,6 +60,7 @@ public abstract class SearchEngine {
     private static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
 
     public enum SearchEngineID {
+        BT_DIGG,
         TPB_ID,
         SOUNDCLOUD_ID,
         ARCHIVEORG_ID,
@@ -78,6 +80,13 @@ public abstract class SearchEngine {
         GLOTORRENTS_ID,
         TELLURIDE_ID
     }
+
+    private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "BTDigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new BTDiggSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
 
     private static final SearchEngine TPB = new SearchEngine(SearchEngineID.TPB_ID, "TPB", SearchEnginesSettings.TPB_SEARCH_ENABLED, null) {
         protected void postInitWork() {
@@ -219,6 +228,7 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         return Arrays.asList(
+                BT_DIGG,
                 ARCHIVEORG,
                 EZTV,
                 GLOTORRENTS,

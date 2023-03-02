@@ -45,7 +45,7 @@ public final class One337xSearchPerformer extends TorrentRegexCrawlerSearchPerfo
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://" + getDomainName() + "/search/" + encodedKeywords + "/1/";
     }
 

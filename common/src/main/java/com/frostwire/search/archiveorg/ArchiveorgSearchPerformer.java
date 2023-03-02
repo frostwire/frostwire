@@ -42,7 +42,7 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://"
                 + getDomainName()
                 + "/advancedsearch.php?q="

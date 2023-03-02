@@ -56,8 +56,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     }
 
     public static boolean isStreamable(String filename) {
-        String ext = FilenameUtils.getExtension(filename);
-        return Arrays.asList(STREAMABLE_EXTENSIONS).contains(ext);
+        return Arrays.asList(STREAMABLE_EXTENSIONS).contains(FilenameUtils.getExtension(filename));
     }
 
     public final String getKeywords() {

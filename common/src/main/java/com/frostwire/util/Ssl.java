@@ -97,6 +97,7 @@ public final class Ssl {
                 "api-v2.soundcloud.com",
                 "api.frostclick.com",
                 "archive.org",
+                "btdig.com",
                 "cdninstagram.com",
                 "clients1.google.com",
                 "cloudflaressl.com",

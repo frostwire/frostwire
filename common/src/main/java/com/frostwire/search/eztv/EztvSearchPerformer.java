@@ -45,7 +45,7 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     @Override
-    protected String getUrl(int page, String encodedKeywords) {
+    protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://" + getDomainName() + "/search/" + encodedKeywords;
     }
 
