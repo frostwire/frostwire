@@ -1,7 +1,9 @@
-FrostWire 2.6.4 build 712 - FEB/25/2023
+FrostWire 2.6.4 build 712 - MAR/02/2023
  - Targets Android 13 (targetSdkVersion 33)
- - SearchManager optimizations
+ - SearchManager optimizations, much faster search results
+ - New BTDigg search engine
  - Less aggressive okhttpclient thread pools to not exhaust http connections
+ - Zooqle search removed, service defunct
  - python:yt_dlp-2023.2.17
  - dev:com.google.firebase:firebase-crashlytics-gradle:2.9.4
  - com.google.gms:google-services:4.3.15
@@ -10,7 +12,6 @@ FrostWire 2.6.4 build 712 - FEB/25/2023
  - androidx.browser:browser:1.5.0
  - com.applovin:applovin-sdk:11.7.1
  - com.applovin.mediation:unityads-adapter:4.6.0.0
- - Zooqle search removed, service defunct
 
 FrostWire 2.6.3 build 711 - JAN/31/2023
  - com.chaquo.python:gradle:14.0.2

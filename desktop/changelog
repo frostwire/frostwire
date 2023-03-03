@@ -1,14 +1,16 @@
 frostwire (6.10.0) stable; urgency=high
+  * Faster search results
   * Telluride build 25 with Python 3.11, faster web video searches
   * New BTDigg search engine
-  * Misc Screen bugfix for Linux
-  * Default audio/video player setting for Linux is mplayer
-  * Removed audio player playlists along with H2 database dependency
-  * Search cache now works with sqlite database
+  * Search results cache now works with sqlite database
   * MPlayer 1.5.0 with FFmpeg snapshot and OpenSSL 1.1.1s
   * SoundCloud search fixed
   * Torrentz2 search fixed
   * SearchManager now has 2 executors, one for crawlers another for one off requests.
+  * Default audio/video player setting for Linux is mplayer
+  * Misc screen bugfix for Linux
+  * Removed defunct Zooqle
+  * Removed audio player playlists along with H2 database dependency
   * DEV: New SearchPerformer.isDDOSProtectionActive() logic used in unit tests
   * CI: jdk19 tests
   * CI: telluride tests do not run in CI
