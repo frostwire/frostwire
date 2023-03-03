@@ -83,6 +83,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * (Swing) thread.
  */
 public final class GUIMediator {
+    private static final ThreadPool pool = new ThreadPool("GUIMediator-background-pool", 1, 2, 30, new LinkedBlockingQueue<>(), true);
     /**
      * Message key for the disconnected message
      */
@@ -131,7 +132,6 @@ public final class GUIMediator {
      * Flag for whether or not the app is allowed to become visible.
      */
     private static boolean _allowVisible = false;
-    private static final ThreadPool pool = new ThreadPool("GUIMediator-updateConnectionQuality", 1, 1, Integer.MAX_VALUE, new LinkedBlockingQueue<>(), true);
     private final RefreshTimer timer;
     private boolean _remoteDownloadsAllowed;
     /**
@@ -1346,5 +1346,9 @@ public final class GUIMediator {
                 instance().setWindow(Tabs.this);
             }
         }
+    }
+
+    public ThreadPool uiThreadPool() {
+        return pool;
     }
 }

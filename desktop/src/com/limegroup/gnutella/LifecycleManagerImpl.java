@@ -1,12 +1,12 @@
 package com.limegroup.gnutella;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.util.Logger;
-import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.service.ErrorService;
-import org.limewire.setting.SettingsGroupManager;
+import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.settings.ApplicationSettings;
+import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.SystemUtils;
 
 import java.io.IOException;
@@ -88,6 +88,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
         if (backgroundBegin.getAndSet(true))
             return;
         installListeners();
+        // Don't try using GUIMediator.instance().uiPool()
         ThreadExecutor.startThread(this::doBackgroundTasks, "BackgroundTasks");
     }
 
@@ -156,7 +157,7 @@ public class LifecycleManagerImpl implements LifecycleManager {
             try {
                 String cmd = parseCommand(toExecute).trim();
                 String params = toExecute.substring(cmd.length()).trim();
-                
+
                 if (OSUtils.isWindowsVista()) {
                     SystemUtils.openFile(cmd, params);
                 } else {

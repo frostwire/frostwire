@@ -79,6 +79,8 @@ public class VPNStatusRefresher {
                 }
             };
             vpnStatusCheckerThread.setDaemon(true);
+            //Don't try refactoring into this, won't work. Weird duplicate setting error happens.
+            //GUIMediator.instance().uiThreadPool().execute(vpnStatusCheckerThread);
             pool.execute(vpnStatusCheckerThread);
         }
     }

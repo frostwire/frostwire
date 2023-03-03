@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +20,8 @@ package com.frostwire.gui.components.slides;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
+import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
-import com.frostwire.concurrent.concurrent.ThreadExecutor;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -104,18 +104,16 @@ public class ImageCache {
     }
 
     private void loadFromUrl(final URL url, final OnLoadedListener listener) {
-        ThreadExecutor.startThread(new Thread(() -> {
+        GUIMediator.instance().uiThreadPool().execute(() -> {
             try {
-                BufferedImage image = null;
+                BufferedImage image;
                 HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
                 byte[] data = newInstance.getBytes(url.toString());
                 if (data == null) {
                     throw new IOException("ImageCache.loadUrl() got nothing at " + url.toString());
                 }
-                if (data != null) {
-                    image = ImageIO.read(new ByteArrayInputStream(data));
-                    saveToCache(url, image, System.currentTimeMillis());
-                }
+                image = ImageIO.read(new ByteArrayInputStream(data));
+                saveToCache(url, image, System.currentTimeMillis());
                 if (listener != null && image != null) {
                     listener.onLoaded(url, image, false, false);
                 }
@@ -123,7 +121,7 @@ public class ImageCache {
                 LOG.error("Failed to load image from: " + url, e);
                 listener.onLoaded(url, null, false, true);
             }
-        }), "ImageCache.loadFromUrl");
+        });
     }
 
     private void saveToCache(URL url, BufferedImage image, long date) {
