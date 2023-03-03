@@ -14,12 +14,13 @@ frostwire (6.10.0) stable; urgency=high
   * Removed defunct Zooqle
   * Removed audio player playlists along with H2 database dependency
   * Less threads, less memory usage, more thread pool reusage for background UI related tasks
+  * Express VPN detection fixed for Windows
   * DEV: New SearchPerformer.isDDOSProtectionActive() logic used in unit tests
   * CI: jdk19 tests
   * CI: telluride tests do not run in CI
   * CI: all search performers have tests
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 3 Mar 2023 10:17:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Fri, 3 Mar 2023 10:43:00 -0600
 
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1

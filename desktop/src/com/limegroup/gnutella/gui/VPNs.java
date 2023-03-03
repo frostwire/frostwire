@@ -92,6 +92,7 @@ public final class VPNs {
             return isWindowsVPNAdapterActive(interfaces, routes, "TAP-Windows Adapter") || // PIA
                     isWindowsVPNAdapterActive(interfaces, routes, "Private Internet Access Network Adapter") ||
                     isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN Tap Adapter") ||
+                    isWindowsVPNAdapterActive(interfaces, null, "ExpressVPN TUN Driver") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "CactusVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "TAP-NordVPN") ||
                     isWindowsVPNAdapterActive(interfaces, routes, "NordVPN") ||
