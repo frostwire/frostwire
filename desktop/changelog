@@ -6,7 +6,9 @@ frostwire (6.10.0) stable; urgency=high
   * MPlayer 1.5.0 with FFmpeg snapshot and OpenSSL 1.1.1s
   * SoundCloud search fixed
   * Torrentz2 search fixed
-  * SearchManager now has 2 executors, one for crawlers another for one off requests.
+  * New button on status line right corner to open settings screen
+  * Old buttons to access settings screen from search results and library gone
+  * SearchManager now has 2 executors, one for crawlers another for one off requests
   * Default audio/video player setting for Linux is mplayer
   * Misc screen bugfix for Linux
   * Removed defunct Zooqle
@@ -16,7 +18,7 @@ frostwire (6.10.0) stable; urgency=high
   * CI: telluride tests do not run in CI
   * CI: all search performers have tests
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 1 Mar 2023 20:42:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 2 Mar 2023 22:31:00 -0600
 
 frostwire (6.9.10) stable; urgency=high
   * Java Runtime Environment 19.0.1
