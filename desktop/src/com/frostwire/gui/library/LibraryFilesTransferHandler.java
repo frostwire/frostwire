@@ -19,16 +19,15 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.dnd.DNDUtils;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.settings.LibrarySettings;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
-import java.awt.datatransfer.Transferable;
 import java.io.File;
 
 /**
@@ -103,7 +102,6 @@ final class LibraryFilesTransferHandler extends TransferHandler {
             return false;
         }
         try {
-            Transferable transferable = support.getTransferable();
             LibraryNode node = getNodeFromLocation(support.getDropLocation());
             {
                 if (node instanceof DirectoryHolderNode) {

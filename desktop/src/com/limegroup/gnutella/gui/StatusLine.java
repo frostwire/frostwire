@@ -21,12 +21,12 @@ import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
-import okhttp3.internal.http2.Settings;
 import org.limewire.setting.BooleanSetting;
 
 import javax.swing.*;
@@ -247,6 +247,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private void createSettingsButton() {
         settingsButton = new IconButton("SETTINGS_GEAR");
+        settingsButton.setAction(new SettingsButtonAction());
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -358,7 +359,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 BAR.add(Box.createHorizontalStrut(10));
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             }
-			BAR.add(settingsButton);
+
+            BAR.add(createSeparator(), gbc);
+            BAR.add(settingsButton);
+
             try {
                 //some macosx versions are throwing a deep NPE when this is invoked all the way down at
                 //sun.lwawt.macosx.LWCToolkit.getScreenResolution(Unknown Source)
@@ -714,6 +718,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private class SettingsButtonAction extends AbstractAction {
         SettingsButtonAction() {
             putValue(Action.NAME, I18n.tr("Settings"));
+            putValue(Action.NAME, I18n.tr("Settings"));
+            putValue(LimeAction.SHORT_NAME, I18n.tr("Settings"));
+            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Settings"));
+            putValue(LimeAction.ICON_NAME, "SETTINGS_GEAR");
         }
 
         @Override

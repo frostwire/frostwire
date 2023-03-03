@@ -26,8 +26,6 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import com.limegroup.gnutella.gui.options.ConfigureOptionsAction;
-import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.DataLineModel;
 
@@ -54,7 +52,6 @@ import static com.limegroup.gnutella.gui.I18n.tr;
 abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E extends AbstractLibraryTableDataLine<I>, I> extends AbstractTableMediator<T, E, I> {
     private static final LibraryActionsRenderer ACTION_RENDERER = new LibraryActionsRenderer();
     Action SEND_TO_FRIEND_ACTION;
-    Action OPTIONS_ACTION;
     private MediaType mediaType;
     private int needToScrollTo;
     private AdjustmentListener adjustmentListener;
@@ -145,7 +142,6 @@ abstract class AbstractLibraryTableMediator<T extends DataLineModel<E, I>, E ext
     protected void buildListeners() {
         super.buildListeners();
         SEND_TO_FRIEND_ACTION = new SendToFriendAction();
-        OPTIONS_ACTION = new ConfigureOptionsAction(OptionsConstructor.LIBRARY_KEY, tr("Options"), tr("You can configure the folders you share in FrostWire's Options."));
     }
 
     @SuppressWarnings("unused")

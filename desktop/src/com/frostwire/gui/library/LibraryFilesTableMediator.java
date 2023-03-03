@@ -192,7 +192,7 @@ final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<Libra
         DATA_MODEL.sort(LibraryFilesTableDataLine.MODIFICATION_TIME_IDX);
         DATA_MODEL.sort(LibraryFilesTableDataLine.MODIFICATION_TIME_IDX);
         TABLE = new LimeJTable(DATA_MODEL);
-        Action[] aa = new Action[]{LAUNCH_ACTION, OPEN_IN_FOLDER_ACTION, SEND_TO_FRIEND_ACTION, DELETE_ACTION, OPTIONS_ACTION};
+        Action[] aa = new Action[]{LAUNCH_ACTION, OPEN_IN_FOLDER_ACTION, SEND_TO_FRIEND_ACTION, DELETE_ACTION};
         BUTTON_ROW = new ButtonRow(aa, ButtonRow.X_AXIS, ButtonRow.NO_GLUE);
     }
 

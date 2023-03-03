@@ -81,7 +81,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
      * The browse host listener.
      */
     MouseAdapter TORRENT_DETAILS_LISTENER;
-    ActionListener CONFIGURE_SHARING_LISTENER;
     ActionListener DOWNLOAD_PARTIAL_FILES_LISTENER;
     ActionListener STOP_SEARCH_LISTENER;
     /**
@@ -234,7 +233,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
             GUIMediator.setClipboardContent(sb.toString());
         };
-        CONFIGURE_SHARING_LISTENER = e -> GUIMediator.instance().setOptionsVisible(true, tr("Options"));
         DOWNLOAD_PARTIAL_FILES_LISTENER = e -> {
             SearchResultDataLine[] lines = getAllSelectedLines();
             if (lines.length == 1 && lines[0] != null) {
@@ -625,7 +623,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         // Support FrostWire / FrostWire for Android Buttons
         JPanel southButtonsPanel = new JPanel();
-        southButtonsPanel.setLayout(new MigLayout("fill, gap 0 0, ins 0","[grow 161][shrink]"));
+        southButtonsPanel.setLayout(new MigLayout("fill, gap 0 0, ins 0", "[grow 161][shrink]"));
         southButtonsPanel.add(supportFrostWireButton(), "grow");
         if (!OSUtils.isWindowsAppStoreInstall()) {
             southButtonsPanel.add(frostwire4AndroidButton(), "w 250px!, wrap");
