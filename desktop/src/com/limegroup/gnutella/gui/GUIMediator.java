@@ -83,7 +83,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * (Swing) thread.
  */
 public final class GUIMediator {
-    private static final ThreadPool pool = new ThreadPool("GUIMediator-background-pool", 1, 2, 30, new LinkedBlockingQueue<>(), true);
+    private static final ThreadPool pool = new ThreadPool("GUIMediator-background-pool", 1, 1, 60, new LinkedBlockingQueue<>(), true);
     /**
      * Message key for the disconnected message
      */
