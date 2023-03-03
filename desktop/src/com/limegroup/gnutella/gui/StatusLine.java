@@ -22,9 +22,11 @@ import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.options.OptionsConstructor;
+import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.StatusBarSettings;
+import okhttp3.internal.http2.Settings;
 import org.limewire.setting.BooleanSetting;
 
 import javax.swing.*;
@@ -109,6 +111,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 jcbmi = new SkinCheckBoxMenuItem(new ShowDonationButtonsAction());
                 jcbmi.setState(StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.getValue());
                 jpm.add(jcbmi);
+
                 jpm.pack();
                 jpm.show(clickedComponent, me.getX(), me.getY());
             } else {
@@ -127,6 +130,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private IconButton seedingStatusButton;
     private IconButton discordButton;
     private DonationButtons donationButtons;
+    private IconButton settingsButton;
+
     /**
      * Variables for the center portion of the status bar, which can display
      * the StatusComponent (progress bar during program load), the UpdatePanel
@@ -186,6 +191,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         createTwitterButton();
         createInstagramButton();
         createDiscordButton();
+        createSettingsButton();
         // male Seeding status label
         GUIMediator.setSplashScreenString(I18n.tr("Painting seeding sign..."));
         createSeedingStatusLabel();
@@ -194,6 +200,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         createCenterPanel();
         // Set the bars to not be connected.
         setConnectionQuality(0);
+
 
         /*
          The refresh listener for updating the bandwidth usage every second.
@@ -236,6 +243,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private void createDiscordButton() {
         discordButton = new IconButton("DISCORD");
         initSocialButton(discordButton, I18n.tr("Join the FrostWire community on Discord"), GUIConstants.FROSTWIRE_CHAT_URL);
+    }
+
+    private void createSettingsButton() {
+        settingsButton = new IconButton("SETTINGS_GEAR");
     }
 
     private void initSocialButton(IconButton socialButton, String toolTipText, final String url) {
@@ -347,6 +358,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 BAR.add(Box.createHorizontalStrut(10));
                 BAR.add(Box.createHorizontalStrut(GUIConstants.SEPARATOR), gbc);
             }
+			BAR.add(settingsButton);
             try {
                 //some macosx versions are throwing a deep NPE when this is invoked all the way down at
                 //sun.lwawt.macosx.LWCToolkit.getScreenResolution(Unknown Source)
@@ -696,6 +708,18 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
         public void actionPerformed(ActionEvent e) {
             StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.invert();
             refresh();
+        }
+    }
+
+    private class SettingsButtonAction extends AbstractAction {
+        SettingsButtonAction() {
+            putValue(Action.NAME, I18n.tr("Settings"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            OptionsMediator options = OptionsMediator.instance();
+            options.setOptionsVisible(!options.isOptionsVisible());
         }
     }
 
