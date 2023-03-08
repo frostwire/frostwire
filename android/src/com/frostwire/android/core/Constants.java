@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import com.frostwire.android.BuildConfig;
  */
 public final class Constants {
 
-    /** isDevelopment */
+    /**
+     * isDevelopment
+     */
     public static final boolean IS_BASIC_AND_DEBUG = BuildConfig.FLAVOR.equals("basic") && BuildConfig.DEBUG;
     public static final boolean IS_GOOGLE_PLAY_DISTRIBUTION = BuildConfig.FLAVOR.equals("basic");
 
@@ -81,6 +83,8 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_IDOPE = "frostwire.prefs.search.use_idope";
     public static final String PREF_KEY_SEARCH_USE_MAGNETDL = "frostwire.prefs.search.use_magnetdl";
     public static final String PREF_KEY_SEARCH_USE_GLOTORRENTS = "frostwire.prefs.search.use_glotorrents";
+
+    public static final String PREF_KEY_SEARCH_USE_BT_DIGG = "frostwire.prefs.search.use_bt_digg";
     public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER = "frostwire.prefs.search.use_telluride_courier";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";

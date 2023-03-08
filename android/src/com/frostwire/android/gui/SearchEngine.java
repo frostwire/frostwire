@@ -27,6 +27,7 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
+import com.frostwire.search.btdigg.BTDiggSearchPerformer;
 import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
@@ -115,9 +116,7 @@ public abstract class SearchEngine {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
         for (SearchEngine se : ALL_ENGINES) {
-            if (excludeNonReady && se.isReady()) {
-                candidates.add(se);
-            } else {
+            if (!excludeNonReady || se.isReady()) {
                 candidates.add(se);
             }
         }
@@ -236,7 +235,7 @@ public abstract class SearchEngine {
     public static final SearchEngine YIFY = new SearchEngine("Yify", Constants.PREF_KEY_SEARCH_USE_YIFY) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new YifySearchPerformer("yts-movie.cc", token, keywords, DEFAULT_TIMEOUT);
+            return new YifySearchPerformer("yify-torrent.cc", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 
@@ -291,6 +290,13 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine BT_DIGG = new SearchEngine("BTDigg", Constants.PREF_KEY_SEARCH_USE_BT_DIGG) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new BTDiggSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
             MAGNETDL,
             TORRENTZ2,
@@ -299,6 +305,7 @@ public abstract class SearchEngine {
             IDOPE,
             FROSTCLICK,
             TPB,
+            BT_DIGG,
             SOUNCLOUD,
             ARCHIVE,
             TORLOCK,

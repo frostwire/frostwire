@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -110,6 +110,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BT_DIGG, true);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);
