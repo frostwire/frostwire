@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.LocalSearchEngine;
-import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -361,7 +360,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void setupAdapter() {
-        LocalSearchEngine.instance().setListener(new LocalSearchEngineListener(this));
+        LocalSearchEngine.instance().setListener(new SearchFragmentSearchEngineListener(this));
         if (adapter == null) {
             adapter = new SearchResultListAdapter(getActivity()) {
                 @Override
@@ -633,10 +632,10 @@ public final class SearchFragment extends AbstractFragment implements
         searchProgress.setDataUp(value);
     }
 
-    private static class LocalSearchEngineListener implements SearchListener {
+    private static class SearchFragmentSearchEngineListener implements SearchListener {
         SearchFragment searchFragment;
 
-        LocalSearchEngineListener(SearchFragment searchFragment) {
+        SearchFragmentSearchEngineListener(SearchFragment searchFragment) {
             this.searchFragment = searchFragment;
         }
 
