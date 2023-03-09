@@ -1,4 +1,5 @@
-FrostWire 2.6.4 build 712 - MAR/02/2023
+FrostWire 2.6.4 build 712 - MAR/08/2023
+ - 100x faster search results
  - Targets Android 13 (targetSdkVersion 33)
  - SearchManager optimizations, much faster search results
  - New BTDigg search engine
