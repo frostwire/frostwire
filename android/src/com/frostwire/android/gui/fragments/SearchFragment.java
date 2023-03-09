@@ -233,7 +233,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     @Override
     public void onDestroy() {
-        LocalSearchEngine.instance().setListener(null);
+        LocalSearchEngine.instance().setSearchListener(null);
         destroyHeaderBanner();
         destroyPromotionsBanner();
         super.onDestroy();
@@ -360,7 +360,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void setupAdapter() {
-        LocalSearchEngine.instance().setListener(new SearchFragmentSearchEngineListener(this));
+        LocalSearchEngine.instance().setSearchListener(new SearchFragmentSearchEngineListener(this));
         if (adapter == null) {
             adapter = new SearchResultListAdapter(getActivity()) {
                 @Override

@@ -22,7 +22,6 @@ import android.text.Html;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.fragments.SearchFragment;
-import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.CrawledSearchResult;
@@ -54,7 +53,7 @@ import java.util.stream.Collectors;
 public final class LocalSearchEngine {
 
     private final SearchManager manager;
-    private SearchListener listener;
+    private SearchListener searchListener;
 
     private static final Object instanceLock = new Object();
     private static LocalSearchEngine instance;
@@ -65,51 +64,57 @@ public final class LocalSearchEngine {
     private TellurideCourier.SearchPerformer lastTellurideCourier;
 
     public static LocalSearchEngine instance() {
-        if (instance != null) {
-            return instance;
-        } else {
+        if (instance == null) {
             synchronized (instanceLock) {
                 if (instance == null) {
                     instance = new LocalSearchEngine();
                 }
             }
-            return instance;
         }
+        return instance;
     }
 
-    public static class LocalSearchEngineSearchListener implements SearchListener {
-        final LocalSearchEngine lse;
-
-        public LocalSearchEngineSearchListener(LocalSearchEngine lse) {
-            this.lse = lse;
-        }
-
-        @Override
-        public void onResults(long token, List<? extends SearchResult> results) {
-            lse.onResults(token, results);
-        }
-
-        @Override
-        public void onError(long token, SearchError error) {
-        }
-
-        @Override
-        public void onStopped(long token) {
-            lse.onFinished(token);
-        }
-    }
 
     private LocalSearchEngine() {
         this.manager = SearchManager.getInstance();
-        this.manager.setListener(new LocalSearchEngineSearchListener(this));
+        this.manager.setListener(new SearchListener() {
+            @Override
+            public void onResults(long token, List<? extends SearchResult> results) {
+                if (token == currentSearchToken) { // one more additional protection
+                    List<SearchResult> filtered = filter(results);
+
+                    if (!filtered.isEmpty()) {
+                        if (searchListener != null) {
+                            searchListener.onResults(token, filtered);
+                            filtered.clear();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onStopped(long token) {
+                if (token == currentSearchToken) {
+                    searchFinished = true;
+                    if (searchListener != null) {
+                        searchListener.onStopped(token);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(long token, SearchError error) {
+
+            }
+        });
     }
 
     public SearchListener getListener() {
-        return listener;
+        return searchListener;
     }
 
-    public void setListener(SearchListener listener) {
-        this.listener = listener;
+    public void setSearchListener(SearchListener searchListener) {
+        this.searchListener = searchListener;
     }
 
     public void performSearch(String query) {
@@ -127,11 +132,6 @@ public final class LocalSearchEngine {
             if (se.isEnabled() && se.isReady()) {
                 SearchPerformer p = se.getPerformer(currentSearchToken, query);
                 manager.perform(p);
-                try {
-                    Thread.sleep(200);
-                    // breath a little between http requests
-                } catch (Throwable ignored) {
-                }
             }
         }
     }
@@ -146,10 +146,7 @@ public final class LocalSearchEngine {
         currentSearchTokens = new ArrayList<>();
         currentSearchTokens.add(pageUrl);
         searchFinished = false;
-        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(
-                currentSearchToken,
-                pageUrl,
-                adapter);
+        lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(currentSearchToken, pageUrl, adapter);
         manager.perform(lastTellurideCourier);
     }
 
@@ -180,7 +177,7 @@ public final class LocalSearchEngine {
         return CrawlPagedWebSearchPerformer.getCacheSize();
     }
 
-    public void markOpened(SearchResult sr, AbstractListAdapter adapter) {
+    public void markOpened(SearchResult sr, SearchResultListAdapter adapter) {
         opened.add(getSearchResultUID(sr));
         if (adapter != null) {
             adapter.notifyDataSetChanged();
@@ -189,28 +186,6 @@ public final class LocalSearchEngine {
 
     public boolean hasBeenOpened(SearchResult sr) {
         return sr != null && opened.contains(getSearchResultUID(sr));
-    }
-
-    private void onResults(long token, List<? extends SearchResult> results) {
-        if (token == currentSearchToken) { // one more additional protection
-            List<SearchResult> filtered = filter(results);
-
-            if (!filtered.isEmpty()) {
-                if (listener != null) {
-                    listener.onResults(token, filtered);
-                    filtered.clear();
-                }
-            }
-        }
-    }
-
-    private void onFinished(long token) {
-        if (token == currentSearchToken) {
-            searchFinished = true;
-            if (listener != null) {
-                listener.onStopped(token);
-            }
-        }
     }
 
     private List<SearchResult> filter(List<? extends SearchResult> results) {
@@ -265,7 +240,7 @@ public final class LocalSearchEngine {
     }
 
     private String sanitize(String str) {
-        str = Html.fromHtml(str).toString();
+        str = Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString();
         //noinspection RegExpRedundantEscape
         str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
         str = StringUtils.removeDoubleSpaces(str);

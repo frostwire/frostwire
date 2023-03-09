@@ -23,7 +23,6 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
