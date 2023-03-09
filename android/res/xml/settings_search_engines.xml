@@ -26,6 +26,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_archiveorg" />
     <CheckBoxPreference
+            android:key="frostwire.prefs.search.use_bt_digg"
+            android:layout="@layout/view_preference_search_engine"
+            android:title="@string/use_btdigg" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_eztv"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_eztv" />
