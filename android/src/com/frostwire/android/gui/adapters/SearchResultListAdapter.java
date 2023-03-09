@@ -95,6 +95,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
      * @param fileType
      */
     public void setFileType(final int fileType, boolean appendToPreviouslyFilteredResults, Runnable callback) {
+        boolean differentFileType = this.fileType != fileType;
         this.fileType = fileType;
         postToHandler(
                 SystemUtils.HandlerThreadName.SEARCH_PERFORMER,
@@ -117,7 +118,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                     if (filteredSearchResults != null) {
                         SystemUtils.postToUIThreadAtFront(() -> {
                             if (filteredSearchResults != null) {
-                                updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered);
+                                updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered, differentFileType);
                             }
                         });
                     }
@@ -286,11 +287,13 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     abstract protected void searchResultClicked(SearchResult sr);
 
-    public void updateVisualListWithAllMediaTypeFilteredSearchResults(List<FileSearchResult> mediaTypeFiltered) {
+    public void updateVisualListWithAllMediaTypeFilteredSearchResults(List<FileSearchResult> mediaTypeFiltered, boolean clearBeforeAdding) {
         ensureUIThreadOrCrash("SearchResultListAdapter::updateVisualListWithFilteredSearchResults");
         try {
             synchronized (listLock) {
-                this.visualList.clear();
+                if (clearBeforeAdding) {
+                    this.visualList.clear();
+                }
                 this.visualList.addAll(mediaTypeFiltered);
             }
             notifyDataSetChanged();

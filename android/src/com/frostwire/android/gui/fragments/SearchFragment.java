@@ -94,6 +94,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author gubatron
@@ -117,6 +118,7 @@ public final class SearchFragment extends AbstractFragment implements
     private final FileTypeCounter fileTypeCounter;
     private OnClickListener headerClickListener;
     private HeaderBanner headerBanner;
+    private AtomicBoolean cancelling = new AtomicBoolean(false);
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -361,23 +363,21 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void setupAdapter() {
         LocalSearchEngine.instance().setSearchListener(new SearchFragmentSearchEngineListener(this));
-        if (adapter == null) {
-            adapter = new SearchResultListAdapter(getActivity()) {
-                @Override
-                protected void searchResultClicked(SearchResult sr) {
-                    startTransfer(sr, getString(R.string.download_added_to_queue));
-                }
-            };
-        }
+        adapter = new SearchResultListAdapter(getActivity()) {
+            @Override
+            protected void searchResultClicked(SearchResult sr) {
+                startTransfer(sr, getString(R.string.download_added_to_queue));
+            }
+        };
         list.setAdapter(adapter);
     }
 
-    private void updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults) {
+    private void updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults, boolean clearBeforeAdding) {
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::updateFilteredSearchResults(List<FileSearchResult> allFilteredSearchResults)");
         if (isAdded()) {
             try {
                 if (adapter != null) {
-                    adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(allFilteredSearchResults);
+                    adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(allFilteredSearchResults, clearBeforeAdding);
                 }
                 refreshFileTypeCounters(true, fileTypeCounter.fsr);
                 showSearchView(getView());
@@ -439,27 +439,28 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void cancelSearch() {
+        if (cancelling.get()) {
+            // avoid loops
+            return;
+        }
+        cancelling.set(true);
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
+        adapter.clear();
+        fileTypeCounter.clear();
         postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
         postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
-        adapter.clear();
         searchInput.setFileTypeCountersVisible(false);
-        fileTypeCounter.clear();
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         currentQuery = null;
         searchProgress.setProgressEnabled(false);
         showRatingsReminder(getView());
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
         showSearchView(getView());
+        cancelling.set(false);
     }
 
     private void showSearchView(View view) {
         ensureUIThreadOrCrash("SearchFragment::showSearchView");
-        try {
-            // Let the adapter's visual list catch up, so adapter.getCount() won't give us false 0 numbers.
-            Thread.sleep(100);
-        } catch (Throwable ignore) {
-        }
         if (LocalSearchEngine.instance() == null) {
             switchView(view, R.id.fragment_search_promos);
             LOG.info("SearchFragment::showSearchView no search instance available, going back to promos.");
@@ -472,7 +473,7 @@ public final class SearchFragment extends AbstractFragment implements
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
         boolean currentTypeHasResults = adapter != null && adapter.getCount() > 0;
 
-        deepSearchProgress.setVisibility((!searchFinished || !searchStopped || !searchCancelled) ? View.VISIBLE : View.GONE);
+        //deepSearchProgress.setVisibility((!searchFinished || !searchStopped || !searchCancelled) ? View.VISIBLE : View.GONE);
 
         if (searchCancelled) {
             switchView(view, R.id.fragment_search_promos);
@@ -480,13 +481,12 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         if (adapterHasResults) {
-            if (currentTypeHasResults) {
-                switchView(view, R.id.fragment_search_list);
-            } else {
-                switchView(view, R.id.fragment_search_search_progress);
-            }
-            searchProgress.setEnabled(!searchFinished && !currentTypeHasResults);
+            switchView(view, R.id.fragment_search_list);
+        } else {
+            switchView(view, R.id.fragment_search_search_progress);
         }
+        searchProgress.setEnabled(!searchFinished);// && !currentTypeHasResults);
+
     }
 
     private void switchView(View v, int id) {
@@ -649,13 +649,18 @@ public final class SearchFragment extends AbstractFragment implements
             // Add new newResults to the adapter
             searchFragment.adapter.addResults(newResults);
             // Sets the file type in the adapter and filters search results by file type
+            boolean differentFileType = searchFragment.adapter.getFileType() != fileType;
             searchFragment.adapter.setFileType(fileType,
                     () -> {
                         // Ask the adapter for the filtered search results
                         FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
                         // Time to report to the UI, let the adapter know about the new newResults
-                        searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-                        SystemUtils.postToUIThreadDelayed(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered), 200);
+                        if (differentFileType) {
+                            searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
+                        } else {
+                            searchFragment.fileTypeCounter.add(fsr);
+                        }
+                        SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, differentFileType));
                     }); //background call
         }
 
