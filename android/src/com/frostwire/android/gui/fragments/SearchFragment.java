@@ -363,12 +363,14 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void setupAdapter() {
         LocalSearchEngine.instance().setSearchListener(new SearchFragmentSearchEngineListener(this));
-        adapter = new SearchResultListAdapter(getActivity()) {
-            @Override
-            protected void searchResultClicked(SearchResult sr) {
-                startTransfer(sr, getString(R.string.download_added_to_queue));
-            }
-        };
+        if (adapter == null) {
+            adapter = new SearchResultListAdapter(getActivity()) {
+                @Override
+                protected void searchResultClicked(SearchResult sr) {
+                    startTransfer(sr, getString(R.string.download_added_to_queue));
+                }
+            };
+        }
         list.setAdapter(adapter);
     }
 
@@ -446,6 +448,7 @@ public final class SearchFragment extends AbstractFragment implements
         cancelling.set(true);
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
         adapter.clear();
+        adapter = null;
         fileTypeCounter.clear();
         postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
         postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
@@ -469,7 +472,7 @@ public final class SearchFragment extends AbstractFragment implements
 
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
         boolean searchStopped = LocalSearchEngine.instance().isSearchStopped();
-        boolean searchCancelled = searchStopped && adapter.getTotalCount() == 0;
+        boolean searchCancelled = adapter == null || (searchStopped && adapter.getTotalCount() == 0);
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
         boolean currentTypeHasResults = adapter != null && adapter.getCount() > 0;
 
