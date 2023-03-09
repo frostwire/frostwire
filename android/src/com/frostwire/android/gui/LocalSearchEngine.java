@@ -21,7 +21,6 @@ import android.text.Html;
 
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
-import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.CrawledSearchResult;
@@ -55,23 +54,18 @@ public final class LocalSearchEngine {
     private final SearchManager manager;
     private SearchListener searchListener;
 
-    private static final Object instanceLock = new Object();
-    private static LocalSearchEngine instance;
     private final HashSet<Integer> opened = new HashSet<>();
     private long currentSearchToken;
     private List<String> currentSearchTokens;
     private boolean searchFinished;
     private TellurideCourier.SearchPerformer lastTellurideCourier;
 
+    private static final class InstanceHolder {
+        private static final LocalSearchEngine instance = new LocalSearchEngine();
+    }
+
     public static LocalSearchEngine instance() {
-        if (instance == null) {
-            synchronized (instanceLock) {
-                if (instance == null) {
-                    instance = new LocalSearchEngine();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.instance;
     }
 
 
@@ -136,7 +130,7 @@ public final class LocalSearchEngine {
         }
     }
 
-    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter, SearchFragment searchFragment) {
+    public void performTellurideSearch(String pageUrl, SearchResultListAdapter adapter) {
         SystemUtils.ensureBackgroundThreadOrCrash("LocalSearchEngine::performTellurideSearch(pageUrl=" + pageUrl + ")");
         if (StringUtils.isNullOrEmpty(pageUrl, true)) {
             return;
