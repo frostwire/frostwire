@@ -100,10 +100,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author gubatron
  * @author aldenml
  */
-public final class SearchFragment extends AbstractFragment implements
-        MainFragment,
-        OnDialogClickListener,
-        SearchProgressView.CurrentQueryReporter, PromotionDownloader {
+public final class SearchFragment extends AbstractFragment implements MainFragment, OnDialogClickListener, SearchProgressView.CurrentQueryReporter, PromotionDownloader {
     private static final Logger LOG = Logger.getLogger(SearchFragment.class);
     @SuppressLint("StaticFieldLeak")
     private static SearchFragment lastInstance = null;
@@ -118,7 +115,7 @@ public final class SearchFragment extends AbstractFragment implements
     private final FileTypeCounter fileTypeCounter;
     private OnClickListener headerClickListener;
     private HeaderBanner headerBanner;
-    private AtomicBoolean cancelling = new AtomicBoolean(false);
+    private final AtomicBoolean cancelling = new AtomicBoolean(false);
 
     public SearchFragment() {
         super(R.layout.fragment_search);
@@ -215,13 +212,7 @@ public final class SearchFragment extends AbstractFragment implements
         }
 
         if (list != null && CM.getBoolean(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH)) {
-            list.setOnScrollListener(
-                    new ComposedOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener(),
-                            new DirectionDetectorScrollListener(
-                                    new ScrollDirectionListener(this),
-                                    Engine.instance().getThreadPool())
-                    )
-            );
+            list.setOnScrollListener(new ComposedOnScrollListener(new FastScrollDisabledWhenIdleOnScrollListener(), new DirectionDetectorScrollListener(new ScrollDirectionListener(this), Engine.instance().getThreadPool())));
         }
         if (headerBanner != null) {
             if (getCurrentQuery() == null || Offers.disabledAds()) {
@@ -333,9 +324,7 @@ public final class SearchFragment extends AbstractFragment implements
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         deepSearchProgress.setVisibility(View.VISIBLE);
 
-        postToHandler(
-                SEARCH_PERFORMER,
-                () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl, adapter, this));
+        postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl, adapter));
         searchInput.setText(" "); // an empty space so the 'x' button is shown.
         switchView(view, R.id.fragment_search_list);
     }
@@ -357,8 +346,7 @@ public final class SearchFragment extends AbstractFragment implements
 
     private void startMagnetDownload(String magnet) {
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
-        TransferManager.instance().downloadTorrent(magnet,
-                new HandpickedTorrentDownloadDialogOnFetch(getActivity(), false));
+        TransferManager.instance().downloadTorrent(magnet, new HandpickedTorrentDownloadDialogOnFetch(getActivity(), false));
     }
 
     private void setupAdapter() {
@@ -474,9 +462,6 @@ public final class SearchFragment extends AbstractFragment implements
         boolean searchStopped = LocalSearchEngine.instance().isSearchStopped();
         boolean searchCancelled = adapter == null || (searchStopped && adapter.getTotalCount() == 0);
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
-        boolean currentTypeHasResults = adapter != null && adapter.getCount() > 0;
-
-        //deepSearchProgress.setVisibility((!searchFinished || !searchStopped || !searchCancelled) ? View.VISIBLE : View.GONE);
 
         if (searchCancelled) {
             switchView(view, R.id.fragment_search_promos);
@@ -488,8 +473,7 @@ public final class SearchFragment extends AbstractFragment implements
         } else {
             switchView(view, R.id.fragment_search_search_progress);
         }
-        searchProgress.setEnabled(!searchFinished);// && !currentTypeHasResults);
-
+        searchProgress.setEnabled(!searchFinished);
     }
 
     private void switchView(View v, int id) {
@@ -532,8 +516,7 @@ public final class SearchFragment extends AbstractFragment implements
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
-        if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) &&
-                ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
+        if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult) {
                 try {
                     NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
@@ -575,14 +558,8 @@ public final class SearchFragment extends AbstractFragment implements
         }
         ClickAdapter<SearchFragment> onRateAdapter = new OnRateClickAdapter(SearchFragment.this, ratingReminder, CM);
         ratingReminder.setOnClickListener(onRateAdapter);
-        RichNotificationActionLink rateFrostWireActionLink =
-                new RichNotificationActionLink(ratingReminder.getContext(),
-                        getString(R.string.love_frostwire),
-                        onRateAdapter);
-        RichNotificationActionLink sendFeedbackActionLink =
-                new RichNotificationActionLink(ratingReminder.getContext(),
-                        getString(R.string.send_feedback),
-                        new OnFeedbackClickAdapter(this, ratingReminder, CM));
+        RichNotificationActionLink rateFrostWireActionLink = new RichNotificationActionLink(ratingReminder.getContext(), getString(R.string.love_frostwire), onRateAdapter);
+        RichNotificationActionLink sendFeedbackActionLink = new RichNotificationActionLink(ratingReminder.getContext(), getString(R.string.send_feedback), new OnFeedbackClickAdapter(this, ratingReminder, CM));
         ratingReminder.updateActionLinks(rateFrostWireActionLink, sendFeedbackActionLink);
         ratingReminder.setVisibility(View.VISIBLE);
     }
@@ -653,18 +630,17 @@ public final class SearchFragment extends AbstractFragment implements
             searchFragment.adapter.addResults(newResults);
             // Sets the file type in the adapter and filters search results by file type
             boolean differentFileType = searchFragment.adapter.getFileType() != fileType;
-            searchFragment.adapter.setFileType(fileType,
-                    () -> {
-                        // Ask the adapter for the filtered search results
-                        FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
-                        // Time to report to the UI, let the adapter know about the new newResults
-                        if (differentFileType) {
-                            searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
-                        } else {
-                            searchFragment.fileTypeCounter.add(fsr);
-                        }
-                        SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, differentFileType));
-                    }); //background call
+            searchFragment.adapter.setFileType(fileType, () -> {
+                // Ask the adapter for the filtered search results
+                FilteredSearchResults fsr = searchFragment.adapter.getFilteredSearchResults();
+                // Time to report to the UI, let the adapter know about the new newResults
+                if (differentFileType) {
+                    searchFragment.fileTypeCounter.updateFilteredSearchResults(fsr);
+                } else {
+                    searchFragment.fileTypeCounter.add(fsr);
+                }
+                SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, differentFileType));
+            }); //background call
         }
 
         @Override
@@ -720,8 +696,7 @@ public final class SearchFragment extends AbstractFragment implements
                 fragment.cancelSearch();
                 new AsyncDownloadSoundcloudFromUrl(fragment.getActivity(), query);
                 fragment.searchInput.setText("");
-            } else if (query.startsWith("magnet:?xt=urn:btih:") ||
-                    (query.startsWith("http") && query.endsWith(".torrent"))) {
+            } else if (query.startsWith("magnet:?xt=urn:btih:") || (query.startsWith("http") && query.endsWith(".torrent"))) {
                 fragment.startMagnetDownload(query);
                 fragment.currentQuery = null;
                 fragment.searchInput.setText("");
@@ -729,12 +704,10 @@ public final class SearchFragment extends AbstractFragment implements
                 // URls that are no torrents, Telluride Search
                 fragment.performTellurideSearch(query);
             } else {
-                postToHandler(SEARCH_PERFORMER, () ->
-                        {
-                            LocalSearchEngine.instance().performSearch(query);
-                            postToUIThread(() -> fragment.prepareUIForSearch(mediaTypeId));
-                        }
-                );
+                postToHandler(SEARCH_PERFORMER, () -> {
+                    LocalSearchEngine.instance().performSearch(query);
+                    postToUIThread(() -> fragment.prepareUIForSearch(mediaTypeId));
+                });
             }
         }
 
@@ -744,10 +717,8 @@ public final class SearchFragment extends AbstractFragment implements
             }
             SearchFragment fragment = fragmentRef.get();
             if (fragment.adapter.getFileType() != mediaTypeId) {
-                postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () ->
-                        ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
-                fragment.adapter.setFileType(mediaTypeId, false, () ->
-                        fragment.showSearchView(rootViewRef.get()));
+                postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().setLastMediaTypeFilter(mediaTypeId));
+                fragment.adapter.setFileType(mediaTypeId, false, () -> fragment.showSearchView(rootViewRef.get()));
             } else {
                 fragment.showSearchView(rootViewRef.get());
             }
@@ -851,11 +822,10 @@ public final class SearchFragment extends AbstractFragment implements
             if (LocalSearchEngine.instance().isSearchFinished()) {
                 final String query = searchInput.getText();
                 searchProgress.setProgressEnabled(true);
-                postToHandler(SEARCH_PERFORMER,
-                        () -> {
-                            LocalSearchEngine.instance().performSearch(query);
-                            postToUIThread(() -> searchFragment.prepareUIForSearch(adapter.getFileType()));
-                        });
+                postToHandler(SEARCH_PERFORMER, () -> {
+                    LocalSearchEngine.instance().performSearch(query);
+                    postToUIThread(() -> searchFragment.prepareUIForSearch(adapter.getFileType()));
+                });
             }
             // cancel
             else {

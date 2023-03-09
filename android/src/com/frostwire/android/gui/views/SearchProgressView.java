@@ -111,7 +111,6 @@ public class SearchProgressView extends LinearLayout {
         textNoResults = findViewById(R.id.view_search_progress_text_no_results_feedback);
         textTryOtherKeywordsOrFilters = findViewById(R.id.view_search_progress_try_other_keywords_or_filters);
         textNoDataConnection = findViewById(R.id.view_search_progress_no_data_connection);
-        String stringTryOtherKeywords = getResources().getString(R.string.try_other_keywords);
         textTryFrostWirePlus = findViewById(R.id.view_search_progress_try_frostwire_plus);
         textTryFrostWirePlus.setPaintFlags(textTryFrostWirePlus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
