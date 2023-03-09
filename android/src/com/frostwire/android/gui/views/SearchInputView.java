@@ -133,8 +133,9 @@ public class SearchInputView extends LinearLayout {
         textInput.setOnItemClickListener(textInputListener);
         textInput.setOnFocusChangeListener((v, hasFocus) -> {
             if (hasFocus) {
-                UIUtils.autoPasteMagnetOrURL(getContext(), textInput);
                 showTextInput();
+                UIUtils.showKeyboard(getContext(), v);
+                UIUtils.autoPasteMagnetOrURL(getContext(), textInput);
             } else {
                 hideSoftInput(textInput);
             }

@@ -436,17 +436,17 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         cancelling.set(true);
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
         adapter.clear();
-        adapter = null;
         fileTypeCounter.clear();
         postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
         postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
         searchInput.setFileTypeCountersVisible(false);
-        refreshFileTypeCounters(false, fileTypeCounter.fsr);
         currentQuery = null;
         searchProgress.setProgressEnabled(false);
         showRatingsReminder(getView());
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
+        refreshFileTypeCounters(false, fileTypeCounter.fsr);
         showSearchView(getView());
+        UIUtils.forceShowKeyboard(getContext());
         cancelling.set(false);
     }
 
@@ -460,7 +460,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
         boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
         boolean searchStopped = LocalSearchEngine.instance().isSearchStopped();
-        boolean searchCancelled = adapter == null || (searchStopped && adapter.getTotalCount() == 0);
+        boolean searchCancelled = cancelling.get() || (searchStopped && adapter.getTotalCount() == 0);
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
 
         if (searchCancelled) {
