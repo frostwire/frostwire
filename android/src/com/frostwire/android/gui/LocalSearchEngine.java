@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author gubatron
@@ -216,36 +217,28 @@ public final class LocalSearchEngine {
         List<SearchResult> list;
 
         if (currentSearchTokens == null || currentSearchTokens.isEmpty()) {
-            list = Collections.emptyList();
-        } else {
-            list = filter2(results);
+            return Collections.emptyList();
         }
-
-        return list;
-    }
-
-    private List<SearchResult> filter2(List<? extends SearchResult> results) {
-        List<SearchResult> list = new LinkedList<>();
 
         try {
-            for (SearchResult sr : results) {
-                if (sr instanceof CrawledSearchResult) {
-                    if (filter(new LinkedList<>(currentSearchTokens), sr)) {
-                        list.add(sr);
-                    }
-                } else {
-                    list.add(sr);
+            list = results.stream().parallel().filter(sr -> {
+                if (sr instanceof CrawledSearchResult && allQueryTokensExistInSearchResult(new LinkedList<>(currentSearchTokens), sr)) {
+                    return true;
                 }
-            }
-        } catch (Throwable e) {
-            // possible NPE due to cancel search or some inner error in search results, ignore it and cleanup list
-            list.clear();
+                return !(sr instanceof CrawledSearchResult);
+            }).collect(Collectors.toList());
+        } catch (Throwable t) {
+            list = new LinkedList<>();
         }
 
         return list;
     }
 
-    private boolean filter(List<String> tokens, SearchResult sr) {
+
+    /**
+     * Using properties of the search result, we build a lowercase string and then we return true if ALL the tokens are to be found in that string
+     */
+    private boolean allQueryTokensExistInSearchResult(List<String> tokens, SearchResult sr) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(sr.getDisplayName());
