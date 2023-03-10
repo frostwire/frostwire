@@ -1,4 +1,7 @@
-FrostWire 2.6.4 build 713 - MAR/08/2023
+FrostWire 2.6.5 build 714 - MAR/09/2023
+ - Removed all landscape layouts, app works only in vertical mode now
+
+FrostWire 2.6.4 build 713 - MAR/09/2023
  - 100x faster search results
  - Targets Android 13 (targetSdkVersion 33)
  - SearchManager optimizations, much faster search results
