@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,15 +130,11 @@ public final class HeaderBanner extends LinearLayout {
         Activity activity = (Activity) getContext();
         // check how long getting display metrics twice is, if expensive gotta refactor these methods
         boolean screenTallEnough = UIUtils.getScreenInches(activity) >= 4.33;
-        boolean isPortrait = UIUtils.isPortrait(activity);
-        boolean isTablet = UIUtils.isTablet(activity.getResources());
         boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
-        boolean bannerVisible = !adsDisabled && screenTallEnough && (isPortrait || isTablet) && diceRollPassed && !getHeaderBannerListener().tooEarlyToDisplay();
+        boolean bannerVisible = !adsDisabled && screenTallEnough && diceRollPassed && !getHeaderBannerListener().tooEarlyToDisplay();
         if (!bannerVisible) {
             LOG.info("updateComponents(): not eligible for search banner display. adsDisabled=" + adsDisabled +
                     ", screenTallEnough=" + screenTallEnough +
-                    ", isPortrait=" + isPortrait +
-                    ", isTablet=" + isTablet +
                     ", diceRollPassed=" + diceRollPassed +
                     ", tooEarlyToDisplay=" + getHeaderBannerListener().tooEarlyToDisplay());
             setBannerViewVisibility(VisibleBannerType.ALL, false);

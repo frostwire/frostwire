@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.SurfaceTexture;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -208,7 +207,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             return;
         }
         if (fwBannerView == null) {
-            fwBannerView = findViewById(isPortrait() ? R.id.activity_preview_player_320x50_banner : R.id.activity_preview_player_320x250_banner);
+            fwBannerView = findViewById(R.id.activity_preview_player_320x50_banner);
         }
         if (fwBannerView != null) {
             fwBannerView.setOnBannerDismissedListener(this::hideAd);
@@ -301,17 +300,12 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         }
     }
 
-    private boolean isPortrait() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
-    }
 
     private void toggleFullScreen(TextureView v) {
         videoSizeSetupDone = false;
         DisplayMetrics metrics = new DisplayMetrics();
         final Display defaultDisplay = getWindowManager().getDefaultDisplay();
         defaultDisplay.getMetrics(metrics);
-
-        boolean isPortrait = isPortrait();
 
         final FrameLayout frameLayout = findView(R.id.activity_preview_player_framelayout);
         LinearLayout.LayoutParams frameLayoutParams = (LinearLayout.LayoutParams) frameLayout.getLayoutParams();
@@ -321,11 +315,8 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
 
         final Button downloadButton = findView(R.id.activity_preview_player_download_button);
 
-        // these ones only exist on landscape mode.
-        ViewGroup rightSide = findView(R.id.activity_preview_player_right_side);
-
         if (fwBannerView == null) {
-            fwBannerView = findView(R.id.activity_preview_player_320x250_banner);
+            fwBannerView = findView(R.id.activity_preview_player_320x50_banner);
         }
 
         // Let's Go into full screen mode.
@@ -334,19 +325,15 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
             findToolbar().setVisibility(View.GONE);
-            setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton, rightSide);
+            setViewsVisibility(View.GONE, playerMetadataHeader, thumbnail, downloadButton);
 
             fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
 
-            if (isPortrait) {
-                //noinspection SuspiciousNameCombination
-                frameLayoutParams.width = metrics.heightPixels;
-                //noinspection SuspiciousNameCombination
-                frameLayoutParams.height = metrics.widthPixels;
-            } else {
-                frameLayoutParams.width = metrics.widthPixels;
-                frameLayoutParams.height = metrics.heightPixels;
-            }
+            //noinspection SuspiciousNameCombination
+            frameLayoutParams.width = metrics.heightPixels;
+            //noinspection SuspiciousNameCombination
+            frameLayoutParams.height = metrics.widthPixels;
+
             isFullScreen = true;
         } else {
             // restore components back from full screen mode.
@@ -356,7 +343,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
             findToolbar().setVisibility(View.VISIBLE);
-            setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton, rightSide);
+            setViewsVisibility(View.VISIBLE, playerMetadataHeader, downloadButton);
             if (Offers.disabledAds()) {
                 hideAd();
                 fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
@@ -394,33 +381,22 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         defaultDisplay.getMetrics(metrics);
 
         final android.widget.FrameLayout.LayoutParams params = (android.widget.FrameLayout.LayoutParams) v.getLayoutParams();
-        boolean isPortrait = isPortrait();
+
         float hRatio = (videoHeight * 1.0f) / (videoWidth * 1.0f);
         float rotation = 0;
 
-        if (isPortrait) {
-            if (isFullScreen) {
-                //noinspection SuspiciousNameCombination
-                params.width = metrics.heightPixels;
-                //noinspection SuspiciousNameCombination
-                params.height = metrics.widthPixels;
-                params.gravity = Gravity.TOP;
-                v.setPivotY((float) metrics.widthPixels / 2.0f);
-                rotation = 90f;
-            } else {
-                params.width = metrics.widthPixels;
-                params.height = (int) (params.width * hRatio);
-                params.gravity = Gravity.CENTER;
-            }
+        if (isFullScreen) {
+            //noinspection SuspiciousNameCombination
+            params.width = metrics.heightPixels;
+            //noinspection SuspiciousNameCombination
+            params.height = metrics.widthPixels;
+            params.gravity = Gravity.TOP;
+            v.setPivotY((float) metrics.widthPixels / 2.0f);
+            rotation = 90f;
         } else {
-            if (isFullScreen) {
-                params.width = metrics.widthPixels;
-                params.height = metrics.heightPixels;
-            } else {
-                params.width = Math.max(videoWidth, metrics.widthPixels / 2);
-                params.height = (int) (params.width * hRatio);
-                params.gravity = Gravity.CENTER;
-            }
+            params.width = metrics.widthPixels;
+            params.height = (int) (params.width * hRatio);
+            params.gravity = Gravity.CENTER;
         }
 
         v.setRotation(rotation);
@@ -501,7 +477,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int width, int height) {
+    public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surfaceTexture, int width, int height) {
         surface = new Surface(surfaceTexture);
         final WeakReference<PreviewPlayerActivity> contextRef = Ref.weak(this);
         final String streamUrlCopy = streamUrl;
@@ -517,7 +493,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int width, int height) {
+    public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surfaceTexture, int width, int height) {
         if (androidMediaPlayer != null) {
             if (surface != null) {
                 surface.release();
@@ -528,7 +504,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+    public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
         if (androidMediaPlayer != null) {
             androidMediaPlayer.setSurface(null);
             this.surface.release();
@@ -538,7 +514,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
     }
 
     @Override
@@ -655,10 +631,6 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private void hideAd() {
         if (fwBannerView != null) {
             fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
-        }
-        if (!isPortrait()) {
-            LinearLayout horizontalAdContainer = findView(R.id.activity_preview_player_right_side);
-            horizontalAdContainer.setVisibility(View.GONE);
         }
     }
 

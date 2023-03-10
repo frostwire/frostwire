@@ -540,12 +540,6 @@ public final class UIUtils {
         return res.getBoolean(R.bool.isTablet);
     }
 
-    public static boolean isPortrait(Activity activity) {
-        DisplayMetrics dm = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
-        return dm.heightPixels > dm.widthPixels;
-    }
-
     /**
      * @param thresholdPreferenceKey - preference key for an int threshold
      * @return true if the threshold is >= 100, otherwise true if the dice roll is below the threshold

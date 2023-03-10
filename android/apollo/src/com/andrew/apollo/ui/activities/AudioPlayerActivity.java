@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 Andrew Neal
- * Copyright (c) 2012-2022, FrostWire(R)
+ * Copyright (c) 2012-2023, FrostWire(R)
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -105,7 +105,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private static final long MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS = 150;
     private static final long UPDATE_NOW_PLAYING_INFO_REFRESH_INTERVAL_MS = 200;
 
-    private static AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();
+    private static final AtomicBoolean waitingToInitAlbumArtBanner = new AtomicBoolean();
 
     // Play and pause button
     private PlayPauseButton mPlayPauseButton;
@@ -295,7 +295,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(final Menu menu) {
+    public boolean onPrepareOptionsMenu(@NonNull final Menu menu) {
         // Hide the EQ option if it can't be opened
         final Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
         if (getPackageManager().resolveActivity(intent, 0) == null) {
@@ -620,7 +620,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void initFWBannerView() {
-        fwBannerView = findView(UIUtils.isPortrait(this) ? R.id.audio_player_320x50_banner_view : R.id.audio_player_320x250_banner_view);
+        fwBannerView = findView(R.id.audio_player_320x50_banner_view);
         if (fwBannerView != null) {
             if (Offers.disabledAds()) {
                 fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
@@ -630,18 +630,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             fwBannerView.loadFallbackBanner(FWBannerView.UNIT_ID_AUDIO_PLAYER);
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
             fwBannerView.setShowFallbackBannerOnDismiss(false);
-            fwBannerView.setOnBannerLoadedListener(() -> {
-                fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true);
-                if (!UIUtils.isPortrait(this)) {
-                    // we don't use hideAlbumArt because it then shows the playlist queue controls
-                    mAlbumArt.setVisibility(View.INVISIBLE);
-                }
-            });
-            fwBannerView.setOnBannerDismissedListener(() -> {
-                if (!UIUtils.isPortrait(this)) {
-                    mAlbumArt.setVisibility(View.VISIBLE);
-                }
-            });
+            fwBannerView.setOnBannerLoadedListener(() -> fwBannerView.setLayersVisibility(FWBannerView.Layers.APPLOVIN, true));
             deferredInitAlbumArtBanner();
             fwBannerView.loadMaxBanner();
         }
@@ -1441,7 +1430,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         }
 
         @Override
-        public boolean onDoubleTap(MotionEvent e) {
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
             try {
                 toggleFavorite();
             } catch (Throwable t) {
