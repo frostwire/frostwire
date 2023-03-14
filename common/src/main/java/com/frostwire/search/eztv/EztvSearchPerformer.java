@@ -18,6 +18,7 @@
 package com.frostwire.search.eztv;
 
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
 import com.frostwire.util.Logger;
@@ -68,6 +69,7 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
         SearchMatcher matcher = new SearchMatcher(searchPattern.matcher(reducedPage));
 
         List<EztvSearchResult> results = new ArrayList<>();
+        List<String> searchTokens = PerformersHelper.tokenizeSearchKeywords(getKeywords());
         int MAX_RESULTS = 75;
         int maxFailures = 10;
         boolean matcherFound = false;
@@ -81,7 +83,9 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
             if (matcherFound) {
                 try {
                     EztvSearchResult sr = new EztvSearchResult(getDomainName(), matcher);
-                    results.add(sr);
+                    if (PerformersHelper.someSearchTokensMatchSearchResult(searchTokens, sr)) {
+                        results.add(sr);
+                    }
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }

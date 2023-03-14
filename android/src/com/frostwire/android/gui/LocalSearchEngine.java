@@ -17,14 +17,12 @@
 
 package com.frostwire.android.gui;
 
-import android.text.Html;
-
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.CrawledSearchResult;
-import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchManager;
@@ -33,16 +31,11 @@ import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.StringUtils;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -118,7 +111,7 @@ public final class LocalSearchEngine {
         }
         manager.stop();
         currentSearchToken = Math.abs(System.nanoTime());
-        currentSearchTokens = tokenize(query);
+        currentSearchTokens = PerformersHelper.tokenizeSearchKeywords(query);
         searchFinished = false;
         ArrayList<SearchEngine> shuffledEngines = new ArrayList<>(SearchEngine.getEngines(true));
         Collections.shuffle(shuffledEngines);
@@ -191,7 +184,7 @@ public final class LocalSearchEngine {
 
         try {
             list = results.stream().parallel().filter(sr -> {
-                if (sr instanceof CrawledSearchResult && allQueryTokensExistInSearchResult(new LinkedList<>(currentSearchTokens), sr)) {
+                if (sr instanceof CrawledSearchResult && PerformersHelper.allQueryTokensExistInSearchResult(new LinkedList<>(currentSearchTokens), sr)) {
                     return true;
                 }
                 return !(sr instanceof CrawledSearchResult);
@@ -201,70 +194,6 @@ public final class LocalSearchEngine {
         }
 
         return list;
-    }
-
-
-    /**
-     * Using properties of the search result, we build a lowercase string and then we return true if ALL the tokens are to be found in that string
-     */
-    private boolean allQueryTokensExistInSearchResult(List<String> tokens, SearchResult sr) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(sr.getDisplayName());
-        if (sr instanceof CrawledSearchResult) {
-            sb.append(((CrawledSearchResult) sr).getParent().getDisplayName());
-        }
-
-        if (sr instanceof FileSearchResult) {
-            sb.append(((FileSearchResult) sr).getFilename());
-        }
-
-        String str = sanitize(sb.toString());
-        str = normalize(str);
-
-        Iterator<String> it = tokens.iterator();
-        while (it.hasNext()) {
-            String token = it.next();
-            if (str.contains(token)) {
-                it.remove();
-            }
-        }
-
-        return tokens.isEmpty();
-    }
-
-    private String sanitize(String str) {
-        str = Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString();
-        //noinspection RegExpRedundantEscape
-        str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
-        str = StringUtils.removeDoubleSpaces(str);
-
-        return str.trim();
-    }
-
-    private String normalize(String token) {
-        String norm = Normalizer.normalize(token, Normalizer.Form.NFKD);
-        norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-        norm = norm.toLowerCase(Locale.US);
-
-        return norm;
-    }
-
-    private Set<String> normalizeTokens(Set<String> tokens) {
-        Set<String> normalizedTokens = new HashSet<>(0);
-
-        for (String token : tokens) {
-            String norm = normalize(token);
-            normalizedTokens.add(norm);
-        }
-
-        return normalizedTokens;
-    }
-
-    private List<String> tokenize(String keywords) {
-        keywords = sanitize(keywords);
-        Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
-        return new ArrayList<>(normalizeTokens(tokens));
     }
 
     private int getSearchResultUID(SearchResult sr) {

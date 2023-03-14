@@ -17,15 +17,26 @@
 
 package com.frostwire.search;
 
+import android.text.Html;
+
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.regex.Pattern;
+import com.frostwire.search.eztv.EztvSearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.StringUtils;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author gubatron
@@ -128,5 +139,74 @@ public final class PerformersHelper {
             html = new String(html.substring(prefixOffset, suffixOffset).toCharArray());
         }
         return html;
+    }
+
+    public static boolean someSearchTokensMatchSearchResult(List<String> keywords, SearchResult sr) {
+        String str = searchResultAsNormalizedString(sr);
+        for (String keyword : keywords) {
+            if (str.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Using properties of the search result, we build a lowercase string and then we return true if ALL the tokens are to be found in that string
+     */
+    public static boolean allQueryTokensExistInSearchResult(List<String> tokens, SearchResult sr) {
+        String str = searchResultAsNormalizedString(sr);
+        tokens.removeIf(str::contains);
+        return tokens.isEmpty();
+    }
+
+    public static List<String> tokenizeSearchKeywords(String keywords) {
+        keywords = sanitize(keywords);
+        Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
+        return new ArrayList<>(normalizeTokens(tokens));
+    }
+
+    private static String searchResultAsNormalizedString(SearchResult sr) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(sr.getDisplayName());
+        if (sr instanceof CrawledSearchResult) {
+            sb.append(((CrawledSearchResult) sr).getParent().getDisplayName());
+        }
+
+        if (sr instanceof FileSearchResult) {
+            sb.append(((FileSearchResult) sr).getFilename());
+        }
+
+        String str = sanitize(sb.toString());
+        return normalize(str);
+    }
+
+    private static String sanitize(String str) {
+        str = Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString();
+        //noinspection RegExpRedundantEscape
+        str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
+        str = StringUtils.removeDoubleSpaces(str);
+
+        return str.trim();
+    }
+
+    private static String normalize(String token) {
+        String norm = Normalizer.normalize(token, Normalizer.Form.NFKD);
+        norm = norm.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        norm = norm.toLowerCase(Locale.US);
+
+        return norm;
+    }
+
+    private static Set<String> normalizeTokens(Set<String> tokens) {
+        Set<String> normalizedTokens = new HashSet<>(0);
+
+        for (String token : tokens) {
+            String norm = normalize(token);
+            normalizedTokens.add(norm);
+        }
+
+        return normalizedTokens;
     }
 }
