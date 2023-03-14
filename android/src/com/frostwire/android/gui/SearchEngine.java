@@ -221,6 +221,21 @@ public abstract class SearchEngine {
             // while this is happening TPB.isReady() should be false, as it's initialized with a null domain name.
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
+
+                // Race condition issue
+                // it appears this static TPB object might be initialized before TPBSearchPerformer.mirrors (also static)
+                int tries = 5;
+                while (TPBSearchPerformer.mirrors == null && tries > 0) {
+                    try {
+                        Thread.sleep(100);
+                        tries--;
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+                if (tries == 0) {
+                    domainName = "thepiratebay.org";
+                    return;
+                }
                 domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.mirrors, 6000, 6);
             }
             ).start();

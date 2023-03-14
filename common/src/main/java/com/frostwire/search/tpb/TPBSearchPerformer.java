@@ -30,13 +30,6 @@ import java.util.List;
  * @author aldenml
  */
 public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResult> {
-    private static final int MAX_RESULTS = 20;
-    private static Pattern PATTERN;
-
-    public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
-    }
-
     public static final String[] mirrors = {
             "pirate-bay.info",
             "pirate-bays.net",
@@ -52,6 +45,13 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
             "thepiratebay7.com",
             "tpb.party",
     };
+
+    private static final int MAX_RESULTS = 20;
+    private static Pattern PATTERN;
+
+    public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
+    }
 
     @Override
     public Pattern getPattern() {
