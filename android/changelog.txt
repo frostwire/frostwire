@@ -1,4 +1,5 @@
-FrostWire 2.6.5 build 714 - MAR/13/2023
+FrostWire 2.6.5 build 714 - MAR/14/2023
+ - Filters out irrelevant search results from EZTV search performer
  - Removed all landscape layouts, app works only in vertical mode now
  - com.android.tools.build:gradle:7.4.2
  - python:yt_dlp-2023.3.4
