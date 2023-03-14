@@ -40,7 +40,7 @@ buildscript {
         classpath 'com.google.gms:google-services:4.3.15'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.4'
 
-        classpath 'androidx.annotation:annotation:1.5.0'
+        classpath 'androidx.annotation:annotation:1.6.0'
         classpath 'com.android.billingclient:billing:4.1.0'
 
         classpath 'com.chaquo.python:gradle:14.0.2'
