@@ -18,6 +18,7 @@
 
 package com.frostwire.util;
 
+import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
@@ -139,13 +140,17 @@ public final class UrlUtils {
         ExecutorService executor = Executors.newFixedThreadPool(4);
         for (String randomMirror : mirrorList) {
             executor.submit(() -> {
-                mirrorDurations.add(
-                        new MirrorHeadDuration(
-                                randomMirror,
-                                testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs)
-                        )
-                );
-                latch.countDown();
+                try {
+                    long duration = testHeadRequestDurationInMs(httpClient, randomMirror, minResponseTimeInMs);
+                    mirrorDurations.add(
+                            new MirrorHeadDuration(
+                                    randomMirror,
+                                    duration
+                            )
+                    );
+                } finally {
+                    latch.countDown();
+                }
             });
         }
 
@@ -155,14 +160,16 @@ public final class UrlUtils {
             return mirrors[0];
         }
 
-        mirrorDurations.sort((o1, o2) -> {
-            if (o1.duration() < o2.duration()) {
-                return -1;
-            } else if (o1.duration() > o2.duration()) {
-                return 1;
-            }
-            return 0;
-        });
+        if (mirrorDurations.size() > 1) {
+            mirrorDurations.sort((o1, o2) -> {
+                if (o1.duration() < o2.duration()) {
+                    return -1;
+                } else if (o1.duration() > o2.duration()) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
 
         fastestMirror = mirrorDurations.get(0).mirror();
         LOG.info("UrlUtils.getFastestMirrorDomain() -> fastest mirror is " + fastestMirror + " in " + mirrorDurations.get(0).duration() + "ms");
