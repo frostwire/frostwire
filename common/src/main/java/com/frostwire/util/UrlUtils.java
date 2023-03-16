@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -159,7 +160,8 @@ public final class UrlUtils {
         } catch (InterruptedException e) {
             return mirrors[0];
         }
-
+        //filter out all null elements from mirrorDurations
+        mirrorDurations.removeIf(Objects::isNull);
         if (mirrorDurations.size() > 1) {
             mirrorDurations.sort((o1, o2) -> {
                 if (o1.duration() < o2.duration()) {
