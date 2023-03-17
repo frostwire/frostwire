@@ -155,16 +155,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.frostwire.android.gui.activities.WizardActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.WizardActivity"
+                android:screenOrientation="portrait"
                 android:theme="@style/WizardActivity" />
         <activity
-            android:name="com.frostwire.android.gui.activities.SettingsActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.SettingsActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/activity_preferences_name" />
         <activity
-            android:name="com.frostwire.android.gui.activities.BuyActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.BuyActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/remove_ads"
                 android:exported="true">
             <intent-filter>
@@ -179,33 +179,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.frostwire.android.gui.activities.AboutActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.AboutActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/about" />
         <activity
-            android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.PreviewPlayerActivity"
+                android:screenOrientation="portrait"
                 android:configChanges="screenSize"
                 android:label="@string/playing" />
         <activity
-            android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.VPNStatusDetailActivity"
+                android:screenOrientation="portrait"
                 android:excludeFromRecents="true"
                 android:label="@string/activity_VPN"
                 android:noHistory="true" />
         <activity
-            android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
-            android:screenOrientation="portrait"
+                android:name="com.frostwire.android.gui.activities.TransferDetailActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/title_activity_transfer_detail" />
 
         <!-- apollo activities -->
         <activity
-            android:name="com.andrew.apollo.ui.activities.HomeActivity"
-            android:screenOrientation="portrait"
+                android:name="com.andrew.apollo.ui.activities.HomeActivity"
+                android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
-            android:screenOrientation="portrait"
+                android:name="com.andrew.apollo.ui.activities.AudioPlayerActivity"
+                android:screenOrientation="portrait"
                 android:clearTaskOnLaunch="true"
                 android:label="@string/frostwire_player"
                 android:launchMode="singleTask"
@@ -271,12 +271,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.andrew.apollo.ui.activities.ProfileActivity"
-            android:screenOrientation="portrait"
+                android:name="com.andrew.apollo.ui.activities.ProfileActivity"
+                android:screenOrientation="portrait"
                 android:excludeFromRecents="true" />
         <activity
-            android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
-            android:screenOrientation="portrait"
+                android:name="com.andrew.apollo.ui.activities.ShortcutActivity"
+                android:screenOrientation="portrait"
                 android:excludeFromRecents="true"
                 android:theme="@style/Theme.Transparent"
                 android:exported="true">
@@ -287,8 +287,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.andrew.apollo.ui.activities.SearchActivity"
-            android:screenOrientation="portrait"
+                android:name="com.andrew.apollo.ui.activities.SearchActivity"
+                android:screenOrientation="portrait"
                 android:parentActivityName="com.andrew.apollo.ui.activities.HomeActivity"
                 android:exported="true">
             <intent-filter>
