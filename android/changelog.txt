@@ -1,9 +1,10 @@
-FrostWire 2.6.5 build 715 - MAR/16/2023
+FrostWire 2.6.5 build 716 - MAR/17/2023
  - Filters out irrelevant search results from EZTV search performer
  - Removed all landscape layouts, app works only in vertical mode now
  - python:yt_dlp-2023.3.4
  - androidx.annotation:annotation:1.6.0
  - Fixes weird crash getting fastest TPB mirror
+ - dev:com.android.tools.build:gradle:7.4.0
 
 FrostWire 2.6.4 build 713 - MAR/09/2023
  - 100x faster search results
