@@ -70,13 +70,12 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
     protected List<? extends SearchResult> searchPage(String page) {
         Matcher jsonMatcher = jsonPattern.matcher(page);
         List<YTSearchResult> results = new ArrayList<>();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        Gson gson = gsonBuilder.create();
         while (jsonMatcher.find()) {
             String json = jsonMatcher.group(1);
             json = json.replace("\"videoRenderer\":", "") + ":\"\"}";
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            Gson gson = gsonBuilder.create();
             Video video = gson.fromJson(json, Video.class);
-
             String title = video.title.runs.get(0).text;
             String videoAge = video.publishedTimeText.simpleText;
             long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
