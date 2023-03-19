@@ -17,26 +17,16 @@
 
 package com.frostwire.search;
 
-import android.text.Html;
-
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.eztv.EztvSearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -183,11 +173,10 @@ public final class PerformersHelper {
     }
 
     private static String sanitize(String str) {
-        str = Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY).toString();
+        str = StringUtils.fromHtml(str);
         //noinspection RegExpRedundantEscape
         str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
         str = StringUtils.removeDoubleSpaces(str);
-
         return str.trim();
     }
 

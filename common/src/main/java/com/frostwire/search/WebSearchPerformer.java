@@ -43,7 +43,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     private final int timeout;
     private final HttpClient client;
 
-    WebSearchPerformer(String domainName, long token, String keywords, int timeout) {
+    WebSearchPerformer(String domainName, long token, String keywords, int timeoutInMilliseconds) {
         super(token);
         if (domainName == null) {
             throw new IllegalArgumentException("domainName can't be null");
@@ -51,7 +51,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         this.domainName = domainName;
         this.keywords = keywords;
         this.encodedKeywords = UrlUtils.encode(keywords);
-        this.timeout = timeout;
+        this.timeout = timeoutInMilliseconds;
         this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
     }
 

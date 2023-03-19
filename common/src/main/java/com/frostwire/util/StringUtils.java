@@ -17,6 +17,8 @@ package com.frostwire.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Provides static methods to split, check for substrings, change case and
@@ -436,5 +438,46 @@ public class StringUtils {
             hash = (hash * (int) s.charAt(i)) % 0x7fffffff; // modded to int max val
         }
         return hash;
+    }
+
+    public static String fromHtml(String html) {
+        // Remove HTML comments
+        html = html.replaceAll("(?s)<!--.*?-->", "");
+
+        // Remove inline CSS styles
+        html = html.replaceAll("<(\\w+)\\s+style=\"[^\"]*\">", "<$1>");
+
+        // Remove JavaScript
+        html = html.replaceAll("(?i)<script.*?</script>", "");
+
+        // Replace HTML entities with their plain text equivalents
+        html = html.replaceAll("&nbsp;", " ");
+        html = html.replaceAll("&amp;", "&");
+        html = html.replaceAll("&lt;", "<");
+        html = html.replaceAll("&gt;", ">");
+        html = html.replaceAll("&quot;", "\"");
+        html = html.replaceAll("&apos;", "'");
+
+        // Convert <br> tags to line breaks
+        html = html.replaceAll("(?i)<br\\s*/?>", System.lineSeparator());
+
+        // Convert <em> and <i> tags to emphasized text
+        html = html.replaceAll("(?i)<(em|i)>(.*?)</\\1>", "_$2_");
+
+        // Convert <strong> and <b> tags to strong text
+        html = html.replaceAll("(?i)<(strong|b)>(.*?)</\\1>", "*$2*");
+
+        // Remove all other HTML tags
+        Pattern pattern = Pattern.compile("<.*?>", Pattern.DOTALL);
+        Matcher matcher = pattern.matcher(html);
+        html = matcher.replaceAll("");
+
+        // Normalize whitespace
+        html = html.replaceAll("\\s+", " ");
+
+        // Trim leading and trailing whitespace
+        html = html.trim();
+
+        return html;
     }
 }
