@@ -40,7 +40,7 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 0);
         if (searchPattern == null) {
-            searchPattern = Pattern.compile("(?is)<td class=\"forum_thread_post\">.*?" + "<a href=\"(?<detailUrl>.*?)\" title=\"(?<displayname>.*?)\" alt=\".*?\" class=\"epinfo\".*?<a href=\"magnet(?<magnet>.*?)\" " + "class=\"magnet\".*?</td>.*?<td align=\"center\" class=\"forum_thread_post\">(?<size>[0-9\\. GMB]+)</td>" + ".*?<td align=\"center\" class=\"forum_thread_post\">(?<age>.*?)</td>");
+            searchPattern = Pattern.compile("(?is)<td class=\"forum_thread_post\">\\s+" + "<a href=\"(?<detailUrl>.*?)\" title=\"(?<displayname>.*?)\" alt=\".*?\" class=\"epinfo\".*?<a href=\"magnet(?<magnet>.*?)\" " + "class=\"magnet\".*?</td>.*?<td align=\"center\" class=\"forum_thread_post\">(?<size>[0-9\\. GMB]+)</td>" + ".*?<td align=\"center\" class=\"forum_thread_post\">(?<age>.*?)</td>");
         }
 
     }
@@ -78,6 +78,7 @@ public class EztvSearchPerformer extends SimpleTorrentSearchPerformer {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 LOG.error("EztvSearchPerformer.searchPage() has failed.\n" + t.getMessage(), t);
+                LOG.error("EztvSearchPerformer.searchPage() reduced page:\n" + reducedPage + "\n");
                 //return results;
             }
             if (matcherFound) {

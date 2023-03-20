@@ -36,7 +36,7 @@ public final class EztvSearchPerformerTest {
     @Test
     public void eztvSearchTest() {
         ArrayList<EztvSearchResult> testResults = new ArrayList<>();
-        EztvSearchPerformer searchPerformer = (EztvSearchPerformer) SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.EZTV_ID).getPerformer(1, "cspan");
+        EztvSearchPerformer searchPerformer = (EztvSearchPerformer) SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.EZTV_ID).getPerformer(1, "love");
         searchPerformer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
