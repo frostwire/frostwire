@@ -82,7 +82,7 @@ public class YTSearchResult implements FileSearchResult {
 
     @Override
     public String getFilename() {
-        return title + "mp4";
+        return title + ".mp4";
     }
 
     @Override

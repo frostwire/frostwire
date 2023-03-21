@@ -76,12 +76,15 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
             String json = jsonMatcher.group(1);
             json = json.replace("\"videoRenderer\":", "") + ":\"\"}";
             Video video = gson.fromJson(json, Video.class);
+            if (video.publishedTimeText == null) {
+                continue;
+            }
             String title = video.title.runs.get(0).text;
             String videoAge = video.publishedTimeText.simpleText;
             long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
             String thumbnailUrl = video.thumbnail.thumbnails.get(0).url;
             String detailsUrl = "https://" + getDomainName() + "/watch?v=" + video.videoId;
-            int viewCount = Integer.parseInt(video.viewCountText.simpleText.replace(",", "").replace(" views", ""));
+            int viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Integer.parseInt(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
             YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCount);
             LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
             results.add(searchResult);
@@ -90,7 +93,8 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
     }
 
     private long parseCreationTimeInMillis(String creationString) {
-        creationString = creationString.toLowerCase().replace("s", "").replace("ago", "");
+        LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
+        creationString = creationString.toLowerCase().replace("streamed ","").replaceAll("s", "").replace("ago", "");
         String[] parts = creationString.split(" ");
         int time = Integer.parseInt(parts[0]);
         String unit = parts[1];

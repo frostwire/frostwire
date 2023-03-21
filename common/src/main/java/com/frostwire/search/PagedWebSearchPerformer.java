@@ -64,7 +64,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
             if (e instanceof SSLPeerUnverifiedException) {
                 LOG.error("Make sure to add " + getDomainName() + " to Ssl.FWHostnameVerifier valid host name list");
             }
-            LOG.error("Error searching page [" + url + "]: " + e.getMessage());
+            LOG.error("Error searching page [" + url + "]: " + e.getMessage(), e);
         }
         return result;
     }
