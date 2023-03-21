@@ -36,6 +36,7 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
+import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
 import com.frostwire.util.UrlUtils;
@@ -47,8 +48,6 @@ import org.limewire.setting.BooleanSetting;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -56,8 +55,6 @@ import static com.limegroup.gnutella.settings.LimeProps.FACTORY;
 public abstract class SearchEngine {
     //private static final Logger LOG = Logger.getLogger(SearchEngine.class);
     private static final int DEFAULT_TIMEOUT = 5000;
-
-    private static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
 
     public enum SearchEngineID {
         BT_DIGG,
@@ -78,7 +75,8 @@ public abstract class SearchEngine {
         MAGNETDL_ID,
         TORRENTPARADISE_ID,
         GLOTORRENTS_ID,
-        TELLURIDE_ID
+        TELLURIDE_ID,
+        YT_ID
     }
 
     private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "BTDigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
@@ -194,13 +192,20 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", TELLURIDE_ENABLED, "*") {
+    private static final SearchEngine TELLURIDE = new SearchEngine(SearchEngineID.TELLURIDE_ID, "Cloud Backup", SearchEnginesSettings.TELLURIDE_ENABLED, "*") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TellurideSearchPerformer(token,
                     keywords,
                     new TellurideSearchPerformerDesktopListener(),
                     FrostWireUtils.getTellurideLauncherFile());
+        }
+    };
+
+    private static final SearchEngine YT = new SearchEngine(SearchEngineID.YT_ID, "YT", SearchEnginesSettings.YT_SEARCH_ENABLED, "www.youtube.com") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new YTSearchPerformer(token, keywords, DEFAULT_TIMEOUT, 1);
         }
     };
 
@@ -228,6 +233,7 @@ public abstract class SearchEngine {
     // desktop/ is currently using this class, but it should use common/SearchManager.java in the near future (like android/)
     public static List<SearchEngine> getEngines() {
         return Arrays.asList(
+                YT,
                 BT_DIGG,
                 ARCHIVEORG,
                 EZTV,

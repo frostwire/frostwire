@@ -37,11 +37,11 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting YIFY_SEARCH_ENABLED = FACTORY.createBooleanSetting("YIFY_SEARCH_ENABLED", true);
     public static final BooleanSetting ONE337X_SEARCH_ENABLED = FACTORY.createBooleanSetting("ONE337X_SEARCH_ENABLED", true);
     public static final BooleanSetting IDOPE_SEARCH_ENABLED = FACTORY.createBooleanSetting("IDOPE_SEARCH_ENABLED", true);
-    public static final BooleanSetting ZOOQLE_SEARCH_ENABLED = FACTORY.createBooleanSetting("ZOOQLE_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTZ2_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTZ2_SEARCH_ENABLED", true);
     public static final BooleanSetting NYAA_SEARCH_ENABLED = FACTORY.createBooleanSetting("NYAA_SEARCH_ENABLED", true);
     public static final BooleanSetting MAGNETDL_ENABLED = FACTORY.createBooleanSetting("MAGNETDL_ENABLED", true);
-    public static final BooleanSetting TORRENTPARADISE_ENABLED = FACTORY.createBooleanSetting("TORRENTPARADISE_ENABLED", true);
     public static final BooleanSetting GLOTORRENTS_ENABLED = FACTORY.createBooleanSetting("GLOTORRENTS_ENABLED", true);
+    public static final BooleanSetting TELLURIDE_ENABLED = (BooleanSetting) FACTORY.createBooleanSetting("TELLURIDE_ENABLED", true).setAlwaysSave(true);
     public static final BooleanSetting BT_DIGG_SEARCH_ENABLED = FACTORY.createBooleanSetting("BT_DIGG_SEARCH_ENABLED", true);
+    public static final BooleanSetting YT_SEARCH_ENABLED = FACTORY.createBooleanSetting("YT_SEARCH_ENABLED", true);
 }

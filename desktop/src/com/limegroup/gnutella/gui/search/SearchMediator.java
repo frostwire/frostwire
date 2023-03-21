@@ -28,6 +28,7 @@ import com.frostwire.search.archiveorg.ArchiveorgCrawledSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.yt.YTSearchResult;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -224,6 +225,8 @@ public final class SearchMediator {
                 ui = new ArchiveorgUISearchResult((ArchiveorgCrawledSearchResult) sr, engine, query);
             } else if (sr instanceof TellurideSearchResult) {
                 ui = new TellurideUISearchResult((TellurideSearchResult) sr, engine, query);
+            } else if (sr instanceof YTSearchResult) {
+                ui = new YTUISearchResult((YTSearchResult) sr, engine, query);
             }
             if (ui != null) {
                 result.add(ui);
