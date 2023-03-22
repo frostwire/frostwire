@@ -27,6 +27,7 @@ import com.frostwire.search.archiveorg.ArchiveorgTorrentSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.yt.YTSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -137,20 +138,24 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private boolean isSearchResultPlayable() {
-        boolean playable = false;
+        if (uiSearchResult instanceof YTUISearchResult) {
+            return true;
+        }
         if (uiSearchResult.getSearchResult() instanceof SoundcloudSearchResult) {
             return true;
-        } else if (uiSearchResult.getSearchResult() instanceof StreamableSearchResult) {
-            playable = ((StreamableSearchResult) uiSearchResult.getSearchResult()).getStreamUrl() != null;
-        } else if (uiSearchResult.getSearchResult() instanceof TellurideSearchResult) {
+        }
+        if (uiSearchResult.getSearchResult() instanceof TellurideSearchResult) {
             return true;
         }
-
-        if (playable && uiSearchResult.getExtension() != null) {
-            MediaType mediaType = MediaType.getMediaTypeForExtension(uiSearchResult.getExtension());
-            playable = mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
+        if (uiSearchResult.getSearchResult() instanceof StreamableSearchResult) {
+            if (((StreamableSearchResult) uiSearchResult.getSearchResult()).getStreamUrl() != null) {
+                if (uiSearchResult.getExtension() != null) {
+                    MediaType mediaType = MediaType.getMediaTypeForExtension(uiSearchResult.getExtension());
+                    return mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
+                }
+            }
         }
-        return playable;
+        return false;
     }
 
     private void updatePlayButton() {
@@ -161,7 +166,8 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult searchResult = uiSearchResult.getSearchResult();
             if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) ||
-                    searchResult instanceof TellurideSearchResult) {
+                    searchResult instanceof TellurideSearchResult ||
+                    searchResult instanceof YTSearchResult) {
                 uiSearchResult.play();
             }
             updatePlayButton();
@@ -170,6 +176,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     /**
      * Handles both + and down arrow
+     *
      * @param e
      */
     private void labelDownloadAction_mouseReleased(MouseEvent e) {
