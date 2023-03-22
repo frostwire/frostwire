@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,26 +89,28 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         labelDownload = new JLabel(download_transparent);
         labelDownload.setToolTipText(I18n.tr("Download"));
 
-        final MouseAdapter downloadActionAdapter = new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                labelDownloadAction_mouseReleased(e);
-            }
-        };
-
-        labelDownload.addMouseListener(downloadActionAdapter);
+        labelDownload.addMouseListener(newDownloadAdapter());
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelDownload, c);
         labelPartialDownload = new JLabel(details_solid);
         labelPartialDownload.setToolTipText(I18n.tr("Select content to download from this torrent."));
-        labelPartialDownload.addMouseListener(downloadActionAdapter);
+        labelPartialDownload.addMouseListener(newDownloadAdapter());
         c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPartialDownload, c);
         setEnabled(true);
+    }
+
+    private MouseListener newDownloadAdapter() {
+        return new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                labelDownloadAction_mouseReleased(e);
+            }
+        };
     }
 
     @Override
@@ -130,11 +132,16 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
         if (labelPlay.isVisible()) {
             updatePlayButton();
         }
-        labelDownload.setIcon(showSolid ? download_solid : download_transparent);
-        labelDownload.setVisible(true);
-        labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
         SearchResult sr = uiSearchResult.getSearchResult();
-        labelPartialDownload.setVisible(sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult);
+        // Two-step download. e.g. show me contents of a torrent first, or starts a telluride search
+        boolean isPartialDownload = sr instanceof CrawlableSearchResult || sr instanceof ArchiveorgTorrentSearchResult || sr instanceof YTSearchResult;
+
+        labelDownload.setIcon(showSolid ? download_solid : download_transparent);
+        labelDownload.setVisible(!isPartialDownload);
+
+        // [+] Partial Download
+        labelPartialDownload.setIcon(showSolid ? details_solid : details_transparent);
+        labelPartialDownload.setVisible(isPartialDownload);
     }
 
     private boolean isSearchResultPlayable() {
@@ -151,7 +158,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             if (((StreamableSearchResult) uiSearchResult.getSearchResult()).getStreamUrl() != null) {
                 if (uiSearchResult.getExtension() != null) {
                     MediaType mediaType = MediaType.getMediaTypeForExtension(uiSearchResult.getExtension());
-                    return mediaType != null && (mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType());
+                    return mediaType != null && ((mediaType.equals(MediaType.getAudioMediaType())) || mediaType.equals(MediaType.getVideoMediaType()));
                 }
             }
         }
@@ -165,9 +172,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private void labelPlay_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             SearchResult searchResult = uiSearchResult.getSearchResult();
-            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) ||
-                    searchResult instanceof TellurideSearchResult ||
-                    searchResult instanceof YTSearchResult) {
+            if ((searchResult instanceof StreamableSearchResult && !isStreamableSourceBeingPlayed(uiSearchResult)) || searchResult instanceof TellurideSearchResult || searchResult instanceof YTSearchResult) {
                 uiSearchResult.play();
             }
             updatePlayButton();
@@ -175,29 +180,16 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     /**
-     * Handles both + and down arrow
-     *
-     * @param e
+     * Handles both partial download and download button
      */
     private void labelDownloadAction_mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            MouseListener[] mouseListeners = labelPartialDownload.getMouseListeners();
-            for (MouseListener mouseListener : mouseListeners) {
-                labelPartialDownload.removeMouseListener(mouseListener);
-            }
-
             SearchResult sr = uiSearchResult.getSearchResult();
             boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
             uiSearchResult.download(isTorrent);
-
             boolean showTransfers = !(uiSearchResult instanceof YTUISearchResult);
-
             if (showTransfers) {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-            }
-
-            for (MouseListener mouseListener : mouseListeners) {
-                labelPartialDownload.addMouseListener(mouseListener);
             }
         }
     }
