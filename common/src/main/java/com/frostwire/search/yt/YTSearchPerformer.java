@@ -84,8 +84,9 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
             long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
             String thumbnailUrl = video.thumbnail.thumbnails.get(0).url;
             String detailsUrl = "https://" + getDomainName() + "/watch?v=" + video.videoId;
-            int viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Integer.parseInt(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
-            YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCount);
+            long viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Long.parseLong(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
+            int viewCountInt = viewCount > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) viewCount;
+            YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt);
             LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
             results.add(searchResult);
         }
