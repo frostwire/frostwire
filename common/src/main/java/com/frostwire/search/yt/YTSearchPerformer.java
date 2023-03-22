@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * YouTube Search performer
+ * YT Search performer
  */
 public class YTSearchPerformer extends PagedWebSearchPerformer {
     private final static Logger LOG = Logger.getLogger(YTSearchPerformer.class);
@@ -87,15 +87,15 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
             long viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Long.parseLong(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
             int viewCountInt = viewCount > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) viewCount;
             YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt);
-            LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
+            //LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
             results.add(searchResult);
         }
         return results;
     }
 
     private long parseCreationTimeInMillis(String creationString) {
-        LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
-        creationString = creationString.toLowerCase().replace("streamed ","").replaceAll("s", "").replace("ago", "");
+        //LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
+        creationString = creationString.toLowerCase().replace("streamed ", "").replaceAll("s", "").replace("ago", "");
         String[] parts = creationString.split(" ");
         int time = Integer.parseInt(parts[0]);
         String unit = parts[1];

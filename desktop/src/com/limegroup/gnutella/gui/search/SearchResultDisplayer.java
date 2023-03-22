@@ -158,11 +158,11 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     SearchResultMediator addResultTab(long token, List<String> searchTokens, SearchInformation info) {
-        SearchResultMediator panel = new SearchResultMediator(token, searchTokens, info);
+        SearchResultMediator searchResultMediator = new SearchResultMediator(token, searchTokens, info);
         if (MAIN_PANEL.getHeight() < SearchResultDisplayer.MIN_HEIGHT) {
             GUIMediator.instance().getMainFrame().resizeSearchTransferDivider(SearchResultDisplayer.MIN_HEIGHT);
         }
-        return addResultPanelInternal(panel, info.getTitle());
+        return addResultPanelInternal(searchResultMediator, info.getTitle());
     }
 
     private void removeTabbedPaneListeners() {
@@ -236,7 +236,7 @@ public final class SearchResultDisplayer implements RefreshListener {
             resetTabbedPane();
             tabbedPane.setSelectedIndex(entries.size() - 1);
             // This will happen under OS X in apple.laf.CUIAquaTabbedPaneTabState.getIndex().
-            // we grab all of the components from the current 
+            // we grab all the components from the current
             // tabbed pane, create a new tabbed pane, and dump
             // the components back into it.
             //

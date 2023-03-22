@@ -38,7 +38,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public final class SearchManager {
     private static final Logger LOG = Logger.getLogger(SearchManager.class);
     /**
-     * Executor for one off searches that don't need any crawling of results
+     * Executor for one-off searches that don't need any crawling of results
      */
     private final ExecutorService singlePageRequestExecutor;
     /**
