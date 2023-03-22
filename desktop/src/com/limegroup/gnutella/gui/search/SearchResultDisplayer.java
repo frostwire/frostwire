@@ -80,7 +80,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      * The layout that switches between the dummy result panel
      * and the JTabbedPane.
      */
-    private final CardLayout switcher = new CardLayout();
+    private final CardLayout cardLayoutSwitcher = new CardLayout();
     /**
      * The listener to notify about the currently displaying search
      * changing.
@@ -101,7 +101,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         // make the results panel take up as much space as possible
         // for when the window is resized. 
         results.setPreferredSize(new Dimension(10000, 10000));
-        results.setLayout(switcher);
+        results.setLayout(cardLayoutSwitcher);
         //results.setBackground(Color.WHITE);
         //Add SlideShowPanel here.
         promoSlides = null;
@@ -125,7 +125,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         promoSlides.setupContainerAndControls(mainScreen, true);
         mainScreen.add(DUMMY.getComponent(), BorderLayout.CENTER);
         results.add("dummy", mainScreen);
-        switcher.first(results);
+        cardLayoutSwitcher.first(results);
         setupTabbedPane();
         MAIN_PANEL.add(results);
         CancelSearchIconProxy.updateTheme();
@@ -219,15 +219,15 @@ public final class SearchResultDisplayer implements RefreshListener {
         }
     }
 
-    private SearchResultMediator addResultPanelInternal(SearchResultMediator panel, String title) {
-        entries.add(panel);
+    private SearchResultMediator addResultPanelInternal(SearchResultMediator searchResultMediator, String title) {
+        entries.add(searchResultMediator);
         // XXX: LWC-1214 (hack)
         try {
-            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), panel.getComponent());
+            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), searchResultMediator.getComponent());
         } catch (ArrayIndexOutOfBoundsException e) {
             resetTabbedPane();
-            entries.add(panel);
-            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), panel.getComponent());
+            entries.add(searchResultMediator);
+            tabbedPane.addTab(title, CancelSearchIconProxy.createSelected(), searchResultMediator.getComponent());
         }
         // XXX: LWC-1088 (hack)
         try {
@@ -257,11 +257,11 @@ public final class SearchResultDisplayer implements RefreshListener {
             killSearchAtIndex(0);
         }
         promoSlides.setVisible(false);
-        switcher.last(results); //show tabbed results
+        cardLayoutSwitcher.last(results); //show tabbed results
         // If there are lots of tabs, this ensures everything
         // is properly visible. 
         MAIN_PANEL.revalidate();
-        return panel;
+        return searchResultMediator;
     }
 
     /**
@@ -440,7 +440,7 @@ public final class SearchResultDisplayer implements RefreshListener {
         if (entries.size() == 0) {
             try {
                 promoSlides.setVisible(true);
-                switcher.first(results); //show dummy table
+                cardLayoutSwitcher.first(results); //show dummy table
             } catch (ArrayIndexOutOfBoundsException aioobe) {
                 //happens on jdk1.5 beta w/ windows XP, ignore.
             }

@@ -73,7 +73,6 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
 
     private void setupUI() {
         setLayout(new GridBagLayout());
-        GridBagConstraints c;
         labelPlay = new JLabel(play_transparent);
         labelPlay.setToolTipText(I18n.tr("Play/Preview"));
         labelPlay.addMouseListener(new MouseAdapter() {
@@ -82,7 +81,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
                 labelPlay_mouseReleased(e);
             }
         });
-        c = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints();
         c.gridx = GridBagConstraints.RELATIVE;
         c.ipadx = 3;
         add(labelPlay, c);
@@ -183,7 +182,12 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             SearchResult sr = uiSearchResult.getSearchResult();
             boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
             uiSearchResult.download(isTorrent);
-            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+
+            boolean showTransfers = !(uiSearchResult instanceof YTUISearchResult);
+
+            if (showTransfers) {
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
+            }
 
             for (MouseListener mouseListener : mouseListeners) {
                 labelPartialDownload.addMouseListener(mouseListener);
