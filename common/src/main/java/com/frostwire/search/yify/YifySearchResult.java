@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     private final String displayName;
     private final String detailsUrl;
     private final String infoHash;
-    private final double size;
+    private final long size;
     private final long creationTime;
     private final int seeds;
     private final String magnetUrl;
@@ -131,7 +131,7 @@ public final class YifySearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return size;
     }
 

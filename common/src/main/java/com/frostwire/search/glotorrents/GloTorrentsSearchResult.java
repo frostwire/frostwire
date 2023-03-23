@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ public class GloTorrentsSearchResult extends AbstractTorrentSearchResult {
     private final String fileSizeUnit;
     private final int seeds;
     private final String usualTorrentTrackersMagnetUrlParameters;
-    private final double fileSize;
+    private final long fileSize;
 
     public GloTorrentsSearchResult(String _magnetURL,
                                    String _detailsURL,
@@ -70,7 +70,7 @@ public class GloTorrentsSearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return fileSize;
     }
 

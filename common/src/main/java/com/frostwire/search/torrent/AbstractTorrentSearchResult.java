@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
-
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,7 @@ import java.util.Map;
  * @author aldenml
  */
 public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResult implements TorrentCrawlableSearchResult {
-    private final static double[] BYTE_MULTIPLIERS = new double[]{
+    private final static long[] BYTE_MULTIPLIERS = new long[]{
             1,
             2 << 9,
             2 << 19,
@@ -59,20 +59,20 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         return getDetailsUrl();
     }
 
-    protected double parseSize(String group) {
+    protected long parseSize(String group) {
         String[] size = group.trim().split(" ");
         String amount = size[0].trim();
         String unit = size[1].trim();
         return calculateSize(amount, unit);
     }
 
-    protected double calculateSize(String amount, String unit) {
+    protected long calculateSize(String amount, String unit) {
         if (amount == null || unit == null) {
             return -1;
         }
         amount = amount.replaceAll(",", "");
         final Integer unitMultiplier = UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit);
-        double multiplier = 1;
+        long multiplier = 1;
         if (unitMultiplier != null) {
             multiplier = BYTE_MULTIPLIERS[unitMultiplier];
         }

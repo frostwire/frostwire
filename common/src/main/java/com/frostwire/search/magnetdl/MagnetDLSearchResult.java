@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,7 +33,7 @@ public final class MagnetDLSearchResult extends AbstractTorrentSearchResult {
     private final String detailsUrl;
     private final String torrentUrl;
     private final String infoHash;
-    private final double size;
+    private final long size;
     private final long creationTime;
     private final int seeds;
 
@@ -55,7 +55,7 @@ public final class MagnetDLSearchResult extends AbstractTorrentSearchResult {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return size;
     }
 

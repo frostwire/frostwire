@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     private final long date;
     private final String downloadUrl;
     private final String progressiveFormatJSONFetcherURL;
-    private final double size;
+    private final long size;
     private final String hash;
 
     SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
@@ -78,7 +78,7 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return size;
     }
 

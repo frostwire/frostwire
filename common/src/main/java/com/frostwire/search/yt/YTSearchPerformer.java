@@ -22,7 +22,6 @@ import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -35,7 +34,6 @@ import java.util.Map;
  * YT Search performer
  */
 public class YTSearchPerformer extends PagedWebSearchPerformer {
-    private final static Logger LOG = Logger.getLogger(YTSearchPerformer.class);
 
     private static Pattern jsonPattern;
 
@@ -86,15 +84,42 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
             String detailsUrl = "https://" + getDomainName() + "/watch?v=" + video.videoId;
             long viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Long.parseLong(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
             int viewCountInt = viewCount > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) viewCount;
-            YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt);
+            YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt, estimatedFileSize(video.lengthText.accessibility.accessibilityData.label));
             //LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
             results.add(searchResult);
         }
         return results;
     }
 
+    /**
+     * Converts durations expressed in strings into total seconds * 30 frames * ideal frame size (1980x1080
+     * examples of durations are:
+     * "11 hours, 13 minutes, 17 seconds"
+     * "24 minutes, 1 second"
+     * "45 seconds"
+     */
+    private long estimatedFileSize(String durationLabel) {
+        String[] parts = durationLabel.
+                replace("days", "day").
+                replace("hours", "hour").
+                replace("minutes", "minute").
+                replace("seconds", "second").
+                split(",");
+        long seconds = 0;
+        for (String part : parts) {
+            part = part.trim();
+            String[] time = part.split(" ");
+            int value = Integer.parseInt(time[0]);
+            String unit = time[1];
+            seconds += (long) value * unitsToSeconds.get(unit);
+        }
+        long totalFrames = seconds * 30;
+        long bitDepth = 6;
+        long frameSize = (1920 * 1080 * bitDepth) / (8 * 1024);
+        return totalFrames * frameSize;
+    }
+
     private long parseCreationTimeInMillis(String creationString) {
-        //LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
         creationString = creationString.toLowerCase().replace("streamed ", "").replaceAll("s", "").replace("ago", "");
         String[] parts = creationString.split(" ");
         int time = Integer.parseInt(parts[0]);
@@ -107,35 +132,48 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
         return false;
     }
 
-    public class Video {
+    public static class Video {
         public String videoId;
         public Thumbnail thumbnail;
         public Title title;
         public PublishedTimeText publishedTimeText;
+        public LengthText lengthText;
         public ViewCountText viewCountText;
     }
 
-    public class Thumbnail {
+    public static class Thumbnail {
         public List<ThumbnailDetails> thumbnails;
     }
 
-    public class ThumbnailDetails {
+    public static class ThumbnailDetails {
         public String url;
     }
 
-    public class Title {
+    public static class Title {
         public List<Runs> runs;
     }
 
-    public class Runs {
+    public static class Runs {
         public String text;
     }
 
-    public class PublishedTimeText {
+    public static class PublishedTimeText {
         public String simpleText;
     }
 
-    public class ViewCountText {
+    public static class LengthText {
+        public Accessibility accessibility;
+    }
+
+    public static class Accessibility {
+        public AccessibilityData accessibilityData;
+    }
+
+    public static class AccessibilityData {
+        public String label;
+    }
+
+    public static class ViewCountText {
         public String simpleText;
     }
 }

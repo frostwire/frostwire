@@ -20,8 +20,6 @@ package com.frostwire.search.yt;
 import com.frostwire.licenses.License;
 import com.frostwire.search.AbstractFileSearchResult;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 public class YTSearchResult extends AbstractFileSearchResult {
     private final String title;
     private final String detailsUrl;
@@ -29,12 +27,15 @@ public class YTSearchResult extends AbstractFileSearchResult {
     private final String thumbnailUrl;
     private final int viewCount;
 
-    public YTSearchResult(String title, String detailsUrl, long creationTime, String thumbnailUrl, int viewCount) {
+    private final long estimatedFileSizeInBytes;
+
+    public YTSearchResult(String title, String detailsUrl, long creationTime, String thumbnailUrl, int viewCount, long estimatedFileSizeInBytes) {
         this.title = title;
         this.detailsUrl = detailsUrl;
         this.creationTimestamp = creationTime;
         this.thumbnailUrl = thumbnailUrl;
         this.viewCount = viewCount;
+        this.estimatedFileSizeInBytes = estimatedFileSizeInBytes;
     }
 
     @Override
@@ -88,8 +89,7 @@ public class YTSearchResult extends AbstractFileSearchResult {
     }
 
     @Override
-    public double getSize() {
-        //returns a random size between 1MB and 100MB
-        return ThreadLocalRandom.current().nextDouble(1000000, 500000000);
+    public long getSize() {
+        return estimatedFileSizeInBytes;
     }
 }

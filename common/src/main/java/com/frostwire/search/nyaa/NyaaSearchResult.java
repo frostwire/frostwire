@@ -1,18 +1,18 @@
 /*
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron)
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.search.nyaa;
@@ -27,17 +27,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NyaaSearchResult implements TorrentCrawlableSearchResult {
-    private static final Map<String, Double> UNIT_TO_BYTES;
+    private static final Map<String, Long> UNIT_TO_BYTES;
 
     static {
         UNIT_TO_BYTES = new HashMap<>();
-        UNIT_TO_BYTES.put("bytes", (double) 1);
-        UNIT_TO_BYTES.put("B", (double) 1);
-        UNIT_TO_BYTES.put("KiB", (double) 1024);
-        UNIT_TO_BYTES.put("MiB", (double) (1024 * 1024));
-        UNIT_TO_BYTES.put("GiB", (double) (1024 * 1024 * 1024));
-        UNIT_TO_BYTES.put("TiB", (double) (1024 * 1024 * 1024 * 1024L));
-        UNIT_TO_BYTES.put("PiB", (double) (1024 * 1024 * 1024 * 1024L * 1024L));
+        UNIT_TO_BYTES.put("bytes", 1L);
+        UNIT_TO_BYTES.put("B", 1L);
+        UNIT_TO_BYTES.put("KiB", 1024L);
+        UNIT_TO_BYTES.put("MiB", 1024L * 1024L);
+        UNIT_TO_BYTES.put("GiB", 1024L * 1024L * 1024L);
+        UNIT_TO_BYTES.put("TiB", 1024L * 1024L * 1024L * 1024L);
+        UNIT_TO_BYTES.put("PiB", 1024 * 1024 * 1024 * 1024L * 1024L);
     }
 
     private final String detailsUrl;
@@ -48,7 +48,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     private final String torrentUrl;
     private final String fileName;
     private final int seeds;
-    private final double fileSize;
+    private final long fileSize;
 
     NyaaSearchResult(String urlPrefix, SearchMatcher matcher) {
         detailsUrl = urlPrefix + matcher.group("detailsurl");
@@ -124,7 +124,7 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return fileSize;
     }
 
@@ -135,18 +135,18 @@ public class NyaaSearchResult implements TorrentCrawlableSearchResult {
         return "";
     }
 
-    private double parseSize(String size) {
+    private long parseSize(String size) {
         String[] sizearr = size.trim().split(" ");
         String amount = sizearr[0].trim();
         String unit = sizearr[1].trim();
         return calculateSize(amount, unit);
     }
 
-    private double calculateSize(String amount, String unit) {
+    private long calculateSize(String amount, String unit) {
         if (amount == null || unit == null) {
             return -1;
         }
-        Double unitMultiplier = UNIT_TO_BYTES.get(unit);
+        Long unitMultiplier = UNIT_TO_BYTES.get(unit);
         if (unitMultiplier == null) {
             unitMultiplier = UNIT_TO_BYTES.get("bytes");
         }
