@@ -18,9 +18,9 @@
 package com.frostwire.search.yt;
 
 import com.frostwire.licenses.License;
-import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.AbstractFileSearchResult;
 
-public class YTSearchResult implements FileSearchResult {
+public class YTSearchResult extends AbstractFileSearchResult {
     private final String title;
     private final String detailsUrl;
     private final long creationTimestamp;

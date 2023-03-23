@@ -49,8 +49,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("EB", 6);
     }
 
-    private int uid = -1;
-
     @Override
     public boolean isComplete() {
         return true;
@@ -89,48 +87,4 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
             return intAmount * multiplier;
         }
     }
-//    public static void main(String[] args) {
-//        AbstractTorrentSearchResult sr = new AbstractTorrentSearchResult() {
-//            @Override
-//            public String getTorrentUrl() {
-//                return null;
-//            }
-//
-//            @Override
-//            public int getSeeds() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public String getHash() {
-//                return null;
-//            }
-//
-//            @Override
-//            public String getFilename() {
-//                return null;
-//            }
-//
-//            @Override
-//            public double getSize() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public String getDisplayName() {
-//                return null;
-//            }
-//
-//            @Override
-//            public String getDetailsUrl() {
-//                return null;
-//            }
-//
-//            @Override
-//            public String getSource() {
-//                return null;
-//            }
-//        };
-//        System.out.println(sr.parseSize("100 EB"));
-//    }
 }

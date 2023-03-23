@@ -17,20 +17,19 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.search.yt.YTSearchResult;
+import com.frostwire.search.AbstractFileSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.util.PopupUtils;
 
 import javax.swing.*;
 
-public class YTUISearchResult extends AbstractUISearchResult {
-    public YTUISearchResult(YTSearchResult sr, SearchEngine se, String query) {
+public class TelluridePartialUISearchResult<S extends AbstractFileSearchResult> extends AbstractUISearchResult {
+    public TelluridePartialUISearchResult(S sr, SearchEngine se, String query) {
         super(sr, se, query);
     }
 
     @Override
     public void download(boolean partial) {
-
         SearchInformation searchInformation =
                 SearchInformation.createTitledKeywordSearch(
                         getSearchResult().getDetailsUrl(),
@@ -54,6 +53,6 @@ public class YTUISearchResult extends AbstractUISearchResult {
 
     @Override
     public int getSeeds() {
-        return ((YTSearchResult) getSearchResult()).getViewCount();
+        return ((S) getSearchResult()).getViewCount();
     }
 }

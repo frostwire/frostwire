@@ -67,7 +67,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
         addedOn = sr.getCreationTime() > 0 ? new Date(sr.getCreationTime()) : null;
         actionsHolder = new SearchResultActionsHolder(sr);
         name = new SearchResultNameHolder(sr);
-        seeds = RESULT.getSeeds() <= 0 || !(RESULT instanceof TorrentUISearchResult) ? "" : String.valueOf(RESULT.getSeeds());
+        seeds = RESULT.getSeeds() <= 0 || !(RESULT instanceof TorrentUISearchResult) && !(RESULT instanceof TelluridePartialUISearchResult<?>) ? "" : String.valueOf(RESULT.getSeeds());
         icon = getIcon();
         size = new SizeHolder(getSize());
         source = new SourceHolder(RESULT);

@@ -145,7 +145,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     }
 
     private boolean isSearchResultPlayable() {
-        if (uiSearchResult instanceof YTUISearchResult) {
+        if (uiSearchResult instanceof TelluridePartialUISearchResult) {
             return true;
         }
         if (uiSearchResult.getSearchResult() instanceof SoundcloudSearchResult) {
@@ -187,7 +187,7 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
             SearchResult sr = uiSearchResult.getSearchResult();
             boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
             uiSearchResult.download(isTorrent);
-            boolean showTransfers = !(uiSearchResult instanceof YTUISearchResult);
+            boolean showTransfers = !(uiSearchResult instanceof TelluridePartialUISearchResult);
             if (showTransfers) {
                 GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
             }

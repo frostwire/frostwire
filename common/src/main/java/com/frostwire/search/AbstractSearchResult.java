@@ -44,4 +44,8 @@ public abstract class AbstractSearchResult implements SearchResult {
     public String getThumbnailUrl() {
         return null;
     }
+
+    public int getViewCount() {
+        return -1;
+    }
 }
