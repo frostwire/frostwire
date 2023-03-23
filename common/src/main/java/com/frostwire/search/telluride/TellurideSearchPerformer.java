@@ -70,6 +70,7 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
 
 
     public void perform() {
+        stopped = false;
         TellurideLauncher.launch(tellurideLauncher,
                 url,
                 null, // saveDirectory
@@ -77,6 +78,11 @@ public class TellurideSearchPerformer extends AbstractSearchPerformer {
                 true, // metaOnly
                 false, // verboseOutput
                 new TellurideProcessListener(this));
+        try {
+            performerLatch.await();
+        } catch (InterruptedException e) {
+        }
+        stopped = true;
     }
 
     @Override
