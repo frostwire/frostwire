@@ -228,7 +228,7 @@ public final class SearchMediator {
             } else if (sr instanceof YTSearchResult) {
                 // if we have some other video search results for Telluride searches
                 // we can reuse TelluridePartialUISearchResult to display them
-                ui = new TelluridePartialUISearchResult((YTSearchResult) sr, engine, query);
+                ui = new TelluridePartialUISearchResult<>((YTSearchResult) sr, engine, query);
             }
             if (ui != null) {
                 result.add(ui);
