@@ -117,8 +117,7 @@ public final class SearchMediator {
             } catch (Throwable t) {
                 LOG.error("could not set database crawl cache", t);
             }
-        },
-                "CrawlPagedWebSearchPerformer-initializer").start();
+        }, "CrawlPagedWebSearchPerformer-initializer").start();
         CrawlPagedWebSearchPerformer.setMagnetDownloader(new LibTorrentMagnetDownloader());
         this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
@@ -146,8 +145,7 @@ public final class SearchMediator {
      * Update the search title's tab given the token id and the new title
      */
     public void updateSearchPanelTitle(final long token, final String title) {
-        GUIMediator.safeInvokeLater(() ->
-        {
+        GUIMediator.safeInvokeLater(() -> {
             SearchResultMediator resultsPanel = getSearchResultDisplayer().getResultPanelForGUID(token);
             if (resultsPanel == null) {
                 LOG.info("updateSearchPanelTitle: could not find SearchResultMediator for token " + token + ", closed prematurely perhaps");
@@ -261,7 +259,7 @@ public final class SearchMediator {
     static void doDownload(final SearchResultMediator rp) {
         final SearchResultDataLine[] lines = rp.getAllSelectedLines();
         SwingUtilities.invokeLater(() -> {
-             SearchMediator.downloadAll(lines);
+            SearchMediator.downloadAll(lines);
             rp.refresh();
         });
     }
@@ -275,7 +273,7 @@ public final class SearchMediator {
         }
 
         if (lines.length == 1 && !(lines[0].getSearchResult() instanceof TelluridePartialUISearchResult)) {
-                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+            GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
         }
 
         for (SearchResultDataLine line : lines) {
@@ -287,8 +285,7 @@ public final class SearchMediator {
             SearchResultDataLine srDataline = lines[0];
             String hash = srDataline.getHash();
             BTDownloadMediator btDownloadMediator = GUIMediator.instance().getBTDownloadMediator();
-            List<BTDownload> downloads =
-                    btDownloadMediator.getDownloads();
+            List<BTDownload> downloads = btDownloadMediator.getDownloads();
             for (BTDownload d : downloads) {
                 if (d.getHash() != null && d.getHash().equals(hash)) {
                     btDownloadMediator.selectBTDownload(d);
@@ -307,7 +304,7 @@ public final class SearchMediator {
             throw new NullPointerException("Tried to download null line");
         }
         SearchResult sr = line.getSearchResult().getSearchResult();
-        boolean isTorrent  = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
+        boolean isTorrent = sr instanceof TorrentSearchResult || sr instanceof CrawlableSearchResult;
         line.getSearchResult().download(isTorrent);
     }
 
@@ -514,8 +511,7 @@ public final class SearchMediator {
         final SearchResultMediator rp = getResultPanelForGUID(token);
         boolean isTellurideSearchResult = results.get(0).getSource().startsWith("Cloud:"); // will be stopped
         if (rp != null && (isTellurideSearchResult || !rp.isStopped())) {
-            @SuppressWarnings("unchecked")
-            List<SearchResult> filtered = filter((List<SearchResult>) results, rp.getSearchTokens());
+            @SuppressWarnings("unchecked") List<SearchResult> filtered = filter((List<SearchResult>) results, rp.getSearchTokens());
             if (filtered != null && !filtered.isEmpty()) {
                 SearchEngine se = SearchEngine.getSearchEngineByName(filtered.get(0).getSource());
                 if (se == null) {
