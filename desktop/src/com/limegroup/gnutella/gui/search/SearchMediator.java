@@ -261,7 +261,7 @@ public final class SearchMediator {
     static void doDownload(final SearchResultMediator rp) {
         final SearchResultDataLine[] lines = rp.getAllSelectedLines();
         SwingUtilities.invokeLater(() -> {
-            SearchMediator.downloadAll(lines);
+             SearchMediator.downloadAll(lines);
             rp.refresh();
         });
     }
@@ -273,7 +273,11 @@ public final class SearchMediator {
         if (lines == null || lines.length == 0) {
             return;
         }
-        GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+
+        if (lines.length == 1 && !(lines[0].getSearchResult() instanceof TelluridePartialUISearchResult)) {
+                GUIMediator.instance().showTransfers(TransfersTab.FilterMode.DOWNLOADING);
+        }
+
         for (SearchResultDataLine line : lines) {
             if (line != null) {
                 downloadLine(line);

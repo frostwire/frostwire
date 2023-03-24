@@ -218,7 +218,7 @@ public final class SearchResultDataLine extends AbstractDataLine<UISearchResult>
      *
      * @return the underlying search result
      */
-    final UISearchResult getSearchResult() {
+    UISearchResult getSearchResult() {
         return RESULT;
     }
 

@@ -32,10 +32,6 @@ import java.util.Map;
  */
 public class TableRowFilteredModel extends ResultPanelModel {
     /**
-     *
-     */
-    private static final long serialVersionUID = -7810977044778830969L;
-    /**
      * A list of all filtered results.
      */
     private final List<SearchResultDataLine> HIDDEN;
@@ -78,7 +74,7 @@ public class TableRowFilteredModel extends ResultPanelModel {
         boolean isNotJunk = junkFilter.allow(tl);
         boolean allow = allow(tl);
         if (isNotJunk || !SearchSettings.hideJunk()) {
-            System.out.println("TableRowFilteredModel.add() allow= " + allow + " isNotJunk= " + isNotJunk + " hideJunk= " + SearchSettings.hideJunk() + " " + tl.getFilename());
+            //System.out.println("TableRowFilteredModel.add() allow= " + allow + " isNotJunk= " + isNotJunk + " hideJunk= " + SearchSettings.hideJunk() + " " + tl.getFilename());
             if (allow) {
                 //System.out.println("TableRowFilteredModel.add() " + tl.getFilename());
                 return super.add(tl, row);
