@@ -849,7 +849,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         });
     }
 
-    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize, boolean extractAudioAndDeleteOriginal) {
+    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize, boolean extractAudio) {
         GUIMediator.safeInvokeLater(() -> {
             final HttpDownload downloader = new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true) {
                 @Override
@@ -857,15 +857,23 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     final File savedFile = getSaveLocation();
                     if (savedFile.exists()) {
                         // if extract audio and delete original, we need to do this before the file is scanned
-                        if (extractAudioAndDeleteOriginal) {
+                        if (extractAudio) {
                             File m4a = extractAudio(savedFile);
                             if (m4a != null) {
                                 GUIMediator.safeInvokeLater(() -> {
-                                    if (extractAudioAndDeleteOriginal) {
+                                    if (extractAudio) {
                                         GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
                                         LibraryMediator.instance().getLibraryExplorer().selectAudio();
                                         LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
-                                        GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
+
+                                        // Wait for the table to be loaded in order to select the first row
+                                        BackgroundExecutorService.schedule(() -> {
+                                            try {
+                                                Thread.sleep(500);
+                                            } catch (InterruptedException ignored) {
+                                            }
+                                            GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
+                                        });
                                     } else {
                                         BTDownloadMediator.instance().updateTableFilters();
                                     }
