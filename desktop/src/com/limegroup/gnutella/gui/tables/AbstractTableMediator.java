@@ -541,6 +541,10 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         }
     }
 
+    public void setSelectedRow(int i) {
+        TABLE.setSelectedRow(i);
+    }
+
     /**
      * Removes the row associated with the Object o
      * Delegates to removeRow(int)

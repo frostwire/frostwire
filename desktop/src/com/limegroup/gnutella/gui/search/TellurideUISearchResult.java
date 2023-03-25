@@ -27,18 +27,18 @@ import javax.swing.*;
 
 public class TellurideUISearchResult extends AbstractUISearchResult {
 
-    private final boolean extractAudioAndDeleteOriginal;
+    private final boolean extractAudio;
 
-    public TellurideUISearchResult(TellurideSearchResult sr, SearchEngine se, String query, boolean extractAudioAndDeleteOriginal) {
+    public TellurideUISearchResult(TellurideSearchResult sr, SearchEngine se, String query, boolean extractAudio) {
         super(sr, se, query);
-        this.extractAudioAndDeleteOriginal = extractAudioAndDeleteOriginal;
+        this.extractAudio = extractAudio;
     }
 
     @Override
     public void download(boolean partial) {
         TellurideSearchResult sr = (TellurideSearchResult) getSearchResult();
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-        GUIMediator.instance().openHttp(sr.getDownloadUrl(), sr.getDisplayName(), sr.getFilename(), sr.getSize(), extractAudioAndDeleteOriginal);
+        GUIMediator.instance().openHttp(sr.getDownloadUrl(), sr.getDisplayName(), sr.getFilename(), sr.getSize(), extractAudio);
         showSearchResultWebPage(false);
     }
 

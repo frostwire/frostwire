@@ -858,14 +858,14 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     if (savedFile.exists()) {
                         // if extract audio and delete original, we need to do this before the file is scanned
                         if (extractAudioAndDeleteOriginal) {
-                            File m4a = extractAudioAndRemoveOriginalVideo(savedFile);
+                            File m4a = extractAudio(savedFile);
                             if (m4a != null) {
                                 GUIMediator.safeInvokeLater(() -> {
                                     if (extractAudioAndDeleteOriginal) {
                                         GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
                                         LibraryMediator.instance().getLibraryExplorer().selectAudio();
                                         LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
-                                        LibraryFilesTableMediator.instance().selectItemAt(0);
+                                        GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
                                     } else {
                                         BTDownloadMediator.instance().updateTableFilters();
                                     }
@@ -885,21 +885,16 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     }
                 }
             };
-            if (!extractAudioAndDeleteOriginal) {
-                add(downloader);
-            } else {
-                remove(downloader);
-            }
+            add(downloader);
         });
     }
 
-    private File extractAudioAndRemoveOriginalVideo(File videoMp4) {
+    private File extractAudio(File videoMp4) {
         File mp4 = videoMp4.getAbsoluteFile();
         File extractedAudio = new File(mp4.getParentFile(), FilenameUtils.getBaseName(mp4.getName()) + ".m4a").getAbsoluteFile();
         Mp4Info inf = Mp4Info.audio(null, null, null, null);
         try {
             Mp4Demuxer.audio(mp4, extractedAudio, inf, null);
-            videoMp4.delete();
         } catch (IOException e) {
             LOG.error("BTDownloadMediator.extractAudioAndRemoveOriginalVideo() error extracting audio from mp4 file: " + mp4.getAbsolutePath(), e);
             return null;
