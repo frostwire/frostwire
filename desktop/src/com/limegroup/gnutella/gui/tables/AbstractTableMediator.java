@@ -534,6 +534,13 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
         }
     }
 
+    public void selectRow(int i) {
+        if (i >= 0 && i < DATA_MODEL.getRowCount()) {
+            TABLE.addRowSelectionInterval(i, i);
+            TABLE.ensureRowVisible(i);
+        }
+    }
+
     /**
      * Removes the row associated with the Object o
      * Delegates to removeRow(int)

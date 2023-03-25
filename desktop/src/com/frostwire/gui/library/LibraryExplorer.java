@@ -68,7 +68,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         tree.repaint();
     }
 
-    void refreshSelection(boolean clearCache) {
+    public void refreshSelection(boolean clearCache) {
         LibraryNode node = (LibraryNode) tree.getLastSelectedPathComponent();
         String searchPrompt;
         if (node == null) {
@@ -216,7 +216,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
         }
     }
 
-    void selectAudio() {
+    public void selectAudio() {
         selectMediaTypeSavedFilesDirectoryHolderbyType(MediaType.getAudioMediaType());
     }
 

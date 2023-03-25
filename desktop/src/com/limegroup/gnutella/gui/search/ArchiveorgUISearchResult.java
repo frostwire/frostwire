@@ -40,7 +40,7 @@ public final class ArchiveorgUISearchResult extends AbstractUISearchResult {
     @Override
     public void download(boolean partial) {
         GUIMediator.instance().showTransfers(TransfersTab.FilterMode.ALL);
-        GUIMediator.instance().openHttp(sr.getDownloadUrl(), sr.getDisplayName(), sr.getFilename(), sr.getSize());
+        GUIMediator.instance().openHttp(sr.getDownloadUrl(), sr.getDisplayName(), sr.getFilename(), sr.getSize(), false);
         showSearchResultWebPage(false);
     }
 

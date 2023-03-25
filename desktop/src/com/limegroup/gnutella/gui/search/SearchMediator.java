@@ -34,6 +34,7 @@ import com.limegroup.gnutella.gui.ApplicationHeader;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.settings.SearchSettings;
+import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.StringUtils;
 
@@ -222,7 +223,23 @@ public final class SearchMediator {
             } else if (sr instanceof ArchiveorgCrawledSearchResult) {
                 ui = new ArchiveorgUISearchResult((ArchiveorgCrawledSearchResult) sr, engine, query);
             } else if (sr instanceof TellurideSearchResult) {
-                ui = new TellurideUISearchResult((TellurideSearchResult) sr, engine, query);
+                TellurideSearchResult tsr = (TellurideSearchResult) sr;
+                ui = new TellurideUISearchResult(tsr, engine, query, false);
+                /// if the tsr is an mp4 video, we create an extra TellurideUISearchResult with extractAudioAndDeleteOriginal set to true
+                if (FilenameUtils.getExtension(tsr.getFilename()).equals("mp4")) {
+                    TellurideSearchResult tsr2 = new TellurideSearchResult(
+                            tsr.getId(),
+                            "(Faster audio download) " + tsr.getDisplayName() + " (.m4a)",
+                            ui.getFilename(),
+                            tsr.getSource(),
+                            tsr.getDetailsUrl(),
+                            tsr.getDownloadUrl(),
+                            tsr.getThumbnailUrl(),
+                            tsr.getSize(),
+                            tsr.getCreationTime());
+                    UISearchResult ui2 = new TellurideUISearchResult(tsr2, engine, query, true);
+                    result.add(ui2);
+                }
             } else if (sr instanceof YTSearchResult) {
                 // if we have some other video search results for Telluride searches
                 // we can reuse TelluridePartialUISearchResult to display them

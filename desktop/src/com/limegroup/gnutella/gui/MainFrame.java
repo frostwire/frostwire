@@ -383,7 +383,7 @@ public final class MainFrame {
      *
      * @param tab index to select
      */
-    final void setSelectedTab(GUIMediator.Tabs tab) {
+    void setSelectedTab(GUIMediator.Tabs tab) {
         CardLayout cl = (CardLayout) (TABBED_PANE.getLayout());
         Tab t = TABS.get(tab);
         cl.show(TABBED_PANE, t.getTitle());

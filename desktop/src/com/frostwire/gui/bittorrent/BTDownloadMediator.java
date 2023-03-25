@@ -23,12 +23,16 @@ import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
 import com.frostwire.gui.filters.TableLineFilter;
+import com.frostwire.gui.library.LibraryFilesTableMediator;
+import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.library.LibraryUtils;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.tabs.TransfersTab;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.mp4.Mp4Demuxer;
+import com.frostwire.mp4.Mp4Info;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
@@ -36,6 +40,7 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.actions.LimeAction;
@@ -51,10 +56,10 @@ import com.limegroup.gnutella.settings.TablesHandlerSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -844,24 +849,59 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         });
     }
 
-    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize) {
+    public void openHttp(final String httpUrl, final String title, final String saveFileAs, final double fileSize, boolean extractAudioAndDeleteOriginal) {
         GUIMediator.safeInvokeLater(() -> {
             final HttpDownload downloader = new HttpDownload(httpUrl, title, saveFileAs, fileSize, null, false, true) {
                 @Override
                 protected void onComplete() {
                     final File savedFile = getSaveLocation();
                     if (savedFile.exists()) {
-                        GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
-                        if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
+                        // if extract audio and delete original, we need to do this before the file is scanned
+                        if (extractAudioAndDeleteOriginal) {
+                            File m4a = extractAudioAndRemoveOriginalVideo(savedFile);
+                            if (m4a != null) {
+                                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(m4a)) {
+                                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
+                                        iTunesMediator.instance().scanForSongs(m4a);
+                                    }
+                                }
+                            }
+                        } else if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
                             if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                                 iTunesMediator.instance().scanForSongs(savedFile);
                             }
                         }
+                        GUIMediator.safeInvokeLater(() -> {
+                            if (extractAudioAndDeleteOriginal) {
+                                GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+                                LibraryMediator.instance().getLibraryExplorer().selectAudio();
+                                LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
+                                LibraryFilesTableMediator.instance().selectItemAt(0);
+                                BTDownloadMediator.instance().remove(this);
+                            }
+                            BTDownloadMediator.instance().updateTableFilters();
+                        });
                     }
                 }
             };
-            add(downloader);
+            if (!extractAudioAndDeleteOriginal) {
+                add(downloader);
+            }
         });
+    }
+
+    private File extractAudioAndRemoveOriginalVideo(File videoMp4) {
+        File mp4 = videoMp4.getAbsoluteFile();
+        File extractedAudio = new File(mp4.getParentFile(), FilenameUtils.getBaseName(mp4.getName()) + ".m4a").getAbsoluteFile();
+        Mp4Info inf = Mp4Info.audio(null, null, null, null);
+        try {
+            Mp4Demuxer.audio(mp4, extractedAudio, inf, null);
+            videoMp4.delete();
+        } catch (IOException e) {
+            LOG.error("BTDownloadMediator.extractAudioAndRemoveOriginalVideo() error extracting audio from mp4 file: " + mp4.getAbsolutePath(), e);
+            return null;
+        }
+        return extractedAudio;
     }
 
     public interface BTDownloadSelectionListener {

@@ -65,7 +65,7 @@ import java.util.concurrent.Future;
  * @author gubatron
  * @author aldenml
  */
-final class LibraryFilesTableMediator extends AbstractLibraryTableMediator<LibraryFilesTableModel, LibraryFilesTableDataLine, File> {
+final public class LibraryFilesTableMediator extends AbstractLibraryTableMediator<LibraryFilesTableModel, LibraryFilesTableDataLine, File> {
     /**
      * instance, for singleton access
      */
