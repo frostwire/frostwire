@@ -122,7 +122,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             return false;
         }
         final TransferState state = dl.getState();
-        return  state == TransferState.CHECKING ||
+        return state == TransferState.CHECKING ||
                 state == TransferState.DOWNLOADING ||
                 state == TransferState.DOWNLOADING_METADATA ||
                 state == TransferState.DOWNLOADING_TORRENT ||
@@ -860,6 +860,17 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         if (extractAudioAndDeleteOriginal) {
                             File m4a = extractAudioAndRemoveOriginalVideo(savedFile);
                             if (m4a != null) {
+                                GUIMediator.safeInvokeLater(() -> {
+                                    if (extractAudioAndDeleteOriginal) {
+                                        GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+                                        LibraryMediator.instance().getLibraryExplorer().selectAudio();
+                                        LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
+                                        LibraryFilesTableMediator.instance().selectItemAt(0);
+                                    } else {
+                                        BTDownloadMediator.instance().updateTableFilters();
+                                    }
+                                });
+
                                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(m4a)) {
                                     if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                                         iTunesMediator.instance().scanForSongs(m4a);
@@ -871,21 +882,13 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                                 iTunesMediator.instance().scanForSongs(savedFile);
                             }
                         }
-                        GUIMediator.safeInvokeLater(() -> {
-                            if (extractAudioAndDeleteOriginal) {
-                                GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-                                LibraryMediator.instance().getLibraryExplorer().selectAudio();
-                                LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
-                                LibraryFilesTableMediator.instance().selectItemAt(0);
-                                BTDownloadMediator.instance().remove(this);
-                            }
-                            BTDownloadMediator.instance().updateTableFilters();
-                        });
                     }
                 }
             };
             if (!extractAudioAndDeleteOriginal) {
                 add(downloader);
+            } else {
+                remove(downloader);
             }
         });
     }

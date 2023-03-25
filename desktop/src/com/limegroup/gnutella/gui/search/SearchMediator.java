@@ -227,6 +227,7 @@ public final class SearchMediator {
                 ui = new TellurideUISearchResult(tsr, engine, query, false);
                 /// if the tsr is an mp4 video, we create an extra TellurideUISearchResult with extractAudioAndDeleteOriginal set to true
                 if (FilenameUtils.getExtension(tsr.getFilename()).equals("mp4")) {
+                    //See BTDownloadMediator::extractAudioAndRemoveOriginalVideo
                     TellurideSearchResult tsr2 = new TellurideSearchResult(
                             tsr.getId(),
                             "(Faster audio download) " + tsr.getDisplayName() + " (.m4a)",
