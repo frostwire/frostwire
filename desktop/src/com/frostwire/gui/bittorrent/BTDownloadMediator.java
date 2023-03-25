@@ -868,10 +868,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
                                         // Wait for the table to be loaded in order to select the first row
                                         BackgroundExecutorService.schedule(() -> {
-                                            try {
-                                                Thread.sleep(500);
-                                            } catch (InterruptedException ignored) {
-                                            }
+                                            Thread.yield();
                                             GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
                                         });
                                     } else {

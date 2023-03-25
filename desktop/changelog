@@ -1,3 +1,8 @@
+frostwire (6.11.0) stable; urgency=high
+  * Telluride Video Search
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 24 Mar 2023 23:00:00 -0600
+
 frostwire (6.10.0) stable; urgency=high
   * Faster search results
   * Telluride build 25 with Python 3.11, faster web video searches
