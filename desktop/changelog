@@ -1,7 +1,8 @@
 frostwire (6.11.0) stable; urgency=high
   * Telluride Video Search
+  * Java Runtime Environment 19.0.2 for Linux binaries
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 24 Mar 2023 23:00:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 27 Mar 2023 08:52:00 -0600
 
 frostwire (6.10.0) stable; urgency=high
   * Faster search results
