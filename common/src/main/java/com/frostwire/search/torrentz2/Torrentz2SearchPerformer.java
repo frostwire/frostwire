@@ -98,7 +98,7 @@ public class Torrentz2SearchPerformer extends SimpleTorrentSearchPerformer {
                 try {
                     Torrentz2SearchResult sr = fromMatcher(matcher);
                     results.add(sr);
-                    LOG.info("Adding a new search result -> " + sr.getHash());
+                    //LOG.info("Adding a new search result -> " + sr.getHash());
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }

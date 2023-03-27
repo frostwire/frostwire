@@ -81,11 +81,9 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
             if (matcherFound) {
                 MagnetDLSearchResult sr = fromMatcher(matcher);
                 if (sr.getSeeds() >= minSeeds) {
-                    LOG.info("Adding a new search result -> " + sr.getHash());
+                    //LOG.info("Adding a new search result -> " + sr.getHash());
                     results.add(sr);
-                } else {
-                    LOG.info("Not adding 0 seed search result -> " + sr.getHash());
-                }
+                } 
             } else {
                 LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
                 //LOG.warn("========");
