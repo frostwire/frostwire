@@ -861,19 +861,15 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                             File m4a = extractAudio(savedFile);
                             if (m4a != null) {
                                 GUIMediator.safeInvokeLater(() -> {
-                                    if (extractAudio) {
-                                        GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
-                                        LibraryMediator.instance().getLibraryExplorer().selectAudio();
-                                        LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
+                                    GUIMediator.instance().setWindow(GUIMediator.Tabs.LIBRARY);
+                                    LibraryMediator.instance().getLibraryExplorer().selectAudio();
+                                    LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
 
-                                        // Wait for the table to be loaded in order to select the first row
-                                        BackgroundExecutorService.schedule(() -> {
-                                            Thread.yield();
-                                            GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
-                                        });
-                                    } else {
-                                        BTDownloadMediator.instance().updateTableFilters();
-                                    }
+                                    // Wait for the table to be loaded in order to select the first row
+                                    BackgroundExecutorService.schedule(() -> {
+                                        Thread.yield();
+                                        GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
+                                    });
                                 });
 
                                 if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(m4a)) {
@@ -886,6 +882,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                             if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
                                 iTunesMediator.instance().scanForSongs(savedFile);
                             }
+                            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
                         }
                     }
                 }
