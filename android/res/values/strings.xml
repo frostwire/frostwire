@@ -512,4 +512,5 @@
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">YouTube downloads are not supported by FrostWire Basic due to Google Play rules.\n\nFor a free copy of FrostWire Plus go to our official website frostwire.com</string>
     <string name="use_btdigg">Use BTDigg</string>
+    <string name="use_yt">Use YT</string>
 </resources>

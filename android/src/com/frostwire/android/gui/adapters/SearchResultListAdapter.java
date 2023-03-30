@@ -53,7 +53,9 @@ import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.yt.YTSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -203,7 +205,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
         MediaPlaybackStatusOverlayView overlayView = findView(view, R.id.view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view);
         fileTypeIcon.setOnClickListener(previewClickListener);
-        if (isAudio(sr)) {
+        if (isAudio(sr) || isTelluridePartialSearchResult(sr)) {
             fileTypeIcon.setTag(sr);
             overlayView.setTag(sr);
             overlayView.setVisibility(View.VISIBLE);
@@ -341,6 +343,10 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         return sr instanceof SoundcloudSearchResult;
     }
 
+    private static boolean isTelluridePartialSearchResult(SearchResult sr) {
+        return sr instanceof YTSearchResult;
+    }
+
     private int getFileTypeIconId() {
         switch (fileType) {
             case Constants.FILE_TYPE_APPLICATIONS:
@@ -438,41 +444,44 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if (v == null) {
                 return;
             }
-            final StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
-            if (sr != null && ctx != null) {
-                WeakReference<Context> ctxRef = Ref.weak(ctx);
-
-                Engine.instance().getThreadPool().execute(() -> {
-                    if (!Ref.alive(ctxRef)) {
-                        return;
-                    }
-                    Activity activity = (Activity) ctxRef.get();
-                    final Intent i = new Intent(activity, PreviewPlayerActivity.class);
-                    PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
-                    i.putExtra("displayName", sr.getDisplayName());
-                    i.putExtra("source", sr.getSource());
-                    i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
-                    i.putExtra("streamUrl", sr.getStreamUrl());
-                    i.putExtra("audio", isAudio(sr));
-                    i.putExtra("hasVideo", false);
-
-                    activity.runOnUiThread(() -> {
+            Object tag = v.getTag();
+            if (isTelluridePartialSearchResult((SearchResult) tag)) {
+                UIUtils.openURL(ctx, ((SearchResult) tag).getDetailsUrl());
+            } else if (tag instanceof StreamableSearchResult) {
+                final StreamableSearchResult sr = (StreamableSearchResult) v.getTag();
+                if (sr != null && ctx != null) {
+                    WeakReference<Context> ctxRef = Ref.weak(ctx);
+                    Engine.instance().getThreadPool().execute(() -> {
                         if (!Ref.alive(ctxRef)) {
                             return;
                         }
-                        try {
-                            SearchMediator.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
-                            ctxRef.get().startActivity(i);
-                        } catch (Throwable t) {
-                            if (BuildConfig.DEBUG) {
-                                throw t;
-                            }
-                            LOG.error("SearchResultListAdapter::PreviewClickListener::onClick() " + t.getMessage(), t);
-                        }
-                    });
-                });
-            }
+                        Activity activity = (Activity) ctxRef.get();
+                        final Intent i = new Intent(activity, PreviewPlayerActivity.class);
+                        PreviewPlayerActivity.srRef = Ref.weak((FileSearchResult) sr);
+                        i.putExtra("displayName", sr.getDisplayName());
+                        i.putExtra("source", sr.getSource());
+                        i.putExtra("thumbnailUrl", sr.getThumbnailUrl());
+                        i.putExtra("streamUrl", sr.getStreamUrl());
+                        i.putExtra("audio", isAudio(sr));
+                        i.putExtra("hasVideo", false);
 
+                        activity.runOnUiThread(() -> {
+                            if (!Ref.alive(ctxRef)) {
+                                return;
+                            }
+                            try {
+                                SearchMediator.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
+                                ctxRef.get().startActivity(i);
+                            } catch (Throwable t) {
+                                if (BuildConfig.DEBUG) {
+                                    throw t;
+                                }
+                                LOG.error("SearchResultListAdapter::PreviewClickListener::onClick() " + t.getMessage(), t);
+                            }
+                        });
+                    });
+                }
+            }
         }
     }
 }

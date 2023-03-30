@@ -89,4 +89,8 @@
         android:key="frostwire.prefs.search.use_zooqle"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_zooqle" />
+    <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_yt"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_yt" />
 </PreferenceScreen>

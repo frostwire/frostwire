@@ -21,6 +21,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
+import com.frostwire.android.BuildConfig;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
@@ -43,6 +44,7 @@ import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yify.YifySearchPerformer;
+import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.http.HttpClient;
@@ -116,12 +118,18 @@ public abstract class SearchEngine {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
         for (SearchEngine se : ALL_ENGINES) {
+            // We can deactivate these via remote config marking them inactive
+            // or when defining the instance by overriding isActive()
+            // This is different from isEnabled() which is a user preference.
+            if (!se.isActive()) {
+                continue;
+            }
             if (!excludeNonReady || se.isReady()) {
                 candidates.add(se);
             }
         }
 
-        // ensure that at leas one is enable
+        // ensure that at least one is enable
         boolean oneEnabled = false;
         for (SearchEngine se : candidates) {
             if (se.isEnabled()) {
@@ -312,7 +320,20 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine YT = new SearchEngine("YT", Constants.PREF_KEY_SEARCH_USE_YT) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new YTSearchPerformer(token, keywords, DEFAULT_TIMEOUT, 1);
+        }
+
+        @Override
+        public boolean isActive() {
+            return BuildConfig.FLAVOR.equals("plus") || BuildConfig.DEBUG;
+        }
+    };
+
     private static final List<SearchEngine> ALL_ENGINES = Arrays.asList(
+            YT,
             MAGNETDL,
             TORRENTZ2,
             YIFY,

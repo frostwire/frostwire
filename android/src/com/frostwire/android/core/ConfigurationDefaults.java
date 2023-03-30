@@ -20,6 +20,7 @@ package com.frostwire.android.core;
 import android.os.Environment;
 
 import com.andrew.apollo.MusicPlaybackService;
+import com.frostwire.android.BuildConfig;
 import com.frostwire.util.Hex;
 
 import java.util.Collections;
@@ -111,6 +112,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BT_DIGG, true);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YT, BuildConfig.FLAVOR.equals("plus") || BuildConfig.DEBUG);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);
