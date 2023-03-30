@@ -82,7 +82,7 @@ public class MainApplication extends MultiDexApplication {
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> this.initializeCrawlPagedWebSearchPerformer(this));
 
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, LocalSearchEngine::instance);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, SearchMediator::instance);
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MainApplication::cleanTemp);
 

@@ -17,7 +17,7 @@
 
 package com.frostwire.android.core;
 
-import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
@@ -52,11 +52,11 @@ public class TellurideCourierCallback {
                             SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
                             adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered, false);
                             SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
-                            LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                            SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                         });
             } else if (results == null || results.isEmpty() || errored) {
-                if (LocalSearchEngine.instance().getListener() != null && searchPerformer != null) {
-                    LocalSearchEngine.instance().getListener().onStopped(searchPerformer.getToken());
+                if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
+                    SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                 }
             }
         });

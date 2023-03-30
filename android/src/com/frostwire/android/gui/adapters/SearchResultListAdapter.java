@@ -38,7 +38,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
-import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.activities.PreviewPlayerActivity;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
@@ -162,7 +162,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         int clickedColor = getContext().getResources().getColor(R.color.my_files_listview_item_inactive_foreground, null);
         int unclickedColor = getContext().getResources().getColor(R.color.app_text_primary, null);
         TextView title = findView(view, R.id.view_bittorrent_search_result_list_item_title);
-        title.setTextColor(LocalSearchEngine.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
+        title.setTextColor(SearchMediator.instance().hasBeenOpened(sr) ? clickedColor : unclickedColor);
     }
 
     @SuppressLint("SetTextI18n")
@@ -461,7 +461,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
                             return;
                         }
                         try {
-                            LocalSearchEngine.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
+                            SearchMediator.instance().markOpened(sr, (Ref.alive(adapterRef)) ? adapterRef.get() : null);
                             ctxRef.get().startActivity(i);
                         } catch (Throwable t) {
                             if (BuildConfig.DEBUG) {

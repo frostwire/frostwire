@@ -47,7 +47,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.gui.LocalSearchEngine;
+import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
@@ -226,7 +226,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     @Override
     public void onDestroy() {
-        LocalSearchEngine.instance().setSearchListener(null);
+        SearchMediator.instance().setSearchListener(null);
         destroyHeaderBanner();
         destroyPromotionsBanner();
         super.onDestroy();
@@ -324,7 +324,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         deepSearchProgress.setVisibility(View.VISIBLE);
 
-        postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().performTellurideSearch(pageUrl, adapter));
+        postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().performTellurideSearch(pageUrl, adapter));
         searchInput.setText(" "); // an empty space so the 'x' button is shown.
         switchView(view, R.id.fragment_search_list);
     }
@@ -350,7 +350,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void setupAdapter() {
-        LocalSearchEngine.instance().setSearchListener(new SearchFragmentSearchEngineListener(this));
+        SearchMediator.instance().setSearchListener(new SearchFragmentSearchEngineListener(this));
         if (adapter == null) {
             adapter = new SearchResultListAdapter(getActivity()) {
                 @Override
@@ -437,7 +437,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         SystemUtils.ensureUIThreadOrCrash("SearchFragment::cancelSearch");
         adapter.clear();
         fileTypeCounter.clear();
-        postToHandler(SEARCH_PERFORMER, () -> LocalSearchEngine.instance().cancelSearch());
+        postToHandler(SEARCH_PERFORMER, () -> SearchMediator.instance().cancelSearch());
         postToHandler(SEARCH_PERFORMER, TellurideCourier::abortCurrentQuery);
         searchInput.setFileTypeCountersVisible(false);
         currentQuery = null;
@@ -452,14 +452,14 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     private void showSearchView(View view) {
         ensureUIThreadOrCrash("SearchFragment::showSearchView");
-        if (LocalSearchEngine.instance() == null) {
+        if (SearchMediator.instance() == null) {
             switchView(view, R.id.fragment_search_promos);
             LOG.info("SearchFragment::showSearchView no search instance available, going back to promos.");
             return;
         }
 
-        boolean searchFinished = LocalSearchEngine.instance().isSearchFinished();
-        boolean searchStopped = LocalSearchEngine.instance().isSearchStopped();
+        boolean searchFinished = SearchMediator.instance().isSearchFinished();
+        boolean searchStopped = SearchMediator.instance().isSearchStopped();
         boolean searchCancelled = cancelling.get() || (searchStopped && adapter.getTotalCount() == 0);
         boolean adapterHasResults = adapter != null && adapter.getTotalCount() > 0;
 
@@ -510,7 +510,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (tag.equals(NewTransferDialog.TAG) && which == Dialog.BUTTON_POSITIVE) {
             if (Ref.alive(NewTransferDialog.srRef)) {
                 startDownload(this.getActivity(), NewTransferDialog.srRef.get(), getString(R.string.download_added_to_queue));
-                LocalSearchEngine.instance().markOpened(NewTransferDialog.srRef.get(), adapter);
+                SearchMediator.instance().markOpened(NewTransferDialog.srRef.get(), adapter);
             }
         }
     }
@@ -705,7 +705,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 fragment.performTellurideSearch(query);
             } else {
                 postToHandler(SEARCH_PERFORMER, () -> {
-                    LocalSearchEngine.instance().performSearch(query);
+                    SearchMediator.instance().performSearch(query);
                     postToUIThread(() -> fragment.prepareUIForSearch(mediaTypeId));
                 });
             }
@@ -819,11 +819,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             SearchResultListAdapter adapter = searchFragment.adapter;
             SearchProgressView searchProgress = searchFragment.searchProgress;
             // retry
-            if (LocalSearchEngine.instance().isSearchFinished()) {
+            if (SearchMediator.instance().isSearchFinished()) {
                 final String query = searchInput.getText();
                 searchProgress.setProgressEnabled(true);
                 postToHandler(SEARCH_PERFORMER, () -> {
-                    LocalSearchEngine.instance().performSearch(query);
+                    SearchMediator.instance().performSearch(query);
                     postToUIThread(() -> searchFragment.prepareUIForSearch(adapter.getFileType()));
                 });
             }

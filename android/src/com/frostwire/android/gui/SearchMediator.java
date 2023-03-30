@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @author gubatron
  * @author aldenml
  */
-public final class LocalSearchEngine {
+public final class SearchMediator {
 
     private final SearchManager manager;
     private SearchListener searchListener;
@@ -54,15 +54,15 @@ public final class LocalSearchEngine {
     private TellurideCourier.SearchPerformer lastTellurideCourier;
 
     private static final class InstanceHolder {
-        private static final LocalSearchEngine instance = new LocalSearchEngine();
+        private static final SearchMediator instance = new SearchMediator();
     }
 
-    public static LocalSearchEngine instance() {
+    public static SearchMediator instance() {
         return InstanceHolder.instance;
     }
 
 
-    private LocalSearchEngine() {
+    private SearchMediator() {
         this.manager = SearchManager.getInstance();
         this.manager.setListener(new SearchListener() {
             @Override

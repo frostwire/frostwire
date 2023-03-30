@@ -21,14 +21,11 @@ import android.app.NotificationManager;
 import android.content.Context;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.LocalSearchEngine;
-import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.gui.views.preference.ButtonActionPreference;
-import com.frostwire.android.util.Asyncs;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
@@ -76,7 +73,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
         if (preference != null) {
             updateIndexSummary(preference);
             preference.setOnActionListener(v -> {
-                LocalSearchEngine.instance().clearCache();
+                SearchMediator.instance().clearCache();
                 UIUtils.showShortMessage(getView(), R.string.deleted_crawl_cache);
                 updateIndexSummary(preference);
             });
@@ -84,7 +81,7 @@ public final class OtherFragment extends AbstractPreferenceFragment {
     }
 
     private void updateIndexSummary(Preference preference) {
-        float size = (((float) LocalSearchEngine.instance().getCacheSize()) / 1024) / 1024;
+        float size = (((float) SearchMediator.instance().getCacheSize()) / 1024) / 1024;
         preference.setSummary(getString(R.string.crawl_cache_size, size));
     }
 }

@@ -40,7 +40,7 @@ public class HttpSlideSearchResult extends AbstractFileSearchResult {
     }
 
     @Override
-    public double getSize() {
+    public long getSize() {
         return slide.size;
     }
 
