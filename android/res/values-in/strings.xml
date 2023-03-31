@@ -1,7 +1,7 @@
 ﻿<!--
  /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -409,4 +409,5 @@
     <string name="add_tracker">Tambahkan pelacak</string>
     <string name="use_nyaa">Gunakan Nyaa</string>
     <string name="use_torrentz2">Gunakan Torrentz2</string>
+    <string name="analyzing_downloadable_files">Menganalisis file yang dapat diunduh</string>
 </resources>

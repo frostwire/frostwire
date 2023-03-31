@@ -34,6 +34,7 @@ import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog.SelectionMode
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.Logger;
 
 import java.util.HashMap;
@@ -51,7 +52,7 @@ import java.util.Map;
  * @author votaguz
  */
 @SuppressWarnings("ConstantConditions")
-abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
+public abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter<T> {
     private static final Logger LOGGER = Logger.getLogger(ConfirmListDialogDefaultAdapter.class);
     private static final int ITEM_TITLE = 0;
     private static final int ITEM_SIZE = 1;
@@ -82,7 +83,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
         layoutMapping.get(SelectionMode.MULTIPLE_SELECTION).put(ITEM_ART, R.id.confirmation_dialog_multiple_selection_list_item_art);
     }
 
-    ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
+    protected ConfirmListDialogDefaultAdapter(Context context, List<T> list, SelectionMode selectionMode) {
         //noinspection ConstantConditions
         super(context, selectionModeToLayoutId.get(selectionMode), list);
         this.selectionMode = selectionMode;
@@ -118,7 +119,7 @@ abstract class ConfirmListDialogDefaultAdapter<T> extends AbstractListAdapter {
 
     public abstract CharSequence getItemTitle(T data);
 
-    public abstract double getItemSize(T data);
+    public abstract long getItemSize(T data);
 
     public abstract CharSequence getItemThumbnailUrl(T data);
 

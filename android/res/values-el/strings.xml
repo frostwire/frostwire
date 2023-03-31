@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -409,4 +409,5 @@
     <string name="contact_us">Επικοινωνήστε μαζί μας</string>
     <string name="use_nyaa">Χρήση Nyaa</string>
     <string name="use_torrentz2">Χρήση Torrentz2</string>
+    <string name="analyzing_downloadable_files">Ανάλυση λήψιμων αρχείων</string>
 </resources>

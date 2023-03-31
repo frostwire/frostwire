@@ -20,46 +20,60 @@ package com.frostwire.android.core;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.fragments.SearchFragment;
+import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
 
 import java.util.List;
 import java.util.Objects;
 
-public class TellurideCourierCallback {
-    private final SearchResultListAdapter adapter;
+public class TellurideCourierCallback<T extends AbstractListAdapter> {
+    private final T adapter;
     private final String url;
     private final TellurideCourier.SearchPerformer searchPerformer;
     private boolean hasAborted = false;
 
-    public TellurideCourierCallback(TellurideCourier.SearchPerformer searchPerformer, String pageUrl, SearchResultListAdapter adapter) {
+    public TellurideCourierCallback(TellurideCourier.SearchPerformer searchPerformer, String pageUrl, T adapter) {
         this.searchPerformer = searchPerformer;
         this.url = pageUrl;
         this.adapter = adapter;
     }
 
-    void onResults(List<TellurideSearchResult> results, boolean errored) {
-        // This comes in too fast, gotta let the UI get there
+    void onSearchResultListAdapterResults(List<TellurideSearchResult> results, boolean errored) {
         SystemUtils.postToUIThread(() -> {
+            SearchResultListAdapter srlAdapter = (SearchResultListAdapter) adapter;
             // Screw our listener, make the adapter do what we want.
             adapter.clear();
-
             if (results != null) {
-                adapter.addResults(results); // adds to full list of results
-                adapter.setFileType(Constants.FILE_TYPE_AUDIO, false, null);
-                adapter.setFileType(Constants.FILE_TYPE_VIDEOS, true,
+                srlAdapter.addResults(results); // adds to full list of results
+                srlAdapter.setFileType(Constants.FILE_TYPE_AUDIO, false, null);
+                srlAdapter.setFileType(Constants.FILE_TYPE_VIDEOS, true,
                         () -> {
-                            SearchResultListAdapter.FilteredSearchResults filteredSearchResults = adapter.getFilteredSearchResults();
-                            adapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered, false);
+                            SearchResultListAdapter.FilteredSearchResults filteredSearchResults = srlAdapter.getFilteredSearchResults();
+                            srlAdapter.updateVisualListWithAllMediaTypeFilteredSearchResults(filteredSearchResults.mediaTypeFiltered, false);
                             SearchFragment.instance().refreshFileTypeCounters(false, filteredSearchResults);
                             SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                         });
+
             } else if (results == null || results.isEmpty() || errored) {
+
                 if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
                     SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                 }
+
             }
         });
+    }
+
+    void onResults(List<TellurideSearchResult> results, boolean errored) {
+        // This comes in too fast, gotta let the UI get there
+        if (adapter instanceof SearchResultListAdapter) {
+            onSearchResultListAdapterResults(results, errored);
+        } else {
+            for (TellurideSearchResult result : results) {
+                adapter.addItem(result);
+            }
+        }
     }
 
     final void abort() {

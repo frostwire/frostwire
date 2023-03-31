@@ -414,4 +414,5 @@
     <string name="information">जानकारी</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">YouTube डाउनलोड Google Play नियमों के कारण फ्रॉस्टवायर बेसिक द्वारा समर्थित नहीं हैं।\n\nफफ्रॉस्टवायर प्लस की मुफ्त कॉपी के लिए हमारी आधिकारिक वेबसाइट Frostwire.com पर जाएं</string>
+    <string name="analyzing_downloadable_files">डाउनलोड करने योग्य फ़ाइलों का विश्लेषण किया जा रहा है</string>
 </resources>

@@ -2,7 +2,7 @@
 <!--
 /*
  * Tác giả Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Lưu ý đây là phần mềm miễn phí: bạn có thể phân phối lại và/hoặc chỉnh sửa 
  * nó thông qua những điều khoản của giấy phép GNU General Public License, giấy phép này đã được phát hành bởi
@@ -409,4 +409,5 @@
     <string name="contact_us">Liên hệ chúng tôi</string>
     <string name="use_nyaa">Chọn Nyaa</string>
     <string name="use_torrentz2">Chọn Torrentz2</string>
+    <string name="analyzing_downloadable_files">Phân tích các tệp có thể tải xuống</string>
 </resources>

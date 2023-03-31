@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -410,4 +410,5 @@
     <string name="contact_us">आमच्याशी संपर्क साधा</string>
     <string name="use_nyaa">Nyaa वापरा</string>
     <string name="use_torrentz2">Torrentz2 वापरा</string>
+    <string name="analyzing_downloadable_files">डाउनलोड करण्यायोग्य फाईल विश्लेषण करीत आहे.</string>
 </resources>

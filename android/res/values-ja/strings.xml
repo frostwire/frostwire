@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -410,4 +410,5 @@
     <string name="contact_us">お問い合わせ</string>
     <string name="use_nyaa">Nyaaを使用する</string>
     <string name="use_torrentz2">Torrentz2を使用する</string>
+    <string name="analyzing_downloadable_files">ダウンロード可能なファイルを分析中…</string>
 </resources>

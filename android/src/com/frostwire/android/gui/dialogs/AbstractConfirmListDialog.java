@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Jose Molina (@votaguz), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,7 +59,7 @@ import java.util.Set;
  * @author marcelinkaaa
  *
  */
-abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
+public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         AbstractListAdapter.OnItemCheckedListener<T> {
 
     private static final Logger LOG = Logger.getLogger(AbstractConfirmListDialog.class);
@@ -78,7 +78,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
 
     private CompoundButton.OnCheckedChangeListener selectAllCheckboxOnCheckedChangeListener;
 
-    enum SelectionMode {
+    public enum SelectionMode {
         NO_SELECTION,
         SINGLE_SELECTION,
         MULTIPLE_SELECTION;
@@ -99,7 +99,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
     private SelectionMode selectionMode;
     private Dialog dlg;
     private OnCancelListener onCancelListener;
-    private OnClickListener onYesListener;
+    protected OnClickListener onYesListener;
     private ConfirmListDialogDefaultAdapter<T> adapter;
 
     abstract protected OnClickListener createOnYesListener();
@@ -341,7 +341,7 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
         return result;
     }
 
-    T getSelectedItem() {
+    public T getSelectedItem() {
         return (T) adapter.getSelectedItem();
     }
 
@@ -422,6 +422,10 @@ abstract class AbstractConfirmListDialog<T> extends AbstractDialog implements
             updateSelectedCount();
         }
         updateSelectedInBundle();
+    }
+
+    public ConfirmListDialogDefaultAdapter<T> getAdapter() {
+        return adapter;
     }
 
     private void scrollToSelectedRadioButton() {

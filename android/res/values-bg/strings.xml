@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -409,4 +409,5 @@
     <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
     <string name="use_nyaa">Използвайте Nyaa</string>
     <string name="use_torrentz2">Използвайте Torrentz2</string>
+    <string name="analyzing_downloadable_files">Анализиране на изтеглимите файлове</string>
 </resources>

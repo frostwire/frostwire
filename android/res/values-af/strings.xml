@@ -2,7 +2,7 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -409,4 +409,5 @@
     <string name="piece_size_header">Stuk Grootte:</string>
     <string name="add_tracker">Voeg spoorsnyer by</string>
     <string name="use_nyaa">Gebruik Nyaa</string>
+    <string name="analyzing_downloadable_files">Analiseer aflaaibare lêers</string>
 </resources>

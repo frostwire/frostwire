@@ -47,13 +47,17 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
+import com.frostwire.android.core.TellurideCourierCallback;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
+import com.frostwire.android.gui.dialogs.AbstractConfirmListDialog;
+import com.frostwire.android.gui.dialogs.ConfirmListDialogDefaultAdapter;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
 import com.frostwire.android.gui.dialogs.NewTransferDialog;
+import com.frostwire.android.gui.dialogs.TellurideSearchResultDownloadDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.tasks.AsyncDownloadSoundcloudFromUrl;
 import com.frostwire.android.gui.tasks.AsyncStartDownload;
@@ -83,7 +87,11 @@ import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
 import com.frostwire.search.SearchResult;
+import com.frostwire.search.telluride.TellurideSearchPerformer;
+import com.frostwire.search.telluride.TellurideSearchPerformerListener;
+import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.search.yt.YTSearchResult;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
@@ -355,7 +363,12 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             adapter = new SearchResultListAdapter(getActivity()) {
                 @Override
                 protected void searchResultClicked(SearchResult sr) {
-                    startTransfer(sr, getString(R.string.download_added_to_queue));
+                    // Telluride Preliminary Search Results
+                    if (sr instanceof YTSearchResult) {
+                        startTellurideDownloadDialog((YTSearchResult) sr, getString(R.string.analyzing_downloadable_files));
+                    } else {
+                        startTransfer(sr, getString(R.string.download_added_to_queue));
+                    }
                 }
             };
         }
@@ -513,6 +526,23 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 SearchMediator.instance().markOpened(NewTransferDialog.srRef.get(), adapter);
             }
         }
+    }
+
+    private void startTellurideDownloadDialog(final YTSearchResult sr, final String toastMessage) {
+        SystemUtils.postToUIThread(() -> UIUtils.showShortMessage(getActivity(), toastMessage));
+
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter tellurideSearchResultDownloadDialogAdapter = new TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter(getContext(), new ArrayList<>(), AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION);
+            TellurideCourier.SearchPerformer<ConfirmListDialogDefaultAdapter<TellurideSearchResult>> searchPerformer =
+                    new TellurideCourier.SearchPerformer<>(1,
+                            sr.getDetailsUrl(),
+                            tellurideSearchResultDownloadDialogAdapter);
+            searchPerformer.perform();
+            SystemUtils.postToUIThread(() -> {
+                TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(getContext(), tellurideSearchResultDownloadDialogAdapter.getFullList());
+                dlg.show(getActivity().getFragmentManager());
+            });
+        });
     }
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {

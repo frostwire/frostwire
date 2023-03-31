@@ -252,7 +252,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         }
 
         @Override
-        public double getItemSize(TorrentFileEntry data) {
+        public long getItemSize(TorrentFileEntry data) {
             return data.getSize();
         }
 

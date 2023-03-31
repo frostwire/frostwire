@@ -23,6 +23,7 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.AbstractSearchPerformer;
 import com.frostwire.search.CrawlableSearchResult;
@@ -133,11 +134,11 @@ public final class TellurideCourier {
     }
 
 
-    public static class SearchPerformer extends AbstractSearchPerformer {
+    public static class SearchPerformer<T extends AbstractListAdapter> extends AbstractSearchPerformer {
         private final String pageUrl;
         private final TellurideCourierCallback courierCallback;
 
-        public SearchPerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
+        public SearchPerformer(long token, String pageUrl, T adapter) {
             super(token);
             this.pageUrl = pageUrl;
             this.courierCallback = new TellurideCourierCallback(this, pageUrl, adapter);
@@ -145,7 +146,7 @@ public final class TellurideCourier {
 
         @Override
         public void perform() {
-            SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourirer.SearchPerformer.perform");
+            SystemUtils.ensureBackgroundThreadOrCrash("TellurideCourier.SearchPerformer.perform");
             TellurideCourier.queryPage(pageUrl, courierCallback);
         }
 
