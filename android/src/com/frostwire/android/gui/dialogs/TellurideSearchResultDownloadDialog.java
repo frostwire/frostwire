@@ -30,6 +30,7 @@ import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
 import java.util.List;
+import java.util.Locale;
 
 public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDialog<TellurideSearchResult> {
 
@@ -101,7 +102,7 @@ public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDial
 
         @Override
         public int getItemThumbnailResourceId(TellurideSearchResult data) {
-            return data.getDisplayName().contains("audio") ? R.drawable.list_item_audio_icon : R.drawable.list_item_video_icon;
+            return data.getDisplayName().toLowerCase(Locale.ROOT).contains("audio") ? R.drawable.list_item_audio_icon : R.drawable.list_item_video_icon;
         }
 
         @Override

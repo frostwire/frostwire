@@ -1,3 +1,7 @@
+FrostWire 2.6.6 build 717 - MAR/31/2023
+ - PLUS-ONLY: New video search source
+ - SoundCloud search fixed
+
 FrostWire 2.6.5 build 716 - MAR/17/2023
  - Filters out irrelevant search results from EZTV search performer
  - Removed all landscape layouts, app works only in vertical mode now
