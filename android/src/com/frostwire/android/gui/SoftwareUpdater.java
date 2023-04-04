@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -327,6 +327,7 @@ public final class SoftwareUpdater {
         // Even if we're offline, we need to disable these for the Google Play Distro.
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
             SearchEngine.SOUNCLOUD.setActive(false);
+            SearchEngine.YT.setActive(false);
         }
     }
 }

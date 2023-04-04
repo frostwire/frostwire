@@ -58,11 +58,11 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        //Fragment f = getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        Fragment fragmentByTag = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         // this is necessary to avoid a crash with double rotation of the screen
-        Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
-        if (f != null) {
-            f.setTargetFragment(this, 0);
+        //Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        if (fragmentByTag != null) {
+            fragmentByTag.setTargetFragment(this, 0);
         }
     }
 

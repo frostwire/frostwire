@@ -96,6 +96,7 @@ public abstract class SearchEngine {
         return preferenceKey;
     }
 
+    /** This is what's eventually checked to perform a search */
     public boolean isEnabled() {
         return isActive() && ConfigurationManager.instance().getBoolean(preferenceKey);
     }
@@ -114,16 +115,20 @@ public abstract class SearchEngine {
         return name;
     }
 
+    /**
+     * This will include all engines, even if they have been marked as inactive via
+     * remote config or by some other mean.
+     *
+     * It will only exclude non-ready engines if excludeNonReady=true
+     *
+     * We need to include inactive engines so that places like the SearchEnginesPreferenceFragment
+     * can separate active engines from inactive engines and do things like hide them from the
+     * user interface in the case of FrostWire Basic where some engines are not allowed in google play
+    */
     public static List<SearchEngine> getEngines(boolean excludeNonReady) {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
         for (SearchEngine se : ALL_ENGINES) {
-            // We can deactivate these via remote config marking them inactive
-            // or when defining the instance by overriding isActive()
-            // This is different from isEnabled() which is a user preference.
-            if (!se.isActive()) {
-                continue;
-            }
             if (!excludeNonReady || se.isReady()) {
                 candidates.add(se);
             }
@@ -320,7 +325,7 @@ public abstract class SearchEngine {
         }
     };
 
-    private static final SearchEngine YT = new SearchEngine("YT", Constants.PREF_KEY_SEARCH_USE_YT) {
+    public static final SearchEngine YT = new SearchEngine("YT", Constants.PREF_KEY_SEARCH_USE_YT) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new YTSearchPerformer(token, keywords, DEFAULT_TIMEOUT, 1);
@@ -328,7 +333,7 @@ public abstract class SearchEngine {
 
         @Override
         public boolean isActive() {
-            return BuildConfig.FLAVOR.equals("plus") || BuildConfig.DEBUG;
+            return !Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG;
         }
     };
 

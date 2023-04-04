@@ -112,7 +112,7 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_IDOPE, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_GLOTORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_BT_DIGG, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YT, BuildConfig.FLAVOR.equals("plus") || BuildConfig.DEBUG);
+        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YT, Constants.IS_BASIC_AND_DEBUG || !Constants.IS_GOOGLE_PLAY_DISTRIBUTION);
 
         defaultValues.put(Constants.PREF_KEY_NETWORK_ENABLE_DHT, true);
         defaultValues.put(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY, false);

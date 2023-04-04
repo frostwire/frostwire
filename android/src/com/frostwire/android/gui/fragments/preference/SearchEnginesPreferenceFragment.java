@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.frostwire.android.gui.fragments.preference;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
@@ -30,10 +31,15 @@ import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ * NOTE: If you want a search engine to not appear on the list for the basic/google play version see
+ * SoftwareUpdater.checkUpdateAsyncPost(), there such engines are de-activated when Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG
+ *
  * @author gubatron
  * @author aldenml
  */
@@ -55,7 +61,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
     }
 
     private void setupSearchEngines() {
-        final CheckBoxPreference selectAll = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
+        final CheckBoxPreference selectAllCheckbox = findPreference(PREF_KEY_SEARCH_SELECT_ALL);
 
         Map<CheckBoxPreference, SearchEngine> inactiveSearchPreferences = new HashMap<>();
         fillSearchEnginePreferences(activeSearchEnginePreferences, inactiveSearchPreferences);
@@ -65,12 +71,12 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
             CheckBoxPreference cb = (CheckBoxPreference) preference;
 
             if (!cb.isChecked()) {
-                setChecked(selectAll, false, false);
+                setChecked(selectAllCheckbox, false, false);
                 if (areAllEnginesChecked(activeSearchEnginePreferences, false)) {
                     cb.setChecked(true); // always keep one checked
                     UIUtils.showShortMessage(getView(), R.string.search_preferences_one_engine_checked_always);
                 }
-                selectAll.setTitle(R.string.select_all);
+                selectAllCheckbox.setTitle(R.string.select_all);
             } else {
                 updateSelectAllCheckBox();
             }
@@ -86,7 +92,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
             preference.setOnPreferenceClickListener(searchEngineClickListener);
         }
 
-        selectAll.setOnPreferenceClickListener(preference -> {
+        selectAllCheckbox.setOnPreferenceClickListener(preference -> {
             CheckBoxPreference selectAll1 = (CheckBoxPreference) preference;
             checkAllEngines(selectAll1.isChecked());
             selectAll1.setTitle(selectAll1.isChecked() ? R.string.deselect_all : R.string.select_all);
@@ -107,7 +113,8 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         inactive.clear();
         active.clear();
 
-        for (SearchEngine engine : SearchEngine.getEngines(false)) {
+        List<SearchEngine> engines = SearchEngine.getEngines(false);
+        for (SearchEngine engine : engines) {
             CheckBoxPreference preference = findPreference(engine.getPreferenceKey());
             if (preference != null) { //it could already have been removed due to remote config value.
                 if (engine.isActive()) {
