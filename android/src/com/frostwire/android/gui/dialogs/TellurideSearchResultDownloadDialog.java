@@ -22,8 +22,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.search.SearchManager;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.util.JsonUtils;
@@ -47,6 +49,7 @@ public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDial
                 ctx.getString(R.string.select_option_below),
                 JsonUtils.toJson(srList),
                 SelectionMode.SINGLE_SELECTION);
+        SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
         return dlg;
     }
 

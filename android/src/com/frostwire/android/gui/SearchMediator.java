@@ -135,6 +135,7 @@ public final class SearchMediator {
         searchFinished = false;
         lastTellurideCourier = SearchEngine.TELLURIDE_COURIER.getTelluridePerformer(currentSearchToken, pageUrl, adapter);
         manager.perform(lastTellurideCourier);
+        manager.perform(SearchEngine.FROSTCLICK.getPerformer(1, pageUrl));
     }
 
 
