@@ -181,7 +181,7 @@ gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
 
 test {
-    failFast = true
+    failFast = false
     enabled = gradle.startParameter.taskNames.contains("test")
     useJUnitPlatform()
 
