@@ -17,6 +17,7 @@
 
 package com.frostwire.search.yt;
 
+import com.frostwire.util.Logger;
 
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
@@ -37,26 +38,20 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
 
     private static Pattern jsonPattern;
 
-    private final Map<String, Integer> unitsToSeconds = new HashMap<>();
+    // Maps for different languages
+    private final Map<String, Integer> englishUnitsToSeconds = getEnglishUnitsToSeconds();
+    private final Map<String, Integer> spanishUnitsToSeconds = getSpanishUnitsToSeconds();
+    private final Map<String, Integer> germanUnitsToSeconds = getGermanUnitsToSeconds();
+    private final Map<String, Integer> italianUnitsToSeconds = getItalianUnitsToSeconds();
+    private final Map<String, Integer> frenchUnitsToSeconds = getFrenchUnitsToSeconds();
+
+    private final static Logger LOG = Logger.getLogger(YTSearchPerformer.class);
 
     public YTSearchPerformer(long token, String keywords, int timeout, int pages) {
         super("www.youtube.com", token, keywords, timeout, pages);
         if (jsonPattern == null) {
             jsonPattern = Pattern.compile("(\"videoRenderer\":.*?\"searchVideoResultEntityKey\")");
         }
-        int minute = 60;
-        int hour = 60 * minute;
-        int day = 24 * hour;
-        int week = 7 * day;
-        int month = 30 * day;
-        int year = 365 * day;
-        unitsToSeconds.put("second", 1);
-        unitsToSeconds.put("minute", minute);
-        unitsToSeconds.put("hour", hour);
-        unitsToSeconds.put("day", day);
-        unitsToSeconds.put("week", week);
-        unitsToSeconds.put("month", month);
-        unitsToSeconds.put("year", year);
     }
 
     @Override
@@ -71,22 +66,27 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
         GsonBuilder gsonBuilder = new GsonBuilder();
         Gson gson = gsonBuilder.create();
         while (jsonMatcher.find()) {
-            String json = jsonMatcher.group(1);
-            json = json.replace("\"videoRenderer\":", "") + ":\"\"}";
-            Video video = gson.fromJson(json, Video.class);
-            if (video.publishedTimeText == null) {
-                continue;
+            try {
+                String json = jsonMatcher.group(1);
+                json = json.replace("\"videoRenderer\":", "") + ":\"\"}";
+                Video video = gson.fromJson(json, Video.class);
+                if (video.publishedTimeText == null) {
+                    continue;
+                }
+                String title = video.title.runs.get(0).text;
+                String videoAge = video.publishedTimeText.simpleText;
+                long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
+                String thumbnailUrl = video.thumbnail.thumbnails.get(0).url;
+                String detailsUrl = "https://" + getDomainName() + "/watch?v=" + video.videoId;
+                long viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Long.parseLong(video.viewCountText.simpleText.replace(",", "").replace(".", "").replace(" ", "").replaceAll("[a-zA-Z]+", "")));
+                int viewCountInt = viewCount > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) viewCount;
+                YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt, estimatedFileSize(video.lengthText.accessibility.accessibilityData.label));
+                //LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
+                results.add(searchResult);
+            } catch (Throwable e) {
+                LOG.error("YTSearchPerformer() searchPage() error: " + e.getMessage(), e);
+                LOG.error("YTSearchPerformer() searchPage() json: " + jsonMatcher.group(1));
             }
-            String title = video.title.runs.get(0).text;
-            String videoAge = video.publishedTimeText.simpleText;
-            long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
-            String thumbnailUrl = video.thumbnail.thumbnails.get(0).url;
-            String detailsUrl = "https://" + getDomainName() + "/watch?v=" + video.videoId;
-            long viewCount = 1000 + ((video.viewCountText.simpleText.toLowerCase().contains("no views")) ? 0 : Long.parseLong(video.viewCountText.simpleText.replace(",", "").replace(" views", "")));
-            int viewCountInt = viewCount > (long) Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) viewCount;
-            YTSearchResult searchResult = new YTSearchResult(title, detailsUrl, creationTimeInMillis, thumbnailUrl, viewCountInt, estimatedFileSize(video.lengthText.accessibility.accessibilityData.label));
-            //LOG.info("YTSearchPerformer() searchPage() searchResult: " + searchResult);
-            results.add(searchResult);
         }
         return results;
     }
@@ -111,7 +111,25 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
             String[] time = part.split(" ");
             int value = Integer.parseInt(time[0]);
             String unit = time[1];
-            seconds += (long) value * unitsToSeconds.get(unit);
+
+            Integer mappedSeconds = englishUnitsToSeconds.getOrDefault(unit, null);
+            if (mappedSeconds == null) {
+                mappedSeconds = spanishUnitsToSeconds.getOrDefault(unit, null);
+            }
+            if (mappedSeconds == null) {
+                mappedSeconds = germanUnitsToSeconds.getOrDefault(unit, null);
+            }
+            if (mappedSeconds == null) {
+                mappedSeconds = italianUnitsToSeconds.getOrDefault(unit, null);
+            }
+            if (mappedSeconds == null) {
+                mappedSeconds = frenchUnitsToSeconds.getOrDefault(unit, null);
+            }
+            if (mappedSeconds == null) {
+                mappedSeconds = 1;
+            }
+
+            seconds += (long) value * mappedSeconds;
         }
         long totalFrames = seconds * 30;
         long bitDepth = 6;
@@ -119,12 +137,174 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
         return totalFrames * frameSize;
     }
 
+    /**
+     * private long parseCreationTimeInMillis(String creationString) {
+     * LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
+     * // hace 50 minutos
+     * // Emitido hace 13 horas
+     * creationString = creationString.toLowerCase().replace("streamed ", "").replaceAll("s", "").replace("ago", "");
+     * String[] parts = creationString.split(" ");
+     * int time = Integer.parseInt(parts[0]);
+     * String unit = parts[1];
+     * return System.currentTimeMillis() - (1000L * time * unitsToSeconds.get(unit));
+     * }
+     */
+
     private long parseCreationTimeInMillis(String creationString) {
-        creationString = creationString.toLowerCase().replace("streamed ", "").replaceAll("s", "").replace("ago", "");
-        String[] parts = creationString.split(" ");
-        int time = Integer.parseInt(parts[0]);
-        String unit = parts[1];
-        return System.currentTimeMillis() - (1000L * time * unitsToSeconds.get(unit));
+        // to lower case and remove any prefix string before the time value
+        creationString = creationString.toLowerCase().replaceFirst("^\\D*", "");
+        LOG.info("YTSearchPerformer() parseCreationTimeInMillis() creationString: " + creationString);
+
+        // Regular expression to match the time value and unit
+        Pattern pattern = Pattern.compile("(\\d+)\\s+([a-zñ]+)");
+        Matcher matcher = pattern.matcher(creationString);
+
+        if (matcher.find()) {
+            int time = Integer.parseInt(matcher.group(1));
+            String unit = matcher.group(2);
+
+            // Find the language map that contains the time unit
+            Integer secondsPerUnit = englishUnitsToSeconds.getOrDefault(unit, null);
+            if (secondsPerUnit == null)
+                secondsPerUnit = spanishUnitsToSeconds.getOrDefault(unit, null);
+            if (secondsPerUnit == null)
+                secondsPerUnit = germanUnitsToSeconds.getOrDefault(unit, null);
+            if (secondsPerUnit == null)
+                secondsPerUnit = italianUnitsToSeconds.getOrDefault(unit, null);
+            if (secondsPerUnit == null)
+                secondsPerUnit = frenchUnitsToSeconds.getOrDefault(unit, null);
+
+            if (secondsPerUnit != null) {
+                return System.currentTimeMillis() - (1000L * time * secondsPerUnit);
+            }
+        }
+
+        // Unable to parse the input string
+        return System.currentTimeMillis();
+    }
+
+    private Map<String, Integer> getEnglishUnitsToSeconds() {
+        Map<String, Integer> unitsToSeconds = new HashMap<>();
+        int minute = 60;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int week = 7 * day;
+        int month = 30 * day;
+        int year = 365 * day;
+        unitsToSeconds.put("second", 1);
+        unitsToSeconds.put("seconds", 1);
+        unitsToSeconds.put("minute", minute);
+        unitsToSeconds.put("minutes", minute);
+        unitsToSeconds.put("hour", hour);
+        unitsToSeconds.put("hours", hour);
+        unitsToSeconds.put("day", day);
+        unitsToSeconds.put("days", day);
+        unitsToSeconds.put("week", week);
+        unitsToSeconds.put("weeks", week);
+        unitsToSeconds.put("month", month);
+        unitsToSeconds.put("months", month);
+        unitsToSeconds.put("year", year);
+        unitsToSeconds.put("years", year);
+        return unitsToSeconds;
+    }
+
+    private Map<String, Integer> getSpanishUnitsToSeconds() {
+        Map<String, Integer> unitsToSeconds = new HashMap<>();
+        int minute = 60;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int week = 7 * day;
+        int month = 30 * day;
+        int year = 365 * day;
+        unitsToSeconds.put("segundo", 1);
+        unitsToSeconds.put("segundos", 1);
+        unitsToSeconds.put("minuto", minute);
+        unitsToSeconds.put("minutos", minute);
+        unitsToSeconds.put("hora", hour);
+        unitsToSeconds.put("horas", hour);
+        unitsToSeconds.put("día", day);
+        unitsToSeconds.put("días", day);
+        unitsToSeconds.put("semana", week);
+        unitsToSeconds.put("semanas", week);
+        unitsToSeconds.put("mes", month);
+        unitsToSeconds.put("meses", month);
+        unitsToSeconds.put("año", year);
+        unitsToSeconds.put("años", year);
+        return unitsToSeconds;
+    }
+
+    private Map<String, Integer> getGermanUnitsToSeconds() {
+        Map<String, Integer> unitsToSeconds = new HashMap<>();
+        int minute = 60;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int week = 7 * day;
+        int month = 30 * day;
+        int year = 365 * day;
+        unitsToSeconds.put("sekunde", 1);
+        unitsToSeconds.put("sekunden", 1);
+        unitsToSeconds.put("minute", minute);
+        unitsToSeconds.put("minuten", minute);
+        unitsToSeconds.put("stunde", hour);
+        unitsToSeconds.put("stunden", hour);
+        unitsToSeconds.put("tag", day);
+        unitsToSeconds.put("tage", day);
+        unitsToSeconds.put("woche", week);
+        unitsToSeconds.put("wochen", week);
+        unitsToSeconds.put("monat", month);
+        unitsToSeconds.put("monate", month);
+        unitsToSeconds.put("jahr", year);
+        unitsToSeconds.put("jahre", year);
+        return unitsToSeconds;
+    }
+
+    private Map<String, Integer> getItalianUnitsToSeconds() {
+        Map<String, Integer> unitsToSeconds = new HashMap<>();
+        int minute = 60;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int week = 7 * day;
+        int month = 30 * day;
+        int year = 365 * day;
+        unitsToSeconds.put("secondo", 1);
+        unitsToSeconds.put("secondi", 1);
+        unitsToSeconds.put("minuto", minute);
+        unitsToSeconds.put("minuti", minute);
+        unitsToSeconds.put("ora", hour);
+        unitsToSeconds.put("ore", hour);
+        unitsToSeconds.put("giorno", day);
+        unitsToSeconds.put("giorni", day);
+        unitsToSeconds.put("settimana", week);
+        unitsToSeconds.put("settimane", week);
+        unitsToSeconds.put("mese", month);
+        unitsToSeconds.put("mesi", month);
+        unitsToSeconds.put("anno", year);
+        unitsToSeconds.put("anni", year);
+        return unitsToSeconds;
+    }
+
+    private Map<String, Integer> getFrenchUnitsToSeconds() {
+        Map<String, Integer> unitsToSeconds = new HashMap<>();
+        int minute = 60;
+        int hour = 60 * minute;
+        int day = 24 * hour;
+        int week = 7 * day;
+        int month = 30 * day;
+        int year = 365 * day;
+        unitsToSeconds.put("seconde", 1);
+        unitsToSeconds.put("secondes", 1);
+        unitsToSeconds.put("minute", minute);
+        unitsToSeconds.put("minutes", minute);
+        unitsToSeconds.put("heure", hour);
+        unitsToSeconds.put("heures", hour);
+        unitsToSeconds.put("jour", day);
+        unitsToSeconds.put("jours", day);
+        unitsToSeconds.put("semaine", week);
+        unitsToSeconds.put("semaines", week);
+        unitsToSeconds.put("mois", month);
+        unitsToSeconds.put("année", year);
+        unitsToSeconds.put("années", year);
+        return unitsToSeconds;
     }
 
     @Override
