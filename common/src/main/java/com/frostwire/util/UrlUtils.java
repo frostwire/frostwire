@@ -160,6 +160,9 @@ public final class UrlUtils {
         } catch (InterruptedException e) {
             return mirrors[0];
         }
+        if (mirrorDurations == null) {
+            return mirrors[0];
+        }
         //filter out all null elements from mirrorDurations
         mirrorDurations.removeIf(Objects::isNull);
         if (mirrorDurations.size() > 1) {
