@@ -92,7 +92,7 @@ public abstract class SearchEngine {
             new Thread(() -> {
                 HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
                 // from https://piratebayproxy.info/
-                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.mirrors, 6000, 6);
+                TPB._domainName = UrlUtils.getFastestMirrorDomain(httpClient, TPBSearchPerformer.getMirrors(), 6000, 6);
             }
             ).start();
         }
