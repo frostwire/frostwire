@@ -1,3 +1,10 @@
+frostwire (6.12.0) stable; urgency=high
+  * Telluride Video Search works in Spanish, German, Italian, French countries
+  * Faster app startup
+  * Java Runtime Environment 20.0.1
+
+ -- FrostWire Team <contact@frostwire.com>  Sat, 06 Ma7 2023 11:08:00 -0600
+
 frostwire (6.11.0) stable; urgency=high
   * Telluride Video Search
   * Java Runtime Environment 19.0.2 for Linux binaries
