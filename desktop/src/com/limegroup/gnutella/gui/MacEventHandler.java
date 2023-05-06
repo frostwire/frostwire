@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (@aldenml)
- * Copyright (c) 2007-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -143,6 +143,9 @@ public class MacEventHandler {
             }
             if (versionStr.startsWith("19")) {
                 return 19;
+            }
+            if (versionStr.startsWith("20")) {
+                return 20;
             }
             throw new RuntimeException("Java version " + versionStr + " not supported");
         }
