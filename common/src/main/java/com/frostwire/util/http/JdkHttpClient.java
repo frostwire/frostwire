@@ -22,9 +22,7 @@ import com.frostwire.util.Ssl;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +36,17 @@ import java.util.zip.GZIPOutputStream;
  * @author gubatron
  * @author aldenml
  */
-public final class JdkHttpClient extends AbstractHttpClient {
+public final class  JdkHttpClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(JdkHttpClient.class);
 
     @Override
     public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        HttpURLConnection connection = null;
+        try {
+            connection = (HttpURLConnection) new URI(url).toURL().openConnection();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         connection.setConnectTimeout(connectTimeoutInMillis);
         connection.setReadTimeout(connectTimeoutInMillis);
         connection.setRequestMethod("HEAD");
@@ -129,7 +132,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
         String result = null;
         canceled = false;
-        final URL u = new URL(url);
+        final URL u;
+        try {
+            u = new URI(url).toURL();
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
         final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
         conn.setDoOutput(true);
         conn.setConnectTimeout(timeout);
@@ -214,7 +222,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
 
     private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, long rangeStart, long rangeLength, final Map<String, String> customHeaders) throws IOException {
         canceled = false;
-        final URL u = new URL(url);
+        final URL u;
+        try {
+            u = new URI(url).toURL();
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex);
+        }
         final URLConnection conn = u.openConnection();
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
@@ -280,7 +293,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
 
     private void post(String url, OutputStream out, int timeout, String userAgent, Map<String, String> formData) throws IOException {
         canceled = false;
-        final URL u = new URL(url);
+        final URL u;
+        try {
+            u = new URI(url).toURL();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
         final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
         conn.setDoOutput(true);
         conn.setConnectTimeout(timeout);
