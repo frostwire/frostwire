@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ import org.xml.sax.*;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * SAX Parser and more. Its responsible for creating UpdateMessages The
+ * SAX Parser and more. It's responsible for creating UpdateMessages The
  * UpdateManager will ask this object if it has announcements or an update
  * message available.
  */
@@ -106,17 +106,17 @@ final class UpdateMessageReader implements ContentHandler {
 
     /**
      * When the tag closes, if we have a _buffer message, we check what type it
-     * is and set it as the Update Message (if its for this client/os) or if its
-     * an announcement, we add it to the announcements collection.
+     * is and set it as the Update Message (if it's for this client/os) or if it's
+     * an announcement, we add it to the announcements' collection.
      * <p>
      * This function will make use of 'isMessageForMe', to try to discard the
-     * message in case its addressed to another OS different than the one where
+     * message in case it's addressed to another OS different from the one where
      * this client is running on top of.
      * <p>
-     * If its an update message and no update message has been spotted so far,
+     * If it's an update message and no update message has been spotted so far,
      * the UpdateReader sets it as the update message object available
      * <p>
-     * If its an announcement we attempt adding it as another announcement. That
+     * If it's an announcement we attempt adding it as another announcement. That
      * method will only add it if the message has not expired.
      */
     public void endElement(String uri, String name, String qName) throws SAXException {
@@ -183,11 +183,11 @@ final class UpdateMessageReader implements ContentHandler {
     /**
      * Checks if we should show this message for the language the user is using.
      * If no language is specified in the message, then it returns true right
-     * away the message is meant for everyone, unless there's a more specific
+     * away the message is meant for everyone, unless there is a more specific
      * message ahead.
      * <p>
      * <p>
-     * If you want a full blown validation use isMessageForMe()
+     * If you want a full-blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyLang(UpdateMessage msg) {
         String langInMsg = msg.getLanguage(); // current language in message
@@ -209,7 +209,7 @@ final class UpdateMessageReader implements ContentHandler {
      * Checks if this message should be shown for the OS on which this FrostWire
      * is running on.
      * <p>
-     * If you want a full blown validation use isMessageForMe()
+     * If you want a full-blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyOs(UpdateMessage msg) {
         if (msg.getOs() == null || "*".equals(msg.getOs()))
@@ -230,7 +230,7 @@ final class UpdateMessageReader implements ContentHandler {
      * doesn't matter what version it's sent, it should be valid because we need
      * to use the version in it to see if we have to update or not.
      * <p>
-     * If you want a full blown validation use isMessageForMe()
+     * If you want a full-blown validation use isMessageForMe()
      */
     private boolean isMessageEligibleForMyVersion(UpdateMessage msg) {
         return msg.getVersion() == null ||
@@ -272,7 +272,7 @@ final class UpdateMessageReader implements ContentHandler {
             if (OSUtils.isAnyMac()) {
                 userAgent = "FrostWire/" + OSUtils.getOS() + "-" + OSUtils.getMacOSArchitecture() + "/" + FrostWireUtils.getFrostWireVersion() + "/build-" + FrostWireUtils.getBuildNumber();
             }
-            connection = (HttpURLConnection) (new URL(DEFAULT_UPDATE_URL)).openConnection();
+            connection = (HttpURLConnection) (new URI(DEFAULT_UPDATE_URL).toURL()).openConnection();
 
             LOG.info("Reading update file from " + DEFAULT_UPDATE_URL);
             connection.setRequestProperty("User-Agent", userAgent);
@@ -297,7 +297,7 @@ final class UpdateMessageReader implements ContentHandler {
             rdr.parse(src);
             LOG.info("readUpdateFile(): finished parsing");
         } catch (Throwable t) {
-            System.err.println("UpdateMessageReader.readUpdateFile() " + t.getClass().getName() + " " + t.toString());
+            System.err.println("UpdateMessageReader.readUpdateFile() " + t.getClass().getName() + " " + t);
             t.printStackTrace();
         } finally {
             if (connection != null) {
