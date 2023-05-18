@@ -25,7 +25,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
 
 /**
  * The Slide panel which has the image and controls.
@@ -88,14 +88,14 @@ class SlidePanel extends JPanel {
         layeredPane.add(imageLabel, Integer.valueOf(0));
         add(layeredPane, BorderLayout.CENTER);
         try {
-            ImageCache.instance().getImage(new URL(controller.getSlide().imageSrc), (url, image, fromCache, fail) -> GUIMediator.safeInvokeLater(() -> {
+            ImageCache.instance().getImage(new java.net.URI(controller.getSlide().imageSrc).toURL(), (url, image, fromCache, fail) -> GUIMediator.safeInvokeLater(() -> {
                 if (image != null) {
                     imageLabel.setIcon(new ImageIcon(image));
                     imageLabel.setBounds(0, 0, image.getWidth(), image.getHeight());
                     overlayControls.setBounds(0, 0, image.getWidth(), image.getHeight());
                 }
             }));
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             e.printStackTrace();
         }
     }
