@@ -29,10 +29,7 @@ import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -76,7 +73,7 @@ public abstract class BaseHttpDownload implements Transfer {
     }
 
     static void simpleHTTP(String url, OutputStream out, int timeout) throws Throwable {
-        URL u = new URL(url);
+        URL u = new URI(url).toURL();
         URLConnection con = u.openConnection();
         con.setConnectTimeout(timeout);
         con.setReadTimeout(timeout);
