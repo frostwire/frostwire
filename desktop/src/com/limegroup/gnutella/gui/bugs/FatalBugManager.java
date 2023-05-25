@@ -25,8 +25,6 @@ public final class FatalBugManager {
      * Handles a fatal bug.
      */
     public static void handleFatalBug(Throwable bug) {
-        if (bug instanceof ThreadDeath) // must rethrow.
-            throw (ThreadDeath) bug;
         bug.printStackTrace();
         // Build the LocalClientInfo out of the info ...
         LocalClientInfoFactory factoryToUse = LimeWireModule.instance().getLimeWireGUIModule().getLimeWireGUI().getLocalClientInfoFactory();
@@ -35,17 +33,6 @@ public final class FatalBugManager {
     }
 
     private static String warning() {
-	/*
-        String msg = "Ui" + "jt!j" + "t!Mjn" + "fXjs" + "f/!U" + "if!pg"+
-                     "gjdjbm!xfc" + "tjuf!j" + "t!xx" + "x/mj" + "nfxjs" + "f/d" + "pn/";
-        StringBuilder ret = new StringBuilder(msg.length());
-        for(int i = 0; i < msg.length(); i++) {
-            ret.append((char)(msg.charAt(i) - 1));
-	    System.out.println("Converting message: "+ ret.toString());
-        }
-	System.out.println("Final message is: "+ ret.toString());
-        return ret.toString();
-	*/
         return "You are using FrostWire. www.frostwire.com";
     }
 
@@ -105,17 +92,21 @@ public final class FatalBugManager {
         mainPanel.add(labelPanel);
         mainPanel.add(buttonPanel);
         DIALOG.getContentPane().add(mainPanel);
-        DIALOG.pack();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dialogSize = DIALOG.getSize();
-        DIALOG.setLocation((screenSize.width - dialogSize.width) / 2,
-                (screenSize.height - dialogSize.height) / 2);
-        DIALOG.setVisible(true);
+        prepareDialog(DIALOG);
         try {
             SplashWindow.instance().setVisible(false);
         } catch (Throwable ignore) {
         }
         DIALOG.toFront();
+    }
+
+    public static void prepareDialog(JDialog dialog) {
+        dialog.pack();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension dialogSize = dialog.getSize();
+        dialog.setLocation((screenSize.width - dialogSize.width) / 2,
+                (screenSize.height - dialogSize.height) / 2);
+        dialog.setVisible(true);
     }
 
     /**

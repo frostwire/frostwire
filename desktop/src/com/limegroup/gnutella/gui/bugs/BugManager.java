@@ -192,9 +192,6 @@ public final class BugManager {
      * or ask the user to review it before sending.
      */
     public void handleBug(Throwable bug, String threadName, String detail) {
-        if (bug instanceof ThreadDeath) { // must rethrow.
-            throw (ThreadDeath) bug;
-        }
         // Try to dispatch the bug to a friendly handler.
         if (bug instanceof IOException &&
                 handleException((IOException) bug)) {

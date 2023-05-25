@@ -208,11 +208,6 @@ class GUILoader {
         mainPanel.add(scroller, BorderLayout.CENTER);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
         DIALOG.getContentPane().add(mainPanel);
-        DIALOG.pack();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension dialogSize = DIALOG.getSize();
-        DIALOG.setLocation((screenSize.width - dialogSize.width) / 2,
-                (screenSize.height - dialogSize.height) / 2);
-        DIALOG.setVisible(true);
+        FatalBugManager.prepareDialog(DIALOG);
     }
 }

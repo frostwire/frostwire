@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
 
 import com.limegroup.gnutella.gui.bugs.BugManager;
@@ -18,13 +35,8 @@ public final class ErrorHandler implements ErrorCallback {
      * Displays the error to the user with a specific message.
      */
     public void error(Throwable problem, String msg) {
-        // ThreadDeath must NOT be caught, or a thread will be left zombied     
-        if (problem instanceof ThreadDeath)
-            throw (ThreadDeath) problem;
-        else {
-            Runnable doWorkRunnable = new Error(problem, msg);
-            GUIMediator.safeInvokeLater(doWorkRunnable);
-        }
+        Runnable doWorkRunnable = new Error(problem, msg);
+        GUIMediator.safeInvokeLater(doWorkRunnable);
     }
 
     /**
