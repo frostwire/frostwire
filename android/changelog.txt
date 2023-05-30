@@ -1,3 +1,24 @@
+FrostWire 2.7.0 build 719 - MAY/29/2023
+ - jlibtorrent 1.2.19.0 upgrade
+ - boost 1.82 upgrade
+ - openssl 1.1.1t upgrade
+ - gradle 8.1.1 upgrade
+ - jar built with jdk20
+ - libtorrent update to RC_1_2 adac0d0843c7fb2180f43d20bd5bee0e380e4673
+ - android NDK r25c (LTS) (from r25b)
+ - lt:back-port load_torrent_*() functions
+ - lt:fix issue with odd piece sizes
+ - lt:fix issue where stop-when-ready would not close files
+ - lt:uTP performance, fix packet loss when sending is stalled
+ - lt:uTP performance, prevent premature timeouts/resends
+ - lt:uTP performance, more lenient nagle's algorithm to always allow one outstanding undersized packet
+ - lt:uTP performance, piggy-back held back undersized packet with ACKs
+ - lt:uTP performance, don't send redundant deferred ACKs
+ - lt:fix wanted_done/done accounting when force-rechecking
+ - lt:expose userdata via torrent_handle (back-port from 2.0)
+ - lt:fix renaming of filenames that are too long for the filesystem
+ - lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
+
 FrostWire 2.6.7 build 718 - APR/29/2023
  - Improved YT search for spanish, french, german, italian
  - python:websockets-11.0.2
