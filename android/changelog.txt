@@ -1,4 +1,4 @@
-FrostWire 2.7.0 build 719 - MAY/29/2023
+FrostWire 2.7.0 build 719 - MAY/30/2023
  - jlibtorrent 1.2.19.0 upgrade
  - boost 1.82 upgrade
  - openssl 1.1.1t upgrade
@@ -6,6 +6,7 @@ FrostWire 2.7.0 build 719 - MAY/29/2023
  - jar built with jdk20
  - libtorrent update to RC_1_2 adac0d0843c7fb2180f43d20bd5bee0e380e4673
  - android NDK r25c (LTS) (from r25b)
+ - fixed race condition issues starting the Python engine
  - lt:back-port load_torrent_*() functions
  - lt:fix issue with odd piece sizes
  - lt:fix issue where stop-when-ready would not close files
