@@ -8,6 +8,7 @@ FrostWire 2.7.0 build 719 - MAY/30/2023
  - android NDK r25c (LTS) (from r25b)
  - more robust initialization of Python runtime
  - fixed race condition issues starting the Python runtime
+ - fixed SC search
  - lt:back-port load_torrent_*() functions
  - lt:fix issue with odd piece sizes
  - lt:fix issue where stop-when-ready would not close files
