@@ -73,6 +73,10 @@
 
 -keep class libcore.io.Memory { *; }
 
+# chaquopy
+-keep class com.chaquo.python.** { *; }
+-dontwarn com.chaquo.python.**
+
 # GMS
 -keep public class com.google.android.gms.** { public protected *; }
 

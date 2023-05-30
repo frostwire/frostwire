@@ -123,6 +123,11 @@ public final class TellurideCourier {
             Engine.startPython();
         }
         Python python = Engine.getPythonInstance();//Python.getInstance();
+        if (python == null) {
+            LOG.error("TellurideCourier::ytDlpVersion could not get Python instance");
+            callback.onVersion("<unavailable>");
+            return;
+        }
         PyObject telluride_module = python.getModule("telluride");
         PyObject ytDlpVersionString = telluride_module.callAttr("yt_dlp_version");
         if (ytDlpVersionString == null) {

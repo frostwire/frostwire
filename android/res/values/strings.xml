@@ -276,6 +276,7 @@
     <string name="enable_dht">Enable DHT</string>
     <string name="enable_dht_summary">Use the Distributed Hash Table to announce/search torrent peers</string>
     <string name="dummy_build" translatable="false">[build number]</string>
+    <string name="yt_dlp_dummy_build" translatable="false">[yt_dlp build number]</string>
     <string name="basic" translatable="false">Basic</string>
     <string name="plus" translatable="false">Plus</string>
     <string name="build">build</string>

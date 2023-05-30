@@ -112,15 +112,6 @@ android {
         }
 
         python {
-            python {
-                // https://chaquo.com/chaquopy/doc/current/android.html#python-version
-                version "3.8"
-
-                // Bytecode compilation, don't include src files https://chaquo.com/chaquopy/doc/current/android.html#android-bytecode
-                pyc {
-                    src false
-                }
-            }
             pip {
                 install "yt_dlp"
             }

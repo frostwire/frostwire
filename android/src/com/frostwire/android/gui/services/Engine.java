@@ -164,17 +164,25 @@ public final class Engine implements IEngineService {
             long a = System.currentTimeMillis();
             AndroidPlatform androidPlatform = new AndroidPlatform(SystemUtils.getApplicationContext());
             synchronized (pythonStarterLock) {
+                LOG.info("Engine::startPython Python runtime first instantiation in synchronized space...");
                 Python.start(androidPlatform);
                 pythonInstance = Python.getInstance();
                 if (pythonStarterLatch.getCount() > 0) {
                     pythonStarterLatch.countDown();
                 }
+                if (pythonInstance != null) {
+                    LOG.info("Engine::startPython Python runtime first instantiated in synchronized space.");
+                } else {
+                    LOG.warn("Engine::startPython Python runtime first instantiation in synchronized space FAILED.");
+                }
             }
             long b = System.currentTimeMillis();
             LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
         } catch (Throwable t) {
+            LOG.error("Engine::startPython Python runtime first instantiation FAILED.", t);
             // keep trying every 10 seconds until Python is started
             if (!Python.isStarted()) {
+                LOG.info("Engine::startPython Python runtime first instantiation FAILED, retrying in 10 seconds...");
                 SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, Engine::startPython, 10000);
             }
         }
