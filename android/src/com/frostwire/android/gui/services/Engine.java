@@ -50,6 +50,7 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -65,6 +66,10 @@ public final class Engine implements IEngineService {
     private EngineService service;
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
+
+    private static final Object pythonStarterLock = new Object();
+    private static final CountDownLatch pythonStarterLatch = new CountDownLatch(1);
+    private static Python pythonInstance;
 
     // the startServices call is a special call that can be made
     // to early (relatively speaking) during the application startup
@@ -155,9 +160,16 @@ public final class Engine implements IEngineService {
             return;
         }
         try {
+
             long a = System.currentTimeMillis();
             AndroidPlatform androidPlatform = new AndroidPlatform(SystemUtils.getApplicationContext());
-            Python.start(androidPlatform);
+            synchronized (pythonStarterLock) {
+                Python.start(androidPlatform);
+                pythonInstance = Python.getInstance();
+                if (pythonStarterLatch.getCount() > 0) {
+                    pythonStarterLatch.countDown();
+                }
+            }
             long b = System.currentTimeMillis();
             LOG.info("Engine::startPython Python runtime first instantiated in " + (b - a) + " ms");
         } catch (Throwable t) {
@@ -166,6 +178,15 @@ public final class Engine implements IEngineService {
                 SystemUtils.postToHandlerDelayed(SystemUtils.HandlerThreadName.MISC, Engine::startPython, 10000);
             }
         }
+    }
+
+    public static Python getPythonInstance() {
+        try {
+            pythonStarterLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return pythonInstance;
     }
 
     public void stopServices(boolean disconnected) {

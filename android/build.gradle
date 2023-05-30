@@ -96,11 +96,12 @@ project.ext.versionName = manifestVersionName()
 boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRelease") || gradle.startParameter.taskNames.contains("assemblePlus1Release")
 
 android {
+    namespace "com.frostwire.android"
 
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId 'com.frostwire.android'
+        applicationId "com.frostwire.android"
         versionName project.ext.versionName
         minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
         targetSdkVersion 33 // Android 13
@@ -111,6 +112,15 @@ android {
         }
 
         python {
+            python {
+                // https://chaquo.com/chaquopy/doc/current/android.html#python-version
+                version "3.8"
+
+                // Bytecode compilation, don't include src files https://chaquo.com/chaquopy/doc/current/android.html#android-bytecode
+                pyc {
+                    src false
+                }
+            }
             pip {
                 install "yt_dlp"
             }

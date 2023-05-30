@@ -65,7 +65,7 @@ public final class TellurideCourier {
         if (!Python.isStarted()) {
             Engine.startPython();
         }
-        Python python = Python.getInstance();
+        Python python = Engine.getPythonInstance();
         long b = System.currentTimeMillis();
         long pythonInstanceFetchTime = b - a;
         if (callback != null && callback.aborted()) {
@@ -122,7 +122,7 @@ public final class TellurideCourier {
         if (!Python.isStarted()) {
             Engine.startPython();
         }
-        Python python = Python.getInstance();
+        Python python = Engine.getPythonInstance();//Python.getInstance();
         PyObject telluride_module = python.getModule("telluride");
         PyObject ytDlpVersionString = telluride_module.callAttr("yt_dlp_version");
         if (ytDlpVersionString == null) {

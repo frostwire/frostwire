@@ -18,7 +18,6 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.frostwire.android"
         android:installLocation="auto"
         android:versionCode="719"
         android:versionName="2.7.0">
