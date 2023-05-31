@@ -30,6 +30,10 @@ buildscript {
         maven { url "https://chaquo.com/maven" }
     }
     dependencies {
+        // The project is using an incompatible version (AGP 8.0.2) of the Android Gradle plugin. Latest supported version is AGP 7.4.2
+        // https://developer.android.com/studio/releases#android_gradle_plugin_and_android_studio_compatibility
+        // classpath 'com.android.tools.build:gradle:8.0.2'
+
         classpath 'com.android.tools.build:gradle:7.4.2'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
