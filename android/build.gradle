@@ -195,6 +195,7 @@ android {
     configurations {
         all {
             exclude group: "com.google.android.gms.common", module: "play-services-measurement"
+            exclude group: 'com.google.android.gms.common', module: 'play-services-base'
         }
     }
 }
@@ -229,7 +230,7 @@ dependencies {
     implementation 'androidx.media2:media2-player:1.2.1'
 
     // AppLovin Max
-    implementation 'com.applovin:applovin-sdk:11.7.1'
+    implementation 'com.applovin:applovin-sdk:11.9.0'
 
     // AppLovin + Unity
     implementation 'com.applovin.mediation:unityads-adapter:4.6.0.0'
