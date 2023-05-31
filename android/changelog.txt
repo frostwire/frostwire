@@ -23,6 +23,8 @@ FrostWire 2.7.0 build 719 - MAY/30/2023
  - lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
  - com.applovin:applovin-sdk:11.9.0
  - com.google.android.material:material:1.9.0
+ - com.applovin.mediation:unityads-adapter:4.7.1.0
+ - org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21
 
 FrostWire 2.6.7 build 718 - APR/29/2023
  - Improved YT search for spanish, french, german, italian
