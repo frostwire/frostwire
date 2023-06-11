@@ -77,30 +77,37 @@ public final class NavigationMenu {
     }
 
     public boolean isOpen() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::isOpen");
         return drawerLayout.isDrawerOpen(navView);
     }
 
     public void show() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::show");
         drawerLayout.openDrawer(navView);
     }
 
     public void hide() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::hide");
         drawerLayout.closeDrawer(navView);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onConfigurationChanged");
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
     public void syncState() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::syncState");
         drawerToggle.syncState();
     }
 
     public void updateCheckedItem(int menuItemId) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::updateCheckedItem");
         navView.setCheckedItem(menuItemId);
     }
 
     private NavigationView initNavigationView(final MainActivity activity) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initNavigationView");
         NavigationView resultNavView = navView;
         if (navView == null) {
             resultNavView = activity.findViewById(R.id.activity_main_nav_view);
@@ -143,6 +150,7 @@ public final class NavigationMenu {
     }
 
     private void onMenuItemSelected(MenuItem menuItem) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onMenuItemSelected");
         if (controller.getActivity() == null) {
             return;
         }
@@ -175,11 +183,13 @@ public final class NavigationMenu {
     }
 
     private void onUpdateButtonClicked(MainActivity mainActivity) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateButtonClicked");
         hide();
         SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
     }
 
     private AdMenuItemView initAdRemovalMenuItemListener(final Activity activity) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initAdRemovalMenuItemListener");
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);
         menuAd.setOnClickListener(v -> {
@@ -190,6 +200,7 @@ public final class NavigationMenu {
     }
 
     private void refreshMenuRemoveAdsItem() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::refreshMenuRemoveAdsItem");
         // only visible for basic or debug build and if ads have not been disabled.
         int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
                 View.VISIBLE :
@@ -207,12 +218,14 @@ public final class NavigationMenu {
     }
 
     public void onUpdateAvailable() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onUpdateAvailable");
         View navViewHeader = navView.getHeaderView(0);
         ImageView updateButton = navViewHeader.findViewById(R.id.nav_view_header_main_update);
         updateButton.setVisibility(View.VISIBLE);
     }
 
     public MenuItem getCheckedItem() {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::getCheckedItem");
         return navView.getMenu().findItem(
                 checkedNavViewMenuItemId != -1 ?
                         checkedNavViewMenuItemId :
@@ -220,6 +233,7 @@ public final class NavigationMenu {
     }
 
     public void onOptionsItemSelected(MenuItem item) {
+        SystemUtils.ensureUIThreadOrCrash("NavigationMenu::onOptionsItemSelected");
         drawerToggle.onOptionsItemSelected(item);
     }
 
@@ -238,6 +252,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerOpened(View drawerView) {
+            SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerOpened");
             refreshMenuRemoveAdsItem();
             if (controller.getActivity() != null) {
                 UIUtils.hideKeyboardFromActivity(controller.getActivity());
@@ -247,6 +262,7 @@ public final class NavigationMenu {
 
         @Override
         public void onDrawerStateChanged(int newState) {
+            SystemUtils.ensureUIThreadOrCrash("NavigationMenu::MenuDrawerToggle::onDrawerStateChanged");
             refreshMenuRemoveAdsItem();
             controller.syncNavigationMenu();
         }
