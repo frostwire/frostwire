@@ -1,4 +1,4 @@
-FrostWire 2.7.0 build 719 - MAY/30/2023
+FrostWire 2.7.0 build 720 - JUN/01/2023
  - jlibtorrent 1.2.19.0 upgrade
  - boost 1.82 upgrade
  - openssl 1.1.1t upgrade
