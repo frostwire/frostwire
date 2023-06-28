@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.transfers;
 
+import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
+import static com.frostwire.android.util.SystemUtils.isUIThread;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.content.Context;
@@ -157,6 +159,11 @@ public final class UIBTDownloadListener implements BTDownloadListener {
     }
 
     private void finalCleanup(BTDownload dl, Set<File> incompleteFiles) {
+        if (isUIThread()) {
+            postToHandler(SystemUtils.HandlerThreadName.MISC, () -> finalCleanup(dl, incompleteFiles));
+            return;
+        }
+        ensureBackgroundThreadOrCrash("UIBTDownloadListener.finalCleanup");
         if (incompleteFiles != null) {
             for (File f : incompleteFiles) {
                 try {
@@ -173,6 +180,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
     }
 
     private static boolean deleteEmptyDirectoryRecursive(File directory) {
+        ensureBackgroundThreadOrCrash("UIBTDownloadListener.deleteEmptyDirectoryRecursive");
         // make sure we only delete canonical children of the parent file we
         // wish to delete. I have a hunch this might be an issue on OSX and
         // Linux under certain circumstances.

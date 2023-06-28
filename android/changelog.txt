@@ -1,3 +1,7 @@
+FrostWire 2.7.1 build 721 - JUN/28/2023
+ - crash fix loading rewarded video
+ - ANR fix during folder cleanup after a download finishes
+
 FrostWire 2.7.0 build 720 - JUN/01/2023
  - jlibtorrent 1.2.19.0 upgrade
  - boost 1.82 upgrade
