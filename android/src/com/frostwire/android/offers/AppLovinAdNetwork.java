@@ -38,6 +38,7 @@ import com.applovin.sdk.AppLovinSdkSettings;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
@@ -132,10 +133,18 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
     }
 
     public MaxRewardedAd loadRewardedVideo(WeakReference<AppCompatActivity> activityRef) {
-        MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(FWBannerView.UNIT_ID_REWARDED_AD, activityRef.get());
-        rewardedAd.setListener(new RewardedAdListener(rewardedAd));
-        rewardedAd.loadAd();
-        return rewardedAd;
+        if (Ref.alive(activityRef)) {
+            try {
+                MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(FWBannerView.UNIT_ID_REWARDED_AD, activityRef.get());
+                rewardedAd.setListener(new RewardedAdListener(rewardedAd));
+                rewardedAd.loadAd();
+                return rewardedAd;
+            } catch (Throwable e) {
+                LOG.error(e.getMessage(), e);
+                return null;
+            }
+        }
+        return null;
     }
 
     private static class RewardedAdListener implements MaxRewardedAdListener {
