@@ -19,8 +19,10 @@ package com.frostwire.search.telluride;
 
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
+import com.frostwire.util.Logger;
 
 public final class TellurideParser {
+    final static Logger LOG = Logger.getLogger(TellurideParser.class);
     final static String DECIMAL_GROUP_FORMAT = "(?<%s>\\d{1,3}\\.\\d{1,3})";
     final static String ETA_GROUP = "(?<eta>\\d{1,3}\\:\\d{1,3})";
     // [download]  30.5% of 277.93MiB at 507.50KiB/s ETA 06:29
@@ -87,7 +89,13 @@ public final class TellurideParser {
         if (metaOnly) {
             String JSON = sb.toString();
             if (JSON != null && JSON.length() > 0) {
-                processListener.onMeta(JSON.substring(JSON.indexOf("{")));
+                // try catch here and report error
+                try {
+                    processListener.onMeta(JSON.substring(JSON.indexOf("{")));
+                } catch (Throwable t) {
+                    LOG.error("TellurideParser.done(JSON=\"" + JSON + "\") error", t);
+                    processListener.onError(t.getMessage());
+                }
             } else {
                 processListener.onError("No metadata returned by telluride");
             }
