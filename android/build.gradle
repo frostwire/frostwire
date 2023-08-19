@@ -30,11 +30,7 @@ buildscript {
         maven { url "https://chaquo.com/maven" }
     }
     dependencies {
-        // The project is using an incompatible version (AGP 8.0.2) of the Android Gradle plugin. Latest supported version is AGP 7.4.2
-        // https://developer.android.com/studio/releases#android_gradle_plugin_and_android_studio_compatibility
-        // classpath 'com.android.tools.build:gradle:8.0.2'
-
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -100,7 +96,7 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 android {
     namespace "com.frostwire.android"
 
-    compileSdkVersion 33
+    compileSdk 34  // Android 14
 
     defaultConfig {
         applicationId "com.frostwire.android"
@@ -200,6 +196,9 @@ android {
             exclude group: 'com.google.android.gms.common', module: 'play-services-base'
         }
     }
+    buildFeatures {
+        aidl true
+    }
 }
 
 dependencies {
@@ -209,7 +208,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
-    implementation 'androidx.browser:browser:1.5.0'
+    implementation 'androidx.browser:browser:1.6.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.21'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
     implementation 'androidx.exifinterface:exifinterface:1.3.6'
