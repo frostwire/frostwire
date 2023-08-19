@@ -1,6 +1,7 @@
 FrostWire 2.7.2 build 722 - AUG/19/2023
  - Google Play Billing Library 4.1.0 to 6.0.1 migration
  - androidx.browser:browser:1.6.0
+ - androidx.preference:preference:1.2.1
  - dev: compileSdk 34
  - dev: com.android.tools.build:gradle:8.1.0
  - dev: gradle-8.3-bin.zip
