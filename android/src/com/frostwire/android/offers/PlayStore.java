@@ -36,6 +36,7 @@ import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
@@ -308,10 +309,6 @@ public final class PlayStore extends StoreBase {
         });
     }
 
-    /**
-     * Query purchases across various use cases and deliver the result in a formalized way through
-     * a listener
-     */
     private void queryPurchases() {
         Runnable queryToExecute = () -> {
             if (isClientDisconnected()) {
@@ -319,41 +316,55 @@ public final class PlayStore extends StoreBase {
             }
 
             try {
-                long time = System.currentTimeMillis();
-                Purchase.PurchasesResult purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP);
-                LOG.info("Querying purchases elapsed time: " + (System.currentTimeMillis() - time) + "ms");
-                // If there are subscriptions supported, we add subscription rows as well
-                if (areSubscriptionsSupported()) {
-                    Purchase.PurchasesResult subscriptionResult = billingClient.queryPurchases(BillingClient.SkuType.SUBS);
-                    LOG.info("Querying purchases and subscriptions elapsed time: "
-                            + (System.currentTimeMillis() - time) + "ms");
+                QueryPurchasesParams inAppParams = QueryPurchasesParams.newBuilder()
+                        .setProductType(BillingClient.SkuType.INAPP)
+                        .build();
 
-                    if (subscriptionResult.getPurchasesList() != null) {
-                        LOG.info("Querying subscriptions result code: "
-                                + subscriptionResult.getResponseCode()
-                                + " res: " + subscriptionResult.getPurchasesList().size());
+                QueryPurchasesParams subsParams = QueryPurchasesParams.newBuilder()
+                        .setProductType(BillingClient.SkuType.SUBS)
+                        .build();
 
-                        if (subscriptionResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                            purchasesResult.getPurchasesList().addAll(subscriptionResult.getPurchasesList());
-                        } else {
-                            LOG.info("Got an error response trying to query subscription purchases");
-                        }
-                    } else {
-                        LOG.info("subscriptionResult.getPurchasesList() == null when trying to query subscription purchases");
+                final long time = System.currentTimeMillis();
+                billingClient.queryPurchasesAsync(inAppParams, (billingResult, purchasesList) -> {
+                    LOG.info("Querying purchases elapsed time: " + (System.currentTimeMillis() - time) + "ms");
+                    if (purchasesList != null && !purchasesList.isEmpty()) {
+                        LOG.info("Got some in-app purchases, total: " + purchasesList.size());
                     }
-                } else if (purchasesResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    LOG.info("Skipped subscription purchases query since they are not supported");
-                } else {
-                    LOG.info("queryPurchases() got an error response code: " + purchasesResult.getResponseCode());
-                }
-                onQueryPurchasesFinished(purchasesResult);
+
+                    // If there are subscriptions supported, we add subscription rows as well
+                    if (areSubscriptionsSupported()) {
+                        billingClient.queryPurchasesAsync(subsParams, (subscriptionResult, subsList) -> {
+                            LOG.info("Querying purchases and subscriptions elapsed time: "
+                                    + (System.currentTimeMillis() - time) + "ms");
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                LOG.info("Querying subscriptions result code: "
+                                        + subscriptionResult.getResponseCode()
+                                        + " res: " + subsList.size());
+                                if (subsList != null && subsList.isEmpty()) {
+                                    purchasesList.addAll(subsList);
+                                } else {
+                                    LOG.info("subsList == null when trying to query subscription purchases");
+                                }
+                            } else {
+                                LOG.info("Got an error response trying to query subscription purchases");
+                            }
+                        });
+                    } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        LOG.info("Skipped subscription purchases query since they are not supported");
+                    } else {
+                        LOG.info("queryPurchases() got an error response code: " + billingResult.getResponseCode());
+                        LOG.info("Error Message: " + billingResult.getDebugMessage());
+                    }
+                    // now we have added up all in app purchases and subscriptions to one list
+                    onQueryPurchasesFinished(purchasesList, billingResult.getResponseCode());
+                });
             } catch (Throwable e) {
                 LOG.error("Error in queryPurchases()", e);
             }
         };
-
         executeServiceRequest(queryToExecute);
     }
+
 
     private void querySkuDetailsAsync(@BillingClient.SkuType final String itemType, final List<String> skuList,
                                       final SkuDetailsResponseListener listener) {
@@ -498,17 +509,17 @@ public final class PlayStore extends StoreBase {
     /**
      * Handle a result from querying of purchases and report an updated list to the listener
      */
-    private void onQueryPurchasesFinished(Purchase.PurchasesResult result) {
+    private void onQueryPurchasesFinished(List<Purchase> purchaseList, int responseCode) {
         // Have we been disposed of in the meantime? If so, or bad result code, then quit
-        if (billingClient == null || result.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-            LOG.info("Billing client was null or result code (" + result.getResponseCode()
+        if (billingClient == null || responseCode != BillingClient.BillingResponseCode.OK) {
+            LOG.info("Billing client was null or result code (" + responseCode
                     + ") was bad - quitting");
             return;
         }
 
         LOG.info("Query inventory was successful.");
         BillingResult billingResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build();
-        onPurchasesUpdatedListener.onPurchasesUpdated(billingResult, result.getPurchasesList());
+        onPurchasesUpdatedListener.onPurchasesUpdated(billingResult, purchaseList);
     }
 
     /**
