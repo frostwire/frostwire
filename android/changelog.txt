@@ -1,3 +1,6 @@
+FrostWire 2.7.2 build 722 - AUG/19/2023
+ - Google Play Billing Library 4.1.0 to 6.0.1 migration
+
 FrostWire 2.7.1 build 721 - JUN/28/2023
  - crash fix loading rewarded video
  - ANR fix during folder cleanup after a download finishes
