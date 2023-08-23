@@ -6,36 +6,25 @@
 
 ## Usage
 ```
-Telluride Cloud Video Downloader. Build 24
+Telluride Cloud Video Downloader. Build 27
 Copyright 2020-2023 FrostWire LLC. Licensed under Apache 2.0.
-Python 3.11.1 (v3.11.1:a7a450f84a, Dec  6 2022, 15:24:06) [Clang 13.0.0 (clang-1300.0.29.30)]
-sys.version_info(major=3, minor=11, micro=1, releaselevel='final', serial=0)
+Python 3.11.3 (v3.11.3:f3909b8bc8, Apr  4 2023, 20:12:10) [Clang 13.0.0 (clang-1300.0.29.30)]
+sys.version_info(major=3, minor=11, micro=3, releaselevel='final', serial=0)
+CWD=/Users/gubatron/workspace/frostwire/telluride
 
-usage: telluride_macos.x86_64 [-h] [--server] [--port PORT] [--audio-only]
-                              [--meta-only]
-                              [page_url]
+usage: telluride_macos.x86_64 [-h] [--audio-only] [--meta-only] [page_url]
 
 positional arguments:
-  page_url              The URL of the page that hosts the video you need to
-                        backup locally
+  page_url          The URL of the page that hosts the video you need to
+                    backup locally
 
 options:
-  -h, --help            show this help message and exit
-  --server, -s          Launches Telluride as a web server to perform URL
-                        queries and return meta data as JSON. There's only
-                        one endpoint at the root path. Possible parameters
-                        are url=<video_page_url> and shutdown=1 to shutdown
-                        the server. The server will only answer to requests
-                        from localhost
-  --port PORT, -p PORT  HTTP port when running on server mode. Default port
-                        number is 47999. This parameter is only taken into
-                        account if --server or -s passed
-  --audio-only, -a      Downloads the video and keeps only a separate audio
-                        file usually a .mp3. (requires ffmpeg installed in
-                        the system)
-  --meta-only, -m       Prints a JSON dictionary with all the metadata
-                        available on the video file found in the page_url.
-                        Does not download the video file
+  -h, --help        show this help message and exit
+  --audio-only, -a  Downloads the video and keeps only a separate audio file
+                    usually a .mp3. (requires ffmpeg installed in the system)
+  --meta-only, -m   Prints a JSON dictionary with all the metadata available
+                    on the video file found in the page_url. Does not download
+                    the video file
 ```
 
 ## Building
@@ -60,18 +49,6 @@ You should end up with a stand-alone executable for the platform you are on:
  - `python3`, `pip`, `pylint`
  - `ffmpeg` (for audio-only downloads. audio is extracted from the downloaded video)
  - `yt_dlp`, `pycryptodome`, `pyinstaller`
-
-## Web Server Mode
-
-If you want your app to make repeated requests to telluride it's very expensive starting and destroying a new telluride process every time. By passing the `--server` option and optionally a tcp `--port` number you can run telluride in the background and send requests to the web server from localhost.
-
-The default port number is `47999`, as defined on `server.py`
-
-Telluride will receive your HTTP requests at the root path and it will expect only two possible request parameters:
- - `url=<url encoded video page url>` - It will search for the available metadata and return it in JSON, the same as when you execute telluride in `--meta-only` mode
- - `shutdown=1` - Pass this paremeter if you want to shutdown the telluride web server
-
-**This web server is designed only to receive requests from `localhost`**. If you want to do something like a P2P network of telluride webservers to resolve a lot of these requests, you need to implement all the peer to peer coordination, throttling, caching, anti-DDOS logic in a service or app that launches this server. This is a simple web interface to the local telluride process, a simple lego piece you can use as best you can.
 
 ## License
 ```
