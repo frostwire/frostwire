@@ -65,9 +65,9 @@ import java.util.*;
  *
  * @author Roger Kapsi
  * @author Sam Berlin
+ * @author Angel Leon
  */
 public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>, Serializable {
-    private static final long serialVersionUID = 110232526181493307L;
     /**
      * The root element of the Trie.
      */
@@ -1057,7 +1057,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * This is implemented by going always to the left until
      * we encounter a valid uplink. That uplink is the first key.
      */
-    private TrieEntry<K, V> firstEntry() {
+    public TrieEntry<K, V> firstEntry() {
         // if Trie is empty, no first node.
         if (isEmpty())
             return null;
@@ -1085,7 +1085,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * This is implemented by going always to the right until
      * we encounter a valid uplink. That uplink is the last key.
      */
-    private TrieEntry<K, V> lastEntry() {
+    public TrieEntry<K, V> lastEntry() {
         return followRight(root.left);
     }
 
@@ -1849,7 +1849,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             fixup();
             TrieEntry<K, V> e;
             if (fromKey == null) {
-                e = firstEntry();
+                e = (TrieEntry<K, V>) firstEntry();
             } else {
                 e = higherEntry(fromKey);
             }
@@ -1863,7 +1863,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
             fixup();
             TrieEntry<K, V> e;
             if (toKey == null) {
-                e = lastEntry();
+                e = (TrieEntry<K, V>) lastEntry();
             } else {
                 e = lowerEntry(toKey);
             }
@@ -2025,7 +2025,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         public K firstKey() {
             TrieEntry<K, V> e;
             if (fromKey == null) {
-                e = firstEntry();
+                e = (TrieEntry<K, V>) firstEntry();
             } else {
                 if (fromInclusive)
                     e = ceilingEntry(fromKey);
@@ -2041,7 +2041,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
         public K lastKey() {
             TrieEntry<K, V> e;
             if (toKey == null) {
-                e = lastEntry();
+                e = (TrieEntry<K, V>) lastEntry();
             } else {
                 if (toInclusive)
                     e = floorEntry(toKey);
@@ -2160,7 +2160,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
 
             public Iterator<Map.Entry<K, V>> iterator() {
                 return new SubMapEntryIterator(
-                        (fromKey == null ? firstEntry() : ceilingEntry(fromKey)),
+                        (fromKey == null ? (TrieEntry<K, V>) firstEntry() : ceilingEntry(fromKey)),
                         (toKey == null ? null : ceilingEntry(toKey)));
             }
         }
