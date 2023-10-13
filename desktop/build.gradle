@@ -60,7 +60,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
-    implementation 'org.xerial:sqlite-jdbc:3.40.1.0'
+    implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
     implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
