@@ -1,5 +1,6 @@
 build 28 - oct/13/2023
  - yt_dlp-2023.10.7
+ - python 3.12.0
  - dev: pylint-3.0.1
  - dev: astroid-3.0.0
  - dev: pyinstaller-6.0.0
