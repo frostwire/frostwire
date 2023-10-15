@@ -63,7 +63,7 @@ dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
-    implementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 
 sourceSets {
@@ -85,6 +85,12 @@ sourceSets {
             include '**/*.dat'
             include '**/*.icc'
             exclude '**/*.DS_Store'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'tests/java'
         }
     }
 }
