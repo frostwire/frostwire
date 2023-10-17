@@ -1,3 +1,10 @@
+build 29 - oct/17/2023
+ - yt_dlp-2023.10.13
+ - dev: pyinstaller-6.1.0
+ - dev: astroid-3.0.1
+ - dev: pip-23.3
+ - dev: pyinstaller-6.1.0
+
 build 28 - oct/13/2023
  - yt_dlp-2023.10.7
  - python 3.12.0
