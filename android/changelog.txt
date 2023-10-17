@@ -1,3 +1,8 @@
+FrostWire 2.7.3 build 723 - OCT/17/2023
+ - com.google.gms:google-services:4.4.0
+ - dev: com.android.tools.build:gradle:8.1.2
+ - dev: gradle-8.4-bin.zip
+
 FrostWire 2.7.2 build 722 - AUG/19/2023
  - Google Play Billing Library 4.1.0 to 6.0.1 migration
  - python: yt_dlp 2023.07.06
