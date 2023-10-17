@@ -82,7 +82,7 @@ public final class PlayStore extends StoreBase {
     private static final long REFRESH_RESOLUTION_MILLIS = 30 * 1000; // 30 seconds
 
     private Inventory inventory;
-    private BillingClient billingClient;
+    private final BillingClient billingClient;
     private boolean isServiceConnected;
     private int billingClientResponseCode = BILLING_MANAGER_NOT_INITIALIZED;
 
@@ -98,7 +98,7 @@ public final class PlayStore extends StoreBase {
 
     private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, purchases) -> {
         if (inventory == null) {
-            LOG.info("Inventory is null, review your logic");
+            LOG.info("PurchasesUpdatedListener::onPurchasesUpdated() Inventory is null, review your logic");
             return;
         }
         int responseCode = billingResult.getResponseCode();
@@ -109,13 +109,13 @@ public final class PlayStore extends StoreBase {
                 }
                 products = buildProducts(inventory);
             } else {
-                LOG.info("Received no purchases");
+                LOG.info("PurchasesUpdatedListener::onPurchasesUpdated() Received no purchases");
             }
 
         } else if (responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            LOG.info("onPurchasesUpdated() - user cancelled the purchase flow - skipping");
+            LOG.info("PurchasesUpdatedListener::onPurchasesUpdated() - user cancelled the purchase flow - skipping");
         } else {
-            LOG.warn("onPurchasesUpdated() got unknown resultCode: " + responseCode);
+            LOG.warn("PurchasesUpdatedListener::onPurchasesUpdated() got unknown resultCode: " + responseCode);
         }
 
         try {
@@ -134,6 +134,12 @@ public final class PlayStore extends StoreBase {
                 instance = new PlayStore(context.getApplicationContext());
             }
             AVAILABLE = true;
+            return instance;
+        }
+    }
+
+    public static PlayStore getCachedInstance() {
+        synchronized (lock) {
             return instance;
         }
     }
@@ -222,15 +228,6 @@ public final class PlayStore extends StoreBase {
         return super.enabled(code);
     }
 
-    public void dispose() {
-        LOG.info("Destroying the internal client");
-
-        if (billingClient != null && billingClient.isReady()) {
-            billingClient.endConnection();
-            billingClient = null;
-        }
-    }
-
     /**
      * This method is used only for internal tests.
      */
@@ -271,6 +268,7 @@ public final class PlayStore extends StoreBase {
 
     private void queryInventory() {
         if (isClientDisconnected()) {
+            LOG.warn("queryInventory: Attempted to query inventory with no connected client. Aborted");
             return;
         }
 
@@ -312,6 +310,7 @@ public final class PlayStore extends StoreBase {
     private void queryPurchases() {
         Runnable queryToExecute = () -> {
             if (isClientDisconnected()) {
+                LOG.warn("PlayStore::queryPurchases() client disconnected, aborting");
                 return;
             }
 
@@ -320,43 +319,49 @@ public final class PlayStore extends StoreBase {
                         .setProductType(BillingClient.SkuType.INAPP)
                         .build();
 
-                QueryPurchasesParams subsParams = QueryPurchasesParams.newBuilder()
-                        .setProductType(BillingClient.SkuType.SUBS)
-                        .build();
-
                 final long time = System.currentTimeMillis();
+                LOG.info("About to query in-app purchases...");
                 billingClient.queryPurchasesAsync(inAppParams, (billingResult, purchasesList) -> {
-                    LOG.info("Querying purchases elapsed time: " + (System.currentTimeMillis() - time) + "ms");
+                    LOG.info("Querying in-app purchases elapsed time: " + (System.currentTimeMillis() - time) + "ms");
                     if (purchasesList != null && !purchasesList.isEmpty()) {
                         LOG.info("Got some in-app purchases, total: " + purchasesList.size());
                     }
 
                     // If there are subscriptions supported, we add subscription rows as well
                     if (areSubscriptionsSupported()) {
+                        QueryPurchasesParams subsParams = QueryPurchasesParams.newBuilder()
+                                .setProductType(BillingClient.SkuType.SUBS)
+                                .build();
+
+                        LOG.info("About to query subscriptions...");
                         billingClient.queryPurchasesAsync(subsParams, (subscriptionResult, subsList) -> {
                             LOG.info("Querying purchases and subscriptions elapsed time: "
                                     + (System.currentTimeMillis() - time) + "ms");
                             if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                 LOG.info("Querying subscriptions result code: "
                                         + subscriptionResult.getResponseCode()
-                                        + " res: " + subsList.size());
-                                if (subsList != null && subsList.isEmpty()) {
+                                        + " total subs: " + subsList.size());
+                                if (subsList != null && !subsList.isEmpty()) {
                                     purchasesList.addAll(subsList);
+                                    for (Purchase s : subsList) {
+                                        LOG.info("queryPurchase() -> sub: " + s.getOrderId() + " " + s.getPurchaseToken() + " " + s.getPurchaseState() + " " + s.getPurchaseTime() + " " + s.getSignature() + " " + s.getOriginalJson());
+                                    }
                                 } else {
                                     LOG.info("subsList == null when trying to query subscription purchases");
                                 }
+                                onQueryPurchasesFinished(purchasesList, billingResult.getResponseCode());
                             } else {
                                 LOG.info("Got an error response trying to query subscription purchases");
                             }
                         });
                     } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         LOG.info("Skipped subscription purchases query since they are not supported");
+                        // now we have added up all in app purchases and subscriptions to one list
+                        onQueryPurchasesFinished(purchasesList, billingResult.getResponseCode());
                     } else {
                         LOG.info("queryPurchases() got an error response code: " + billingResult.getResponseCode());
                         LOG.info("Error Message: " + billingResult.getDebugMessage());
                     }
-                    // now we have added up all in app purchases and subscriptions to one list
-                    onQueryPurchasesFinished(purchasesList, billingResult.getResponseCode());
                 });
             } catch (Throwable e) {
                 LOG.error("Error in queryPurchases()", e);
@@ -512,12 +517,12 @@ public final class PlayStore extends StoreBase {
     private void onQueryPurchasesFinished(List<Purchase> purchaseList, int responseCode) {
         // Have we been disposed of in the meantime? If so, or bad result code, then quit
         if (billingClient == null || responseCode != BillingClient.BillingResponseCode.OK) {
-            LOG.info("Billing client was null or result code (" + responseCode
+            LOG.warn("Billing client was null or result code (" + responseCode
                     + ") was bad - quitting");
             return;
         }
 
-        LOG.info("Query inventory was successful.");
+        LOG.info("onQueryPurchasesFinished: Query inventory was successful.");
         BillingResult billingResult = BillingResult.newBuilder().setResponseCode(BillingClient.BillingResponseCode.OK).build();
         onPurchasesUpdatedListener.onPurchasesUpdated(billingResult, purchaseList);
     }

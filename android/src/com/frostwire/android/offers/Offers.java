@@ -396,9 +396,7 @@ public final class Offers {
         }
         PlayStore store;
         try {
-            // try with a null context
-            //noinspection ConstantConditions
-            store = PlayStore.getInstance(null);
+            store = PlayStore.getCachedInstance();
         } catch (Throwable e) {
             store = null;
             LOG.error(e.getMessage(), e);
@@ -449,7 +447,9 @@ public final class Offers {
     private static boolean stopAdNetworksIfPurchasedRemoveAds(Context context) {
         boolean stopped = false;
         PlayStore playStore = PlayStore.getInstance(context);
+
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
+
         if (purchasedProducts.size() > 0) {
             Offers.stopAdNetworks(context);
             stopped = true;
