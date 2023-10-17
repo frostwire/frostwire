@@ -20,11 +20,6 @@ package com.frostwire.android.gui.activities.internal;
 import android.app.DownloadManager;
 import android.app.Fragment;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.net.Uri;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.widget.Toast;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -35,11 +30,9 @@ import com.frostwire.android.gui.activities.WizardActivity;
 import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.fragments.TransfersFragment.TransferStatus;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.platform.Platforms;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
-import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
@@ -121,7 +114,14 @@ public final class MainController {
         // This opens com.google.android.apps.docs but not on the given folder
         Intent intent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        activityRef.get().startActivity(intent);
+        try {
+            activityRef.get().startActivity(intent);
+        } catch (Throwable e) {
+            // No activity can handle the intent.
+            // You can show a user-friendly message or perhaps attempt to open another activity.
+            String errorMessage = activityRef.get().getString(R.string.error_cannot_open_downloads_folder);
+            UIUtils.showShortMessage(activityRef.get(), errorMessage);
+        }
     }
 
     public void startWizardActivity() {
