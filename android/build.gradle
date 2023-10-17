@@ -186,12 +186,12 @@ android {
         abortOnError false
     }
 
-    applicationVariants.all { variant ->
+    applicationVariants.configureEach { variant ->
         changeApkOutput(variant)
     }
 
     configurations {
-        all {
+        configureEach {
             exclude group: "com.google.android.gms.common", module: "play-services-measurement"
             exclude group: 'com.google.android.gms.common', module: 'play-services-base'
         }
