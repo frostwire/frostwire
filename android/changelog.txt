@@ -11,6 +11,7 @@ FrostWire 2.7.3 build 723 - OCT/17/2023
  - dev: gradle build script deprecation fixes, cleanup
  - dev: com.android.tools.build:gradle:8.1.2
  - dev: gradle-8.4-bin.zip
+ - dev: com.google.firebase:firebase-bom:32.3.1
 
 FrostWire 2.7.2 build 722 - AUG/19/2023
  - Google Play Billing Library 4.1.0 to 6.0.1 migration
