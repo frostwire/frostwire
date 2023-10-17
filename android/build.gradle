@@ -251,41 +251,6 @@ dependencies {
     implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
 
-class DeployRelease extends DefaultTask {
-
-    String flavor = 'unknown'
-
-    def version = project.ext.versionName
-    def build = project.ext.versionCode
-
-    static def runCmd(cmd) {
-        println(cmd)
-
-        def p = Runtime.getRuntime().exec(cmd)
-        def stdOut = new BufferedReader(new InputStreamReader(p.getInputStream()))
-
-        def s
-        while ((s = stdOut.readLine()) != null) {
-            println(s)
-        }
-    }
-
-    @TaskAction
-    def run() {
-        println "Building and installing..."
-        println "VERSION: $version"
-        println "BUILD: $build"
-        println "FLAVOR: $flavor"
-
-        def suffix = version + '-b' + build + '-' + flavor
-        def filename = "$project.buildDir/frostwire-android-release-" + suffix + '.apk'
-
-        runCmd("adb uninstall com.frostwire.android")
-        runCmd("./gradlew clean assembleRelease")
-        runCmd("adb install $filename")
-    }
-}
-
 class SignatureRequester {
     String myKeyAlias = ""
     String myKeyPassword = ""
@@ -330,12 +295,4 @@ class SignatureRequester {
     String keyPassword() {
         this.myKeyPassword
     }
-}
-
-task deployBasic(type: DeployRelease) {
-    flavor = 'basic'
-}
-
-task deployPlus(type: DeployRelease) {
-    flavor = 'plus'
 }
