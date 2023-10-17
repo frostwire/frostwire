@@ -515,4 +515,5 @@
     <string name="use_btdigg">Use BTDigg</string>
     <string name="use_yt">Use YT</string>
     <string name="analyzing_downloadable_files">Analyzing downloadable files URLs</string>
+    <string name="error_cannot_open_downloads_folder">No app found to view downloads. Ensure FrostWire has permissions and a File Explorer is installed</string>
 </resources>

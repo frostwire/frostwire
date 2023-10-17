@@ -419,4 +419,5 @@
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">YouTube-Downloads sind mit FrostWire Basic aufgrund der Google Play-Regeln nicht erlaubt.\n\nFür eine kostenlose Kopie von FrostWire Plus besuchen Sie unsere offizielle Website frostwire.com</string>
     <string name="analyzing_downloadable_files">Parsing von herunterladbaren Datei-URLs</string>
+    <string name="error_cannot_open_downloads_folder">Keine App gefunden, um Downloads anzuzeigen. Stellen Sie sicher, dass FrostWire die erforderlichen Berechtigungen hat und ein Datei-Explorer installiert ist</string>
 </resources>

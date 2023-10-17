@@ -2,7 +2,7 @@
 <!--
 /* 
  * Creado por Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Derechos de Autor (c) 2011-2022, FrostWire(R). Todos los derechos reservados.
+ * Derechos de Autor (c) 2011-2023, FrostWire(R). Todos los derechos reservados.
  * 
  * Este programa es gratuito: puedes distribuirlo y/o modificarlo 
  * bajo los términos de la Licencia General Pública de GNU tal y como lo publica 
@@ -441,4 +441,5 @@
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">Descargas de YouTube no son permitidas con FrostWire Basic debido a las reglas de Google Play.\n\nPara una copia gratuita de FrostWire Plus visite nuestro sitio oficial frostwire.com</string>
     <string name="analyzing_downloadable_files">Análizando URLs de archivos descargables</string>
+    <string name="error_cannot_open_downloads_folder">No se encontró una aplicación para ver descargas. Asegúrate de que FrostWire tenga permisos y que haya un Explorador de Archivos instalado.</string>
 </resources>
