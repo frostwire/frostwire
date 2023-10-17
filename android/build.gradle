@@ -231,7 +231,7 @@ dependencies {
     implementation 'androidx.media2:media2-player:1.2.1'
 
     // AppLovin Max
-    implementation 'com.applovin:applovin-sdk:11.9.0'
+    implementation 'com.applovin:applovin-sdk:11.11.3'
 
     // AppLovin + Unity
     implementation 'com.applovin.mediation:unityads-adapter:4.7.1.0'
