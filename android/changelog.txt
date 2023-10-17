@@ -1,5 +1,6 @@
 FrostWire 2.7.3 build 723 - OCT/17/2023
  - com.google.gms:google-services:4.4.0
+ - com.google.firebase:firebase-crashlytics-gradle:2.9.9
  - dev: com.android.tools.build:gradle:8.1.2
  - dev: gradle-8.4-bin.zip
 
