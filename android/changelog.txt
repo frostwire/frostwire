@@ -1,4 +1,5 @@
 FrostWire 2.7.3 build 723 - OCT/17/2023
+ - Fixed bug where Play Store Ad-removal subscriptions weren't updating locally.
  - com.google.code.gson:gson:2.10.1
  - com.google.gms:google-services:4.4.0
  - com.google.firebase:firebase-crashlytics-gradle:2.9.9
