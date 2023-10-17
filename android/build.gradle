@@ -82,7 +82,7 @@ def changeApkOutput(variant) {
             assemble ->
                 copy {
                     from variant.outputs*.outputFile
-                    into "${project.buildDir}"
+                    into "${project.getLayout().getBuildDirectory().getAsFile().get()}"
                 }
         }
     }
