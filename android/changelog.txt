@@ -6,6 +6,7 @@ FrostWire 2.7.3 build 723 - OCT/17/2023
  - org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10
  - androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2
  - com.applovin:applovin-sdk:11.11.3
+ - com.applovin.mediation:unityads-adapter:4.9.1.0
  - python: yt_dlp 2023.10.13
  - dev: gradle build script deprecation fixes, cleanup
  - dev: com.android.tools.build:gradle:8.1.2
