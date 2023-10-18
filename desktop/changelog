@@ -1,9 +1,9 @@
-frostwire (6.13.0) stable; urgency=high
+frostwire (6.13.1) stable; urgency=high
   * Java Runtime Environment 21 update
   * org.xerial:sqlite-jdbc:3.43.0.0 update
-  * Telluride Video Downloader build 28 with Python 3.12.0
+  * Telluride Video Downloader build 29 with Python 3.12.0
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 15 Oct 2023 05:41:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 17 Oct 2023 20:25:00 -0600
 
 frostwire (6.12.1) stable; urgency=high
   * jlibtorrent 1.2.19.0
