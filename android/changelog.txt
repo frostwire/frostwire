@@ -1,6 +1,7 @@
 FrostWire 2.7.4 build 724 - DEC/05/2023
  - com.android.billingclient:billing:6.1.0
  - androidx.browser:browser:1.7.0
+ - com.android.tools.build:gradle:8.1.4
 
 FrostWire 2.7.3 build 723 - OCT/17/2023
  - Fixed bug where Play Store Ad-removal subscriptions weren't updating locally.

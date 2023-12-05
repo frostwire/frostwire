@@ -30,7 +30,7 @@ buildscript {
         maven { url "https://chaquo.com/maven" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.2'
+        classpath 'com.android.tools.build:gradle:8.1.4'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
