@@ -62,7 +62,7 @@ public class ImageCache {
     private File getCacheFile(URL url) {
         String host = url.getHost();
         String path = url.getPath();
-        if (host == null || host.length() == 0) { // dealing with local resource images, not perfect
+        if (host == null || host.isEmpty()) { // dealing with local resource images, not perfect
             host = "localhost";
             path = new File(path).getName();
         }
