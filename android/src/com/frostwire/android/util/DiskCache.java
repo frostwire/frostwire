@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,11 @@ import okhttp3.internal.cache.DiskLruCache;
 import okhttp3.internal.cache.DiskLruCache.Editor;
 import okhttp3.internal.cache.DiskLruCache.Snapshot;
 import okhttp3.internal.concurrent.TaskRunner;
-import okhttp3.internal.io.FileSystem;
 import okio.BufferedSink;
 import okio.ByteString;
+import okio.FileSystem;
 import okio.Okio;
+import okio.Path;
 import okio.Source;
 
 /**
@@ -48,7 +49,8 @@ public final class DiskCache {
     private final DiskLruCache cache;
 
     public DiskCache(File directory, long size) {
-        this.cache = new DiskLruCache(FileSystem.SYSTEM, directory, APP_VERSION, VALUE_COUNT_PER_CACHE_ENTRY, size, TaskRunner.INSTANCE);
+        okio.Path path = Path.get(directory);
+        this.cache = new DiskLruCache(FileSystem.SYSTEM, path, APP_VERSION, VALUE_COUNT_PER_CACHE_ENTRY, size, TaskRunner.INSTANCE);
     }
 
     public boolean containsKey(String key) {
