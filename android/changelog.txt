@@ -1,3 +1,9 @@
+FrostWire 2.7.6 build 726
+ - Subscription page improvements
+ - com.google.android.material:material:1.11.0
+ - python: yt_dlp 2023.12.30
+
+
 FrostWire 2.7.4 build 724 - DEC/05/2023
  - com.android.billingclient:billing:6.1.0
  - androidx.browser:browser:1.7.0
