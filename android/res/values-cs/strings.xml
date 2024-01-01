@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<!--
+﻿<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
@@ -411,4 +410,6 @@
     <string name="manage_subscriptions">Správa odběrů</string>
     <string name="analyzing_downloadable_files">Analýza stažitelných souborů</string>
     <string name="subs_details">Během 7denní zkušební doby nebudou účtovány žádné poplatky.\n\nPředplatné se účtuje ihned po skončení 7denní zkušební doby nebo okamžitě pro stávající předplatitele.\n\nPředplatné se automaticky obnovuje, pokud není zrušeno alespoň 24 hodin před koncem předplatního období.\n\nStiskněte \'Správa předplatného\' pro automatické obnovení a zrušení v Google Play.</string>
+    <string name="subscriptions">📅 Předplatné</string>
+    <string name="rewarded_video_ad">📺 Odmeňovaná video reklama</string>
 </resources>

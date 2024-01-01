@@ -417,4 +417,6 @@
     <string name="yt_not_supported_on_basic">Os downloads do YouTube não são permitidos com o FrostWire Basic devido às regras do Google Play.\n\nPara obter uma cópia gratuita do FrostWire Plus, visite nosso site oficial frostwire.com</string>
     <string name="analyzing_downloadable_files">Analisando arquivos baixáveis</string>
     <string name="subs_details">Não será cobrado durante o período de teste de 7 dias.\n\nA assinatura é cobrada assim que o período de teste de 7 dias termina ou imediatamente para assinantes anteriores.\n\nA assinatura é renovada automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período de assinatura.\n\nPressione \'Gerenciar Assinaturas\' para renovações automáticas e cancelamentos no Google Play.</string>
+    <string name="subscriptions">📅 Assinaturas</string>
+    <string name="rewarded_video_ad">📺 Anúncio de Vídeo Remunerado</string>
 </resources>

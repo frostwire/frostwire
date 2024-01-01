@@ -411,4 +411,6 @@
     <string name="manage_subscriptions">サブスクリプションの管理</string>
     <string name="analyzing_downloadable_files">ダウンロード可能なファイルを分析中…</string>
     <string name="subs_details">7日間の試用期間中は料金が発生しません。\n\n7日間の試用期間が終了するとすぐに、または以前の加入者に対しては即時にサブスクリプション料金が発生します。\n\nサブスクリプション期間の終了の少なくとも24時間前にキャンセルされない限り、サブスクリプションは自動的に更新されます。\n\nGoogle Playでの自動更新とキャンセルについては、「サブスクリプションの管理」を押してください。</string>
+    <string name="subscriptions">📅 定期購読</string>
+    <string name="rewarded_video_ad">📺 報酬付きビデオ広告</string>
 </resources>

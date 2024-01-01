@@ -417,4 +417,6 @@
     <string name="analyzing_downloadable_files">Analisi dei file scaricabili</string>
     <string name="error_cannot_open_downloads_folder">Nessuna app trovata per visualizzare i download. Assicurati che FrostWire abbia le autorizzazioni e che un Esploratore di File sia installato</string>
     <string name="subs_details">Non saranno addebitati costi durante il periodo di prova di 7 giorni.\n\nL\'abbonamento sarà addebitato non appena il periodo di prova di 7 giorni termina o immediatamente per gli abbonati precedenti.\n\nL\'abbonamento si rinnova automaticamente a meno che non venga cancellato almeno 24 ore prima della fine del periodo di abbonamento.\n\nPremi \'Gestisci Abbonamenti\' per rinnovi automatici e cancellazioni su Google Play.</string>
+    <string name="subscriptions">📅 Abbonamenti</string>
+    <string name="rewarded_video_ad">📺 Annuncio Video Premiato</string>
 </resources>

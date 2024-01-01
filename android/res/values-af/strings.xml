@@ -411,4 +411,6 @@
     <string name="manage_subscriptions">Bestuur intekeninge</string>
     <string name="analyzing_downloadable_files">Analiseer aflaaibare lêers</string>
     <string name="subs_details">Jy sal nie gedurende die 7-dae proeftydperk aangekla word nie.\n\nIntekening word gehef sodra die 7 dae proeftydperk eindig of onmiddellik vir vorige intekenare.\n\nIntekening word outomaties hernu tensy dit ten minste 24 uur voor die einde van die intekeningstydperk gekanselleer word.\n\nDruk op \'Bestuur Intekeninge\' vir outo-hernuwings en kansellasies in Google Play.</string>
+    <string name="subscriptions">📅 Subskripsies</string>
+    <string name="rewarded_video_ad">📺 Beloonde Videoadvertensie</string>
 </resources>

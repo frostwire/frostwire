@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Előfizetések kezelése</string>
     <string name="analyzing_downloadable_files">A letölthető fájlok elemzése</string>
     <string name="subs_details">A 7 napos próbaidőszak alatt nem kerül felszámításra díj.\n\nAz előfizetés díja a 7 napos próbaidőszak végén, vagy azonnal a korábbi előfizetők esetében kerül felszámításra.\n\nAz előfizetés automatikusan megújul, hacsak nem mondják le legalább 24 órával az előfizetési időszak végét megelőzően.\n\nNyomja meg a \'Előfizetések kezelése\' gombot az automatikus megújításokhoz és lemondásokhoz a Google Play-en.</string>
+    <string name="subscriptions">📅 Előfizetések</string>
+    <string name="rewarded_video_ad">📺 Jutalmazott videóhirdetés</string>
 </resources>

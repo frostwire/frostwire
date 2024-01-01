@@ -409,4 +409,6 @@
     <string name="manage_subscriptions">ניהול מנויים</string>
     <string name="analyzing_downloadable_files">ניתוח קבצים הניתנים להורדה</string>
     <string name="subs_details">לא יחולו חיובים במהלך תקופת הניסיון של 7 ימים.\n\nהמנוי יחויב מיד עם סיום תקופת הניסיון של 7 ימים או מיד עבור מנויים קודמים.\n\nהמנוי מתחדש אוטומטית אלא אם יבוטל לפחות 24 שעות לפני סיום תקופת המנוי.\n\nלחץ על \'ניהול מנויים\' לחידושים אוטומטיים וביטולים ב-Google Play.</string>
+    <string name="subscriptions">📅 מנויים</string>
+    <string name="rewarded_video_ad">📺 פרסום וידאו בתגמול</string>
 </resources>

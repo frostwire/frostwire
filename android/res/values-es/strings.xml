@@ -442,4 +442,6 @@
     <string name="analyzing_downloadable_files">Análizando URLs de archivos descargables</string>
     <string name="error_cannot_open_downloads_folder">No se encontró una aplicación para ver descargas. Asegúrate de que FrostWire tenga permisos y que haya un Explorador de Archivos instalado.</string>
     <string name="subs_details">No se te cobrará durante el período de prueba de 7 días.\n\nLa suscripción se cobra tan pronto como finaliza el período de prueba de 7 días o inmediatamente para suscriptores anteriores.\n\nLa suscripción se renueva automáticamente a menos que se cancele al menos 24 horas antes del final del período de suscripción.\n\nPresiona \'Administrar Suscripciones\' para renovaciones automáticas y cancelaciones en Google Play.</string>
+    <string name="subscriptions">📅 Suscripciones</string>
+    <string name="rewarded_video_ad">📺 Anuncio de Video con Recompensa</string>
 </resources>

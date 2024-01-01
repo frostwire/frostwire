@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Abonelikleri Yönet</string>
     <string name="analyzing_downloadable_files">İndirilebilir dosyalar analiz ediliyor</string>
     <string name="subs_details">7 günlük deneme süresi boyunca herhangi bir ücret alınmayacak.\n\nAbonelik, 7 günlük deneme süresinin sona ermesinin hemen ardından veya önceki aboneler için hemen tahsil edilecektir.\n\nAbonelik, abonelik süresinin bitiminden en az 24 saat önce iptal edilmediği takdirde otomatik olarak yenilenecektir.\n\nGoogle Play\'de otomatik yenileme ve iptaller için \'Abonelikleri Yönet\'e basın.</string>
+    <string name="subscriptions">📅 Abonelikler</string>
+    <string name="rewarded_video_ad">📺 Ödüllü Video Reklam</string>
 </resources>

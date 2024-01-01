@@ -420,4 +420,6 @@
     <string name="analyzing_downloadable_files">Parsing von herunterladbaren Datei-URLs</string>
     <string name="error_cannot_open_downloads_folder">Keine App gefunden, um Downloads anzuzeigen. Stellen Sie sicher, dass FrostWire die erforderlichen Berechtigungen hat und ein Datei-Explorer installiert ist</string>
     <string name="subs_details">Während des 7-tägigen Probezeitraums fallen keine Gebühren an.\n\nDas Abonnement wird berechnet, sobald der 7-tägige Probezeitraum endet oder sofort für frühere Abonnenten.\n\nDas Abonnement wird automatisch erneuert, es sei denn, es wird mindestens 24 Stunden vor Ende des Abonnementzeitraums gekündigt.\n\nDrücken Sie \'Abonnements verwalten\' für automatische Erneuerungen und Kündigungen in Google Play.</string>
+    <string name="subscriptions">📅 Abonnements</string>
+    <string name="rewarded_video_ad">📺 Belohnte Videoanzeige</string>
 </resources>

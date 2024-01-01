@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Hallinnoi tilauksia</string>
     <string name="analyzing_downloadable_files">Analysoi ladattavia tiedostoja</string>
     <string name="subs_details">Sinua ei veloiteta 7 päivän kokeilujakson aikana.\n\nTilaus veloitetaan heti, kun 7 päivän kokeilujakso päättyy tai välittömästi aiempien tilaajien osalta.\n\nTilaus uusitaan automaattisesti, ellei sitä peruuteta vähintään 24 tuntia ennen tilausjakson päättymistä.\n\nPaina \'Hallinnoi tilauksia\' automaattisten uusimisten ja peruutusten osalta Google Play:ssä.</string>
+    <string name="subscriptions">📅 Tilaukset</string>
+    <string name="rewarded_video_ad">📺 Palkittu videomainos</string>
 </resources>

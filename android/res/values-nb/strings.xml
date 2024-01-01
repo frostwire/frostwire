@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Administrer abonnementer</string>
     <string name="analyzing_downloadable_files">Analyserer nedlastbare filer</string>
     <string name="subs_details">Du vil ikke bli belastet i løpet av 7-dagers prøveperioden.\n\nAbonnementet belastes så snart 7-dagers prøveperiode er over eller umiddelbart for tidligere abonnenter.\n\nAbonnementet fornyes automatisk med mindre det avbestilles minst 24 timer før slutten av abonnementsperioden.\n\nTrykk på \'Administrer abonnementer\' for automatisk fornyelse og avbestilling i Google Play.</string>
+    <string name="subscriptions">📅 Abonnementer</string>
+    <string name="rewarded_video_ad">📺 Belønnet videoannonse</string>
 </resources>

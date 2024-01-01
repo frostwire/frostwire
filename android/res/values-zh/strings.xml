@@ -413,4 +413,6 @@
     <string name="yt_not_supported_on_basic">由于 Google Play 规则，FrostWire Basic 不支持 YouTube 下载。\n\n如需 FrostWire Plus 的免费副本，请访问我们的官方网站frostwire.com</string>
     <string name="analyzing_downloadable_files">分析可下载的文件…</string>
     <string name="subs_details">在7天试用期内不会收取费用。\n\n订阅费将在7天试用期结束后立即收取，或对于之前的订阅者立即收取。\n\n订阅将在订阅期结束前至少24小时内未取消的情况下自动续订。\n\n点击\'管理订阅\'进行Google Play中的自动续订和取消操作。</string>
+    <string name="subscriptions">📅 订阅</string>
+    <string name="rewarded_video_ad">📺 奖励视频广告</string>
 </resources>

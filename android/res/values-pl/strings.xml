@@ -414,4 +414,6 @@
     <string name="manage_subscriptions">zarządzanie subskrypcjami</string>
     <string name="analyzing_downloadable_files">Analizowanie plików do pobrania</string>
     <string name="subs_details">Nie zostaniesz obciążony opłatami w okresie 7-dniowego bezpłatnego okresu próbnego.\n\nSubskrypcja zostanie naliczona natychmiast po zakończeniu 7-dniowego okresu próbnego lub natychmiast dla dotychczasowych subskrybentów.\n\nSubskrypcja jest automatycznie odnawiana, chyba że zostanie anulowana co najmniej 24 godziny przed zakończeniem okresu subskrypcji.\n\nNaciśnij \'Zarządzaj subskrypcjami\' dla automatycznych odnowień i anulacji w Google Play.</string>
+    <string name="subscriptions">📅 Subskrypcje</string>
+    <string name="rewarded_video_ad">📺 Nagrodzona reklama wideo</string>
 </resources>

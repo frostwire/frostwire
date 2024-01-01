@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Kelola Langganan</string>
     <string name="analyzing_downloadable_files">Menganalisis file yang dapat diunduh</string>
     <string name="subs_details">Anda tidak akan dikenakan biaya selama periode percobaan 7 hari.\n\nLangganan akan dikenakan biaya segera setelah periode percobaan 7 hari berakhir atau segera untuk pelanggan sebelumnya.\n\nLangganan akan diperbarui secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode langganan.\n\nTekan \'Kelola Langganan\' untuk pembaharuan otomatis dan pembatalan di Google Play.</string>
+    <string name="subscriptions">📅 Langganan</string>
+    <string name="rewarded_video_ad">📺 Iklan Video Berhadiah</string>
 </resources>

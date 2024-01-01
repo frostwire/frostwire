@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Gestionați abonamentele</string>
     <string name="analyzing_downloadable_files">Analiza fișierelor descărcabile</string>
     <string name="subs_details">Nu se vor percepe taxe în perioada de încercare de 7 zile.\n\nAbonamentul este taxat imediat ce perioada de încercare de 7 zile se încheie sau imediat pentru abonații anteriori.\n\nAbonamentul se reînnoiește automat, cu excepția cazului în care este anulat cu cel puțin 24 de ore înainte de sfârșitul perioadei de abonament.\n\nApăsați \'Gestionați abonamentele\' pentru reînnoiri automate și anulări în Google Play.</string>
+    <string name="subscriptions">📅 Abonamente</string>
+    <string name="rewarded_video_ad">📺 Reclamă video recompensată</string>
 </resources>

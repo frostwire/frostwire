@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Hantera prenumerationer</string>
     <string name="analyzing_downloadable_files">Analyserar nedladdningsbara filer</string>
     <string name="subs_details">Du kommer inte att debiteras under 7-dagars provperioden.\n\nPrenumerationen debiteras så snart 7-dagars provperioden slutar eller omedelbart för tidigare prenumeranter.\n\nPrenumerationen förnyas automatiskt om den inte sägs upp minst 24 timmar före prenumerationsperiodens slut.\n\nTryck på \'Hantera prenumerationer\' för automatisk förnyelse och avbokning i Google Play.</string>
+    <string name="subscriptions">📅 Prenumerationer</string>
+    <string name="rewarded_video_ad">📺 Belönad videoannons</string>
 </resources>

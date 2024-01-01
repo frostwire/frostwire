@@ -412,4 +412,6 @@
     <string name="manage_subscriptions">Управљајте претплатама</string>
     <string name="analyzing_downloadable_files">Анализирање преузетих датотека</string>
     <string name="subs_details">Neće biti naplaćeno tokom 7-dnevnog probnog perioda.\n\nPretplata se naplaćuje čim 7-dnevni probni period istekne ili odmah za prethodne pretplatnike.\n\nPretplata se automatski obnavlja ukoliko se ne otkaže najmanje 24 sata pre kraja perioda pretplate.\n\nPritisnite \'Upravljanje pretplatama\' za automatska obnavljanja i otkazivanja na Google Play-u.</string>
+    <string name="subscriptions">📅 Претплате</string>
+    <string name="rewarded_video_ad">📺 Награђени видео оглас</string>
 </resources>

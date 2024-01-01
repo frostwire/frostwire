@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Beheer Abonnementen</string>
     <string name="analyzing_downloadable_files">Analyseren van te downloaden bestanden</string>
     <string name="subs_details">Er worden geen kosten in rekening gebracht tijdens de 7-daagse proefperiode.\n\nHet abonnement wordt in rekening gebracht zodra de 7-daagse proefperiode eindigt of onmiddellijk voor eerdere abonnees.\n\nHet abonnement wordt automatisch verlengd, tenzij het ten minste 24 uur voor het einde van de abonnementsperiode wordt opgezegd.\n\nDruk op \'Beheer Abonnementen\' voor automatische verlengingen en annuleringen in Google Play.</string>
+    <string name="subscriptions">📅 Abonnementen</string>
+    <string name="rewarded_video_ad">📺 Beloonde videoadvertentie</string>
 </resources>

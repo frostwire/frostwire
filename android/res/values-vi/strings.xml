@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Quản lý Đăng ký</string>
     <string name="analyzing_downloadable_files">Phân tích các tệp có thể tải xuống</string>
     <string name="subs_details">Bạn sẽ không bị tính phí trong suốt thời gian dùng thử 7 ngày.\n\nPhí đăng ký sẽ được tính ngay sau khi kết thúc thời gian dùng thử 7 ngày hoặc ngay lập tức đối với người đăng ký trước đó.\n\nĐăng ký sẽ được tự động gia hạn trừ khi nó được hủy bỏ ít nhất 24 giờ trước khi kỳ hạn đăng ký kết thúc.\n\nNhấn \'Quản lý Đăng ký\' để tự động gia hạn và hủy bỏ trên Google Play.</string>
+    <string name="subscriptions">📅 Đăng ký</string>
+    <string name="rewarded_video_ad">📺 Quảng cáo video có thưởng</string>
 </resources>

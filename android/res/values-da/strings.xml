@@ -411,4 +411,6 @@
     <string name="manage_subscriptions">Administrer abonnementer</string>
     <string name="analyzing_downloadable_files">Analyserer downloadbare filer</string>
     <string name="subs_details">Der vil ikke blive opkrævet betaling i løbet af 7-dages prøveperioden.\n\nAbonnementet opkræves, så snart 7-dages prøveperioden slutter, eller med det samme for tidligere abonnenter.\n\nAbonnementet fornyes automatisk, medmindre det opsiges mindst 24 timer før abonnementsperiodens udløb.\n\nTryk på \'Administrer abonnementer\' for automatisk fornyelse og afmelding i Google Play.</string>
+    <string name="subscriptions">📅 Abonnementer</string>
+    <string name="rewarded_video_ad">📺 Belønnet videoannonce</string>
 </resources>

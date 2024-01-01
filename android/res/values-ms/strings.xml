@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Urus Langganan</string>
     <string name="analyzing_downloadable_files">Menganalisis fail yang boleh dimuat turun</string>
     <string name="subs_details">Anda tidak akan dikenakan caj semasa tempoh percubaan 7 hari.\n\nLangganan akan dikenakan caj sebaik sahaja tempoh percubaan 7 hari berakhir atau segera untuk pelanggan sebelumnya.\n\nLangganan akan diperbaharui secara automatik melainkan dibatalkan sekurang-kurangnya 24 jam sebelum tempoh langganan berakhir.\n\nTekan \'Urus Langganan\' untuk pembaharuan automatik dan pembatalan di Google Play.</string>
+    <string name="subscriptions">📅 Langganan</string>
+    <string name="rewarded_video_ad">📺 Iklan Video Berhadiah</string>
 </resources>

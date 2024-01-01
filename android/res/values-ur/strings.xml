@@ -408,4 +408,6 @@
     <string name="manage_subscriptions">سبسکرپشنز کا نظم کریں۔</string>
     <string name="analyzing_downloadable_files">ڈاؤن لوڈ کرنے کے قابل فائلوں کی تجزیہ</string>
     <string name="subs_details">7 دن کی آزمائشی مدت کے دوران آپ سے کوئی چارج نہیں لیا جائے گا۔\n\n7 دن کی آزمائشی مدت ختم ہونے کے فوراً بعد یا پچھلے صارفین کے لئے فوری طور پر سبسکرپشن کا چارج لیا جائے گا۔\n\nسبسکرپشن کی مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے منسوخ نہ کرنے پر سبسکرپشن خود بخود تجدید ہو جائے گی۔\n\nGoogle Play میں خودکار تجدید اور منسوخی کے لئے \'سبسکرپشن کا انتظام\' دبائیں۔</string>
+    <string name="subscriptions">📅 رکنیتیں</string>
+    <string name="rewarded_video_ad">📺 انعامی ویڈیو اشتہار</string>
 </resources>

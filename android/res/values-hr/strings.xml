@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Upravljanje pretplatama</string>
     <string name="analyzing_downloadable_files">Analiziranje preuzetih datoteka</string>
     <string name="subs_details">Tijekom 7-dnevnog probnog razdoblja neće se naplaćivati nikakve naknade.\n\nPretplata se naplaćuje čim završi 7-dnevno probno razdoblje ili odmah za prethodne pretplatnike.\n\nPretplata se automatski obnavlja, osim ako se ne otkaže najmanje 24 sata prije kraja razdoblja pretplate.\n\nPritisnite \'Upravljanje pretplatama\' za automatska obnavljanja i otkazivanja u Google Playu.</string>
+    <string name="subscriptions">📅 Pretplate</string>
+    <string name="rewarded_video_ad">📺 Nagrađeni video oglas</string>
 </resources>

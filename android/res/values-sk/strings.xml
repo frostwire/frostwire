@@ -410,4 +410,6 @@
     <string name="manage_subscriptions">Spravovať odbery</string>
     <string name="analyzing_downloadable_files">Analýza sťahovateľných súborov</string>
     <string name="subs_details">Počas 7-dňového skúšobného obdobia nebudú účtované žiadne poplatky.\n\nPredplatné sa účtuje ihneď po skončení 7-dňového skúšobného obdobia alebo okamžite pre predchádzajúcich predplatiteľov.\n\nPredplatné sa automaticky obnovuje, pokiaľ nie je zrušené aspoň 24 hodín pred koncom predplatného obdobia.\n\nStlačte \'Spravovať predplatné\' pre automatické obnovy a zrušenia v Google Play.</string>
+    <string name="subscriptions">📅 Predplatné</string>
+    <string name="rewarded_video_ad">📺 Odmenená video reklama</string>
 </resources>
