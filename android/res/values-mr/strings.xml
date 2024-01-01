@@ -410,5 +410,6 @@
     <string name="contact_us">आमच्याशी संपर्क साधा</string>
     <string name="use_nyaa">Nyaa वापरा</string>
     <string name="use_torrentz2">Torrentz2 वापरा</string>
+    <string name="manage_subscriptions">सदस्यता व्यवस्थापित करा</string>
     <string name="analyzing_downloadable_files">डाउनलोड करण्यायोग्य फाईल विश्लेषण करीत आहे.</string>
 </resources>

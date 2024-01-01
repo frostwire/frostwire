@@ -409,5 +409,6 @@
     <string name="contact_us">Bizimle iletişime geçin</string>
     <string name="use_nyaa">Nyaa\'u kullanın</string>
     <string name="use_torrentz2">Torrentz2\'u kullanın</string>
+    <string name="manage_subscriptions">Abonelikleri Yönet</string>
     <string name="analyzing_downloadable_files">İndirilebilir dosyalar analiz ediliyor</string>
 </resources>

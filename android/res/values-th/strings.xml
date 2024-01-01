@@ -409,5 +409,6 @@
     <string name="add_tracker">เพิ่มตัวติดตาม</string>
     <string name="use_nyaa">ใช้ Nyaa</string>
     <string name="use_torrentz2">ใช้ Torrentz2</string>
+    <string name="manage_subscriptions">จัดการการสมัครสมาชิก</string>
     <string name="analyzing_downloadable_files">วิเคราะห์ไฟล์ที่สามารถดาวน์โหลดได้</string>
 </resources>

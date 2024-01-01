@@ -410,5 +410,6 @@
     <string name="contact_us">Свяжитесь с нами</string>
     <string name="use_nyaa">Использовать Nyaa</string>
     <string name="use_torrentz2">Использовать Torrentz2</string>
+    <string name="manage_subscriptions">Управление подписками</string>
     <string name="analyzing_downloadable_files">Анализ загружаемых файлов</string>
 </resources>

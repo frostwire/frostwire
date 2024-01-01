@@ -409,5 +409,6 @@
     <string name="contact_us">Kontaktuj nás</string>
     <string name="use_nyaa">Použiť Nyaa</string>
     <string name="use_torrentz2">Použiť Torrentz2</string>
+    <string name="manage_subscriptions">Spravovať odbery</string>
     <string name="analyzing_downloadable_files">Analýza sťahovateľných súborov</string>
 </resources>

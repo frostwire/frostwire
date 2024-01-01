@@ -409,6 +409,7 @@
     <string name="contact_us">联系我们</string>
     <string name="use_nyaa">使用 Nyaa</string>
     <string name="use_torrentz2">使用 Torrentz2</string>
+    <string name="manage_subscriptions">管理订阅</string>
     <string name="information">信息</string>
     <string name="ok">好的</string>
     <string name="yt_not_supported_on_basic">由于 Google Play 规则，FrostWire Basic 不支持 YouTube 下载。\n\n如需 FrostWire Plus 的免费副本，请访问我们的官方网站frostwire.com</string>

@@ -408,5 +408,6 @@
     <string name="contact_us">צור קשר</string>
     <string name="use_nyaa">השתמש Nyaa</string>
     <string name="use_torrentz2">Torrentz2 השתמש</string>
+    <string name="manage_subscriptions">ניהול מנויים</string>
     <string name="analyzing_downloadable_files">ניתוח קבצים הניתנים להורדה</string>
 </resources>

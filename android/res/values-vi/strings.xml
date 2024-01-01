@@ -409,5 +409,6 @@
     <string name="contact_us">Liên hệ chúng tôi</string>
     <string name="use_nyaa">Chọn Nyaa</string>
     <string name="use_torrentz2">Chọn Torrentz2</string>
+    <string name="manage_subscriptions">Quản lý các mục đăng kí</string>
     <string name="analyzing_downloadable_files">Phân tích các tệp có thể tải xuống</string>
 </resources>

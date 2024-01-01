@@ -409,5 +409,6 @@
     <string name="add_tracker">Tambahkan pelacak</string>
     <string name="use_nyaa">Gunakan Nyaa</string>
     <string name="use_torrentz2">Gunakan Torrentz2</string>
+    <string name="manage_subscriptions">Kelola Langganan</string>
     <string name="analyzing_downloadable_files">Menganalisis file yang dapat diunduh</string>
 </resources>

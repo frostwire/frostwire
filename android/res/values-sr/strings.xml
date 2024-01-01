@@ -411,5 +411,6 @@
     <string name="contact_us">Контактирајте нас</string>
     <string name="use_nyaa">Користе Nyaa</string>
     <string name="use_torrentz2">Користе Torrentz2</string>
+    <string name="manage_subscriptions">Управљајте претплатама</string>
     <string name="analyzing_downloadable_files">Анализирање преузетих датотека</string>
 </resources>

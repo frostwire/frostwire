@@ -409,5 +409,6 @@
     <string name="contact_us">Επικοινωνήστε μαζί μας</string>
     <string name="use_nyaa">Χρήση Nyaa</string>
     <string name="use_torrentz2">Χρήση Torrentz2</string>
+    <string name="manage_subscriptions">Διαχείριση συνδρομών</string>
     <string name="analyzing_downloadable_files">Ανάλυση λήψιμων αρχείων</string>
 </resources>

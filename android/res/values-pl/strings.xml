@@ -412,5 +412,6 @@
     <string name="add_tracker">Dodaj trackera</string>
     <string name="use_nyaa">Używaj Nyaa</string>
     <string name="free">Za Darmo</string>
+    <string name="manage_subscriptions">zarządzanie subskrypcjami</string>
     <string name="analyzing_downloadable_files">Analizowanie plików do pobrania</string>
 </resources>

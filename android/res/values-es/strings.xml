@@ -437,6 +437,7 @@
     <string name="one_month">1 mes</string>
     <string name="n_months">%s meses</string>
     <string name="n_years">%s años</string>
+    <string name="manage_subscriptions">Administrar Suscripciones</string>
     <string name="information">Información</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">Descargas de YouTube no son permitidas con FrostWire Basic debido a las reglas de Google Play.\n\nPara una copia gratuita de FrostWire Plus visite nuestro sitio oficial frostwire.com</string>

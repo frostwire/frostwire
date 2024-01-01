@@ -389,6 +389,9 @@ public final class Offers {
         }
     }
 
+    /**
+     * @return true if the user has paid for ad removals, or if the PlayStore is not available
+     */
     public static boolean disabledAds() {
         if (PAUSED) {
             async(Offers::checkIfPausedAsync);

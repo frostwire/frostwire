@@ -409,5 +409,6 @@
     <string name="contact_us">Звяжыцеся з намі</string>
     <string name="use_nyaa">выкарыстанне Nyaa</string>
     <string name="use_torrentz2">выкарыстанне Torrentz2</string>
+    <string name="manage_subscriptions">Кіраванне падпіскамі</string>
     <string name="analyzing_downloadable_files">Аналіз загружаемых файлаў</string>
 </resources>

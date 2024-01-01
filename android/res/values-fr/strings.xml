@@ -425,6 +425,7 @@
     <string name="looking_For_rewarded_video">Vous recherchez une vidéo récompensée…</string>
     <string name="no_reward_videos_available">Impossible de récupérer une vidéo récompensée. Veuillez réessayer</string>
     <string name="free">Gratuit</string>
+    <string name="manage_subscriptions">Gérer les abonnements</string>
     <string name="information">Informations</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">Les téléchargements YouTube ne sont pas autorisés avec FrostWire Basic en raison des règles de Google Play.\n\nPour une copie gratuite de FrostWire Plus, visitez notre site officiel frostwire.com</string>

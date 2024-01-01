@@ -409,5 +409,6 @@
     <string name="contact_us">Kontaktirajte nas</string>
     <string name="use_nyaa">Koristi Nyaa</string>
     <string name="use_torrentz2">Koristi Torrentz2</string>
+    <string name="manage_subscriptions">Upravljanje pretplatama</string>
     <string name="analyzing_downloadable_files">Analiziranje preuzetih datoteka</string>
 </resources>

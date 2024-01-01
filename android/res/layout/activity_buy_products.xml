@@ -130,7 +130,7 @@
                     android:layout_gravity="center_horizontal"
                     style="@style/BuyNoAdsCardHint"
                     android:layout_marginTop="5dp"
-                    android:text="@string/subscriptions"
+                    android:text="@string/manage_subscriptions"
                     android:visibility="gone"/>
 
         </LinearLayout>

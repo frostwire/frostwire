@@ -93,6 +93,7 @@ public final class BuyActivity extends AbstractActivity {
     }
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
+        SystemUtils.ensureBackgroundThreadOrCrash("BuyActivity::getRewardFreeAdMinutesFromConfigTask");
         REWARD_FREE_AD_MINUTES = ConfigurationManager.instance().getInt(Constants.PREF_KEY_GUI_REWARD_AD_FREE_MINUTES);
         SystemUtils.postToUIThread(() -> {
             try {
@@ -156,8 +157,15 @@ public final class BuyActivity extends AbstractActivity {
 
         // If Google Store not ready or available, auto-select rewarded ad option
         if (card30days.getVisibility() == View.GONE ||
-                card1year.getVisibility() == View.GONE) {
+            card1year.getVisibility() == View.GONE) {
+            // ProductCardViewOnClickListener::onClick will be called
             cardNminutes.performClick();
+        }
+
+        // AUTO SELECT THE 1 YEAR OPTION IF IT'S AVAILABLE
+        if (card1year.getVisibility() == View.VISIBLE) {
+            // ProductCardViewOnClickListener::onClick will be called
+            card1year.performClick();
         }
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
@@ -168,8 +176,9 @@ public final class BuyActivity extends AbstractActivity {
 
     private void initSubscriptionsButton() {
         // Only for Google Play version
-        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION)
+        if (!PlayStore.available()) {
             return;
+        }
 
         Button subscriptionsButton = findView(R.id.activity_buy_products_subscriptions_button);
         if (subscriptionsButton != null) {
@@ -296,7 +305,7 @@ public final class BuyActivity extends AbstractActivity {
 
         PlayStore store = PlayStore.getInstance(this);
 
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) {
             initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, null);
             initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, null);
             card30days.setOnClickListener(cardClickListener);
@@ -561,7 +570,6 @@ public final class BuyActivity extends AbstractActivity {
                 highlightSelectedCard(selectedProductCard);
                 showPaymentOptionsBelowSelectedCard(selectedProductCard);
                 scrollToSelectedCard(selectedProductCard);
-
             }
         }
     }

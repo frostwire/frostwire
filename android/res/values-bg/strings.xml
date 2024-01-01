@@ -409,5 +409,6 @@
     <string name="invalid_tracker_url">URL адрес на тракера е невалиден</string>
     <string name="use_nyaa">Използвайте Nyaa</string>
     <string name="use_torrentz2">Използвайте Torrentz2</string>
+    <string name="manage_subscriptions">Управление на абонаменти</string>
     <string name="analyzing_downloadable_files">Анализиране на изтеглимите файлове</string>
 </resources>

@@ -409,5 +409,6 @@
     <string name="contact_us">Kontakta oss</string>
     <string name="use_nyaa">Använda Nyaa</string>
     <string name="use_torrentz2">Använda Torrentz2</string>
+    <string name="manage_subscriptions">Hantera prenumerationer</string>
     <string name="analyzing_downloadable_files">Analyserar nedladdningsbara filer</string>
 </resources>

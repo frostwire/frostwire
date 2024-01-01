@@ -409,5 +409,6 @@
     <string name="contact_us">Kontakt os</string>
     <string name="use_nyaa">Brug Nyaa</string>
     <string name="use_torrentz2">Brug Torrentz2</string>
+    <string name="manage_subscriptions">Administrer abonnementer</string>
     <string name="analyzing_downloadable_files">Analyserer downloadbare filer</string>
 </resources>

@@ -408,5 +408,6 @@
     <string name="add_tracker">Додати трекер</string>
     <string name="contact_us">Зв\'яжіться з нами</string>
     <string name="use_nyaa">користування Nyaa</string>
+    <string name="manage_subscriptions">Керування підписками</string>
     <string name="analyzing_downloadable_files">Аналіз завантажуваних файлів</string>
 </resources>

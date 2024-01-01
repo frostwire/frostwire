@@ -409,5 +409,6 @@
     <string name="contact_us">Lépjen kapcsolatba velünk</string>
     <string name="use_nyaa">Használja Nyaa</string>
     <string name="use_torrentz2">Használja Torrentz2</string>
+    <string name="manage_subscriptions">Előfizetések kezelése</string>
     <string name="analyzing_downloadable_files">A letölthető fájlok elemzése</string>
 </resources>

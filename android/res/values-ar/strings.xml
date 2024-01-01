@@ -407,5 +407,6 @@
     <string name="contact_us">اتصل بنا</string>
     <string name="use_nyaa">استخدام Nyaa</string>
     <string name="use_torrentz2">Torrentz2 استخدام</string>
+    <string name="manage_subscriptions">إدارة الاشتراكات</string>
     <string name="analyzing_downloadable_files">تحليل الملفات التي يمكن تحميلها</string>
 </resources>

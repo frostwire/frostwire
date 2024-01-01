@@ -409,5 +409,6 @@
     <string name="piece_size_header">Stuk Grootte:</string>
     <string name="add_tracker">Voeg spoorsnyer by</string>
     <string name="use_nyaa">Gebruik Nyaa</string>
+    <string name="manage_subscriptions">Bestuur intekeninge</string>
     <string name="analyzing_downloadable_files">Analiseer aflaaibare lêers</string>
 </resources>

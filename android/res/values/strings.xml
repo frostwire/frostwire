@@ -508,7 +508,7 @@
     <string name="open_file_explorer">Open File Explorer</string>
     <string name="comma">,</string>
     <string name="permission_denied">Permission denied</string>
-    <string name="subscriptions">Subscriptions</string>
+    <string name="manage_subscriptions">Manage Subscriptions</string>
     <string name="information">Information</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">YouTube downloads are not supported by FrostWire Basic due to Google Play rules.\n\nFor a free copy of FrostWire Plus go to our official website frostwire.com</string>

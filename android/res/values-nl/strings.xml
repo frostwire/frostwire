@@ -409,5 +409,6 @@
     <string name="piece_size_header">Stuk maat:</string>
     <string name="add_tracker">Voeg tracker toe</string>
     <string name="use_nyaa">Gebruik Nyaa</string>
+    <string name="manage_subscriptions">Beheer abonnementen</string>
     <string name="analyzing_downloadable_files">Analyseren van te downloaden bestanden</string>
 </resources>

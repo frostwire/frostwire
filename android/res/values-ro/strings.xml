@@ -409,5 +409,6 @@
     <string name="contact_us">Contacteaza-ne</string>
     <string name="use_nyaa">Utilizați Nyaa</string>
     <string name="use_torrentz2">Utilizați Torrentz2</string>
+    <string name="manage_subscriptions">Gestionați abonamentele</string>
     <string name="analyzing_downloadable_files">Analiza fișierelor descărcabile</string>
 </resources>
