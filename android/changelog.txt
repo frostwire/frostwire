@@ -1,6 +1,7 @@
 FrostWire 2.7.6 build 726
  - Subscription page improvements
  - com.google.android.material:material:1.11.0
+ - org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22
  - python: yt_dlp 2023.12.30
 
 
