@@ -231,10 +231,10 @@ dependencies {
     implementation 'androidx.media2:media2-player:1.2.1'
 
     // AppLovin Max
-    implementation 'com.applovin:applovin-sdk:11.11.3'
+    implementation 'com.applovin:applovin-sdk:12.1.0'
 
     // AppLovin + Unity
-    implementation 'com.applovin.mediation:unityads-adapter:4.9.1.0'
+    implementation 'com.applovin.mediation:unityads-adapter:4.9.2.1'
 
     def jlibtorrent_version = '1.2.19.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
