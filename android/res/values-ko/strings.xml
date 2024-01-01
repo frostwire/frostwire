@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
-  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
-  * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
-  *
-  * This program is free software: you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation, either version 3 of the License, or
-  * (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  * GNU General Public License for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[정보: 귀하의 다운로드에 권장되지만, <b>FrostWire를 사용하기 위해 VPN이 필요하지 않습니다. </b>]]></string>
@@ -144,7 +142,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire는 파일 브라우저 및 다운로더 앱이므로 디스크에 액세스 할 수 있어야합니다.\n\n귀하의 허락 없이는 FrostWire가 작동하지 않습니다.\n\n다시 시도하고 싶습니까?</string>
     <string name="unprotected_connection">보호되지 않은</string>
     <string name="transfers_context_menu_copy_magnet_copied">자석이 클립 보드에 복사 됨</string>
-    <string name="buy_uppercase">사다</string>
+    <string name="free_trial_uppercase">무료 시험판</string>
     <string name="saving_to_internal_memory_description">SD 카드도 가지고 있습니다. (%1$s 비어 있는)</string>
     <string name="selected">선택된</string>
     <string name="add_transfer_label">자석 또는 토런트 URL 붙여 넣기</string>
@@ -287,7 +285,7 @@
     <string name="file_descriptor_sd_unmounted">이 파일은 SD 카드에 속하므로 장치에 삽입하십시오.</string>
     <string name="cheaper_than_beer">맥주보다 쌉니다.</string>
     <string name="rating_reminder_description">FrostWire를 사랑한다면 잠시 시간을내어 평가 해주십시오.</string>
-    <string name="includes_3_day_free_trial">3 일 무료 평가판이 포함됩니다. 추천</string>
+    <string name="includes_7_day_free_trial">7일 무료 평가판이 포함되어 있습니다. 추천</string>
     <string name="transfers_context_menu_copy_magnet">자석 복사</string>
     <string name="try_other_keywords">더 적은 수의/다른 키워드 사용해보기</string>
     <string name="thank_you">고맙습니다!</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Torrentz2사용</string>
     <string name="manage_subscriptions">구독 관리</string>
     <string name="analyzing_downloadable_files">다운로드 가능한 파일 분석 중…</string>
+    <string name="subs_details">7일간의 체험 기간 동안에는 요금이 부과되지 않습니다.\n\n7일 체험 기간이 끝나는 대로, 또는 이전 구독자의 경우 즉시 구독료가 청구됩니다.\n\n구독은 구독 기간이 끝나기 최소 24시간 전에 취소되지 않는 한 자동으로 갱신됩니다.\n\nGoogle Play에서 자동 갱신 및 취소를 관리하려면 \'구독 관리\'를 누르세요.</string>
 </resources>

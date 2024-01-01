@@ -71,46 +71,13 @@
                 android:background="@color/basic_gray_light"
                 android:orientation="vertical">
 
-            <com.frostwire.android.gui.views.ProductCardView
-                    android:id="@+id/activity_buy_product_card_30_days"
+            <TextView
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    frostwire:product_card_description="@string/dummy_content_description"
-                    frostwire:product_card_hint_button_visible="false"
-                    frostwire:product_card_price="$0.99"
-                    frostwire:product_card_title_bold="@string/thirty_days"
-                    frostwire:product_card_title_normal="@string/ad_free" />
-
-            <com.frostwire.android.gui.views.ProductCardView
-                    android:id="@+id/activity_buy_product_card_1_year"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    frostwire:product_card_description="@string/dummy_content_description"
-                    frostwire:product_card_hint_button_caption="@string/best_value"
-                    frostwire:product_card_hint_button_visible="true"
-                    frostwire:product_card_price="$5.94"
-                    frostwire:product_card_selected="true"
-                    frostwire:product_card_title_bold="@string/one_year"
-                    frostwire:product_card_title_normal="@string/ad_free" />
-
-            <com.frostwire.android.gui.views.ProductPaymentOptionsView
-                    android:id="@+id/activity_buy_product_payment_options_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scaleY="0"
-                    android:transformPivotY="0dp"
-                    android:visibility="gone" />
-
-            <com.frostwire.android.gui.views.ProductCardView
-                    android:id="@+id/activity_buy_product_card_6_months"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    frostwire:product_card_description="@string/dummy_content_description"
-                    frostwire:product_card_hint_button_visible="false"
-                    frostwire:product_card_price="$4.45"
-                    frostwire:product_card_title_bold="@string/six_months"
-                    frostwire:product_card_title_normal="@string/ad_free" />
+                    android:textSize="@dimen/text_size_extra_micro"
+                    android:text="@string/rewarded_video_ad" />
 
             <com.frostwire.android.gui.views.ProductCardView
                     android:id="@+id/activity_buy_product_card_reward"
@@ -123,15 +90,67 @@
                     frostwire:product_card_title_bold="@string/reward_product_title"
                     frostwire:product_card_title_normal="@string/ad_free" />
 
+            <TextView
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_size_extra_micro"
+                    android:text="@string/subscriptions" />
+
+
+            <com.frostwire.android.gui.views.ProductCardView
+                    android:id="@+id/activity_buy_product_card_30_days"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_visible="false"
+                    frostwire:product_card_price="$1.99"
+                    frostwire:product_card_title_bold="@string/thirty_days"
+                    frostwire:product_card_title_normal="@string/ad_free" />
+
+            <com.frostwire.android.gui.views.ProductCardView
+                    android:id="@+id/activity_buy_product_card_1_year"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_hint_button_caption="@string/best_value"
+                    frostwire:product_card_hint_button_visible="true"
+                    frostwire:product_card_price="$9.99"
+                    frostwire:product_card_selected="true"
+                    frostwire:product_card_title_bold="@string/one_year"
+                    frostwire:product_card_title_normal="@string/ad_free" />
+
+            <com.frostwire.android.gui.views.ProductPaymentOptionsView
+                    android:id="@+id/activity_buy_product_payment_options_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleY="0"
+                    android:transformPivotY="0dp"
+                    android:visibility="gone" />
+
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="start"
+                    android:text="@string/subs_details"
+                    android:textSize="@dimen/text_size_extra_micro"
+                    android:justificationMode="inter_word" />
+
             <Button
                     android:id="@+id/activity_buy_products_subscriptions_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    style="@style/BuyNoAdsCardHint"
-                    android:layout_marginTop="5dp"
                     android:text="@string/manage_subscriptions"
-                    android:visibility="gone"/>
+                    android:textSize="@dimen/text_size_extra_micro"
+                    android:visibility="visible" />
+
 
         </LinearLayout>
 

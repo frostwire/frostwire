@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Dezvăluire:</b> Cu toate că este recomandat pentru descărcarea, în special atunci când descarcă sau schimbă informații sensibile (de exemplu, bancare) și în timp ce utilizează date publice Wi-Fi sau mobile, <b>nu aveți nevoie de un VPN pentru a utiliza FrostWire. </b>]]></string>
@@ -37,7 +35,7 @@
     <string name="video">Video</string>
     <string name="download">Descarca</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet de copiat în clipboard</string>
-    <string name="buy_uppercase">CUMPĂRA</string>
+    <string name="free_trial_uppercase">ÎNCERCARE GRATUITĂ</string>
     <string name="saving_to_internal_memory_description">De asemenea, aveți un card SD(%1$s disponibil)</string>
     <string name="selected">selectat</string>
     <string name="dialog_new_transfer_text_text">Sunteți sigur că doriți să descărcați %1$s (%2$s)</string>
@@ -271,7 +269,7 @@
     <string name="seeds">Seminte</string>
     <string name="cheaper_than_beer">Mai ieftin decât bere</string>
     <string name="rating_reminder_description">Daca va place FrostWire, vă rugăm să luați un moment pentru a ne evaluați.</string>
-    <string name="includes_3_day_free_trial">Include 3 zi libera-proces. Recomandat</string>
+    <string name="includes_7_day_free_trial">Include 7 zi libera-proces. Recomandat</string>
     <string name="intent_text">FrostWire este un program peer-to-peer pentru partajarea numai fișiere autorizate. Instalarea și utilizarea programului nu constituie o licență pentru obținerea sau distribuirea de conținut neautorizat.</string>
     <string name="seeding_has_been_turned_off">Însămânțarea a fost oprit</string>
     <string name="transfers_context_menu_copy_magnet">Copiere Magnet</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Utilizați Torrentz2</string>
     <string name="manage_subscriptions">Gestionați abonamentele</string>
     <string name="analyzing_downloadable_files">Analiza fișierelor descărcabile</string>
+    <string name="subs_details">Nu se vor percepe taxe în perioada de încercare de 7 zile.\n\nAbonamentul este taxat imediat ce perioada de încercare de 7 zile se încheie sau imediat pentru abonații anteriori.\n\nAbonamentul se reînnoiește automat, cu excepția cazului în care este anulat cu cel puțin 24 de ore înainte de sfârșitul perioadei de abonament.\n\nApăsați \'Gestionați abonamentele\' pentru reînnoiri automate și anulări în Google Play.</string>
 </resources>

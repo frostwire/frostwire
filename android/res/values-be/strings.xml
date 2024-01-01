@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>інфармацыя:</b> Націсніце ўжытыя тэгі да]]></string>
@@ -39,7 +37,7 @@
     <string name="video">Відэа</string>
     <string name="download">Спампаваць</string>
     <string name="transfers_context_menu_copy_magnet_copied">Магніт скапіяваны ў буфер абмену</string>
-    <string name="buy_uppercase">КУПІЦЬ</string>
+    <string name="free_trial_uppercase">Бясплатны тэст</string>
     <string name="saving_to_internal_memory_description">У вас таксама ёсць SD-карту (%1$s даступны)</string>
     <string name="selected">абраны</string>
     <string name="dialog_new_transfer_text_text">Вы ўпэўненыя, што вы хочаце спампаваць %1$s (%2$s)</string>
@@ -275,7 +273,7 @@
     <string name="seeds">Насенне</string>
     <string name="cheaper_than_beer">Танней, чым піва</string>
     <string name="rating_reminder_description">Калі вы любіце FrostWire калі ласка, знайдзіце час, каб ацаніць нас.</string>
-    <string name="includes_3_day_free_trial">Ўключае ў сябе 3-х дзён бясплатнага тэставання. Рэкамендуецца.</string>
+    <string name="includes_7_day_free_trial">Ўключае ў сябе 7-х дзён бясплатнага тэставання. Рэкамендуецца.</string>
     <string name="intent_text">FrostWire гэта праграма раўнапраўных вузлоў ЛВС для сумеснага выкарыстання толькі дазволеных файлаў. Ўстаноўка і выкарыстанне праграмы не з\'яўляецца ліцэнзіяй на атрыманне або распаўсюд несанкцыянаванага кантэнту.</string>
     <string name="seeding_has_been_turned_off">Пасеў быў выключаны</string>
     <string name="transfers_context_menu_copy_magnet">Капіяваць магніт</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">выкарыстанне Torrentz2</string>
     <string name="manage_subscriptions">Кіраванне падпіскамі</string>
     <string name="analyzing_downloadable_files">Аналіз загружаемых файлаў</string>
+    <string name="subs_details">Узнос не будзе спаганяцца ў перыяд 7-дзённага пробнага тэрміну.\n\nПадпіска будзе спаганяцца адразу пасля завяршэння 7-дзённага пробнага тэрміну або негайна для папярэдніх падпісчыкаў.\n\nПадпіска аўтаматычна падаўжаецца, калі яна не была скасавана як мінімум за 24 гадзіны да канца перыяду падпіскі.\n\nНацісніце \'Кіраванне падпіскамі\' для аўтаматычнага падаўжэння і скасавання ў Google Play.</string>
 </resources>

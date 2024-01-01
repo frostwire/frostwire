@@ -2,7 +2,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (marcelinkaaa), Grzesiek Rzaca (grzesiekrzaca)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -333,9 +333,9 @@
     <string name="ad_free">Ad-free</string>
     <string name="best_value">Best Value</string>
     <string name="select_option_below">Select option below:</string>
-    <string name="buy_uppercase">BUY</string>
+    <string name="free_trial_uppercase">FREE TRIAL</string>
     <string name="automatic_renewal">Automatic Renewal</string>
-    <string name="includes_3_day_free_trial">Includes 3 day free-trial. Recommended</string>
+    <string name="includes_7_day_free_trial">Includes 7 day free-trial. Recommended</string>
     <string name="one_time_purchase">One Time Purchase</string>
     <string name="no_trial_period_included">No trial period included</string>
     <string name="error_connection_timed_out">Error: connection timed out/dropped. Try again.</string>
@@ -516,4 +516,7 @@
     <string name="use_yt">Use YT</string>
     <string name="analyzing_downloadable_files">Analyzing downloadable files URLs</string>
     <string name="error_cannot_open_downloads_folder">No app found to view downloads. Ensure FrostWire has permissions and a File Explorer is installed</string>
+    <string name="subs_details">You will not be charged during the 7-day trial period.\n\nSubscription is charged as soon as the 7 day trial period ends or immediatly for previous subscribers.\n\nSubscription is automatically renewed unless cancelled at least 24 hours prior to the end of the subscription period.\n\nPress \'Manage Subscriptions\' for auto-renewals and cancellations in Google Play.</string>
+    <string name="subscriptions">📅 Subscriptions</string>
+    <string name="rewarded_video_ad">📺 Rewarded Video Ad</string>
 </resources>

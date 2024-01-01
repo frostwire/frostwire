@@ -2,21 +2,20 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste etikette aan]]></string>
@@ -42,7 +41,7 @@
     <string name="video">Video</string>
     <string name="download">Aflaai</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magneet gekopieer na knipbord</string>
-    <string name="buy_uppercase">KOOP</string>
+    <string name="free_trial_uppercase">GRATIS TOETS</string>
     <string name="saving_to_internal_memory_description">Jy het ook \'n SD kaart (%1$s beskikbaar)</string>
     <string name="selected">gekies</string>
     <string name="dialog_new_transfer_text_text">Is jy seker jy wil aflaai %1$s (%2$s)</string>
@@ -328,7 +327,7 @@
     <string name="or">of</string>
     <string name="rating_reminder_description">As jy lief is vir FrostWire, neem asseblief \'n oomblik om ons te beoordelen.</string>
     <string name="file_names">Lêernaam</string>
-    <string name="includes_3_day_free_trial">Sluit 3 dae gratis verhoor in. Aanbeveel</string>
+    <string name="includes_7_day_free_trial">Sluit 7 dae gratis verhoor in. Aanbeveel</string>
     <string name="intent_text">FrostWire is \'n peer-to-peer-program om slegs gemagtigde lêers te deel. Die installering en gebruik van die program vorm nie \'n lisensie vir die verkryging of verspreiding van ongemagtigde inhoud nie.</string>
     <string name="seeding_has_been_turned_off">Saai is afgeskakel</string>
     <string name="transfers_context_menu_copy_magnet">Kopieer Magneet</string>
@@ -411,4 +410,5 @@
     <string name="use_nyaa">Gebruik Nyaa</string>
     <string name="manage_subscriptions">Bestuur intekeninge</string>
     <string name="analyzing_downloadable_files">Analiseer aflaaibare lêers</string>
+    <string name="subs_details">Jy sal nie gedurende die 7-dae proeftydperk aangekla word nie.\n\nIntekening word gehef sodra die 7 dae proeftydperk eindig of onmiddellik vir vorige intekenare.\n\nIntekening word outomaties hernu tensy dit ten minste 24 uur voor die einde van die intekeningstydperk gekanselleer word.\n\nDruk op \'Bestuur Intekeninge\' vir outo-hernuwings en kansellasies in Google Play.</string>
 </resources>

@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Offenlegung:</b> Obwohl für Ihre Downloads empfohlen, insbesondere beim Herunterladen oder Austausch sensibler Informationen (z. B. Bankgeschäfte) und bei der Nutzung öffentlicher Wi-Fi- oder mobiler Daten, <b>Sie brauchen nicht ein VPN Wire zu verwenden. </b>]]></string>
@@ -159,7 +157,7 @@
     <string name="why_we_need_storage_permissions_summary">Frostwire ist ein Dateibrowser und Downloader App, deshalb muss es in der Lage sein, Ihre Festplatte zugreifen.\n\nOhne Ihre Berechtigungen können Frostwire nicht funktionieren.\n\nVersuch es noch einmal?</string>
     <string name="unprotected_connection">ungeschützt</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet die Zwischenablage kopiert</string>
-    <string name="buy_uppercase">KAUFEN</string>
+    <string name="free_trial_uppercase">KOSTENLOSER TEST</string>
     <string name="saving_to_internal_memory_description">Sie haben auch eine SD-Karte (%1$s free)</string>
     <string name="selected">ausgewählt</string>
     <string name="add_transfer_label">Fügen Sie einen Magneten oder Torrent-URL</string>
@@ -291,7 +289,7 @@
     <string name="file_descriptor_sd_unmounted">Diese Datei gehört zu einer SD-Karte, legen Sie es bitte auf Ihrem Gerät.</string>
     <string name="cheaper_than_beer">Günstiger als Bier</string>
     <string name="rating_reminder_description">Wenn Sie Frostwire lieben nehmen bitte einen Moment, um uns zu bewerten.</string>
-    <string name="includes_3_day_free_trial">Inklusive 3 Tage kostenlos-Studie. Empfohlen</string>
+    <string name="includes_7_day_free_trial">Inklusive 7 Tage kostenlos-Studie. Empfohlen</string>
     <string name="transfers_context_menu_copy_magnet">Kopieren Magnet</string>
     <string name="try_other_keywords">Probieren Sie weniger/andere Suchbegriffe</string>
     <string name="thank_you">Danke!</string>
@@ -421,4 +419,5 @@
     <string name="yt_not_supported_on_basic">YouTube-Downloads sind mit FrostWire Basic aufgrund der Google Play-Regeln nicht erlaubt.\n\nFür eine kostenlose Kopie von FrostWire Plus besuchen Sie unsere offizielle Website frostwire.com</string>
     <string name="analyzing_downloadable_files">Parsing von herunterladbaren Datei-URLs</string>
     <string name="error_cannot_open_downloads_folder">Keine App gefunden, um Downloads anzuzeigen. Stellen Sie sicher, dass FrostWire die erforderlichen Berechtigungen hat und ein Datei-Explorer installiert ist</string>
+    <string name="subs_details">Während des 7-tägigen Probezeitraums fallen keine Gebühren an.\n\nDas Abonnement wird berechnet, sobald der 7-tägige Probezeitraum endet oder sofort für frühere Abonnenten.\n\nDas Abonnement wird automatisch erneuert, es sei denn, es wird mindestens 24 Stunden vor Ende des Abonnementzeitraums gekündigt.\n\nDrücken Sie \'Abonnements verwalten\' für automatische Erneuerungen und Kündigungen in Google Play.</string>
 </resources>

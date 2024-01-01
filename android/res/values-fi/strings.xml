@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Julkaiseminen:</b> Vaikka suosittelemme latauksillemme, varsinkin kun lataat tai vaihdat arkaluonteisia tietoja (esim. pankkitoimintaa) ja käyttäessäsi julkisia Wi-Fi- tai mobiilitietoja, <b>sinun ei tarvitse käyttää VPN: tä FrostWire.</b>]]></string>
@@ -38,7 +36,7 @@
     <string name="video">Video</string>
     <string name="download">Lataa</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet kopioitu leikepöydälle</string>
-    <string name="buy_uppercase">OSTAA</string>
+    <string name="free_trial_uppercase">ILMAINEN KOKEILU</string>
     <string name="saving_to_internal_memory_description">Sinulla on myös SD-kortti (%1$s saatavissa)</string>
     <string name="selected">valittu</string>
     <string name="dialog_new_transfer_text_text">Oletko varma, että haluat ladata %1$s (%2$s)</string>
@@ -285,7 +283,7 @@
     <string name="seeds">Seeds</string>
     <string name="cheaper_than_beer">Halvempi kuin olut</string>
     <string name="rating_reminder_description">Jos rakastat FrostWire Käytä hetki rate meille.</string>
-    <string name="includes_3_day_free_trial">Sisältää 3 päivän maksuton oikeudenkäyntiä. Suositeltava</string>
+    <string name="includes_7_day_free_trial">Sisältää 7 päivän maksuton oikeudenkäyntiä. Suositeltava</string>
     <string name="intent_text">FrostWire on peer-to-peer ohjelma jakaa valtuutettujen vain tiedostot. Asennuksesta ja käytöstä ohjelma ei muodosta lisenssiä saamiseksi tai jakelevat luvatonta sisältöä.</string>
     <string name="seeding_has_been_turned_off">Kylvö on katkaistu virta.</string>
     <string name="transfers_context_menu_copy_magnet">Kopioi Magnet</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Käytä Torrentz2</string>
     <string name="manage_subscriptions">Hallinnoi tilauksia</string>
     <string name="analyzing_downloadable_files">Analysoi ladattavia tiedostoja</string>
+    <string name="subs_details">Sinua ei veloiteta 7 päivän kokeilujakson aikana.\n\nTilaus veloitetaan heti, kun 7 päivän kokeilujakso päättyy tai välittömästi aiempien tilaajien osalta.\n\nTilaus uusitaan automaattisesti, ellei sitä peruuteta vähintään 24 tuntia ennen tilausjakson päättymistä.\n\nPaina \'Hallinnoi tilauksia\' automaattisten uusimisten ja peruutusten osalta Google Play:ssä.</string>
 </resources>

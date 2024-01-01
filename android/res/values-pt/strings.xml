@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Criado por Angel Leon (@gubatron), Alden Torres (aldenml)
- * Direitos Autorais (c) 2011-2023, FrostWire(R). Todos os direitos reservados.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * Este programa é um software gratuito: você pode redistribui-lo e/ou modifica-lo
- * sob os termos de GNU General Public License como publicado por 
- * uma Fundação de Software Gratuito, ou na versão 3 da licença ou
- * (sua opção) ou versão mais recente.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Este programa é distribuido na esperança de ser útil,
- * mas sem NENHUMA GARANTIA; sem nem mesmo a garantia implícita de COMERCIALIZAÇÃO ou ADEQUAÇÃO PARA UM PROPÓSITO PESSOAL. Para maiores detalhes veja a
- * GNU General Public License.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * Junto com o programa, você deve ter recebido uma cópia de GNU General Public License. Caso contrário, veja o link<http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Toque etiquetas aplicadas para]]></string>
@@ -222,7 +222,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire é um navegador de arquivos e aplicativo downloader, portanto, ele precisa ser capaz de acessar seu disco.\n\n Sem suas permissões FrostWire não pode trabalhar.\n\nDeseja tentar novamente?</string>
     <string name="unprotected_connection">desprotegido</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet copiado para o clipboard</string>
-    <string name="buy_uppercase">COMPRAR</string>
+    <string name="free_trial_uppercase">TESTE GRÁTIS</string>
     <string name="selected">selecionado</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="storage_picker_treeuri_error">Erro inesperado selecionando destino de armazenamento</string>
@@ -290,7 +290,7 @@
     <string name="media_preview">%s visualização</string>
     <string name="cheaper_than_beer">Mais barato do que cerveja</string>
     <string name="rating_reminder_description">Se você ama FrostWire por favor tome um momento para nos avaliar.</string>
-    <string name="includes_3_day_free_trial">Inclui três dias de teste gratuito. Recomendado</string>
+    <string name="includes_7_day_free_trial">Inclui 7 dias de teste gratuito. Recomendado</string>
     <string name="transfers_context_menu_copy_magnet">Copiar Magnet</string>
     <string name="thank_you">Obrigado!</string>
     <string name="enable_seeding">Ativar Semeadura</string>
@@ -416,4 +416,5 @@
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">Os downloads do YouTube não são permitidos com o FrostWire Basic devido às regras do Google Play.\n\nPara obter uma cópia gratuita do FrostWire Plus, visite nosso site oficial frostwire.com</string>
     <string name="analyzing_downloadable_files">Analisando arquivos baixáveis</string>
+    <string name="subs_details">Não será cobrado durante o período de teste de 7 dias.\n\nA assinatura é cobrada assim que o período de teste de 7 dias termina ou imediatamente para assinantes anteriores.\n\nA assinatura é renovada automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período de assinatura.\n\nPressione \'Gerenciar Assinaturas\' para renovações automáticas e cancelamentos no Google Play.</string>
 </resources>

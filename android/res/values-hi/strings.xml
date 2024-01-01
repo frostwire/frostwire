@@ -2,21 +2,20 @@
 <!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[प्रकटीकरण हालांकि अपने डाउनलोड के लिए सिफारिश की, <b>आप FrostWire का उपयोग करने के लिए एक वीपीएन जरूरत नहीं है। </b>]]></string>
@@ -140,7 +139,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire, एक फ़ाइल ब्राउज़र और डाउनलोडर app है इसलिए इसे अपने डिस्क का उपयोग करने में सक्षम होने की जरूरत\n\nआपकी अनुमति के बिना FrostWire काम नहीं कर सकता।\n\nफिर से कोशिश करना चाहते हैं?</string>
     <string name="unprotected_connection">अरक्षित</string>
     <string name="transfers_context_menu_copy_magnet_copied">चुंबक क्लिपबोर्ड करने के लिए नकल</string>
-    <string name="buy_uppercase">खरीदें</string>
+    <string name="free_trial_uppercase">मुफ्त परीक्षण</string>
     <string name="saving_to_internal_memory_description">आप यह भी एक एसडी कार्ड (%1$s मुक्त)</string>
     <string name="selected">चयनित</string>
     <string name="add_transfer_label">एक चुंबक या धार यूआरएल पेस्ट</string>
@@ -286,7 +285,7 @@
     <string name="file_descriptor_sd_unmounted">इस फ़ाइल में एक एसडी कार्ड के अंतर्गत आता है, अपने डिवाइस पर इसे डालने करें।</string>
     <string name="cheaper_than_beer">बियर की तुलना में सस्ता</string>
     <string name="rating_reminder_description">आप FrostWire प्यार तो एक पल के लिए हमें दर करने के लिए ले कृपया।</string>
-    <string name="includes_3_day_free_trial">3 दिन नि: शुल्क परीक्षण भी शामिल है। सिफारिश की</string>
+    <string name="includes_7_day_free_trial">7 दिन नि: शुल्क परीक्षण भी शामिल है। सिफारिश की</string>
     <string name="transfers_context_menu_copy_magnet">कॉपी चुंबक</string>
     <string name="try_other_keywords">कम / अलग कुंजीशब्दों से प्रयास करें</string>
     <string name="thank_you">धन्यवाद!</string>
@@ -411,9 +410,10 @@
     <string name="contact_us">हमसे संपर्क करें</string>
     <string name="use_nyaa">उपयोग Nyaa</string>
     <string name="use_torrentz2">उपयोग Torrentz2</string>
-    <string name="manage_subscriptions">सदस्यता प्रबंधित करें</string>
+    <string name="manage_subscriptions">सब्सक्रिप्शन प्रबंधित करें</string>
     <string name="information">जानकारी</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">YouTube डाउनलोड Google Play नियमों के कारण फ्रॉस्टवायर बेसिक द्वारा समर्थित नहीं हैं।\n\nफफ्रॉस्टवायर प्लस की मुफ्त कॉपी के लिए हमारी आधिकारिक वेबसाइट Frostwire.com पर जाएं</string>
     <string name="analyzing_downloadable_files">डाउनलोड करने योग्य फ़ाइलों का विश्लेषण किया जा रहा है</string>
+    <string name="subs_details">7-दिवसीय परीक्षण अवधि के दौरान आपसे कोई शुल्क नहीं लिया जाएगा।\n\nसदस्यता शुल्क 7 दिन की परीक्षण अवधि समाप्त होने के तुरंत बाद या पिछले ग्राहकों के लिए तुरंत लागू होता है।\n\nसदस्यता समाप्ति के कम से कम 24 घंटे पहले रद्द न किए जाने पर स्वचालित रूप से नवीनीकृत होती है।\n\nGoogle Play में स्वचालित नवीनीकरण और रद्दीकरण के लिए \'सब्सक्रिप्शन प्रबंधित करें\' पर क्लिक करें।</string>
 </resources>

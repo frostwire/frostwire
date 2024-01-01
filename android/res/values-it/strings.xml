@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tocca i tag applicati a]]></string>
@@ -146,7 +144,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire è un browser di file e downloader app, quindi, ha bisogno di essere in grado di accedere al disco.\n\nSenza le autorizzazioni FrostWire non può funzionare.\n\nVuoi provare di nuovo?</string>
     <string name="unprotected_connection">senza protezione</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnete copiato negli appunti</string>
-    <string name="buy_uppercase">ACQUISTARE</string>
+    <string name="free_trial_uppercase">PROVA GRATUITA</string>
     <string name="saving_to_internal_memory_description">Hai anche una scheda SD (%1$s libero)</string>
     <string name="selected">selezionato</string>
     <string name="add_transfer_label">Incollare un magnete o un URL torrente</string>
@@ -287,7 +285,7 @@
     <string name="file_descriptor_sd_unmounted">Questo file appartiene a una scheda SD, inserire sul vostro dispositivo.</string>
     <string name="cheaper_than_beer">Più economico di birra</string>
     <string name="rating_reminder_description">Se amate FrostWire si prega di prendere un momento per votare noi.</string>
-    <string name="includes_3_day_free_trial">Include tre giorni senza processo. Consigliato</string>
+    <string name="includes_7_day_free_trial">Include 7 giorni di prova gratuita. Consigliato</string>
     <string name="transfers_context_menu_copy_magnet">Copia Magnet</string>
     <string name="try_other_keywords">Prova con meno parole chiave/diversi</string>
     <string name="thank_you">Grazie!</string>
@@ -412,10 +410,11 @@
     <string name="contact_us">Contattaci</string>
     <string name="use_nyaa">Utilizzare Nyaa</string>
     <string name="free">Gratuito</string>
-    <string name="manage_subscriptions">Gestisci le iscrizioni</string>
+    <string name="manage_subscriptions">Gestisci Abbonamenti</string>
     <string name="information">Informazione</string>
     <string name="ok">OK</string>
     <string name="yt_not_supported_on_basic">I download di YouTube non sono consentiti con FrostWire Basic a causa delle regole di Google Play.\n\nPer una copia gratuita di FrostWire Plus visita il nostro sito ufficiale frostwire.com</string>
     <string name="analyzing_downloadable_files">Analisi dei file scaricabili</string>
     <string name="error_cannot_open_downloads_folder">Nessuna app trovata per visualizzare i download. Assicurati che FrostWire abbia le autorizzazioni e che un Esploratore di File sia installato</string>
+    <string name="subs_details">Non saranno addebitati costi durante il periodo di prova di 7 giorni.\n\nL\'abbonamento sarà addebitato non appena il periodo di prova di 7 giorni termina o immediatamente per gli abbonati precedenti.\n\nL\'abbonamento si rinnova automaticamente a meno che non venga cancellato almeno 24 ore prima della fine del periodo di abbonamento.\n\nPremi \'Gestisci Abbonamenti\' per rinnovi automatici e cancellazioni su Google Play.</string>
 </resources>

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -56,6 +57,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -157,7 +159,7 @@ public final class BuyActivity extends AbstractActivity {
 
         // If Google Store not ready or available, auto-select rewarded ad option
         if (card30days.getVisibility() == View.GONE ||
-            card1year.getVisibility() == View.GONE) {
+                card1year.getVisibility() == View.GONE) {
             // ProductCardViewOnClickListener::onClick will be called
             cardNminutes.performClick();
         }
@@ -239,20 +241,25 @@ public final class BuyActivity extends AbstractActivity {
         scrollToSelectedCard(selectedProductCard);
     }
 
-    @Override
-    public void onBackPressed() {
+
+    private void onHandleOnBackPressed() {
         if (isInterstitial()) {
             onInterstitialActionBarDismiss();
-            finish();
-        } else {
-            finish();
         }
+        finish();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // initComponents() and setToolbar() have been called
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                onHandleOnBackPressed();
+            }
+        });
 
         // from DEEP-Link House Ad pointing to app://com.frostwire.android/remove-ads
         Intent intent = getIntent();
@@ -306,8 +313,8 @@ public final class BuyActivity extends AbstractActivity {
         PlayStore store = PlayStore.getInstance(this);
 
         if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) {
-            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU, null);
-            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU, null);
+            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU);
+            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU);
             card30days.setOnClickListener(cardClickListener);
             card1year.setOnClickListener(cardClickListener);
         } else {
@@ -360,8 +367,8 @@ public final class BuyActivity extends AbstractActivity {
 
         final Resources resources = card.getResources();
         final String reward_product_title = (resources != null) ?
-                String.format(resources.getString(R.string.reward_product_title), REWARD_FREE_AD_MINUTES) :
-                String.format("%d minutes", REWARD_FREE_AD_MINUTES);
+                String.format(Locale.US, resources.getString(R.string.reward_product_title), REWARD_FREE_AD_MINUTES) :
+                String.format(Locale.US, "%d minutes", REWARD_FREE_AD_MINUTES);
         final String reward_product_description = (resources != null) ?
                 resources.getString(R.string.ad_free) : "Ad-free";
         final String reward_product_price = (resources != null) ?
@@ -427,8 +434,7 @@ public final class BuyActivity extends AbstractActivity {
 
     private void initProductCard(ProductCardView card,
                                  PlayStore store,
-                                 String subsSKU,
-                                 String inappSKU) {
+                                 String subsSKU) {
         if (card == null) {
             throw new IllegalArgumentException("card argument can't be null");
         }
@@ -441,16 +447,14 @@ public final class BuyActivity extends AbstractActivity {
         if (subsSKU == null) {
             throw new IllegalArgumentException("subsSKU argument can't be null");
         }
-        final boolean includeOnetimeProducts = inappSKU != null;
+
         final Product prodSubs = store.product(subsSKU);
-        final Product prodInApp = includeOnetimeProducts ? store.product(inappSKU) : null;
-        if (prodSubs == null && prodInApp == null) {
+        if (prodSubs == null) {
             card.setVisibility(View.GONE);
             return;
         }
         card.setTag(R.id.subs_product_tag_id, prodSubs);
-        card.setTag(R.id.inapp_product_tag_id, prodInApp);
-        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(includeOnetimeProducts, true, false));
+        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, true, false));
 
         card.updateData(prodSubs);
     }
@@ -462,8 +466,8 @@ public final class BuyActivity extends AbstractActivity {
             outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
             outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
             outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
+            super.onSaveInstanceState(outState);
         }
-        super.onSaveInstanceState(outState);
     }
 
     private int getLastSelectedCardViewId(Bundle savedInstanceState) {

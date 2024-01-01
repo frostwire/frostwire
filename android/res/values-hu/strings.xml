@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Közzététel:</b> Bár ajánlott a letöltéseket, különösen akkor, ha érzékeny információk (például banki szolgáltatások) letöltése és cseréje, valamint nyilvános Wi-Fi vagy mobil adat használata közben, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
@@ -39,7 +37,7 @@
     <string name="video">Videó</string>
     <string name="download">Letöltés</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet vágólapra másolva</string>
-    <string name="buy_uppercase">VÉTEL</string>
+    <string name="free_trial_uppercase">INGYENES PRÓBAVERZIÓ</string>
     <string name="saving_to_internal_memory_description">Arra is van egy SD kártya (%1$s elérhető)</string>
     <string name="selected">kiválasztott</string>
     <string name="dialog_new_transfer_text_text">Biztos benne, hogy szeretné letölteni %1$s (%2$s)</string>
@@ -273,7 +271,7 @@
     <string name="seeds">Seeds</string>
     <string name="cheaper_than_beer">Olcsóbb, mint a sör</string>
     <string name="rating_reminder_description">Ha szeretsz FrostWire kérjük, szánjon egy kis értékeléshez minket.</string>
-    <string name="includes_3_day_free_trial">Tartalmaz 3 napos próbaverzióját. Ajánlott</string>
+    <string name="includes_7_day_free_trial">Tartalmaz 7 napos próbaverzióját. Ajánlott</string>
     <string name="intent_text">FrostWire egy peer-to-peer programok megosztása engedélyezett fájlokon. Telepítése és a program használata nem jelent engedélyt megszerzésére vagy terjesztése nem engedélyezett tartalom.</string>
     <string name="seeding_has_been_turned_off">Seeding ki van kapcsolva</string>
     <string name="transfers_context_menu_copy_magnet">Másolja Magnet</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Használja Torrentz2</string>
     <string name="manage_subscriptions">Előfizetések kezelése</string>
     <string name="analyzing_downloadable_files">A letölthető fájlok elemzése</string>
+    <string name="subs_details">A 7 napos próbaidőszak alatt nem kerül felszámításra díj.\n\nAz előfizetés díja a 7 napos próbaidőszak végén, vagy azonnal a korábbi előfizetők esetében kerül felszámításra.\n\nAz előfizetés automatikusan megújul, hacsak nem mondják le legalább 24 órával az előfizetési időszak végét megelőzően.\n\nNyomja meg a \'Előfizetések kezelése\' gombot az automatikus megújításokhoz és lemondásokhoz a Google Play-en.</string>
 </resources>

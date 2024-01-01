@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Bilgilendirme:</b> İndirmeleriniz için önerilse de, özellikle hassas bilgileri (örneğin bankacılık) indirirken veya paylaşırken ve herkese açık Wi-Fi veya mobil veri kullanırken, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
@@ -156,7 +154,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire bir dosya tarayıcı ve downloader uygulamasıdır, bu nedenle diskinize erişebilmesi gerekir.\n\nFrostWire izinleriniz olmadan çalışamaz.\n\nTekrar denemek ister misin?</string>
     <string name="unprotected_connection">korumasız</string>
     <string name="transfers_context_menu_copy_magnet_copied">Mıknatıs panoya kopyalandı</string>
-    <string name="buy_uppercase">ALIN</string>
+    <string name="free_trial_uppercase">ÜCRETSİZ DENEME</string>
     <string name="saving_to_internal_memory_description">Ayrıca bir SD kartınız var (%1$s mevcut)</string>
     <string name="selected">seçilmiş</string>
     <string name="add_transfer_label">Bir mıknatıs veya sel URL\'lerini yapıştırın</string>
@@ -286,7 +284,7 @@
     <string name="file_descriptor_sd_unmounted">Bu dosya SD karta ait, lütfen cihazınıza ekleyin.</string>
     <string name="cheaper_than_beer">Biradan Daha Ucuz</string>
     <string name="rating_reminder_description">FrostWire\'ı seviyorsanız lütfen bize puan verin.</string>
-    <string name="includes_3_day_free_trial">3 gün ücretsiz deneme dahildir. Tavsiye edilen</string>
+    <string name="includes_7_day_free_trial">7 günlük ücretsiz deneme içerir. Tavsiye edilen</string>
     <string name="transfers_context_menu_copy_magnet">Kopyala Magnet</string>
     <string name="try_other_keywords">Daha az/farklı anahtar kelimeler deneyin</string>
     <string name="thank_you">Sağol!</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Torrentz2\'u kullanın</string>
     <string name="manage_subscriptions">Abonelikleri Yönet</string>
     <string name="analyzing_downloadable_files">İndirilebilir dosyalar analiz ediliyor</string>
+    <string name="subs_details">7 günlük deneme süresi boyunca herhangi bir ücret alınmayacak.\n\nAbonelik, 7 günlük deneme süresinin sona ermesinin hemen ardından veya önceki aboneler için hemen tahsil edilecektir.\n\nAbonelik, abonelik süresinin bitiminden en az 24 saat önce iptal edilmediği takdirde otomatik olarak yenilenecektir.\n\nGoogle Play\'de otomatik yenileme ve iptaller için \'Abonelikleri Yönet\'e basın.</string>
 </resources>

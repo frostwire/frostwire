@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>การเปิดเผยข้อมูล:</b> แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณโดยเฉพาะอย่างยิ่งเมื่อดาวน์โหลดหรือแลกเปลี่ยนข้อมูลที่สำคัญ (เช่นธนาคาร) และในขณะที่ใช้ Wi-Fi สาธารณะหรือข้อมูลมือถือ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
@@ -39,7 +37,7 @@
     <string name="video">วีดีโอ</string>
     <string name="download">ดาวน์โหลด</string>
     <string name="transfers_context_menu_copy_magnet_copied">แม่เหล็กคัดลอกไปที่คลิปบอร์ด</string>
-    <string name="buy_uppercase">ซื้อ</string>
+    <string name="free_trial_uppercase">ทดลองฟรี</string>
     <string name="saving_to_internal_memory_description">คุณยังมีการ์ด SD (%1$s ใช้ได้)</string>
     <string name="selected">เลือก</string>
     <string name="dialog_new_transfer_text_text">คุณแน่ใจหรือไม่ว่าคุณต้องการดาวน์โหลด %1$s (%2$s)</string>
@@ -280,7 +278,7 @@
     <string name="seeds">เมล็ดพันธุ์พืช</string>
     <string name="cheaper_than_beer">ราคาถูกกว่าเบียร์</string>
     <string name="rating_reminder_description">ถ้าคุณรัก FrostWire โปรดใช้เวลาสักครู่ให้คะแนนเรา</string>
-    <string name="includes_3_day_free_trial">รวม 3 วันทดลองใช้ฟรี แนะนำ</string>
+    <string name="includes_7_day_free_trial">รวม 7 วันทดลองใช้ฟรี แนะนำ</string>
     <string name="intent_text">FrostWire เป็นโปรแกรมแบบ peer-to-peer สำหรับการแชร์ไฟล์ได้รับอนุญาตเท่านั้น การติดตั้งและการใช้โปรแกรมไม่ก่อให้ใบอนุญาตสำหรับการได้รับหรือแจกจ่ายเนื้อหาไม่ได้รับอนุญาต</string>
     <string name="seeding_has_been_turned_off">เมล็ดถูกปิด</string>
     <string name="transfers_context_menu_copy_magnet">คัดลอกแม่เหล็ก</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">ใช้ Torrentz2</string>
     <string name="manage_subscriptions">จัดการการสมัครสมาชิก</string>
     <string name="analyzing_downloadable_files">วิเคราะห์ไฟล์ที่สามารถดาวน์โหลดได้</string>
+    <string name="subs_details">คุณจะไม่ถูกเรียกเก็บเงินในช่วงทดลองใช้ 7 วัน\n\nการสมัครสมาชิกจะถูกเรียกเก็บเงินทันทีที่ช่วงทดลองใช้ 7 วันสิ้นสุดลง หรือทันทีสำหรับผู้สมัครสมาชิกก่อนหน้า\n\nการสมัครสมาชิกจะต่ออายุโดยอัตโนมัติเว้นแต่จะถูกยกเลิกอย่างน้อย 24 ชั่วโมงก่อนสิ้นสุดระยะเวลาการสมัครสมาชิก\n\nกด \'จัดการการสมัครสมาชิก\' เพื่อต่ออายุอัตโนมัติและยกเลิกใน Google Play</string>
 </resources>

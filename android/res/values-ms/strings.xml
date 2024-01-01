@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Maklumat:</b> Walaupun disyorkan untuk muat turun anda, terutamanya apabila memuat turun atau menukar maklumat sensitif (cth. perbankan) dan semasa menggunakan data Wi-Fi awam atau mudah alih, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
@@ -39,7 +37,7 @@
     <string name="video">Video</string>
     <string name="download">Muat turun</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet disalin ke papan keratan</string>
-    <string name="buy_uppercase">BELI</string>
+    <string name="free_trial_uppercase">CUBAAN PERCUMA</string>
     <string name="saving_to_internal_memory_description">Anda juga mempunyai kad SD (%1$s ada)</string>
     <string name="selected">dipilih</string>
     <string name="dialog_new_transfer_text_text">Adakah anda pasti anda ingin muat turun %1$s (%2$s)</string>
@@ -280,7 +278,7 @@
     <string name="seeds">Benih</string>
     <string name="cheaper_than_beer">Lebih murah daripada bir</string>
     <string name="rating_reminder_description">Jika anda suka FrostWire sila ambil seketika untuk mengadar kami.</string>
-    <string name="includes_3_day_free_trial">Termasuk 3 hari percubaan percuma. Disyorkan</string>
+    <string name="includes_7_day_free_trial">Termasuk 7 hari percubaan percuma. Disyorkan</string>
     <string name="intent_text">FrostWire adalah program peer-to-rakan sebaya untuk berkongsi fail yang dibenarkan sahaja. Memasang dan menggunakan program ini bukan merupakan lesen untuk mendapatkan atau menyebarkan kandungan yang tidak dibenarkan.</string>
     <string name="seeding_has_been_turned_off">Pembenihan telah dimatikan</string>
     <string name="transfers_context_menu_copy_magnet">Salinan Magnet</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Gunakan Torrentz2</string>
     <string name="manage_subscriptions">Urus Langganan</string>
     <string name="analyzing_downloadable_files">Menganalisis fail yang boleh dimuat turun</string>
+    <string name="subs_details">Anda tidak akan dikenakan caj semasa tempoh percubaan 7 hari.\n\nLangganan akan dikenakan caj sebaik sahaja tempoh percubaan 7 hari berakhir atau segera untuk pelanggan sebelumnya.\n\nLangganan akan diperbaharui secara automatik melainkan dibatalkan sekurang-kurangnya 24 jam sebelum tempoh langganan berakhir.\n\nTekan \'Urus Langganan\' untuk pembaharuan automatik dan pembatalan di Google Play.</string>
 </resources>

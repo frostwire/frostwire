@@ -1,21 +1,20 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
@@ -238,7 +237,7 @@
     <string name="error_connection_timed_out">Błąd: przekroczono limit czasu połączenia. Spróbuj jeszcze raz. </string>
     <string name="request_again">Ponów żądanie</string>
     <string name="unprotected_connection">niezabezpieczone</string>
-    <string name="buy_uppercase">KUP</string>
+    <string name="free_trial_uppercase">BEZPŁATNY PRÓBNY</string>
     <string name="selected">wybrane</string>
     <string name="bittorrent_off">BitTorrent wyłączony</string>
     <string name="storage_picker_treeuri_error">Nieoczekiwany błąd wyboru ścieżki przechowywania</string>
@@ -294,7 +293,7 @@
     <string name="terms_of_use">Warunki Korzystania z Serwisu</string>
     <string name="fetching_torrent_ellipsis">Pobieranie torrentu…</string>
     <string name="cheaper_than_beer">Tańszy niż Sześciopak</string>
-    <string name="includes_3_day_free_trial">Zawiera 3-dniową gwarancję zwrotu pieniędzy. Polecamy.</string>
+    <string name="includes_7_day_free_trial">Zawiera 7-dniową gwarancję zwrotu pieniędzy. Polecamy.</string>
     <string name="enable_seeding">Włącz seedowanie</string>
     <string name="cheaper_than_gas">Tańszy niż Benzyna</string>
     <string name="cheaper_than_cigarettes">Tańszy niż Szlugi</string>
@@ -414,4 +413,5 @@
     <string name="free">Za Darmo</string>
     <string name="manage_subscriptions">zarządzanie subskrypcjami</string>
     <string name="analyzing_downloadable_files">Analizowanie plików do pobrania</string>
+    <string name="subs_details">Nie zostaniesz obciążony opłatami w okresie 7-dniowego bezpłatnego okresu próbnego.\n\nSubskrypcja zostanie naliczona natychmiast po zakończeniu 7-dniowego okresu próbnego lub natychmiast dla dotychczasowych subskrybentów.\n\nSubskrypcja jest automatycznie odnawiana, chyba że zostanie anulowana co najmniej 24 godziny przed zakończeniem okresu subskrypcji.\n\nNaciśnij \'Zarządzaj subskrypcjami\' dla automatycznych odnowień i anulacji w Google Play.</string>
 </resources>

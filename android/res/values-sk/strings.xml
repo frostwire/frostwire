@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Zverejnenie:</b> Hoci odporúčaná pre sťahovanie, najmä pri sťahovaní alebo výmene citlivých informácií (napr. bankovníctva) a pri používaní verejných dát Wi-Fi alebo mobilných údajov, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
@@ -39,7 +37,7 @@
     <string name="video">Video</string>
     <string name="download">Stiahnuť</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet skopírovať do schránky</string>
-    <string name="buy_uppercase">KÚPIŤ</string>
+    <string name="free_trial_uppercase">SKÚŠKA ZADARMO</string>
     <string name="saving_to_internal_memory_description">Máte tiež SD karty (%1$s k dispozícii)</string>
     <string name="selected">vybraný</string>
     <string name="dialog_new_transfer_text_text">Ste si istí, že chcete stiahnuť %1$s (%2$s)</string>
@@ -280,7 +278,7 @@
     <string name="seeds">Semená</string>
     <string name="cheaper_than_beer">Lacnejšie ako pivo</string>
     <string name="rating_reminder_description">Ak máte radi FrostWire prosím, chvíľku nám sadzby.</string>
-    <string name="includes_3_day_free_trial">Zahŕňa 3 denné free-trial. Odporúčaná</string>
+    <string name="includes_7_day_free_trial">Zahŕňa 7 denné free-trial. Odporúčaná</string>
     <string name="intent_text">FrostWire je program peer-to-peer pre zdieľanie súborov iba oprávnená. Inštalácia a používanie programu nepredstavuje licenciu pre získavanie alebo rozširovanie neoprávneného obsahu.</string>
     <string name="seeding_has_been_turned_off">Siatie bol vypnutý</string>
     <string name="transfers_context_menu_copy_magnet">Kópia Magnet</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Použiť Torrentz2</string>
     <string name="manage_subscriptions">Spravovať odbery</string>
     <string name="analyzing_downloadable_files">Analýza sťahovateľných súborov</string>
+    <string name="subs_details">Počas 7-dňového skúšobného obdobia nebudú účtované žiadne poplatky.\n\nPredplatné sa účtuje ihneď po skončení 7-dňového skúšobného obdobia alebo okamžite pre predchádzajúcich predplatiteľov.\n\nPredplatné sa automaticky obnovuje, pokiaľ nie je zrušené aspoň 24 hodín pred koncom predplatného obdobia.\n\nStlačte \'Spravovať predplatné\' pre automatické obnovy a zrušenia v Google Play.</string>
 </resources>

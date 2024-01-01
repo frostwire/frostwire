@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Розкриття інформації:</b> Хоча рекомендується для завантаження, особливо коли ви завантажуєте або обмінюєтесь конфіденційною інформацією (наприклад, банківською діяльністю) та під час користування загальнодоступними Wi-Fi або мобільними даними, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
@@ -39,7 +37,7 @@
     <string name="video">Відео</string>
     <string name="download">Завантажити</string>
     <string name="transfers_context_menu_copy_magnet_copied">Магніт копіюється в буфер обміну</string>
-    <string name="buy_uppercase">КУПИТИ</string>
+    <string name="free_trial_uppercase">БЕЗКОШТОВНИЙ ТЕСТ</string>
     <string name="saving_to_internal_memory_description">У вас також є SD-карту (%1$s доступний)</string>
     <string name="selected">вибране</string>
     <string name="dialog_new_transfer_text_text">Ви впевнені, що ви хочете скачати %1$s (%2$s)</string>
@@ -273,7 +271,7 @@
     <string name="seeds">Насіння</string>
     <string name="cheaper_than_beer">Дешевше, ніж пиво</string>
     <string name="rating_reminder_description">Якщо ви любите FrostWire ласка, знайдіть час, щоб оцінити нас.</string>
-    <string name="includes_3_day_free_trial">Включає в себе 3-х днів безкоштовної пробної версії. Рекомендується.</string>
+    <string name="includes_7_day_free_trial">Включає 7-денну безкоштовну пробну версію. Рекомендовано</string>
     <string name="intent_text">FrostWire це програма рівноправних вузлів ЛВС для спільного використання тільки дозволених файлів. Установка і використання програми не є ліцензією на отримання або розповсюдження несанкціонованого контенту.</string>
     <string name="seeding_has_been_turned_off">Посів був вимкнений</string>
     <string name="transfers_context_menu_copy_magnet">Копіювати магніт</string>
@@ -410,4 +408,5 @@
     <string name="use_nyaa">користування Nyaa</string>
     <string name="manage_subscriptions">Керування підписками</string>
     <string name="analyzing_downloadable_files">Аналіз завантажуваних файлів</string>
+    <string name="subs_details">Під час 7-денного пробного періоду збори не будуть нараховуватися.\n\nПідписка буде нарахована відразу після закінчення 7-денного пробного періоду або негайно для попередніх підписників.\n\nПідписка автоматично оновлюється, якщо її не відмінено за 24 години до кінця періоду підписки.\n\nНатисніть \'Керування підписками\' для автоматичного оновлення та скасування в Google Play.</string>
 </resources>

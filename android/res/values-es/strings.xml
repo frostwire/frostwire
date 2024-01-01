@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-/* 
- * Creado por Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
- * Derechos de Autor (c) 2011-2023, FrostWire(R). Todos los derechos reservados.
- * 
- * Este programa es gratuito: puedes distribuirlo y/o modificarlo 
- * bajo los términos de la Licencia General Pública de GNU tal y como lo publica 
- * la Fundación del Software Gratuito, ya sea la 3ª versión de la Licencia, o 
- * (es tu opción) una versión anterior. 
- * 
- * Este programa se distribuye con la esperanza de que será de gran uso, 
- * pero SIN GARANTÍAS; ni siquiera con la garantía implícita de la 
- * COMERCIALIDAD o ADECUACIÓN AL PROPÓSITO. Lee los 
- * detalles de la Licencia General Pública de GNU. 
- * 
- * Deberías haber recibido una copia de la Licencia General Pública GNU 
- * junto con este programa. Si no la has recibido, ve a http://www.gnu.org/licenses/. 
- */ 
+<?xml version="1.0" encoding="UTF-8"?><!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <!-- Important: Android tiene bugs con HTML, no dejes etiquetas HTML pegadas al texto, deja espacios. De otro modo android cuenta las etiquetas como parte de la longitud del texto y luego las lineas se cortan de forma prematura. -->
@@ -282,7 +280,7 @@
     <string name="fetching_torrent_ellipsis">Obteniendo torrent…</string>
     <string name="enable_seeding">Habilitar Compartir</string>
     <string name="error_connection_timed_out">Error: Se agotó el tiempo de conexión. Intenta nuevamente.</string>
-    <string name="buy_uppercase">COMPRAR</string>
+    <string name="free_trial_uppercase">PRUEBA GRATIS</string>
     <string name="cheaper_than_parking">Menos que aparcar el auto</string>
     <string name="dummy_price">$ 99.99</string>
     <string name="one_time_purchase">Pago Único</string>
@@ -300,7 +298,7 @@
     <string name="automatic_renewal">Renovación automática</string>
     <string name="cheaper_than_lattes">Menos que unos lattes</string>
     <string name="cheaper_than_beer">Menos que una cerveza</string>
-    <string name="includes_3_day_free_trial">Incluye prueba gratis de tres días. Recomendado</string>
+    <string name="includes_7_day_free_trial">Incluye prueba gratis de 7 días. Recomendado</string>
     <string name="cheaper_than_gas">Menos que poner gasolina</string>
     <string name="cheaper_than_cigarettes">Menos que unos cigarrillos</string>
     <string name="days_left">días quedan</string>
@@ -443,4 +441,5 @@
     <string name="yt_not_supported_on_basic">Descargas de YouTube no son permitidas con FrostWire Basic debido a las reglas de Google Play.\n\nPara una copia gratuita de FrostWire Plus visite nuestro sitio oficial frostwire.com</string>
     <string name="analyzing_downloadable_files">Análizando URLs de archivos descargables</string>
     <string name="error_cannot_open_downloads_folder">No se encontró una aplicación para ver descargas. Asegúrate de que FrostWire tenga permisos y que haya un Explorador de Archivos instalado.</string>
+    <string name="subs_details">No se te cobrará durante el período de prueba de 7 días.\n\nLa suscripción se cobra tan pronto como finaliza el período de prueba de 7 días o inmediatamente para suscriptores anteriores.\n\nLa suscripción se renueva automáticamente a menos que se cancele al menos 24 horas antes del final del período de suscripción.\n\nPresiona \'Administrar Suscripciones\' para renovaciones automáticas y cancelaciones en Google Play.</string>
 </resources>

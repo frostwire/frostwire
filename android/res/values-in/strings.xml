@@ -1,22 +1,20 @@
-﻿<!--
- /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+﻿<?xml version="1.0" encoding="utf-8"?><!--
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasi:</b> Meskipun dianjurkan untuk download Anda, terutama setiap kali mengunduh atau menukar informasi sensitif (misalnya perbankan) dan saat menggunakan Wi-Fi publik atau data seluler, <b>Anda tidak perlu VPN untuk menggunakan FrostWire.</b>]]></string>
@@ -143,7 +141,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire adalah peramban berkas dan downloader aplikasi, oleh karena itu perlu untuk dapat mengakses disk Anda.\n\nTanpa izin Anda FrostWire tidak bisa bekerja.\n\nIngin mencoba lagi?</string>
     <string name="unprotected_connection">tak terlindung</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magnet disalin ke papan klip</string>
-    <string name="buy_uppercase">MEMBELI</string>
+    <string name="free_trial_uppercase">UJI COBA GRATIS</string>
     <string name="saving_to_internal_memory_description">Anda juga memiliki kartu SD (%1$s bebas)</string>
     <string name="selected">terpilih</string>
     <string name="add_transfer_label">Tempelkan magnet atau URL torrent</string>
@@ -286,7 +284,7 @@
     <string name="file_descriptor_sd_unmounted">File ini milik kartu SD, silahkan masukkan pada perangkat Anda.</string>
     <string name="cheaper_than_beer">Lebih murah daripada bir</string>
     <string name="rating_reminder_description">Jika Anda menyukai FrostWire silakan luangkan waktu untuk menilai kita.</string>
-    <string name="includes_3_day_free_trial">Termasuk 3 hari bebas-sidang. Direkomendasikan</string>
+    <string name="includes_7_day_free_trial">Termasuk 7 hari bebas-sidang. Direkomendasikan</string>
     <string name="transfers_context_menu_copy_magnet">Salin Magnet</string>
     <string name="try_other_keywords">Coba lebih sedikit/kata kunci yang berbeda</string>
     <string name="thank_you">Terima kasih!</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Gunakan Torrentz2</string>
     <string name="manage_subscriptions">Kelola Langganan</string>
     <string name="analyzing_downloadable_files">Menganalisis file yang dapat diunduh</string>
+    <string name="subs_details">Anda tidak akan dikenakan biaya selama periode percobaan 7 hari.\n\nLangganan akan dikenakan biaya segera setelah periode percobaan 7 hari berakhir atau segera untuk pelanggan sebelumnya.\n\nLangganan akan diperbarui secara otomatis kecuali dibatalkan setidaknya 24 jam sebelum akhir periode langganan.\n\nTekan \'Kelola Langganan\' untuk pembaharuan otomatis dan pembatalan di Google Play.</string>
 </resources>

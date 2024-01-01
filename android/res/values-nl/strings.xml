@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Informatie: Hoewel aanbevolen voor je downloads, <b>u geen VPN nodig FrostWire gebruiken. </b>]]></string>
@@ -146,7 +144,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire is een bestand browser en downloader app, dus het moet in staat zijn om toegang tot uw schijf.\n\nZonder uw rechten FrostWire niet kunnen werken.\n\nWil je nog eens proberen?</string>
     <string name="unprotected_connection">onbeschermd</string>
     <string name="transfers_context_menu_copy_magnet_copied">Magneet gekopieerd naar het klembord</string>
-    <string name="buy_uppercase">KOPEN</string>
+    <string name="free_trial_uppercase">GRATIS PROEF</string>
     <string name="saving_to_internal_memory_description">Je hebt ook een SD-kaart (%1$s vrij)</string>
     <string name="selected">gekozen</string>
     <string name="add_transfer_label">Plak een magneet of torrent URL</string>
@@ -285,7 +283,7 @@
     <string name="file_descriptor_sd_unmounted">Dit bestand maakt deel uit van een SD-kaart, gelieve deze op uw apparaat.</string>
     <string name="cheaper_than_beer">Goedkoper dan bier</string>
     <string name="rating_reminder_description">Als u houdt van FrostWire neem even de tijd om ons te geven.</string>
-    <string name="includes_3_day_free_trial">Inclusief 3 dagen gratis trial. Aanbevolen</string>
+    <string name="includes_7_day_free_trial">Inclusief 7 dagen gratis trial. Aanbevolen</string>
     <string name="transfers_context_menu_copy_magnet">Magneet Kopieer</string>
     <string name="try_other_keywords">Probeer minder/verschillende trefwoorden</string>
     <string name="thank_you">Dank je!</string>
@@ -409,6 +407,7 @@
     <string name="piece_size_header">Stuk maat:</string>
     <string name="add_tracker">Voeg tracker toe</string>
     <string name="use_nyaa">Gebruik Nyaa</string>
-    <string name="manage_subscriptions">Beheer abonnementen</string>
+    <string name="manage_subscriptions">Beheer Abonnementen</string>
     <string name="analyzing_downloadable_files">Analyseren van te downloaden bestanden</string>
+    <string name="subs_details">Er worden geen kosten in rekening gebracht tijdens de 7-daagse proefperiode.\n\nHet abonnement wordt in rekening gebracht zodra de 7-daagse proefperiode eindigt of onmiddellijk voor eerdere abonnees.\n\nHet abonnement wordt automatisch verlengd, tenzij het ten minste 24 uur voor het einde van de abonnementsperiode wordt opgezegd.\n\nDruk op \'Beheer Abonnementen\' voor automatische verlengingen en annuleringen in Google Play.</string>
 </resources>

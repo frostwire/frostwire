@@ -408,7 +408,6 @@ public final class PlayStore extends StoreBase {
                 LOG.info("onSkuDetailsResponse() got unknown resultCode: " + responseCode);
             }
         };
-        querySkuDetailsAsync(BillingClient.SkuType.INAPP, Products.itemSkus(), listener);
         querySkuDetailsAsync(BillingClient.SkuType.SUBS, Products.subsSkus(), listener);
     }
 
@@ -587,19 +586,7 @@ public final class PlayStore extends StoreBase {
         // build each product, one by one, not magic here intentionally
         Product product;
 
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_MONTH_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_MONTH_SKU));
-        m.put(product.sku(), product);
-
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_6_MONTHS_SKU));
-        m.put(product.sku(), product);
-
-        product = buildDisableAds(Products.INAPP_DISABLE_ADS_1_YEAR_SKU, BillingClient.SkuType.INAPP, inventory, toDays(Products.INAPP_DISABLE_ADS_1_YEAR_SKU));
-        m.put(product.sku(), product);
-
         product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
-        m.put(product.sku(), product);
-
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_6_MONTHS_SKU));
         m.put(product.sku(), product);
 
         product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
@@ -624,11 +611,7 @@ public final class PlayStore extends StoreBase {
 
         // see if it the user has some conflicting sku purchase
         String[] disableAdsSku = new String[]{
-                Products.INAPP_DISABLE_ADS_1_MONTH_SKU,
-                Products.INAPP_DISABLE_ADS_6_MONTHS_SKU,
-                Products.INAPP_DISABLE_ADS_1_YEAR_SKU,
                 Products.SUBS_DISABLE_ADS_1_MONTH_SKU,
-                Products.SUBS_DISABLE_ADS_6_MONTHS_SKU,
                 Products.SUBS_DISABLE_ADS_1_YEAR_SKU
         };
         boolean conflict = false;

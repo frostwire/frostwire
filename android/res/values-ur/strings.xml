@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[افشا: اگرچہ آپ کے ڈاؤن لوڈ کے لئے سفارش کی گئی ہے، آپ کو FrostWire استعمال کرنے کے لئے ایک وی پی این کی ضرورت نہیں ہے.]]></string>
@@ -75,7 +73,6 @@
     <string name="unprotected_connection">غیر محفوظ</string>
     <string name="download">لوڈ</string>
     <string name="transfers_context_menu_copy_magnet_copied">مقناطیس کی کلپ بورڈ پر کاپی</string>
-    <string name="buy_uppercase">خریدنے</string>
     <string name="saving_to_internal_memory_description">(%1$s free)آپ یہ بھی ایک ایسڈی کارڈ </string>
     <string name="selected">منتخب شدہ</string>
     <string name="dialog_new_transfer_text_text"> %1$s (%2$s) کیا آپ واقعی ڈاؤن لوڈ، اتارنا کرنا چاہتے ہیں</string>
@@ -255,6 +252,7 @@
     <string name="seeding_settings_explanation">انٹرنیٹ پر BitTorrent کے صارفین کا ڈیٹا آپ بارشیں بیج کی فائل کو حصوں کو ڈاؤن لوڈ کرنے کے قابل ہو جائے گا.</string>
     <string name="torrent_transfer_aborted_on_mobile_data">آپ ایک وائی فائی نیٹ ورک سے منسلک ہے جب تک اوپر کی منتقلی شروع نہیں کرے گا. (3G / 4G ڈیٹا کے استعمال کے سلسلے میں آپ کے نیٹ ورک کی ترتیبات چیک کریں)</string>
     <string name="distraction_free_search_results">تباہی مفت تلاش (بیٹا)</string>
+    <string name="free_trial_uppercase">مفت جانچ</string>
     <string name="automatic_renewal">خودکار تجدید</string>
     <string name="audio">آڈیو</string>
     <string name="enable_dht">DHT فعال</string>
@@ -283,7 +281,7 @@
     <string name="seeds">بیج</string>
     <string name="cheaper_than_beer">بیئر سے سستا</string>
     <string name="rating_reminder_description">آپ FrostWire محبت ہے تو ہمیں شرح کے لئے ایک لمحے لے لو.</string>
-    <string name="includes_3_day_free_trial">3 دن کا مفت ٹرائل مشتمل. تجویز کردہ</string>
+    <string name="includes_7_day_free_trial">7 دن کی مفت آزمائش پر مشتمل ہے۔ تجویز کردہ</string>
     <string name="intent_text">FrostWire صرف مجاز فائلوں اشتراک کرنے کے لئے ایک ہم مرتبہ سے ہم مرتبہ کے پروگرام ہے. نصب ہو اور پروگرام استعمال کرتے ہوئے حاصل کرنے یا غیر مجاز مواد کی تقسیم کے لئے لائسنس کا قیام نہیں کرتا.</string>
     <string name="seeding_has_been_turned_off">بوائ بند کردیا گیا ہے</string>
     <string name="transfers_context_menu_copy_magnet">کاپی مقناطیس</string>
@@ -409,4 +407,5 @@
     <string name="use_torrentz2">Torrentz2 استعمال</string>
     <string name="manage_subscriptions">سبسکرپشنز کا نظم کریں۔</string>
     <string name="analyzing_downloadable_files">ڈاؤن لوڈ کرنے کے قابل فائلوں کی تجزیہ</string>
+    <string name="subs_details">7 دن کی آزمائشی مدت کے دوران آپ سے کوئی چارج نہیں لیا جائے گا۔\n\n7 دن کی آزمائشی مدت ختم ہونے کے فوراً بعد یا پچھلے صارفین کے لئے فوری طور پر سبسکرپشن کا چارج لیا جائے گا۔\n\nسبسکرپشن کی مدت ختم ہونے سے کم از کم 24 گھنٹے پہلے منسوخ نہ کرنے پر سبسکرپشن خود بخود تجدید ہو جائے گی۔\n\nGoogle Play میں خودکار تجدید اور منسوخی کے لئے \'سبسکرپشن کا انتظام\' دبائیں۔</string>
 </resources>

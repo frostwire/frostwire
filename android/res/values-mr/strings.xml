@@ -1,25 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Alejandro Martinez (alejandroarturom)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
-
     <string name="azureus_peer_manager_status_finished">समाप्त</string>
     <string name="your_installation_is_complete">आपली स्थापना पूर्ण झाली आहे.</string>
     <string name="error_connection_timed_out">त्रुटी: कनेक्शन कालबाह्य/वगळले पुन्हा प्रयत्न करा.</string>
@@ -44,7 +41,7 @@
     <string name="video">व्हिडिओ</string>
     <string name="download">डाउनलोड करा</string>
     <string name="transfers_context_menu_copy_magnet_copied">चुंबकाच्या क्लिपबोर्डवर कॉपी केली</string>
-    <string name="buy_uppercase">विकत घ्या</string>
+    <string name="free_trial_uppercase">विनामूल्य चाचणी</string>
     <string name="saving_to_internal_memory_description">आपल्याकडे SD कार्ड आहे (%1$s उपलब्ध)</string>
     <string name="selected">निवडलेले</string>
     <string name="dialog_new_transfer_text_text">आपल्याला खात्री आहे की आपण डाउनलोड करू इच्छिता %1$s (%2$s)</string>
@@ -360,7 +357,7 @@
     <string name="or">किंवा</string>
     <string name="rating_reminder_description">आपण FrostWire प्रेम असेल तर आम्हाला रेट एक क्षण लागू करा.</string>
     <string name="file_names">फाइल नावे</string>
-    <string name="includes_3_day_free_trial">तीन दिवसीय विनामूल्य-चाचणी समाविष्ट आहे शिफारस केलेले</string>
+    <string name="includes_7_day_free_trial">7 दिवसांच्या विनामूल्य-चाचणीचा समावेश आहे. शिफारस केली</string>
     <string name="intent_text">FrostWire केवळ अधिकृत फाइल्स शेअर एक सरदार-ते-सरदार कार्यक्रम आहे. प्रोग्राम स्थापित करणे आणि वापरणे अनधिकृत सामग्री प्राप्त करण्यासाठी किंवा वितरणासाठी परवाना तयार करत नाही.</string>
     <string name="seeding_has_been_turned_off">बीजन बंद केले गेले आहे</string>
     <string name="uploaded_n">अपलोड केलेले %1$s</string>
@@ -412,4 +409,5 @@
     <string name="use_torrentz2">Torrentz2 वापरा</string>
     <string name="manage_subscriptions">सदस्यता व्यवस्थापित करा</string>
     <string name="analyzing_downloadable_files">डाउनलोड करण्यायोग्य फाईल विश्लेषण करीत आहे.</string>
+    <string name="subs_details">7 दिवसांच्या प्रायोगिक कालावधीत कोणतेही शुल्क आकारले जाणार नाही.\n\n7 दिवसांचा प्रायोगिक कालावधी संपल्यावर किंवा अगोदरच्या ग्राहकांसाठी लगेचच सदस्यता शुल्क आकारले जाईल.\n\nसदस्यता कालावधी संपण्यापूर्वी किमान 24 तास आधी रद्द न केल्यास आपोआप नूतनीकरण होईल.\n\nGoogle Play मध्ये स्वयंचलित नूतनीकरण आणि रद्दीकरणासाठी \'सदस्यता व्यवस्थापित करा\' दाबा.</string>
 </resources>

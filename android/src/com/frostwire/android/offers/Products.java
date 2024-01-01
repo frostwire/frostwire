@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,35 +30,20 @@ public final class Products {
     private Products() {
     }
 
-    // products SKUs
-    public static final String INAPP_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.inapp.disable_ads.1_month");
-    public static final String INAPP_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.inapp.disable_ads.6_months");
-    public static final String INAPP_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.inapp.disable_ads.1_year");
     public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.subs.disable_ads.1_month");
-    public static final String SUBS_DISABLE_ADS_6_MONTHS_SKU = getSKU("com.frostwire.subs.disable_ads.6_months");
     public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
     public static final String REWARDS_DISABLE_ADS_MINUTES_SKU = "com.frostwire.reward.disable_ads_minutes";
 
     // inapp/subs product duration in days
     private static final int DISABLE_ADS_1_MONTH_DAYS = 31;
-    private static final int DISABLE_ADS_6_MONTHS_DAYS = 183;
     private static final int DISABLE_ADS_1_YEAR_DAYS = 365;
 
     // features codes
     public static final String DISABLE_ADS_FEATURE = "DISABLE_ADS_FEATURE";
 
-    public static List<String> itemSkus() {
-        return Arrays.asList(
-                INAPP_DISABLE_ADS_1_MONTH_SKU,
-                INAPP_DISABLE_ADS_6_MONTHS_SKU,
-                INAPP_DISABLE_ADS_1_YEAR_SKU
-        );
-    }
-
     public static List<String> subsSkus() {
         return Arrays.asList(
                 SUBS_DISABLE_ADS_1_MONTH_SKU,
-                SUBS_DISABLE_ADS_6_MONTHS_SKU,
                 SUBS_DISABLE_ADS_1_YEAR_SKU
         );
     }
@@ -70,19 +55,14 @@ public final class Products {
     public static int toDays(String sku) {
         int result = -1;
 
-        if (INAPP_DISABLE_ADS_1_MONTH_SKU.equals(sku) ||
-                SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
+        if (SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
             result = DISABLE_ADS_1_MONTH_DAYS;
-        } else if (INAPP_DISABLE_ADS_6_MONTHS_SKU.equals(sku) ||
-                SUBS_DISABLE_ADS_6_MONTHS_SKU.equals(sku)) {
-            result = DISABLE_ADS_6_MONTHS_DAYS;
-        } else if (INAPP_DISABLE_ADS_1_YEAR_SKU.equals(sku) ||
-                SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
+        } else if (SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
             result = DISABLE_ADS_1_YEAR_DAYS;
         }
 
         if (result < 0) {
-            throw new IllegalArgumentException("SKU argument does not represent a product with duration");
+            throw new IllegalArgumentException("SKU argument does not represent a subscription with duration");
         }
 
         return result;
@@ -90,6 +70,7 @@ public final class Products {
 
     /**
      * Returns a list of products that have been purchased and enabled to the user.
+     *
      * @param store
      * @param code
      * @return

@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/product_card_hint_button_background"
-                android:text="@string/buy_uppercase"
+                android:text="@string/free_trial_uppercase"
                 android:visibility="visible" />
 
             <ProgressBar
@@ -95,7 +95,7 @@
                 style="@style/BuyNoAdsCardDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/includes_3_day_free_trial" />
+                android:text="@string/includes_7_day_free_trial" />
 
         </LinearLayout>
 
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/product_card_hint_button_background"
-                android:text="@string/buy_uppercase" />
+                android:text="@string/free_trial_uppercase" />
 
             <ProgressBar
                 android:id="@+id/view_product_payment_options_buy_one_time_progressbar"

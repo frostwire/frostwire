@@ -1,22 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 -->
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Αποκάλυψη:</b> Αν και συνιστάται για τις λήψεις σας, ιδίως όταν κάνετε λήψη ή ανταλλάσσετε ευαίσθητες πληροφορίες (π.χ. τραπεζικά) και ενώ χρησιμοποιείτε δημόσια δεδομένα Wi-Fi ή κινητά, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
@@ -200,7 +198,7 @@
     <string name="why_we_need_storage_permissions_summary">FrostWire είναι ένα πρόγραμμα περιήγησης αρχείων και κατέβασα την εφαρμογή, ως εκ τούτου, πρέπει να είναι σε θέση να έχουν πρόσβαση στο δίσκο σας.\n\nΧωρίς δικαιώματα σας FrostWire δεν μπορεί να λειτουργήσει.\n\nΘέλετε να δοκιμάσετε ξανά;</string>
     <string name="unprotected_connection">απροστάτευτος</string>
     <string name="transfers_context_menu_copy_magnet_copied">Μαγνήτης αντιγραφεί στο πρόχειρο</string>
-    <string name="buy_uppercase">ΑΓΟΡΆ</string>
+    <string name="free_trial_uppercase">ΔΩΡΕΑΝ ΔΟΚΙΜΗ</string>
     <string name="selected">επιλεγμένα</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="storage_picker_treeuri_error">Μη αναμενόμενο σφάλμα διαδρομή αποθήκευσης μάζεμα</string>
@@ -291,7 +289,7 @@
     <string name="send_tip_donation">Αποστολή δωρεά</string>
     <string name="cheaper_than_beer">Φθηνότερο από μπύρα</string>
     <string name="rating_reminder_description">Αν αγαπάτε τον FrostWire αφιερώστε λίγο χρόνο για να μας αξιολογήσετε.</string>
-    <string name="includes_3_day_free_trial">Περιλαμβάνει τρεις ημέρες δωρεάν δοκιμής. συνιστάται</string>
+    <string name="includes_7_day_free_trial">Περιλαμβάνει δωρεάν δοκιμή 7 ημερών. Συνιστάται</string>
     <string name="transfers_context_menu_copy_magnet">μαγνήτης αντίγραφο</string>
     <string name="try_other_keywords">Δοκιμάστε λιγότερες / διαφορετικές λέξεις-κλειδιά</string>
     <string name="thank_you">Ευχαριστώ!</string>
@@ -411,4 +409,5 @@
     <string name="use_torrentz2">Χρήση Torrentz2</string>
     <string name="manage_subscriptions">Διαχείριση συνδρομών</string>
     <string name="analyzing_downloadable_files">Ανάλυση λήψιμων αρχείων</string>
+    <string name="subs_details">Δεν θα χρεωθείτε κατά τη διάρκεια της 7ήμερης δοκιμαστικής περιόδου.\n\nΗ συνδρομή χρεώνεται μόλις ολοκληρωθεί η 7ήμερη δοκιμαστική περίοδος ή αμέσως για προηγούμενους συνδρομητές.\n\nΗ συνδρομή ανανεώνεται αυτόματα, εκτός εάν ακυρωθεί τουλάχιστον 24 ώρες πριν από το τέλος της περιόδου συνδρομής.\n\nΠατήστε \'Διαχείριση Συνδρομών\' για αυτόματες ανανεώσεις και ακυρώσεις στο Google Play.</string>
 </resources>
