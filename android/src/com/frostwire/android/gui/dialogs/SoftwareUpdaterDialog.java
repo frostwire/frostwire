@@ -102,6 +102,14 @@ public final class SoftwareUpdaterDialog extends AbstractDialog {
 
     private void onYesClick(View v) {
         // Google Play distribution (even if it's a dev. build)
+        Bundle arguments = getArguments();
+        String apkDownloadURL = arguments.getString("apkDownloadURL");
+
+        if (apkDownloadURL != null) {
+            UIUtils.openURL(getActivity(), apkDownloadURL);
+            dismiss();
+            return;
+        }
         UIUtils.openURL(getActivity(),
                 Constants.IS_GOOGLE_PLAY_DISTRIBUTION ?
                         Constants.FROSTWIRE_ANDROID_GOOGLE_PLAY_URL :

@@ -174,11 +174,13 @@ android {
 
     productFlavors {
         basic {
-            versionCode 9060000 + project.ext.versionCode
+            // OLD BASIC CODE VERSION SUFFIX 9060000
+            versionCode 9080000 + project.ext.versionCode
             resValue "string", "application_label", "FrostWire"
         }
         plus1 {
-            versionCode 9070000 + project.ext.versionCode
+            // OLD PLUS CODE VERSION SUFFIX 9070000
+            versionCode 9090000 + project.ext.versionCode
             resValue "string", "application_label", "FrostWire Plus"
         }
     }

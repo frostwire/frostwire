@@ -18,23 +18,19 @@
 package com.frostwire.android.gui;
 
 import android.content.Intent;
-import android.net.Uri;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.frostwire.android.BuildConfig;
-import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.SoftwareUpdaterDialog;
-import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
-import com.frostwire.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -50,18 +46,12 @@ public final class SoftwareUpdater {
 
     private static final long UPDATE_MESSAGE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
-    private static final String UPDATE_ACTION_OTA = "ota";
-    private static final String UPDATE_ACTION_MARKET = "market";
-    private static final String UPDATE_ACTION_OTA_OVERRIDE = "ota_override";
-
     private boolean oldVersion;
-    private String latestVersion;
     private Update update;
     private long updateTimestamp;
 
     private SoftwareUpdater() {
         this.oldVersion = false;
-        this.latestVersion = Constants.FROSTWIRE_VERSION_STRING;
     }
 
     private static class Loader {
@@ -89,87 +79,38 @@ public final class SoftwareUpdater {
      * @return true if there's an update available.
      */
     private boolean shouldHandleOTAUpdate() {
-        if (UPDATE_ACTION_OTA_OVERRIDE.equals(update.a)) {
-            LOG.info("handleOTAUpdate() overriding, take update from OTA message");
-            update.a = UPDATE_ACTION_OTA;
-        }
-
-        if (oldVersion) {
-            if (update.a == null) {
-                update.a = UPDATE_ACTION_OTA; // make it the old behavior
-            }
-
-            if (update.a.equals(UPDATE_ACTION_OTA)) {
-                //Jan/22/2020 - Until we figure out the PackageManager integration
-                // we won't download the apk, we'll let the user download it with the
-                // web browser.
-                return true;
-            } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
-                return update.m != null;
-            }
-        }
-        return false;
+        return oldVersion && update != null && update.u != null;
     }
 
     public void notifyUserAboutUpdate(final MainActivity activity) {
         try {
-            if (update.a == null) {
-                update.a = UPDATE_ACTION_OTA; // make it the old behavior
-            }
-
-            if (update.a.equals(UPDATE_ACTION_OTA)) {
-                // Fresh runs with fast connections might send the broadcast intent before
-                // MainActivity has had a chance to register the broadcast receiver (onResume)
-                // therefore, the menu update icon will only show on the 2nd run only
-                activity.updateNavigationMenu(true);
-                SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(
-                        update.u,
-                        update.updateMessages,
-                        update.changelog);
-                dlg.show(activity.getFragmentManager());
-            } else if (update.a.equals(UPDATE_ACTION_MARKET)) {
-
-                String message = StringUtils.getLocaleString(update.marketMessages, activity.getString(R.string.update_message));
-
-                UIUtils.showYesNoDialog(activity.getFragmentManager(), message, R.string.update_title, (dialog, which) -> {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(update.m));
-                    activity.startActivity(intent);
-                });
-            }
+            activity.updateNavigationMenu(true);
+            SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(
+                    update.u,
+                    update.updateMessages,
+                    update.changelog);
+            dlg.show(activity.getFragmentManager());
         } catch (Throwable e) {
             LOG.error("Failed to notify update", e);
             updateTimestamp = -1; // try again next time MainActivity is resumed
         }
     }
 
-    /**
-     * mv = my version
-     * lv = latest version
-     * <p/>
-     * returns true if mv is older.
-     */
-    private boolean isFrostWireOld(byte[] mv, byte[] lv) {
-        boolean a = mv[0] < lv[0];
-        boolean b = mv[0] == lv[0] && mv[1] < lv[1];
-        boolean c = mv[0] == lv[0] && mv[1] == lv[1] && mv[2] < lv[2];
-        return a || b || c;
-    }
-
-    private boolean isFrostWireOld(String latestBuild) {
-        int myBuild = BuildConfig.VERSION_CODE;
-        if (Constants.IS_BASIC_AND_DEBUG) {
-            myBuild += 10000;
+    private boolean isFrostWireOldByVersionCode(String latestVersionCodeFromUpdateMessage) {
+        if (latestVersionCodeFromUpdateMessage == null) {
+            LOG.error("isFrostWireOldByVersionCode() latestVersionCodeFromUpdateMessage is null");
+            return false;
         }
+        // regardless of the prefix, basic or plus, we only care about the last 4 digits
         boolean result;
         try {
-            int latestBuildNum = Integer.parseInt(latestBuild);
+            int latestBuildNum = Integer.parseInt(latestVersionCodeFromUpdateMessage) % 10000;
+            int myBuild = BuildConfig.VERSION_CODE % 10000;
             result = myBuild < latestBuildNum;
         } catch (Throwable t) {
-            LOG.error("isFrostWireOld() can't parse latestBuild number.", t);
-            result = false;
+            LOG.error("isFrostWireOldByVersionCode() can't parse latestVersionCodeFromUpdateMessage number.", t);
+            return false;
         }
-        LOG.info("isFrostWireOld(myBuild=" + myBuild + ", latestBuild=" + latestBuild + ") => " + result);
         return result;
     }
 
@@ -214,54 +155,20 @@ public final class SoftwareUpdater {
         Offers.initAdNetworks(mainActivity);
     }
 
-    private static byte[] buildVersion() {
-        try {
-            String[] arr = Constants.FROSTWIRE_VERSION_STRING.split("\\.");
-            return new byte[]{Byte.parseByte(arr[0]), Byte.parseByte(arr[1]), Byte.parseByte(arr[2])};
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return new byte[]{0, 0, 0};
-    }
-
-
     private static class Update {
         /**
-         * version X.Y.Z
-         */
-        public String v;
-
-        /**
-         * version code: Plus = 9000000 + manifest:versionCode; Basic = 8000000 + manifest:versionCode
+         * version code: Plus = 9090000 + manifest:versionCode; Basic = 9080000 + manifest:versionCode
          */
         String vc;
 
         /**
-         * .apk download URL
+         * Download URL
          */
         public String u;
-
-        /**
-         * .apk md5
-         */
-        public String md5;
-
-        /**
-         * Address from the market
-         */
-        public String m;
-
-        /**
-         * Action for the update message
-         * - "ota" is download from 'u' (a regular http)
-         * - "market" go to market page
-         */
-        public String a;
 
         List<String> changelog;
 
         Map<String, String> updateMessages;
-        Map<String, String> marketMessages;
         public Config config;
     }
 
@@ -292,15 +199,7 @@ public final class SoftwareUpdater {
             if (jsonBytes != null) {
                 softwareUpdater.update = JsonUtils.toObject(new String(jsonBytes), Update.class);
                 if (softwareUpdater.update.vc != null) {
-                    softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(softwareUpdater.update.vc);
-                } else {
-                    softwareUpdater.latestVersion = softwareUpdater.update.v;
-                    String[] latestVersionArr = softwareUpdater.latestVersion.split("\\.");
-                    // lv = latest version
-                    byte[] lv = new byte[]{Byte.parseByte(latestVersionArr[0]), Byte.parseByte(latestVersionArr[1]), Byte.parseByte(latestVersionArr[2])};
-                    // mv = my version
-                    byte[] mv = buildVersion();
-                    softwareUpdater.oldVersion = softwareUpdater.isFrostWireOld(mv, lv);
+                    softwareUpdater.oldVersion = softwareUpdater.isFrostWireOldByVersionCode(softwareUpdater.update.vc);
                 }
                 softwareUpdater.updateConfiguration(softwareUpdater.update, activity);
             } else {
@@ -316,18 +215,18 @@ public final class SoftwareUpdater {
     private static void checkUpdateAsyncPost(MainActivity activity,
                                              final SoftwareUpdater softwareUpdater, boolean result) {
         SystemUtils.ensureUIThreadOrCrash("SoftwareUpdater::checkUpdateAsyncPost");
+        // Even if we're offline, we need to disable these for the Google Play Distro.
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
+            SearchEngine.SOUNCLOUD.setActive(false);
+            SearchEngine.YT.setActive(false);
+        }
+
         //nav menu or other components always needs to be updated after we read the config.
         Intent intent = new Intent(Constants.ACTION_NOTIFY_UPDATE_AVAILABLE);
         intent.putExtra("value", result);
         LocalBroadcastManager.getInstance(activity).sendBroadcast(intent);
         if (ALWAYS_SHOW_UPDATE_DIALOG || result) {
             softwareUpdater.notifyUserAboutUpdate(activity);
-        }
-
-        // Even if we're offline, we need to disable these for the Google Play Distro.
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-            SearchEngine.SOUNCLOUD.setActive(false);
-            SearchEngine.YT.setActive(false);
         }
     }
 }
