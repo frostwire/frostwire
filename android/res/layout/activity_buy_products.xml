@@ -83,13 +83,13 @@
                     android:id="@+id/activity_buy_product_card_reward"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    frostwire:product_card_description="@string/dummy_content_description"
+                    frostwire:product_card_description="No ads for 30 minutes"
                     frostwire:product_card_hint_button_caption="@string/free"
                     frostwire:product_card_hint_button_visible="true"
                     frostwire:product_card_price="@string/reward_product_price"
                     frostwire:product_card_title_bold="@string/reward_product_title"
                     frostwire:product_card_title_normal="@string/ad_free"
-                    frostwire:product_card_subscription_period_fallback="@string/_30_minutes"/>
+                    frostwire:product_card_subscription_period_fallback=""/>
 
             <TextView
                     android:layout_marginTop="5dp"
