@@ -1,4 +1,4 @@
-FrostWire 2.7.6 build 726
+FrostWire 2.7.7 build 727
  - Subscription page improvements
  - com.google.android.material:material:1.11.0
  - org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22
