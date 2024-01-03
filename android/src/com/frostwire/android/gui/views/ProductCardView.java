@@ -44,6 +44,8 @@ public class ProductCardView extends RelativeLayout {
     private final String hintButtonCaption;
     private final boolean selected;
     private final boolean hintButtonVisible;
+
+    private final String fallbackSubscriptionPeriodString;
     private PaymentOptionsVisibility paymentOptionsVisibility;
 
     public ProductCardView(Context context, AttributeSet attrs) {
@@ -56,6 +58,7 @@ public class ProductCardView extends RelativeLayout {
         selected = attributes.getBoolean(R.styleable.ProductCardView_product_card_selected, false);
         hintButtonVisible = attributes.getBoolean(R.styleable.ProductCardView_product_card_hint_button_visible, false);
         hintButtonCaption = attributes.getString(R.styleable.ProductCardView_product_card_hint_button_caption);
+        fallbackSubscriptionPeriodString = attributes.getString(R.styleable.ProductCardView_product_card_subscription_period_fallback);
         attributes.recycle();
     }
 
@@ -68,7 +71,7 @@ public class ProductCardView extends RelativeLayout {
             price = currency + " " + productPrice;
         }
         if (sku != null) {
-            subscriptionPeriod = "";
+            subscriptionPeriod = fallbackSubscriptionPeriodString;
             if (Products.SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
                 subscriptionPeriod = getContext().getResources().getString(R.string.period_monthly);
             } else if (Products.SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
@@ -117,7 +120,11 @@ public class ProductCardView extends RelativeLayout {
         initTextView(R.id.view_product_card_title_bold_portion, titleBold);
         initTextView(R.id.view_product_card_title_normal_portion, titleNormal);
         initTextView(R.id.view_product_card_price, price);
-        initTextView(R.id.view_product_card_subscription_period, "/" + subscriptionPeriod);
+        initTextView(R.id.view_product_card_subscription_period,
+                (subscriptionPeriod != null && !subscriptionPeriod.trim().isEmpty()) ?
+                        "/" + subscriptionPeriod
+                        :
+                        fallbackSubscriptionPeriodString);
         initTextView(R.id.view_product_card_description, description);
         initTextView(R.id.view_product_card_hint_button, hintButtonCaption, hintButtonVisible);
     }

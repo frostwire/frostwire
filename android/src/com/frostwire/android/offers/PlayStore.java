@@ -586,28 +586,26 @@ public final class PlayStore extends StoreBase {
         // build each product, one by one, not magic here intentionally
         Product product;
 
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU));
+        product = buildDisableAdsSubscriptionProduct(Products.SUBS_DISABLE_ADS_1_MONTH_SKU, inventory, toDays(Products.SUBS_DISABLE_ADS_1_MONTH_SKU), SubscriptionDescriptionFallback.DISABLE_ADS_1_MONTH);
         m.put(product.sku(), product);
 
-        product = buildDisableAds(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, BillingClient.SkuType.SUBS, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU));
+        product = buildDisableAdsSubscriptionProduct(Products.SUBS_DISABLE_ADS_1_YEAR_SKU, inventory, toDays(Products.SUBS_DISABLE_ADS_1_YEAR_SKU), SubscriptionDescriptionFallback.DISABLE_ADS_1_YEAR);
         m.put(product.sku(), product);
 
         return m;
     }
 
     @NonNull
-    private Product buildDisableAds(final String sku, final String type, Inventory inventory, final int days) {
+    private Product buildDisableAdsSubscriptionProduct(final String sku, Inventory inventory, final int days, final SubscriptionDescriptionFallback fallback) {
         final SkuDetails d = inventory.getSkuDetails(sku);
         Purchase p = inventory.getPurchase(sku);
 
         // see if product exists
-        final boolean exists = d != null && d.getType().equals(type); // product exists in the play store
-
-        final boolean subscription = type.equals(BillingClient.SkuType.SUBS);
-        final String title = exists ? d.getTitle() : "NA";
-        final String description = exists ? d.getDescription() : "NA";
-        final String price = exists ? d.getPrice() : "NA";
-        final String currency = exists ? d.getPriceCurrencyCode() : "NA";
+        final boolean exists = d != null && d.getType().equals(BillingClient.SkuType.SUBS); // product exists in the play store
+        final String title = exists ? d.getTitle() : fallback.getTitle();
+        final String description = exists ? d.getDescription() : fallback.getDescription();
+        final String price = exists ? d.getPrice() : fallback.getPrice();
+        final String currency = exists ? d.getPriceCurrencyCode() : fallback.getPriceCurrencyCode();
 
         // see if it the user has some conflicting sku purchase
         String[] disableAdsSku = new String[]{
@@ -624,24 +622,11 @@ public final class PlayStore extends StoreBase {
 
         // see if product is purchased
         boolean purchased = p != null; // already purchased
-        // see if time expired, then consume it
-        if (p != null && type.equals(BillingClient.SkuType.INAPP)) {
-            long time = TimeUnit.DAYS.toMillis(days);
-            long now = System.currentTimeMillis();
-            if (now - p.getPurchaseTime() > time) {
-                try {
-                    consumeAsync(p.getPurchaseToken());
-                } catch (Throwable e) {
-                    LOG.error("Error consuming purchase", e);
-                }
-                purchased = false;
-            }
-        }
 
         final boolean available = exists && !conflict && !purchased;
         final long purchaseTime = purchased ? p.getPurchaseTime() : 0;
 
-        return new Products.ProductBase(sku, subscription, title,
+        return new Products.ProductBase(sku, true, title,
                 description, price, currency, purchased, purchaseTime, available) {
 
             @Override
@@ -655,21 +640,9 @@ public final class PlayStore extends StoreBase {
                     return false;
                 }
 
-                // if available, then the user does not have it, then
-                // the feature is not enabled
-                if (available) {
-                    return false;
-                }
-
-                // at this point, the user have it, if it's a subscription
-                // then it is enabled
-                if (type.equals(BillingClient.SkuType.SUBS)) {
-                    return true;
-                }
-
-                long time = TimeUnit.DAYS.toMillis(days);
-                long now = System.currentTimeMillis();
-                return now - purchaseTime <= time;
+                // If available, the user does not have it, then the feature is not enabled.
+                // However, at this point, the user does have it, and since it's a subscription, then it is enabled.
+                return !available;
             }
         };
     }
@@ -808,6 +781,35 @@ public final class PlayStore extends StoreBase {
                 LOG.error("Signature exception.");
             }
             return false;
+        }
+    }
+
+    private static class SubscriptionDescriptionFallback {
+        private static final SubscriptionDescriptionFallback DISABLE_ADS_1_MONTH = new SubscriptionDescriptionFallback("30 days Ad-Free", "$1.99", "No ads for 30 days", "USD");
+        private static final SubscriptionDescriptionFallback DISABLE_ADS_1_YEAR = new SubscriptionDescriptionFallback("1 year Ad-Free", "$9.99", "Best Value: 42% off, No ads for 1 year", "USD");
+        private final String title;
+        private final String price;
+        private final String description;
+        private final String priceCurrencyCode;
+
+        SubscriptionDescriptionFallback(String title, String price, String description, String priceCurrencyCode) {
+            this.title = title;
+            this.price = price;
+            this.description = description;
+            this.priceCurrencyCode = priceCurrencyCode;
+        }
+
+        String getTitle() {
+            return title;
+        }
+        String getPrice() {
+            return price;
+        }
+        String getDescription() {
+            return description;
+        }
+        String getPriceCurrencyCode() {
+            return priceCurrencyCode;
         }
     }
 }

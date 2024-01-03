@@ -30,8 +30,8 @@ public final class Products {
     private Products() {
     }
 
-    public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = getSKU("com.frostwire.subs.disable_ads.1_month");
-    public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = getSKU("com.frostwire.subs.disable_ads.1_year");
+    public static final String SUBS_DISABLE_ADS_1_MONTH_SKU = "com.frostwire.subs.disable_ads.1_month";
+    public static final String SUBS_DISABLE_ADS_1_YEAR_SKU = "com.frostwire.subs.disable_ads.1_year";
     public static final String REWARDS_DISABLE_ADS_MINUTES_SKU = "com.frostwire.reward.disable_ads_minutes";
 
     // inapp/subs product duration in days
@@ -85,10 +85,6 @@ public final class Products {
         }
 
         return list;
-    }
-
-    private static String getSKU(String skuId) {
-        return skuId;
     }
 
     /**

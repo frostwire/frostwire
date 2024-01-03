@@ -120,7 +120,7 @@ public final class BuyActivity extends AbstractActivity {
         }
     }
 
-    private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, purchases) -> BuyActivity.this.onPurchasesUpdatedOld(billingResult.getResponseCode());
+    private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, _purchases) -> BuyActivity.this.onPurchasesUpdatedOld(billingResult.getResponseCode());
 
     private void purchaseProduct(int tagId) {
         Product p = (Product) selectedProductCard.getTag(tagId);
@@ -440,31 +440,30 @@ public final class BuyActivity extends AbstractActivity {
         }
         // let's do this here to avoid a rare NPE that's popping up on ProductPaymentOptionsView::refreshOptionsVisibility
         card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, true, false));
-
         if (store == null) {
             throw new IllegalArgumentException("store argument can't be null");
         }
         if (subsSKU == null) {
             throw new IllegalArgumentException("subsSKU argument can't be null");
         }
-
-        final Product prodSubs = store.product(subsSKU);
-        if (prodSubs == null) {
+        final Product subscriptionProduct = store.product(subsSKU);
+        if (subscriptionProduct == null) {
             card.setVisibility(View.GONE);
             return;
         }
-        card.setTag(R.id.subs_product_tag_id, prodSubs);
-        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, true, false));
-
-        card.updateData(prodSubs);
+        card.setTag(R.id.subs_product_tag_id, subscriptionProduct);
+        card.updateData(subscriptionProduct);
     }
 
-    @SuppressWarnings("NullableProblems")
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (outState != null) {
-            outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
-            outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+            if (selectedProductCard != null) {
+                outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
+            }
+            if (paymentOptionsView != null) {
+                outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+            }
             outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
             super.onSaveInstanceState(outState);
         }
@@ -553,10 +552,10 @@ public final class BuyActivity extends AbstractActivity {
             throw new IllegalArgumentException("BuyActivity::getSelectedProductCard(productCardViewId=" + productCardViewId + ", buyActivity=null!!!)");
         }
         ProductCardView productCard;
-        if (productCardViewId == R.id.activity_buy_product_card_30_days) {
-            productCard = buyActivity.card30days;
-        } else if (productCardViewId == R.id.activity_buy_product_card_reward) {
+        if (productCardViewId == R.id.activity_buy_product_card_reward) {
             productCard = buyActivity.cardNminutes;
+        } else if (productCardViewId == R.id.activity_buy_product_card_30_days) {
+            productCard = buyActivity.card30days;
         } else {
             productCard = buyActivity.card1year;
         }
