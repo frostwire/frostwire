@@ -370,7 +370,7 @@ public final class BuyActivity extends AbstractActivity {
                 String.format(Locale.US, resources.getString(R.string.reward_product_title), REWARD_FREE_AD_MINUTES) :
                 String.format(Locale.US, "%d minutes", REWARD_FREE_AD_MINUTES);
         final String reward_product_description = (resources != null) ?
-                resources.getString(R.string.ad_free) : "Ad-free";
+                resources.getString(R.string.ad_free_30_minutes) : "Ad-free 30 minutes";
         final String reward_product_price = (resources != null) ?
                 resources.getString(R.string.reward_product_price) :
                 "Free, Play 1 Video Ad";

@@ -520,4 +520,5 @@
     <string name="subscriptions">📅 Subscriptions</string>
     <string name="rewarded_video_ad">📺 Rewarded Video Ad</string>
     <string name="_30_minutes">30 minutes</string>
+    <string name="ad_free_30_minutes">Ad-free 30 minutes</string>
 </resources>
