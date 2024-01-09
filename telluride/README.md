@@ -47,6 +47,10 @@ You should end up with a stand-alone executable for the platform you are on:
  - `python3`, `pip`, `pylint`
  - `ffmpeg` (for audio-only downloads. audio is extracted from the downloaded video)
  - `yt_dlp`, `pycryptodome`, `pyinstaller`
+ 
+## Signing
+
+See `frostwire-tools/installer_builders/windows/TOKEN_README.md` 
 
 ## License
 ```
