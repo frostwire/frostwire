@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:18.04
+FROM --platform=linux/amd64 ubuntu:24.04
 ENV DEBIAN_FRONTEND noninteractive
 ARG PYTHON_VERSION_MAJOR=3.12
 ARG PYTHON_VERSION=3.12.1
