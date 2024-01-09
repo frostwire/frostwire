@@ -1,3 +1,23 @@
+build 30 - jan/08/2024
+ - yt_dlp-2023.12.30
+ - python 3.12.1
+ - dev: pyinstaller-6.3.0
+ - dev: pip-23.3.2
+ - dev: astroid-3.0.2
+ - dev: pylint-3.0.3
+ - dev: requests-2.31.0
+ - dev: certifi-2023.11.17
+ - dev: urllib3-2.1.0
+ - dev: websockets-12.0
+ - dev: mutagen-1.47.0
+ - dev: pycryptodomex-3.19.1
+ - dev: charset_normalizer-3.3.2
+ - dev: idna-3.6
+ - dev: macholib-1.16.3
+ - dev: altgraph-0.17.4
+ - dev: packaging-23.2
+ - dev: macholib-1.16.3
+
 build 29 - oct/17/2023
  - yt_dlp-2023.10.13
  - dev: pyinstaller-6.1.0
