@@ -6,25 +6,23 @@
 
 ## Usage
 ```
-Telluride Cloud Video Downloader. Build 27
-Copyright 2020-2023 FrostWire LLC. Licensed under Apache 2.0.
-Python 3.11.3 (v3.11.3:f3909b8bc8, Apr  4 2023, 20:12:10) [Clang 13.0.0 (clang-1300.0.29.30)]
-sys.version_info(major=3, minor=11, micro=3, releaselevel='final', serial=0)
+Telluride Cloud Video Downloader. Build 30
+Copyright 2020-2024 FrostWire LLC. Licensed under Apache 2.0.
+Python 3.12.1 (v3.12.1:2305ca5144, Dec  7 2023, 17:23:38) [Clang 13.0.0 (clang-1300.0.29.30)]
+sys.version_info(major=3, minor=12, micro=1, releaselevel='final', serial=0)
 CWD=/Users/gubatron/workspace/frostwire/telluride
 
-usage: telluride_macos.x86_64 [-h] [--audio-only] [--meta-only] [page_url]
+usage: telluride_macos.arm64 [-h] [--audio-only] [--meta-only] [page_url]
 
 positional arguments:
-  page_url          The URL of the page that hosts the video you need to
-                    backup locally
+  page_url          The URL of the page that hosts the video you need to backup locally
 
 options:
   -h, --help        show this help message and exit
-  --audio-only, -a  Downloads the video and keeps only a separate audio file
-                    usually a .mp3. (requires ffmpeg installed in the system)
-  --meta-only, -m   Prints a JSON dictionary with all the metadata available
-                    on the video file found in the page_url. Does not download
-                    the video file
+  --audio-only, -a  Downloads the video and keeps only a separate audio file usually a .mp3. (requires
+                    ffmpeg installed in the system)
+  --meta-only, -m   Prints a JSON dictionary with all the metadata available on the video file found in the
+                    page_url. Does not download the video file
 ```
 
 ## Building
