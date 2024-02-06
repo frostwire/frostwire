@@ -98,7 +98,7 @@ public final class UIBTDownloadListener implements BTDownloadListener {
     /**
      * We only use this method for Android 10.
      * The actual file copying to the Downloads/FrostWire folder
-     * is done with the MediaStore API the main thread pool as to not block
+     * is done with the MediaStore API using the main thread pool as to not block
      * the jlibtorrent's SessionManager alert loop thread while all the disk IO is happening
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
