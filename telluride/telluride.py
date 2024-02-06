@@ -86,7 +86,8 @@ def main():
     yt_dlp_opts = {
         'nocheckcertificate': True,
         'quiet': False,
-        'restrictfilenames': True
+        'restrictfilenames': True,
+        'trim_file_name': 200
     }
     if meta_only:
         yt_dlp_opts['quiet'] = True
