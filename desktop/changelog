@@ -1,3 +1,10 @@
+frostwire (6.13.2) stable; urgency=high
+  * SC search fixed
+  * EZTV search removed
+  * Telluride Video Downloader build 31 with Python 3.12.1
+
+ -- FrostWire Team <contact@frostwire.com>  Fri, 09 Feb 2024 16:47:00 -0600
+
 frostwire (6.13.1) stable; urgency=high
   * Java Runtime Environment 21 update
   * org.xerial:sqlite-jdbc:3.43.0.0 update

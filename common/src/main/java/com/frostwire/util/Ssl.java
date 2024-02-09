@@ -102,7 +102,6 @@ public final class Ssl {
                 "clients1.google.com",
                 "cloudflaressl.com",
                 "dl.frostwire.com",
-                "eztv.re",
                 "fbcdn.net",
                 "github.com",
                 "github.io",

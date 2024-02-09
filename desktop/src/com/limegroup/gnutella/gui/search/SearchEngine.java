@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.btdigg.BTDiggSearchPerformer;
-import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
@@ -82,7 +81,7 @@ public abstract class SearchEngine {
     private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "BTDigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new BTDiggSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+            return new BTDiggSearchPerformer(token, keywords, DEFAULT_TIMEOUT * 6);
         }
     };
 
@@ -147,12 +146,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-    private static final SearchEngine EZTV = new SearchEngine(SearchEngineID.EZTV_ID, "Eztv", SearchEnginesSettings.EZTV_SEARCH_ENABLED, "eztv.re") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new EztvSearchPerformer(EZTV.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
     private static final SearchEngine YIFY = new SearchEngine(SearchEngineID.YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "yts-movie.cc") {
@@ -236,7 +229,6 @@ public abstract class SearchEngine {
                 YT,
                 BT_DIGG,
                 ARCHIVEORG,
-                EZTV,
                 GLOTORRENTS,
                 IDOPE,
                 LIMETORRENTS,
