@@ -35,7 +35,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
                 "pirate-bay.info",
                 "pirate-bays.net",
                 "piratebay.live",
-                "pirateproxy.live",
+                "pirateproxylive.org",
                 "thehiddenbay.com",
                 "thepiratebay-unblocked.org",
                 "thepiratebay.org",
