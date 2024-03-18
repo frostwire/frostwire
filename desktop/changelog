@@ -2,8 +2,9 @@ frostwire (6.13.2) stable; urgency=high
   * SC search fixed
   * EZTV search removed
   * Telluride Video Downloader build 31 with Python 3.12.1
+  * Fixes X Video Download issue where video file names were too long
 
- -- FrostWire Team <contact@frostwire.com>  Fri, 09 Feb 2024 16:47:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 18 Mar 2024 09:35:00 -0600
 
 frostwire (6.13.1) stable; urgency=high
   * Java Runtime Environment 21 update
