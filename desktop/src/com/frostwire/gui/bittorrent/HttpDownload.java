@@ -76,7 +76,7 @@ public class HttpDownload extends HttpBTDownload {
     private static File buildIncompleteFile(File file) {
         String prefix = FilenameUtils.getBaseName(file.getName());
         String ext = FilenameUtils.getExtension(file.getAbsolutePath());
-        return new File(HttpBTDownload.getIncompleteFolder(), prefix + ".incomplete." + ext);
+        return org.apache.commons.io.FileUtils.validFilepathLengthFile(new File(HttpBTDownload.getIncompleteFolder(), prefix + ".incomplete." + ext));
     }
 
     @Override
@@ -145,10 +145,10 @@ public class HttpDownload extends HttpBTDownload {
 
     private void start(final boolean resume) {
         state = TransferState.WAITING;
-        saveFile = completeFile;
+        saveFile = org.apache.commons.io.FileUtils.validFilepathLengthFile(completeFile);
         HTTP_THREAD_POOL.execute(() -> {
             try {
-                File expectedFile = new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs);
+                File expectedFile = org.apache.commons.io.FileUtils.validFilepathLengthFile(new File(SharingSettings.TORRENT_DATA_DIR_SETTING.getValue(), saveAs));
                 if (md5 != null &&
                         expectedFile.length() == size &&
                         checkMD5(expectedFile)) {
