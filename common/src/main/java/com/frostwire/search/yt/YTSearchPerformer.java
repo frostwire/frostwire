@@ -73,7 +73,7 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
                 if (video.publishedTimeText == null) {
                     continue;
                 }
-                String title = video.title.runs.get(0).text;
+                String title = video.title.runs.get(0).text.length() > 150 ? video.title.runs.get(0).text.substring(0, 150) : video.title.runs.get(0).text;
                 String videoAge = video.publishedTimeText.simpleText;
                 long creationTimeInMillis = parseCreationTimeInMillis(videoAge);
                 String thumbnailUrl = video.thumbnail.thumbnails.get(0).url;
