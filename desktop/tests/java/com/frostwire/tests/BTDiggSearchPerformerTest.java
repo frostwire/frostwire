@@ -39,7 +39,7 @@ public class BTDiggSearchPerformerTest {
 
             @Override
             public void onError(long token, SearchError error) {
-
+                LOG.error("[BTDiggSearchPerformerTest] error: " + error);
             }
 
             @Override

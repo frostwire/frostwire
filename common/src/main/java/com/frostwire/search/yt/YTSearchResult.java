@@ -85,7 +85,7 @@ public class YTSearchResult extends AbstractFileSearchResult {
 
     @Override
     public String getFilename() {
-        return title + ".mp4";
+        return (title.length() > 150 ? title.substring(0, 150) : title) + ".mp4";
     }
 
     @Override

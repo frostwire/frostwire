@@ -16,12 +16,12 @@ public class BTDiggSearchPerformer extends SimpleTorrentSearchPerformer {
     private boolean isDDOSProtectionActive;
 
     public BTDiggSearchPerformer(long token, String keywords, int timeout) {
-        super("btdig.com", token, keywords, timeout, 2, 0);
+        super("btdig.com", token, keywords, timeout, 1, 0);
     }
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        String searchUrl = "https://" + getDomainName() + "/search?q=" + encodedKeywords + "&p=" + page + "&order=2";
+        String searchUrl = "https://" + getDomainName() + "/search?q=" + encodedKeywords + "&p=0&order=2";
         return searchUrl;
     }
 

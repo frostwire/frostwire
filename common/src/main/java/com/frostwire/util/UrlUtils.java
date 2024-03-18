@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,10 @@
 
 package com.frostwire.util;
 
-import com.frostwire.concurrent.concurrent.ExecutorsHelper;
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -70,24 +68,14 @@ public final class UrlUtils {
         if (s == null) {
             return "";
         }
-        try {
-            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replaceAll("\\+", "%20");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
     }
 
     public static String decode(String s) {
         if (s == null) {
             return "";
         }
-        try {
-            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return "";
-        }
+        return URLDecoder.decode(s, StandardCharsets.UTF_8);
     }
 
     public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
@@ -96,7 +84,8 @@ public final class UrlUtils {
 
 
     // can't use java records yet because of android 11 being the max compatible version
-    private static class MirrorHeadDuration {
+    private static class
+    MirrorHeadDuration {
         private final String mirror;
         private final long duration;
 
@@ -158,9 +147,6 @@ public final class UrlUtils {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            return mirrors[0];
-        }
-        if (mirrorDurations == null) {
             return mirrors[0];
         }
         //filter out all null elements from mirrorDurations

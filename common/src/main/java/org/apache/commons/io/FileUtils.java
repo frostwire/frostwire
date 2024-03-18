@@ -2628,4 +2628,34 @@ public class FileUtils {
         }
         return !fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
     }
+
+    /**
+     * If the given file path is > 255 characters, then it is invalid and we will truncate the file name
+     * so that along with its file extension and it's parent directory structure it will be at most 255 characters long.
+     * @author gubatron
+     */
+    public static File validFilepathLengthFile(File file) {
+        final int MAX_PATH_LENGTH = 255;
+        String path = file.getAbsolutePath();
+        if (path.length() <= MAX_PATH_LENGTH) {
+            return file;
+        }
+
+        String extension = FilenameUtils.getExtension(file.getName());
+        // Ensure space for extension and the dot
+        int maxBaseNameLength = MAX_PATH_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1);
+        String originalBaseName = FilenameUtils.getBaseName(file.getName());
+
+        // Calculate the new length, ensuring it's not negative
+        int newBaseNameLength = Math.max(originalBaseName.length() - (path.length() - MAX_PATH_LENGTH), 0);
+        newBaseNameLength = Math.min(newBaseNameLength, maxBaseNameLength); // Ensure it does not exceed max length
+
+        String newBaseName = originalBaseName.substring(0, Math.min(originalBaseName.length(), newBaseNameLength));
+        String newFileName = newBaseName + (extension.isEmpty() ? "" : "." + extension);
+        File newFile = new File(file.getParent(), newFileName);
+
+        // Not going to handle a case where the path prior to the file name is too long, fuck it
+        return newFile;
+    }
+
 }

@@ -434,6 +434,6 @@ public class FileUtils {
             f = new File(savePath, baseName + " (" + i + ")." + ext);
             i++;
         }
-        return f;
+        return org.apache.commons.io.FileUtils.validFilepathLengthFile(f);
     }
 }
