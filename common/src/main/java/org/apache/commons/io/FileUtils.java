@@ -2635,18 +2635,27 @@ public class FileUtils {
      * @author gubatron
      */
     public static File validFilepathLengthFile(File file) {
-        final int totalPathLength = file.getAbsolutePath().length();
-        if (totalPathLength <= 255) {
+        final int MAX_PATH_LENGTH = 255;
+        String path = file.getAbsolutePath();
+        if (path.length() <= MAX_PATH_LENGTH) {
             return file;
         }
-        final int numExtraCharacters = totalPathLength - 255;
-        // get file name without extension
+
+        String extension = FilenameUtils.getExtension(file.getName());
+        // Ensure space for extension and the dot
+        int maxBaseNameLength = MAX_PATH_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1);
         String originalBaseName = FilenameUtils.getBaseName(file.getName());
-        final int originalBaseNameLength = originalBaseName.length();
-        final int newBaseNameLength = originalBaseNameLength - numExtraCharacters;
-        final String newBaseName = originalBaseName.substring(0, newBaseNameLength);
-        final String newFileName = newBaseName + "." + FilenameUtils.getExtension(file.getName());
-        final File newFile = new File(file.getParentFile(), newFileName);
+
+        // Calculate the new length, ensuring it's not negative
+        int newBaseNameLength = Math.max(originalBaseName.length() - (path.length() - MAX_PATH_LENGTH), 0);
+        newBaseNameLength = Math.min(newBaseNameLength, maxBaseNameLength); // Ensure it does not exceed max length
+
+        String newBaseName = originalBaseName.substring(0, Math.min(originalBaseName.length(), newBaseNameLength));
+        String newFileName = newBaseName + (extension.isEmpty() ? "" : "." + extension);
+        File newFile = new File(file.getParent(), newFileName);
+
+        // Not going to handle a case where the path prior to the file name is too long, fuck it
         return newFile;
     }
+
 }
