@@ -116,7 +116,7 @@ Frostwire Desktop and Frostwire Android are offered under the [GNU General Publi
 [Reddit](https://reddit.com/r/frostwire)
 [Twitter @frostwire](https://twitter.com/frostwire) |
 [Facebook](https://www.facebook.com/FrostWireOfficial) |
-[Discord Chatrooms](https://www.facebook.com/chat) |
+[Discord Chatrooms](https://discord.com/channels/461752211802947585/461752211802947587) |
 [Tumblr](http://tumblr.frostwire.com)
 
 
