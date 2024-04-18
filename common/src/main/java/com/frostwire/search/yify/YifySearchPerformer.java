@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 package com.frostwire.search.yify;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
@@ -42,7 +43,12 @@ public final class YifySearchPerformer extends TorrentRegexCrawlerSearchPerforme
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/search/" + encodedKeywords + "/";
+        return "https://" + getDomainName() + "/browse-movies/" + encodedKeywords + "/";
+    }
+
+    @Override
+    public Pattern getAltPattern() {
+        return null;
     }
 
     @Override
