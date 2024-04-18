@@ -147,6 +147,7 @@ public final class Ssl {
                 "www.torrentdownloads.pro",
                 "youtu.be",
                 "youtube.com",
+                "yts-movie.cc",
                 "yts.mx",
                 "zoink.ch",
                 "zooqle.com",
