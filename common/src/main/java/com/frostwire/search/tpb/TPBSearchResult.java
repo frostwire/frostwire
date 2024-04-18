@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
 
     TPBSearchResult(SearchMatcher matcher) {
         /*
+        (?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"([^\"]*?)\" class=\"detLink\" title=\"Details for ([^\"]*?)\">.*?</a>.*?</div>.*?<a href=\"magnet(.*?)\" title=\"Download this torrent using magnet\">.*?Uploaded ([^,]*?), Size (.*?), ULed by.*?<td align="right">(.*?)</td>.*?<td align="right">(.*?)</td>.*?</tr>
          * Matcher groups cheatsheet
          * 1 -> Category (useless)
          * 2 -> Torrent Details Page
@@ -71,17 +72,19 @@ public class TPBSearchResult extends AbstractTorrentSearchResult {
          * 6 -> MM-DD&nbsp;YYYY or Today&nbsp;HH:MM or Y-day&nbsp;HH:MM
          * 7 -> SIZE&nbsp;(B|KiB|MiBGiB)
          * 8 -> seeds
+         * 9 -> leechers (unused, probably there for matching purposes)
          */
-        this.detailsUrl = matcher.group(2);
-        String temp = HtmlManipulator.replaceHtmlEntities(matcher.group(3));
+        this.detailsUrl = matcher.group("detailsUrl");
+        String temp = HtmlManipulator.replaceHtmlEntities(matcher.group("filename"));
         temp = HtmlManipulator.replaceHtmlEntities(temp); // because of input
         this.filename = buildFilename(temp);
         this.displayName = FilenameUtils.getBaseName(filename);
-        this.torrentUrl = matcher.group(4); //let's assign the magnet to this for now.
+        this.torrentUrl = "magnet" + matcher.group("magnet");
+
         this.infoHash = torrentUrl.substring(20, 60).toLowerCase();
-        this.creationTime = parseCreationTime(matcher.group(5));
-        this.size = parseSize(matcher.group(6));
-        this.seeds = parseSeeds(matcher.group(7));
+        this.creationTime = parseCreationTime(matcher.group("creationTime"));
+        this.size = parseSize(matcher.group("size"));
+        this.seeds = parseSeeds(matcher.group("seeds"));
     }
 
     @Override
