@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
                 "pirateproxylive.org",
                 "thehiddenbay.com",
                 "thepiratebay-unblocked.org",
-                "thepiratebay.org",
                 "thepiratebay.party",
                 "thepiratebay.zone",
                 "thepiratebay0.org",
@@ -49,7 +48,8 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     }
 
     private static final int MAX_RESULTS = 20;
-    private static Pattern PATTERN;
+    private static Pattern NEW_TPB_PATTERN;
+    private static Pattern OLD_TPB_PATTERN;
 
     public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
@@ -57,10 +57,22 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     public Pattern getPattern() {
-        if (PATTERN == null) {
-            PATTERN = Pattern.compile("(?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"([^\"]*?)\" class=\"detLink\" title=\"Details for ([^\"]*?)\">.*?</a>.*?<a href=\\\"(magnet:\\?xt=urn:btih:.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?</a>.*?<font class=\"detDesc\">Uploaded ([^,]*?), Size (.*?), ULed.*?<td align=\"right\">(.*?)</td>\\s*<td align=\"right\">(.*?)</td>");
+        if (NEW_TPB_PATTERN == null) {
+            // Simpler html output, no class=detLink, seems like the newer version of TPB which shows the upload date as well as the file size as a column
+            // (?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"(?<detailsUrl>[^\"]*?)\" title=\"Details for (?<filename>[^\"]*?)\">.*?<td>(?<creationTime>.*?)</td>.*?<td><nobr><a href=\"magnet(?<magnet>.*?)\" title=\"Download this torrent using magnet\">.*?<td align=\"right\">(?<size>.*?)</td>.*?<td align=\"right\">(?<seeds>.*?)</td>.*?<td align=\"right\">(?<leeches>.*?)</td>.*?</tr>
+            NEW_TPB_PATTERN = Pattern.compile("(?is)<td class=\\\"vertTh\\\">.*?<a href=\\\"[^\\\"]*?\\\" title=\\\"More from this category\\\">(.*?)</a>.*?</td>.*?<a href=\\\"(?<detailsUrl>[^\\\"]*?)\\\" title=\\\"Details for (?<filename>[^\\\"]*?)\\\">.*?<td>(?<creationTime>.*?)</td>.*?<td><nobr><a href=\\\"magnet(?<magnet>.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?<td align=\\\"right\\\">(?<size>.*?)</td>.*?<td align=\\\"right\\\">(?<seeds>.*?)</td>.*?<td align=\\\"right\\\">(?<leeches>.*?)</td>.*?</tr>");
         }
-        return PATTERN;
+        return NEW_TPB_PATTERN;
+    }
+
+    @Override
+    public Pattern getAltPattern() {
+        if (OLD_TPB_PATTERN == null) {
+            // Old html output matching
+            // (?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"(?<detailsUrl>[^\"]*?)\" class=\"detLink\" title=\"Details for (?<filename>[^\"]*?)\">.*?</a>.*?</div>.*?<a href=\"magnet(?<magnet>.*?)\" title=\"Download this torrent using magnet\">.*?Uploaded (?<creationTime>[^,]*?), Size (?<size>.*?), ULed by.*?<td align=\"right\">(?<seeds>.*?)</td>.*?</tr>
+            OLD_TPB_PATTERN = Pattern.compile("(?is)<td class=\\\"vertTh\\\">.*?<a href=\\\"[^\\\"]*?\\\" title=\\\"More from this category\\\">(.*?)</a>.*?</td>.*?<a href=\\\"(?<detailsUrl>[^\\\"]*?)\\\" class=\\\"detLink\\\" title=\\\"Details for (?<filename>[^\\\"]*?)\\\">.*?</a>.*?</div>.*?<a href=\\\"magnet(?<magnet>.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?Uploaded (?<creationTime>[^,]*?), Size (?<size>.*?), ULed by.*?<td align=\\\"right\\\">(?<seeds>.*?)</td>.*?</tr>");
+        }
+        return OLD_TPB_PATTERN;
     }
 
     @Override
