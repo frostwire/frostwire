@@ -17,6 +17,7 @@
 
 package com.frostwire.search.one337x;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
@@ -47,6 +48,11 @@ public final class One337xSearchPerformer extends TorrentRegexCrawlerSearchPerfo
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
         return "https://" + getDomainName() + "/search/" + encodedKeywords + "/1/";
+    }
+
+    @Override
+    public Pattern getAltPattern() {
+        return null;
     }
 
     @Override
