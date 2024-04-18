@@ -17,6 +17,7 @@
 
 package com.frostwire.search.torlock;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
@@ -44,6 +45,11 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
     protected String getSearchUrl(int page, String encodedKeywords) {
         String transformedKeywords = encodedKeywords.replace("%20", "-");
         return "https://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
+    }
+
+    @Override
+    public Pattern getAltPattern() {
+        return null;
     }
 
     @Override
