@@ -28,7 +28,6 @@ import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.search.SearchPerformer;
 import com.frostwire.search.archiveorg.ArchiveorgSearchPerformer;
 import com.frostwire.search.btdigg.BTDiggSearchPerformer;
-import com.frostwire.search.eztv.EztvSearchPerformer;
 import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
@@ -211,13 +210,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine EZTV = new SearchEngine("Eztv", Constants.PREF_KEY_SEARCH_USE_EZTV) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new EztvSearchPerformer("eztv.re", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public static final SearchEngine TPB = new SearchEngine("TPB", Constants.PREF_KEY_SEARCH_USE_TPB) {
         private String domainName = null;
 
@@ -337,6 +329,5 @@ public abstract class SearchEngine {
             TORRENTDOWNLOADS,
             LIMETORRENTS,
             NYAA,
-            EZTV,
             GLOTORRENTS);
 }
