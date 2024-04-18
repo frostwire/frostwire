@@ -17,6 +17,7 @@
 
 package com.frostwire.search.torrentdownloads;
 
+import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
@@ -43,6 +44,11 @@ public class TorrentDownloadsSearchPerformer extends TorrentRegexCrawlerSearchPe
     protected String getSearchUrl(int page, String encodedKeywords) {
         String transformedKeywords = encodedKeywords.replace("%20", "+");
         return "https://" + getDomainName() + "/search/?search=" + transformedKeywords;
+    }
+
+    @Override
+    public Pattern getAltPattern() {
+        return null;
     }
 
     @Override
