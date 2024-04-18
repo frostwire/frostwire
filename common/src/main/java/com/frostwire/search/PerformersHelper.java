@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,33 @@ public final class PerformersHelper {
             LOG.warn(performer.getClass().getSimpleName() + " returning null page. Issue fetching page or issue getting page prefix/suffix offsets. Notify developers at contact@frostwire.com");
             return result;
         }
-        SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(page));
+
+        Pattern primaryPattern = performer.getPattern();
+        Pattern altPattern = performer.getAltPattern();
+
+        result.addAll(performSearch(performer, primaryPattern, page, regexMaxResults));
+
+        if (result.isEmpty() && altPattern != null) {
+            result.addAll(performSearch(performer, altPattern, page, regexMaxResults));
+        }
+
+        return result;
+    }
+
+    private static List<? extends SearchResult> performSearch(RegexSearchPerformer<?> performer, Pattern pattern, String page, int regexMaxResults) {
+        List<SearchResult> result = new LinkedList<>();
+        SearchMatcher matcher = SearchMatcher.from(pattern.matcher(page));
         int i = 0;
         boolean matcherFound;
+
         do {
             try {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 matcherFound = false;
-                LOG.error("searchPageHelper(...): " + performer.getPattern().toString() + " has failed.\n" + t.getMessage(), t);
+                LOG.error("performSearch(...): " + pattern.toString() + " has failed.\n" + t.getMessage(), t);
             }
+
             if (matcherFound) {
                 SearchResult sr = performer.fromMatcher(matcher);
                 if (sr != null) {
@@ -63,6 +80,7 @@ public final class PerformersHelper {
                 }
             }
         } while (matcherFound && i < regexMaxResults && !performer.isStopped());
+
         return result;
     }
 
