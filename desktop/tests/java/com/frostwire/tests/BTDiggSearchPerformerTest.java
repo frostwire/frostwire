@@ -49,6 +49,6 @@ public class BTDiggSearchPerformerTest {
         });
 
         searchPerformer.perform();
-        Assertions.assertTrue(!searchPerformer.isDDOSProtectionActive() && testResults.size() > 0, "[BTDiggSearchPerformerTest] No results found");
+        Assertions.assertTrue(!searchPerformer.isDDOSProtectionActive() && !testResults.isEmpty(), "[BTDiggSearchPerformerTest] No results found");
     }
 }
