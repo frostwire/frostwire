@@ -28,9 +28,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TPBSearchPerformerTest {
     private static final Logger LOG = Logger.getLogger(TPBSearchPerformerTest.class);
@@ -40,38 +40,50 @@ public class TPBSearchPerformerTest {
         final List<TPBSearchResult> tpbResults = new ArrayList<>();
         TPBSearchPerformer tpbSearchPerformer = initializeSearchPerformer();
         assert (tpbSearchPerformer != null);
+        CountDownLatch latch = new CountDownLatch(1);
 
         tpbSearchPerformer.setListener(new SearchListener() {
             @Override
             public void onResults(long token, List<? extends SearchResult> results) {
                 LOG.info("[TPBSearchPerformerTest] onResults() " + results.size());
-                for (SearchResult r : results) {
-                    TPBSearchResult sr = (TPBSearchResult) r;
-                    LOG.info("[TPBSearchPerformerTest] onResults() size = " + sr.getSize());
-                    LOG.info("[TPBSearchPerformerTest] onResults() hash = " + sr.getHash());
-                    LOG.info("[TPBSearchPerformerTest] ==== ");
-                    tpbResults.add(sr);
+                try {
+                    for (SearchResult r : results) {
+                        TPBSearchResult sr = (TPBSearchResult) r;
+                        LOG.info("[TPBSearchPerformerTest] onResults() size = " + sr.getSize());
+                        LOG.info("[TPBSearchPerformerTest] onResults() hash = " + sr.getHash());
+                        LOG.info("[TPBSearchPerformerTest] ==== ");
+                        tpbResults.add(sr);
+                    }
+                } finally {
+                    latch.countDown();
                 }
             }
 
             @Override
             public void onError(long token, SearchError error) {
-
+                latch.countDown();
             }
 
             @Override
             public void onStopped(long token) {
-
+                latch.countDown();
             }
         });
 
         tpbSearchPerformer.perform();
-
-        assertTrue(tpbResults.size() > 0, "[TPBSearchPerformerTest] No results found using domain: " + tpbSearchPerformer.getDomainName());
+        try {
+            LOG.info("[TPBSearchPerformerTest] Waiting for results...");
+            latch.await();
+        } catch (InterruptedException e) {
+            LOG.error("[TPBSearchPerformerTest] Error waiting for results: " + e.getMessage());
+        }
+        LOG.info("[TPBSearchPerformerTest] Results found: " + tpbResults.size() + " using domain: " + tpbSearchPerformer.getDomainName());
+        assertFalse(tpbResults.isEmpty(), "[TPBSearchPerformerTest] No results found using domain: " + tpbSearchPerformer.getDomainName());
     }
 
     private TPBSearchPerformer initializeSearchPerformer() {
         SearchEngine tpbEngine = SearchEngine.getSearchEngineByID(SearchEngine.SearchEngineID.TPB_ID);
+        assertNotNull(tpbEngine, "[TPBSearchPerformerTest] TPB engine is null");
         int wait = 250;
         int maxWait = 15000;
         int currentWait = 0;
@@ -80,7 +92,7 @@ public class TPBSearchPerformerTest {
                 Thread.sleep(wait);
                 currentWait += wait;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("[TPBSearchPerformerTest] Error waiting for TPB engine to be ready: " + e.getMessage());
             }
             LOG.info("[TPBSearchPerformerTest] Waiting " + currentWait + "ms for TPB engine to be ready...");
         }
