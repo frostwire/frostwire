@@ -30,7 +30,7 @@ buildscript {
         maven { url "https://chaquo.com/maven" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.3.2'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -38,7 +38,7 @@ buildscript {
         classpath 'com.google.gms:google-services:4.4.0'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
 
-        classpath 'com.chaquo.python:gradle:14.0.2'
+        classpath 'com.chaquo.python:gradle:15.0.1'
     }
 }
 
@@ -102,6 +102,7 @@ android {
         applicationId "com.frostwire.android"
         versionName project.ext.versionName
         minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
+        //minSdkVersion 28 // Android 9.0 Pie
         targetSdkVersion 33 // Android 13
         multiDexEnabled true
 
