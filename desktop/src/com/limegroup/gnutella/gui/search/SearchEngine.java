@@ -34,7 +34,6 @@ import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
-import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.OSUtils;
@@ -148,12 +147,7 @@ public abstract class SearchEngine {
             return new NyaaSearchPerformer("nyaa.si", token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine YIFY = new SearchEngine(SearchEngineID.YIFI_ID, "Yify", SearchEnginesSettings.YIFY_SEARCH_ENABLED, "yts-movie.cc") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new YifySearchPerformer(YIFY.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
+
     private static final SearchEngine ONE337X = new SearchEngine(SearchEngineID.ONE337X_ID, "1337x", SearchEnginesSettings.ONE337X_SEARCH_ENABLED, "www.1377x.to") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -239,7 +233,6 @@ public abstract class SearchEngine {
                 TORLOCK,
                 TORRENTDOWNLOADS,
                 TORRENTZ2,
-                YIFY,
                 SOUNDCLOUD,
                 FROSTCLICK);
     }
