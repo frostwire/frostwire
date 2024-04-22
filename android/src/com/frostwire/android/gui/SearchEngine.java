@@ -41,7 +41,6 @@ import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
-import com.frostwire.search.yify.YifySearchPerformer;
 import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.UrlUtils;
@@ -94,7 +93,9 @@ public abstract class SearchEngine {
         return preferenceKey;
     }
 
-    /** This is what's eventually checked to perform a search */
+    /**
+     * This is what's eventually checked to perform a search
+     */
     public boolean isEnabled() {
         return isActive() && ConfigurationManager.instance().getBoolean(preferenceKey);
     }
@@ -116,13 +117,13 @@ public abstract class SearchEngine {
     /**
      * This will include all engines, even if they have been marked as inactive via
      * remote config or by some other mean.
-     *
+     * <p>
      * It will only exclude non-ready engines if excludeNonReady=true
-     *
+     * <p>
      * We need to include inactive engines so that places like the SearchEnginesPreferenceFragment
      * can separate active engines from inactive engines and do things like hide them from the
      * user interface in the case of FrostWire Basic where some engines are not allowed in google play
-    */
+     */
     public static List<SearchEngine> getEngines(boolean excludeNonReady) {
         ArrayList<SearchEngine> candidates = new ArrayList<>();
 
@@ -236,13 +237,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine YIFY = new SearchEngine("Yify", Constants.PREF_KEY_SEARCH_USE_YIFY) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new YifySearchPerformer("yify-torrent.cc", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public static final SearchEngine ONE337X = new SearchEngine("1337x", Constants.PREF_KEY_SEARCH_USE_ONE337X) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -317,7 +311,6 @@ public abstract class SearchEngine {
             YT,
             MAGNETDL,
             TORRENTZ2,
-            YIFY,
             ONE337X,
             IDOPE,
             FROSTCLICK,

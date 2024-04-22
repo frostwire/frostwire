@@ -30,10 +30,6 @@
             android:layout="@layout/view_preference_search_engine"
             android:title="@string/use_btdigg" />
     <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_eztv"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_eztv" />
-    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_glotorrents"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_glotorrents" />
@@ -73,10 +69,6 @@
         android:key="frostwire.prefs.search.use_nyaa"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_nyaa" />
-    <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_yify"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_yify" />
     <CheckBoxPreference
         android:key="frostwire.prefs.search.use_one337x"
         android:layout="@layout/view_preference_search_engine"
