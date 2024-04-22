@@ -18,10 +18,13 @@
 
 package com.frostwire.util;
 
+import android.os.Build;
+
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -68,14 +71,28 @@ public final class UrlUtils {
         if (s == null) {
             return "";
         }
-        return URLEncoder.encode(s, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+
+        try {
+            // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
+            return URLEncoder.encode(s, StandardCharsets.UTF_8.name()).replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("UrlUtils.encode() -> " + e.getMessage(), e);
+            return "";
+        }
     }
 
     public static String decode(String s) {
         if (s == null) {
             return "";
         }
-        return URLDecoder.decode(s, StandardCharsets.UTF_8);
+
+        try {
+            // gotta keep using the deprecated method because we need android min sdk to be 33, a long way to go
+            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("UrlUtils.decode() -> " + e.getMessage(), e);
+            return "";
+        }
     }
 
     public static String buildMagnetUrl(String infoHash, String displayFilename, String trackerParameters) {
