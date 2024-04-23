@@ -312,16 +312,15 @@ public final class BuyActivity extends AbstractActivity {
 
         PlayStore store = PlayStore.getInstance(this);
 
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) {
+        if (store == null || !PlayStore.available()) {
+            card30days.setVisibility(View.GONE);
+            card1year.setVisibility(View.GONE);
+        } else if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
             initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU);
             initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU);
             card30days.setOnClickListener(cardClickListener);
             card1year.setOnClickListener(cardClickListener);
-        } else {
-            card30days.setVisibility(View.GONE);
-            card1year.setVisibility(View.GONE);
         }
-
         initLastCardSelection(lastSelectedCardViewId);
     }
 

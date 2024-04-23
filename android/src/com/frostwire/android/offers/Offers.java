@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -453,7 +453,7 @@ public final class Offers {
 
         final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
 
-        if (purchasedProducts.size() > 0) {
+        if (!purchasedProducts.isEmpty()) {
             Offers.stopAdNetworks(context);
             stopped = true;
             LOG.info("Turning off ads, user previously purchased AdRemoval");

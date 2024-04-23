@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,13 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
-        PlayStore.getInstance(context).refresh();
+
+        try {
+            PlayStore.getInstance(context).refresh();
+        } catch (Throwable e) {
+            LOG.error("handleConnectedNetwork: Error refreshing PlayStore", e);
+        }
+
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isInternetDataConnectionUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();
