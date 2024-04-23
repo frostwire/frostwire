@@ -18,8 +18,6 @@
 
 package com.frostwire.util;
 
-import android.os.Build;
-
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.util.http.HttpClient;
