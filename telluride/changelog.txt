@@ -1,5 +1,10 @@
-build 31 - feb/06/2024
+build 31 - apr/24/2024
+ - yt_dlp-2023.4.9
  - trim file names up to 200 characters max
+ - dev: pyinstaller-6.6.0
+ - dev: astroid-3.1.0
+ - dev: pylint-3.1.0
+ - dev: pip-24.0
 
 build 30 - jan/08/2024
  - yt_dlp-2023.12.30
