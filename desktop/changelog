@@ -3,8 +3,13 @@ frostwire (6.13.2) stable; urgency=high
   * EZTV search removed
   * Telluride Video Downloader build 31 with Python 3.12.1
   * Fixes X Video Download issue where video file names were too long
+  * Java Runtime Environment 22 update
+  * Updated TPB search engine with new domain and HTML parsing
+  * Improved file name handling to truncate names exceeding 255 characters
+  * Updated User-Agent list with more recent agents
+  * Updated Ssl pinned domains
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 18 Mar 2024 09:35:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 24 Apr 2024 09:35:00 -0600
 
 frostwire (6.13.1) stable; urgency=high
   * Java Runtime Environment 21 update
