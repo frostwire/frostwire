@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -82,6 +82,7 @@ public class MiniPlayerView extends LinearLayout {
 
         initEventHandlers();
         refreshComponents();
+        refreshAlbumCover();
     }
 
     private void initEventHandlers() {
@@ -108,11 +109,13 @@ public class MiniPlayerView extends LinearLayout {
     private void onPreviousClick() {
         MusicUtils.previous();
         refreshComponents();
+        refreshAlbumCover();
     }
 
     private void onNextClick() {
         MusicUtils.next();
         refreshComponents();
+        refreshAlbumCover();
     }
 
     private void onPlayPauseLongClick() {
@@ -131,6 +134,7 @@ public class MiniPlayerView extends LinearLayout {
         }
         MusicUtils.playPauseOrResume();
         refreshComponents();
+        refreshAlbumCover();
     }
 
     private void refreshComponents() {
@@ -145,7 +149,7 @@ public class MiniPlayerView extends LinearLayout {
         if (currentAlbumId != -1) {
             Uri albumUri = ImageLoader.getAlbumArtUri(currentAlbumId);
             ImageLoader.getInstance(getContext()).load(albumUri, coverImage);
-        } else {
+        } else if (coverImage != null) {
             coverImage.setBackgroundResource(R.drawable.default_artwork);
         }
     }
@@ -181,20 +185,24 @@ public class MiniPlayerView extends LinearLayout {
     private static void refreshOnTimerPostTask(MiniPlayerView miniPlayer, FWFileDescriptor fd) {
         String title = "";
         String artist = "";
-        miniPlayer.refreshComponents();
         if (fd != null) {
             title = fd.title;
             artist = fd.artist;
-            if (miniPlayer.getVisibility() == View.GONE) {
-                miniPlayer.setVisibility(View.VISIBLE);
+            if (miniPlayer != null) {
+                if (miniPlayer.getVisibility() == View.GONE) {
+                    miniPlayer.setVisibility(View.VISIBLE);
+                }
+                miniPlayer.refreshComponents();
             }
         } else {
-            if (miniPlayer.getVisibility() == View.VISIBLE) {
+            if (miniPlayer != null && miniPlayer.getVisibility() == View.VISIBLE) {
                 miniPlayer.setVisibility(View.GONE);
             }
         }
-        miniPlayer.titleText.setText(title);
-        miniPlayer.artistText.setText(artist);
+        if (miniPlayer != null) {
+            miniPlayer.titleText.setText(title);
+            miniPlayer.artistText.setText(artist);
+        }
     }
 
     private void openAudioPlayerActivity() {
