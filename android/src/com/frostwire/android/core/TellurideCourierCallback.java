@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,11 +67,13 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
 
     void onResults(List<TellurideSearchResult> results, boolean errored) {
         // This comes in too fast, gotta let the UI get there
-        if (adapter instanceof SearchResultListAdapter) {
+        if (adapter instanceof SearchResultListAdapter || (results == null || results.isEmpty() || errored)) {
             onSearchResultListAdapterResults(results, errored);
         } else {
-            for (TellurideSearchResult result : results) {
-                adapter.addItem(result);
+            if (results != null && !results.isEmpty() && adapter != null) {
+                for (TellurideSearchResult result : results) {
+                    adapter.addItem(result);
+                }
             }
         }
     }
