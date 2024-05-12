@@ -86,7 +86,7 @@ public final class SoftwareUpdater {
         try {
             activity.updateNavigationMenu(true);
             SoftwareUpdaterDialog dlg = SoftwareUpdaterDialog.newInstance(
-                    update.u,
+                    update.u, //apkDownloadURL
                     update.updateMessages,
                     update.changelog);
             dlg.show(activity.getFragmentManager());
