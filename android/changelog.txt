@@ -3,10 +3,14 @@ FrostWire 2.7.8 build 731
  - Search fixes
  - EZTV search removed
  - Yify search removed
- - com.android.tools.build:gradle:8.3.2
- - python 3.12
- - python: yt-dlp-2024.4.9
- - python: com.chaquo.python:gradle:15.0.1
+ - Updated Gradle to version 8.6
+ - Updated Android Gradle plugin to 8.2.1 and 8.3.2
+ - Updated Python integration with com.chaquo.python:gradle:15.0.1
+ - Fixed null pointer exceptions in AbstractConfirmListDialog and TellurideCourierCallback
+ - Improved null checks for miniPlayer and coverImage
+ - Miscellaneous Play Store compliance enhancements
+ - Python version updated to 3.12
+ - Python: yt-dlp-2024.4.9
 
 FrostWire 2.7.7 build 730
  - Subscription page improvements
