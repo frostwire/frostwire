@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
+import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.List;
@@ -55,7 +56,7 @@ import java.util.List;
  * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
-
+    private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
@@ -63,6 +64,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     private FWBannerView fwBannerView;
     private int specialOfferLayout;
     private static final double PROMO_HEIGHT_TO_WIDTH_RATIO = 0.52998;
+
 
     public PromotionsAdapter(Context ctx, List<Slide> slides, PromotionDownloader promotionDownloader) {
         super(ctx, R.layout.view_promotions_item);
@@ -73,6 +75,9 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public void setupView(View convertView, ViewGroup parent, Slide viewItem) {
+        if (viewItem == null) {
+            return;
+        }
         ImageView imageView = findView(convertView, R.id.view_promotions_item_image);
         TextView downloadTextView = findView(convertView, R.id.view_promotions_item_download_textview);
         ImageView previewImageView = findView(convertView, R.id.view_promotions_item_preview_imageview);
@@ -136,23 +141,22 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
-        boolean inLandscapeMode =
-                Configuration.ORIENTATION_LANDSCAPE ==
-                        getContext().getResources().getConfiguration().orientation;
         int addSpecialOffer = (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) ? 1 : 0;
-        int addFrostWireFeaturesTitle = !inLandscapeMode ? 1 : 0;
+        int addFrostWireFeaturesTitle = 1;
         int slideCount = (slides != null) ? slides.size() : 0;
-        if (inLandscapeMode && slideCount % 2 == 0) {
-            slideCount--;
-        }
         int addAllFeaturesButtonAtTheEnd = 1;
         return addSpecialOffer + addFrostWireFeaturesTitle + slideCount + addAllFeaturesButtonAtTheEnd;
     }
 
     @Override
     public Slide getItem(int position) {
-        return slides.get(position);
+        int correction_offset = 0;
+        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position > 0) {
+            correction_offset = -1;
+        }
+        return slides.get(position + correction_offset);
     }
+
 
     @Override
     public long getItemId(int position) {
@@ -162,8 +166,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // Plus (or when on landscape orientation) needs no special offer as we can't sell remove ads yet
-        boolean inLandscapeMode = Configuration.ORIENTATION_LANDSCAPE == getContext().getResources().getConfiguration().orientation;
         // "ALL FREE DOWNLOADS" button shown last
         if (position == getCount() - 1) {
             if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
@@ -172,15 +174,14 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
             }
         }
-        return (!inLandscapeMode) ? getPortraitView(position, convertView, parent) :
-                getLandscapeView(position, convertView, parent);
+        return getPortraitView(position, convertView, parent);
     }
 
     private View getPortraitView(int position, View convertView, ViewGroup parent) {
         // "FROSTWIRE FEATURES" view logic.
         int offsetFeaturesTitleHeader = 0;
         // OPTIONAL OFFER ON TOP
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || PlayStore.available()) {
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
             View basicPortraitView = getFWBasicPortraitView(position, convertView, parent);
             if (basicPortraitView != null) {
                 return basicPortraitView;
@@ -195,6 +196,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
             }
         }
+        LOG.info("PromotionsAdapter::getView -> position: " + position + ", offsetFeaturesTitleHeader: " + offsetFeaturesTitleHeader + ", slides.size(): " + slides.size());
         return super.getView(position - offsetFeaturesTitleHeader, null, parent);
     }
 
@@ -235,14 +237,6 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             fwBannerView.loadMaxBanner();
         }
         return fwBannerView;
-    }
-
-    private View getLandscapeView(int position, View convertView, ViewGroup parent) {
-        try {
-            return super.getView(position, null, parent);
-        } catch (Throwable t) {
-            return convertView;
-        }
     }
 
     @Nullable

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,6 +157,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         try {
             HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
             String url = String.format("%s&from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
+            LOG.info("SearchFragment::loadSlidesInBackground() @ " + url);
             String json = http.get(url);
             SlideList slides = JsonUtils.toObject(json, SlideList.class);
             // yes, these requests are done only once per session.
