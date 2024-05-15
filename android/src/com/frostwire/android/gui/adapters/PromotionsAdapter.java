@@ -149,14 +149,8 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public Slide getItem(int position) {
-        int correction_offset;
-        // basic
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            correction_offset = -2; // works great.
-        } else {
-            correction_offset = -2;
-        }
-        return slides.get(position + correction_offset);
+        int correction_offset = -2;
+        return slides.get(Math.max(0, position + correction_offset));
     }
 
     @NonNull
@@ -173,7 +167,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
         // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
         int specialOfferLayout = pickSpecialOfferLayout();
-        boolean adsAreOn = !Offers.disabledAds();//specialOfferLayout == R.layout.view_remove_ads_notification;
+        boolean adsAreOn = !Offers.disabledAds();
 
         // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
         if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
