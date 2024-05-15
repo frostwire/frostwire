@@ -255,6 +255,16 @@ dependencies {
     implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
 }
 
+afterEvaluate {
+    tasks.named('uploadCrashlyticsMappingFileBasicRelease').configure {
+        dependsOn ':processPlus1ReleaseGoogleServices'
+    }
+
+    tasks.named('uploadCrashlyticsMappingFilePlus1Release').configure {
+        dependsOn ':processBasicReleaseGoogleServices'
+    }
+}
+
 class SignatureRequester {
     String myKeyAlias = ""
     String myKeyPassword = ""

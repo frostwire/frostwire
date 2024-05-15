@@ -1,4 +1,4 @@
-FrostWire 2.7.8 build 731
+FrostWire 2.7.8 build 731 MAY/15/2024
  - Fixes X Video Download issue where video file names were too long
  - Search fixes
  - EZTV search removed
@@ -11,8 +11,14 @@ FrostWire 2.7.8 build 731
  - Miscellaneous Play Store compliance enhancements
  - Python version updated to 3.12
  - Python: yt-dlp-2024.4.9
+ - com.applovin:applovin-sdk:12.4.3 update
+ - androidx.media2:media2-session:1.3.0 update
+ - androidx.media2:media2-widget:1.3.0 update
+ - androidx.media2:media2-player:1.3.0 update
+ - com.google.firebase:firebase-crashlytics-gradle:3.0.1 update
+ - com.google.gms:google-services:4.4.1 update
 
-FrostWire 2.7.7 build 730
+FrostWire 2.7.7 build 730 - JAN/01/2024
  - Subscription page improvements
  - Plus users with Google Play can also buy Ad-Removal subscription
  - com.google.android.material:material:1.11.0

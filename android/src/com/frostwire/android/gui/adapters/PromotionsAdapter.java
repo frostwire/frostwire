@@ -20,7 +20,6 @@ package com.frostwire.android.gui.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,13 +38,13 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractAdapter;
 import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
@@ -150,17 +149,14 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public Slide getItem(int position) {
-        int correction_offset = 0;
-        if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position > 0) {
-            correction_offset = -1;
+        int correction_offset;
+        // basic
+        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            correction_offset = -2; // works great.
+        } else {
+            correction_offset = -2;
         }
         return slides.get(position + correction_offset);
-    }
-
-
-    @Override
-    public long getItemId(int position) {
-        return position;
     }
 
     @NonNull
@@ -174,46 +170,20 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
                 return View.inflate(getContext(), R.layout.view_invisible_promo, null);
             }
         }
-        return getPortraitView(position, convertView, parent);
-    }
 
-    private View getPortraitView(int position, View convertView, ViewGroup parent) {
-        // "FROSTWIRE FEATURES" view logic.
-        int offsetFeaturesTitleHeader = 0;
-        // OPTIONAL OFFER ON TOP
-        if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            View basicPortraitView = getFWBasicPortraitView(position, convertView, parent);
-            if (basicPortraitView != null) {
-                return basicPortraitView;
-            }
-            offsetFeaturesTitleHeader++; // has to move down one slot since we'll have special offer above
-        }
-        // "FROSTWIRE FEATURES" title view
-        if (position == offsetFeaturesTitleHeader) {
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && !Constants.IS_BASIC_AND_DEBUG) {
-                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-            } else {
-                return View.inflate(getContext(), R.layout.view_frostwire_features_title, null);
-            }
-        }
-        LOG.info("PromotionsAdapter::getView -> position: " + position + ", offsetFeaturesTitleHeader: " + offsetFeaturesTitleHeader + ", slides.size(): " + slides.size());
-        return super.getView(position - offsetFeaturesTitleHeader, null, parent);
-    }
-
-    private View getFWBasicPortraitView(int position, View convertView, ViewGroup parent) {
         // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
         int specialOfferLayout = pickSpecialOfferLayout();
-        boolean adsAreOn = specialOfferLayout == R.layout.view_remove_ads_notification;
+        boolean adsAreOn = !Offers.disabledAds();//specialOfferLayout == R.layout.view_remove_ads_notification;
 
         // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
         if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
             return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-        } else if (position == 0 && adsAreOn) {
-            return setupRemoveAdsOfferView();
-        } else if (position == 1 && adsAreOn && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
+        } else if (position == 0 && adsAreOn && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
+            return Objects.requireNonNull(setupRemoveAdsOfferView());
+        } else if (position == 1 && adsAreOn) {
             return getFwBannerView();
         } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
-            return super.getView(position - 2, null, parent);
+            return super.getView(position, null, parent);
         }
         return null;
     }
@@ -239,16 +209,14 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return fwBannerView;
     }
 
-    @Nullable
     private View setupRemoveAdsOfferView() {
         String pitch = getContext().getString(UIUtils.randomPitchResId(true));
         View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
         TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
         if (pitchTitle != null) {
             pitchTitle.setText(pitch);
-            return specialOfferView;
         }
-        return null;
+        return specialOfferView;
     }
 
     /**
