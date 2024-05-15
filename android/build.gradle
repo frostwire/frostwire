@@ -214,7 +214,7 @@ dependencies {
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.2.0'
     implementation 'androidx.browser:browser:1.8.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2' // breaks if updated
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0' // breaks if updated
     implementation 'androidx.exifinterface:exifinterface:1.3.7'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
