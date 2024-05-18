@@ -150,15 +150,13 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public Slide getItem(int position) {
-        // The given position has already had an offset subtracted so that it makes sense for our slides.
-        // We show 2 views before the first slide, the special offer view and the FrostWire banner view.
         return slides.get(position);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // FIRST POSITION: A special offer/ad or an invisible view if we're not showing ads
+        // [0] FIRST POSITION: A special offer/ad or an invisible view if we're not showing ads
         // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
         int specialOfferLayout = pickSpecialOfferLayout();
         boolean adsAreOn = !Offers.disabledAds();
@@ -168,21 +166,22 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
             return removeAdsOfferView();
         }
 
+        // [1] SECOND POSITION: The banner ad or an invisible view if we're not showing ads
         if (position == 1 && adsAreOn) {
             return getFwBannerView();
         } else if (position == 1) {
             return View.inflate(getContext(), R.layout.view_invisible_promo, null);
         }
 
+        // [2..N-1] SLIDES
         if (position > 1 && position < getCount() - 1) {
             return super.getView(position - 2, null, parent);
         }
 
-        // Last position: "ALL FREE DOWNLOADS"
+        // [N] Last position: "ALL FREE DOWNLOADS" Button that takes user to the FrostWire Features page
         if (position == getCount() - 1) {
             return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
         }
-
         return View.inflate(getContext(), R.layout.view_invisible_promo, null);
     }
 
