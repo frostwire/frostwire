@@ -225,6 +225,7 @@ public final class Offers {
     }
 
     private static void checkIfPausedAsync() {
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::checkIfPausedAsync");
         pausedCheckLock.lock();
         ConfigurationManager CM = ConfigurationManager.instance();
         int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
@@ -419,10 +420,10 @@ public final class Offers {
     }
 
     /**
-     * @return true only for flavor basic or for plus_debug and we haven't paid for ad removals, or
-     * it's plus supporting FrostWire with ads.
-     * If it's been less than 2 seconds since the app started, we always return false as there's not
-     * enough time to check if user has purchased anything
+     * Determines if remove ads offers are enabled.
+     *
+     * @return false if the app has been running for less than 2 seconds to ensure accurate user purchase verification,
+     *         otherwise true if ads are not disabled.
      */
     public static boolean removeAdsOffersEnabled() {
         long now = System.currentTimeMillis();
@@ -430,13 +431,17 @@ public final class Offers {
             // not enough time to ask if user has bought products, better to avoid false positives for users that paid.
             return false;
         }
-        // Coded so explicitly for clarity.
-        boolean isBasic = Constants.IS_GOOGLE_PLAY_DISTRIBUTION;
-        boolean isDevelopment = Constants.IS_BASIC_AND_DEBUG;
-        boolean notDisabledAds = !Offers.disabledAds();
-        return (isBasic || isDevelopment) && notDisabledAds;
+        return !Offers.disabledAds();
     }
 
+    /**
+     * Attempts to show a back-to-back interstitial ad.
+     *
+     * This method checks if the remove ads feature is enabled and started. If so, it proceeds to determine if an
+     * interstitial ad should be shown based on a threshold. If the conditions are met, an interstitial ad is shown.
+     *
+     * @param activity the activity context in which to show the interstitial ad.
+     */
     private static void tryBackToBackInterstitial(Activity activity) {
         if (!REMOVE_ADS.enabled() || !REMOVE_ADS.started()) {
             return;

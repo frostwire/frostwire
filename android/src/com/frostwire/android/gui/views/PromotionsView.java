@@ -18,7 +18,6 @@
 package com.frostwire.android.gui.views;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
@@ -27,14 +26,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.frostwire.android.R;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.PromotionsAdapter;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.frostclick.Slide;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -95,18 +91,13 @@ public class PromotionsView extends LinearLayout {
                 return;
             }
             PromotionsAdapter promoAdapter = (PromotionsAdapter) gridview.getAdapter();
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION && position == 0) {
+            if (position == 0) {
                 promoAdapter.onSpecialOfferClick();
                 return;
             }
 
             // FROSTWIRE FEATURES VIEW
-            if (position == (Constants.IS_GOOGLE_PLAY_DISTRIBUTION ? 1 : 0)) {
-                promoAdapter.onAllFeaturedDownloadsClick("topHeader");
-                return;
-            }
-
-            if (position ==  promoAdapter.getCount()-1) {
+            if (position == promoAdapter.getCount() - 1) {
                 promoAdapter.onAllFeaturedDownloadsClick("allFreeDownloadsButton");
             }
         });

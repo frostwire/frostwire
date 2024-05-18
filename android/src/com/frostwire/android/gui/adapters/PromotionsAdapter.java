@@ -28,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
@@ -40,11 +39,9 @@ import com.frostwire.android.offers.FWBannerView;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.frostclick.Slide;
-import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Adapter in control of the List View shown when we're browsing the files of
@@ -55,7 +52,7 @@ import java.util.Objects;
  * @author marcelinkaaa
  */
 public class PromotionsAdapter extends AbstractAdapter<Slide> {
-    private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
+    //private static final Logger LOG = Logger.getLogger(PromotionsAdapter.class);
     private static final int NO_SPECIAL_OFFER = 97999605;
     private final List<Slide> slides;
     private final PromotionDownloader promotionDownloader;
@@ -140,46 +137,53 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
 
     @Override
     public int getCount() {
-        int addSpecialOffer = (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) ? 1 : 0;
-        int addFrostWireFeaturesTitle = 1;
+        int addSpecialOffer = 1;
+        int banner = 1;
         int slideCount = (slides != null) ? slides.size() : 0;
         int addAllFeaturesButtonAtTheEnd = 1;
-        return addSpecialOffer + addFrostWireFeaturesTitle + slideCount + addAllFeaturesButtonAtTheEnd;
+        if (Offers.disabledAds()) {
+            addSpecialOffer = 0;
+            banner = 0;
+        }
+        return addSpecialOffer + banner + slideCount + addAllFeaturesButtonAtTheEnd;
     }
 
     @Override
     public Slide getItem(int position) {
-        int correction_offset = -2;
-        return slides.get(Math.max(0, position + correction_offset));
+        // The given position has already had an offset subtracted so that it makes sense for our slides.
+        // We show 2 views before the first slide, the special offer view and the FrostWire banner view.
+        return slides.get(position);
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        // "ALL FREE DOWNLOADS" button shown last
-        if (position == getCount() - 1) {
-            if (!Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
-                return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
-            } else {
-                return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-            }
-        }
-
+        // FIRST POSITION: A special offer/ad or an invisible view if we're not showing ads
         // if you paid for ads we show no special layout (NO_SPECIAL_OFFER)
         int specialOfferLayout = pickSpecialOfferLayout();
         boolean adsAreOn = !Offers.disabledAds();
-
-        // Show special offer or banner, Google play logic included in pickSpecialOfferLayout()
-        if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER) {
+        if (position == 0 && specialOfferLayout == NO_SPECIAL_OFFER && !adsAreOn) {
             return View.inflate(getContext(), R.layout.view_invisible_promo, null);
-        } else if (position == 0 && adsAreOn && Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
-            return Objects.requireNonNull(setupRemoveAdsOfferView());
-        } else if (position == 1 && adsAreOn) {
-            return getFwBannerView();
-        } else if (position > 1) { // everything after the "FROSTWIRE FEATURES" title view.
-            return super.getView(position, null, parent);
+        } else if (position == 0 && adsAreOn) {
+            return removeAdsOfferView();
         }
-        return null;
+
+        if (position == 1 && adsAreOn) {
+            return getFwBannerView();
+        } else if (position == 1) {
+            return View.inflate(getContext(), R.layout.view_invisible_promo, null);
+        }
+
+        if (position > 1 && position < getCount() - 1) {
+            return super.getView(position - 2, null, parent);
+        }
+
+        // Last position: "ALL FREE DOWNLOADS"
+        if (position == getCount() - 1) {
+            return View.inflate(getContext(), R.layout.view_frostwire_features_all_downloads, null);
+        }
+
+        return View.inflate(getContext(), R.layout.view_invisible_promo, null);
     }
 
     private FWBannerView getFwBannerView() {
@@ -203,7 +207,7 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
         return fwBannerView;
     }
 
-    private View setupRemoveAdsOfferView() {
+    private View removeAdsOfferView() {
         String pitch = getContext().getString(UIUtils.randomPitchResId(true));
         View specialOfferView = View.inflate(getContext(), R.layout.view_remove_ads_notification, null);
         TextView pitchTitle = specialOfferView.findViewById(R.id.view_remove_ads_notification_title);
@@ -217,14 +221,12 @@ public class PromotionsAdapter extends AbstractAdapter<Slide> {
      * Decide what the special offer layout we should use.
      */
     private int pickSpecialOfferLayout() {
-        // Optimistic: If we're plus, we can't offer ad removal yet.
-        specialOfferLayout = NO_SPECIAL_OFFER;
-
         if (Offers.removeAdsOffersEnabled()) {
             specialOfferLayout = R.layout.view_remove_ads_notification;
+            return R.layout.view_remove_ads_notification;
         }
-
-        return specialOfferLayout;
+        specialOfferLayout = NO_SPECIAL_OFFER;
+        return NO_SPECIAL_OFFER;
     }
 
     public void onAllFeaturedDownloadsClick(String from) {
