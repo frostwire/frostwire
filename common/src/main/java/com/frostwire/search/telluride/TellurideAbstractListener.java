@@ -17,7 +17,7 @@
 package com.frostwire.search.telluride;
 
 /**
- * An abstract listener so we can implement succint TellurideListeners
+ * An abstract listener so we can implement succinct TellurideListeners
  * with only the methods we care about
  */
 public class TellurideAbstractListener implements TellurideListener {

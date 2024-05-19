@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@
 
 package com.frostwire.search.yt;
 
-import com.frostwire.util.Logger;
-
 import com.frostwire.regex.Matcher;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
+import com.frostwire.util.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -47,6 +46,9 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
 
     private final static Logger LOG = Logger.getLogger(YTSearchPerformer.class);
 
+    private String htmlOutput;
+
+
     public YTSearchPerformer(long token, String keywords, int timeout, int pages) {
         super("www.youtube.com", token, keywords, timeout, pages);
         if (jsonPattern == null) {
@@ -61,6 +63,8 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
+        page = normalizeScriptTags(page);
+        htmlOutput = page;
         Matcher jsonMatcher = jsonPattern.matcher(page);
         List<YTSearchResult> results = new ArrayList<>();
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -310,6 +314,56 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
     @Override
     public boolean isCrawler() {
         return false;
+    }
+
+    public String getHtmlOutput() {
+        return htmlOutput;
+    }
+
+    private static boolean isHexEncoded(String input) {
+        // Check for the pattern \x followed by two hex digits
+        Pattern hexPattern = Pattern.compile("\\\\x[0-9A-Fa-f]{2}");
+        Matcher matcher = hexPattern.matcher(input);
+        return matcher.find();
+    }
+
+    private static String decodeHexString(String hex) {
+        StringBuilder output = new StringBuilder();
+
+        for (int i = 0; i < hex.length(); i++) {
+            if (hex.charAt(i) == '\\' && hex.charAt(i + 1) == 'x') {
+                String str = hex.substring(i + 2, i + 4);
+                output.append((char) Integer.parseInt(str, 16));
+                i += 3; // Move past the hex sequence
+            } else {
+                output.append(hex.charAt(i));
+            }
+        }
+
+        return output.toString();
+    }
+
+    public static String normalizeString(String input) {
+        if (isHexEncoded(input)) {
+            return decodeHexString(input);
+        } else {
+            return input;
+        }
+    }
+
+    public static String normalizeScriptTags(String html) {
+        java.util.regex.Pattern scriptPattern = java.util.regex.Pattern.compile("<script[^>]*>(.*?)</script>", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Matcher matcher = scriptPattern.matcher(html);
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+            String scriptContent = matcher.group(1);
+            String normalizedScriptContent = normalizeString(scriptContent);
+            matcher.appendReplacement(sb, "<script>" + java.util.regex.Matcher.quoteReplacement(normalizedScriptContent) + "</script>");
+        }
+        matcher.appendTail(sb);
+
+        return sb.toString();
     }
 
     public static class Video {

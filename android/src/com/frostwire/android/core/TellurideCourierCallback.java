@@ -23,6 +23,7 @@ import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.gui.views.AbstractListAdapter;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.telluride.TellurideSearchResult;
+import com.frostwire.util.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +34,8 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
     private final TellurideCourier.SearchPerformer searchPerformer;
     private boolean hasAborted = false;
 
+    private static Logger LOG = Logger.getLogger(TellurideCourierCallback.class);
+
     public TellurideCourierCallback(TellurideCourier.SearchPerformer searchPerformer, String pageUrl, T adapter) {
         this.searchPerformer = searchPerformer;
         this.url = pageUrl;
@@ -41,10 +44,11 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
 
     void onSearchResultListAdapterResults(List<TellurideSearchResult> results, boolean errored) {
         SystemUtils.postToUIThread(() -> {
+            LOG.info("onSearchResultListAdapterResults: " + adapter.getClass().getName());
             SearchResultListAdapter srlAdapter = (SearchResultListAdapter) adapter;
             // Screw our listener, make the adapter do what we want.
             adapter.clear();
-            if (results != null) {
+            if (results != null && !results.isEmpty()) {
                 srlAdapter.addResults(results); // adds to full list of results
                 srlAdapter.setFileType(Constants.FILE_TYPE_AUDIO, false, null);
                 srlAdapter.setFileType(Constants.FILE_TYPE_VIDEOS, true,
@@ -56,11 +60,9 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
                         });
 
             } else if (results == null || results.isEmpty() || errored) {
-
                 if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
                     SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                 }
-
             }
         });
     }

@@ -141,12 +141,12 @@ public final class TellurideCourier {
 
     public static class SearchPerformer<T extends AbstractListAdapter> extends AbstractSearchPerformer {
         private final String pageUrl;
-        private final TellurideCourierCallback courierCallback;
+        private final TellurideCourierCallback<T> courierCallback;
 
         public SearchPerformer(long token, String pageUrl, T adapter) {
             super(token);
             this.pageUrl = pageUrl;
-            this.courierCallback = new TellurideCourierCallback(this, pageUrl, adapter);
+            this.courierCallback = new TellurideCourierCallback<T>(this, pageUrl, adapter);
         }
 
         @Override

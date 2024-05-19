@@ -48,13 +48,16 @@ public class YTSearchPerformerTest {
 
             @Override
             public void onError(long token, SearchError error) {
-
+                LOG.error("YTSearchPerformerTest error: " + error.message());
             }
         };
         YTSearchPerformer searchPerformer = new YTSearchPerformer(1, "frostwire", 5000, 1);
         searchPerformer.setListener(listener);
         searchPerformer.perform();
         LOG.info("YTSearchPerformerTest results: " + results.size());
+        if (results.isEmpty()) {
+            LOG.info("YTSearchPerformerTest no results found, htmlOutput:\n\n" + searchPerformer.getHtmlOutput() + "\n\n");
+        }
         Assertions.assertEquals(true, results.size() > 0, "No results found");
     }
 
