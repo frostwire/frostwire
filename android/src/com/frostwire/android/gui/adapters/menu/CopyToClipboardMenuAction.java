@@ -25,6 +25,7 @@ import android.content.Context;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.util.Logger;
 
 /**
  * @author gubatron
@@ -35,6 +36,8 @@ public class CopyToClipboardMenuAction extends MenuAction {
 
     private final int messageId;
     private final Object data;
+
+    private static final Logger LOG = Logger.getLogger(CopyToClipboardMenuAction.class);
 
     public CopyToClipboardMenuAction(Context context, int drawable, int actionNameId,
                                      int messageId, Object data) {
@@ -50,9 +53,13 @@ public class CopyToClipboardMenuAction extends MenuAction {
         Object data = getData();
 
         if (clipboard != null && data != null) {
-            ClipData clip = ClipData.newPlainText("data", data.toString());
-            clipboard.setPrimaryClip(clip);
-            UIUtils.showLongMessage(context, messageId);
+            try {
+                ClipData clip = ClipData.newPlainText("data", data.toString());
+                clipboard.setPrimaryClip(clip);
+                UIUtils.showLongMessage(context, messageId);
+            } catch (SecurityException e) {
+                LOG.error("Error copying to clipboard", e);
+            }
         }
         if (context instanceof TimerObserver) {
             ((TimerObserver) context).onTime();
