@@ -52,8 +52,8 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.SoftwareUpdater;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.NavigationMenu;
@@ -163,7 +163,9 @@ public class MainActivity extends AbstractActivity implements
                 fragmentsStack.pop();
                 int id = fragmentsStack.peek();
                 Fragment fragment = getFragmentManager().findFragmentById(id);
-                switchContent(fragment, false);
+                if (fragment != null) {
+                    switchContent(fragment, false);
+                }
             } catch (Throwable e) {
                 // don't break the app
                 showLastBackDialog();
@@ -616,6 +618,9 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void switchContent(Fragment fragment, boolean addToStack) {
+        if (fragment == null || fragment == currentFragment) {
+            return;
+        }
         hideFragments();
         FragmentTransaction transaction = getFragmentManager().beginTransaction().show(fragment);
         try {
