@@ -1211,6 +1211,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                 activity.getString(R.string.now_listening_to_no_artist_available, trackName);
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         View rootView = activity.getWindow().getDecorView().getRootView();
         File screenshotFile = UIUtils.takeScreenshot(rootView);
         if (screenshotFile != null && screenshotFile.canRead() && screenshotFile.length() > 0) {
