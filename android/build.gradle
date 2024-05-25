@@ -65,12 +65,13 @@ def manifestVersionName() {
 }
 
 def changeApkOutput(variant) {
-    def flavor = 'unknown'
-    if (variant.productFlavors[0].name == "basic") {
-        flavor = 'basic'
-    } else if (variant.productFlavors[0].name == "plus1") {
-        flavor = 'plus'
-    }
+    //def flavor = 'unknown'
+    //if (variant.productFlavors[0].name == "basic") {
+    //    flavor = 'basic'
+    //} else if (variant.productFlavors[0].name == "plus1") {
+    //    flavor = 'plus'
+    //}
+    def flavor = 'plus'
     def suffix = project.ext.versionName + '-b' + project.ext.versionCode + '-' + flavor
     def name = "frostwire-android-" + variant.buildType.name + '-' + suffix
 
@@ -174,11 +175,13 @@ android {
     flavorDimensions "classicApp"
 
     productFlavors {
+        /*
         basic {
             // OLD BASIC CODE VERSION SUFFIX 9060000
             versionCode 9080000 + project.ext.versionCode
             resValue "string", "application_label", "FrostWire"
         }
+        */
         plus1 {
             // OLD PLUS CODE VERSION SUFFIX 9070000
             versionCode 9090000 + project.ext.versionCode
@@ -256,12 +259,14 @@ dependencies {
 }
 
 afterEvaluate {
-    tasks.named('uploadCrashlyticsMappingFileBasicRelease').configure {
-        dependsOn ':processPlus1ReleaseGoogleServices'
-    }
+    //tasks.named('uploadCrashlyticsMappingFileBasicRelease').configure {
+    //    dependsOn ':processPlus1ReleaseGoogleServices'
+    //    dependsOn ':processBasicReleaseGoogleServices' // this should be the one, but it wasn't
+    //}
 
     tasks.named('uploadCrashlyticsMappingFilePlus1Release').configure {
-        dependsOn ':processBasicReleaseGoogleServices'
+    //    dependsOn ':processBasicReleaseGoogleServices'
+        dependsOn ':processPlus1ReleaseGoogleServices'
     }
 }
 
