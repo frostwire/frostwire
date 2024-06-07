@@ -1,5 +1,13 @@
+build 32 - jun/07/2024
+ - x.com url support
+ - yt_dlp-2024.5.27
+ - dev: pyinstaller-6.7.0
+ - dev: pylint-3.2.3
+ - dev: astroid-3.2.2
+
+
 build 31 - apr/24/2024
- - yt_dlp-2023.4.9
+ - yt_dlp-2024.4.9
  - trim file names up to 200 characters max
  - dev: pyinstaller-6.6.0
  - dev: astroid-3.1.0
