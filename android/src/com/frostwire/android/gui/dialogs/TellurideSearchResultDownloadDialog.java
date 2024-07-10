@@ -84,20 +84,17 @@ public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDial
 
         @Override
         public CharSequence getItemTitle(TellurideSearchResult data) {
-            TellurideSearchResult sr = (TellurideSearchResult) data;
-            return sr.getDisplayName();
+            return data.getDisplayName();
         }
 
         @Override
         public long getItemSize(TellurideSearchResult data) {
-            TellurideSearchResult sr = (TellurideSearchResult) data;
-            return sr.getSize();
+            return data.getSize();
         }
 
         @Override
         public CharSequence getItemThumbnailUrl(TellurideSearchResult data) {
-            TellurideSearchResult sr = (TellurideSearchResult) data;
-            return sr.getThumbnailUrl();
+            return data.getThumbnailUrl();
         }
 
         @Override
