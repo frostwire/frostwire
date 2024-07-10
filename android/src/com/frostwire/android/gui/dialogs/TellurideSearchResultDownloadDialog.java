@@ -33,6 +33,7 @@ import com.frostwire.util.Logger;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDialog<TellurideSearchResult> {
 
@@ -45,7 +46,7 @@ public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDial
         TellurideSearchResultList srList = new TellurideSearchResultList();
         srList.listData = listData;
         dlg.prepareArguments(R.drawable.download_icon,
-                ctx.getString(R.string.downloads),
+                Optional.of(ctx.getString(R.string.downloads)).orElse("Downloads"),
                 ctx.getString(R.string.select_option_below),
                 JsonUtils.toJson(srList),
                 SelectionMode.SINGLE_SELECTION);
