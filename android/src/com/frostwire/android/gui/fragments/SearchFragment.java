@@ -47,7 +47,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
-import com.frostwire.android.core.TellurideCourierCallback;
+import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
@@ -86,9 +86,8 @@ import com.frostwire.frostclick.TorrentPromotionSearchResult;
 import com.frostwire.search.FileSearchResult;
 import com.frostwire.search.SearchError;
 import com.frostwire.search.SearchListener;
+import com.frostwire.search.SearchManager;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.telluride.TellurideSearchPerformer;
-import com.frostwire.search.telluride.TellurideSearchPerformerListener;
 import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.search.yt.YTSearchResult;
@@ -542,6 +541,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             SystemUtils.postToUIThread(() -> {
                 TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(getContext(), tellurideSearchResultDownloadDialogAdapter.getFullList());
                 dlg.show(getActivity().getFragmentManager());
+                SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
             });
         });
     }
