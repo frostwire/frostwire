@@ -1,3 +1,9 @@
+frostwire (6.13.3) stable; urgency=high
+  * Java Runtime Environment 22.0.2 update
+  * Telluride Video Downloader build 32
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 11 Aug 2024 00:25:00 -0600
+
 frostwire (6.13.2) stable; urgency=high
   * SC search fixed
   * EZTV search removed
