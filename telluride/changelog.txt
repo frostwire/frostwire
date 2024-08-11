@@ -1,3 +1,10 @@
+build 33 - aug/10/2024
+ - yt_dlp-2024.8.6
+ - dev: pip-24.2
+ - dev: astroid-3.2.4
+ - dev: pylint-3.2.6
+ - dev: pyinstaller-6.10.0
+
 build 32 - jun/07/2024
  - x.com url support
  - yt_dlp-2024.5.27
