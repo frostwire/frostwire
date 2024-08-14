@@ -1,17 +1,16 @@
 FROM --platform=linux/amd64 ubuntu:24.04
 ENV DEBIAN_FRONTEND noninteractive
 ARG PYTHON_VERSION_MAJOR=3.12
-ARG PYTHON_VERSION=3.12.1
+ARG PYTHON_VERSION=3.12.5
 RUN apt update -y
 RUN apt upgrade -y
-RUN apt install libssl1.1 -y
-RUN apt install pylint3 -y
+RUN apt install libssl3 -y
 RUN apt install less -y
 RUN apt install emacs-nox -y
 RUN apt install wget -y
 RUN apt install xz-utils -y
 RUN apt install build-essential checkinstall -y
-RUN apt install libreadline-gplv2-dev -y
+RUN apt install libreadline-dev -y
 RUN apt install libncursesw5-dev -y
 RUN apt install libssl-dev -y
 RUN apt install openssl -y
