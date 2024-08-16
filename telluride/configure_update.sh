@@ -19,7 +19,6 @@
 
 # Python3 by default for macOS (and Windows to be tested)
 # set -x
-PIP_CMD='python3 -m pip'
 PYINSTALLER_PACKAGE='pyinstaller'
 PIP_OPTIONS='install --upgrade --no-cache-dir'
 source ./common.sh
@@ -30,10 +29,14 @@ then
   exit 1
 fi
 
-if iswindows
+PIP_CMD='python3 -m pip'
+
+iswindows
+if [ $? -eq ${TRUE} ];
 then
   PIP_CMD='python -m pip'
 fi
+
 
 ${PIP_CMD} cache purge
 ${PIP_CMD} cache info

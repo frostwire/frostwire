@@ -41,7 +41,7 @@ isubuntu() {
 }
 
 iswindows() {
-  if [ $(uname -a | grep -c windows) == 0 ]
+  if [ $(uname -a | grep -c windows) -eq 0 ] && [ $(uname -a | grep -c MINGW64) -eq 0 ];
   then
     echo "iswindows(): false"
     return ${FALSE}
@@ -52,7 +52,7 @@ iswindows() {
 }
 
 ismac() {
-  if [  $(uname -a | grep -c Darwin) == 0 ]
+  if [  $(uname -a | grep -c Darwin) -eq 0 ]
   then
     echo "ismac(): false"
     return ${FALSE}
