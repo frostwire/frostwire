@@ -92,7 +92,13 @@ public class ImageCache {
 
     private BufferedImage loadFromResource(URL url, OnLoadedListener listener) {
         try {
-            BufferedImage image = ImageIO.read(url);
+            // Use JdkHttpClient to fetch the image data
+            HttpClient newInstance = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
+            byte[] data = newInstance.getBytes(url.toString());
+            if (data == null) {
+                throw new IOException("ImageCache.loadFromResource() got nothing at " + url.toString());
+            }
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(data));
             saveToCache(url, image, 0);
             listener.onLoaded(url, image, false, false);
             return image;
