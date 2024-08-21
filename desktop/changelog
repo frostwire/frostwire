@@ -1,8 +1,11 @@
 frostwire (6.13.3) stable; urgency=high
   * Java Runtime Environment 22.0.2 update
   * Telluride Video Downloader build 33
-
- -- FrostWire Team <contact@frostwire.com>  Sun, 11 Aug 2024 00:25:00 -0600
+  * Enhance SSL/TLS Validation with Improved Domain and Certificate Handling
+  * Refactor Image Loading to Use HttpClient for Better Handling
+  * YT search fixed
+ 
+ -- FrostWire Team <contact@frostwire.com>  Wed, 21 Aug 2024 15:45:00 -0600
 
 frostwire (6.13.2) stable; urgency=high
   * SC search fixed
