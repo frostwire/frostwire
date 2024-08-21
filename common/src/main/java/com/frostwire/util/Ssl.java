@@ -24,8 +24,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Util class to provide SSL/TLS specific features.
@@ -103,6 +105,7 @@ public final class Ssl {
                 "cloudflaressl.com",
                 "dl.frostwire.com",
                 "fbcdn.net",
+                "frostwire.com",
                 "github.com",
                 "github.io",
                 "githubusercontent.com",
@@ -183,17 +186,50 @@ public final class Ssl {
             }
             return validDomainsSet.contains(s);
         }
+
+        public static boolean hostnameIsValid(String hostname) {
+            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + "...");
+            if (!validDomainsSet.contains(hostname)) {
+                // check if the s is a subdomain
+                for (String baseDomain : validDomainsSet) {
+                    if (hostname.contains(baseDomain)) {
+                        validDomainsSet.add(hostname);
+                        LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": TRUE, validDomainSet updated with: " + hostname);
+
+                        return true;
+                    }
+                }
+            }
+            boolean result = validDomainsSet.contains(hostname);
+            LOG.info("SSL::FWHostnameVerifier::hostnameIsValid: " + hostname + ": " + result);
+            return result;
+        }
     }
 
     private static final class NullTrustManager implements X509TrustManager {
+        private final List<X509Certificate> acceptedCertificates = new ArrayList<>();
+
         public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
+            return acceptedCertificates.toArray(new X509Certificate[0]);
         }
 
         public void checkClientTrusted(X509Certificate[] certs, String authType) {
+
         }
 
         public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            if (certs != null && certs.length > 0) {
+                X509Certificate cert = certs[0];
+                String certHostName = cert.getSubjectX500Principal().getName();
+                LOG.info("checkServerTrusted: Certificate issued to " + certHostName);
+
+                if (FWHostnameVerifier.hostnameIsValid(certHostName)) {
+                    LOG.info("checkServerTrusted: Certificate matches valid domain " + certHostName);
+                    if (!acceptedCertificates.contains(cert)) {
+                        acceptedCertificates.add(cert);
+                    }
+                }
+            }
         }
     }
 
