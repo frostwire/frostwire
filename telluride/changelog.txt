@@ -1,5 +1,6 @@
-build 33 - aug/10/2024
+build 33 - aug/18/2024
  - yt_dlp-2024.8.6
+ - python 3.12.5
  - dev: pip-24.2
  - dev: astroid-3.2.4
  - dev: pylint-3.2.6
