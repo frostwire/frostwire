@@ -58,12 +58,16 @@ public class YTSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/results?search_query=" + encodedKeywords;
+        return "https://" + getDomainName() + "/results?app=desktop&search_query=" + encodedKeywords;
     }
 
     @Override
     protected List<? extends SearchResult> searchPage(String page) {
         page = normalizeScriptTags(page);
+        int start = page.indexOf("videoRenderer") - 2;
+        int end = page.indexOf("</script>", start);
+
+        page = page.substring(start, end);
         htmlOutput = page;
         Matcher jsonMatcher = jsonPattern.matcher(page);
         List<YTSearchResult> results = new ArrayList<>();
