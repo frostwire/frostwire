@@ -10,6 +10,7 @@ FrostWire 2.7.9 build 734 AUG/23/2024
  - Adjusted YTSearchPerformer for more memory-efficient handling of search results
  - Improved placement of FrostClick search within the Android UI
  - Fixed potential NullPointerException in TellurideSearchResultDownloadDialog
+ - com.google.firebase:firebase-bom:33.2.0
 
 FrostWire 2.7.8 build 733 MAY/25/2024
  - Fixes X Video Download issue where video file names were too long
