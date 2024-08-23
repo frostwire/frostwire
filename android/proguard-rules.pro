@@ -4,6 +4,7 @@
 #D8: Type `org.conscrypt.Conscrypt` was not found
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 -dontwarn javax.annotation.**
+-keep class androidx.lifecycle.** { *; }
 -keep class okhttp3.Headers { *; }
 -keep class org.apache.http.client.utils.URLEncodedUtils { *; }
 -keep class org.conscrypt.Conscrypt { *; }
