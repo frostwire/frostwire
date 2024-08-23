@@ -281,7 +281,12 @@ class SignatureRequester {
 
     void ask() {
         System.setProperty('java.awt.headless', 'false')
-        if (System.console() == null) { // this is always the case on macOS at least
+        boolean useSwingDialog = true  // Force use of Swing dialog
+
+        System.out.println("System.console()=" + System.console())
+
+        if (useSwingDialog || System.console() == null) {
+            // Force the Swing dialog to be used by always setting useSwingDialog to true
             new SwingBuilder().edt {
                 dialog(modal: true,
                         title: 'Enter keystore data',
@@ -305,10 +310,8 @@ class SignatureRequester {
                 }
             }
         } else {
-            this.myKeyAlias = System.console().readPassword("\nKey Alias: ")
-            this.myKeyAlias = new String(myKeyAlias)
-            this.myKeyPassword = System.console().readPassword("\nKey Password: ")
-            this.myKeyPassword = new String(myKeyPassword)
+            this.myKeyAlias = new String(System.console().readPassword("\nKey Alias: "))
+            this.myKeyPassword = new String(System.console().readPassword("\nKey Password: "))
         }
     }
 
@@ -320,3 +323,4 @@ class SignatureRequester {
         this.myKeyPassword
     }
 }
+

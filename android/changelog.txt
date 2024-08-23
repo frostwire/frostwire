@@ -10,6 +10,7 @@ FrostWire 2.7.9 build 734 AUG/23/2024
  - Adjusted YTSearchPerformer for more memory-efficient handling of search results
  - Improved placement of FrostClick search within the Android UI
  - Fixed potential NullPointerException in TellurideSearchResultDownloadDialog
+ - Updated Gradle wrapper to use version 8.9
  - yt_dlp 2024.08.06
  - com.google.firebase:firebase-bom:33.2.0
  - com.google.gms:google-services:4.4.2
