@@ -1,3 +1,16 @@
+FrostWire 2.7.9 build 734 AUG/23/2024
+ - Enhanced SSL/TLS validation with improved domain and certificate handling in Ssl.java
+ - Added "frostwire.com" to the list of valid SSL certificate domains
+ - Implemented dynamic validation for subdomains
+ - Updated NullTrustManager to manage and log SSL certificates more effectively
+ - Simplified item access methods in TellurideSearchResultDownloadDialog
+ - Removed unnecessary casting to improve code readability and efficiency
+ - Corrected iswindows function in common.sh for proper integer comparison
+ - Updated function’s usage in configure_update.sh for correct return status handling
+ - Adjusted YTSearchPerformer for more memory-efficient handling of search results
+ - Improved placement of FrostClick search within the Android UI
+ - Fixed potential NullPointerException in TellurideSearchResultDownloadDialog
+
 FrostWire 2.7.8 build 733 MAY/25/2024
  - Fixes X Video Download issue where video file names were too long
  - Search fixes
