@@ -45,6 +45,18 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
     void onSearchResultListAdapterResults(List<TellurideSearchResult> results, boolean errored) {
         SystemUtils.postToUIThread(() -> {
             LOG.info("onSearchResultListAdapterResults: " + adapter.getClass().getName());
+
+            if (results == null || results.isEmpty() || errored) {
+                adapter.clear();
+                if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
+                    SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
+                }
+                return;
+            }
+            if (adapter instanceof com.frostwire.android.gui.dialogs.TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter) {
+                LOG.info("onSearchResultListAdapterResults: TellurideSearchResultDownloadDialogAdapter, aborting.");
+                return;
+            }
             SearchResultListAdapter srlAdapter = (SearchResultListAdapter) adapter;
             // Screw our listener, make the adapter do what we want.
             adapter.clear();
@@ -59,10 +71,6 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
                             SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
                         });
 
-            } else if (results == null || results.isEmpty() || errored) {
-                if (SearchMediator.instance().getListener() != null && searchPerformer != null) {
-                    SearchMediator.instance().getListener().onStopped(searchPerformer.getToken());
-                }
             }
         });
     }
