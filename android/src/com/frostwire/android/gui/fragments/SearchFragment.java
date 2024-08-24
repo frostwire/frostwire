@@ -21,6 +21,7 @@ package com.frostwire.android.gui.fragments;
 import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
+import static com.frostwire.android.util.SystemUtils.getApplicationContext;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
@@ -539,7 +540,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                             tellurideSearchResultDownloadDialogAdapter);
             searchPerformer.perform();
             SystemUtils.postToUIThread(() -> {
-                TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(getContext(), tellurideSearchResultDownloadDialogAdapter.getFullList());
+                Context ctx = getContext() != null ? getContext() : getApplicationContext();
+                TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(ctx, tellurideSearchResultDownloadDialogAdapter.getFullList());
                 dlg.show(getActivity().getFragmentManager());
                 SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
             });
