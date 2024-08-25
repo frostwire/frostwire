@@ -28,6 +28,7 @@ import static com.frostwire.android.util.SystemUtils.postToUIThread;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -542,7 +543,13 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             SystemUtils.postToUIThread(() -> {
                 Context ctx = getContext() != null ? getContext() : getApplicationContext();
                 TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(ctx, tellurideSearchResultDownloadDialogAdapter.getFullList());
-                dlg.show(getActivity().getFragmentManager());
+                FragmentManager fragmentManager = getFragmentManager();
+                if (fragmentManager == null && getActivity() != null) {
+                    fragmentManager = getActivity().getFragmentManager();
+                }
+                if (fragmentManager != null) {
+                    dlg.show(fragmentManager);
+                }
                 SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
             });
         });
