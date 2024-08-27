@@ -1,4 +1,4 @@
-FrostWire 2.7.9 build 735 AUG/24/2024
+FrostWire 2.7.9 build 736 AUG/24/2024
  - Enhanced SSL/TLS validation with improved domain and certificate handling in Ssl.java
  - Added "frostwire.com" to the list of valid SSL certificate domains
  - Implemented dynamic validation for subdomains
@@ -10,6 +10,9 @@ FrostWire 2.7.9 build 735 AUG/24/2024
  - Adjusted YTSearchPerformer for more memory-efficient handling of search results
  - Improved placement of FrostClick search within the Android UI
  - Fixed potential NullPointerException in TellurideSearchResultDownloadDialog
+ - Fix potential NullPointerException in SearchFragment by ensuring valid FragmentManager
+ - Fix ClassCastException in TellurideCourierCallback by adding type check for adapter instance
+ - Enhanced URL opening method to handle cases where no default browser is found
  - Updated Gradle wrapper to use version 8.9
  - yt_dlp 2024.08.06
  - com.google.firebase:firebase-bom:33.2.0
