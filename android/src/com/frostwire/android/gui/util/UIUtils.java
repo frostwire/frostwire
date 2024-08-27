@@ -27,6 +27,7 @@ import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -361,12 +362,23 @@ public final class UIUtils {
     public static void openURL(Context context, String url) {
         try {
             Intent i = new Intent(Intent.ACTION_VIEW);
+            i.addCategory(Intent.CATEGORY_BROWSABLE);
             i.setData(Uri.parse(url));
-            context.startActivity(i);
+            if (i.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(i);
+            } else {
+                LOG.info("openURL: Will try default android browser component... (not guaranteed to exist on all distributions)");
+                // Fallback to default android component (not guaranteed to exist on all android distributions)
+                ComponentName componentName = new ComponentName("com.android.browser", "com.android.browser.BrowserActivity");
+                i.setComponent(componentName);
+                try {
+                    context.startActivity(i);
+                } catch (ActivityNotFoundException e) {
+                    LOG.error("openURL: No default browser component activity found to open URL: " + url, e);
+                }
+            }
         } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-            // ignore
-            // yes, it happens
+            LOG.error("openURL: No activity found to open URL: " + url, e);
         }
     }
 
@@ -630,8 +642,7 @@ public final class UIUtils {
                     } else {
                         text = charSequence.toString();
                     }
-                    if (!StringUtils.isNullOrEmpty(text) && (text.startsWith("http") || text.startsWith("magnet")))
-                    {
+                    if (!StringUtils.isNullOrEmpty(text) && (text.startsWith("http") || text.startsWith("magnet"))) {
                         targetTextView.setText(text.trim());
                     }
                 }
