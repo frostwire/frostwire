@@ -146,6 +146,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private Component centerComponent;
     private long _nextUpdateTime = System.currentTimeMillis();
 
+    private boolean previousSeedingStatus;
+
     /**
      * Creates a new status line in the disconnected state.
      */
@@ -257,17 +259,19 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private void createSeedingStatusLabel() {
         seedingStatusButton = new IconButton("", "SEEDING", true) {
-            private static final long serialVersionUID = -8985154093868645203L;
-
             @Override
             public String getToolTipText() {
                 boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
                 return "<html>" + (seedingStatus ? I18n.tr("<b>Seeding</b><p>completed torrent downloads.</p>") : I18n.tr("<b>Not Seeding</b><p>File chunks might be shared only during a torrent download.</p>") + "</html>");
             }
         };
+        seedingStatusButton.setText(I18n.tr("Not Seeding")); // Default text
+        seedingStatusButton.setIcon(GUIMediator.getThemeImage("not_seeding_small")); // Default icon
+        previousSeedingStatus = false; // Set default value
         seedingStatusButton.addActionListener(e -> GUIMediator.instance().setOptionsVisible(true, OptionsConstructor.BITTORRENT_BASIC_KEY));
         ToolTipManager.sharedInstance().registerComponent(seedingStatusButton);
     }
+
 
     /**
      * Redraws the status bar based on changes to StatusBarSettings,
@@ -491,9 +495,32 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
 
     private void updateSeedingStatus() {
         boolean seedingStatus = SharingSettings.SEED_FINISHED_TORRENTS.getValue();
-        seedingStatusButton.setText("<html><b>" + (seedingStatus ? I18n.tr("Seeding") : I18n.tr("Not Seeding")) + "</b></html>");
-        seedingStatusButton.setIcon(seedingStatus ? GUIMediator.getThemeImage("seeding_small") : GUIMediator.getThemeImage("not_seeding_small"));
+
+        // Only update if there's a change in the seeding status
+        if (seedingStatus != previousSeedingStatus) {
+            // Update the label text and icon
+            String newText = seedingStatus ? I18n.tr("Seeding") : I18n.tr("Not Seeding");
+            ImageIcon newIcon = seedingStatus ? GUIMediator.getThemeImage("seeding_small") : GUIMediator.getThemeImage("not_seeding_small");
+
+            // Avoid flicker by checking if the content is already the same
+            if (!seedingStatusButton.getText().equals(newText)) {
+                seedingStatusButton.setText(newText);
+            }
+
+            if (!seedingStatusButton.getIcon().equals(newIcon)) {
+                seedingStatusButton.setIcon(newIcon);
+            }
+
+            // Force a re-layout of the component to ensure proper sizing
+            seedingStatusButton.revalidate();
+            seedingStatusButton.repaint();
+
+            // Update previous seeding status
+            previousSeedingStatus = seedingStatus;
+        }
     }
+
+
 
     /**
      * Updates the status text.
