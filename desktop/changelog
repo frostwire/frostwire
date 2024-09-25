@@ -1,10 +1,15 @@
+frostwire (6.13.4) stable; urgency=high
+  * Fix flickering and empty label issue in seeding status indicator
+
+ -- FrostWire Team <contact@frostwire.com>  Thu, 24 Sep 2024 20:44:00 -0600
+
 frostwire (6.13.3) stable; urgency=high
   * Java Runtime Environment 22.0.2 update
   * Telluride Video Downloader build 33
   * Enhance SSL/TLS Validation with Improved Domain and Certificate Handling
   * Refactor Image Loading to Use HttpClient for Better Handling
   * YT search fixed
- 
+
  -- FrostWire Team <contact@frostwire.com>  Wed, 21 Aug 2024 15:45:00 -0600
 
 frostwire (6.13.2) stable; urgency=high
