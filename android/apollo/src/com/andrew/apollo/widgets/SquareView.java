@@ -39,10 +39,20 @@ public class SquareView extends ViewGroup {
     @Override
     protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         final View mChildren = getChildAt(0);
-        mChildren.measure(widthMeasureSpec, widthMeasureSpec);
-        final int mWidth = resolveSize(mChildren.getMeasuredWidth(), widthMeasureSpec);
-        mChildren.measure(mWidth, mWidth);
-        setMeasuredDimension(mWidth, mWidth);
+            if (mChildren == null) {
+                setMeasuredDimension(0, 0);
+                return;
+            }
+            
+            try {
+                mChildren.measure(widthMeasureSpec, widthMeasureSpec);
+                final int mWidth = resolveSize(mChildren.getMeasuredWidth(), widthMeasureSpec);
+                mChildren.measure(mWidth, mWidth);
+                setMeasuredDimension(mWidth, mWidth);
+            } catch (Exception e) {
+                e.printStackTrace();
+                setMeasuredDimension(0, 0);
+            }
     }
 
     /**
