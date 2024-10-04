@@ -133,7 +133,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:background="@color/app_background_white"
+        android:background="@color/app_background_main"
         android:paddingBottom="15dp"
         android:text="@string/dismiss" />
 </LinearLayout>

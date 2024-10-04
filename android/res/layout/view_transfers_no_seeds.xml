@@ -22,7 +22,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_white"
+    android:background="@color/app_background_main"
     android:clickable="true"
     android:gravity="center_vertical|center_horizontal"
     android:orientation="vertical">

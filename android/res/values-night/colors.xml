@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Basic colors -->
-    <color name="basic_white">@android:color/black</color> //done
-    <color name="basic_blue">#181818</color> //done
-    <color name="basic_blue_transparent">#181818AC</color> //done
-    <color name="basic_blue_dark">#000000</color> //done
-    <color name="basic_blue_dark_highlight">@color/basic_gray_medium</color>
-    <color name="basic_blue_highlight">#2A9AC4</color>
-    <color name="basic_blue_highlight_dark">#278EB4</color> //done
-    <color name="basic_green">#0FC486</color>
-    <color name="basic_green_dark">#05a751</color>
-    <color name="basic_red">#ff0000</color>
-    <color name="basic_yellow">#ffe16a</color>
-    <color name="basic_gray_light">#101010</color> //done
-    <color name="basic_gray_medium">#2D2D2D</color> //done
-    <color name="basic_gray_dark">#A6A6A6</color> //done
-    <color name="basic_gray_text_dark">#FFFFFF</color> //done
-    <color name="basic_gray_text_medium">#E7E7E7</color> //done
-    <color name="basic_gray_text_light">#b5b5b5</color>
+    <color name="basic_background">@android:color/black</color>
+    <color name="basic_color">#1B1B1B</color>
+    <color name="basic_color_transparent">#1B1B1BAC</color>
+    <color name="basic_color_dark">#141414</color>
+    <color name="basic_color_dark_highlight">@android:color/black</color>
+    <color name="basic_blue_highlight">#33B5E5</color> //same
+    <color name="basic_blue_highlight_dark">#278EB4</color> //same
+    <color name="basic_green">#0FC486</color> //same
+    <color name="basic_green_dark">#0DAF77</color> //same
+    <color name="basic_red">#ff0000</color> //same
+    <color name="basic_yellow">#ffe16a</color> //same
+    <color name="basic_gray_light">#2B2B2B</color>
+    <color name="basic_gray_medium">#3B3B3B</color>
+    <color name="basic_gray_dark">#A6A6A6</color>
+    <color name="basic_gray_text_dark">#F2F2F2</color>
+    <color name="basic_gray_text_medium">#E0E0E0</color>
+    <color name="basic_gray_text_light">#CFCFCF</color>
 
     <!-- GENERAL APP COLORS -->
     <!-- Background Colors -->
-    <color name="app_background_white">@color/basic_white</color>
-    <color name="app_background">@color/basic_blue</color>
-    <color name="app_background_dark">@color/basic_blue_dark</color>
-    <color name="app_background_dark_highlight">@color/basic_blue_dark_highlight</color>
+    <color name="app_background_main">@color/basic_background</color>
+    <color name="app_background_color">@color/basic_color</color>
+    <color name="app_background_color_dark">@color/basic_color_dark</color>
+    <color name="app_background_color_dark_highlight">@color/basic_color_dark_highlight</color>
     <color name="app_background_body_light">@color/basic_gray_light</color>
     <color name="app_background_body_dark">@color/basic_gray_medium</color>
-    <color name="app_toolbar_background">@color/basic_blue</color>
-    <color name="app_toolbar_background_bottom">@color/basic_blue_dark_highlight</color>
+    <color name="app_toolbar_background">@color/basic_color</color>
+    <color name="app_toolbar_background_bottom">@color/basic_color_dark_highlight</color>
     <color name="app_selection_background">@color/basic_gray_light</color>
     <color name="app_rich_notification_background">@color/basic_yellow</color>
     <color name="app_browse_thumbnail_background">@color/basic_gray_medium</color>
-    <color name="app_grid_selected_background">@color/basic_blue_transparent</color>
+    <color name="app_grid_selected_background">@color/basic_color_transparent</color>
 
     <!-- Text Colors -->
     <color name="app_text_primary">@color/basic_gray_text_dark</color> //done
     <color name="app_text_secondary">@color/basic_gray_text_medium</color> //done
     <color name="app_text_disabled">@color/basic_gray_text_light</color>
-    <color name="app_text_white">#ffffff</color>
+    <color name="app_text_white">#ffffff</color> //same
     <color name="app_text_light">@color/basic_gray_text_light</color>
     <color name="app_text_highlight">@color/basic_blue_highlight_dark</color>
     <color name="app_text_wizard">#abb3bc</color>
@@ -46,7 +46,7 @@
 
     <!-- Other Colors -->
     <color name="app_divider">@color/basic_gray_medium</color>
-    <color name="app_divider_dark">@color/basic_blue_dark</color>
+    <color name="app_divider_dark">@color/basic_color_dark</color>
     <color name="app_approval_green">@color/basic_green_dark</color>
     <color name="app_warning_red">@color/basic_red</color>
 

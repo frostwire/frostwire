@@ -42,7 +42,7 @@
             <shape android:shape="line">
                 <stroke
                     android:width="2dp"
-                    android:color="@color/basic_white" />
+                    android:color="@color/basic_background" />
             </shape>
         </rotate>
     </item>
@@ -58,7 +58,7 @@
             <shape android:shape="line">
                 <stroke
                     android:width="2dp"
-                    android:color="@color/basic_white" />
+                    android:color="@color/basic_background" />
             </shape>
         </rotate>
     </item>

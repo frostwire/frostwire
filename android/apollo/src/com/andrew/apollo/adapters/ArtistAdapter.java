@@ -83,7 +83,7 @@ public class ArtistAdapter extends ApolloFragmentAdapter<Artist> implements Apol
             if (Ref.alive(holder.mBackground)) {
                 if (mLayoutId == R.layout.list_item_detailed_no_background) {
                     holder.mBackground.get().setBackground(null);
-                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_background_white));
+                    holder.mBackground.get().setBackgroundColor(convertView.getResources().getColor(R.color.app_background_main));
                 } else {
                     // Set the background image
                     mImageFetcher.loadArtistImage(dataHolder.mLineOne, holder.mBackground.get());

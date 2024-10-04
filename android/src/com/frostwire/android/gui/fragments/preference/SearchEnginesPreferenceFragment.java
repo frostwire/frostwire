@@ -19,7 +19,6 @@ package com.frostwire.android.gui.fragments.preference;
 
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceGroupAdapter;
 import androidx.preference.PreferenceScreen;
@@ -31,7 +30,6 @@ import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -167,7 +165,7 @@ public final class SearchEnginesPreferenceFragment extends AbstractPreferenceFra
         CheckedAwarePreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
             super(preferenceGroup);
             this.checkedDrawableId = R.color.app_selection_background;
-            this.unCheckedDrawableId = R.color.basic_white;
+            this.unCheckedDrawableId = R.color.basic_background;
         }
 
         @Override

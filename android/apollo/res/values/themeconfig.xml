@@ -29,11 +29,11 @@
     <!-- Now playing -->
     <color name="audio_player_current_time">#ff000000</color>
     <color name="audio_player_total_time">#ff000000</color>
-    <color name="audio_player_line_one">#ff000000</color>
+    <color name="audio_player_line_one">@color/basic_yellow</color>
     <color name="audio_player_line_two">#ff000000</color>
 
     <!-- Bottom action bar -->
-    <color name="bottom_action_bar">@color/app_background_dark_highlight</color>
+    <color name="bottom_action_bar">@color/app_background_color_dark_highlight</color>
     <color name="bab_line_one">@color/white</color>
     <color name="bab_line_two">@color/transparent_white</color>
 

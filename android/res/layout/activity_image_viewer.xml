@@ -22,7 +22,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_white"
+    android:background="@color/app_background_main"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />

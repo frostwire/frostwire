@@ -22,7 +22,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/app_background_white"
+    android:background="@color/app_background_main"
     android:orientation="vertical">
 
     <com.google.android.material.tabs.TabLayout
@@ -30,7 +30,7 @@
         style="@style/AppTabLayout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/basic_blue"
+        android:background="@color/basic_color"
         app:tabMode="scrollable" />
 
     <!--Extends androidx.viewpager.widget.ViewPager-->

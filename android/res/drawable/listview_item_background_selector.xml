@@ -23,5 +23,5 @@
     <item android:drawable="@color/app_selection_background" android:state_focused="true" />
     <item android:drawable="@color/app_selection_background" android:state_selected="true" />
     <item android:drawable="@color/app_selection_background" android:state_checked="true" />
-    <item android:drawable="@color/app_background_white" />
+    <item android:drawable="@color/app_background_main" />
 </selector>
