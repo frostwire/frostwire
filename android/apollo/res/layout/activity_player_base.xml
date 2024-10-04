@@ -38,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/audio_player_header_height"
             android:layout_alignParentTop="true"
-            android:background="@color/basic_white"
+            android:background="@color/basic_background"
             android:baselineAligned="false"
             android:orientation="horizontal">
 

@@ -50,7 +50,7 @@
         <item name="android:indeterminateDrawable">
             @drawable/progress_indeterminate_horizontal_holo
         </item>
-        <item name="android:background">@color/basic_blue</item>
+        <item name="android:background">@color/basic_color</item>
         <item name="android:minHeight">16dip</item>
         <item name="android:maxHeight">16dip</item>
     </style>
@@ -209,7 +209,7 @@
     <style name="ListItemAd">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">@dimen/text_x_small</item>
-        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:textColor">@color/basic_background</item>
         <item name="android:background">#ffedb802</item>
         <item name="android:padding">2sp</item>
     </style>
@@ -223,7 +223,7 @@
     <style name="SearchResultListItemSource">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/basic_blue</item>
+        <item name="android:textColor">@color/basic_color</item>
     </style>
 
     <style name="BlueButton">
@@ -237,7 +237,7 @@
     </style>
 
     <style name="GetVPNToastNotification">
-        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:textColor">@color/basic_background</item>
         <item name="android:paddingLeft">15dp</item>
         <item name="android:paddingRight">15dp</item>
         <item name="android:paddingTop">12dp</item>
@@ -286,7 +286,7 @@
     </style>
 
     <style name="BuyNoAdsCardHint">
-        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:textColor">@color/basic_background</item>
         <item name="android:background">@drawable/product_card_hint_button_background</item>
         <item name="android:textSize">@dimen/text_x_small</item>
         <item name="android:textStyle">bold</item>
@@ -326,14 +326,14 @@
     </style>
 
     <style name="BuyNoAdsAdText.Remove">
-        <item name="android:textColor">@color/basic_white</item>
+        <item name="android:textColor">@color/basic_background</item>
         <item name="android:textSize">28.0sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="BuyNoAdsAdText.AdFree">
         <item name="android:textSize">@dimen/text_x_large</item>
-        <item name="android:textColor">@color/basic_blue_dark</item>
+        <item name="android:textColor">@color/basic_color_dark</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:paddingBottom">16dp</item>
@@ -347,7 +347,7 @@
 
     <style name="WizardActivity" parent="Theme.FrostWire">
         <item name="android:textColorSecondary">@color/app_text_wizard</item>
-        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:windowBackground">@color/app_background_color</item>
     </style>
 
     <style name="WizardTitle">
@@ -388,7 +388,7 @@
     </style>
 
     <style name="WizardDivider">
-        <item name="android:background">@color/basic_blue_dark</item>
+        <item name="android:background">@color/basic_color_dark</item>
         <item name="android:height">1dp</item>
         <item name="android:layout_marginBottom">12dp</item>
         <item name="android:layout_marginTop">12dp</item>

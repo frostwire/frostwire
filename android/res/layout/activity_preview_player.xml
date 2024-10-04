@@ -31,7 +31,7 @@
         android:id="@+id/activity_preview_player_metadata_header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/audio_player_header_height"
-        android:background="@color/app_background_white"
+        android:background="@color/app_background_main"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:paddingEnd="@dimen/audio_player_header_padding_right"

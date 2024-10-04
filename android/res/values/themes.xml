@@ -22,8 +22,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <style name="Theme.FrostWire" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/basic_blue</item>
-        <item name="colorPrimaryDark">@color/basic_blue_dark</item>
+        <item name="colorPrimary">@color/basic_color</item>
+        <item name="colorPrimaryDark">@color/basic_color_dark</item>
         <item name="colorAccent">@color/basic_blue_highlight_dark</item>
         <item name="android:textColorPrimary">@color/app_text_primary</item>
         <item name="android:textColorSecondary">@color/app_text_secondary</item>

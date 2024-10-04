@@ -45,7 +45,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:text="@string/dummy_title"
-            android:textColor="@color/basic_white"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_size_small"
             android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/nav_view_header_main_title"
             android:text="@string/dummy_title"
-            android:textColor="@color/basic_gray_medium"
+            android:textColor="@color/app_text_secondary"
             android:textSize="@dimen/text_size_micro" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:layout_below="@+id/nav_view_header_main_title"
             android:layout_toEndOf="@+id/nav_view_header_main_version"
             android:text="@string/comma"
-            android:textColor="@color/basic_gray_medium"
+            android:textColor="@color/app_text_secondary"
             android:textSize="@dimen/text_size_micro" />
 
         <TextView
@@ -76,7 +76,7 @@
             android:layout_marginStart="5dp"
             android:layout_toEndOf="@+id/nav_view_header_main_comma"
             android:text="@string/dummy_build"
-            android:textColor="@color/basic_gray_medium"
+            android:textColor="@color/app_text_secondary"
             android:textSize="@dimen/text_size_micro" />
 
         <ImageView

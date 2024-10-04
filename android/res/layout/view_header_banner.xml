@@ -21,7 +21,7 @@
         android:id="@+id/fragment_search_advertisement_header_layout"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@color/app_background_dark"
+        android:background="@color/app_background_color_dark"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -86,7 +86,7 @@
         <!-- applovin banner -->
         <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"
                 android:id="@+id/view_search_header_banner_maxadview"
-                android:background="@color/basic_blue_dark"
+                android:background="@color/basic_color_dark"
                 maxads:adUnitId="95c5db83dbc84c6b"
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"

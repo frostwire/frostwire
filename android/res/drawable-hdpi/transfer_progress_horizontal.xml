@@ -22,7 +22,7 @@
 
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="@color/basic_gray_medium" />
+            <solid android:color="@color/basic_gray_dark" />
 
 
         </shape>

@@ -99,7 +99,7 @@
             android:maxLines="1"
             android:text="@string/dummy_extra"
             android:textAppearance="@android:style/TextAppearance.Small"
-            android:textColor="@color/basic_blue"
+            android:textColor="@color/basic_color"
             android:textStyle="bold"
             android:visibility="gone" />
     </LinearLayout>

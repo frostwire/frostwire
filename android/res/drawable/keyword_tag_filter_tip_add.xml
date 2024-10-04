@@ -25,7 +25,7 @@
         android:right="0dp"
         android:top="0dp">
         <shape android:shape="oval">
-            <solid android:color="@color/basic_white" />
+            <solid android:color="@color/basic_background" />
             <size
                 android:width="14dp"
                 android:height="14dp" />
