@@ -81,7 +81,7 @@
 
     <style name="ToolbarMainHeaderTitle">
         <item name="android:textSize">@dimen/text_large</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/app_text_white</item>
     </style>
 
     <style name="ToolbarMainHeaderCounter">
@@ -249,6 +249,7 @@
         <item name="android:textSize">@dimen/text_size_x_large</item>
         <item name="android:fontFamily">sans-serif-regular</item>
         <item name="android:layout_marginTop">-5dp</item>
+        <item name="android:textColor">@color/app_text_primary</item>
     </style>
 
     <style name="VPNText">
