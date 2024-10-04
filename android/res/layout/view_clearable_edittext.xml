@@ -28,8 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:background="@android:color/transparent"
         android:dropDownVerticalOffset="11dp"
+        android:background="@android:color/transparent"
         android:hint="@null"
         android:imeOptions="actionSearch"
         android:inputType="text"
@@ -63,6 +63,7 @@
         android:layout_marginTop="6dp"
         android:background="@null"
         android:contentDescription="@null"
-        android:src="@drawable/clearable_edittext_clear_icon" />
+        android:src="@drawable/clearable_edittext_clear_icon"
+        android:foregroundTint="@color/basic_yellow"/>
 
 </RelativeLayout>
