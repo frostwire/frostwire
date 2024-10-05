@@ -30,7 +30,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/dummy_title"
-        android:textColor="@color/basic_background"
+        android:textColor="@color/app_text_primary"
         android:textSize="17dp" />
 
     <TextView
@@ -41,7 +41,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/dummy_subtitle"
-        android:textColor="@color/basic_background"
+        android:textColor="@color/app_text_primary"
         android:textSize="@dimen/text_size_small"
         android:visibility="gone" />
 </LinearLayout>

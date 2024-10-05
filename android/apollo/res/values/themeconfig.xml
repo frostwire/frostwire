@@ -19,7 +19,7 @@
     <color name="action_bar">@color/action_bar_color</color>
 
     <!-- The action bar title color -->
-    <color name="action_bar_title">@color/white</color>
+    <color name="action_bar_title">@color/app_text_white</color>
 
     <!-- The action bar sub title color -->
 
@@ -29,8 +29,8 @@
     <!-- Now playing -->
     <color name="audio_player_current_time">#ff000000</color>
     <color name="audio_player_total_time">#ff000000</color>
-    <color name="audio_player_line_one">@color/basic_yellow</color>
-    <color name="audio_player_line_two">#ff000000</color>
+    <color name="audio_player_line_one">@color/app_text_primary</color>
+    <color name="audio_player_line_two">@color/app_text_primary</color>
 
     <!-- Bottom action bar -->
     <color name="bottom_action_bar">@color/app_background_color_dark_highlight</color>

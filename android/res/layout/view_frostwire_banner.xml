@@ -18,27 +18,29 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/fw_banner_linear_layout"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:layout_marginBottom="7dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fw_banner_linear_layout"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_marginBottom="7dp">
 
     <LinearLayout
-            android:gravity="center_vertical"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal">
 
         <ImageButton
-                android:background="@null"
-                android:layout_gravity="center_horizontal|start"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_width="wrap_content"
-                android:src="@drawable/ad_cancel"
-                android:visibility="invisible" />
+            android:background="@null"
+            android:layout_gravity="center_horizontal|start"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ad_cancel"
+            android:visibility="invisible"
+            app:tint="@color/app_icon_primary" />
 
         <TextView
                 android:gravity="center"
@@ -59,7 +61,8 @@
                 android:layout_marginEnd="10dp"
                 android:layout_width="wrap_content"
                 android:src="@drawable/ad_cancel"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:tint="@color/app_icon_primary"/>
     </LinearLayout>
 
     <com.applovin.mediation.ads.MaxAdView xmlns:maxads="http://schemas.applovin.com/android/1.0"

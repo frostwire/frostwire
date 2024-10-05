@@ -20,6 +20,7 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -47,7 +48,8 @@
                 android:layout_gravity="center|center_vertical"
                 android:contentDescription="@null"
                 android:scaleType="fitCenter"
-                android:src="@drawable/transfer_menuitem_plus" />
+                android:src="@drawable/transfer_menuitem_plus"
+                app:tint="@color/app_icon_primary" />
         </FrameLayout>
 
         <LinearLayout
@@ -144,7 +146,7 @@
                     android:layout_toStartOf="@+id/view_transfer_list_item_speed"
                     android:contentDescription="@null"
                     android:src="@drawable/transfers_triangle_downward"
-                    android:tint="@color/basic_gray_text_dark" />
+                    app:tint="@color/basic_gray_text_dark" />
 
                 <TextView
                     android:id="@+id/view_transfer_list_item_speed"

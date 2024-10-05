@@ -27,7 +27,7 @@
         android:id="@+id/view_promotions_gridview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"
+        android:background="@color/app_background_main"
         android:gravity="center"
         android:numColumns="1"
         android:stretchMode="columnWidth" />

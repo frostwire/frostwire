@@ -19,6 +19,7 @@
 package com.andrew.apollo.widgets;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.KeyEvent;

@@ -137,7 +137,7 @@
 
     <!-- Transfers indicator end -->
     <style name="TransfersNotificationTitle">
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/app_text_primary</item>
         <item name="android:fontFamily">sans-serif-condensed</item>
         <item name="android:textSize">@dimen/text_medium</item>
     </style>
@@ -223,7 +223,7 @@
     <style name="SearchResultListItemSource">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/basic_color</item>
+        <item name="android:textColor">@color/app_text_secondary</item>
     </style>
 
     <style name="BlueButton">
@@ -355,7 +355,7 @@
         <item name="android:gravity">center</item>
         <item name="android:paddingBottom">3dp</item>
         <item name="android:paddingTop">15dp</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/app_text_white</item>
         <item name="android:textSize">@dimen/title_text</item>
     </style>
 

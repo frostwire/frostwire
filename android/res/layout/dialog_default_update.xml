@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toStartOf="@+id/dialog_default_update_button_yes"
-            android:background="@color/app_background_main" />
+            android:background="@drawable/default_dialog_background" />
 
         <Button
             android:id="@+id/dialog_default_update_button_yes"
@@ -67,6 +67,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:background="@color/app_background_main" />
+            android:background="@drawable/default_dialog_background" />
     </RelativeLayout>
 </RelativeLayout>

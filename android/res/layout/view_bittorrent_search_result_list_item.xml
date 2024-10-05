@@ -20,23 +20,25 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/basic_background"
     android:baselineAligned="false"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
+
         <ImageView
             android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon"
             android:layout_width="52dp"
             android:layout_height="match_parent"
             android:layout_gravity="center|center_vertical"
             android:layout_marginStart="3dp"
-            android:contentDescription="@null"
-            />
+            android:contentDescription="@null" />
+
         <com.frostwire.android.gui.views.MediaPlaybackStatusOverlayView
             android:id="@+id/view_bittorrent_search_result_list_item_filetype_icon_media_playback_overlay_view"
             android:layout_width="30dp"
@@ -57,7 +59,8 @@
         android:paddingRight="5dp"
         android:paddingTop="21dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/download_icon" />
+        android:src="@drawable/download_icon"
+        app:tint="@color/app_icon_primary" />
 
     <RelativeLayout
         android:layout_width="0dip"

@@ -19,6 +19,7 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -55,7 +56,8 @@
                 android:contentDescription="@null"
                 android:paddingEnd="2dp"
                 android:paddingStart="0dp"
-                android:src="@drawable/contextmenu_icon_rename" />
+                android:src="@drawable/contextmenu_icon_rename"
+                app:tint="@color/app_icon_primary" />
 
             <ImageView
                 android:id="@+id/view_transfer_detail_tracker_remove_button"
@@ -64,7 +66,8 @@
                 android:contentDescription="@null"
                 android:paddingEnd="5dp"
                 android:paddingStart="2dp"
-                android:src="@drawable/contextmenu_icon_remove_transfer" />
+                android:src="@drawable/contextmenu_icon_remove_transfer"
+                app:tint="@color/app_icon_primary"/>
         </LinearLayout>
 
     </LinearLayout>

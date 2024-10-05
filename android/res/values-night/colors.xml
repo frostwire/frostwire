@@ -30,7 +30,7 @@
     <color name="app_toolbar_background">@color/basic_color</color>
     <color name="app_toolbar_background_bottom">@color/basic_color_dark_highlight</color>
     <color name="app_selection_background">@color/basic_gray_light</color>
-    <color name="app_rich_notification_background">@color/basic_yellow</color>
+    <color name="app_rich_notification_background">#9E7F03</color>
     <color name="app_browse_thumbnail_background">@color/basic_gray_medium</color>
     <color name="app_grid_selected_background">@color/basic_color_transparent</color>
 
@@ -47,9 +47,11 @@
     <!-- Other Colors -->
     <color name="app_divider">#2B2B2B</color>
     <color name="app_divider_dark">@color/basic_color_dark</color>
+    <color name="app_icon_primary">#B1B1B1</color>
     <color name="app_approval_green">@color/basic_green_dark</color>
     <color name="app_warning_red">@color/basic_red</color>
     <color name="app_search_input">#343434</color>
+    <color name="app_dark_gray">#2B2B2B</color>
 
 
     <!-- TODO: Below colors belong to no longer used player in nav drawer, remove with layouts -->
