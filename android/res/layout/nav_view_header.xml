@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/nav_view_header_main_title"
             android:text="@string/dummy_title"
-            android:textColor="@color/app_text_secondary"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_size_micro" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:layout_below="@+id/nav_view_header_main_title"
             android:layout_toEndOf="@+id/nav_view_header_main_version"
             android:text="@string/comma"
-            android:textColor="@color/app_text_secondary"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_size_micro" />
 
         <TextView
@@ -76,7 +76,7 @@
             android:layout_marginStart="5dp"
             android:layout_toEndOf="@+id/nav_view_header_main_comma"
             android:text="@string/dummy_build"
-            android:textColor="@color/app_text_secondary"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_size_micro" />
 
         <ImageView
