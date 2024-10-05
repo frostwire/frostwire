@@ -15,11 +15,12 @@
   limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="128.0dip"
-    android:background="@android:color/white"
-    tools:ignore="ContentDescription" >
+    android:background="@color/app_background_body_light"
+    tools:ignore="ContentDescription">
 
     <!-- The height cannot be specified any other way. It must read "128.0dip" and cannot be referenced. I think it's a bug. -->
 
@@ -41,7 +42,7 @@
         android:divider="?android:listDivider"
         android:dividerPadding="@dimen/notification_expanded_buttons_divider_padding"
         android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/notification_expanded_base_previous"
@@ -51,7 +52,8 @@
             android:background="?android:selectableItemBackground"
             android:padding="@dimen/notification_expanded_button_padding"
             android:scaleType="fitCenter"
-            android:src="@drawable/btn_notification_playback_previous" />
+            android:src="@drawable/btn_notification_playback_previous"
+            app:tint="@color/app_icon_primary" />
 
         <ImageButton
             android:id="@+id/notification_expanded_base_play"
@@ -61,7 +63,8 @@
             android:background="?android:selectableItemBackground"
             android:padding="@dimen/notification_expanded_button_padding"
             android:scaleType="fitCenter"
-            android:src="@drawable/btn_notification_playback_pause" />
+            android:src="@drawable/btn_notification_playback_pause"
+            app:tint="@color/app_icon_primary"/>
 
         <ImageButton
             android:id="@+id/notification_expanded_base_next"
@@ -71,7 +74,8 @@
             android:background="?android:selectableItemBackground"
             android:padding="@dimen/notification_expanded_button_padding"
             android:scaleType="fitCenter"
-            android:src="@drawable/btn_notification_playback_next" />
+            android:src="@drawable/btn_notification_playback_next"
+            app:tint="@color/app_icon_primary"/>
     </LinearLayout>
 
     <ImageButton
@@ -82,7 +86,8 @@
         android:layout_alignParentTop="true"
         android:background="?android:selectableItemBackground"
         android:padding="@dimen/notification_expanded_collapse_padding"
-        android:src="@drawable/btn_notification_collapse" />
+        android:src="@drawable/btn_notification_collapse"
+        app:tint="@color/app_icon_primary"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -98,17 +103,19 @@
         <TextView
             android:id="@+id/notification_expanded_base_line_one"
             style="@style/NotificationText"
-            android:textColor="@color/black"
+            android:textColor="@color/app_text_primary"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title" />
 
         <TextView
             android:id="@+id/notification_expanded_base_line_two"
             style="@style/NotificationText"
+            android:textColor="@color/app_text_primary"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent" />
 
         <TextView
             android:id="@+id/notification_expanded_base_line_three"
             style="@style/NotificationText"
+            android:textColor="@color/app_text_primary"
             android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent" />
     </LinearLayout>
 

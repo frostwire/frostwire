@@ -19,6 +19,7 @@
  */
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -44,7 +45,7 @@
                 android:text="@string/dummy_title"
                 android:textSize="21sp"
                 android:textStyle="bold"
-                android:textColor="@color/app_text_primary"/>
+                android:textColor="@color/app_text_primary" />
 
             <TextView
                 android:id="@+id/fragment_about_build_number"
@@ -65,13 +66,13 @@
                 android:textSize="@dimen/text_x_medium" />
 
             <TextView
-                    android:id="@+id/fragment_about_yt_dlp_version"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/yt_dlp_dummy_build"
-                    android:textColor="@color/app_text_secondary"
-                    android:textSize="@dimen/text_x_medium" />
+                android:id="@+id/fragment_about_yt_dlp_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/yt_dlp_dummy_build"
+                android:textColor="@color/app_text_secondary"
+                android:textSize="@dimen/text_x_medium" />
 
 
             <Button
@@ -99,7 +100,8 @@
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
                     android:src="@drawable/about_social_facebook"
-                    android:contentDescription="@null"/>
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_twitter_button"
@@ -109,7 +111,8 @@
                     android:layout_marginEnd="10dp"
                     android:background="@color/transparent"
                     android:src="@drawable/about_social_twitter"
-                    android:contentDescription="@null"/>
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_reddit_button"
@@ -119,7 +122,8 @@
                     android:layout_marginEnd="20dp"
                     android:background="@color/transparent"
                     android:src="@drawable/about_social_reddit"
-                    android:contentDescription="@null"/>
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_github_button"
@@ -129,7 +133,8 @@
                     android:layout_marginEnd="20dp"
                     android:background="@color/transparent"
                     android:src="@drawable/about_social_github"
-                    android:contentDescription="@null"/>
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary"/>
 
                 <ImageButton
                     android:id="@+id/fragment_about_slack_button"
@@ -137,7 +142,8 @@
                     android:layout_height="wrap_content"
                     android:background="@color/transparent"
                     android:src="@drawable/about_social_slack"
-                    android:contentDescription="@null"/>
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary" />
 
             </LinearLayout>
 

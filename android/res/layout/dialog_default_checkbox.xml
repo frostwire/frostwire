@@ -49,7 +49,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:layout_toStartOf="@+id/dialog_default_checkbox_button_yes"
-            android:background="@color/app_background_main" />
+            android:background="@drawable/default_dialog_background" />
 
         <Button
             android:id="@+id/dialog_default_checkbox_button_yes"
@@ -59,7 +59,7 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:layout_alignParentEnd="true"
-            android:background="@color/app_background_main" />
+            android:background="@drawable/default_dialog_background" />
     </RelativeLayout>
 
     <CheckBox

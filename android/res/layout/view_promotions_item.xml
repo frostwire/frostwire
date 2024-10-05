@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="end|center_vertical"
-            android:background="@color/app_text_primary"
+            android:background="@color/app_dark_gray"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
             android:src="@drawable/promo_read_more_button" />
