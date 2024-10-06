@@ -28,6 +28,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.Librarian;
@@ -52,9 +54,14 @@ public class RenameFileMenuAction extends MenuAction {
     }
 
     public RenameFileMenuAction(Context context, FWFileDescriptor fd, AbstractDialog.OnDialogClickListener clickListener) {
-        super(context, R.drawable.contextmenu_icon_rename, R.string.rename);
+        super(context, R.drawable.contextmenu_icon_rename, R.string.rename, getTintColor(context)); // Updated super() call
         this.fd = fd;
         this.dialogClickListener = clickListener;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override
@@ -64,7 +71,8 @@ public class RenameFileMenuAction extends MenuAction {
 
     private void showRenameFileDialog() {
         RenameFileMenuActionDialog.renameAction = this;
-        RenameFileMenuActionDialog.newInstance(getFilePath(), dialogClickListener).show(((Activity) getContext()).getFragmentManager());
+        RenameFileMenuActionDialog.newInstance(getFilePath(), dialogClickListener)
+                .show(((Activity) getContext()).getFragmentManager());
     }
 
     private boolean isValidFileName(String newFileName) {

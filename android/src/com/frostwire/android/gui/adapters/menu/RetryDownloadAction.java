@@ -19,6 +19,8 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.InvalidTransfer;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
@@ -34,8 +36,13 @@ public class RetryDownloadAction extends MenuAction {
     private final Transfer transfer;
 
     public RetryDownloadAction(Context context, Transfer transfer) {
-        super(context, R.drawable.contextmenu_icon_download, R.string.retry);
+        super(context, R.drawable.contextmenu_icon_download, R.string.retry, getTintColor(context)); // Updated super() call
         this.transfer = transfer;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

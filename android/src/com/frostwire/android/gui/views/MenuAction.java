@@ -20,6 +20,9 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -35,22 +38,24 @@ public abstract class MenuAction {
     private final Drawable image;
     private final String text;
 
-    public MenuAction(Context context, Drawable image, String text) {
+    public MenuAction(Context context, int imageId, String text, int tintColor) {
         this.contextRef = new WeakReference<>(context);
-        this.image = image;
+
+        Drawable drawable = ContextCompat.getDrawable(context, imageId);
+        if (drawable != null) {
+            drawable = DrawableCompat.wrap(drawable).mutate();
+            DrawableCompat.setTint(drawable, tintColor);
+        }
+        this.image = drawable;
         this.text = text;
     }
 
-    public MenuAction(Context context, int imageId, String text) {
-        this(context, context.getResources().getDrawable(imageId), text);
+    public MenuAction(Context context, int imageId, int textId, int tintColor) {
+        this(context, imageId, context.getResources().getString(textId), tintColor);
     }
 
-    public MenuAction(Context context, int imageId, int textId) {
-        this(context, context.getResources().getDrawable(imageId), context.getResources().getString(textId));
-    }
-
-    public MenuAction(Context context, int imageId, int textId, Object... formatArgs) {
-        this(context, imageId, context.getResources().getString(textId, formatArgs));
+    public MenuAction(Context context, int imageId, int textId, int tintColor, Object... formatArgs) {
+        this(context, imageId, context.getResources().getString(textId, formatArgs), tintColor);
     }
 
     public String getText() {
@@ -62,17 +67,14 @@ public abstract class MenuAction {
     }
 
     public final void onClick() {
-        if (contextRef.get() != null) {
-            onClick(contextRef.get());
+        Context context = contextRef.get();
+        if (context != null) {
+            onClick(context);
         }
     }
 
     public Context getContext() {
-        Context result = null;
-        if (Ref.alive(contextRef)) {
-            result = contextRef.get();
-        }
-        return result;
+        return contextRef.get();
     }
 
     public abstract void onClick(Context context);

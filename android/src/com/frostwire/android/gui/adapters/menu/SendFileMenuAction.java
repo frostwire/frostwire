@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.providers.TableFetcher;
@@ -41,9 +43,14 @@ public class SendFileMenuAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public SendFileMenuAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_send, R.string.share);
+        super(context, R.drawable.contextmenu_icon_send, R.string.share, getTintColor(context)); // Updated super() call
 
         this.fd = fd;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

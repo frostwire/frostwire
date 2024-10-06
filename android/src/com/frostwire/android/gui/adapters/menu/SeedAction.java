@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -60,7 +62,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                        FWFileDescriptor fd,
                        BittorrentDownload existingBittorrentDownload,
                        Transfer transferToClear) {
-        super(context, R.drawable.contextmenu_icon_seed, R.string.seed);
+        super(context, R.drawable.contextmenu_icon_seed, R.string.seed, getTintColor(context));
         this.fd = fd;
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
@@ -215,7 +217,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // due to the android providers getting out of sync.
             }
         } else {
-            async(this::buildTorrentAndSeedIt,fd);
+            async(this::buildTorrentAndSeedIt, fd);
         }
     }
 
@@ -321,5 +323,10 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 newNoWifiInformationDialogRef.get().dismiss();
             }
         }
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 }

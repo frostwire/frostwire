@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.TransferDetailActivity;
 import com.frostwire.android.gui.util.UIUtils;
@@ -41,8 +43,13 @@ public class TransferDetailsMenuAction extends MenuAction {
     private WeakReference<View> clickedViewRef; // used for possible toast message
 
     public TransferDetailsMenuAction(Context context, int stringId, String infoHash) {
-        super(context, R.drawable.contextmenu_icon_file, stringId);
+        super(context, R.drawable.contextmenu_icon_file, stringId, getTintColor(context)); // Updated super() call
         this.infohash = infoHash;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

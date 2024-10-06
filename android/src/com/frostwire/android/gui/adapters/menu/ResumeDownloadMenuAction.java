@@ -21,6 +21,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
@@ -43,9 +45,14 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
 
 
     public ResumeDownloadMenuAction(Context context, BittorrentDownload download, int stringId) {
-        super(context, R.drawable.contextmenu_icon_play, stringId);
+        super(context, R.drawable.contextmenu_icon_play, stringId, getTintColor(context)); // Updated super() call
         this.download = download;
         this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

@@ -19,6 +19,8 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -41,9 +43,17 @@ public class StopSeedingAction extends MenuAction {
     private StopSeedingAction(Context context,
                               BittorrentDownload existingBittorrentDownload,
                               @SuppressWarnings("SameParameterValue") Transfer transferToClear) {
-        super(context, R.drawable.contextmenu_icon_seed, R.string.seed_stop);
+        super(context,
+                R.drawable.contextmenu_icon_seed,
+                R.string.seed_stop,
+                getTintColor(context));
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override
