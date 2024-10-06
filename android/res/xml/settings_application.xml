@@ -43,6 +43,11 @@
             android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
             android:summary="@string/vpn_drop_protection_summary"
             android:title="@string/vpn_drop_protection_title" />
+        <SwitchPreference
+            android:key="frostwire.prefs.theme.dark_mode"
+            android:title="@string/dark_mode"
+            android:summary="@string/dark_mode_summary"
+            android:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/search_torrent_settings">
@@ -68,6 +73,9 @@
         <Preference
             android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
             android:title="@string/notification_other_header" />
+
+
+
         <Preference android:title="@string/about">
             <intent
                 android:action="android.intent.action.VIEW"
