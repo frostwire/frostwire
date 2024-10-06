@@ -19,14 +19,15 @@
 package com.andrew.apollo.widgets;
 
 import android.content.Context;
+import android.content.res.ColorStateList; // Added import
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.ImageButton;
 
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.content.ContextCompat; // Added import
 
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
@@ -34,7 +35,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.util.Asyncs;
 
 /**
- * A custom {@link ImageButton} that represents the "play and pause" button.
+ * A custom {@link AppCompatImageButton} that represents the "play and pause" button.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
@@ -109,5 +110,13 @@ public final class PlayPauseButton extends AppCompatImageButton
             setContentDescription(getResources().getString(R.string.accessibility_play));
             setImageResource(playDrawable);
         }
+
+        // Apply tint color to the icon
+        setImageTintList(ColorStateList.valueOf(getTintColor(getContext())));
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 }
