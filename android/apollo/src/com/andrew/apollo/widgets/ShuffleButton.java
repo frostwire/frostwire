@@ -18,21 +18,18 @@
 
 package com.andrew.apollo.widgets;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.Asyncs;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -66,19 +63,39 @@ public final class ShuffleButton extends AppCompatImageButton
             try {
                 onClickedCallback.run();
             } catch (Throwable t) {
+                // Handle exception if necessary
             }
         }
     }
 
     /**
-     * Sets the correct drawable for the shuffle state.
+     * Sets the correct drawable and tint for the shuffle state.
      */
     public void updateShuffleState() {
         Asyncs.async(MusicUtils::isShuffleEnabled, ShuffleButton::isShuffleEnabledPost, this);
     }
 
     private void isShuffleEnabledPost(Boolean shuffleEnabled) {
-        setImageResource(shuffleEnabled ? R.drawable.btn_playback_shuffle_all : R.drawable.btn_playback_shuffle);
+        int iconResId = R.drawable.btn_playback_shuffle; // Use the same icon for both states
+        setImageResource(iconResId);
+
+        if (shuffleEnabled) {
+            // When shuffle is enabled, set the tint color to blue
+            setImageTintList(ColorStateList.valueOf(getShuffleEnabledColor(getContext())));
+        } else {
+            // When shuffle is disabled, apply the default tint color
+            setImageTintList(ColorStateList.valueOf(getShuffleDisabledTintColor(getContext())));
+        }
         setContentDescription(getResources().getString(shuffleEnabled ? R.string.accessibility_shuffle_all : R.string.accessibility_shuffle));
+    }
+
+    // Method to retrieve the tint color when shuffle is disabled
+    private static int getShuffleDisabledTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary); // Your default tint color
+    }
+
+    // Method to retrieve the color when shuffle is enabled
+    private static int getShuffleEnabledColor(Context context) {
+        return ContextCompat.getColor(context, R.color.basic_blue_highlight); // The blue color you want
     }
 }

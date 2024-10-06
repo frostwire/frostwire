@@ -45,7 +45,8 @@
             android:layout_gravity="center"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/btn_playback_previous" />
+            android:src="@drawable/btn_playback_previous"
+            android:tint="@color/app_icon_primary"/>
     </FrameLayout>
 
     <FrameLayout
@@ -77,7 +78,8 @@
             android:layout_gravity="center"
             android:background="@null"
             android:scaleType="centerInside"
-            android:src="@drawable/btn_playback_next" />
+            android:src="@drawable/btn_playback_next"
+            android:tint="@color/app_icon_primary"/>
     </FrameLayout>
 
     <FrameLayout
