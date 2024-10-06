@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
@@ -36,8 +38,16 @@ public final class SendBitcoinTipAction extends MenuAction {
     private final String bitcoinUrl;
 
     public SendBitcoinTipAction(Context context, String bitcoinUrl) {
-        super(context, R.drawable.contextmenu_icon_donation_bitcoin, R.string.send_bitcoin_tip);
+        super(context,
+                R.drawable.contextmenu_icon_donation_bitcoin,
+                R.string.send_bitcoin_tip,
+                getTintColor(context));
         this.bitcoinUrl = bitcoinUrl;
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

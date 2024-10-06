@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
@@ -34,8 +36,13 @@ public final class SendFiatTipAction extends MenuAction {
     private final String paypalUrl;
 
     public SendFiatTipAction(Context context, String paypalUrl) {
-        super(context, R.drawable.contextmenu_icon_donation_fiat, R.string.send_tip_donation);
+        super(context, R.drawable.contextmenu_icon_donation_fiat, R.string.send_tip_donation, getTintColor(context)); // Updated super() call
         this.paypalUrl = paypalUrl;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

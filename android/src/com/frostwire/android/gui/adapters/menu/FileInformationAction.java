@@ -25,6 +25,8 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.gui.util.UIUtils;
@@ -46,8 +48,16 @@ public final class FileInformationAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public FileInformationAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_file, R.string.file_information);
+        super(context,
+                R.drawable.contextmenu_icon_file,
+                R.string.file_information,
+                getTintColor(context));
         this.fd = fd;
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

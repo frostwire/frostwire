@@ -38,6 +38,8 @@ import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
 
+import androidx.core.content.ContextCompat;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -48,11 +50,11 @@ public final class CancelMenuAction extends MenuAction {
     private final boolean deleteData;
     private final boolean deleteTorrent;
 
-
     public CancelMenuAction(Context context, Transfer transfer, boolean deleteData) {
         super(context,
                 deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
-                deleteData ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action);
+                deleteData ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action,
+                getTintColor(context));
         this.transfer = transfer;
         this.deleteData = deleteData;
         this.deleteTorrent = deleteData;
@@ -61,17 +63,23 @@ public final class CancelMenuAction extends MenuAction {
     public CancelMenuAction(Context context, BittorrentDownload transfer, boolean deleteTorrent, boolean deleteData) {
         super(context,
                 deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
-                R.string.remove_torrent_and_data);
+                R.string.remove_torrent_and_data,
+                getTintColor(context));
         this.transfer = transfer;
         this.deleteTorrent = deleteTorrent;
         this.deleteData = deleteData;
     }
 
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
+    }
+
     @Override
     public void onClick(final Context context) {
         CancelMenuActionDialog.newInstance(
-                transfer,
-                deleteData, deleteTorrent, this).
+                        transfer,
+                        deleteData, deleteTorrent, this).
                 show(((Activity) getContext()).getFragmentManager());
     }
 

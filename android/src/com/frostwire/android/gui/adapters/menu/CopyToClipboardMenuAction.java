@@ -22,6 +22,9 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 
+import androidx.core.content.ContextCompat;
+
+import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
@@ -41,9 +44,14 @@ public class CopyToClipboardMenuAction extends MenuAction {
 
     public CopyToClipboardMenuAction(Context context, int drawable, int actionNameId,
                                      int messageId, Object data) {
-        super(context, drawable, actionNameId);
+        super(context, drawable, actionNameId, getTintColor(context));
         this.messageId = messageId;
         this.data = data;
+    }
+
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

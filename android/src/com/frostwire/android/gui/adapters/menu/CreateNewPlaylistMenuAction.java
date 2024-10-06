@@ -26,6 +26,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -46,8 +48,13 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.new_empty_playlist);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.new_empty_playlist, getTintColor(context)); // Updated super() call
         this.fileDescriptors = fileDescriptors;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

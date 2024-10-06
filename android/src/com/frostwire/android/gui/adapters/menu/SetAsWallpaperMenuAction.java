@@ -22,6 +22,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
@@ -39,8 +41,13 @@ public class SetAsWallpaperMenuAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public SetAsWallpaperMenuAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_picture, R.string.set_as_wallpaper);
+        super(context, R.drawable.contextmenu_icon_picture, R.string.set_as_wallpaper, getTintColor(context)); // Updated super() call
         this.fd = fd;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

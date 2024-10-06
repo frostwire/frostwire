@@ -19,6 +19,8 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -45,13 +47,18 @@ public final class AddToPlaylistMenuAction extends MenuAction {
     private long[] fds;
 
     public AddToPlaylistMenuAction(Context context, List<FWFileDescriptor> fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, getTintColor(context)); // Updated super() call
         setFileIdList(fds);
     }
 
     public AddToPlaylistMenuAction(Context context, long[] fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist);
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, getTintColor(context)); // Updated super() call
         this.fds = fds;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

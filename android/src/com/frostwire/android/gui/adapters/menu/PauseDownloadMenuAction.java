@@ -20,6 +20,8 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
@@ -35,8 +37,13 @@ public final class PauseDownloadMenuAction extends MenuAction {
     private final BittorrentDownload download;
 
     public PauseDownloadMenuAction(Context context, BittorrentDownload download) {
-        super(context, R.drawable.contextmenu_icon_pause_transfer, R.string.pause_torrent_menu_action);
+        super(context, R.drawable.contextmenu_icon_pause_transfer, R.string.pause_torrent_menu_action, getTintColor(context)); // Updated super() call
         this.download = download;
+    }
+
+    // Added method to retrieve tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

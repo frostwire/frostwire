@@ -26,6 +26,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
@@ -41,11 +43,16 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
     private final AbstractDialog.OnDialogClickListener onDialogClickListener;
 
     AbstractDeleteFilesMenuAction(final Context context, final int imageId, final int textId, AbstractDialog.OnDialogClickListener onDialogClickListener) {
-        super(context, imageId, textId);
+        super(context, imageId, textId, getTintColor(context));
         this.onDialogClickListener = onDialogClickListener;
     }
 
-    abstract protected void onDeleteClicked();
+    // Method to retrieve the tint color from resources
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
+    }
+
+    protected abstract void onDeleteClicked();
 
     @Override
     public void onClick(Context context) {
@@ -57,7 +64,8 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
     }
 
     private void showDeleteFilesDialog() {
-        DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener).show(((Activity) getContext()).getFragmentManager());
+        DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener)
+                .show(((Activity) getContext()).getFragmentManager());
     }
 
     @SuppressWarnings("WeakerAccess")
