@@ -24,6 +24,7 @@
         android:id="@+id/menu_player_new_playlist"
         android:icon="@drawable/contextmenu_icon_playlist_add_dark"
         android:title="@string/new_empty_playlist"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
 
 </menu>

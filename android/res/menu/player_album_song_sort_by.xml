@@ -23,28 +23,34 @@
     <item
         android:icon="@drawable/contextmenu_icon_sort"
         android:title="@string/menu_sort_by"
-        app:showAsAction="never">
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary">
         <menu>
             <item
                 android:id="@+id/menu_player_sort_by_az"
                 android:icon="@drawable/contextmenu_icon_sort_down"
-                android:title="@string/sort_order_entry_az" />
+                android:title="@string/sort_order_entry_az"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_sort_by_za"
                 android:icon="@drawable/contextmenu_icon_sort_up"
-                android:title="@string/sort_order_entry_za" />
+                android:title="@string/sort_order_entry_za"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_sort_by_duration"
                 android:icon="@drawable/contextmenu_icon_time"
-                android:title="@string/sort_order_entry_duration" />
+                android:title="@string/sort_order_entry_duration"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_sort_by_track_list"
                 android:icon="@drawable/contextmenu_icon_track_list"
-                android:title="@string/sort_order_entry_track_list" />
+                android:title="@string/sort_order_entry_track_list"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_sort_by_filename"
                 android:icon="@drawable/contextmenu_icon_file"
-                android:title="@string/sort_order_entry_filename" />
+                android:title="@string/sort_order_entry_filename"
+                app:iconTint="@color/app_icon_primary"/>
         </menu>
     </item>
 

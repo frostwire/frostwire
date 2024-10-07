@@ -24,31 +24,31 @@
         android:id="@+id/menu_player_audio_player_share"
         android:icon="@drawable/contextmenu_icon_send"
         android:title="@string/menu_share"
-        app:showAsAction="ifRoom"
-        android:iconTint="@color/app_icon_primary"/>
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/menu_player_audio_player_add_to_playlist"
         android:icon="@drawable/contextmenu_icon_playlist_add_dark"
         android:title="@string/add_to_playlist"
         app:showAsAction="never"
-        android:iconTint="@color/app_icon_primary"/>
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/menu_player_audio_player_equalizer"
         android:icon="@drawable/contextmenu_icon_equalizer"
         android:title="@string/menu_equalizer"
         app:showAsAction="never"
-        android:iconTint="@color/app_icon_primary"/>
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/menu_player_audio_player_stop"
         android:icon="@drawable/contextmenu_icon_stop_playback"
         android:title="@string/stop"
         app:showAsAction="never"
-        android:iconTint="@color/app_icon_primary"/>
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/menu_player_audio_player_delete"
         android:icon="@drawable/contextmenu_icon_trash"
         android:title="@string/context_menu_delete"
         app:showAsAction="never"
-        android:iconTint="@color/app_icon_primary"/>
+        app:iconTint="@color/app_icon_primary"/>
 
 </menu>
