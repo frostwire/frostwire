@@ -26,7 +26,7 @@
         android:orderInCategory="1"
         android:title="@string/add_transfer"
         app:showAsAction="ifRoom"
-        app:iconTint="@color/app_icon_primary"/>
+        app:iconTint="@color/action_bar_icon"/>
     <item
         android:id="@+id/fragment_transfers_menu_clear_all"
         android:icon="@drawable/contextmenu_icon_stop_transfer"

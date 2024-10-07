@@ -25,43 +25,48 @@
         android:icon="@drawable/action_bar_pause"
         android:orderInCategory="1"
         android:title="@string/transfers_context_menu_pause_stop_all_transfers"
-        app:showAsAction="always"/>
+        app:showAsAction="always"
+        app:iconTint="@color/action_bar_icon"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_clear"
         android:icon="@drawable/action_bar_stop_transfer"
         android:orderInCategory="2"
         android:title="@string/cancel_transfer"
         app:showAsAction="ifRoom"
-        />
+        app:iconTint="@color/action_bar_icon"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_delete"
         android:icon="@drawable/contextmenu_icon_trash"
         android:orderInCategory="3"
         android:title="@string/remove_torrent_and_data"
         app:showAsAction="never"
-        />
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_copy_magnet"
         android:icon="@drawable/contextmenu_icon_magnet"
         android:orderInCategory="4"
         android:title="@string/transfers_context_menu_copy_magnet"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_copy_infohash"
         android:icon="@drawable/contextmenu_icon_copy"
         android:orderInCategory="5"
         android:title="@string/transfers_context_menu_copy_infohash"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_donate_fiat"
         android:icon="@drawable/contextmenu_icon_donation_fiat"
         android:orderInCategory="6"
         android:title="@string/send_tip_donation"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfer_detail_menu_donate_bitcoin"
         android:icon="@drawable/contextmenu_icon_donation_bitcoin"
         android:orderInCategory="7"
         android:title="@string/send_bitcoin_tip"
-        app:showAsAction="never"/>
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
 </menu>

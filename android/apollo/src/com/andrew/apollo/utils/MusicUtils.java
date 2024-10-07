@@ -19,6 +19,8 @@
 package com.andrew.apollo.utils;
 
 import android.app.Activity;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.content.ContextCompat;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -28,6 +30,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.database.CursorIndexOutOfBoundsException;
+import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -1672,6 +1675,7 @@ public final class MusicUtils {
         }
         subMenu.add(groupId, FragmentMenuItems.NEW_PLAYLIST, Menu.NONE, R.string.new_empty_playlist)
                 .setIcon(R.drawable.contextmenu_icon_playlist_add_dark);
+
         Cursor cursor = PlaylistLoader.makePlaylistCursor(context);
         if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -1679,8 +1683,17 @@ public final class MusicUtils {
                 String name = cursor.getString(1);
                 if (name != null) {
                     intent.putExtra("playlist", getIdForPlaylist(context, name));
-                    subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE,
-                            name).setIntent(intent).setIcon(R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
+
+                    // Apply tint color to the icon
+                    Drawable icon = ContextCompat.getDrawable(context, R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
+                    if (icon != null) {
+                        icon = DrawableCompat.wrap(icon);
+                        DrawableCompat.setTint(icon, ContextCompat.getColor(context, R.color.app_icon_primary));
+                    }
+
+                    subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE, name)
+                            .setIntent(intent)
+                            .setIcon(icon);
                 }
                 cursor.moveToNext();
             }

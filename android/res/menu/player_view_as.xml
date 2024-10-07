@@ -23,20 +23,24 @@
     <item
         android:title="@string/menu_view_as"
         android:icon="@drawable/contextmenu_icon_view_as_detailed"
-        app:showAsAction="never">
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary">
         <menu>
             <item
                 android:id="@+id/menu_player_view_as_simple"
                 android:icon="@drawable/contextmenu_icon_view_as_simple"
-                android:title="@string/menu_simple" />
+                android:title="@string/menu_simple"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_view_as_detailed"
                 android:icon="@drawable/contextmenu_icon_view_as_detailed"
-                android:title="@string/menu_detailed" />
+                android:title="@string/menu_detailed"
+                app:iconTint="@color/app_icon_primary"/>
             <item
                 android:id="@+id/menu_player_view_as_grid"
                 android:icon="@drawable/contextmenu_icon_view_as_grid"
-                android:title="@string/menu_grid" />
+                android:title="@string/menu_grid"
+                app:iconTint="@color/app_icon_primary"/>
         </menu>
     </item>
 

@@ -23,6 +23,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.content.ContextCompat;
+
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener;

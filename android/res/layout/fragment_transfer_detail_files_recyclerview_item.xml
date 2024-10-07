@@ -97,7 +97,8 @@
         android:background="@color/transparent"
         android:contentDescription="@null"
         android:scaleType="fitCenter"
-        android:src="@drawable/my_files_play_icon" />
+        android:src="@drawable/my_files_play_icon"
+        app:iconTint="@color/app_icon_primary"/>
 
     <ImageView
         android:layout_width="match_parent"

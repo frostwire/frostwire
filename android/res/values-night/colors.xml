@@ -48,6 +48,7 @@
     <color name="app_divider">#2B2B2B</color>
     <color name="app_divider_dark">@color/basic_color_dark</color>
     <color name="app_icon_primary">#B1B1B1</color>
+    <color name="action_bar_icon">#B1B1B1</color>
     <color name="app_approval_green">@color/basic_green_dark</color>
     <color name="app_warning_red">@color/basic_red</color>
     <color name="app_search_input">#343434</color>
