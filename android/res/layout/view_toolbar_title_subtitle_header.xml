@@ -30,7 +30,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/dummy_title"
-        android:textColor="@color/app_text_primary"
+        android:textColor="@color/app_text_white"
         android:textSize="17dp" />
 
     <TextView
