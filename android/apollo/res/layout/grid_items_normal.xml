@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:maxLines="2"
-            android:textColor="@color/app_text_primary"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_x_medium"
             android:textStyle="bold" />
 
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/line_one"
             android:maxLines="1"
-            android:textColor="@color/app_text_secondary"
+            android:textColor="@color/app_text_white"
             android:textSize="@dimen/text_small" />
     </RelativeLayout>
 

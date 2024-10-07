@@ -63,7 +63,8 @@
             android:contentDescription="@string/accessibility_play"
             android:focusable="true"
             android:scaleType="centerInside"
-            android:src="@drawable/btn_playback_play" />
+            android:src="@drawable/btn_playback_play"
+            android:tint="@color/app_icon_primary"/>
     </FrameLayout>
 
     <FrameLayout
