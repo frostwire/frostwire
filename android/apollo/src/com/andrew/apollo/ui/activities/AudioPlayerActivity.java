@@ -27,6 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -56,6 +57,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat; // Added import
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
@@ -606,6 +608,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Theme the queue switch icon
         if (mQueueSwitch != null) {
             mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+            // Apply tint color to the icon
+            mQueueSwitch.setImageTintList(ColorStateList.valueOf(getTintColor(this))); // Added tint application
         }
         // Progress
         mProgress = findView(android.R.id.progress);
@@ -617,6 +621,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (fwBannerView != null && !Offers.disabledAds()) {
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
         }
+    }
+
+    // Added method to retrieve the tint color
+    private static int getTintColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     private void initFWBannerView() {

@@ -90,7 +90,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/btn_switch_queue"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    android:tint="@color/app_icon_primary"/>
             </FrameLayout>
         </LinearLayout>
 

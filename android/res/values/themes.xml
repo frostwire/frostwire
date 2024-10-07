@@ -45,7 +45,7 @@
     </style>
 
     <style name="ActionModeStyle.Title">
-        <item name="android:textSize">19sp</item>
+        <item name="android:textSize">60sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/app_text_white</item>
     </style>
