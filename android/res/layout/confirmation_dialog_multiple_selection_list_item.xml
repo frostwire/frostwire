@@ -15,10 +15,11 @@
   limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:baselineAligned="false"
-    android:orientation="horizontal" >
+    android:orientation="horizontal">
 
     <CheckBox
         android:id="@+id/view_selectable_list_item_checkbox"
@@ -31,7 +32,8 @@
         android:layout_height="35dp"
         android:layout_gravity="center|center_vertical"
         android:layout_margin="2dp"
-        android:src="@drawable/app_icon" />
+        android:src="@drawable/frostwire_notification_flat"
+        app:tint="@color/app_icon_primary" />
 
     <LinearLayout
         android:layout_width="match_parent"

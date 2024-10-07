@@ -27,6 +27,7 @@ import android.provider.MediaStore;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -53,6 +54,11 @@ import static com.andrew.apollo.loaders.PlaylistLoader.FAVORITE_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.LAST_ADDED_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.NEW_PLAYLIST_ID;
 
+// Added imports for tinting
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import android.graphics.drawable.Drawable;
+
 /**
  * This class is used to display all of the playlists on a user's device.
  *
@@ -78,19 +84,47 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         menu.clear();
         mItem = mAdapter.getItem(mPosition);
 
+        // Initialize the tint color
+        int tintColor = ContextCompat.getColor(getActivity(), R.color.app_icon_primary);
+
         // Play the playlist
-        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, R.string.context_menu_play_selection)
-                .setIcon(R.drawable.contextmenu_icon_play);
+        MenuItem playSelectionItem = menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.PLAY_SELECTION, Menu.NONE, R.string.context_menu_play_selection);
+        Drawable playIcon = ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_play);
+        if (playIcon != null) {
+            playIcon = DrawableCompat.wrap(playIcon);
+            DrawableCompat.setTint(playIcon, tintColor);
+            playSelectionItem.setIcon(playIcon);
+        }
 
         // Add the playlist to the queue
-        menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, R.string.add_to_queue)
-                .setIcon(R.drawable.contextmenu_icon_queue_add);
+        MenuItem addToQueueItem = menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.ADD_TO_QUEUE, Menu.NONE, R.string.add_to_queue);
+        Drawable queueIcon = ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_queue_add);
+        if (queueIcon != null) {
+            queueIcon = DrawableCompat.wrap(queueIcon);
+            DrawableCompat.setTint(queueIcon, tintColor);
+            addToQueueItem.setIcon(queueIcon);
+        }
 
         // Delete and rename (user made playlists)
         long pId = mItem.mPlaylistId;
         if (pId != NEW_PLAYLIST_ID && pId != FAVORITE_PLAYLIST_ID && pId != LAST_ADDED_PLAYLIST_ID) {
-            menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.RENAME_PLAYLIST, Menu.NONE, R.string.context_menu_rename_playlist).setIcon(R.drawable.contextmenu_icon_rename);
-            menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, R.string.context_menu_delete).setIcon(R.drawable.contextmenu_icon_trash);
+            // Rename playlist
+            MenuItem renameItem = menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.RENAME_PLAYLIST, Menu.NONE, R.string.context_menu_rename_playlist);
+            Drawable renameIcon = ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_rename);
+            if (renameIcon != null) {
+                renameIcon = DrawableCompat.wrap(renameIcon);
+                DrawableCompat.setTint(renameIcon, tintColor);
+                renameItem.setIcon(renameIcon);
+            }
+
+            // Delete playlist
+            MenuItem deleteItem = menu.add(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, R.string.context_menu_delete);
+            Drawable deleteIcon = ContextCompat.getDrawable(getActivity(), R.drawable.contextmenu_icon_trash);
+            if (deleteIcon != null) {
+                deleteIcon = DrawableCompat.wrap(deleteIcon);
+                DrawableCompat.setTint(deleteIcon, tintColor);
+                deleteItem.setIcon(deleteIcon);
+            }
         }
     }
 

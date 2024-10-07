@@ -25,35 +25,41 @@
         android:icon="@drawable/add_transfer"
         android:orderInCategory="1"
         android:title="@string/add_transfer"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfers_menu_clear_all"
         android:icon="@drawable/contextmenu_icon_stop_transfer"
         android:orderInCategory="2"
         android:title="@string/transfers_context_menu_clear_finished"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfers_menu_pause_stop_all"
         android:icon="@drawable/contextmenu_icon_pause_transfer"
         android:orderInCategory="2"
         android:title="@string/transfers_context_menu_pause_stop_all_transfers"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfers_menu_resume_all"
         android:icon="@drawable/contextmenu_icon_play"
         android:orderInCategory="2"
         android:title="@string/transfers_context_resume_all_torrent_transfers"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfers_menu_seed_all"
         android:icon="@drawable/contextmenu_icon_seed"
         android:orderInCategory="3"
         android:title="@string/transfers_context_seed_all_transfers"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
     <item
         android:id="@+id/fragment_transfers_menu_stop_seeding_all"
         android:icon="@drawable/contextmenu_icon_seed"
         android:orderInCategory="3"
         android:title="@string/transfers_context_stop_seeding_all_transfers"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        app:iconTint="@color/app_icon_primary"/>
 </menu>
