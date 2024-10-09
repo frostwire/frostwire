@@ -38,11 +38,8 @@ public abstract class MenuAction {
     private final Drawable image;
     private final String text;
 
-    private final int tintColor;
-
     public MenuAction(Context context, int imageId, String text, int tintColor) {
         this.contextRef = new WeakReference<>(context);
-        this.tintColor = tintColor;
 
         Drawable drawable = ContextCompat.getDrawable(context, imageId);
         if (drawable != null) {
@@ -67,10 +64,6 @@ public abstract class MenuAction {
 
     public Drawable getImage() {
         return image;
-    }
-
-    public int getTintColor() {
-        return tintColor;
     }
 
     public final void onClick() {

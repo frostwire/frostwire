@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import com.frostwire.android.gui.views.MenuAction;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public class SendFileMenuAction extends MenuAction {
 
@@ -43,14 +43,8 @@ public class SendFileMenuAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public SendFileMenuAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_send, R.string.share, getTintColor(context)); // Updated super() call
-
+        super(context, R.drawable.contextmenu_icon_send, R.string.share, UIUtils.getAppIconPrimaryColor(context));
         this.fd = fd;
-    }
-
-    // Added method to retrieve tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

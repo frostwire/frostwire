@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,11 +26,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat; // Added import
-
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
@@ -42,19 +41,15 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public class CreateNewPlaylistMenuAction extends MenuAction {
 
     private final long[] fileDescriptors;
 
     public CreateNewPlaylistMenuAction(Context context, long[] fileDescriptors) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.new_empty_playlist, getTintColor(context)); // Updated super() call
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.new_empty_playlist, UIUtils.getAppIconPrimaryColor(context));
         this.fileDescriptors = fileDescriptors;
-    }
-
-    // Added method to retrieve tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

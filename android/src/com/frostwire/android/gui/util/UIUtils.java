@@ -46,6 +46,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -649,5 +650,9 @@ public final class UIUtils {
             } catch (Throwable ignored) {
             }
         }
+    }
+
+    public static int getAppIconPrimaryColor(Context context) {
+        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 }

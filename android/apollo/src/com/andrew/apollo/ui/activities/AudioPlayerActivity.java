@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
- * Copyright (c) 2012-2023, FrostWire(R)
- * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2012-2024, FrostWire(R)
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat; // Added import
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
@@ -94,6 +93,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Apollo's "now playing" interface.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (aldenml)
+ * @author Marcelina Knitter (@marcelinkaaa)
  */
 public final class AudioPlayerActivity extends AbstractActivity implements
         OnSeekBarChangeListener,
@@ -609,7 +611,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (mQueueSwitch != null) {
             mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
             // Apply tint color to the icon
-            mQueueSwitch.setImageTintList(ColorStateList.valueOf(getTintColor(this))); // Added tint application
+            mQueueSwitch.setImageTintList(ColorStateList.valueOf(UIUtils.getAppIconPrimaryColor(this)));
         }
         // Progress
         mProgress = findView(android.R.id.progress);
@@ -621,11 +623,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (fwBannerView != null && !Offers.disabledAds()) {
             fwBannerView.setLayersVisibility(FWBannerView.Layers.FALLBACK, true);
         }
-    }
-
-    // Added method to retrieve the tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     private void initFWBannerView() {
@@ -1024,7 +1021,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void  musicServiceRequestTask(AudioPlayerActivity activity,
+    private static void musicServiceRequestTask(AudioPlayerActivity activity,
                                                 MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:

@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.UIBittorrentDownload;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
@@ -38,11 +39,10 @@ import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.util.Ref;
 
-import androidx.core.content.ContextCompat;
-
 /**
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public final class CancelMenuAction extends MenuAction {
 
@@ -54,7 +54,7 @@ public final class CancelMenuAction extends MenuAction {
         super(context,
                 deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
                 deleteData ? R.string.cancel_delete_menu_action : (transfer.isComplete()) ? R.string.clear_complete : R.string.cancel_menu_action,
-                getTintColor(context));
+                UIUtils.getAppIconPrimaryColor(context));
         this.transfer = transfer;
         this.deleteData = deleteData;
         this.deleteTorrent = deleteData;
@@ -64,15 +64,10 @@ public final class CancelMenuAction extends MenuAction {
         super(context,
                 deleteData ? R.drawable.contextmenu_icon_trash : R.drawable.contextmenu_icon_stop_transfer,
                 R.string.remove_torrent_and_data,
-                getTintColor(context));
+                UIUtils.getAppIconPrimaryColor(context));
         this.transfer = transfer;
         this.deleteTorrent = deleteTorrent;
         this.deleteData = deleteData;
-    }
-
-    // Method to retrieve the tint color from resources
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

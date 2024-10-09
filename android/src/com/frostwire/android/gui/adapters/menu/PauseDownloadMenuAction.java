@@ -1,28 +1,25 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
-import androidx.core.content.ContextCompat; // Added import
-
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.transfers.BittorrentDownload;
@@ -30,20 +27,15 @@ import com.frostwire.transfers.BittorrentDownload;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public final class PauseDownloadMenuAction extends MenuAction {
 
     private final BittorrentDownload download;
 
     public PauseDownloadMenuAction(Context context, BittorrentDownload download) {
-        super(context, R.drawable.contextmenu_icon_pause_transfer, R.string.pause_torrent_menu_action, getTintColor(context)); // Updated super() call
+        super(context, R.drawable.contextmenu_icon_pause_transfer, R.string.pause_torrent_menu_action, UIUtils.getAppIconPrimaryColor(context));
         this.download = download;
-    }
-
-    // Added method to retrieve tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

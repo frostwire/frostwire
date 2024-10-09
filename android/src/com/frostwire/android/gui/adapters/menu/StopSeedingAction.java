@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
-import androidx.core.content.ContextCompat;
-
 import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
@@ -34,6 +32,7 @@ import com.frostwire.util.Logger;
 /**
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public class StopSeedingAction extends MenuAction {
     private static final Logger LOG = Logger.getLogger(StopSeedingAction.class);
@@ -46,15 +45,11 @@ public class StopSeedingAction extends MenuAction {
         super(context,
                 R.drawable.contextmenu_icon_seed,
                 R.string.seed_stop,
-                getTintColor(context));
+                UIUtils.getAppIconPrimaryColor(context));
         this.btDownload = existingBittorrentDownload;
         this.transferToClear = transferToClear;
     }
 
-    // Method to retrieve the tint color from resources
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
-    }
 
     @Override
     public void onClick(Context context) {

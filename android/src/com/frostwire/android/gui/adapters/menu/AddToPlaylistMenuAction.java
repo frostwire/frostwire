@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@ package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
 
-import androidx.core.content.ContextCompat; // Added import
-
 import com.andrew.apollo.model.Playlist;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.MenuAdapter;
 import com.frostwire.android.gui.views.MenuBuilder;
@@ -41,24 +40,20 @@ import java.util.List;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public final class AddToPlaylistMenuAction extends MenuAction {
 
     private long[] fds;
 
     public AddToPlaylistMenuAction(Context context, List<FWFileDescriptor> fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, getTintColor(context)); // Updated super() call
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, UIUtils.getAppIconPrimaryColor(context));
         setFileIdList(fds);
     }
 
     public AddToPlaylistMenuAction(Context context, long[] fds) {
-        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, getTintColor(context)); // Updated super() call
+        super(context, R.drawable.contextmenu_icon_playlist_add_dark, R.string.add_to_playlist, UIUtils.getAppIconPrimaryColor(context));
         this.fds = fds;
-    }
-
-    // Added method to retrieve tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override

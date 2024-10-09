@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
 package com.frostwire.android.gui.adapters.menu;
 
 import android.content.Context;
-
-import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -43,7 +41,7 @@ public class OpenMenuAction extends MenuAction {
     private final int position;
 
     public OpenMenuAction(Context context, String title, String path, String mime) {
-        super(context, R.drawable.contextmenu_icon_open, title, getTintColor(context)); // Corrected super() call
+        super(context, R.drawable.contextmenu_icon_open, title, UIUtils.getAppIconPrimaryColor(context));
         this.path = path;
         this.mime = mime;
         this.fileType = -1;
@@ -52,7 +50,7 @@ public class OpenMenuAction extends MenuAction {
     }
 
     public OpenMenuAction(Context context, String path, String mime) {
-        super(context, R.drawable.contextmenu_icon_open, R.string.open, getTintColor(context)); // Corrected super() call
+        super(context, R.drawable.contextmenu_icon_open, R.string.open, UIUtils.getAppIconPrimaryColor(context));
         this.path = path;
         this.mime = mime;
         this.fileType = -1;
@@ -61,7 +59,7 @@ public class OpenMenuAction extends MenuAction {
     }
 
     public OpenMenuAction(Context context, FWFileDescriptor fwFileDescriptor, int position) {
-        super(context, R.drawable.contextmenu_icon_open, R.string.open, getTintColor(context)); // Corrected super() call
+        super(context, R.drawable.contextmenu_icon_open, R.string.open, UIUtils.getAppIconPrimaryColor(context));
         this.path = fwFileDescriptor.filePath;
         this.mime = fwFileDescriptor.mime;
         this.fileType = fwFileDescriptor.fileType;
@@ -70,17 +68,12 @@ public class OpenMenuAction extends MenuAction {
     }
 
     public OpenMenuAction(Context context, String title, FWFileDescriptor pictureFWFileDescriptor) {
-        super(context, R.drawable.contextmenu_icon_picture, title, getTintColor(context)); // Corrected super() call
+        super(context, R.drawable.contextmenu_icon_picture, title, UIUtils.getAppIconPrimaryColor(context));
         this.path = pictureFWFileDescriptor.filePath;
         this.mime = pictureFWFileDescriptor.mime;
         this.fileType = pictureFWFileDescriptor.fileType;
         this.fd = pictureFWFileDescriptor;
         this.position = -1;
-    }
-
-    // Method to retrieve tint color
-    private static int getTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary);
     }
 
     @Override
