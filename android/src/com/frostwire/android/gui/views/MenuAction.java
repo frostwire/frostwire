@@ -1,5 +1,5 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelina), and FrostWire
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public abstract class MenuAction {
 
@@ -38,8 +38,11 @@ public abstract class MenuAction {
     private final Drawable image;
     private final String text;
 
+    private final int tintColor;
+
     public MenuAction(Context context, int imageId, String text, int tintColor) {
         this.contextRef = new WeakReference<>(context);
+        this.tintColor = tintColor;
 
         Drawable drawable = ContextCompat.getDrawable(context, imageId);
         if (drawable != null) {
@@ -64,6 +67,10 @@ public abstract class MenuAction {
 
     public Drawable getImage() {
         return image;
+    }
+
+    public int getTintColor() {
+        return tintColor;
     }
 
     public final void onClick() {
