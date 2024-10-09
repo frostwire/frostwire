@@ -64,7 +64,7 @@ public class RichNotificationActionLink {
             SpannableString text = new SpannableString(getText());
             text.setSpan(new UnderlineSpan(), 0, text.length(), 0);
             tv.setText(text);
-            tv.setTextColor(contextReference.get().getResources().getColor(R.color.basic_blue));
+            tv.setTextColor(contextReference.get().getResources().getColor(R.color.basic_color));
             tv.setOnClickListener(getClickAdapter());
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15.0f);
             result = tv;

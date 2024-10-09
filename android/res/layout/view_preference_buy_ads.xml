@@ -54,7 +54,7 @@
             android:paddingRight="7dp"
             android:paddingTop="2dp"
             android:text="@string/pro"
-            android:textColor="@color/basic_white"
+            android:textColor="@color/basic_background"
             android:textSize="@dimen/text_x_small"
             android:textStyle="bold" />
 

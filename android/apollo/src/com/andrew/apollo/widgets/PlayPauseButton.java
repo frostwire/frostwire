@@ -24,7 +24,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.widget.ImageButton;
 
 import androidx.appcompat.widget.AppCompatImageButton;
 
@@ -34,7 +33,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.util.Asyncs;
 
 /**
- * A custom {@link ImageButton} that represents the "play and pause" button.
+ * A custom {@link AppCompatImageButton} that represents the "play and pause" button.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */

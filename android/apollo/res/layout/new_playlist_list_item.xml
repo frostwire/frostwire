@@ -18,6 +18,7 @@
  */
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -29,7 +30,7 @@
         android:gravity="center_vertical"
         android:minHeight="@dimen/item_normal_height"
         android:paddingLeft="@dimen/list_simple_horizontal_padding"
-        android:paddingRight="@dimen/list_simple_horizontal_padding" >
+        android:paddingRight="@dimen/list_simple_horizontal_padding">
 
         <TextView
             android:layout_width="match_parent"
@@ -49,7 +50,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="12dp"
-            android:src="@drawable/contextmenu_icon_playlist_add_dark" />
+            android:src="@drawable/contextmenu_icon_playlist_add_dark"
+            app:tint="@color/app_icon_primary" />
 
     </RelativeLayout>
 

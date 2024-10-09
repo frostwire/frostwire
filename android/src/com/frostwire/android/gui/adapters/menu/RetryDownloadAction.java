@@ -1,6 +1,7 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,18 +24,21 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.transfers.InvalidTransfer;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.transfers.Transfer;
 
 /**
  * @author gubatron
+ * @author aldenml
+ * @author marcelinkaaa
  */
 public class RetryDownloadAction extends MenuAction {
 
     private final Transfer transfer;
 
     public RetryDownloadAction(Context context, Transfer transfer) {
-        super(context, R.drawable.contextmenu_icon_download, R.string.retry);
+        super(context, R.drawable.contextmenu_icon_download, R.string.retry, UIUtils.getAppIconPrimaryColor(context));
         this.transfer = transfer;
     }
 
@@ -51,7 +55,6 @@ public class RetryDownloadAction extends MenuAction {
 
     private void retryTorrentFetcherDownload() {
         TorrentFetcherDownload tfd = (TorrentFetcherDownload) transfer;
-
         TransferManager.instance().downloadTorrent(
                 tfd.getTorrentDownloadInfo().getTorrentUrl(),
                 tfd.getTorrentFetcherListener(),

@@ -20,17 +20,20 @@ package com.andrew.apollo.widgets;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList; // Added import
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
 import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.core.content.ContextCompat; // Added import
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Ref;
 
@@ -72,33 +75,52 @@ public final class RepeatButton extends AppCompatImageButton
             try {
                 onClickedCallback.run();
             } catch (Throwable t) {
+                // Handle exception if necessary
             }
         }
     }
 
     /**
-     * Sets the correct drawable for the repeat state.
+     * Sets the correct drawable and tint for the repeat state.
      */
     public void updateRepeatState() {
         Asyncs.async(MusicUtils::getRepeatMode, RepeatButton::getRepeatModePost, this);
     }
 
     private void getRepeatModePost(Integer repeatMode) {
+        int iconResId;
+        int tintColor;
+
         switch (repeatMode) {
             case MusicPlaybackService.REPEAT_ALL:
                 setContentDescription(getResources().getString(R.string.accessibility_repeat_all));
-                setImageResource(R.drawable.btn_playback_repeat_all);
+                iconResId = R.drawable.btn_playback_repeat_all;
+                tintColor = getRepeatEnabledColor(getContext());
                 break;
             case MusicPlaybackService.REPEAT_CURRENT:
                 setContentDescription(getResources().getString(R.string.accessibility_repeat_one));
-                setImageResource(R.drawable.btn_playback_repeat_one);
+                iconResId = R.drawable.btn_playback_repeat_one;
+                tintColor = getRepeatEnabledColor(getContext());
                 break;
             case MusicPlaybackService.REPEAT_NONE:
                 setContentDescription(getResources().getString(R.string.accessibility_repeat));
-                setImageResource(R.drawable.btn_playback_repeat);
+                iconResId = R.drawable.btn_playback_repeat;
+                tintColor = getRepeatDisabledColor(getContext());
                 break;
             default:
-                break;
+                return;
         }
+        setImageResource(iconResId);
+        setImageTintList(ColorStateList.valueOf(tintColor));
+    }
+
+    // Method to retrieve the tint color when repeat is disabled
+    private static int getRepeatDisabledColor(Context context) {
+        return UIUtils.getAppIconPrimaryColor(context);
+    }
+
+    // Method to retrieve the tint color when repeat is enabled
+    private static int getRepeatEnabledColor(Context context) {
+        return ContextCompat.getColor(context, R.color.basic_blue_highlight); // Define in resources
     }
 }

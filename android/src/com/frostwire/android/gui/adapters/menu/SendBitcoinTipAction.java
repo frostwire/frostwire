@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,13 +30,17 @@ import com.frostwire.android.gui.views.MenuAction;
  *
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public final class SendBitcoinTipAction extends MenuAction {
 
     private final String bitcoinUrl;
 
     public SendBitcoinTipAction(Context context, String bitcoinUrl) {
-        super(context, R.drawable.contextmenu_icon_donation_bitcoin, R.string.send_bitcoin_tip);
+        super(context,
+                R.drawable.contextmenu_icon_donation_bitcoin,
+                R.string.send_bitcoin_tip,
+                UIUtils.getAppIconPrimaryColor(context));
         this.bitcoinUrl = bitcoinUrl;
     }
 

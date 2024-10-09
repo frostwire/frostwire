@@ -36,7 +36,7 @@
                 style="@style/AppTabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="@color/app_background"
+                android:background="@color/app_background_color"
                 app:tabPaddingStart="20dp"
                 app:tabPaddingEnd="20dp"
                 app:tabMode="scrollable" />

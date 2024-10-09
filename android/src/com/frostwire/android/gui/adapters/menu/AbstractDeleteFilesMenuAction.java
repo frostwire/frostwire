@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 
@@ -41,11 +42,11 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
     private final AbstractDialog.OnDialogClickListener onDialogClickListener;
 
     AbstractDeleteFilesMenuAction(final Context context, final int imageId, final int textId, AbstractDialog.OnDialogClickListener onDialogClickListener) {
-        super(context, imageId, textId);
+        super(context, imageId, textId, UIUtils.getAppIconPrimaryColor(context));
         this.onDialogClickListener = onDialogClickListener;
     }
 
-    abstract protected void onDeleteClicked();
+    protected abstract void onDeleteClicked();
 
     @Override
     public void onClick(Context context) {
@@ -57,7 +58,8 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
     }
 
     private void showDeleteFilesDialog() {
-        DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener).show(((Activity) getContext()).getFragmentManager());
+        DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener)
+                .show(((Activity) getContext()).getFragmentManager());
     }
 
     @SuppressWarnings("WeakerAccess")

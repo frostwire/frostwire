@@ -3,7 +3,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@
 -->
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Theme.FrostWire" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/basic_blue</item>
-        <item name="colorPrimaryDark">@color/basic_blue_dark</item>
+    <style name="Theme.FrostWire" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/basic_color</item>
+        <item name="colorPrimaryDark">@color/basic_color_dark</item>
         <item name="colorAccent">@color/basic_blue_highlight_dark</item>
         <item name="android:textColorPrimary">@color/app_text_primary</item>
         <item name="android:textColorSecondary">@color/app_text_secondary</item>
@@ -45,7 +45,7 @@
     </style>
 
     <style name="ActionModeStyle.Title">
-        <item name="android:textSize">19sp</item>
+        <item name="android:textSize">60sp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/app_text_white</item>
     </style>
@@ -66,7 +66,8 @@
     </style>
     
     <style name="Button" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:textColor">@color/app_text_primary</item>
         <item name="colorButtonNormal">@color/basic_gray_dark</item>
-        <item name="colorAccent">@color/basic_gray_medium</item>
+        <item name="colorAccent">@color/basic_gray_light</item>
     </style>
 </resources>

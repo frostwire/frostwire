@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:background="@color/app_background_body_light"
         android:orientation="vertical">
 
     <include layout="@layout/toolbar_main" />
@@ -38,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/audio_player_header_height"
             android:layout_alignParentTop="true"
-            android:background="@color/basic_white"
+            android:background="@color/basic_background"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
@@ -84,14 +83,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:contentDescription="@null" />
+                    android:contentDescription="@null"
+                    app:tint="@color/app_icon_primary"/>
 
                 <com.andrew.apollo.widgets.SquareImageView
                     android:id="@+id/audio_player_switch_album_art"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:background="@drawable/btn_switch_queue"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    app:tint="@color/app_icon_primary"/>
             </FrameLayout>
         </LinearLayout>
 

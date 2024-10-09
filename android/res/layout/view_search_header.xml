@@ -21,7 +21,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="@color/app_background">
+              android:background="@color/app_background_color">
 
     <TextView
         android:id="@+id/view_search_header_text_title"
@@ -38,6 +38,6 @@
         android:layout_height="match_parent"
         android:gravity="center_vertical"
         android:text=""
-        android:textColor="@color/basic_white"
+        android:textColor="@color/basic_background"
         android:textSize="@dimen/text_small" />
 </LinearLayout>

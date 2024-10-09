@@ -22,7 +22,7 @@
     android:padding="3dp"
     android:shape="rectangle">
 
-    <solid android:color="@android:color/white" />
+    <solid android:color="@color/app_search_input" />
     <corners android:radius="3dp" />
 
 </shape>

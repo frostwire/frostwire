@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/remove_ads"
-                android:textColor="@color/basic_white"
+                android:textColor="@color/basic_background"
                 android:layout_marginLeft="10dp"
                 android:layout_gravity="center_vertical" />
 

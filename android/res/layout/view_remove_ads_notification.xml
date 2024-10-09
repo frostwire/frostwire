@@ -46,7 +46,7 @@
         android:layout_below="@+id/view_remove_ads_notification_title"
         android:layout_centerHorizontal="true"
         android:text="@string/remove_ads"
-        android:textColor="@color/basic_white"
+        android:textColor="@color/basic_background"
         android:textSize="@dimen/text_xx_large"
         android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
         android:padding="14dp"
         android:text="@string/remove_ads"
         android:textAllCaps="true"
-        android:textColor="@color/basic_blue_dark"
+        android:textColor="@color/basic_color_dark"
         android:textSize="@dimen/text_small"
         android:textStyle="bold"
         android:visibility="gone" />

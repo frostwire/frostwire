@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -9,16 +10,18 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
+
         <Button
             android:id="@+id/view_preference_community_blog_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Blog"/>
+            android:text="Blog" />
+
         <Button
             android:id="@+id/view_preference_community_rate_our_app_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/rate_our_app"/>
+            android:text="@string/rate_our_app" />
     </LinearLayout>
 
     <LinearLayout
@@ -36,7 +39,8 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_facebook" />
+            android:src="@drawable/about_social_facebook"
+            app:tint="@color/app_icon_primary" />
 
         <ImageButton
             android:id="@+id/view_preference_community_twitter_button"
@@ -46,7 +50,8 @@
             android:layout_marginEnd="10dp"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_twitter" />
+            android:src="@drawable/about_social_twitter"
+            app:tint="@color/app_icon_primary"/>
 
         <ImageButton
             android:id="@+id/view_preference_community_reddit_button"
@@ -56,7 +61,8 @@
             android:layout_marginEnd="20dp"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_reddit" />
+            android:src="@drawable/about_social_reddit"
+            app:tint="@color/app_icon_primary"/>
 
         <ImageButton
             android:id="@+id/view_preference_community_github_button"
@@ -66,7 +72,8 @@
             android:layout_marginEnd="20dp"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_github" />
+            android:src="@drawable/about_social_github"
+            app:tint="@color/app_icon_primary"/>
 
         <ImageButton
             android:id="@+id/view_preference_community_slack_button"
@@ -74,6 +81,7 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:contentDescription="@null"
-            android:src="@drawable/about_social_discord" />
+            android:src="@drawable/about_social_discord"
+            app:tint="@color/app_icon_primary"/>
     </LinearLayout>
 </LinearLayout>

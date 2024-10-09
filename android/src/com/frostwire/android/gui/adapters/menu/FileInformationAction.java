@@ -46,7 +46,10 @@ public final class FileInformationAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public FileInformationAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_file, R.string.file_information);
+        super(context,
+                R.drawable.contextmenu_icon_file,
+                R.string.file_information,
+                UIUtils.getAppIconPrimaryColor(context));
         this.fd = fd;
     }
 

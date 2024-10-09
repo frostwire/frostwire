@@ -64,7 +64,7 @@
             style="@style/WizardText.Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/basic_blue_dark"
+            android:background="@color/basic_color_dark"
             android:paddingBottom="7dp"
             android:paddingTop="7dp"
             android:text="@string/seeding_settings" />

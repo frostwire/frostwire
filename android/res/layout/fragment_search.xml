@@ -65,7 +65,7 @@
             android:id="@+id/fragment_search_framelayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/app_background_white">
+            android:background="@color/app_background_main">
 
             <com.frostwire.android.gui.views.PromotionsView
                 android:id="@+id/fragment_search_promos"

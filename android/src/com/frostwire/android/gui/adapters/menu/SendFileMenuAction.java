@@ -1,6 +1,6 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat; // Added import
+
 import com.frostwire.android.R;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.providers.TableFetcher;
@@ -32,7 +34,7 @@ import com.frostwire.android.gui.views.MenuAction;
 /**
  * @author gubatron
  * @author aldenml
- *
+ * @author marcelinkaaa
  */
 public class SendFileMenuAction extends MenuAction {
 
@@ -41,8 +43,7 @@ public class SendFileMenuAction extends MenuAction {
     private final FWFileDescriptor fd;
 
     public SendFileMenuAction(Context context, FWFileDescriptor fd) {
-        super(context, R.drawable.contextmenu_icon_send, R.string.share);
-
+        super(context, R.drawable.contextmenu_icon_send, R.string.share, UIUtils.getAppIconPrimaryColor(context));
         this.fd = fd;
     }
 

@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,6 +34,7 @@ import com.frostwire.transfers.BittorrentDownload;
 /**
  * @author gubatron
  * @author aldenml
+ * @author marcelinkaaa
  */
 public final class ResumeDownloadMenuAction extends MenuAction implements AbstractDialog.OnDialogClickListener {
 
@@ -43,7 +44,7 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
 
 
     public ResumeDownloadMenuAction(Context context, BittorrentDownload download, int stringId) {
-        super(context, R.drawable.contextmenu_icon_play, stringId);
+        super(context, R.drawable.contextmenu_icon_play, stringId, UIUtils.getAppIconPrimaryColor(context));
         this.download = download;
         this.onBittorrentConnectRunnable = new OnBittorrentConnectRunnable(this);
     }

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
- * Copyright (c) 2012-2023, FrostWire(R)
- * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2012-2024, FrostWire(R)
+ * Modified by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
@@ -92,6 +93,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Apollo's "now playing" interface.
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
+ * @author Angel Leon (@gubatron)
+ * @author Alden Torres (aldenml)
+ * @author Marcelina Knitter (@marcelinkaaa)
  */
 public final class AudioPlayerActivity extends AbstractActivity implements
         OnSeekBarChangeListener,
@@ -606,6 +610,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         // Theme the queue switch icon
         if (mQueueSwitch != null) {
             mQueueSwitch.setImageResource(R.drawable.btn_switch_queue);
+            // Apply tint color to the icon
+            mQueueSwitch.setImageTintList(ColorStateList.valueOf(UIUtils.getAppIconPrimaryColor(this)));
         }
         // Progress
         mProgress = findView(android.R.id.progress);
@@ -1015,7 +1021,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         ARTIST_AND_ALBUM_NAMES,
     }
 
-    private static void  musicServiceRequestTask(AudioPlayerActivity activity,
+    private static void musicServiceRequestTask(AudioPlayerActivity activity,
                                                 MusicServiceRequestType requestType) {
         switch (requestType) {
             case POSITION:
