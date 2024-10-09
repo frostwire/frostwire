@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,68 +19,65 @@
 <!-- see ApplicationPreferencesFragment -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:key="frostwire.prefs.general"
-        android:title="@string/general_settings">
+            android:key="frostwire.prefs.general"
+            android:title="@string/general_settings">
         <Preference
-            android:key="frostwire.prefs.offers.buy_no_ads"
-            android:layout="@layout/view_preference_buy_ads"
-            android:summary="@string/remove_ads_description"
-            android:title="@string/remove_ads">
+                android:key="frostwire.prefs.offers.buy_no_ads"
+                android:layout="@layout/view_preference_buy_ads"
+                android:summary="@string/remove_ads_description"
+                android:title="@string/remove_ads">
             <intent
-                android:action="android.intent.action.VIEW"
-                android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
-                android:targetPackage="com.frostwire.android" />
+                    android:action="android.intent.action.VIEW"
+                    android:targetClass="com.frostwire.android.gui.activities.BuyActivity"
+                    android:targetPackage="com.frostwire.android" />
         </Preference>
         <SwitchPreference
-            android:key="frostwire.prefs.internal.connect_disconnect"
-            android:summary="@string/bittorrent_network_summary"
-            android:title="@string/bittorrent" />
+                android:key="frostwire.prefs.internal.connect_disconnect"
+                android:summary="@string/bittorrent_network_summary"
+                android:title="@string/bittorrent" />
         <SwitchPreference
-            android:key="frostwire.prefs.network.use_wifi_only"
-            android:summary="@string/wifi_networks_only_summary"
-            android:title="@string/wifi_networks_only" />
+                android:key="frostwire.prefs.network.use_wifi_only"
+                android:summary="@string/wifi_networks_only_summary"
+                android:title="@string/wifi_networks_only" />
         <SwitchPreference
-            android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
-            android:summary="@string/vpn_drop_protection_summary"
-            android:title="@string/vpn_drop_protection_title" />
+                android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
+                android:summary="@string/vpn_drop_protection_summary"
+                android:title="@string/vpn_drop_protection_title" />
         <SwitchPreference
-            android:key="frostwire.prefs.theme.dark_mode"
-            android:title="@string/dark_mode"
-            android:summary="@string/dark_mode_summary"
-            android:defaultValue="false" />
+                android:key="frostwire.prefs.theme.dark_mode"
+                android:title="@string/dark_mode"
+                android:summary="@string/dark_mode_summary"
+                android:defaultValue="false" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/search_torrent_settings">
         <Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
-            android:title="@string/search_header" />
+                android:fragment="com.frostwire.android.gui.fragments.preference.SearchEnginesPreferenceFragment"
+                android:title="@string/search_header" />
         <Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
-            android:title="@string/torrent_preferences_header" />
+                android:fragment="com.frostwire.android.gui.fragments.preference.TorrentPreferenceFragment"
+                android:title="@string/torrent_preferences_header" />
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="frostwire.prefs.community_buttons_category"
-        android:title="@string/community">
+            android:key="frostwire.prefs.community_buttons_category"
+            android:title="@string/community">
         <com.frostwire.android.gui.views.preference.CommunityButtonsPreference
-            android:key="frostwire.prefs.community_buttons"
-            android:title="" />
+                android:key="frostwire.prefs.community_buttons"
+                android:title="" />
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="frostwire.prefs.other_settings"
-        android:title="@string/other_settings">
+            android:key="frostwire.prefs.other_settings"
+            android:title="@string/other_settings">
         <Preference
-            android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
-            android:title="@string/notification_other_header" />
-
-
-
+                android:fragment="com.frostwire.android.gui.fragments.preference.OtherFragment"
+                android:title="@string/notification_other_header" />
         <Preference android:title="@string/about">
             <intent
-                android:action="android.intent.action.VIEW"
-                android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
-                android:targetPackage="com.frostwire.android" />
+                    android:action="android.intent.action.VIEW"
+                    android:targetClass="com.frostwire.android.gui.activities.AboutActivity"
+                    android:targetPackage="com.frostwire.android" />
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

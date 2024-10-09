@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 
 /**
@@ -91,7 +92,7 @@ public final class ShuffleButton extends AppCompatImageButton
 
     // Method to retrieve the tint color when shuffle is disabled
     private static int getShuffleDisabledTintColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary); // Your default tint color
+        return UIUtils.getAppIconPrimaryColor(context);
     }
 
     // Method to retrieve the color when shuffle is enabled

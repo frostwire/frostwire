@@ -33,6 +33,7 @@ import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.Asyncs;
 import com.frostwire.util.Ref;
 
@@ -115,7 +116,7 @@ public final class RepeatButton extends AppCompatImageButton
 
     // Method to retrieve the tint color when repeat is disabled
     private static int getRepeatDisabledColor(Context context) {
-        return ContextCompat.getColor(context, R.color.app_icon_primary); // Define in resources
+        return UIUtils.getAppIconPrimaryColor(context);
     }
 
     // Method to retrieve the tint color when repeat is enabled

@@ -1688,7 +1688,7 @@ public final class MusicUtils {
                     Drawable icon = ContextCompat.getDrawable(context, R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
                     if (icon != null) {
                         icon = DrawableCompat.wrap(icon);
-                        DrawableCompat.setTint(icon, ContextCompat.getColor(context, R.color.app_icon_primary));
+                        DrawableCompat.setTint(icon, UIUtils.getAppIconPrimaryColor(context));
                     }
 
                     subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE, name)
