@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelina), and FrostWire
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -67,14 +67,18 @@ public abstract class MenuAction {
     }
 
     public final void onClick() {
-        Context context = contextRef.get();
+        Context context = getContext();
         if (context != null) {
             onClick(context);
         }
     }
 
     public Context getContext() {
-        return contextRef.get();
+        Context result = null;
+        if (Ref.alive(contextRef)) {
+            result = contextRef.get();
+        }
+        return result;
     }
 
     public abstract void onClick(Context context);
