@@ -1,6 +1,6 @@
 '''
 Telluride Cloud Video Downloader.
-Copyright 2020-2024 FrostWire LLC.
+Copyright 2020-2025 FrostWire LLC.
 Author: @gubatron
 
 A portable and easy to use yt_dlp wrapper by FrostWire.
@@ -25,7 +25,7 @@ import os
 import sys
 import yt_dlp
 
-BUILD = 33
+BUILD = 34
 
 
 def welcome():
