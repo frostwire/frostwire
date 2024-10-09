@@ -6,8 +6,8 @@
     <color name="basic_color_transparent">#1B1B1BAC</color>
     <color name="basic_color_dark">#141414</color>
     <color name="basic_color_dark_highlight">@android:color/black</color>
-    <color name="basic_blue_highlight">#278EB4</color> //same
-    <color name="basic_blue_highlight_dark">#33B5E5</color> //same
+    <color name="basic_blue_highlight">#33B5E5</color> //same
+    <color name="basic_blue_highlight_dark">#278EB4</color> //same
     <color name="basic_green">#0FC486</color> //same
     <color name="basic_green_dark">#0DAF77</color> //same
     <color name="basic_red">#ff0000</color> //same
@@ -45,10 +45,8 @@
     <color name="app_text_wizard_dark">#ff6f7d88</color>
 
     <!-- Other Colors -->
-    <color name="app_divider">#2B2B2B</color>
+    <color name="app_divider">@color/basic_gray_medium</color>
     <color name="app_divider_dark">@color/basic_color_dark</color>
-    <color name="app_icon_primary">#B1B1B1</color>
-    <color name="action_bar_icon">#ffffff</color>
     <color name="app_approval_green">@color/basic_green_dark</color>
     <color name="app_warning_red">@color/basic_red</color>
     <color name="app_search_input">#343434</color>

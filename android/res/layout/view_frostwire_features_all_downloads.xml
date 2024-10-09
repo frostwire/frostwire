@@ -32,7 +32,7 @@
         android:text="@string/all_free_downloads"
         android:background="@drawable/blue_dark_button_background_selector"
         android:textSize="@dimen/text_medium"
-        android:textColor="@color/app_text_white"
+        android:textColor="@color/basic_background"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:paddingRight="24dp"

@@ -27,10 +27,10 @@
     <color name="line_one">@color/app_text_primary</color>
 
     <!-- Now playing -->
-    <color name="audio_player_current_time">@color/app_text_primary</color>
-    <color name="audio_player_total_time">@color/app_text_primary</color>
-    <color name="audio_player_line_one">@color/app_text_primary</color>
-    <color name="audio_player_line_two">@color/app_text_primary</color>
+    <color name="audio_player_current_time">#ff000000</color>
+    <color name="audio_player_total_time">#ff000000</color>
+    <color name="audio_player_line_one">@color/basic_yellow</color>
+    <color name="audio_player_line_two">#ff000000</color>
 
     <!-- Bottom action bar -->
     <color name="bottom_action_bar">@color/app_background_color_dark_highlight</color>

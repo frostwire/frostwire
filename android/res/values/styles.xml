@@ -223,7 +223,7 @@
     <style name="SearchResultListItemSource">
         <item name="android:singleLine">true</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/app_text_secondary</item>
+        <item name="android:textColor">@color/basic_color</item>
     </style>
 
     <style name="BlueButton">
