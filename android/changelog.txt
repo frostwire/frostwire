@@ -1,3 +1,7 @@
+FrostWire 2.8.0 build 737 OCT/10/2024
+ - New: Dark Mode Theme
+ - yt_dlp-2024.9.27
+
 FrostWire 2.7.9 build 736 AUG/24/2024
  - Enhanced SSL/TLS validation with improved domain and certificate handling in Ssl.java
  - Added "frostwire.com" to the list of valid SSL certificate domains
