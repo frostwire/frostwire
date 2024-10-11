@@ -34,6 +34,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -152,7 +153,7 @@ public final class BuyActivity extends AbstractActivity {
             return;
         }
         if (!Ref.alive(activityRef)) {
-            LOG.info("onAdsPausedAsyncFinished (adsPaused=" + adsPaused + ") aborted, lost reference to BuyActivity");
+            LOG.info("onAdsPausedAsyncFinished (adsPaused=true) aborted, lost reference to BuyActivity");
             return;
         }
         LOG.info("onAdsPausedAsyncFinished: ads aren't paused, have not yet fetched the rewarded video, going for it...");
@@ -359,26 +360,16 @@ public final class BuyActivity extends AbstractActivity {
         card.updateTitle(productReward.title());
     }
 
-//    private void initProductCard(ProductCardView card) {
-//        if (card == null) {
-//            throw new IllegalArgumentException("card argument can't be null");
-//        }
-//        // let's do this here to avoid a rare NPE that's popping up on ProductPaymentOptionsView::refreshOptionsVisibility
-//        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(true, false, true));
-//    }
-
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            if (selectedProductCard != null) {
-                outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
-            }
-            if (paymentOptionsView != null) {
-                outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
-            }
-            outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
-            super.onSaveInstanceState(outState);
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if (selectedProductCard != null) {
+            outState.putInt(LAST_SELECTED_CARD_ID_KEY, selectedProductCard.getId());
         }
+        if (paymentOptionsView != null) {
+            outState.putInt(PAYMENT_OPTIONS_VISIBILITY_KEY, paymentOptionsView.getVisibility());
+        }
+        outState.putBoolean(OFFER_ACCEPTED, offerAccepted);
+        super.onSaveInstanceState(outState);
     }
 
     private int getLastSelectedCardViewId(Bundle savedInstanceState) {
@@ -461,10 +452,6 @@ public final class BuyActivity extends AbstractActivity {
         if (buyActivity == null) {
             throw new IllegalArgumentException("BuyActivity::getSelectedProductCard(productCardViewId=" + productCardViewId + ", buyActivity=null!!!)");
         }
-//        ProductCardView productCard;
-//        if (productCardViewId == R.id.activity_buy_product_card_reward) {
-//            productCard = buyActivity.cardNminutes;
-//        }
         return buyActivity.cardNminutes;
     }
 
