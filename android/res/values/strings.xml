@@ -20,8 +20,11 @@
 -->
 <resources>
 
-    <string name="dark_mode">Dark Mode</string>
-    <string name="dark_mode_summary">Enable dark theme throughout the app.</string>
+    <!-- TODO: Translate to all languages -->
+    <string name="theme">Theme</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
+    <string name="system">System</string>
 
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Disclosure:</b> Although recommended for your downloads, especially whenever downloading or exchanging sensitive information (e.g. banking) and while using public Wi-Fi or mobile data, <b>you don\'t need a VPN to use FrostWire. </b>]]></string>

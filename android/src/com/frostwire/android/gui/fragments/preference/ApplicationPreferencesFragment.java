@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreference;
@@ -35,6 +36,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
+import com.frostwire.android.gui.ThemeManager;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
@@ -46,6 +48,7 @@ import com.frostwire.android.offers.Offers;
 import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
@@ -81,6 +84,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         setupVPNRequirementOption();
         setupStorageOption();
         setupDataSaving();
+        setupTheme();
         setupStore(removeAdsPurchaseTime);
     }
 
@@ -114,6 +118,34 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         });
     }
 
+    public void setupTheme() {
+        ListPreference listPreference = findPreference(Constants.PREF_KEY_GUI_THEME_MODE);
+        if (listPreference == null) {
+            LOG.error("setupTheme(): ListPreference under key " + Constants.PREF_KEY_GUI_THEME_MODE + " not found");
+            return;
+        }
+        listPreference.setOnPreferenceChangeListener((listPreferenceCalled, newThemeModeStringValue) -> {
+            ThemeManager.saveThemeModeAsync((String) newThemeModeStringValue);
+            ThemeManager.applyThemeMode((String) newThemeModeStringValue);
+            listPreferenceCalled.setSummary(listPreference.getEntries()[listPreference.findIndexOfValue((String) newThemeModeStringValue)]);
+            return true;
+        });
+        LOG.info("setupTheme(): about to setupThemeAsync()");
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> loadTheme(listPreference));
+    }
+
+    /**
+     * Load the last saved theme mode in a background thread, when done update the Preference List with the loaded value
+     */
+    private void loadTheme(ListPreference listPreference) {
+        ThemeManager.loadSavedThemeModeAsync(themeMode -> {
+            LOG.info("loadTheme()->onThemeLoaded(): themeMode=" + themeMode);
+            String themeModeStringValue = ThemeManager.getThemeEntryFromMode(themeMode);
+            String themeModeStringLabel = listPreference.getEntries()[listPreference.findIndexOfValue(themeModeStringValue)].toString();
+            listPreference.setValue(themeModeStringValue);
+            listPreference.setSummary(themeModeStringLabel);
+        });
+    }
 
     @Override
     public void onDialogClick(String tag, int which) {
@@ -234,6 +266,9 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     // AD REMOVAL PREFERENCE LOGIC
     //////////////////////////////
     private void setupStore(final long purchaseTimestamp) {
+        if (!PlayStore.available()) {
+            return;
+        }
         pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
         SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
         // Async gymnastics to pass both the purchase timestamp and the amounts of minutes left paused
@@ -267,11 +302,20 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             return;
         }
         ApplicationPreferencesFragment applicationPreferencesFragment = paramHolder.appPrefsFragRef.get();
+        if (applicationPreferencesFragment == null) {
+            return;
+        }
         Activity settingsActivity = applicationPreferencesFragment.getActivity();
+        if (settingsActivity == null) {
+            return;
+        }
         final long purchaseTimestamp = paramHolder.purchaseTimestamp;
 
         Preference p = applicationPreferencesFragment.findPreference("frostwire.prefs.offers.buy_no_ads");
-        if (p != null && Offers.disabledAds() && pausedAdsPreferenceClickListener.adsPaused()) {
+        if (p == null) {
+            return;
+        }
+        if (Offers.disabledAds() && pausedAdsPreferenceClickListener.adsPaused()) {
             final int minutesPausedLeft = paramHolder.minutesPaused;
             // Paused summary
             String summaryMinutesLeft = minutesPausedLeft > 1 ?
@@ -279,11 +323,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                     applicationPreferencesFragment.getString(R.string.minute_left_ad_free);
             p.setSummary(summaryMinutesLeft);
             p.setOnPreferenceClickListener(pausedAdsPreferenceClickListener);
-        } else if (p != null && PlayStore.available() && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
+        } else if (PlayStore.available() && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
             PlayStore playStore = PlayStore.getInstance(settingsActivity);
             playStore.refresh();
             Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-            if (purchaseTimestamp == 0 && purchasedProducts.size() > 0) {
+            if (purchaseTimestamp == 0 && !purchasedProducts.isEmpty()) {
                 // HOW MUCH TIME LEFT OR SUBSCRIPTION PLAN SUMMARY
                 applicationPreferencesFragment.initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
                 //otherwise, a BuyActivity intent has been configured on application_preferences.xml

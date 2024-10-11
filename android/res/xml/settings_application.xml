@@ -43,11 +43,13 @@
                 android:key="frostwire.prefs.network.bittorrent_on_vpn_only"
                 android:summary="@string/vpn_drop_protection_summary"
                 android:title="@string/vpn_drop_protection_title" />
-        <SwitchPreference
-                android:key="frostwire.prefs.theme.dark_mode"
-                android:title="@string/dark_mode"
-                android:summary="@string/dark_mode_summary"
-                android:defaultValue="false" />
+        <androidx.preference.ListPreference
+                android:key="frostwire.prefs.gui.theme_mode"
+                android:title="@string/theme"
+                android:entries="@array/theme_mode_labels"
+                android:entryValues="@array/theme_mode_entries"
+                android:defaultValue="@string/system"
+                android:summary="Enable Dark Mode"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/search_torrent_settings">

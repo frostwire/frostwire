@@ -130,7 +130,13 @@ public final class ConfigurationManager {
             LOG.error("getInt(key=" + key + ", defValue=" + defValue + ") preferences == null");
             throw new IllegalStateException("getInt(key=" + key + ") failed, preferences:SharedPreferences is null");
         }
-        return preferences.getInt(key, defValue);
+
+        try {
+            return preferences.getInt(key, defValue);
+        } catch (ClassCastException e) {
+            LOG.error("getInt(key=" + key + ", defValue=" + defValue + ") failed", e);
+            return defValue;
+        }
     }
 
     public int getInt(String key) {

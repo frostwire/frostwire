@@ -15,6 +15,16 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources>
+    <string-array name="theme_mode_labels">
+        <item>@string/light</item>
+        <item>@string/dark</item>
+        <item>@string/system</item>
+    </string-array>
 
+    <string-array name="theme_mode_entries" translatable="false">
+        <item>light</item>
+        <item>dark</item>
+        <item>system</item>
+    </string-array>
 </resources>

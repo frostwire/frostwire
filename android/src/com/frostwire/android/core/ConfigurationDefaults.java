@@ -19,6 +19,8 @@ package com.frostwire.android.core;
 
 import android.os.Environment;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.util.Hex;
@@ -86,6 +88,7 @@ final class ConfigurationDefaults {
                         Constants.AD_NETWORK_SHORTCODE_REMOVEADS
                 });
         defaultValues.put(Constants.PREF_KEY_GUI_DISTRACTION_FREE_SEARCH, false);
+
         defaultValues.put(Constants.PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_DOWNLOAD_FOR_TORRENT_DEEP_SCAN, 20);
         defaultValues.put(Constants.PREF_KEY_SEARCH_COUNT_ROUNDS_FOR_TORRENT_DEEP_SCAN, 10);

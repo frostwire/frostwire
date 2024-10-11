@@ -121,6 +121,8 @@ public final class Constants {
     public static final String PREF_KEY_GUI_DISTRACTION_FREE_SEARCH = "frostwire.prefs.gui.distraction_free_search";
     public static final String PREF_KEY_ADNETWORK_ASK_FOR_LOCATION_PERMISSION = "frostwire.prefs.gui.adnetwork_ask_for_location";
 
+    public static final String PREF_KEY_GUI_THEME_MODE = "frostwire.prefs.gui.theme_mode";
+
     public static final String PREF_KEY_TORRENT_MAX_DOWNLOAD_SPEED = "frostwire.prefs.torrent.max_download_speed";
     public static final String PREF_KEY_TORRENT_MAX_UPLOAD_SPEED = "frostwire.prefs.torrent.max_upload_speed";
     public static final String PREF_KEY_TORRENT_MAX_DOWNLOADS = "frostwire.prefs.torrent.max_downloads";
