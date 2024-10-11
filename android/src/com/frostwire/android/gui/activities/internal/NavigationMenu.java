@@ -43,7 +43,6 @@ import com.frostwire.android.gui.fragments.TransfersFragment;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AdMenuItemView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.google.android.material.navigation.NavigationView;
@@ -202,9 +201,9 @@ public final class NavigationMenu {
     private void refreshMenuRemoveAdsItem() {
         SystemUtils.ensureUIThreadOrCrash("NavigationMenu::refreshMenuRemoveAdsItem");
         // only visible for basic or debug build and if ads have not been disabled.
-        int visibility = ((Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG || PlayStore.available()) && !Offers.disabledAds()) ?
-                View.VISIBLE :
-                View.GONE;
+
+        // visible if ads are not paused
+        int visibility = Offers.disabledAds() ? View.GONE : View.VISIBLE;
         SystemUtils.postToUIThread(() -> {
             try {
                 menuRemoveAdsItem.setVisibility(visibility);

@@ -61,13 +61,13 @@ class RemoveAdsNetwork extends AbstractAdNetwork {
         boolean enabled = false;
         try {
             //noinspection SimplifiableIfStatement (done like this on purpose for readability)
-            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION | PlayStore.available()) {
+            if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION) {
                 enabled = true;
             } else {
                 enabled = super.enabled();
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("RemoveAds::enabled(): error", e);
         }
         return enabled;
     }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
@@ -78,6 +77,8 @@ public class MainApplication extends MultiDexApplication {
 
         new Thread(new BTEngineInitializer()).start();
 
+        ThemeManager.loadSavedThemeModeAsync(themeMode -> ThemeManager.applyThemeMode(themeMode));
+
         ImageLoader.start(this);
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> this.initializeCrawlPagedWebSearchPerformer(this));
@@ -106,8 +107,6 @@ public class MainApplication extends MultiDexApplication {
         ConfigurationManager.create(this);
 
         AbstractActivity.setMenuIconsVisible(true);
-
-        PlayStore.getInstance(this); // triggers initial query
 
         NetworkManager.create(this);
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,

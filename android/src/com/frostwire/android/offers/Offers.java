@@ -41,7 +41,6 @@ import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,10 +72,6 @@ public final class Offers {
     public static void initAdNetworks(Activity activity) {
         if (FORCED_DISABLED) {
             LOG.info("Offers.initAdNetworks() aborted, FORCED_DISABLED");
-            return;
-        }
-        if (stopAdNetworksIfPurchasedRemoveAds(activity)) {
-            LOG.info("Offers.initAdNetworks() aborted, user paid for ad removal.");
             return;
         }
         long now = System.currentTimeMillis();
@@ -289,7 +284,7 @@ public final class Offers {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOG.error("keepTryingRewardedAdAsync() " + e.getMessage(), e);
         }
         if (rewardedAd != null && !rewardedAd.isReady()) {
             async(Offers::unPauseAdsAsync);
@@ -391,21 +386,14 @@ public final class Offers {
     }
 
     /**
-     * @return true if the user has paid for ad removals, or if the PlayStore is not available
+     * @return true if the user has paused ads by viewing rewarded ad video
      */
     public static boolean disabledAds() {
         if (PAUSED) {
             async(Offers::checkIfPausedAsync);
             return true;
         }
-        PlayStore store;
-        try {
-            store = PlayStore.getCachedInstance();
-        } catch (Throwable e) {
-            store = null;
-            LOG.error(e.getMessage(), e);
-        }
-        return FORCED_DISABLED || (store != null && Products.disabledAds(store));
+        return FORCED_DISABLED;
     }
 
     /**
@@ -436,7 +424,6 @@ public final class Offers {
 
     /**
      * Attempts to show a back-to-back interstitial ad.
-     *
      * This method checks if the remove ads feature is enabled and started. If so, it proceeds to determine if an
      * interstitial ad should be shown based on a threshold. If the conditions are met, an interstitial ad is shown.
      *
@@ -449,20 +436,6 @@ public final class Offers {
         if (UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_REMOVEADS_BACK_TO_BACK_THRESHOLD)) {
             REMOVE_ADS.showInterstitial(activity, null, false, false);
         }
-    }
-
-    private static boolean stopAdNetworksIfPurchasedRemoveAds(Context context) {
-        boolean stopped = false;
-        PlayStore playStore = PlayStore.getInstance(context);
-
-        final Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-
-        if (!purchasedProducts.isEmpty()) {
-            Offers.stopAdNetworks(context);
-            stopped = true;
-            LOG.info("Turning off ads, user previously purchased AdRemoval");
-        }
-        return stopped;
     }
 
     /**

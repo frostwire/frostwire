@@ -73,7 +73,7 @@
 
             <TextView
                     android:layout_marginTop="5dp"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_size_extra_micro"
@@ -91,38 +91,6 @@
                     frostwire:product_card_title_normal="@string/ad_free"
                     frostwire:product_card_subscription_period_fallback=""/>
 
-            <TextView
-                    android:layout_marginTop="5dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/text_size_extra_micro"
-                    android:text="@string/subscriptions" />
-
-
-            <com.frostwire.android.gui.views.ProductCardView
-                    android:id="@+id/activity_buy_product_card_30_days"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    frostwire:product_card_description="No ads for 30 days"
-                    frostwire:product_card_hint_button_visible="false"
-                    frostwire:product_card_price="USD $1.99/monthly"
-                    frostwire:product_card_title_bold="@string/thirty_days"
-                    frostwire:product_card_title_normal="@string/ad_free"
-                    frostwire:product_card_subscription_period_fallback="@string/period_monthly"/>
-
-            <com.frostwire.android.gui.views.ProductCardView
-                    android:id="@+id/activity_buy_product_card_1_year"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    frostwire:product_card_description="Best Value: 42% off, No ads for 1 year"
-                    frostwire:product_card_hint_button_caption="@string/best_value"
-                    frostwire:product_card_hint_button_visible="true"
-                    frostwire:product_card_price="USD $9.99/yearly"
-                    frostwire:product_card_selected="true"
-                    frostwire:product_card_title_bold="@string/one_year"
-                    frostwire:product_card_title_normal="@string/ad_free"
-                    frostwire:product_card_subscription_period_fallback="@string/period_yearly"/>
 
             <com.frostwire.android.gui.views.ProductPaymentOptionsView
                     android:id="@+id/activity_buy_product_payment_options_view"
@@ -131,29 +99,6 @@
                     android:scaleY="0"
                     android:transformPivotY="0dp"
                     android:visibility="gone" />
-
-
-            <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:gravity="start"
-                    android:text="@string/subs_details"
-                    android:textSize="@dimen/text_size_extra_micro"
-                    android:justificationMode="inter_word" />
-
-            <Button
-                    android:id="@+id/activity_buy_products_subscriptions_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/manage_subscriptions"
-                    android:textSize="@dimen/text_size_extra_micro"
-                    android:visibility="visible" />
-
 
         </LinearLayout>
 

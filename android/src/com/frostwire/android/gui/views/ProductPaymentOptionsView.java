@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Marcelina Knitter (marcelinkaaa),
  * Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -169,30 +169,14 @@ public class ProductPaymentOptionsView extends LinearLayout {
     private class BuyButtonClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
-            if (listener != null) {
-                switch (v.getId()) {
-                    case R.id.view_product_payment_options_buy_automatic_renewal_button:
-                        startProgressBar(PayButtonType.SUBSCRIPTION);
-                        listener.onAutomaticRenewal();
-                        break;
-                    case R.id.view_product_payment_options_buy_one_time_button:
-                        startProgressBar(PayButtonType.ONE_TIME);
-                        listener.onOneTime();
-                        break;
-                    case R.id.view_product_payment_options_watch_rewarded_video_button:
-                        startProgressBar(PayButtonType.REWARD_VIDEO);
-                        listener.onRewardedVideo();
-                        break;
-                }
+            if (listener != null && v != null && v.getId() == R.id.view_product_payment_options_watch_rewarded_video_button) {
+                startProgressBar(PayButtonType.REWARD_VIDEO);
+                listener.onRewardedVideo();
             }
         }
     }
 
     public interface OnBuyListener {
-
-        void onAutomaticRenewal();
-
-        void onOneTime();
 
         void onRewardedVideo();
     }

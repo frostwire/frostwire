@@ -28,7 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -38,7 +37,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -49,7 +47,6 @@ import com.frostwire.android.gui.views.PaymentOptionsVisibility;
 import com.frostwire.android.gui.views.ProductCardView;
 import com.frostwire.android.gui.views.ProductPaymentOptionsView;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.offers.Product;
 import com.frostwire.android.offers.Products;
 import com.frostwire.android.util.SystemUtils;
@@ -78,8 +75,6 @@ public final class BuyActivity extends AbstractActivity {
     private static int REWARD_FREE_AD_MINUTES = Constants.MIN_REWARD_AD_FREE_MINUTES;
 
     private ProductCardView cardNminutes;
-    private ProductCardView card30days;
-    private ProductCardView card1year;
     private ProductCardView selectedProductCard;
 
     /**
@@ -120,21 +115,6 @@ public final class BuyActivity extends AbstractActivity {
         }
     }
 
-    private final PurchasesUpdatedListener onPurchasesUpdatedListener = (billingResult, _purchases) -> BuyActivity.this.onPurchasesUpdatedOld(billingResult.getResponseCode());
-
-    private void purchaseProduct(int tagId) {
-        Product p = (Product) selectedProductCard.getTag(tagId);
-        if (p != null) {
-            PlayStore playStore = PlayStore.getInstance(this);
-            if (playStore == null) {
-                LOG.error("purchaseProduct(tagId=" + tagId + ") failed, could not get an instance of PlayStore");
-                return;
-            }
-            playStore.setGlobalPurchasesUpdatedListenerWeakRef(onPurchasesUpdatedListener);
-            playStore.purchase(this, p);
-        }
-    }
-
     @Override
     protected void initToolbar(Toolbar toolbar) {
         toolbar.setTitle(getActionBarTitle());
@@ -152,41 +132,17 @@ public final class BuyActivity extends AbstractActivity {
             initInterstitialModeActionBar(getActionBarTitle());
         }
 
-        initSubscriptionsButton();
         initOfferLayer(interstitialMode);
         initProductCards(getLastSelectedCardViewId(savedInstanceState));
         initPaymentOptionsView(getLastPaymentOptionsViewVisibility(savedInstanceState));
 
-        // If Google Store not ready or available, auto-select rewarded ad option
-        if (card30days.getVisibility() == View.GONE ||
-                card1year.getVisibility() == View.GONE) {
-            // ProductCardViewOnClickListener::onClick will be called
-            cardNminutes.performClick();
-        }
-
-        // AUTO SELECT THE 1 YEAR OPTION IF IT'S AVAILABLE
-        if (card1year.getVisibility() == View.VISIBLE) {
-            // ProductCardViewOnClickListener::onClick will be called
-            card1year.performClick();
-        }
+        // Auto-select rewarded ad option (we used to have google purchase related cards here)
+        cardNminutes.performClick();
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             boolean paused = Offers.adsPausedAsync();
             SystemUtils.postToUIThread(() -> onAdsPausedAsyncFinished(paused, activityRef));
         });
-    }
-
-    private void initSubscriptionsButton() {
-        // Only for Google Play version
-        if (!PlayStore.available()) {
-            return;
-        }
-
-        Button subscriptionsButton = findView(R.id.activity_buy_products_subscriptions_button);
-        if (subscriptionsButton != null) {
-            subscriptionsButton.setVisibility(View.VISIBLE);
-            subscriptionsButton.setOnClickListener(v -> UIUtils.openURL(v.getContext(), "https://play.google.com/store/account/subscriptions"));
-        }
     }
 
     private static void onAdsPausedAsyncFinished(boolean adsPaused, WeakReference<AppCompatActivity> activityRef) {
@@ -298,8 +254,6 @@ public final class BuyActivity extends AbstractActivity {
 
     private void initProductCards(int lastSelectedCardViewId) {
         View.OnClickListener cardClickListener = new ProductCardViewOnClickListener();
-        card30days = findView(R.id.activity_buy_product_card_30_days);
-        card1year = findView(R.id.activity_buy_product_card_1_year);
         cardNminutes = findView(R.id.activity_buy_product_card_reward);
 
         if (REWARD_FREE_AD_MINUTES > 0) {
@@ -310,17 +264,6 @@ public final class BuyActivity extends AbstractActivity {
             cardNminutes.setVisibility(View.GONE);
         }
 
-        PlayStore store = PlayStore.getInstance(this);
-
-        if (store == null || !PlayStore.available()) {
-            card30days.setVisibility(View.GONE);
-            card1year.setVisibility(View.GONE);
-        } else if (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG) {
-            initProductCard(card30days, store, Products.SUBS_DISABLE_ADS_1_MONTH_SKU);
-            initProductCard(card1year, store, Products.SUBS_DISABLE_ADS_1_YEAR_SKU);
-            card30days.setOnClickListener(cardClickListener);
-            card1year.setOnClickListener(cardClickListener);
-        }
         initLastCardSelection(lastSelectedCardViewId);
     }
 
@@ -332,22 +275,7 @@ public final class BuyActivity extends AbstractActivity {
     private void initPaymentOptionsView(int paymentOptionsVisibility) {
         paymentOptionsView = findView(R.id.activity_buy_product_payment_options_view);
         paymentOptionsView.setVisibility(paymentOptionsVisibility);
-        paymentOptionsView.setOnBuyListener(new ProductPaymentOptionsView.OnBuyListener() {
-            @Override
-            public void onAutomaticRenewal() {
-                purchaseProduct(R.id.subs_product_tag_id);
-            }
-
-            @Override
-            public void onOneTime() {
-                purchaseProduct(R.id.inapp_product_tag_id);
-            }
-
-            @Override
-            public void onRewardedVideo() {
-                playRewardedVideo();
-            }
-        });
+        paymentOptionsView.setOnBuyListener(this::playRewardedVideo);
 
         if (paymentOptionsVisibility == View.VISIBLE) {
             showPaymentOptionsBelowSelectedCard(selectedProductCard);
@@ -431,28 +359,13 @@ public final class BuyActivity extends AbstractActivity {
         card.updateTitle(productReward.title());
     }
 
-    private void initProductCard(ProductCardView card,
-                                 PlayStore store,
-                                 String subsSKU) {
-        if (card == null) {
-            throw new IllegalArgumentException("card argument can't be null");
-        }
-        // let's do this here to avoid a rare NPE that's popping up on ProductPaymentOptionsView::refreshOptionsVisibility
-        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(false, true, false));
-        if (store == null) {
-            throw new IllegalArgumentException("store argument can't be null");
-        }
-        if (subsSKU == null) {
-            throw new IllegalArgumentException("subsSKU argument can't be null");
-        }
-        final Product subscriptionProduct = store.product(subsSKU);
-        if (subscriptionProduct == null) {
-            card.setVisibility(View.GONE);
-            return;
-        }
-        card.setTag(R.id.subs_product_tag_id, subscriptionProduct);
-        card.updateData(subscriptionProduct);
-    }
+//    private void initProductCard(ProductCardView card) {
+//        if (card == null) {
+//            throw new IllegalArgumentException("card argument can't be null");
+//        }
+//        // let's do this here to avoid a rare NPE that's popping up on ProductPaymentOptionsView::refreshOptionsVisibility
+//        card.setPaymentOptionsVisibility(new PaymentOptionsVisibility(true, false, true));
+//    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -492,8 +405,6 @@ public final class BuyActivity extends AbstractActivity {
         if (productCardView == null) {
             return;
         }
-        card30days.setSelected(productCardView == card30days);
-        card1year.setSelected(productCardView == card1year);
         cardNminutes.setSelected(productCardView == cardNminutes);
     }
 
@@ -550,15 +461,11 @@ public final class BuyActivity extends AbstractActivity {
         if (buyActivity == null) {
             throw new IllegalArgumentException("BuyActivity::getSelectedProductCard(productCardViewId=" + productCardViewId + ", buyActivity=null!!!)");
         }
-        ProductCardView productCard;
-        if (productCardViewId == R.id.activity_buy_product_card_reward) {
-            productCard = buyActivity.cardNminutes;
-        } else if (productCardViewId == R.id.activity_buy_product_card_30_days) {
-            productCard = buyActivity.card30days;
-        } else {
-            productCard = buyActivity.card1year;
-        }
-        return productCard;
+//        ProductCardView productCard;
+//        if (productCardViewId == R.id.activity_buy_product_card_reward) {
+//            productCard = buyActivity.cardNminutes;
+//        }
+        return buyActivity.cardNminutes;
     }
 
     private class ProductCardViewOnClickListener implements View.OnClickListener {
@@ -579,23 +486,6 @@ public final class BuyActivity extends AbstractActivity {
     private boolean isInterstitial() {
         Intent intent = getIntent();
         return intent != null && intent.getBooleanExtra(INTERSTITIAL_MODE, false);
-    }
-
-    private void onPurchasesUpdatedOld(int responseCode) {
-        // RESPONSE_CODE = 0 -> Payment Successful
-        // user clicked outside of the PlayStore purchase dialog
-        if (responseCode != 0) {
-            paymentOptionsView.stopProgressBar();
-
-            LOG.info("BuyActivity local receiver -> purchase cancelled");
-            return;
-        }
-
-        // make sure ads won't show on this session any more if we got a positive response.
-        Offers.stopAdNetworks(this);
-
-        LOG.info("BuyActivity local receiver -> purchase finished");
-        finish();
     }
 
     private class InterstitialActionBarDismissButtonClickListener implements View.OnClickListener {

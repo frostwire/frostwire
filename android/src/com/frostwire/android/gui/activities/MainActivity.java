@@ -42,7 +42,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -56,7 +55,6 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.SearchMediator;
 import com.frostwire.android.gui.SoftwareUpdater;
-import com.frostwire.android.gui.ThemeManager;
 import com.frostwire.android.gui.activities.internal.MainController;
 import com.frostwire.android.gui.activities.internal.NavigationMenu;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
@@ -353,7 +351,6 @@ public class MainActivity extends AbstractActivity implements
         localBroadcastReceiver.register(this);
         setupDrawer();
         ConfigurationManager CM = ConfigurationManager.instance();
-        ThemeManager.loadSavedThemeModeAsync(themeMode -> ThemeManager.applyThemeMode(themeMode));
         if (CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
             Offers.initAdNetworks(this);

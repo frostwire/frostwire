@@ -34,7 +34,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.offers.PlayStore;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
@@ -126,13 +125,6 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
-
-        try {
-            PlayStore.getInstance(context).refresh();
-        } catch (Throwable e) {
-            LOG.error("handleConnectedNetwork: Error refreshing PlayStore", e);
-        }
-
         NetworkManager networkManager = NetworkManager.instance();
         if (networkManager.isInternetDataConnectionUp()) {
             ConfigurationManager CM = ConfigurationManager.instance();

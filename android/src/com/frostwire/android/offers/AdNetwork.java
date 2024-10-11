@@ -24,7 +24,7 @@ import android.content.Context;
  * @author gubatron
  * @author aldenml
  */
-interface AdNetwork {
+public interface AdNetwork {
 
     void initialize(final Activity activity);
 

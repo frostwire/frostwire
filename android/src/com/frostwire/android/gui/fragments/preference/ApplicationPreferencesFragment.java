@@ -21,8 +21,6 @@ import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Intent;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.preference.ListPreference;
@@ -31,13 +29,11 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.SwitchPreference;
 
 import com.frostwire.android.AndroidPlatform;
-import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.NetworkManager;
 import com.frostwire.android.gui.ThemeManager;
-import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.dialogs.YesNoDialog;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.transfers.TransferManager;
@@ -45,15 +41,11 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractPreferenceFragment;
 import com.frostwire.android.offers.Offers;
-import com.frostwire.android.offers.PlayStore;
-import com.frostwire.android.offers.Product;
-import com.frostwire.android.offers.Products;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.Collection;
 
 /**
  * @author gubatron
@@ -63,11 +55,8 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private static final Logger LOG = Logger.getLogger(ApplicationPreferencesFragment.class);
 
-    private static final boolean INTERNAL_BUILD = BuildConfig.DEBUG;
-    private static final int MILLISECONDS_IN_A_DAY = 86400000;
     private static final String CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG = "ApplicationPreferencesFragment.DIALOG.stop.http";
 
-    private static DoNothingOnPreferenceClickListener doNothingOnPreferenceClickListener;
     private static PausedAdsOnPreferenceClickListener pausedAdsPreferenceClickListener;
 
     // TODO: refactor this
@@ -266,9 +255,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     // AD REMOVAL PREFERENCE LOGIC
     //////////////////////////////
     private void setupStore(final long purchaseTimestamp) {
-        if (!PlayStore.available()) {
-            return;
-        }
         pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
         SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
         // Async gymnastics to pass both the purchase timestamp and the amounts of minutes left paused
@@ -323,114 +309,14 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                     applicationPreferencesFragment.getString(R.string.minute_left_ad_free);
             p.setSummary(summaryMinutesLeft);
             p.setOnPreferenceClickListener(pausedAdsPreferenceClickListener);
-        } else if (PlayStore.available() && (Constants.IS_GOOGLE_PLAY_DISTRIBUTION || Constants.IS_BASIC_AND_DEBUG)) {
-            PlayStore playStore = PlayStore.getInstance(settingsActivity);
-            playStore.refresh();
-            Collection<Product> purchasedProducts = Products.listEnabled(playStore, Products.DISABLE_ADS_FEATURE);
-            if (purchaseTimestamp == 0 && !purchasedProducts.isEmpty()) {
-                // HOW MUCH TIME LEFT OR SUBSCRIPTION PLAN SUMMARY
-                applicationPreferencesFragment.initRemoveAdsSummaryWithPurchaseInfo(p, purchasedProducts);
-                //otherwise, a BuyActivity intent has been configured on application_preferences.xml
-            } else if (purchaseTimestamp > 0 &&
-                    (System.currentTimeMillis() - purchaseTimestamp) < 30000) {
-                // STILL PROCESSING SUMMARY
-                p.setSummary(applicationPreferencesFragment.getString(R.string.processing_payment) + "...");
-                p.setOnPreferenceClickListener(doNothingOnPreferenceClickListener);
-            } else {
-                // ENCOURAGE AD-REMOVAL ACTION SUMMARY
-                p.setSummary(R.string.remove_ads_description);
-                p.setOnPreferenceClickListener(preference -> {
-                    Intent intent = new Intent(settingsActivity, BuyActivity.class);
-                    applicationPreferencesFragment.startActivityForResult(intent, BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE);
-                    return true;
-                });
-            }
         }
     }
-
-    private void initRemoveAdsSummaryWithPurchaseInfo(Preference p, Collection<Product> purchasedProducts) {
-        if (purchasedProducts != null && purchasedProducts.size() > 0) {
-            Product product = purchasedProducts.iterator().next();
-            String daysLeft = "";
-            // if it's a one time purchase, show user how many days left she has.
-            if (!product.subscription() && product.purchased()) {
-                int daysBought = Products.toDays(product.sku());
-                if (daysBought > 0) {
-                    long timePassed = System.currentTimeMillis() - product.purchaseTime();
-                    int daysPassed = (int) timePassed / MILLISECONDS_IN_A_DAY;
-                    if (daysPassed > 0 && daysPassed < daysBought) {
-                        daysLeft = " (" + getString(R.string.days_left) + ": " + (daysBought - daysPassed) + ")";
-                    }
-                }
-            }
-            p.setSummary(getString(R.string.current_plan) + ": " + product.description() + daysLeft);
-        }
-        p.setOnPreferenceClickListener(new RemoveAdsOnPreferenceClickListener(getActivity(), purchasedProducts));
-    }
-
 
     private static final class DoNothingOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
 
         @Override
         public boolean onPreferenceClick(@NonNull Preference preference) {
             return true;
-        }
-    }
-
-    private static final class RemoveAdsOnPreferenceClickListener implements Preference.OnPreferenceClickListener {
-
-        private int clicksLeftToConsumeProducts = 20;
-        private final Collection<Product> purchasedProducts;
-        private final WeakReference<Activity> activityRef;
-
-        RemoveAdsOnPreferenceClickListener(Activity activity, final Collection<Product> purchasedProducts) {
-            activityRef = Ref.weak(activity);
-            this.purchasedProducts = purchasedProducts;
-        }
-
-        @Override
-        public boolean onPreferenceClick(Preference preference) {
-            final boolean gotProducts = purchasedProducts != null && !purchasedProducts.isEmpty();
-            if (gotProducts) {
-                if (gotProducts) {
-                    LOG.info("onPreferenceClick(): Products purchased by user:");
-                    for (Product p : purchasedProducts) {
-                        LOG.info(" - " + p.description() + " (" + p.sku() + ")");
-                    }
-                }
-
-                if (INTERNAL_BUILD) {
-                    clicksLeftToConsumeProducts--;
-                    LOG.info("onPreferenceClick(): If you click again " + clicksLeftToConsumeProducts + " times, all ONE-TIME purchases or Paused Ads Time left will be forced-consumed.");
-                    if ((0 >= clicksLeftToConsumeProducts && clicksLeftToConsumeProducts < 11)) {
-                        if (clicksLeftToConsumeProducts == 0) {
-                            if (gotProducts) {
-                                for (Product p : purchasedProducts) {
-                                    if (p.subscription()) {
-                                        continue;
-                                    }
-                                    PlayStore.getInstance(activityRef.get()).consume(p);
-                                    LOG.info("onPreferenceClick() - " + p.description() + " (" + p.sku() + ") force-consumed!");
-                                    UIUtils.showToastMessage(preference.getContext(),
-                                            "Product " + p.sku() + " forced-consumed.",
-                                            Toast.LENGTH_SHORT);
-                                }
-                                if (Ref.alive(activityRef)) {
-                                    activityRef.get().finish();
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    if (gotProducts) {
-                        UIUtils.openURL(preference.getContext(), "https://play.google.com/store/account/subscriptions");
-                    }
-                }
-                return true; // true = click was handled.
-            } else {
-                LOG.info("Couldn't find any purchases.");
-            }
-            return false;
         }
     }
 

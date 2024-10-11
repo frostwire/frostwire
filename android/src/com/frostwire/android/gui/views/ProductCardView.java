@@ -72,11 +72,6 @@ public class ProductCardView extends RelativeLayout {
         }
         if (sku != null) {
             subscriptionPeriod = fallbackSubscriptionPeriodString;
-            if (Products.SUBS_DISABLE_ADS_1_MONTH_SKU.equals(sku)) {
-                subscriptionPeriod = getContext().getResources().getString(R.string.period_monthly);
-            } else if (Products.SUBS_DISABLE_ADS_1_YEAR_SKU.equals(sku)) {
-                subscriptionPeriod = getContext().getResources().getString(R.string.period_yearly);
-            }
         }
         if (productDescription != null) {
             description = productDescription;
