@@ -1,7 +1,7 @@
 FrostWire 2.8.0 build 737 OCT/11/2024
  - New: Dark Mode Theme
  - Removed Google Playstore Billing integration and libraries
- - yt_dlp-2024.9.27
+ - yt_dlp-2024.10.07
  - androidx.core:core:1.13.1
  - com.android.tools.build:gradle:8.7.0
  - androidx.appcompat:appcompat:1.7.0
