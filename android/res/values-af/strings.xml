@@ -18,6 +18,10 @@
 */
 -->
 <resources>
+    <string name="theme">Tema</string>
+    <string name="light">Lig</string>
+    <string name="dark">Donker</string>
+    <string name="system">Stelsel</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Raak toegepaste etikette aan]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Openbaarmaking:</b> Alhoewel dit aanbeveel word vir jou aflaai, veral wanneer sensitiewe inligting (bv. bankdienste) afgelaai of verruil word en tydens die gebruik van openbare Wi-Fi- of mobiele data, <b> het jy nie \'n Skynprivaatnetwerk nodig om FrostWire te gebruik nie.</b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>U privaatheid is \'n fundamentele mensereg</b>. \'N Onbeskermde verbinding beteken alles wat jy aanlyn doen, insluitend <b>navrae, boodskappe en aflaaisels</b>, kan deur enigiemand op u netwerk gemonitor en opgesny word, bv. Internet Diensverskaffers, hackers, regerings.<br><br><b>Ons beveel sterk aan om \'n Skynprivaatnetwerkdiens te gebruik</b>. <br> Hier is \'n paar opsies wat betroubare diens lewer en goed werk met FrostWire:]]></string>

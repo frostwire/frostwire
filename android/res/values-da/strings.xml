@@ -18,6 +18,9 @@
 */
 -->
 <resources>
+    <string name="theme">Tema</string>
+    <string name="light">Lys</string>
+    <string name="dark">Mørk</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tryk på anvendte tags til]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Afsløring:</b> Selvom anbefalet til dine downloads, især når du downloader eller udveksler følsomme oplysninger (f.eks. bank) og samtidig bruger offentlige Wi-Fi- eller mobildata, <b>du behøver ikke en VPN til at bruge FrostWire. </b>]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Du er forbundet til internettet ved hjælp af en VPN. <br><br> Hvis du ikke allerede er, anbefaler vi at bruge en af nedenstående tjenester til at kryptere din forbindelse og <b>beskytte dit privatliv</b>. ]]></string>

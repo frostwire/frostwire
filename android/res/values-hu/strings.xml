@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Téma</string>
+    <string name="light">Világos</string>
+    <string name="dark">Sötét</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Közzététel:</b> Bár ajánlott a letöltéseket, különösen akkor, ha érzékeny információk (például banki szolgáltatások) letöltése és cseréje, valamint nyilvános Wi-Fi vagy mobil adat használata közben, <b>akkor nem kell egy VPN használata FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Érintse meg az alkalmazott címkéket a következőhöz:]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ VPN-vel csatlakozik az internethez. <br><br> Ha még nem vagy, javasoljuk, hogy az alábbi szolgáltatások valamelyikét használja a titkosításához, és <b>a magánélet védelme</b>. ]]></string>

@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">థీమ్</string>
+    <string name="light">తెలివైన</string>
+    <string name="dark">చీకటి</string>
     <string name="azureus_peer_manager_status_finished">పూర్తయ్యింది</string>
     <string name="your_installation_is_complete">మీ సంస్థాపన పూర్తయింది.</string>
     <string name="error_connection_timed_out">లోపం: కనెక్షన్ సమయం ముగిసింది/పడిపోయింది. మళ్ళీ ప్రయత్నించండి.</string>

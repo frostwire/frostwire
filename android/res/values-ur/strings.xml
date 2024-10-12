@@ -17,6 +17,10 @@
 */
 -->
 <resources>
+    <string name="theme">تھیم</string>
+    <string name="light">روشن</string>
+    <string name="dark">تاریک</string>
+    <string name="system">نظام</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[افشا: اگرچہ آپ کے ڈاؤن لوڈ کے لئے سفارش کی گئی ہے، آپ کو FrostWire استعمال کرنے کے لئے ایک وی پی این کی ضرورت نہیں ہے.]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>معلومات:</b> ایپلی کیشنز کو ٹچ کریں]]></string>
     <string name="activity_preferences_name">ترتیبات</string>

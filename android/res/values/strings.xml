@@ -19,8 +19,6 @@
  */
 -->
 <resources>
-
-    <!-- TODO: Translate to all languages -->
     <string name="theme">Theme</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>

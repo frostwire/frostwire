@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Téma</string>
+    <string name="light">Svetlý</string>
+    <string name="dark">Tmavý</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Zverejnenie:</b> Hoci odporúčaná pre sťahovanie, najmä pri sťahovaní alebo výmene citlivých informácií (napr. bankovníctva) a pri používaní verejných dát Wi-Fi alebo mobilných údajov, <b>nepotrebujete VPN použiť FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Dotknite sa aplikovaných značiek na]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Vaše súkromie je základným ľudským právom</b>. Nechránené pripojenie znamená, že všetko, čo robíte online, vrátane <b>sťahovania, vyhľadávania a odosielania správ</b>, môže byť monitorované a zachytené každým v sieti, napr. Poskytovatelia internetových služieb, hackeri, vlády.<br><br><b>Odporúčame vám používať službu VPN</b>. <br> Tu sú niektoré možnosti, ktoré poskytujú spoľahlivé služby a fungujú dobre s FrostWire:]]></string>

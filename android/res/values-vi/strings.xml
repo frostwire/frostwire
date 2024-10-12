@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Chủ đề</string>
+    <string name="light">Sáng</string>
+    <string name="dark">Tối</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[* Mặc dù đề nghị cho tải về của bạn, <b>bạn không cần một VPN để sử dụng FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Thông tin:</b> Chạm vào thẻ được áp dụng để]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Quyền riêng tư của bạn là quyền cơ bản của con người</b>. Kết nối không được bảo vệ có nghĩa là mọi thứ bạn thực hiện trực tuyến bao gồm <b>tải xuống, tìm kiếm, nhắn tin</b>, có thể được theo dõi và chặn bởi bất kỳ ai trên mạng của bạn, ví dụ: Nhà cung cấp dịch vụ Internet, tin tặc, chính phủ.<br><br><b>Chúng tôi mạnh mẽ khuyên bạn nên sử dụng dịch vụ VPN</b>. <br> Dưới đây là một số tùy chọn cung cấp dịch vụ đáng tin cậy và hoạt động tốt với FrostWire:]]></string>

@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">テーマ</string>
+    <string name="light">ライト</string>
+    <string name="dark">ダーク</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[情報： 強くお勧めしますが、 <b>FrostWireを使う上でVPNは必要ありません。 </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> 適用タグをタップする]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>あなたのプライバシーは基本的な人権です</b>. 保護されていない接続は、オンラインを含めないすべてのものを意味し、 <b>ダウンロード、検索、メッセージング</b>あなたのネットワーク上の誰かが監視して傍受することができます。 インターネットサービスプロバイダ、ハッカー、政府.<br><br><b>VPNサービスを使用することを強くお勧めします</b>. <br> 信頼できるサービスを提供し、FrostWireでうまくいくいくつかのオプションがあります：]]></string>

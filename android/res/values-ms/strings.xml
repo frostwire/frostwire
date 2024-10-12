@@ -17,6 +17,10 @@
 */
 -->
 <resources>
+    <string name="theme">Tema</string>
+    <string name="light">Cerah</string>
+    <string name="dark">Gelap</string>
+    <string name="system">Sistem</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Maklumat:</b> Walaupun disyorkan untuk muat turun anda, terutamanya apabila memuat turun atau menukar maklumat sensitif (cth. perbankan) dan semasa menggunakan data Wi-Fi awam atau mudah alih, <b>anda tidak memerlukan VPN untuk menggunakan FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Maklumat:</b> Sentuh teg yang digunakan]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Anda disambungkan ke Internet menggunakan VPN. <br><br> Sekiranya anda belum lagi, kami cadangkan menggunakan salah satu perkhidmatan di bawah untuk menyulitkan sambungan anda dan <b>melindungi privasi anda</b>. ]]></string>

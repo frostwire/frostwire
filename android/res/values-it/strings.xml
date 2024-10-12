@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Tema</string>
+    <string name="light">Chiaro</string>
+    <string name="dark">Scuro</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Tocca i tag applicati a]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informazione:</b> Anche se consigliata per i download, soprattutto quando si scaricano o si scambiano informazioni riservate (ad esempio servizi bancari) e mentre si utilizzano dati pubblici Wi-Fi o mobili, <b>non c\'è bisogno di una VPN da utilizzare FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>La tua vita privata è un diritto umano fondamentale</b>. Una connessione non protetta, tutto ciò che fai online <b>ricerche, messaggistica e download</b>, può essere monitorato e intercettato da chiunque sulla tua rete, ad es. Provider di servizi Internet, hacker, governi.<br><br><b>Raccomandiamo VIVAMENTE di utilizzare un servizio VPN</b>. <br> Ecco alcune opzioni che forniscono un servizio affidabile e funzionano bene con FrostWire:]]></string>

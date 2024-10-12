@@ -17,6 +17,10 @@
 */
 -->
 <resources>
+    <string name="theme">Тема</string>
+    <string name="light">Світла</string>
+    <string name="dark">Темна</string>
+    <string name="system">Система</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Розкриття інформації:</b> Хоча рекомендується для завантаження, особливо коли ви завантажуєте або обмінюєтесь конфіденційною інформацією (наприклад, банківською діяльністю) та під час користування загальнодоступними Wi-Fi або мобільними даними, <b>Вам не потрібно VPN використовувати FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Інформація:</b> Торкніться доданих тегів до]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Ви під\'єднані до Інтернету за допомогою VPN. <br><br> Якщо ви ще не є, ми рекомендуємо скористатись одним із наведених нижче служб для шифрування вашого з\'єднання та  <b>захисту вашої конфіденційності</b>. ]]></string>

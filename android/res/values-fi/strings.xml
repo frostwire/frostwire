@@ -19,6 +19,9 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Julkaiseminen:</b> Vaikka suosittelemme latauksillemme, varsinkin kun lataat tai vaihdat arkaluonteisia tietoja (esim. pankkitoimintaa) ja käyttäessäsi julkisia Wi-Fi- tai mobiilitietoja, <b>sinun ei tarvitse käyttää VPN: tä FrostWire.</b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Kosketa sovellettuja tunnisteita ]]></string>
+    <string name="theme">Teema</string>
+    <string name="light">Vaalea</string>
+    <string name="dark">Tumma</string>
     <string name="azureus_peer_manager_status_finished">Valmiit</string>
     <string name="your_installation_is_complete">Asennus on valmis.</string>
     <string name="error_connection_timed_out">Virhe: yhteyden aikakatkaisu/laski. Yritä uudelleen.</string>

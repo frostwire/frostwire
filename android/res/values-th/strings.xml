@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">ธีม</string>
+    <string name="light">สว่าง</string>
+    <string name="dark">มืด</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>การเปิดเผยข้อมูล:</b> แม้ว่าแนะนำสำหรับการดาวน์โหลดของคุณโดยเฉพาะอย่างยิ่งเมื่อดาวน์โหลดหรือแลกเปลี่ยนข้อมูลที่สำคัญ (เช่นธนาคาร) และในขณะที่ใช้ Wi-Fi สาธารณะหรือข้อมูลมือถือ <b>คุณไม่จำเป็นต้อง VPN เพื่อใช้ FrostWire </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>ข้อมูล:</b> แตะแท็กที่ใช้ไปที่]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ คุณเชื่อมต่อกับอินเทอร์เน็ตโดยใช้ VPN <br><br> หากคุณยังไม่ได้เราขอแนะนำให้ใช้บริการด้านล่างเพื่อเข้ารหัสการเชื่อมต่อของคุณและ <b>ปกป้องข้อมูลส่วนบุคคลของคุณ</b> ]]></string>

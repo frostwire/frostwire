@@ -17,6 +17,10 @@
 */
 -->
 <resources>
+    <string name="theme">थीम</string>
+    <string name="light">प्रकाश</string>
+    <string name="dark">गडद</string>
+    <string name="system">सिस्टम</string>
     <string name="azureus_peer_manager_status_finished">समाप्त</string>
     <string name="your_installation_is_complete">आपली स्थापना पूर्ण झाली आहे.</string>
     <string name="error_connection_timed_out">त्रुटी: कनेक्शन कालबाह्य/वगळले पुन्हा प्रयत्न करा.</string>

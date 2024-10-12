@@ -24,6 +24,9 @@
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ Estás conectado a Internet usando un VPN. <br><br> Si aún no lo has hecho, te recomendamos que uses uno de estos servicios para encriptar tu conexión y <b>proteger tu privacidad</b>. ]]></string>
 
     <!-- NON HTML TAGS -->
+    <string name="theme">Tema</string>
+    <string name="light">Claro</string>
+    <string name="dark">Oscuro</string>
     <string name="activity_preferences_name">Configuración</string>
     <string name="exit">Salir</string>
     <string name="search_label">Buscar</string>

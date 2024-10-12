@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Тэма</string>
+    <string name="light">Святло</string>
+    <string name="dark">Цёмны</string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>інфармацыя:</b> Націсніце ўжытыя тэгі да]]></string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[Раскрыццё інфармацыі: Хоць рэкамендуецца для загрузкі, <b>bам не трэба VPN выкарыстоўваць FrostWire. </b>]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Ваша канфідэнцыяльнасць з\'яўляецца адным з асноўных правоў чалавека</b>. Неабаронены злучэнне азначае ўсё, што вы робіце ў Інтэрнэце, уключаючы <b>загрузкі, пошук, абмен паведамленнямі</b>, можна кантраляваць і перахопленыя кім-небудзь у сеткі, напрыклад, Інтэрнэт-паслугі, хакеры, урад.<br><br><b>Мы настойліва раім выкарыстоўваць паслугу VPN</b>. <br> Вось некаторыя варыянты, якія забяспечваюць надзейную працу і добра працаваць з FrostWire:]]></string>

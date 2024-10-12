@@ -17,6 +17,9 @@
 */
 -->
 <resources>
+    <string name="theme">Tema</string>
+    <string name="light">Açık</string>
+    <string name="dark">Koyu</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Bilgilendirme:</b> İndirmeleriniz için önerilse de, özellikle hassas bilgileri (örneğin bankacılık) indirirken veya paylaşırken ve herkese açık Wi-Fi veya mobil veri kullanırken, <b>FrostWire\'ı kullanmak için VPN\'ye ihtiyacınız yok. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>Bilgi:</b> Için uygulanmış etiketler\'e dokunun]]></string>
     <string name="activity_preferences_name">Ayarlar</string>

@@ -18,6 +18,9 @@
 -->
 <resources>
     <!-- Important: Android is buggy with HTML, do not put HTML tags right next to text, leave a space, as it seems the text wrapping logic is considering HTML as visible text and you get premature wrapping. -->
+    <string name="theme">Motyw</string>
+    <string name="light">Jasny</string>
+    <string name="dark">Ciemny</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<p> * Chociaż bardzo zalecamy, <b> nie musisz mieć VPN aby korzystać z FrostWire. </b></p>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>WSKAZÓWKA:</b> Dotchnij dodane tagi aby]]></string>
 

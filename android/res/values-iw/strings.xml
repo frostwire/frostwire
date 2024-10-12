@@ -21,6 +21,9 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> גע בתגים שחלים על]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ אתה מחובר לאינטרנט באמצעות VPN. <br> <br>r אם אינך משתמש כבר, מומלץ להשתמש באחד מהשירותים הבאים כדי להצפין את החיבור שלך ו <b/> לשמור על הפרטיות שלך <b>. ]]></string>
 
+    <string name="theme">ערכת נושא</string>
+    <string name="light">בהיר</string>
+    <string name="dark">כהה</string>
     <string name="azureus_peer_manager_status_finished">גָמוּר</string>
     <string name="your_installation_is_complete">שההתקנה הושלמה.</string>
     <string name="error_connection_timed_out">שגיאה: חיבור הופסק/ירד. נסה שוב.</string>

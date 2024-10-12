@@ -17,6 +17,10 @@
 */
 -->
 <resources>
+    <string name="theme">Θέμα</string>
+    <string name="light">Φωτεινό</string>
+    <string name="dark">Σκούρο</string>
+    <string name="system">Σύστημα</string>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Αποκάλυψη:</b> Αν και συνιστάται για τις λήψεις σας, ιδίως όταν κάνετε λήψη ή ανταλλάσσετε ευαίσθητες πληροφορίες (π.χ. τραπεζικά) και ενώ χρησιμοποιείτε δημόσια δεδομένα Wi-Fi ή κινητά, <b>δεν χρειάζεται ένα VPN για να χρησιμοποιήσετε FrostWire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Αγγίξτε τις ετικέτες στις]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>Η ιδιωτική σας ζωή είναι ένα θεμελιώδες ανθρώπινο δικαίωμα</b>. Μια μη προστατευμένη σύνδεση σημαίνει ότι ό, τι κάνετε online, συμπεριλαμβανομένων των <b>λήψεων, αναζητήσεων, μηνυμάτων</b>, μπορεί να παρακολουθείται και να παρεμποδίζεται από οποιονδήποτε στο δίκτυό σας, π.χ. Πάροχοι υπηρεσιών διαδικτύου, χάκερ, κυβερνήσεις.<br><br><b>We STRONGLY recommend using a VPN service</b>. <br> Εδώ είναι μερικές επιλογές που παρέχουν αξιόπιστες υπηρεσίες και λειτουργούν καλά με το FrostWire:]]></string>

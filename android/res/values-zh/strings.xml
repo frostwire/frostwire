@@ -21,6 +21,9 @@
     <string name="tip_touch_tags_to"><![CDATA[ <b>提示:</b> 触摸应用的标签]]></string>
     <string name="unprotected_connections_visibility_bullet_html"><![CDATA[ <b>您的隐私权是一项基本人权</b>. 不受保护的连接意味着您在线进行的所有操作（包括<b>下载，搜索，消息传递</b>）都可以被网络上的任何人监控和拦截，例如： 互联网服务提供商，黑客，政府。<br><br><b>我们强烈建议您使用VPN服务</b>. <br> 以下是一些提供可靠服务并与FrostWire配合良好的选项：]]></string>
     <string name="protected_connections_visibility_bullet_html"><![CDATA[ 您已使用VPN连接到Internet。 <br><br> 如果您尚未使用，我们建议您使用以下服务之一加密您的连接并<b>保护您的隐私</b>。 ]]></string>
+    <string name="theme">主题</string>
+    <string name="light">浅色</string>
+    <string name="dark">深色</string>
     <string name="activity_preferences_name">设置</string>
     <string name="exit">退出</string>
     <string name="search_label">搜索</string>

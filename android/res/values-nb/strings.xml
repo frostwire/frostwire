@@ -19,6 +19,9 @@
 <resources>
     <string name="you_dont_need_a_vpn_to_use_frostwire_bullet_html"><![CDATA[<b>Informasjon:</b> Selv anbefalt for nedlastingene dine, spesielt når du laster ned eller bytter sensitiv informasjon (for eksempel bank) og mens du bruker offentlig Wi-Fi eller mobildata, <b>du trenger ikke en VPN å bruke Frostwire. </b>]]></string>
     <string name="tip_touch_tags_to"><![CDATA[ <b>TIP:</b> Trykk på påførte tagger til]]></string>
+    <string name="theme">Tema</string>
+    <string name="light">Lys</string>
+    <string name="dark">Mørk</string>
     <string name="azureus_peer_manager_status_finished">Ferdig</string>
     <string name="your_installation_is_complete">Installasjonen er fullført.</string>
     <string name="error_connection_timed_out">Feil: tilkobling tids ut/droppet. Prøv igjen.</string>
