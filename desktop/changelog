@@ -1,7 +1,8 @@
 frostwire (6.13.4) stable; urgency=high
   * Fix flickering and empty label issue in seeding status indicator
+  * Telluride Video Downloader build 35
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 24 Sep 2024 20:44:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 13 Oct 2024 11:33:00 -0600
 
 frostwire (6.13.3) stable; urgency=high
   * Java Runtime Environment 22.0.2 update
