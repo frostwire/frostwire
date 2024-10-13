@@ -17,12 +17,12 @@
 ##########################################################################
 #set -x
 PYINSTALLER_CMD="pyinstaller"
-PYLINT_CMD="pylint3"
+PYLINT_CMD="python3 -m pylint"
 source ./common.sh
 
 if [[ ismac -eq ${TRUE} || iswindows -eq ${TRUE} ]]
 then
-    PYLINT_CMD="pylint"
+    PYLINT_CMD="python3 -m pylint"
 fi
 
 # Linux's pyinstaller PATH
@@ -69,6 +69,7 @@ fi
 echo "Cleaning up..."
 cleanup
 echo "Running ${PYLINT_CMD}..."
+echo ${PYLINT_CMD} --max-line-length=350 telluride.py
 ${PYLINT_CMD} --max-line-length=350 telluride.py
 read -p "[Press any key to continue] [Press Ctrl+C to cancel build]"
 echo "Running ${PYINSTALLER_CMD} --onefile ${EXTRA_FLAGS} telluride.py"
