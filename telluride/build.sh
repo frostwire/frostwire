@@ -20,18 +20,23 @@ PYINSTALLER_CMD="pyinstaller"
 PYLINT_CMD="python3 -m pylint"
 source ./common.sh
 
-if [[ ismac -eq ${TRUE} || iswindows -eq ${TRUE} ]]
+if ismac;
 then
     PYLINT_CMD="python3 -m pylint"
 fi
 
+if iswindows;
+then
+    PYLINT_CMD="python -m pylint"
+fi
+
 # Linux's pyinstaller PATH
-if isubuntu == ${TRUE}
+if isubuntu;
 then
     PYINSTALLER_CMD="${HOME}/.local/bin/pyinstaller"
 fi
 
-if isdocker == ${TRUE}
+if isdocker;
 then
     #echo "isdocker: true, setting pylint command to 'pylint3'"
     PYINSTALLER_CMD=/usr/local/bin/pyinstaller

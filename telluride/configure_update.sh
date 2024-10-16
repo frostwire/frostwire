@@ -30,6 +30,15 @@ then
 fi
 
 PIP_CMD='python3 -m pip'
+if iswindows;
+then
+  echo "Running from windows..."
+  # the python that you install in windows from python.org does not have a python3.exe
+  # trying to set aliases or fixing paths in windows 10 is a nightmare because they have
+  # a Microsoft Store launcher to install python from there linked to 'python3'
+  PIP_CMD='python -m pip'
+fi
+
 
 ${PIP_CMD} cache purge
 ${PIP_CMD} cache info
