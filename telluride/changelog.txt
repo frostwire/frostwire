@@ -1,5 +1,6 @@
 build 35 - oct/13/2024
  - yt_dlp-2024.10.07
+ - dev: pyinstaller-6.11.0
 
 build 34 - oct/06/2024
  - yt_dlp-2024.9.27
