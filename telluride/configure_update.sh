@@ -31,13 +31,6 @@ fi
 
 PIP_CMD='python3 -m pip'
 
-iswindows
-if [ $? -eq ${TRUE} ];
-then
-  PIP_CMD='python -m pip'
-fi
-
-
 ${PIP_CMD} cache purge
 ${PIP_CMD} cache info
 ${PIP_CMD} ${PIP_OPTIONS} pip
