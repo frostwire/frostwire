@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.frostwire.android.core.ConfigurationManager;
@@ -56,6 +57,10 @@ public class ThemeManager {
 
         SystemUtils.ensureBackgroundThreadOrCrash("ThemeManager::loadSavedThemeModeAsync");
         String themeEntry = ConfigurationManager.instance().getString(Constants.PREF_KEY_GUI_THEME_MODE, "system");
+        if (themeEntry == null) {
+            themeEntry = "system";
+            ConfigurationManager.instance().setString(Constants.PREF_KEY_GUI_THEME_MODE, themeEntry);
+        }
         final int themeMode = getThemeModeFromEntry(themeEntry);
         SystemUtils.postToUIThreadAtFront(() -> uiThreadCallback.onThemeLoaded(themeMode));
     }
@@ -69,7 +74,7 @@ public class ThemeManager {
         applyThemeMode(themeMode);
     }
 
-    public static void saveThemeModeAsync(String themeEntry) {
+    public static void saveThemeModeAsync(@NonNull String themeEntry) {
         if (SystemUtils.isUIThread()) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> saveThemeModeAsync(themeEntry));
             return;
@@ -79,9 +84,13 @@ public class ThemeManager {
     }
 
     // Get the theme mode from the theme entry
-    public static int getThemeModeFromEntry(String themeEntry) {
+    public static int getThemeModeFromEntry(@NonNull String themeEntry) {
         initThemeEntryToIntModeMap();
-        return theme_entry_to_int_mode_map.get(themeEntry.toLowerCase());
+        Integer themeMode = theme_entry_to_int_mode_map.get(themeEntry.toLowerCase());
+        if (themeMode == null) {
+            themeMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM;
+        }
+        return themeMode;
     }
 
     // Get the theme entry from the theme mode
