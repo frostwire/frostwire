@@ -15,13 +15,18 @@
 -keep class org.conscrypt.ConscryptHostnameVerifier { *; }
 -keep class com.crashlytics.** { *; }
 -dontwarn com.crashlytics.**
--keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase {
+    void <init>();
+}
+
 
 #  VUNGLE
 -dontwarn com.vungle.**
 -dontnote com.vungle.**
 -keep class com.vungle.** { *; }
--keep class javax.inject.*
+-keep class javax.inject.* {
+    void <init>();
+}
 -dontwarn de.greenrobot.event.util.**
 -dontwarn rx.internal.util.unsafe.**
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
