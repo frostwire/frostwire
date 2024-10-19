@@ -1,4 +1,4 @@
-FrostWire 2.8.0 build 737 OCT/11/2024
+FrostWire 2.8.0 build 738 OCT/18/2024
  - New: Dark Mode Theme
  - Removed Google Playstore Billing integration and libraries
  - yt_dlp-2024.10.07
