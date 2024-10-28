@@ -1,4 +1,6 @@
 FrostWire 2.8.1 build 739 OCT/27/2024
+ - yt_dlp-2024.10.22
+ - Update Chaquopy plugin to 16.0.0
  - crash: Fix IllegalStateException by making DrawerLayout the root view in activity_main.xml
  - dev: com.google.firebase:firebase-bom:33.5.1
  - dev: com.android.tools.build:gradle:8.7.1
