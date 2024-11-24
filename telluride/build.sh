@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ##########################################################################
 # Created by Angel Leon (@gubatron)
 # Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
