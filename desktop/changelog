@@ -1,3 +1,8 @@
+frostwire (6.13.5) stable; urgency=high
+  * Telluride Video Downloader build 36
+
+ -- FrostWire Team <contact@frostwire.com>  Sun, 24 Nov 2024 08:53:00 -0600
+
 frostwire (6.13.4) stable; urgency=high
   * Fix flickering and empty label issue in seeding status indicator
   * Telluride Video Downloader build 35
