@@ -344,10 +344,5 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/file_paths" />
         </provider>
-
-        <!-- AppLovin -->
-        <meta-data
-                android:name="applovin.sdk.key"
-                android:value="PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R" />
     </application>
 </manifest>

@@ -22,6 +22,9 @@ import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +37,10 @@ import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxRewardedAd;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
+import com.applovin.sdk.AppLovinSdkConfiguration;
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration;
 import com.applovin.sdk.AppLovinSdkSettings;
+import com.applovin.sdk.AppLovinTermsAndPrivacyPolicyFlowSettings;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -52,23 +58,55 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
     private AppLovinAdNetwork() {
     }
 
+    public static String getAppLovinSdkKey(Context context) {
+        try {
+            // Get the ApplicationInfo object
+            ApplicationInfo appInfo = context.getPackageManager()
+                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+
+            // Retrieve the value of "applovin.sdk.key" from the meta-data
+            if (appInfo.metaData != null) {
+                return appInfo.metaData.getString("applovin.sdk.key");
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace(); // Handle the exception appropriately
+        }
+
+        // Return null or a default value if the key is not found
+        return null;
+    }
+
     @Override
     public void initialize(final Activity activity) {
         if (shouldWeAbortInitialize(activity)) {
             return;
         }
+
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             try {
                 if (!started()) {
                     Context appContext = SystemUtils.getApplicationContext();
-                    AppLovinSdk.initializeSdk(appContext);
+                    final String APPLOVIN_SDK_KEY = "PDAf5nX3UvzDFSGe52hI1kez_GTHC4GcIQGOCpRghOuyr9axCGDD_sB-6kFJpWw5yBU8_wphJhd8rD32UHGT8R";
+                    AppLovinSdkInitializationConfiguration config = AppLovinSdkInitializationConfiguration.builder(APPLOVIN_SDK_KEY, appContext)
+                            .setMediationProvider(AppLovinMediationProvider.MAX)
+                            .build();
                     AppLovinSdk sdk = AppLovinSdk.getInstance(appContext);
-                    sdk.setMediationProvider(AppLovinMediationProvider.MAX);
                     AppLovinSdkSettings sdkSettings = sdk.getSettings();
+                    AppLovinTermsAndPrivacyPolicyFlowSettings termsAndPrivacyPolicyFlowSettings = sdkSettings.getTermsAndPrivacyPolicyFlowSettings();
+                    termsAndPrivacyPolicyFlowSettings.setEnabled(true);
+                    termsAndPrivacyPolicyFlowSettings.setPrivacyPolicyUri(Uri.parse("https://www.frostwire.com/privacy"));
+                    termsAndPrivacyPolicyFlowSettings.setTermsOfServiceUri(Uri.parse("https://www.frostwire.com/terms"));
                     sdkSettings.setMuted(!DEBUG_MODE);
                     sdkSettings.setVerboseLogging(DEBUG_MODE);
-                    start();
-                    LOG.info("AppLovin initialized. AppLovinAdNetwork.DEBUG_MODE=" + DEBUG_MODE);
+
+
+                    sdk.initialize(config, new AppLovinSdk.SdkInitializationListener() {
+                        @Override
+                        public void onSdkInitialized(AppLovinSdkConfiguration appLovinSdkConfiguration) {
+                            LOG.info("AppLovin initialized. AppLovinAdNetwork.DEBUG_MODE=" + DEBUG_MODE);
+                            start();
+                        }
+                    });
                 }
             } catch (Throwable e) {
                 LOG.error(e.getMessage(), e);
@@ -119,7 +157,6 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                         interstitialAdapter.show(activity, placement);
             } catch (Throwable e) {
                 e.printStackTrace();
-                result = false;
             }
         }
         return result;
@@ -159,27 +196,13 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         }
 
         @Override
-        public void onRewardedVideoStarted(MaxAd ad) {
-            LOG.info("onRewardedVideoStarted() started reward Ad playback");
-            wasPlayingMusic = MusicUtils.isPlaying();
-
-            if (wasPlayingMusic) {
-                MusicUtils.pause();
-            }
-        }
-
-        @Override
-        public void onRewardedVideoCompleted(MaxAd ad) {
-            LOG.info("onRewardedVideoCompleted: adUnitId=" + ad.getAdUnitId());
+        public void onUserRewarded(MaxAd ad, MaxReward reward) {
+            async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
+            LOG.info("onUserRewarded: adUnitId=" + ad.getAdUnitId());
             async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
             if (wasPlayingMusic) {
                 MusicUtils.play();
             }
-        }
-
-        @Override
-        public void onUserRewarded(MaxAd ad, MaxReward reward) {
-            async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
         }
 
         @Override
@@ -189,7 +212,12 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
 
         @Override
         public void onAdDisplayed(MaxAd ad) {
+            LOG.info("onRewardedVideoStarted() started reward Ad playback");
+            wasPlayingMusic = MusicUtils.isPlaying();
 
+            if (wasPlayingMusic) {
+                MusicUtils.pause();
+            }
         }
 
         @Override
