@@ -1,3 +1,8 @@
+FrostWire 2.8.2 build 740 NOC/26/20245
+ - yt_dlp-2024.11.18
+ - Python runtime upgraded from 3.8 to 3.11
+ - androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7
+
 FrostWire 2.8.1 build 739 OCT/27/2024
  - yt_dlp-2024.10.22
  - Update Chaquopy plugin to 16.0.0
@@ -50,7 +55,7 @@ FrostWire 2.7.8 build 733 MAY/25/2024
  - Fixed null pointer exceptions in AbstractConfirmListDialog and TellurideCourierCallback
  - Improved null checks for miniPlayer and coverImage
  - Miscellaneous Play Store compliance enhancements
- - Python version updated to 3.12
+ - Python version updated to 3.8
  - Python: yt-dlp-2024.4.9
  - androidx.browser:browser:1.8.0 update
  - androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0 update

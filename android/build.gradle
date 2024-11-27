@@ -32,7 +32,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.1'
+        classpath 'com.android.tools.build:gradle:8.7.2'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -110,8 +110,15 @@ android {
         }
 
         python {
+            chaquopy {
+                defaultConfig {
+                    version "3.11"
+                }
+            }
             pip {
-                install "yt_dlp"
+                install "yt_dlp==2024.11.18"
+                // helps a lot with debugging
+                //options "--verbose"
             }
         }
     }
@@ -210,9 +217,9 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.browser:browser:1.8.0'
-    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.core:core:1.13.1' // updating to 1.15 requires upgrading project to target >= 34
     implementation 'androidx.exifinterface:exifinterface:1.3.7'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -226,7 +233,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20'
 
     // Firebase Crashlytics
-    implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    implementation platform('com.google.firebase:firebase-bom:33.6.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
@@ -236,10 +243,10 @@ dependencies {
     implementation 'androidx.media2:media2-player:1.3.0'
 
     // AppLovin Max
-    implementation 'com.applovin:applovin-sdk:12.4.3'
+    implementation 'com.applovin:applovin-sdk:13.0.1'
 
     // AppLovin + Unity
-    implementation 'com.applovin.mediation:unityads-adapter:4.9.2.1'
+    implementation 'com.applovin.mediation:unityads-adapter:4.12.4.0'
 
     def jlibtorrent_version = '1.2.19.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
@@ -257,13 +264,7 @@ dependencies {
 }
 
 afterEvaluate {
-    //tasks.named('uploadCrashlyticsMappingFileBasicRelease').configure {
-    //    dependsOn ':processPlus1ReleaseGoogleServices'
-    //    dependsOn ':processBasicReleaseGoogleServices' // this should be the one, but it wasn't
-    //}
-
     tasks.named('uploadCrashlyticsMappingFilePlus1Release').configure {
-    //    dependsOn ':processBasicReleaseGoogleServices'
         dependsOn ':processPlus1ReleaseGoogleServices'
     }
 }
