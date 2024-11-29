@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,6 @@ import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.SearchEngine;
 import com.frostwire.android.gui.SearchMediator;
-import com.frostwire.android.gui.adapters.OnFeedbackClickAdapter;
 import com.frostwire.android.gui.adapters.PromotionDownloader;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter;
 import com.frostwire.android.gui.adapters.SearchResultListAdapter.FilteredSearchResults;
@@ -72,10 +71,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.AbstractFragment;
-import com.frostwire.android.gui.views.ClickAdapter;
 import com.frostwire.android.gui.views.PromotionsView;
-import com.frostwire.android.gui.views.RichNotification;
-import com.frostwire.android.gui.views.RichNotificationActionLink;
 import com.frostwire.android.gui.views.SearchInputView;
 import com.frostwire.android.gui.views.SearchProgressView;
 import com.frostwire.android.gui.views.SwipeLayout;
@@ -102,7 +98,6 @@ import com.frostwire.util.http.HttpClient;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -457,7 +452,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         searchInput.setFileTypeCountersVisible(false);
         currentQuery = null;
         searchProgress.setProgressEnabled(false);
-        showRatingsReminder(getView());
         headerBanner.setBannerViewVisibility(HeaderBanner.VisibleBannerType.ALL, false);
         refreshFileTypeCounters(false, fileTypeCounter.fsr);
         showSearchView(getView());
@@ -579,29 +573,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             UIUtils.showShortMessage(ctx, R.string.fetching_torrent_ellipsis);
         }
         new AsyncStartDownload(ctx, sr, message);
-    }
-
-    private void showRatingsReminder(View v) {
-        final RichNotification ratingReminder = findView(v, R.id.fragment_search_rating_reminder_notification);
-        ratingReminder.setVisibility(View.GONE);
-        final ConfigurationManager CM = ConfigurationManager.instance();
-        boolean alreadyRated = CM.getBoolean(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET);
-        if (alreadyRated || ratingReminder.wasDismissed()) {
-            //LOG.info("SearchFragment.showRatingsReminder() aborted. alreadyRated="+alreadyRated + " wasDismissed=" + ratingReminder.wasDismissed());
-            return;
-        }
-        long installationTimestamp = CM.getLong(Constants.PREF_KEY_GUI_INSTALLATION_TIMESTAMP);
-        long daysInstalled = TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - installationTimestamp);
-        if (installationTimestamp == -1 || daysInstalled < 5) {
-            //LOG.info("SearchFragment.showRatingsReminder() aborted. Too soon to show ratings reminder. daysInstalled=" + daysInstalled);
-            return;
-        }
-        ClickAdapter<SearchFragment> onRateAdapter = new OnRateClickAdapter(SearchFragment.this, ratingReminder, CM);
-        ratingReminder.setOnClickListener(onRateAdapter);
-        RichNotificationActionLink rateFrostWireActionLink = new RichNotificationActionLink(ratingReminder.getContext(), getString(R.string.love_frostwire), onRateAdapter);
-        RichNotificationActionLink sendFeedbackActionLink = new RichNotificationActionLink(ratingReminder.getContext(), getString(R.string.send_feedback), new OnFeedbackClickAdapter(this, ratingReminder, CM));
-        ratingReminder.updateActionLinks(rateFrostWireActionLink, sendFeedbackActionLink);
-        ratingReminder.setVisibility(View.VISIBLE);
     }
 
     public void startPromotionDownload(Slide slide) {
@@ -810,31 +781,6 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             this.fsr.numFilteredTorrents = 0;
             this.fsr.numFilteredVideo = 0;
             this.fsr.clear();
-        }
-    }
-
-    private static final class OnRateClickAdapter extends ClickAdapter<SearchFragment> {
-        private final WeakReference<RichNotification> ratingReminderRef;
-        private final ConfigurationManager CM;
-
-        OnRateClickAdapter(final SearchFragment owner, final RichNotification ratingReminder, final ConfigurationManager CM) {
-            super(owner);
-            ratingReminderRef = Ref.weak(ratingReminder);
-            this.CM = CM;
-        }
-
-        @Override
-        public void onClick(SearchFragment owner, View v) {
-            if (Ref.alive(ratingReminderRef)) {
-                ratingReminderRef.get().setVisibility(View.GONE);
-            }
-            CM.setBoolean(Constants.PREF_KEY_GUI_ALREADY_RATED_US_IN_MARKET, true);
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse("market://details?id=" + Constants.APP_PACKAGE_NAME));
-            try {
-                owner.startActivity(intent);
-            } catch (Throwable ignored) {
-            }
         }
     }
 

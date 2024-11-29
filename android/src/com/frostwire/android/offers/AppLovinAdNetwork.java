@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -56,24 +54,6 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
     private AppLovinMaxInterstitialAdapter interstitialAdapter = null;
 
     private AppLovinAdNetwork() {
-    }
-
-    public static String getAppLovinSdkKey(Context context) {
-        try {
-            // Get the ApplicationInfo object
-            ApplicationInfo appInfo = context.getPackageManager()
-                    .getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-
-            // Retrieve the value of "applovin.sdk.key" from the meta-data
-            if (appInfo.metaData != null) {
-                return appInfo.metaData.getString("applovin.sdk.key");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace(); // Handle the exception appropriately
-        }
-
-        // Return null or a default value if the key is not found
-        return null;
     }
 
     @Override
