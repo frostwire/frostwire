@@ -1,9 +1,10 @@
-FrostWire 2.8.2 build 740 NOV/27/20245
+FrostWire 2.8.2 build 740 NOV/28/2024
  - yt_dlp-2024.11.18
  - Python runtime upgraded from 3.8 to 3.11
  - androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7
  - com.applovin.mediation:unityads-adapter:4.12.4.0
-
+ - Removed 'Rate us' rich notification, no longer on Google Play
+ 
 FrostWire 2.8.1 build 739 OCT/27/2024
  - yt_dlp-2024.10.22
  - Update Chaquopy plugin to 16.0.0
