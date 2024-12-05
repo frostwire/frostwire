@@ -95,14 +95,15 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 android {
     namespace "com.frostwire.android"
 
-    compileSdk 34  // Android 14
+    compileSdk 35  // Android 14 UpsideDownCake
 
     defaultConfig {
         applicationId "com.frostwire.android"
         versionName project.ext.versionName
-        minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
+        //minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
+        minSdkVersion 26 // Android 8.0 Oreo
         //minSdkVersion 28 // Android 9.0 Pie
-        targetSdkVersion 33 // Android 13 (more involved upgrade, crashes on targetsdkversion 34)
+        targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 34)
         multiDexEnabled true
 
         ndk {
@@ -124,8 +125,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -217,7 +218,7 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.browser:browser:1.8.0'
-    implementation 'androidx.core:core:1.13.1' // updating to 1.15 requires upgrading project to target >= 34
+    implementation 'androidx.core:core:1.15.0'
     implementation 'androidx.exifinterface:exifinterface:1.3.7'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -233,7 +234,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.20'
 
     // Firebase Crashlytics
-    implementation platform('com.google.firebase:firebase-bom:33.6.0')
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'

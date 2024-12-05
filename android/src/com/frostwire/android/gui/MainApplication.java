@@ -20,6 +20,8 @@ package com.frostwire.android.gui;
 import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.content.Context;
+import android.os.Build;
+import android.os.StrictMode;
 
 import androidx.multidex.MultiDexApplication;
 
@@ -40,12 +42,18 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+
+import dalvik.system.ZipPathValidator;
 
 /**
  * @author gubatron
@@ -62,12 +70,18 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ZipPathValidator.clearCallback();
+        }
 
+        LOG.info("MainApplication::onCreate waiting for appContextLock");
         synchronized (appContextLock) {
             if (appContext == null) {
                 appContext = this;
             }
         }
+        LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
+        //asyncFirebaseInitialization(appContext);
 
         runStrict(this::onCreateSafe);
 
@@ -90,6 +104,16 @@ public class MainApplication extends MultiDexApplication {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             TellurideCourier.ytDlpVersion((version) -> LOG.info("MainApplication::onCreate -> yt_dlp version: " + version));
         });
+    }
+
+    public static void disableStrictModePolicyForUnbufferedIO() {
+        LOG.info(String.format("MainApplication::disableStrictModePolicyForUnbufferedIO SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                    .permitAll() // Allow other operations if needed
+                    .build());
+        }
     }
 
     public static Context context() {
