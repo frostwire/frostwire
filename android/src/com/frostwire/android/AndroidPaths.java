@@ -39,6 +39,7 @@ import org.apache.commons.io.FilenameUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -54,7 +55,7 @@ public final class AndroidPaths implements SystemPaths {
     private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
-    private final File internalFilesDir;
+    private File internalFilesDir;
 
     private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
             MediaStore.VOLUME_EXTERNAL_PRIMARY :
@@ -68,8 +69,28 @@ public final class AndroidPaths implements SystemPaths {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public AndroidPaths(Application app) {
         this.app = app;
-        internalFilesDir = app.getFilesDir();
-        LOG.info("");
+        // All disk operations must be done in the background
+        final CountDownLatch waitForInternalFiles = new CountDownLatch(1);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            internalFilesDir = app.getFilesDir();
+            waitForInternalFiles.countDown();
+        });
+        if (internalFilesDir == null) {
+            try {
+                LOG.info("AndroidPaths: Internal Files Dir: waiting for internal files dir");
+                waitForInternalFiles.await(200, java.util.concurrent.TimeUnit.MILLISECONDS);
+                LOG.info("AndroidPaths: Internal Files Dir: done waiting for internal files dir");
+            } catch (InterruptedException e) {
+                LOG.error("AndroidPaths: Error waiting for internal files dir (time out?)", e);
+            }
+            if (internalFilesDir != null) {
+                LOG.info("AndroidPaths: Internal Files Dir: " + internalFilesDir.getAbsolutePath());
+            } else {
+                LOG.error("AndroidPaths: Internal Files Dir is null");
+            }
+        } else {
+            LOG.info("AndroidPaths: Internal Files Dir: " + internalFilesDir.getAbsolutePath() + " (already set) no need to wait for thread");
+        }
     }
 
     /**
