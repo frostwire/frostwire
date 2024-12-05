@@ -34,6 +34,7 @@ import android.telephony.TelephonyManager;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
+import androidx.core.content.ContextCompat;
 
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
@@ -306,25 +307,25 @@ public final class Engine implements IEngineService {
         IntentFilter telephonyFilter = new IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED);
 
         try {
-            context.registerReceiver(receiver, fileFilter);
+            ContextCompat.registerReceiver(context, receiver, fileFilter, ContextCompat.RECEIVER_EXPORTED);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
 
         try {
-            context.registerReceiver(receiver, connectivityFilter);
+            ContextCompat.registerReceiver(context, receiver, connectivityFilter, ContextCompat.RECEIVER_EXPORTED);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
 
         try {
-            context.registerReceiver(receiver, audioFilter);
+            ContextCompat.registerReceiver(context, receiver, audioFilter, ContextCompat.RECEIVER_EXPORTED);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
 
         try {
-            context.registerReceiver(receiver, telephonyFilter);
+            ContextCompat.registerReceiver(context, receiver, telephonyFilter, ContextCompat.RECEIVER_EXPORTED);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }

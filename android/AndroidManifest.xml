@@ -19,8 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="auto"
-        android:versionCode="740"
-        android:versionName="2.8.2">
+        android:versionCode="741"
+        android:versionName="2.9.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
@@ -344,5 +344,6 @@
                     android:name="android.support.FILE_PROVIDER_PATHS"
                     android:resource="@xml/file_paths" />
         </provider>
+
     </application>
 </manifest>
