@@ -34,6 +34,7 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.RunStrict;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -42,16 +43,12 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.CompletableFuture;
 
 import dalvik.system.ZipPathValidator;
 
@@ -70,8 +67,8 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        enableStrictModePolicies();
-        //disableStrictModePolicyForUnbufferedIO();
+        RunStrict.enableStrictModePolicies();
+        //RunStrict.disableStrictModePolicyForUnbufferedIO();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ZipPathValidator.clearCallback();
         }
@@ -88,8 +85,8 @@ public class MainApplication extends MultiDexApplication {
         //asyncFirebaseInitialization(appContext);
 
         runStrict(this::onCreateSafe);
-        enableStrictModePolicies();
-        //disableStrictModePolicyForUnbufferedIO();
+        RunStrict.enableStrictModePolicies();
+        //RunStrict.disableStrictModePolicyForUnbufferedIO();
 
         Engine.instance().onApplicationCreate(this);
 
@@ -110,32 +107,6 @@ public class MainApplication extends MultiDexApplication {
         });
     }
 
-    public static void disableStrictModePolicyForUnbufferedIO() {
-        LOG.info(String.format("MainApplication::disableStrictModePolicyForUnbufferedIO SDK VERSION: {%d}", Build.VERSION.SDK_INT));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
-                    .permitAll() // Allow other operations if needed
-                    .build());
-        }
-    }
-
-    public static void enableStrictModePolicies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            LOG.info(String.format("MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    //.penaltyDeath()
-                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
-                    .build());
-//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//                    .detectAll()
-//                    .penaltyLog()
-//                    .penaltyDeath()
-//                    .build());
-        }
-    }
 
     public static Context context() {
         return appContext;

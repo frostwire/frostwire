@@ -17,10 +17,13 @@
 
 package com.frostwire.android.util;
 
+import android.os.Build;
 import android.os.StrictMode;
 
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.util.Logger;
+
+import java.util.Locale;
 
 public interface RunStrict<R> {
 
@@ -68,7 +71,8 @@ public interface RunStrict<R> {
     }
 
     /**
-     * Runs the runnable code under strict policy.
+     * Runs the runnable code under strict policy but then sets relaxed policies back.
+     * On the current thread where it's invoked.
      *
      * @param r the runnable to execute r.run()
      */
@@ -94,6 +98,38 @@ public interface RunStrict<R> {
             return r.run();
         } finally {
             setStrictPolicy(false);
+        }
+    }
+
+    /** @noinspection unused*/
+    static void enableStrictModePolicies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LOG.info(String.format(Locale.US, "MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog() //.penaltyDeath()
+                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                    .build());
+        }
+    }
+
+    /** @noinspection unused*/
+    static void disableStrictModePolicies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LOG.info(String.format(Locale.US,"MainApplication::disableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .permitAll() // Allow other operations if needed
+                    .build());
+        }
+    }
+
+    /** @noinspection unused*/
+    static void disableStrictModePolicyForUnbufferedIO() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LOG.info(String.format(Locale.US, "MainApplication::disableStrictModePolicyForUnbufferedIO SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                    .build());
         }
     }
 }
