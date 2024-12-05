@@ -70,9 +70,13 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        enableStrictModePolicies();
+        //disableStrictModePolicyForUnbufferedIO();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ZipPathValidator.clearCallback();
         }
+
+        Platforms.set(new AndroidPlatform(this));
 
         LOG.info("MainApplication::onCreate waiting for appContextLock");
         synchronized (appContextLock) {
@@ -84,14 +88,14 @@ public class MainApplication extends MultiDexApplication {
         //asyncFirebaseInitialization(appContext);
 
         runStrict(this::onCreateSafe);
-
-        Platforms.set(new AndroidPlatform(this));
+        enableStrictModePolicies();
+        //disableStrictModePolicyForUnbufferedIO();
 
         Engine.instance().onApplicationCreate(this);
 
         new Thread(new BTEngineInitializer()).start();
 
-        ThemeManager.loadSavedThemeModeAsync(themeMode -> ThemeManager.applyThemeMode(themeMode));
+        ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
 
         ImageLoader.start(this);
 
@@ -116,6 +120,23 @@ public class MainApplication extends MultiDexApplication {
         }
     }
 
+    public static void enableStrictModePolicies() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LOG.info(String.format("MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    //.penaltyDeath()
+                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                    .build());
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .penaltyDeath()
+//                    .build());
+        }
+    }
+
     public static Context context() {
         return appContext;
     }
@@ -126,6 +147,7 @@ public class MainApplication extends MultiDexApplication {
         ImageLoader.getInstance(this).clear();
         super.onLowMemory();
     }
+
 
     private void onCreateSafe() {
         ConfigurationManager.create(this);

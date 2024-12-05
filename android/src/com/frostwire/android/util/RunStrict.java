@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +20,11 @@ package com.frostwire.android.util;
 import android.os.StrictMode;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
 
 public interface RunStrict<R> {
+
+    Logger LOG = Logger.getLogger(RunStrict.class);
 
     R run();
 
@@ -36,7 +39,9 @@ public interface RunStrict<R> {
      * @param enable {@code true} activate the most strict policy
      */
     static void setStrictPolicy(boolean enable) {
+        LOG.info("RunStrict.setStrictPolicy(" + enable + ") Debug.isEnabled()=" + Debug.isEnabled());
         if (!Debug.isEnabled()) {
+            LOG.info("StrictMode is disabled, this is a DEBUG build");
             return; // no debug mode, do nothing
         }
 
