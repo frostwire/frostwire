@@ -18,13 +18,13 @@
 package com.frostwire.android.offers;
 
 import static com.frostwire.android.offers.Offers.DEBUG_MODE;
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -35,7 +35,6 @@ import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxRewardedAd;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration;
 import com.applovin.sdk.AppLovinSdkSettings;
 import com.applovin.sdk.AppLovinTermsAndPrivacyPolicyFlowSettings;
@@ -80,12 +79,9 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                     sdkSettings.setVerboseLogging(DEBUG_MODE);
 
 
-                    sdk.initialize(config, new AppLovinSdk.SdkInitializationListener() {
-                        @Override
-                        public void onSdkInitialized(AppLovinSdkConfiguration appLovinSdkConfiguration) {
-                            LOG.info("AppLovin initialized. AppLovinAdNetwork.DEBUG_MODE=" + DEBUG_MODE);
-                            start();
-                        }
+                    sdk.initialize(config, appLovinSdkConfiguration -> {
+                        LOG.info("AppLovin initialized. AppLovinAdNetwork.DEBUG_MODE=" + DEBUG_MODE);
+                        start();
                     });
                 }
             } catch (Throwable e) {
@@ -136,7 +132,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
                         (!shutdownAfterwards || !interstitialAdapter.isVideoAd()) &&
                         interstitialAdapter.show(activity, placement);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOG.error("AppLovinAdNetwork.showInterstitial() failed", e);
             }
         }
         return result;
@@ -176,22 +172,21 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         }
 
         @Override
-        public void onUserRewarded(MaxAd ad, MaxReward reward) {
-            async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
+        public void onUserRewarded(MaxAd ad, @NonNull MaxReward reward) {
             LOG.info("onUserRewarded: adUnitId=" + ad.getAdUnitId());
-            async(Offers::pauseAdsAsync, Constants.MIN_REWARD_AD_FREE_MINUTES);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Offers.pauseAdsAsync(Constants.MIN_REWARD_AD_FREE_MINUTES));
             if (wasPlayingMusic) {
                 MusicUtils.play();
             }
         }
 
         @Override
-        public void onAdLoaded(MaxAd ad) {
+        public void onAdLoaded(@NonNull MaxAd ad) {
             retryAttempt = 0;
         }
 
         @Override
-        public void onAdDisplayed(MaxAd ad) {
+        public void onAdDisplayed(@NonNull MaxAd ad) {
             LOG.info("onRewardedVideoStarted() started reward Ad playback");
             wasPlayingMusic = MusicUtils.isPlaying();
 
@@ -201,20 +196,20 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         }
 
         @Override
-        public void onAdHidden(MaxAd ad) {
+        public void onAdHidden(@NonNull MaxAd ad) {
             // rewarded ad is hidden. Pre-load the next ad
             rewardedAd.loadAd();
         }
 
         @Override
-        public void onAdClicked(MaxAd ad) {
+        public void onAdClicked(@NonNull MaxAd ad) {
             if (wasPlayingMusic) {
                 MusicUtils.play();
             }
         }
 
         @Override
-        public void onAdLoadFailed(String adUnitId, MaxError error) {
+        public void onAdLoadFailed(@NonNull String adUnitId, @NonNull MaxError error) {
             // Rewarded ad failed to load
             // We recommend retrying with exponentially higher delays up to a maximum delay (in this case 64 seconds)
             retryAttempt++;
@@ -223,7 +218,7 @@ public class AppLovinAdNetwork extends AbstractAdNetwork {
         }
 
         @Override
-        public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+        public void onAdDisplayFailed(@NonNull MaxAd ad, @NonNull MaxError error) {
             // Rewarded ad failed to display. We recommend loading the next ad
             rewardedAd.loadAd();
             if (wasPlayingMusic) {

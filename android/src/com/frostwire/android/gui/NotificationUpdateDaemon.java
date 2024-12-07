@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,9 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -136,7 +135,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
                 return; // quick return
             }
             //  format strings
-            String sDown = UIUtils.rate2speed(transferManager.getDownloadsBandwidth() / 1024);
+            String sDown = UIUtils.rate2speed((double) transferManager.getDownloadsBandwidth() / 1024);
             String sUp = UIUtils.rate2speed(transferManager.getUploadsBandwidth() / 1024);
             // Transfers status.
             try {
@@ -149,22 +148,20 @@ public final class NotificationUpdateDaemon implements TimerObserver {
             final NotificationManager notificationManager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 try {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        NotificationChannel channel = null;
+                    NotificationChannel channel = null;
 
-                        try {
-                            channel = notificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-                            //LOG.info("updateTransfersStatusNotification() got a channel with notificationManager.getNotificationChannel()? -> " + channel);
-                        } catch (Throwable t) {
-                            LOG.info("updateTransfersStatusNotification() " + t.getMessage(), t);
-                        }
+                    try {
+                        channel = notificationManager.getNotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+                        //LOG.info("updateTransfersStatusNotification() got a channel with notificationManager.getNotificationChannel()? -> " + channel);
+                    } catch (Throwable t) {
+                        LOG.info("updateTransfersStatusNotification() " + t.getMessage(), t);
+                    }
 
-                        if (channel == null) {
-                            channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
-                            channel.setSound(null, null);
-                            notificationManager.createNotificationChannel(channel);
-                            //LOG.info("updateTransfersStatusNotification() had to create a new channel with notificationManager.createNotificationChannel()");
-                        }
+                    if (channel == null) {
+                        channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
+                        channel.setSound(null, null);
+                        notificationManager.createNotificationChannel(channel);
+                        //LOG.info("updateTransfersStatusNotification() had to create a new channel with notificationManager.createNotificationChannel()");
                     }
 
                     // "Fix invalid channel issue for foreground service" -> synchronization around notification methods, even though we no longer use foreground services
@@ -186,11 +183,16 @@ public final class NotificationUpdateDaemon implements TimerObserver {
     }
 
     private void setupNotification() {
+        SystemUtils.ensureBackgroundThreadOrCrash("NotificationUpdateDaemon::setupNotificationAsync()");
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
             LOG.info("setupNotification() aborted, PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION=false");
             return;
         }
+        SystemUtils.postToUIThread(this::setupNotificationUICallback);
+    }
 
+    private void setupNotificationUICallback() {
+        SystemUtils.ensureUIThreadOrCrash("NotificationUpdateDaemon::setupNotification() must be called from the UI thread");
         RemoteViews remoteViews = new RemoteViews(mParentContext.getPackageName(),
                 R.layout.view_permanent_status_notification);
 
@@ -245,7 +247,7 @@ public final class NotificationUpdateDaemon implements TimerObserver {
         }
         if (mTimerSubscription != null && mTimerSubscription.isSubscribed()) {
             if (TaskThrottle.isReadyToSubmitTask("NotificationUpdateDaemon::onTimeRefreshTask)", (FROSTWIRE_STATUS_NOTIFICATION_UPDATE_INTERVAL_IN_SECS * 1000) - 100)) {
-                async(this, NotificationUpdateDaemon::onTimeRefreshTask);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::onTimeRefreshTask);
             }
         } else {
             LOG.error("NotificationUpdateDaemon::onTime() invoked by who?", new Throwable());
@@ -254,7 +256,6 @@ public final class NotificationUpdateDaemon implements TimerObserver {
 
     @SuppressWarnings("deprecation")
     private boolean isScreenOn() {
-        long a = System.currentTimeMillis();
         PowerManager pm = (PowerManager) mParentContext.getSystemService(Context.POWER_SERVICE);
         return pm != null && pm.isScreenOn();
     }

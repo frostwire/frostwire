@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.app.Activity;
@@ -396,7 +395,10 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
         }
         if (BTEngine.ctx != null) {
             if (TaskThrottle.isReadyToSubmitTask("TransfersFragment::getStatusBarDataBackground", TRANSFERS_FRAGMENT_SUBSCRIPTION_INTERVAL_IN_SECS * 1000)) {
-                async(this, TransfersFragment::getStatusBarDataBackground, TransfersFragment::updateStatusBar);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+                    StatusBarData statusBarData = getStatusBarDataBackground();
+                    SystemUtils.postToUIThread(() -> updateStatusBar(statusBarData));
+                });
             }
             onCheckDHT();
         }

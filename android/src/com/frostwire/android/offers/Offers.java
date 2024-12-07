@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
  */
 
 package com.frostwire.android.offers;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.app.Application;
@@ -90,7 +88,7 @@ public final class Offers {
             }
         }
         LOG.info("Offers.initAdNetworks() success");
-        async(Offers::checkIfPausedAsync);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Offers::checkIfPausedAsync);
     }
 
     public static void stopAdNetworks(Context context) {
@@ -188,6 +186,7 @@ public final class Offers {
     }
 
     public static int getMinutesLeftPausedAsync() {
+        SystemUtils.ensureUIThreadOrCrash("Offers::getMinutesLeftPausedAsync");
         ConfigurationManager CM = ConfigurationManager.instance();
         int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
         if (rewarded_video_minutes == -1) {
@@ -268,7 +267,7 @@ public final class Offers {
             activity.finish();
         } else {
             UIUtils.showShortMessage(activity, R.string.looking_For_rewarded_video);
-            async(Offers::keepTryingRewardedAdAsync, Ref.weak(activity));
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> keepTryingRewardedAdAsync(Ref.weak(activity)));
         }
     }
 
@@ -282,7 +281,7 @@ public final class Offers {
             LOG.error("keepTryingRewardedAdAsync() " + e.getMessage(), e);
         }
         if (rewardedAd != null && !rewardedAd.isReady()) {
-            async(Offers::unPauseAdsAsync);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Offers::unPauseAdsAsync);
             activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
@@ -299,7 +298,7 @@ public final class Offers {
                     Ref.free(activityRef);
                 }
             });
-        }  else if (Ref.alive(activityRef)) {
+        } else if (Ref.alive(activityRef)) {
             activityRef.get().runOnUiThread(() -> {
                 if (!Ref.alive(activityRef)) {
                     return;
@@ -323,12 +322,15 @@ public final class Offers {
                                                         final boolean dismissAfterwards,
                                                         final boolean ignoreStartedTransfers) {
         InterstitialLogicParams params = new InterstitialLogicParams(placement, shutdownAfterwards, dismissAfterwards, ignoreStartedTransfers);
-        async(
-                Offers::readyForAnotherInterstitialAsync, activity, params, // returns true if ready
-                Offers::onReadyForAnotherInterstitialAsyncCallback); // shows offers on main thread if ready received
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () ->
+                {
+                    final boolean ready = readyForAnotherInterstitialAsync(params);
+                    SystemUtils.postToUIThread(() -> Offers.onReadyForAnotherInterstitialAsyncCallback(activity, params, ready));
+                }
+        );
     }
 
-    private static boolean readyForAnotherInterstitialAsync(Activity activity, InterstitialLogicParams params) {
+    private static boolean readyForAnotherInterstitialAsync(InterstitialLogicParams params) {
         try {
             ConfigurationManager CM = ConfigurationManager.instance();
             final int INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES = DEBUG_MODE ? 0 : CM.getInt(Constants.PREF_KEY_GUI_INTERSTITIAL_FIRST_DISPLAY_DELAY_IN_MINUTES);
@@ -385,7 +387,7 @@ public final class Offers {
      */
     public static boolean disabledAds() {
         if (PAUSED) {
-            async(Offers::checkIfPausedAsync);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Offers::unPauseAdsAsync);
             return true;
         }
         return FORCED_DISABLED;
@@ -406,7 +408,7 @@ public final class Offers {
      * Determines if remove ads offers are enabled.
      *
      * @return false if the app has been running for less than 2 seconds to ensure accurate user purchase verification,
-     *         otherwise true if ads are not disabled.
+     * otherwise true if ads are not disabled.
      */
     public static boolean removeAdsOffersEnabled() {
         long now = System.currentTimeMillis();

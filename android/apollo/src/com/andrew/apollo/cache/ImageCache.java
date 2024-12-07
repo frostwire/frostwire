@@ -32,7 +32,6 @@ import android.util.LruCache;
 import androidx.annotation.NonNull;
 
 import com.frostwire.android.gui.services.Engine;
-import com.frostwire.android.util.Asyncs;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
@@ -400,7 +399,7 @@ public final class ImageCache {
      * cache first
      */
     public void flush() {
-        Asyncs.async(this::flushTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::flushTask);
     }
 
     private void flushTask() {
