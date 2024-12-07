@@ -21,7 +21,6 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.StrictMode;
 
 import androidx.multidex.MultiDexApplication;
 
@@ -43,6 +42,7 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import org.apache.commons.io.FileUtils;
 
@@ -67,7 +67,7 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        RunStrict.enableStrictModePolicies();
+        RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             ZipPathValidator.clearCallback();
@@ -84,8 +84,8 @@ public class MainApplication extends MultiDexApplication {
         LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
         //asyncFirebaseInitialization(appContext);
 
-        runStrict(this::onCreateSafe);
-        RunStrict.enableStrictModePolicies();
+        runStrict(this::onCreateStrict);
+        RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
 
         Engine.instance().onApplicationCreate(this);
@@ -95,6 +95,8 @@ public class MainApplication extends MultiDexApplication {
         ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
 
         ImageLoader.start(this);
+
+        //fetchGoogleAdvertisingIdAsync();
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> this.initializeCrawlPagedWebSearchPerformer(this));
 
@@ -106,7 +108,6 @@ public class MainApplication extends MultiDexApplication {
             TellurideCourier.ytDlpVersion((version) -> LOG.info("MainApplication::onCreate -> yt_dlp version: " + version));
         });
     }
-
 
     public static Context context() {
         return appContext;
@@ -120,7 +121,7 @@ public class MainApplication extends MultiDexApplication {
     }
 
 
-    private void onCreateSafe() {
+    private void onCreateStrict() {
         ConfigurationManager.create(this);
 
         AbstractActivity.setMenuIconsVisible(true);

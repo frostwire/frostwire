@@ -112,6 +112,8 @@ public final class Ssl {
                 "github.io",
                 "githubusercontent.com",
                 "google.com",
+                "googleapis.com",
+                "gstatic.com",
                 "gtdb.to",
                 "idope.se",
                 "igcdn.com",
