@@ -52,12 +52,10 @@ import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.adapters.menu.CreateNewPlaylistMenuAction;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.HeaderBanner;
-import com.frostwire.android.offers.Offers;
-import com.frostwire.android.util.Asyncs;
+import com.frostwire.android.util.SystemUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -224,7 +222,7 @@ public abstract class BaseActivity extends AbstractActivity {
         filter.addAction(MusicPlaybackService.REFRESH);
 
         try {
-            registerReceiver(mPlaybackStatus, filter);
+            registerReceiver(mPlaybackStatus, filter, RECEIVER_EXPORTED);
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -262,7 +260,10 @@ public abstract class BaseActivity extends AbstractActivity {
      * Initializes the items in the bottom action bar.
      */
     private void initBottomActionBar() {
-        Asyncs.async(MusicUtils::isStopped, BaseActivity::initBottomActionBarPost, this);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            boolean isStopped = MusicUtils.isStopped();
+            SystemUtils.postToUIThread(() -> initBottomActionBarPost(isStopped));
+        });
     }
 
     private void initBottomActionBarPost(Boolean isStopped) {

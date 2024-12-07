@@ -3,13 +3,13 @@
  *
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Marcelina Knitter (@marcelinkaaa), Jose Molina (@votaguz)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,10 +35,9 @@ import com.andrew.apollo.model.Song;
 import com.andrew.apollo.ui.fragments.profile.ApolloFragment;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.List;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * This class is used to display all of the recently listened to albums by the
@@ -84,7 +83,7 @@ public final class RecentFragment extends ApolloFragment<SongAdapter, Song> {
 
     @Override
     public void onMetaChanged() {
-        async(this, RecentFragment::restartLoader);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::restartLoader);
     }
 
     @Override

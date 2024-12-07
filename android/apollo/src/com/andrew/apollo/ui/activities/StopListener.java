@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.ui.activities;
 
+
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
@@ -25,11 +26,10 @@ import android.view.View;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -46,7 +46,7 @@ class StopListener implements View.OnLongClickListener {
 
     @Override
     public boolean onLongClick(View v) {
-        async(v, StopListener::stopMusicTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> stopMusicTask(v));
         if (Ref.alive(activityRef)) {
             if (finishOnStop) {
                 activityRef.get().onBackPressed();

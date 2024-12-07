@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.getApplicationContext;
@@ -145,11 +144,16 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (slides != null) {
             promotions.setSlides(slides);
         } else {
-            async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
+            //async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> {
+                final List<Slide> slides = loadSlidesInBackground();
+                SystemUtils.postToUIThread(() -> onSlidesLoaded(slides));
+            });
         }
     }
 
     private List<Slide> loadSlidesInBackground() {
+        SystemUtils.ensureBackgroundThreadOrCrash("SearchFragment::loadSlidesInBackground");
         try {
             HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
             String url = String.format("%s&from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);

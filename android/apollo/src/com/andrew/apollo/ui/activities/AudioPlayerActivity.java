@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2012 Andrew Neal
- * Copyright (c) 2012-2024, FrostWire(R)
+ * Copyright (c) 2012-2025, FrostWire(R)
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 package com.andrew.apollo.ui.activities;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -1058,9 +1056,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private void updateLastKnown(MusicServiceRequestType requestType, boolean callOnLastKnownUpdatePostTaskAfter) {
         if (TaskThrottle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
             if (callOnLastKnownUpdatePostTaskAfter) {
-                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType, AudioPlayerActivity::onLastKnownUpdatePostTask);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    musicServiceRequestTask(this, requestType);
+                    onLastKnownUpdatePostTask();
+                });
             } else {
-                async(this, AudioPlayerActivity::musicServiceRequestTask, requestType);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> musicServiceRequestTask(this, requestType));
             }
         }
     }
@@ -1202,7 +1203,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (fwBannerView != null) {
             fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
         }
-        async(this, AudioPlayerActivity::shareTrackScreenshotTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> shareTrackScreenshotTask(this));
     }
 
     private static void shareTrackScreenshotTask(AudioPlayerActivity activity) {

@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,11 +30,11 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.frostwire.android.R;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.frostwire.android.util.Asyncs.async;
+import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author aldenml
@@ -85,9 +85,10 @@ public class HexHiveView<T> extends View {
         setLayerType(LAYER_TYPE_HARDWARE, null);
         Resources r = getResources();
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.HexHiveView);
-        int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white));
-        int emptyColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_emptyColor, r.getColor(R.color.basic_gray_dark));
-        int fullColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_fullColor, r.getColor(R.color.basic_blue_highlight));
+        Resources.Theme theme = getContext().getTheme();
+        int borderColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_hexBorderColor, r.getColor(R.color.white, theme));
+        int emptyColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_emptyColor, r.getColor(R.color.basic_gray_dark, theme));
+        int fullColor = typedArray.getColor(R.styleable.HexHiveView_hexhive_fullColor, r.getColor(R.color.basic_blue_highlight, theme));
         typedArray.recycle();
         initPaints(borderColor, emptyColor, fullColor);
     }
@@ -113,7 +114,7 @@ public class HexHiveView<T> extends View {
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
         // see asyncDraw to see how compressedBitmap is created (in a background thread)
         // once that thread is done, it posts an invalidate call on the UI's handler loop.
         if (compressedBitmap != null) {
@@ -138,10 +139,10 @@ public class HexHiveView<T> extends View {
             return;
         }
         if (hexDataAdapter != null && hexDataAdapter.getFullHexagonsCount() >= 0 && canvasWidth > 0 && canvasHeight > 0) {
-            async(this,
-                    HexHiveView::asyncDraw,
-                    canvasWidth, canvasHeight, hexDataAdapter,
-                    (v, w, h, a) -> v.invalidate());
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                asyncDraw(canvasWidth, canvasHeight, hexDataAdapter);
+                SystemUtils.postToUIThread(this::invalidate);
+            });
         }
     }
 
@@ -324,12 +325,12 @@ public class HexHiveView<T> extends View {
         while (pieceIndex < DP.numHexs) {
             drawHexagon(DP, canvas, hexagonBorderPaint, (adapter.isFull(pieceIndex) ? fullHexPaint : emptyHexPaint), drawCubes);
             pieceIndex++;
-            DP.hexCenterBuffer.x += DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4);
+            DP.hexCenterBuffer.x += (int) (DP.hexWidth + (hexagonBorderPaint.getStrokeWidth() * 4));
             float rightSide = DP.hexCenterBuffer.x + (DP.hexWidth / 2) + (hexagonBorderPaint.getStrokeWidth() * 3);
             if (rightSide >= DP.end.x) {
                 evenRow = !evenRow;
                 DP.hexCenterBuffer.x = (evenRow) ? DP.evenRowOrigin.x : DP.oddRowOrigin.x;
-                DP.hexCenterBuffer.y += threeQuarters;
+                DP.hexCenterBuffer.y += (int) threeQuarters;
             }
         }
         compressedBitmap = bitmap;

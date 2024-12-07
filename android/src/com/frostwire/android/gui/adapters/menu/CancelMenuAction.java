@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -34,6 +32,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.HttpDownload;
 import com.frostwire.transfers.Transfer;
@@ -74,7 +73,7 @@ public final class CancelMenuAction extends MenuAction {
     public void onClick(final Context context) {
         CancelMenuActionDialog.newInstance(
                         transfer,
-                        deleteData, deleteTorrent, this).
+                        deleteData, deleteTorrent).
                 show(((Activity) getContext()).getFragmentManager());
     }
 
@@ -94,16 +93,14 @@ public final class CancelMenuAction extends MenuAction {
         private static Transfer transfer;
         private static boolean deleteData;
         private static boolean deleteTorrent;
-        private static CancelMenuAction cancelMenuAction;
+
 
         public static CancelMenuActionDialog newInstance(Transfer t,
                                                          boolean delete_data,
-                                                         boolean delete_torrent,
-                                                         CancelMenuAction cancel_menu_action) {
+                                                         boolean delete_torrent) {
             transfer = t;
             deleteData = delete_data;
             deleteTorrent = delete_torrent;
-            cancelMenuAction = cancel_menu_action;
             return new CancelMenuActionDialog();
         }
 
@@ -133,7 +130,7 @@ public final class CancelMenuAction extends MenuAction {
             yesButton.setText(android.R.string.ok);
 
             noButton.setOnClickListener(new NegativeButtonOnClickListener(dlg));
-            yesButton.setOnClickListener(new PositiveButtonOnClickListener(transfer, deleteTorrent, deleteData, cancelMenuAction, dlg));
+            yesButton.setOnClickListener(new PositiveButtonOnClickListener(transfer, deleteTorrent, deleteData, dlg));
         }
     }
 
@@ -162,7 +159,6 @@ public final class CancelMenuAction extends MenuAction {
         PositiveButtonOnClickListener(Transfer transfer,
                                       boolean deleteTorrent,
                                       boolean deleteData,
-                                      CancelMenuAction cancelMenuAction,
                                       Dialog dialog) {
             this.transfer = transfer;
             this.deleteTorrent = deleteTorrent;
@@ -172,7 +168,7 @@ public final class CancelMenuAction extends MenuAction {
 
         @Override
         public void onClick(View view) {
-            async(dlg.getContext(), CancelMenuAction::removeTransfer, transfer, deleteTorrent, deleteData);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> removeTransfer(dlg.getContext(), transfer, deleteTorrent, deleteData));
             dlg.dismiss();
             if (dlg.getContext() instanceof TimerObserver) {
                 ((TimerObserver) dlg.getContext()).onTime();

@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
  */
 
 package com.frostwire.android.gui.activities;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.Manifest;
 import android.app.ActionBar;
@@ -295,7 +293,7 @@ public class MainActivity extends AbstractActivity implements
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
-            async(this, MainActivity::onDownloadCompleteNotification, intent);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> onDownloadCompleteNotification(intent));
         }
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
@@ -347,13 +345,18 @@ public class MainActivity extends AbstractActivity implements
         } else if (!isShutdown()) {
             controller.startWizardActivity();
         }
+
+
         checkLastSeenVersionBuild();
         syncNavigationMenu();
         updateNavigationMenu();
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissions();
         }
-        async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            NetworkManager networkManager = NetworkManager.instance();
+            NetworkManager.queryNetworkStatusBackground(networkManager);
+        });
     }
 
     @Override

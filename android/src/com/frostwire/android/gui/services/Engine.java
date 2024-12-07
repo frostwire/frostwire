@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 package com.frostwire.android.gui.services;
 
 import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Application;
 import android.content.ComponentName;
@@ -102,7 +101,7 @@ public final class Engine implements IEngineService {
      * @param application the application object
      */
     public void onApplicationCreate(Application application) {
-        async(new EngineApplicationRefsHolder(this, application), Engine::engineServiceStarter);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, application)));
     }
 
     @Override
@@ -141,8 +140,7 @@ public final class Engine implements IEngineService {
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
             }
             if (wasShutdown) {
-                async(new EngineApplicationRefsHolder(this, getApplication()),
-                        Engine::engineServiceStarter);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, getApplication())));
             }
             wasShutdown = false;
         } else {
@@ -193,7 +191,7 @@ public final class Engine implements IEngineService {
         try {
             pythonStarterLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LOG.error("Engine::getPythonInstance() ", e);
         }
         return pythonInstance;
     }
@@ -232,7 +230,7 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unbindService(connection);
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
+                    LOG.error("Engine::shutdown() failed unbinding service: " + e.getMessage(), e);
                 }
             }
 
@@ -240,7 +238,7 @@ public final class Engine implements IEngineService {
                 try {
                     getApplication().unregisterReceiver(receiver);
                 } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
+                    LOG.error("Engine::shutdown() failed unregistering receiver: " + e.getMessage(), e);
                 }
             }
             service.shutdown();
@@ -286,7 +284,7 @@ public final class Engine implements IEngineService {
                     LOG.error("Engine::startEngineService() failed posting UIUtils.showLongMessage error to main looper: " + t.getMessage(), t);
                 }
             });
-            execution.printStackTrace();
+            LOG.error("Engine::startEngineService() failed binding service: " + execution.getMessage(), execution);
         }
     }
 

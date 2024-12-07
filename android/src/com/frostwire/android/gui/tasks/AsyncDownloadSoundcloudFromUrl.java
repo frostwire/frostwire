@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.dialogs.ConfirmSoundcloudDownloadDialog;
 import com.frostwire.android.gui.util.UIUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.util.HttpClientFactory;
@@ -32,9 +33,7 @@ import com.frostwire.util.http.HttpClient;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.frostwire.android.util.Asyncs.async;
-
-/*
+/**
  * @author aldenml
  * @author gubatron
  */
@@ -43,7 +42,10 @@ public final class AsyncDownloadSoundcloudFromUrl {
     private static final Logger LOG = Logger.getLogger(AsyncDownloadSoundcloudFromUrl.class);
 
     public AsyncDownloadSoundcloudFromUrl(Context ctx, String soundcloudUrl) {
-        async(ctx, (context, soundcloudUrl1) -> doInBackground(soundcloudUrl1), soundcloudUrl, AsyncDownloadSoundcloudFromUrl::onPostExecute);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
+            List<SoundcloudSearchResult> results = doInBackground(soundcloudUrl);
+            SystemUtils.postToUIThread(() -> onPostExecute(ctx, soundcloudUrl, results));
+        });
     }
 
     private static List<SoundcloudSearchResult> doInBackground(final String soundcloudUrl) {
@@ -58,7 +60,7 @@ public final class AsyncDownloadSoundcloudFromUrl {
             String json = client.get(resolveURL, 10000);
             results = SoundcloudSearchPerformer.fromJson(json, true);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("AsyncDownloadSoundcloudFromUrl::doInBackground: Error downloading from Soundcloud", e);
         }
         return results;
     }

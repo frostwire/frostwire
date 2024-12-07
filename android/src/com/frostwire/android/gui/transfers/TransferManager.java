@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 package com.frostwire.android.gui.transfers;
+
+import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -50,11 +52,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import static com.frostwire.android.util.Asyncs.async;
-import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 /**
  * @author gubatron
@@ -93,13 +93,14 @@ public final class TransferManager {
         this.bittorrentDownloadsList = new CopyOnWriteArrayList<>();
         this.bittorrentDownloadsMap = new HashMap<>(0);
         this.downloadsToReview = 0;
-        async(this::loadTorrentsTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::loadTorrentsTask);
     }
 
     public void reset() {
         registerPreferencesChangeListener();
         clearTransfers();
-        async(this::loadTorrentsTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::loadTorrentsTask);
+
     }
 
     public void onShutdown(boolean disconnected) {
@@ -354,10 +355,7 @@ public final class TransferManager {
 
             Uri u = Uri.parse(url);
             String scheme = u.getScheme();
-            if (scheme != null && !scheme.equalsIgnoreCase("file") &&
-                    !scheme.equalsIgnoreCase("http") &&
-                    !scheme.equalsIgnoreCase("https") &&
-                    !scheme.equalsIgnoreCase("magnet")) {
+            if (scheme != null && !scheme.equalsIgnoreCase("file") && !scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https") && !scheme.equalsIgnoreCase("magnet")) {
                 LOG.warn("Invalid URI scheme: " + u);
                 return new InvalidBittorrentDownload(R.string.torrent_scheme_download_not_supported, null);
             }
@@ -366,7 +364,7 @@ public final class TransferManager {
 
             if (fetcherListener == null) {
                 if (scheme != null && scheme.equalsIgnoreCase("file")) {
-                    BTEngine.getInstance().download(new File(u.getPath()), null, null);
+                    BTEngine.getInstance().download(new File(Objects.requireNonNull(u.getPath())), null, null);
                 } else if (scheme != null && scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet")) {
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle));
                     synchronized (downloadsListMonitor) {
@@ -380,7 +378,7 @@ public final class TransferManager {
                 if (scheme != null && scheme.equalsIgnoreCase("file")) {
                     // download an existing transfer from a .torrent in My Files (partial download)
                     // See com.frostwire.android.gui.adapters.menu.OpenMenuAction::onClick()
-                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(u.getPath())), null, new Random(System.currentTimeMillis()).nextLong());
+                    fetcherListener.onTorrentInfoFetched(FileUtils.readFileToByteArray(new File(Objects.requireNonNull(u.getPath()))), null, new Random(System.currentTimeMillis()).nextLong());
                 } else if (scheme != null && (scheme.equalsIgnoreCase("http") || scheme.equalsIgnoreCase("https") || scheme.equalsIgnoreCase("magnet"))) {
                     // this executes the listener method when it fetches the bytes.
                     download = new TorrentFetcherDownload(this, new TorrentUrlInfo(u.toString(), tempDownloadTitle), fetcherListener);
@@ -465,8 +463,7 @@ public final class TransferManager {
     }
 
     public boolean isMobileAndDataSavingsOn() {
-        return NetworkManager.instance().isDataMobileUp() &&
-                ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+        return NetworkManager.instance().isDataMobileUp() && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
     }
 
     public boolean isBittorrentSearchResultAndMobileDataSavingsOn(SearchResult sr) {
@@ -615,7 +612,7 @@ public final class TransferManager {
 
     private void registerPreferencesChangeListener() {
         if (SystemUtils.isUIThread()) {
-            Engine.instance().getThreadPool().execute(() -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener));
         } else {
             ConfigurationManager.instance().registerOnPreferenceChange(onSharedPreferenceChangeListener);
         }
@@ -623,8 +620,7 @@ public final class TransferManager {
 
     private void unregisterPreferencesChangeListener() {
         if (SystemUtils.isUIThread()) {
-            postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER,
-                    () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
+            postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener));
 
         } else {
             ConfigurationManager.instance().unregisterOnPreferenceChange(onSharedPreferenceChangeListener);
@@ -633,7 +629,7 @@ public final class TransferManager {
 
     private void onPreferenceChanged(String key) {
         //LOG.info("onPreferenceChanged(key="+key+")");
-        Engine.instance().getThreadPool().execute(() -> {
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> {
             BTEngine e = BTEngine.getInstance();
             ConfigurationManager CM = ConfigurationManager.instance();
             switch (key) {
