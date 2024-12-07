@@ -102,26 +102,24 @@ public interface RunStrict<R> {
     }
 
     /** @noinspection unused*/
-    static void enableStrictModePolicies() {
+    static void enableStrictModePolicies(boolean enable) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            LOG.info(String.format(Locale.US, "MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog() //.penaltyDeath()
-                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
-                    .build());
+            if (enable) {
+                LOG.info(String.format(Locale.US, "MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+                StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                        .detectAll()
+                        .penaltyLog() //.penaltyDeath()
+                        .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                        .build());
+            } else {
+                LOG.info(String.format(Locale.US,"MainApplication::disableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+                StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                        .permitAll() // Allow everything
+                        .build());
+            }
         }
     }
 
-    /** @noinspection unused*/
-    static void disableStrictModePolicies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            LOG.info(String.format(Locale.US,"MainApplication::disableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .permitAll() // Allow other operations if needed
-                    .build());
-        }
-    }
 
     /** @noinspection unused*/
     static void disableStrictModePolicyForUnbufferedIO() {

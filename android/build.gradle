@@ -3,7 +3,7 @@ import groovy.xml.Namespace
 
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.2'
+        classpath 'com.android.tools.build:gradle:8.7.3'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -225,6 +225,8 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.vectordrawable:vectordrawable-animated:1.2.0'
+    //implementation 'com.google.android.gms:play-services-location:21.3.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.google.code.gson:gson:2.10.1'

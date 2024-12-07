@@ -205,11 +205,6 @@ public final class Offers {
         return (int) ((pause_duration - time_on_pause) / 60_000);
     }
 
-    public static void initDataPrivacy() {
-        // Add here any applovin sdk adapter privacy initialization code
-        // formerly used by MobileFuse's adapter
-    }
-
     private static Map<String, AdNetwork> getAllAdNetworks() {
         if (AD_NETWORKS == null) {
             AD_NETWORKS = new HashMap<>();

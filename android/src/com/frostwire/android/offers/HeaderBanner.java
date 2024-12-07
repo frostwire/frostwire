@@ -130,7 +130,7 @@ public final class HeaderBanner extends LinearLayout {
         Activity activity = (Activity) getContext();
         // check how long getting display metrics twice is, if expensive gotta refactor these methods
         boolean screenTallEnough = UIUtils.getScreenInches(activity) >= 4.33;
-        boolean diceRollPassed = UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
+        boolean diceRollPassed = true;//UIUtils.diceRollPassesThreshold(ConfigurationManager.instance(), Constants.PREF_KEY_GUI_MOPUB_SEARCH_HEADER_BANNER_THRESHOLD);
         boolean bannerVisible = !adsDisabled && screenTallEnough && diceRollPassed && !getHeaderBannerListener().tooEarlyToDisplay();
         if (!bannerVisible) {
             LOG.info("updateComponents(): not eligible for search banner display. adsDisabled=" + adsDisabled +

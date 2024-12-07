@@ -56,6 +56,7 @@ import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 import okhttp3.ConnectionPool;
 
@@ -344,7 +345,8 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // STATIC SECTION
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /// /////////////////////////////////////////////////////////////////////////////////////////////
     private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
         LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
         engineService.updateState(STATE_STARTING);
@@ -378,14 +380,15 @@ public class EngineService extends JobIntentService implements IEngineService {
         private static final String PREF_KEY_NOTIFIED_HASHES = "frostwire.prefs.gui.notified_hashes";
 
         // not using ConfigurationManager to avoid setup/startup timing issues
-        private final SharedPreferences preferences;
-        private final bloom_filter_256 hashes;
+        private volatile SharedPreferences preferences;
+        private volatile bloom_filter_256 hashes;
 
         NotifiedStorage(Context context) {
-            preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            hashes = new bloom_filter_256();
-
-            loadHashes();
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                hashes = new bloom_filter_256();
+                loadHashes();
+            });
         }
 
         public boolean contains(String infoHash) {
@@ -433,6 +436,7 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
 
         private void loadHashes() {
+            SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::loadHashes");
             String s = preferences.getString(PREF_KEY_NOTIFIED_HASHES, null);
             if (s != null) {
                 try {
