@@ -88,6 +88,10 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private void setupDataSaving() {
         SwitchPreference preference = findPreference(Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY);
+        if (preference == null) {
+            LOG.error(MessageFormat.format("ApplicationPreferencesFragment.setupDataSaving(): SwitchPreference under key {0} not found", Constants.PREF_KEY_NETWORK_USE_WIFI_ONLY));
+            return;
+        }
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (Boolean) newValue;
             if (newVal && !NetworkManager.instance().isDataWIFIUp()) {
@@ -107,12 +111,13 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             }
             return true;
         });
+        LOG.info("ApplicationPreferencesFragment.setupDataSaving(): preference change listener set");
     }
 
     public void setupTheme() {
         ListPreference listPreference = findPreference(Constants.PREF_KEY_GUI_THEME_MODE);
         if (listPreference == null) {
-            LOG.error("setupTheme(): ListPreference under key " + Constants.PREF_KEY_GUI_THEME_MODE + " not found");
+            LOG.error(MessageFormat.format("ApplicationPreferencesFragment.setupTheme(): ListPreference under key {0} not found", Constants.PREF_KEY_GUI_THEME_MODE ));
             return;
         }
         listPreference.setOnPreferenceChangeListener((listPreferenceCalled, newThemeModeStringValue) -> {
@@ -121,7 +126,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             listPreferenceCalled.setSummary(listPreference.getEntries()[listPreference.findIndexOfValue((String) newThemeModeStringValue)]);
             return true;
         });
-        LOG.info("setupTheme(): about to setupThemeAsync()");
+        LOG.info("ApplicationPreferencesFragment.setupTheme(): about to setupThemeAsync()");
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> loadTheme(listPreference));
     }
 
@@ -155,7 +160,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     private void setupVPNRequirementOption() {
         SwitchPreference preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
         if (preference == null) {
-            LOG.error(MessageFormat.format("ApplicationPreferencesFragment::setupVPNRequirementOption() Preference with key ''{0}'' not found.", Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY));
+            LOG.error(MessageFormat.format("ApplicationPreferencesFragment::setupVPNRequirementOption() Preference with key {0} not found.", Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY));
             return; // Safeguard to prevent crashes
         }
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
