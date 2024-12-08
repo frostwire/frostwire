@@ -302,7 +302,7 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
         }
     }
 
-    // what a bad design to properly shutdown the framework threads!
+    // What a bad design to properly shutdown the framework threads!
     // TODO: deal with potentially active connections
     private void stopOkHttp() {
         ConnectionPool pool = OkHttpClientWrapper.CONNECTION_POOL;
