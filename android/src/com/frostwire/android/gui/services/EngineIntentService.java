@@ -62,9 +62,9 @@ import okhttp3.ConnectionPool;
  * @author gubatron
  * @author aldenml
  */
-public class EngineService extends JobIntentService implements IEngineService {
+public class EngineIntentService extends JobIntentService implements IEngineService {
     // members:
-    private static final Logger LOG = Logger.getLogger(EngineService.class);
+    private static final Logger LOG = Logger.getLogger(EngineIntentService.class);
     private static final long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
     private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
     private final IBinder binder;
@@ -76,7 +76,7 @@ public class EngineService extends JobIntentService implements IEngineService {
 
     // public:
 
-    public EngineService() {
+    public EngineIntentService() {
         binder = new EngineServiceBinder();
         mediaPlayer = new ApolloMediaPlayer();
         updateState(STATE_DISCONNECTED);
@@ -244,14 +244,14 @@ public class EngineService extends JobIntentService implements IEngineService {
     public void shutdown() {
         LOG.info("shutdown");
         Context ctx = getApplication();
-        Intent i = new Intent(ctx, EngineService.class);
+        Intent i = new Intent(ctx, EngineIntentService.class);
         i.setAction(SHUTDOWN_ACTION);
         ctx.startService(i);
     }
 
     public class EngineServiceBinder extends Binder {
-        public EngineService getService() {
-            return EngineService.this;
+        public EngineIntentService getService() {
+            return EngineIntentService.this;
         }
     }
 
@@ -341,9 +341,9 @@ public class EngineService extends JobIntentService implements IEngineService {
     // STATIC SECTION
 
     /// /////////////////////////////////////////////////////////////////////////////////////////////
-    private static void resumeBTEngineTask(EngineService engineService, boolean wasShutdown) {
+    private static void resumeBTEngineTask(EngineIntentService engineIntentService, boolean wasShutdown) {
         LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
-        engineService.updateState(STATE_STARTING);
+        engineIntentService.updateState(STATE_STARTING);
         BTEngine btEngine = BTEngine.getInstance();
         if (!wasShutdown) {
             btEngine.resume();
@@ -353,7 +353,7 @@ public class EngineService extends JobIntentService implements IEngineService {
             TransferManager.instance().reset();
             btEngine.resume();
         }
-        engineService.updateState(STATE_STARTED);
+        engineIntentService.updateState(STATE_STARTED);
         LOG.info("resumeBTEngineTask(): Engine started", true);
     }
 
@@ -368,83 +368,11 @@ public class EngineService extends JobIntentService implements IEngineService {
         return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
     }
 
-    private static final class NotifiedStorage {
 
-        // this is a preference key to be used only by this class
-        private static final String PREF_KEY_NOTIFIED_HASHES = "frostwire.prefs.gui.notified_hashes";
 
-        // not using ConfigurationManager to avoid setup/startup timing issues
-        private final SharedPreferences preferences;
-        private final bloom_filter_256 hashes;
-
-        NotifiedStorage(Context context) {
-            SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::Constructor");
-            preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            hashes = new bloom_filter_256();
-            loadHashes();
-        }
-
-        public boolean contains(String infoHash) {
-            if (infoHash == null || infoHash.length() != 40) {
-                // not a valid info hash
-                return false;
-            }
-
-            try {
-
-                byte[] arr = Hex.decode(infoHash);
-                sha1_hash ih = new sha1_hash(Vectors.bytes2byte_vector(arr));
-                return hashes.find(ih);
-
-            } catch (Throwable e) {
-                LOG.warn("Error checking if info hash was notified", e);
-            }
-
-            return false;
-        }
-
-        public void add(String infoHash) {
-            if (infoHash == null || infoHash.length() != 40) {
-                // not a valid info hash
-                return;
-            }
-
-            try {
-
-                byte[] arr = Hex.decode(infoHash);
-                sha1_hash ih = new sha1_hash(Vectors.bytes2byte_vector(arr));
-                hashes.set(ih);
-
-                byte_vector v = hashes.to_bytes();
-                arr = Vectors.byte_vector2bytes(v);
-                String s = Hex.encode(arr);
-
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString(PREF_KEY_NOTIFIED_HASHES, s);
-                editor.apply();
-
-            } catch (Throwable e) {
-                LOG.warn("Error adding info hash to notified storage", e);
-            }
-        }
-
-        private void loadHashes() {
-            SystemUtils.ensureBackgroundThreadOrCrash("EngineService::NotifiedStorage::loadHashes");
-            String s = preferences.getString(PREF_KEY_NOTIFIED_HASHES, null);
-            if (s != null) {
-                try {
-                    byte[] arr = Hex.decode(s);
-                    hashes.from_bytes(Vectors.bytes2byte_vector(arr));
-                } catch (Throwable e) {
-                    LOG.warn("Error loading notified storage from preference data", e);
-                }
-            }
-        }
-    }
-
-    private static void cancelAllNotificationsTask(EngineService engineService) {
+    private static void cancelAllNotificationsTask(EngineIntentService engineIntentService) {
         try {
-            NotificationManager notificationManager = (NotificationManager) engineService.getSystemService(NOTIFICATION_SERVICE);
+            NotificationManager notificationManager = (NotificationManager) engineIntentService.getSystemService(NOTIFICATION_SERVICE);
             if (notificationManager != null) {
                 notificationManager.cancelAll();
             } else {
@@ -455,14 +383,14 @@ public class EngineService extends JobIntentService implements IEngineService {
         }
     }
 
-    private static void startPermanentNotificationUpdatesTask(EngineService engineService) {
+    private static void startPermanentNotificationUpdatesTask(EngineIntentService engineIntentService) {
         try {
-            if (engineService.notificationUpdateDaemon == null) {
-                engineService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineService.getApplicationContext());
+            if (engineIntentService.notificationUpdateDaemon == null) {
+                engineIntentService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineIntentService.getApplicationContext());
             } else {
                 LOG.warn("EngineService::startPermanentNotificationUpdatesTask(EngineService) notificationUpdateDaemon is not null");
             }
-            engineService.notificationUpdateDaemon.start();
+            engineIntentService.notificationUpdateDaemon.start();
         } catch (Throwable t) {
             LOG.warn(t.getMessage(), t);
         }

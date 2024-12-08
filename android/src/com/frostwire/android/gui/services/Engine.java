@@ -20,6 +20,7 @@ package com.frostwire.android.gui.services;
 import static com.frostwire.android.core.Constants.JOB_ID_ENGINE_SERVICE;
 
 import android.app.Application;
+import android.app.ForegroundServiceStartNotAllowedException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +43,7 @@ import com.frostwire.android.R;
 import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.MainApplication;
-import com.frostwire.android.gui.services.EngineService.EngineServiceBinder;
+import com.frostwire.android.gui.services.EngineIntentService.EngineServiceBinder;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -63,7 +64,7 @@ public final class Engine implements IEngineService {
 
     private static final ExecutorService MAIN_THREAD_POOL = new EngineThreadPool();
 
-    private EngineService service;
+    private EngineIntentService service;
     private ServiceConnection connection;
     private EngineBroadcastReceiver receiver;
 
@@ -100,8 +101,20 @@ public final class Engine implements IEngineService {
      *
      * @param application the application object
      */
+//    public void onApplicationCreate(Application application) {
+//        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, application)));
+//    }
+
+    /**
+     * Initialize Engine during application creation.
+     *
+     * @param application the Application context
+     */
     public void onApplicationCreate(Application application) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, application)));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            LOG.info("Engine::onApplicationCreate(): Starting EngineForegroundService...");
+            startEngineService(application);
+        });
     }
 
     @Override
@@ -133,18 +146,30 @@ public final class Engine implements IEngineService {
         return service != null && service.isDisconnected();
     }
 
+//    public void startServices() {
+//        if (service != null || wasShutdown) {
+//            if (service != null) {
+//                service.startServices(wasShutdown);
+//                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
+//            }
+//            if (wasShutdown) {
+//                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, getApplication())));
+//            }
+//            wasShutdown = false;
+//        } else {
+//            // save pending startServices call
+//            pendingStartServices = true;
+//        }
+//    }
+
+    @Override
     public void startServices() {
-        if (service != null || wasShutdown) {
-            if (service != null) {
-                service.startServices(wasShutdown);
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Engine::startPython);
-            }
-            if (wasShutdown) {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.engineServiceStarter(new EngineApplicationRefsHolder(this, getApplication())));
-            }
+        LOG.info("Engine::startServices(): Requesting startServices from EngineForegroundService");
+        if (wasShutdown) {
+            LOG.info("Extract string resource Restarting EngineForegroundService after shutdown...");
+            startEngineService(getApplication());
             wasShutdown = false;
         } else {
-            // save pending startServices call
             pendingStartServices = true;
         }
     }
@@ -196,12 +221,48 @@ public final class Engine implements IEngineService {
         return pythonInstance;
     }
 
+    //    public void stopServices(boolean disconnected) {
+//        if (service != null) {
+//            service.stopServices(disconnected);
+//        }
+//        TellurideCourier.abortCurrentQuery();
+//    }
     public void stopServices(boolean disconnected) {
-        if (service != null) {
-            service.stopServices(disconnected);
-        }
+        LOG.info("Stopping Engine services...");
         TellurideCourier.abortCurrentQuery();
+        stopEngineService();
     }
+
+    private void startEngineService(Context context) {
+        Intent serviceIntent = new Intent(context, EngineForegroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Check if conditions are appropriate for starting the service
+            if (!SystemUtils.isAppInForeground(context)) {
+                LOG.warn("Engine::startEngineService() - App is not in foreground, delaying start.");
+                return; // Delay or prevent the start if app is not in foreground
+            }
+        }
+        try {
+            ContextCompat.startForegroundService(context, serviceIntent);
+        } catch (Throwable t) {
+            LOG.error("Engine::startEngineService() - Failed starting foreground service: " + t.getMessage(), t);
+        }
+    }
+
+    private void stopEngineService() {
+        Context context = getApplication();
+        if (context != null) {
+            Intent serviceIntent = new Intent(context, EngineForegroundService.class);
+            context.stopService(serviceIntent);
+        }
+        wasShutdown = true;
+    }
+
+    @Override
+    public Application getApplication() {
+        return (Application) MainApplication.context();
+    }
+
 
     /**
      * Tip: Try using SystemUtils.HandlerFactory.postTo(one of few predetermined threads, run) if possible
@@ -223,70 +284,77 @@ public final class Engine implements IEngineService {
         notifyDownloadFinished(displayName, file, null);
     }
 
+//    @Override
+//    public void shutdown() {
+//        if (service != null) {
+//            if (connection != null) {
+//                try {
+//                    getApplication().unbindService(connection);
+//                } catch (IllegalArgumentException e) {
+//                    LOG.error("Engine::shutdown() failed unbinding service: " + e.getMessage(), e);
+//                }
+//            }
+//
+//            if (receiver != null) {
+//                try {
+//                    getApplication().unregisterReceiver(receiver);
+//                } catch (IllegalArgumentException e) {
+//                    LOG.error("Engine::shutdown() failed unregistering receiver: " + e.getMessage(), e);
+//                }
+//            }
+//            service.shutdown();
+//            wasShutdown = true;
+//
+//        }
+//    }
+
     @Override
     public void shutdown() {
-        if (service != null) {
-            if (connection != null) {
-                try {
-                    getApplication().unbindService(connection);
-                } catch (IllegalArgumentException e) {
-                    LOG.error("Engine::shutdown() failed unbinding service: " + e.getMessage(), e);
-                }
-            }
-
-            if (receiver != null) {
-                try {
-                    getApplication().unregisterReceiver(receiver);
-                } catch (IllegalArgumentException e) {
-                    LOG.error("Engine::shutdown() failed unregistering receiver: " + e.getMessage(), e);
-                }
-            }
-            service.shutdown();
-            wasShutdown = true;
-        }
+        LOG.info("Engine::shutdown() Shutting down EngineForegroundService...");
+        stopEngineService();
     }
 
     /**
      * @param context This must be the application context, otherwise there will be a leak.
      */
-    private void startEngineService(final Context context) {
-        Intent i = new Intent();
-        i.setClass(context, EngineService.class);
-        try {
-            Engine.enqueueServiceJob(context, i);
-            context.bindService(i, connection = new ServiceConnection() {
-                public void onServiceDisconnected(ComponentName name) {
-                }
-
-                public void onServiceConnected(ComponentName name, IBinder service) {
-                    // avoids: java.lang.ClassCastException: android.os.BinderProxy cannot be cast to com.frostwire.android.gui.services.EngineService$EngineServiceBinder
-                    if (service instanceof EngineServiceBinder) {
-                        Engine.this.service = ((EngineServiceBinder) service).getService();
-                        registerStatusReceiver(context);
-                        if (pendingStartServices) {
-                            pendingStartServices = false;
-                            Engine.this.service.startServices();
-                        }
-                    }
-                }
-            }, 0);
-        } catch (SecurityException execution) {
-            WeakReference<Context> contextRef = Ref.weak(context);
-            SystemUtils.postToUIThread(() -> {
-                try {
-                    if (Ref.alive(contextRef)) {
-                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);
-                    }
-                } catch (Throwable t) {
-                    if (BuildConfig.DEBUG) {
-                        throw t;
-                    }
-                    LOG.error("Engine::startEngineService() failed posting UIUtils.showLongMessage error to main looper: " + t.getMessage(), t);
-                }
-            });
-            LOG.error("Engine::startEngineService() failed binding service: " + execution.getMessage(), execution);
-        }
-    }
+//    private void startEngineService(final Context context) {
+//        Intent i = new Intent();
+//        i.setClass(context, EngineIntentService.class);
+//        try {
+//            Engine.enqueueServiceJob(context, i);
+//            context.bindService(i, connection = new ServiceConnection() {
+//                public void onServiceDisconnected(ComponentName name) {
+//                }
+//
+//                public void onServiceConnected(ComponentName name, IBinder service) {
+//                    // avoids: java.lang.ClassCastException: android.os.BinderProxy cannot be cast to com.frostwire.android.gui.services.EngineService$EngineServiceBinder
+//                    if (service instanceof EngineServiceBinder) {
+//                        Engine.this.service = ((EngineServiceBinder) service).getService();
+//                        registerStatusReceiver(context);
+//                        if (pendingStartServices) {
+//                            pendingStartServices = false;
+//                            Engine.this.service.startServices();
+//                        }
+//                    }
+//                }
+//            }, 0);
+//        } catch (SecurityException execution) {
+//            WeakReference<Context> contextRef = Ref.weak(context);
+//            SystemUtils.postToUIThread(() -> {
+//                try {
+//                    if (Ref.alive(contextRef)) {
+//                        UIUtils.showLongMessage(context, R.string.frostwire_start_engine_service_security_exception);
+//                    }
+//                } catch (Throwable t) {
+//                    if (BuildConfig.DEBUG) {
+//                        throw t;
+//                    }
+//                    LOG.error("Engine::startEngineService() failed posting UIUtils.showLongMessage error to main looper: " + t.getMessage(), t);
+//                }
+//            });
+//            LOG.error("Engine::startEngineService() failed binding service: " + execution.getMessage(), execution);
+//        }
+//    }
 
     private void registerStatusReceiver(Context context) {
         receiver = new EngineBroadcastReceiver();
@@ -329,17 +397,17 @@ public final class Engine implements IEngineService {
         }
     }
 
-    @Override
-    public Application getApplication() {
-        Application r = null;
-        if (service != null) {
-            r = service.getApplication();
-        }
-        return r;
-    }
+//    @Override
+//    public Application getApplication() {
+//        Application r = null;
+//        if (service != null) {
+//            r = service.getApplication();
+//        }
+//        return r;
+//    }
 
     public static void enqueueServiceJob(final Context context, final Intent intent) {
-        JobIntentService.enqueueWork(context, EngineService.class, JOB_ID_ENGINE_SERVICE, intent);
+        JobIntentService.enqueueWork(context, EngineIntentService.class, JOB_ID_ENGINE_SERVICE, intent);
     }
 
     private static class EngineApplicationRefsHolder {
