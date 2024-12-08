@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package com.frostwire.android.gui.util;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -45,6 +44,7 @@ import android.widget.Toast;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
