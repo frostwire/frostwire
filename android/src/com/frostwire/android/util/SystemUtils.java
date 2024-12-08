@@ -17,6 +17,7 @@
 
 package com.frostwire.android.util;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
@@ -200,6 +201,19 @@ public final class SystemUtils {
 
     public static boolean isUIThread() {
         return Platforms.get().isUIThread();
+    }
+
+    public static boolean isAppInForeground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            for (ActivityManager.RunningAppProcessInfo appProcess : activityManager.getRunningAppProcesses()) {
+                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
+                        appProcess.processName.equals(context.getPackageName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public enum HandlerThreadName {
