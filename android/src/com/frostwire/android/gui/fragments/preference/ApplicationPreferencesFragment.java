@@ -44,6 +44,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
+import java.text.MessageFormat;
 
 /**
  * @author gubatron
@@ -153,6 +154,10 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private void setupVPNRequirementOption() {
         SwitchPreference preference = findPreference(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY);
+        if (preference == null) {
+            LOG.error(MessageFormat.format("ApplicationPreferencesFragment::setupVPNRequirementOption() Preference with key ''{0}'' not found.", Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY));
+            return; // Safeguard to prevent crashes
+        }
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newVal = (boolean) newValue;
             if (newVal && !NetworkManager.instance().isTunnelUp()) {
@@ -259,7 +264,8 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     //////////////////////////////
     // AD REMOVAL PREFERENCE LOGIC
-    //////////////////////////////
+
+    /// ///////////////////////////
     private void setupStore(final long purchaseTimestamp) {
         pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
         SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
