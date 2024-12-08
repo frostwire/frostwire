@@ -59,10 +59,25 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
             String magnetUri,
             long torrentFetcherDownloadTokenId,
             boolean openTransfersOnCancel) {
+
         if (!Ref.alive(contextRef) ||
-            !Ref.alive(fragmentManagerRef) ||
-            torrentInfoData == null || torrentInfoData.length == 0) {
+                !Ref.alive(fragmentManagerRef) ||
+                torrentInfoData == null || torrentInfoData.length == 0) {
             LOG.warn("Incomplete conditions to create HandpickedTorrentDownloadDialog.");
+            return;
+        }
+
+        FragmentManager fragmentManager = fragmentManagerRef.get();
+        if (fragmentManager == null) {
+            LOG.warn("FragmentManager is null. Cannot show dialog.");
+            return;
+        }
+
+        String dialogTag = "HANDPICKED_TORRENT_DOWNLOAD_DIALOG";
+
+        // Check if the dialog is already present
+        if (fragmentManager.findFragmentByTag(dialogTag) != null) {
+            LOG.warn("HandpickedTorrentDownloadDialog is already shown.");
             return;
         }
 
@@ -75,9 +90,11 @@ public class HandpickedTorrentDownloadDialogOnFetch implements TorrentFetcherLis
                             magnetUri,
                             torrentFetcherDownloadTokenId,
                             openTransfersOnCancel);
-            dlg.show(fragmentManagerRef.get());
+
+            dlg.show(fragmentManager, dialogTag);
         } catch (Throwable t) {
             LOG.warn("Could not create or show HandpickedTorrentDownloadDialog", t);
         }
     }
+
 }
