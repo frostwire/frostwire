@@ -18,6 +18,8 @@
 
 package com.frostwire.android.gui.activities;
 
+import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE;
+
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -124,10 +126,11 @@ public final class SettingsActivity extends AbstractActivity
     }
 
     private void switchToFragment(String fragmentName, Bundle args, CharSequence title) {
-        Fragment f = Fragment.instantiate(this, fragmentName, args);
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.replace(R.id.activity_settings_content, f, fragmentName);
+        //Fragment f = Fragment.instantiate(this, fragmentName, args);
+        androidx.fragment.app.Fragment f = androidx.fragment.app.Fragment.instantiate(this, fragmentName, args);
+        androidx.fragment.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setTransition(TRANSIT_FRAGMENT_FADE);
+        transaction.replace(R.id.activity_settings_content, f);
         transaction.commitAllowingStateLoss();
 
         if (title != null) {
