@@ -1,6 +1,6 @@
 package com.andrew.apollo.loaders;
 
-import android.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 import android.content.Context;
 
 /**
