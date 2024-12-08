@@ -76,7 +76,7 @@ public final class AsyncDownloadSoundcloudFromUrl {
 
         MainActivity activity = (MainActivity) ctx;
         ConfirmSoundcloudDownloadDialog dlg = createConfirmListDialog(ctx, results);
-        dlg.show(activity.getFragmentManager());
+        dlg.show(activity.getSupportFragmentManager());
     }
 
     private static ConfirmSoundcloudDownloadDialog createConfirmListDialog(Context ctx, List<SoundcloudSearchResult> results) {
