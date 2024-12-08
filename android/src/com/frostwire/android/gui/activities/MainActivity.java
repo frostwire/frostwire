@@ -17,11 +17,11 @@
 
 package com.frostwire.android.gui.activities;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -156,7 +156,7 @@ public class MainActivity extends AbstractActivity implements
             try {
                 fragmentsStack.pop();
                 int id = fragmentsStack.peek();
-                Fragment fragment = getFragmentManager().findFragmentById(id);
+                Fragment fragment = getSupportFragmentManager().findFragmentById(id);
                 if (fragment != null) {
                     switchContent(fragment, false);
                 }
@@ -413,7 +413,7 @@ public class MainActivity extends AbstractActivity implements
     private void saveLastFragment(Bundle outState) {
         Fragment fragment = getCurrentFragment();
         if (fragment != null) {
-            getFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, fragment);
+            getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, fragment);
         }
     }
 
@@ -468,7 +468,7 @@ public class MainActivity extends AbstractActivity implements
                 R.string.minimize_frostwire,
                 R.string.are_you_sure_you_wanna_leave,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.show(getFragmentManager());
+        dlg.show(getSupportFragmentManager());
     }
 
     public void showShutdownDialog() {
@@ -477,7 +477,7 @@ public class MainActivity extends AbstractActivity implements
                 R.string.app_shutdown_dlg_title,
                 R.string.app_shutdown_dlg_message,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.show(getFragmentManager());
+        dlg.show(getSupportFragmentManager());
     }
 
     public void onDialogClick(String tag, int which) {
@@ -505,8 +505,8 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void setupFragments() {
-        search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
+        search = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
+        transfers = (TransfersFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
 
     private void hideFragments() {
@@ -515,7 +515,7 @@ public class MainActivity extends AbstractActivity implements
         } catch (Throwable t) {
             LOG.warn(t.getMessage(), t);
         }
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        androidx.fragment.app.FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.hide(search).hide(transfers);
         try {
             tx.commit();
@@ -532,7 +532,7 @@ public class MainActivity extends AbstractActivity implements
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
         if (savedInstanceState != null) {
-            fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+            fragment = getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
             restoreFragmentsStack(savedInstanceState);
         }
         if (fragment == null) {
@@ -595,7 +595,7 @@ public class MainActivity extends AbstractActivity implements
             return;
         }
         hideFragments();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction().show(fragment);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().show(fragment);
         try {
             transaction.commitAllowingStateLoss();
         } catch (Throwable ignored) {

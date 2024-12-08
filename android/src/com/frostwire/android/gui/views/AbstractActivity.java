@@ -17,8 +17,8 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -114,7 +114,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     public final List<Fragment> getFragments() {
         List<Fragment> result = new LinkedList<>();
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         for (String tag : fragmentTags) {
             Fragment f = fm.findFragmentByTag(tag);
             if (f != null) {
@@ -209,7 +209,7 @@ public abstract class AbstractActivity extends AppCompatActivity {
     }
 
     protected final <T extends Fragment> T findFragment(@IdRes int id) {
-        return (T) getFragmentManager().findFragmentById(id);
+        return (T) getSupportFragmentManager().findFragmentById(id);
     }
 
     /**

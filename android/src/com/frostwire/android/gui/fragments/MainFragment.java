@@ -18,8 +18,9 @@
 
 package com.frostwire.android.gui.fragments;
 
-import android.app.Activity;
 import android.view.View;
+
+import androidx.fragment.app.FragmentActivity;
 
 /**
  * @author gubatron
@@ -27,7 +28,7 @@ import android.view.View;
  */
 public interface MainFragment {
 
-    View getHeader(Activity activity);
+    View getHeader(FragmentActivity activity);
 
     void onShow();
 }
