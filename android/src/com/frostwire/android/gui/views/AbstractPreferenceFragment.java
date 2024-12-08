@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,11 +29,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
-
-import com.frostwire.android.util.SystemUtils;
 
 import java.lang.reflect.Field;
 
@@ -49,23 +46,23 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
     private final int preferencesResId;
 
     public AbstractPreferenceFragment(int preferencesResId) {
+        if (preferencesResId <= 0) {
+            throw new IllegalArgumentException("AbstractPreferenceFragment: Invalid preferences resource ID");
+        }
         this.preferencesResId = preferencesResId;
     }
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER,()->{
-            setPreferencesFromResource(preferencesResId, rootKey);
-            SystemUtils.postToUIThread(this::initComponents);
-        });
+        addPreferencesFromResource(preferencesResId);
+        initComponents();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Fragment fragmentByTag = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        Fragment fragmentByTag = getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         // this is necessary to avoid a crash with double rotation of the screen
-        //Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         if (fragmentByTag != null) {
             fragmentByTag.setTargetFragment(this, 0);
         }
