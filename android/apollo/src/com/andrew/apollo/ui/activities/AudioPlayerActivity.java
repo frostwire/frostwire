@@ -383,7 +383,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         } else if (itemId == R.id.menu_player_audio_player_delete) {// Delete current song
             DeleteDialog.newInstance(MusicUtils.getTrackName(), new long[]{
                     MusicUtils.getCurrentAudioId()
-            }, null).show(getFragmentManager(), "DeleteDialog");
+            }, null).show(getSupportFragmentManager(), "DeleteDialog");
             return true;
         } else if (itemId == R.id.menu_player_audio_player_add_to_playlist) {
             AddToPlaylistMenuAction menuAction = new AddToPlaylistMenuAction(this, new long[]{

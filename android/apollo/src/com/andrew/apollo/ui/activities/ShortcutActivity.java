@@ -18,12 +18,14 @@
 
 package com.andrew.apollo.ui.activities;
 
-import android.app.Activity;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager.LoaderCallbacks;
+import androidx.loader.content.Loader;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.format.Capitalize;
@@ -43,7 +45,7 @@ import java.util.List;
  *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public final class ShortcutActivity extends Activity {
+public final class ShortcutActivity extends AppCompatActivity {
 
     /**
      * If true, this class will begin playback and open
@@ -98,7 +100,7 @@ public final class ShortcutActivity extends Activity {
      * Uses the query from a voice search to try and play a song, then album,
      * then artist. If all of those fail, it checks for playlists and genres
      */
-    private final LoaderCallbacks<List<Song>> mSongAlbumArtistQuery = new LoaderCallbacks<List<Song>>() {
+    private final LoaderCallbacks<List<Song>> mSongAlbumArtistQuery = new LoaderCallbacks<>() {
 
         @Override
         public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
@@ -106,7 +108,7 @@ public final class ShortcutActivity extends Activity {
         }
 
         @Override
-        public void onLoadFinished(final Loader<List<Song>> loader, final List<Song> data) {
+        public void onLoadFinished(@NonNull Loader<List<Song>> loader, List<Song> data) {
             // If the user searched for a playlist or genre, this list will
             // return empty
             if (data.isEmpty()) {
@@ -158,7 +160,7 @@ public final class ShortcutActivity extends Activity {
         }
 
         @Override
-        public void onLoaderReset(final Loader<List<Song>> loader) {
+        public void onLoaderReset(@NonNull androidx.loader.content.Loader<List<Song>> loader) {
             // Clear the data
             mSong.clear();
         }
