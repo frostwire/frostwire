@@ -186,7 +186,7 @@ public final class Offers {
     }
 
     public static int getMinutesLeftPausedAsync() {
-        SystemUtils.ensureUIThreadOrCrash("Offers::getMinutesLeftPausedAsync");
+        SystemUtils.ensureBackgroundThreadOrCrash("Offers::getMinutesLeftPausedAsync");
         ConfigurationManager CM = ConfigurationManager.instance();
         int rewarded_video_minutes = CM.getInt(Constants.FW_REWARDED_VIDEO_MINUTES, -1);
         if (rewarded_video_minutes == -1) {
