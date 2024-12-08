@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,13 @@
 
 package com.frostwire.android.gui.activities;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+
 import android.os.Bundle;
 import android.util.SparseArray;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -43,14 +46,11 @@ import com.frostwire.android.gui.views.TimerObserver;
 import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.offers.HeaderBanner;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.transfers.BittorrentDownload;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.List;
-
-import androidx.viewpager.widget.ViewPager;
 
 public class TransferDetailActivity extends AbstractActivity implements TimerObserver {
     private static final int TRANSFER_DETAIL_ACTIVITY_TIMER_INTERVAL_IN_SECS = 2;
@@ -91,7 +91,7 @@ public class TransferDetailActivity extends AbstractActivity implements TimerObs
         }
         OnPageChangeListener onPageChangeListener = new OnPageChangeListener(this);
         SectionsPagerAdapter mSectionsPagerAdapter =
-                new SectionsPagerAdapter(getFragmentManager(), detailFragments);
+                new SectionsPagerAdapter(getSupportFragmentManager(), detailFragments);
         ViewPager viewPager = findViewById(R.id.transfer_detail_viewpager);
 
         if (viewPager != null) {

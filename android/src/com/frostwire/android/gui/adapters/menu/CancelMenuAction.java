@@ -74,7 +74,7 @@ public final class CancelMenuAction extends MenuAction {
         CancelMenuActionDialog.newInstance(
                         transfer,
                         deleteData, deleteTorrent).
-                show(((Activity) getContext()).getFragmentManager());
+                show(getFragmentManager());
     }
 
     private static void removeTransfer(Context context, Transfer transfer, boolean deleteTorrent,

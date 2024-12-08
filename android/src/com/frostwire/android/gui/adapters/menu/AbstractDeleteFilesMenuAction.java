@@ -59,7 +59,7 @@ public abstract class AbstractDeleteFilesMenuAction extends MenuAction {
 
     private void showDeleteFilesDialog() {
         DeleteFileMenuActionDialog.newInstance(this, onDialogClickListener)
-                .show(((Activity) getContext()).getFragmentManager());
+                .show(getFragmentManager());
     }
 
     @SuppressWarnings("WeakerAccess")

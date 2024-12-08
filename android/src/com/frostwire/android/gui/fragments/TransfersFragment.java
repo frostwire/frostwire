@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,6 @@ package com.frostwire.android.gui.fragments;
 
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
-import android.app.Activity;
-import android.content.ClipData;
-import android.content.ClipData.Item;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -39,6 +35,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,7 +66,6 @@ import com.frostwire.android.gui.views.TimerService;
 import com.frostwire.android.gui.views.TimerSubscription;
 import com.frostwire.android.gui.views.TransfersNoSeedsView;
 import com.frostwire.android.offers.HeaderBanner;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.transfers.Transfer;
@@ -481,7 +478,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
     }
 
     @Override
-    public View getHeader(Activity activity) {
+    public View getHeader(FragmentActivity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         View header = inflater.inflate(R.layout.view_transfers_header, null, false);
         TextView text = findView(header, R.id.view_transfers_header_text_title);
@@ -764,7 +761,7 @@ public class TransfersFragment extends AbstractFragment implements TimerObserver
             } else if (url.startsWith("magnet:?xt=urn:btih:") ||
                     (url.startsWith("http") && url.endsWith(".torrent"))) {
                 TransferManager.instance().downloadTorrent(url.trim(),
-                        new HandpickedTorrentDownloadDialogOnFetch(getActivity(), true));
+                        new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) getActivity(), true));
                 UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
             } else if (url.startsWith("http") && !url.endsWith(".torrent")) {
                 if (MainActivity.instance() != null && SearchFragment.instance() != null) {

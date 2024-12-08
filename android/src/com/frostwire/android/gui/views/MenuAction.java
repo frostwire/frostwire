@@ -20,8 +20,10 @@ package com.frostwire.android.gui.views;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.frostwire.util.Ref;
 
@@ -79,6 +81,22 @@ public abstract class MenuAction {
             result = contextRef.get();
         }
         return result;
+    }
+
+    public AppCompatActivity getAppCompatActivity() {
+        Context context = getContext();
+        if (context instanceof AppCompatActivity) {
+            return (AppCompatActivity) context;
+        }
+        return null;
+    }
+
+    public FragmentManager getFragmentManager() {
+        AppCompatActivity activity = getAppCompatActivity();
+        if (activity != null) {
+            return activity.getSupportFragmentManager();
+        }
+        return null;
     }
 
     public abstract void onClick(Context context);

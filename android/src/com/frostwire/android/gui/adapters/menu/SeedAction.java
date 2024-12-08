@@ -17,7 +17,6 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -151,11 +150,11 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void showNoWifiInformationDialog() {
-        ShowNoWifiInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
+        ShowNoWifiInformationDialog.newInstance().show(getFragmentManager());
     }
 
     private void showMobileDataProtectionInformationDialog() {
-        ShowMobileDataProtectionInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
+        ShowMobileDataProtectionInformationDialog.newInstance().show(getFragmentManager());
     }
 
     private void showBittorrentDisconnectedDialog() {
@@ -165,7 +164,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
-        dlg.show(((Activity) getContext()).getFragmentManager());
+        dlg.show(getFragmentManager());
     }
 
     private void showSeedingDialog() {
@@ -175,7 +174,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 R.string.seeding_is_currently_disabled_in_settings,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
-        dlg.show(((Activity) getContext()).getFragmentManager());
+        dlg.show(getFragmentManager());
     }
 
     @Override

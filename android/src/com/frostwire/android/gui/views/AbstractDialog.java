@@ -1,13 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
- *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,133 +17,79 @@
 
 package com.frostwire.android.gui.views;
 
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.annotation.IdRes;
-
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager.LayoutParams;
+
+import androidx.annotation.IdRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.frostwire.android.R;
 
 import java.util.List;
 
 /**
- * IMPORTANT:
- * - All subclasses must be public, otherwise the dialogs can't be instantiated by android on rotation
- * - All subclasses must only have an empty constructor. If you feel the need to use a custom constructor
- * implement a "newInstance(...)" method that uses the default empty constructor and then set your
- * attributes on the object to return.
- *
- * @author gubatron
- * @author aldenml
- * @author marcelinkaaa
+ * AbstractDialog updated for AndroidX compatibility.
  */
 public abstract class AbstractDialog extends DialogFragment {
 
-    protected static String getSuggestedTAG(Class clazz) {
-        StringBuilder sb = new StringBuilder();
-        char[] className = clazz.getSimpleName().toCharArray();
-        for (int i = 0; i < className.length; i++) {
-            char c = className[i];
-            if (i > 0 && Character.isUpperCase(c)) {
-                sb.append('_');
-                sb.append(Character.toUpperCase(c));
-            } else {
-                sb.append(Character.toUpperCase(c));
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * The identifier for the positive button.
-     */
     private final String tag;
     private final int layoutResId;
 
     private OnDialogClickListener onDialogClickListener;
 
-    public AbstractDialog(int layoutResId) {
+    public AbstractDialog(@LayoutRes int layoutResId) {
         this.tag = getSuggestedTAG(getClass());
         this.layoutResId = layoutResId;
         setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
     }
 
-    public AbstractDialog(String tag, int layoutResId) {
-        this.tag = tag;
-        this.layoutResId = layoutResId;
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.DefaultDialogTheme);
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnDialogClickListener) {
+            onDialogClickListener = (OnDialogClickListener) context;
+        }
     }
 
+    @NonNull
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dlg = super.onCreateDialog(savedInstanceState);
-        dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dlg.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        setContentView(dlg, layoutResId);
-        initComponents(dlg, savedInstanceState);
-        return dlg;
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.requestWindowFeature(DialogFragment.STYLE_NORMAL);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setContentView(layoutResId);
+        initComponents(dialog, savedInstanceState);
+        return dialog;
     }
 
     public void show(FragmentManager manager) {
         super.show(manager, tag);
     }
 
-    public final void performDialogClick(int which) {
-        performDialogClick(tag, which);
-    }
+    protected abstract void initComponents(Dialog dialog, Bundle savedInstanceState);
 
-    private void setContentView(Dialog dlg, int layoutResId) {
-        dlg.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        dlg.setContentView(layoutResId);
+    protected final <T extends View> T findView(Dialog dialog, @IdRes int id) {
+        return dialog.findViewById(id);
     }
 
     protected void performDialogClick(String tag, int which) {
-        Activity activity = getActivity();
-        if (activity != null) {
-            dispatchDialogClick(activity, tag, which);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Dialog d = getDialog();
-        if (d != null) {
-            d.setCanceledOnTouchOutside(true);
-        }
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-
-    protected abstract void initComponents(Dialog dlg, Bundle savedInstanceState);
-
-    protected final <T extends View> T findView(Dialog dlg, @IdRes int id) {
-        return dlg.findViewById(id);
-    }
-
-    private void dispatchDialogClick(Activity activity, String tag, int which) {
         if (onDialogClickListener != null) {
-            dispatchDialogClickSafe(onDialogClickListener, tag, which);
-            return;
+            onDialogClickListener.onDialogClick(tag, which);
         }
-        dispatchDialogClickSafe(activity, tag, which);
-        if (activity instanceof AbstractActivity) {
-            List<Fragment> fragments = ((AbstractActivity) activity).getFragments();
-            for (Fragment f : fragments) {
-                dispatchDialogClickSafe(f, tag, which);
-            }
-        }
+    }
+
+    public interface OnDialogClickListener {
+        void onDialogClick(String tag, int which);
     }
 
     private void dispatchDialogClickSafe(Object obj, String tag, int which) {
@@ -161,7 +106,19 @@ public abstract class AbstractDialog extends DialogFragment {
         return this.onDialogClickListener;
     }
 
-    public interface OnDialogClickListener {
-        void onDialogClick(String tag, int which);
+
+    public static String getSuggestedTAG(Class<?> clazz) {
+        StringBuilder sb = new StringBuilder();
+        char[] className = clazz.getSimpleName().toCharArray();
+        for (int i = 0; i < className.length; i++) {
+            char c = className[i];
+            if (i > 0 && Character.isUpperCase(c)) {
+                sb.append('_');
+                sb.append(Character.toUpperCase(c));
+            } else {
+                sb.append(Character.toUpperCase(c));
+            }
+        }
+        return sb.toString();
     }
 }
