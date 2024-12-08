@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,7 +19,6 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.content.ContentResolver;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -30,6 +29,9 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+
+import androidx.annotation.NonNull;
+import androidx.loader.content.Loader;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.ProfileSongAdapter;
@@ -112,6 +114,7 @@ public final class PlaylistSongFragment extends ApolloFragment<ProfileSongAdapte
         onSongItemClick(position);
     }
 
+    @NonNull
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
         return new PlaylistSongLoader(getActivity(), mPlaylistId);

@@ -19,7 +19,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Fragment;
-import android.content.Loader;
+import androidx.loader.content.Loader;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;

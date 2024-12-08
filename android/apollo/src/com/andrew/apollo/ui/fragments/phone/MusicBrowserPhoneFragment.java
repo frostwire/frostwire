@@ -22,6 +22,8 @@ package com.andrew.apollo.ui.fragments.phone;
 
 import android.app.Fragment;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -90,7 +92,7 @@ public final class MusicBrowserPhoneFragment extends Fragment {
                 R.layout.fragment_music_browser_phone, container, false);
 
         // Initialize the adapter
-        mPagerAdapter = new PagerAdapter(getActivity());
+        mPagerAdapter = new PagerAdapter((AppCompatActivity) getActivity());
         final MusicFragments[] mFragments = MusicFragments.values();
         for (final MusicFragments mFragment : mFragments) {
             mPagerAdapter.add(mFragment.getFragmentClass(), null);
