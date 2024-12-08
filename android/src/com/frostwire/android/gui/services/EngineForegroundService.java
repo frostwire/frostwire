@@ -30,40 +30,76 @@ import android.os.IBinder;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
 import com.frostwire.android.R;
+import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.core.player.CoreMediaPlayer;
+import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.workers.NotificationWorker;
 import com.frostwire.android.gui.workers.TorrentEngineWorker;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.util.Logger;
+import com.frostwire.util.TaskThrottle;
+import com.frostwire.util.http.OkHttpClientWrapper;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class EngineForegroundService extends Service {
+import okhttp3.ConnectionPool;
+
+public class EngineForegroundService extends Service implements IEngineService {
     private static final Logger LOG = Logger.getLogger(EngineForegroundService.class);
 
-    private static final byte STATE_UNSTARTED = 0;
-    private static final byte STATE_STARTED = 1;
-    private static final byte STATE_STOPPED = 2;
-    private static final byte STATE_STOPPING = 3;
+    private static final long[] VENEZUELAN_VIBE = buildVenezuelanVibe();
+
+    private static final String SHUTDOWN_ACTION = "com.frostwire.android.engine.SHUTDOWN";
 
     private static volatile byte state = STATE_UNSTARTED;
+    private volatile static EngineForegroundService instance;
     private final AtomicReference<Byte> stateReference = new AtomicReference<>(STATE_UNSTARTED);
-
+    private final Object instanceLock = new Object();
+    public byte STATE_DISCONNECTED = 14;
     private NotificationUpdateDaemon notificationDaemon;
     private NotifiedStorage notifiedStorage;
+
+    public static EngineForegroundService getInstance() {
+        return instance;
+    }
+
+    private static void resumeBTEngineTask(EngineForegroundService engineForegroundService, boolean wasShutdown) {
+        LOG.info("resumeBTEngineTask(wasShutdown=" + wasShutdown, true);
+        engineForegroundService.updateState(STATE_STARTING);
+        BTEngine btEngine = BTEngine.getInstance();
+        if (!wasShutdown) {
+            btEngine.resume();
+            TransferManager.instance().forceReannounceTorrents();
+        } else {
+            btEngine.start();
+            TransferManager.instance().reset();
+            btEngine.resume();
+        }
+        engineForegroundService.updateState(STATE_STARTED);
+        LOG.info("resumeBTEngineTask(): Engine started", true);
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        synchronized (instanceLock) {
+            instance = this;
+        }
+
         LOG.info("EngineForegroundService::onCreate() - Initializing service");
 
         // Initialize state
@@ -93,6 +129,18 @@ public class EngineForegroundService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         LOG.info("EngineForegroundService::onStartCommand() - Starting foreground service");
+        LOG.info("EngineForegroundService::onStartCommand() - intent: " + intent + " flags: " + flags + " startId: " + startId);
+
+        if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
+            LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
+            new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
+                @Override
+                public void run() {
+                    shutdownSupport();
+                }
+            }.start();
+            return START_NOT_STICKY;
+        }
 
         // Create and display persistent notification
         Notification notification = createPersistentNotification();
@@ -179,7 +227,7 @@ public class EngineForegroundService extends Service {
                 .enqueue(new androidx.work.PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.MINUTES).build());
     }
 
-    private void shutdown() {
+    public void shutdown() {
         LOG.info("EngineForegroundService::shutdown() - Performing shutdown");
         if (notificationDaemon != null) {
             notificationDaemon.stop();
@@ -189,7 +237,121 @@ public class EngineForegroundService extends Service {
         stopSelf();
     }
 
-    private void stopServices(boolean disconnected) {
+    private void shutdownSupport() {
+        LOG.debug("shutdownSupport");
+        Librarian.instance().shutdownHandler();
+        stopPermanentNotificationUpdates();
+        cancelAllNotificationsTask(this);
+        stopServices(false);
+        if (BTEngine.ctx != null) {
+            LOG.debug("EngineForegroundService::shutdownSupport(), stopping BTEngine...");
+            BTEngine.getInstance().stop();
+            LOG.debug("EngineForegroundService::shutdownSupport(), BTEngine stopped");
+        } else {
+            LOG.debug("EngineForegroundService::shutdownSupport(), BTEngine didn't have a chance to start, no need to stop it");
+        }
+        stopOkHttp();
+        updateState(STATE_STOPPED);
+        stopSelf();
+    }
+    private void stopPermanentNotificationUpdates() {
+        if (notificationDaemon != null) {
+            notificationDaemon.stop();
+        }
+    }
+
+    private void stopOkHttp() {
+        ConnectionPool pool = OkHttpClientWrapper.CONNECTION_POOL;
+        try {
+            pool.evictAll();
+        } catch (Throwable e) {
+            LOG.error("EngineService::stopOkHttp() Error evicting all connections from OkHttp ConnectionPool", e);
+        }
+        try {
+            synchronized (OkHttpClientWrapper.CONNECTION_POOL) {
+                pool.notifyAll();
+            }
+        } catch (Throwable e) {
+            LOG.error("EngineService::stopOkHttp() Error notifying all threads waiting on OkHttp ConnectionPool", e);
+        }
+    }
+
+    private static void cancelAllNotificationsTask(EngineForegroundService engineForegroundService) {
+        try {
+            NotificationManager notificationManager = (NotificationManager) engineForegroundService.getSystemService(NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancelAll();
+            } else {
+                LOG.warn("EngineForegroundService::cancelAllNotificationsTask(EngineForegroundService) notificationManager is null");
+            }
+        } catch (Throwable t) {
+            LOG.warn("EngineForegroundService::cancelAllNotificationsTask(EngineForegroundService)" + t.getMessage(), t);
+        }
+    }
+
+
+    @Override
+    public CoreMediaPlayer getMediaPlayer() {
+        return null;
+    }
+
+    @Override
+    public byte getState() {
+        return state;
+    }
+
+    public boolean isStarted() {
+        return getState() == STATE_STARTED;
+    }
+
+    public boolean isStarting() {
+        return getState() == STATE_STARTING;
+    }
+
+    public boolean isStopped() {
+        return getState() == STATE_STOPPED;
+    }
+
+    public boolean isStopping() {
+        return getState() == STATE_STOPPING;
+    }
+
+    public boolean isDisconnected() {
+        return getState() == STATE_DISCONNECTED;
+    }
+
+    @Override
+    public void startServices() {
+        startServices(false);
+    }
+
+    public synchronized void startServices(boolean wasShutdown) {
+        LOG.info("startServices(wasShutdown=" + wasShutdown + ")", true);
+        // hard check for TOS
+        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
+            return;
+        }
+
+        if (!SystemUtils.isPrimaryExternalStorageMounted()) {
+            return;
+        }
+
+        if (isStarted()) {
+            LOG.info("startServices() - aborting, it's already started", true);
+            return;
+        }
+
+        if (isStarting()) {
+            LOG.info("startServices() - aborting, it's already starting", true);
+            return;
+        }
+
+        LOG.info("startServices() - invoking resumeBTEngineTask, wasShutdown=" + wasShutdown);
+        TaskThrottle.isReadyToSubmitTask("EngineService::resumeBTEngineTask", 5000);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> resumeBTEngineTask(this, wasShutdown));
+    }
+
+    public void stopServices(boolean disconnected) {
         if (state == STATE_STOPPED || state == STATE_STOPPING) {
             LOG.info("EngineForegroundService::stopServices() - Already stopped or stopping");
             return;
@@ -203,9 +365,62 @@ public class EngineForegroundService extends Service {
         updateState(STATE_STOPPED);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
+    public void notifyDownloadFinished(String displayName, File file, String infoHash) {
+        try {
+            if (notifiedStorage.contains(infoHash)) {
+                // already notified
+                return;
+            } else {
+                notifiedStorage.add(infoHash);
+            }
+
+            Context context = getApplicationContext();
+            Intent i = new Intent(context, MainActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION, true);
+            i.putExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_PATH, file.getAbsolutePath());
+            PendingIntent pi = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            Notification notification = new NotificationCompat.Builder(context, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                    .setWhen(System.currentTimeMillis())
+                    .setContentText(getString(R.string.download_finished))
+                    .setContentTitle(getString(R.string.download_finished))
+                    .setSmallIcon(getNotificationIcon())
+                    .setContentIntent(pi)
+                    .build();
+            notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
+            notification.number = TransferManager.instance().getDownloadsToReview();
+            notification.flags |= Notification.FLAG_AUTO_CANCEL;
+            if (manager != null) {
+                NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
+                channel.setSound(null, null);
+                manager.createNotificationChannel(channel);
+                manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
+            }
+        } catch (Throwable e) {
+            LOG.error("Error creating notification for download finished", e);
+        }
+    }
+
     private void updateState(byte newState) {
         stateReference.set(newState);
         state = stateReference.get();
         LOG.info("EngineForegroundService::updateState() - Updated state to: " + newState);
     }
+
+    private int getNotificationIcon() {
+        return R.drawable.frostwire_notification_flat;
+    }
+    private static long[] buildVenezuelanVibe() {
+
+        long shortVibration = 80;
+        long mediumVibration = 100;
+        long shortPause = 100;
+        long mediumPause = 150;
+        long longPause = 180;
+
+        return new long[]{0, shortVibration, longPause, shortVibration, shortPause, shortVibration, shortPause, shortVibration, mediumPause, mediumVibration};
+    }
+
 }
