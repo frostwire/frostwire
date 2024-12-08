@@ -78,7 +78,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     @Override
     public void onResume() {
         super.onResume();
-        initComponents();
+        ThemeManager.loadSavedThemeModeAsync(themeMode -> {
+            LOG.info("ApplicationPreferencesFragment: onResume()->onThemeLoaded(): themeMode=" + themeMode);
+            initComponents();
+        });
+
     }
 
     private void setupDataSaving() {
@@ -93,7 +97,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                             R.string.data_saving_kill_http_warning,
                             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
                     );
-
                     dlg.setTargetFragment(ApplicationPreferencesFragment.this, 0);
                     dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
@@ -163,6 +166,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private void setupConnectSwitch() {
         SwitchPreference preference = findPreference("frostwire.prefs.internal.connect_disconnect");
+        if (preference == null) {
+            LOG.error("ApplicationPreferencesFragment::setupConnectSwitch() Preference with key 'frostwire.prefs.internal.connect_disconnect' not found.");
+            return; // Safeguard to prevent crashes
+        }
+
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newStatus = (boolean) newValue;
             Engine e = Engine.instance();
