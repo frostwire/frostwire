@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
  */
 
 package com.frostwire.android.gui.fragments.preference;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -80,7 +78,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     @Override
     public void onResume() {
         super.onResume();
-        initComponents();
+        ThemeManager.loadSavedThemeModeAsync(themeMode -> {
+            LOG.info("ApplicationPreferencesFragment: onResume()->onThemeLoaded(): themeMode=" + themeMode);
+            initComponents();
+        });
+
     }
 
     private void setupDataSaving() {
@@ -95,7 +97,6 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
                             R.string.data_saving_kill_http_warning,
                             YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK
                     );
-
                     dlg.setTargetFragment(ApplicationPreferencesFragment.this, 0);
                     dlg.show(getFragmentManager(), CONFIRM_STOP_HTTP_IN_PROGRESS_DIALOG_TAG);
 
@@ -165,6 +166,11 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
     private void setupConnectSwitch() {
         SwitchPreference preference = findPreference("frostwire.prefs.internal.connect_disconnect");
+        if (preference == null) {
+            LOG.error("ApplicationPreferencesFragment::setupConnectSwitch() Preference with key 'frostwire.prefs.internal.connect_disconnect' not found.");
+            return; // Safeguard to prevent crashes
+        }
+
         preference.setOnPreferenceChangeListener((preference1, newValue) -> {
             boolean newStatus = (boolean) newValue;
             Engine e = Engine.instance();
@@ -257,13 +263,10 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     private void setupStore(final long purchaseTimestamp) {
         pausedAdsPreferenceClickListener = new PausedAdsOnPreferenceClickListener(getActivity());
         SetupStoreTaskParamHolder paramHolder = new SetupStoreTaskParamHolder(this, purchaseTimestamp);
-        // Async gymnastics to pass both the purchase timestamp and the amounts of minutes left paused
-        // to the UI Thread task, we use a Holder object for this.
-        //<T1, R> void async(ResultTask1<T1, R> task,
-        //        T1 arg1,
-        //        ResultPostTask1<T1, R> post) //result post task just doesn't return anything
-        async(ApplicationPreferencesFragment::checkMinutesLeftPausedAsync, paramHolder,
-                ApplicationPreferencesFragment::setupStorePostTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            SetupStoreTaskParamHolder resultTaskParamHolder = checkMinutesLeftPausedAsync(paramHolder);
+            SystemUtils.postToUIThread(() -> setupStorePostTask(paramHolder, resultTaskParamHolder));
+        });
     }
 
     private static class SetupStoreTaskParamHolder {
@@ -278,12 +281,14 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
     }
 
     private static SetupStoreTaskParamHolder checkMinutesLeftPausedAsync(SetupStoreTaskParamHolder paramHolder) {
+        SystemUtils.ensureBackgroundThreadOrCrash("ApplicationPreferencesFragment::checkMinutesLeftPausedAsync");
         paramHolder.minutesPaused = Offers.getMinutesLeftPausedAsync();
         return paramHolder;
     }
 
     private static void setupStorePostTask(SetupStoreTaskParamHolder paramHolder,
                                            @SuppressWarnings("unused") SetupStoreTaskParamHolder unusedResultTaskParamHolder) {
+        SystemUtils.ensureUIThreadOrCrash("ApplicationPreferencesFragment::setupStorePostTask");
         if (!Ref.alive(paramHolder.appPrefsFragRef)) {
             return;
         }
@@ -328,7 +333,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
 
         PausedAdsOnPreferenceClickListener(Activity activity) {
             activityRef = Ref.weak(activity);
-            async(PausedAdsOnPreferenceClickListener::loadPausedAdsInfoAsync);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, PausedAdsOnPreferenceClickListener::loadPausedAdsInfoAsync);
         }
 
         @Override
@@ -337,7 +342,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             LOG.info("onPreferenceClick() clicks left: " + clicksLeft);
             if (adsPaused() && --clicksLeft <= 0) {
                 clicksLeft = 10;
-                async(Offers::unPauseAdsAsync);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, Offers::unPauseAdsAsync);
                 if (Ref.alive(activityRef)) {
                     activityRef.get().finish();
                 }
@@ -348,7 +353,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
         }
 
         private boolean adsPaused() {
-            long pause_duration = rewarded_video_minutes * 60_000;
+            long pause_duration = rewarded_video_minutes * 60_000L;
             long time_on_pause = System.currentTimeMillis() - paused_timestamp;
             return time_on_pause < pause_duration;
         }

@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.fragments;
 
-import static com.frostwire.android.util.Asyncs.async;
 import static com.frostwire.android.util.SystemUtils.HandlerThreadName.SEARCH_PERFORMER;
 import static com.frostwire.android.util.SystemUtils.ensureUIThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.getApplicationContext;
@@ -26,9 +25,7 @@ import static com.frostwire.android.util.SystemUtils.postToHandler;
 import static com.frostwire.android.util.SystemUtils.postToUIThread;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -43,6 +40,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -145,11 +146,16 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (slides != null) {
             promotions.setSlides(slides);
         } else {
-            async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
+            //async(this, SearchFragment::loadSlidesInBackground, SearchFragment::onSlidesLoaded);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> {
+                final List<Slide> slides = loadSlidesInBackground();
+                SystemUtils.postToUIThread(() -> onSlidesLoaded(slides));
+            });
         }
     }
 
     private List<Slide> loadSlidesInBackground() {
+        SystemUtils.ensureBackgroundThreadOrCrash("SearchFragment::loadSlidesInBackground");
         try {
             HttpClient http = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
             String url = String.format("%s&from=android&fw=%s&sdk=%s", Constants.SERVER_PROMOTIONS_URL, Constants.FROSTWIRE_VERSION_STRING, Build.VERSION.SDK_INT);
@@ -175,7 +181,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     @Override
-    public View getHeader(Activity activity) {
+    public View getHeader(FragmentActivity activity) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         @SuppressLint("InflateParams") LinearLayout header = (LinearLayout) inflater.inflate(R.layout.view_search_header, null, false);
         TextView title = header.findViewById(R.id.view_search_header_text_title);
@@ -313,7 +319,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             cancelSearch();
             searchInput.setText("");
             NotAvailableDialog dialog = new NotAvailableDialog();
-            dialog.show(getFragmentManager());
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            dialog.show(activity.getSupportFragmentManager());
             return;
         }
         searchInput.selectTabByMediaType(Constants.FILE_TYPE_VIDEOS);
@@ -351,7 +358,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
 
     private void startMagnetDownload(String magnet) {
         UIUtils.showLongMessage(getActivity(), R.string.torrent_url_added);
-        TransferManager.instance().downloadTorrent(magnet, new HandpickedTorrentDownloadDialogOnFetch(getActivity(), false));
+        TransferManager.instance().downloadTorrent(magnet, new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) getActivity(), false));
     }
 
     private void setupAdapter() {
@@ -537,9 +544,12 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             SystemUtils.postToUIThread(() -> {
                 Context ctx = getContext() != null ? getContext() : getApplicationContext();
                 TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(ctx, tellurideSearchResultDownloadDialogAdapter.getFullList());
+
+
                 FragmentManager fragmentManager = getFragmentManager();
+
                 if (fragmentManager == null && getActivity() != null) {
-                    fragmentManager = getActivity().getFragmentManager();
+                    fragmentManager = getActivity().getSupportFragmentManager();
                 }
                 if (fragmentManager != null) {
                     dlg.show(fragmentManager);

@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,11 +17,17 @@
 
 package com.frostwire.android.util;
 
+import android.os.Build;
 import android.os.StrictMode;
 
 import com.frostwire.android.gui.services.Engine;
+import com.frostwire.util.Logger;
+
+import java.util.Locale;
 
 public interface RunStrict<R> {
+
+    Logger LOG = Logger.getLogger(RunStrict.class);
 
     R run();
 
@@ -36,7 +42,9 @@ public interface RunStrict<R> {
      * @param enable {@code true} activate the most strict policy
      */
     static void setStrictPolicy(boolean enable) {
+        LOG.info("RunStrict.setStrictPolicy(" + enable + ") Debug.isEnabled()=" + Debug.isEnabled());
         if (!Debug.isEnabled()) {
+            LOG.info("StrictMode is disabled, this is a DEBUG build");
             return; // no debug mode, do nothing
         }
 
@@ -63,7 +71,8 @@ public interface RunStrict<R> {
     }
 
     /**
-     * Runs the runnable code under strict policy.
+     * Runs the runnable code under strict policy but then sets relaxed policies back.
+     * On the current thread where it's invoked.
      *
      * @param r the runnable to execute r.run()
      */
@@ -89,6 +98,36 @@ public interface RunStrict<R> {
             return r.run();
         } finally {
             setStrictPolicy(false);
+        }
+    }
+
+    /** @noinspection unused*/
+    static void enableStrictModePolicies(boolean enable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (enable) {
+                LOG.info(String.format(Locale.US, "MainApplication::enableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+                StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                        .detectAll()
+                        .penaltyLog() //.penaltyDeath()
+                        .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                        .build());
+            } else {
+                LOG.info(String.format(Locale.US,"MainApplication::disableStrictModePolicies SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+                StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                        .permitAll() // Allow everything
+                        .build());
+            }
+        }
+    }
+
+
+    /** @noinspection unused*/
+    static void disableStrictModePolicyForUnbufferedIO() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            LOG.info(String.format(Locale.US, "MainApplication::disableStrictModePolicyForUnbufferedIO SDK VERSION: {%d}", Build.VERSION.SDK_INT));
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .permitUnbufferedIo() // Temporarily allow unbuffered IO
+                    .build());
         }
     }
 }

@@ -89,7 +89,7 @@ public final class SoftwareUpdater {
                     update.u, //apkDownloadURL
                     update.updateMessages,
                     update.changelog);
-            dlg.show(activity.getFragmentManager());
+            dlg.show(activity.getSupportFragmentManager());
         } catch (Throwable e) {
             LOG.error("Failed to notify update", e);
             updateTimestamp = -1; // try again next time MainActivity is resumed

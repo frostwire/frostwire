@@ -18,28 +18,21 @@
 
 package com.andrew.apollo.widgets;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.ColorStateList; // Added import
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
 import androidx.appcompat.widget.AppCompatImageButton;
-import androidx.core.content.ContextCompat; // Added import
+import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.Asyncs;
-import com.frostwire.util.Ref;
-
-import java.lang.ref.WeakReference;
-
-import static com.frostwire.android.util.Asyncs.async;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * A custom {@link ImageButton} that represents the "repeat" button.
@@ -69,7 +62,7 @@ public final class RepeatButton extends AppCompatImageButton
 
     @Override
     public void onClick(final View v) {
-        async(MusicUtils::cycleRepeat);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, MusicUtils::cycleRepeat);
         updateRepeatState();
         if (onClickedCallback != null) {
             try {
@@ -84,7 +77,10 @@ public final class RepeatButton extends AppCompatImageButton
      * Sets the correct drawable and tint for the repeat state.
      */
     public void updateRepeatState() {
-        Asyncs.async(MusicUtils::getRepeatMode, RepeatButton::getRepeatModePost, this);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            int repeatMode = MusicUtils.getRepeatMode();
+            SystemUtils.postToUIThread(() -> getRepeatModePost(repeatMode));
+        });
     }
 
     private void getRepeatModePost(Integer repeatMode) {

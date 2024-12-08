@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,7 @@ import androidx.core.content.ContextCompat;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.Asyncs;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * @author Andrew Neal (andrewdneal@gmail.com)
@@ -73,7 +73,10 @@ public final class ShuffleButton extends AppCompatImageButton
      * Sets the correct drawable and tint for the shuffle state.
      */
     public void updateShuffleState() {
-        Asyncs.async(MusicUtils::isShuffleEnabled, ShuffleButton::isShuffleEnabledPost, this);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            final boolean isShuffling = MusicUtils.isShuffleEnabled();
+            SystemUtils.postToUIThread(() -> isShuffleEnabledPost(isShuffling));
+        });
     }
 
     private void isShuffleEnabledPost(Boolean shuffleEnabled) {

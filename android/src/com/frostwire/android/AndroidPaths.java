@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,8 @@
 package com.frostwire.android;
 
 import android.app.Application;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
 
-import androidx.annotation.RequiresApi;
-
-import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.MediaType;
 import com.frostwire.android.util.SystemUtils;
@@ -37,8 +32,7 @@ import com.frostwire.util.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -51,25 +45,28 @@ public final class AndroidPaths implements SystemPaths {
     public static final String TORRENTS_PATH = "Torrents";
     private static final String TEMP_PATH = "temp";
     private static final String LIBTORRENT_PATH = "libtorrent";
-    private static final String UPDATE_APK_NAME = "frostwire.apk";
 
     private final Application app;
-    private final File internalFilesDir;
+    private volatile File internalFilesDir;
 
-    private static final String VOLUME_EXTERNAL_NAME = SystemUtils.hasAndroid10OrNewer() ?
-            MediaStore.VOLUME_EXTERNAL_PRIMARY :
-            MediaStore.VOLUME_EXTERNAL;
-
-    private static final boolean USE_MEDIASTORE_DOWNLOADS = true;
-
-    private static final Map<Byte, String> fileTypeFolders = new HashMap<>();
-    private static final Object fileTypeFoldersLock = new Object();
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public AndroidPaths(Application app) {
         this.app = app;
-        internalFilesDir = app.getFilesDir();
-        LOG.info("");
+        // All disk operations must be done in the background
+        final CountDownLatch waitForInternalFiles = new CountDownLatch(1);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            internalFilesDir = app.getFilesDir();
+            waitForInternalFiles.countDown();
+        });
+        if (internalFilesDir == null) {
+            try {
+                // takes between 2 o 5 ms to get the internal files dir
+                waitForInternalFiles.await();
+            } catch (InterruptedException e) {
+                LOG.error("AndroidPaths: Error waiting for internal files dir (time out?)", e);
+            }
+        } else {
+            LOG.info("AndroidPaths: Internal Files Dir: " + internalFilesDir.getAbsolutePath() + " (already set) no need to wait for thread");
+        }
     }
 
     /**
@@ -84,7 +81,6 @@ public final class AndroidPaths implements SystemPaths {
     /**
      * Downloads/FrostWire/Torrents
      *
-     * @return
      */
     @Override
     public File torrents() {
@@ -100,8 +96,6 @@ public final class AndroidPaths implements SystemPaths {
     public File libtorrent() {
         return new File(internalFilesDir, LIBTORRENT_PATH);
     }
-
-    private static final boolean APP_PATHS_SHOWN = false;
 
     /**
      * Environment.getExternalStoragePublicDirectory() + "/Downloads/FrostWire" (This path won't work on android 10 even with legacy flag on)
@@ -181,9 +175,9 @@ public final class AndroidPaths implements SystemPaths {
             return commonRelativePrefix;
         }
 
-        String result = removedDataPathFromFilePath.replace(f.getName(), "").
-                replaceAll("/\\z", ""); // remove trailing slash
-        return result;
+        // remove trailing slash
+        return removedDataPathFromFilePath.replace(f.getName(), "").
+                replaceAll("/\\z", "");
     }
 
     /**
@@ -209,7 +203,6 @@ public final class AndroidPaths implements SystemPaths {
         if (!possiblyFolderName.equals("/") && possiblyFolderName.length() > 1) {
             destinationFolder = new File(android11StorageFolder, possiblyFolderName);
         }
-        final File destinationFile = new File(destinationFolder, filename);
-        return destinationFile;
+        return new File(destinationFolder, filename);
     }
 }

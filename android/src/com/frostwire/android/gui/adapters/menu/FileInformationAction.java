@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -55,7 +54,7 @@ public final class FileInformationAction extends MenuAction {
 
     @Override
     public void onClick(Context context) {
-        FileInformationDialog.newInstance(fd).show(((Activity) getContext()).getFragmentManager());
+        FileInformationDialog.newInstance(fd).show(getFragmentManager());
     }
 
     public static class FileInformationDialog extends AbstractDialog {

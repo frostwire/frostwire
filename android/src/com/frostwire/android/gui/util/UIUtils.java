@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,9 @@
 
 package com.frostwire.android.gui.util;
 
-import static com.frostwire.android.util.Asyncs.async;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.app.KeyguardManager;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -32,7 +29,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
@@ -48,6 +44,7 @@ import android.widget.Toast;
 import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.FragmentManager;
 
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.AndroidPaths;
@@ -400,20 +397,20 @@ public final class UIUtils {
      * Create an ephemeral playlist with the files of the same type that live on the folder of the given file descriptor and play it.
      */
     public static void playEphemeralPlaylist(final Context context, final FWFileDescriptor fd) {
-        async(context, UIUtils::playEphemeralPlaylistTask, fd);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> playEphemeralPlaylistTask(context, fd));
     }
 
     private static boolean openAudioInternal(final Context context, String filePath) {
         try {
             List<FWFileDescriptor> fds = Librarian.instance().getFilesInAndroidMediaStore(context, filePath, false);
-            if (fds.size() > 0 && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
+            if (!fds.isEmpty() && fds.get(0).fileType == Constants.FILE_TYPE_AUDIO) {
                 playEphemeralPlaylist(context, fds.get(0));
                 return true;
             } else {
                 return false;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("UIUtils::openAudioInternal() Failed to open audio file: " + filePath, e);
             return false;
         }
     }
@@ -547,10 +544,6 @@ public final class UIUtils {
         double y_sq = Math.pow(dm.heightPixels / dm.ydpi, 2);
         // Thank you Pitagoras
         return Math.sqrt(x_sq + y_sq);
-    }
-
-    public static boolean isTablet(Resources res) {
-        return res.getBoolean(R.bool.isTablet);
     }
 
     /**

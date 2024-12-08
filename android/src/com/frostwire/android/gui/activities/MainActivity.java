@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -10,21 +10,18 @@
  *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed under the License.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.frostwire.android.gui.activities;
 
-import static com.frostwire.android.util.Asyncs.async;
-
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -91,10 +88,6 @@ import java.lang.reflect.Method;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author gubatron
- * @author aldenml
- */
 public class MainActivity extends AbstractActivity implements
         OnDialogClickListener,
         ServiceConnection,
@@ -156,13 +149,14 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
             try {
                 fragmentsStack.pop();
                 int id = fragmentsStack.peek();
-                Fragment fragment = getFragmentManager().findFragmentById(id);
+                Fragment fragment = getSupportFragmentManager().findFragmentById(id);
                 if (fragment != null) {
                     switchContent(fragment, false);
                 }
@@ -179,10 +173,6 @@ public class MainActivity extends AbstractActivity implements
 
     public void shutdown() {
         if (shuttingDown.get()) {
-            // NOTE: the actual solution should be for a re-architecture for
-            // a guarantee of a single call of this logic.
-            // For now, just mitigate the double call if coming from the exit
-            // and at the same time the close of the interstitial
             return;
         }
         shuttingDown.set(true);
@@ -261,7 +251,6 @@ public class MainActivity extends AbstractActivity implements
             setupDrawer();
         }
         if (updateAvailable) {
-            // make sure it will remember this, even if the menu gets destroyed
             getIntent().putExtra("updateAvailable", true);
             navigationMenu.onUpdateAvailable();
         }
@@ -304,7 +293,7 @@ public class MainActivity extends AbstractActivity implements
             }
         }
         if (intent.hasExtra(Constants.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION)) {
-            async(this, MainActivity::onDownloadCompleteNotification, intent);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> onDownloadCompleteNotification(intent));
         }
         if (intent.hasExtra(Constants.EXTRA_FINISH_MAIN_ACTIVITY)) {
             finish();
@@ -314,13 +303,10 @@ public class MainActivity extends AbstractActivity implements
 
     private void openTorrentUrl(Intent intent) {
         try {
-            //Open a Torrent from a URL or from a local file :), say from Astro File Manager.
-            //Show me the transfer tab
             Intent i = new Intent(this, MainActivity.class);
             i.setAction(Constants.ACTION_SHOW_TRANSFERS);
             i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(i);
-            //go!
             final String uri = intent.getDataString();
             intent.setAction(null);
             if (uri != null) {
@@ -337,7 +323,6 @@ public class MainActivity extends AbstractActivity implements
                 }
             } else {
                 LOG.warn("MainActivity.onNewIntent(): Couldn't start torrent download from Intent's URI, intent.getDataString() -> null");
-                LOG.warn("(maybe URI is coming in another property of the intent object - #fragmentation)");
             }
         } catch (Throwable e) {
             LOG.error("Error opening torrent from intent", e);
@@ -353,20 +338,25 @@ public class MainActivity extends AbstractActivity implements
         ConfigurationManager CM = ConfigurationManager.instance();
         if (CM.getBoolean(Constants.PREF_KEY_GUI_INITIAL_SETTINGS_COMPLETE)) {
             mainResume();
-            Offers.initAdNetworks(this);
-            Offers.initDataPrivacy();
+
+            // CHANGED: Run initAdNetworks immediately on main thread
+            Offers.initAdNetworks(this); // ADDED - revert from background post
+
         } else if (!isShutdown()) {
             controller.startWizardActivity();
         }
+
+
         checkLastSeenVersionBuild();
         syncNavigationMenu();
         updateNavigationMenu();
-        //uncomment to test social links dialog
-        //UIUtils.showSocialLinksDialog(this, true, null, "");
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissions();
         }
-        async(NetworkManager.instance(), NetworkManager::queryNetworkStatusBackground);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            NetworkManager networkManager = NetworkManager.instance();
+            NetworkManager.queryNetworkStatusBackground(networkManager);
+        });
     }
 
     @Override
@@ -377,18 +367,14 @@ public class MainActivity extends AbstractActivity implements
 
     private SparseArray<DangerousPermissionsChecker> initPermissionsCheckers() {
         SparseArray<DangerousPermissionsChecker> checkers = new SparseArray<>();
-        // EXTERNAL STORAGE ACCESS CHECKER.
         final DangerousPermissionsChecker externalStorageChecker =
                 new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        //externalStorageChecker.setPermissionsGrantedCallback(() -> {});
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
-        // add more permissions checkers if needed...
         return checkers;
     }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
-        // MIGHT DO: save checkedNavViewMenuItemId in bundle.
         outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
         super.onSaveInstanceState(outState);
         saveLastFragment(outState);
@@ -415,12 +401,7 @@ public class MainActivity extends AbstractActivity implements
     protected void onDestroy() {
         super.onDestroy();
         if (search != null) {
-            // this is necessary because the Fragment#onDestroy is not
-            // necessary called right in the Activity#onDestroy call, making
-            // the internal mopub view possible to outlive the activity
-            // destruction, creating a context leak
             search.destroyHeaderBanner();
-            // TODO: make a unique call for these destroys
             search.destroyPromotionsBanner();
         }
         if (playerSubscription != null) {
@@ -432,7 +413,7 @@ public class MainActivity extends AbstractActivity implements
     private void saveLastFragment(Bundle outState) {
         Fragment fragment = getCurrentFragment();
         if (fragment != null) {
-            getFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, fragment);
+            getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, fragment);
         }
     }
 
@@ -444,7 +425,7 @@ public class MainActivity extends AbstractActivity implements
                 UIUtils.showDismissableMessage(findView(R.id.activity_main_parent_layout), R.string.cannot_start_engine_without_vpn);
             } else {
                 firstTime = false;
-                Engine.instance().startServices(); // it's necessary for the first time after wizard
+                Engine.instance().startServices();
             }
         }
         if (Engine.instance().wasShutdown()) {
@@ -455,7 +436,6 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // the filetype and audio id parameters are passed via static hack
         if (!DangerousPermissionsChecker.handleOnWriteSettingsActivityResult(this)) {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -466,10 +446,8 @@ public class MainActivity extends AbstractActivity implements
         final String lastSeenVersionBuild = CM.getString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD);
         final String currentVersionBuild = Constants.FROSTWIRE_VERSION_STRING + "." + Constants.FROSTWIRE_BUILD;
         if (StringUtils.isNullOrEmpty(lastSeenVersionBuild)) {
-            //fresh install
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
         } else if (!currentVersionBuild.equals(lastSeenVersionBuild)) {
-            //just updated.
             CM.setString(Constants.PREF_KEY_CORE_LAST_SEEN_VERSION_BUILD, currentVersionBuild);
         }
     }
@@ -490,7 +468,7 @@ public class MainActivity extends AbstractActivity implements
                 R.string.minimize_frostwire,
                 R.string.are_you_sure_you_wanna_leave,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.show(getFragmentManager()); //see onDialogClick
+        dlg.show(getSupportFragmentManager());
     }
 
     public void showShutdownDialog() {
@@ -499,7 +477,7 @@ public class MainActivity extends AbstractActivity implements
                 R.string.app_shutdown_dlg_title,
                 R.string.app_shutdown_dlg_message,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
-        dlg.show(getFragmentManager()); //see onDialogClick
+        dlg.show(getSupportFragmentManager());
     }
 
     public void onDialogClick(String tag, int which) {
@@ -527,8 +505,8 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void setupFragments() {
-        search = (SearchFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
-        transfers = (TransfersFragment) getFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
+        search = (SearchFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment_search);
+        transfers = (TransfersFragment) getSupportFragmentManager().findFragmentById(R.id.activity_main_fragment_transfers);
     }
 
     private void hideFragments() {
@@ -537,21 +515,16 @@ public class MainActivity extends AbstractActivity implements
         } catch (Throwable t) {
             LOG.warn(t.getMessage(), t);
         }
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        androidx.fragment.app.FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
         tx.hide(search).hide(transfers);
         try {
             tx.commit();
         } catch (IllegalStateException e) {
-            // if not that we can do a lot here, since the root of the problem
-            // is the multiple entry points to MainActivity, just let it run
-            // a possible inconsistent (but probably right) version.
-            // in the future with a higher API, commitNow should be considered
             LOG.warn("Error running commit in fragment transaction, using weaker option", e);
             try {
                 tx.commitAllowingStateLoss();
             } catch (IllegalStateException e2) {
-                // ¯\_(ツ)_/¯
-                LOG.warn("Error running commit in fragment transaction, weaker option also failed (commit already called - mCommited=true)", e2);
+                LOG.warn("Error running commit in fragment transaction", e2);
             }
         }
     }
@@ -559,7 +532,7 @@ public class MainActivity extends AbstractActivity implements
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
         if (savedInstanceState != null) {
-            fragment = getFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+            fragment = getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
             restoreFragmentsStack(savedInstanceState);
         }
         if (fragment == null) {
@@ -599,7 +572,7 @@ public class MainActivity extends AbstractActivity implements
         try {
             Toolbar toolbar = findToolbar();
             if (toolbar == null) {
-                LOG.warn("updateHeader(): Check your logic, no actionBar available");
+                LOG.warn("updateHeader(): no actionBar available");
                 return;
             }
             if (fragment instanceof MainFragment) {
@@ -622,7 +595,7 @@ public class MainActivity extends AbstractActivity implements
             return;
         }
         hideFragments();
-        FragmentTransaction transaction = getFragmentManager().beginTransaction().show(fragment);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().show(fragment);
         try {
             transaction.commitAllowingStateLoss();
         } catch (Throwable ignored) {
@@ -636,10 +609,6 @@ public class MainActivity extends AbstractActivity implements
             ((MainFragment) currentFragment).onShow();
         }
     }
-
-    /*
-     * The following methods are only public to be able to use them from another package(internal).
-     */
 
     public Fragment getFragmentByNavMenuId(int id) {
         if (id == R.id.menu_main_search) {
@@ -674,7 +643,6 @@ public class MainActivity extends AbstractActivity implements
             try {
                 navigationMenu.onOptionsItemSelected(item);
             } catch (Throwable t) {
-                // usually java.lang.IllegalArgumentException: No drawer view found with gravity LEFT
                 return false;
             }
             return false;
@@ -714,11 +682,9 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onServiceConnected(final ComponentName name, final IBinder service) {
-        //musicPlaybackService = IApolloService.Stub.asInterface(service);
     }
 
     public void onServiceDisconnected(final ComponentName name) {
-        //musicPlaybackService = null;
     }
 
     @Override
@@ -779,7 +745,7 @@ public class MainActivity extends AbstractActivity implements
         try {
             inStream = context.getContentResolver().openInputStream(uri);
             outStream = new FileOutputStream(target);
-            byte[] buffer = new byte[16384]; // MAGIC_NUMBER
+            byte[] buffer = new byte[16384];
             int bytesRead;
             if (inStream != null) {
                 while ((bytesRead = inStream.read(buffer)) != -1) {
@@ -787,7 +753,7 @@ public class MainActivity extends AbstractActivity implements
                 }
             }
         } catch (Throwable e) {
-            LOG.error("Error when copying file from " + uri + " to temp/" + "content-intent.torrent", e);
+            LOG.error("Error when copying file from " + uri + " to temp/content-intent.torrent", e);
             return null;
         } finally {
             IOUtils.closeQuietly(inStream);

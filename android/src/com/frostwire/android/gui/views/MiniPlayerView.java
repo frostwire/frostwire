@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,8 @@ import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.TaskThrottle;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * See also Apollo's BaseActivity and StopAndHideBottomActionBarListener if you're trying
@@ -169,7 +168,10 @@ public class MiniPlayerView extends LinearLayout {
             // rest :)
             return;
         }
-        async(this, MiniPlayerView::refreshOnTimerResultTask, MiniPlayerView::refreshOnTimerPostTask);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            FWFileDescriptor fd = refreshOnTimerResultTask(this);
+            SystemUtils.postToUIThread(() -> refreshOnTimerPostTask(this, fd));
+        });
     }
 
     private static FWFileDescriptor refreshOnTimerResultTask(MiniPlayerView miniPlayer) {

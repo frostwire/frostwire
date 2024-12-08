@@ -31,7 +31,7 @@ public abstract class AbstractAdNetwork implements AdNetwork {
     private static final Logger LOG = Logger.getLogger(AbstractAdNetwork.class);
 
     private long lastStopped = -1;
-    private boolean started;
+    private volatile boolean started;
 
     @Override
     public void stop(Context context) {

@@ -18,7 +18,6 @@
 package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -28,9 +27,13 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
+
+import com.frostwire.android.util.SystemUtils;
 
 import java.lang.reflect.Field;
 
@@ -38,7 +41,7 @@ import java.lang.reflect.Field;
  * @author gubatron
  * @author aldenml
  */
-public abstract class AbstractPreferenceFragment extends PreferenceFragment {
+public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompat {
 
     protected static final String DIALOG_FRAGMENT_TAG =
             "androidx.preference.PreferenceFragment.DIALOG";
@@ -51,8 +54,10 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(preferencesResId);
-        initComponents();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER,()->{
+            setPreferencesFromResource(preferencesResId, rootKey);
+            SystemUtils.postToUIThread(this::initComponents);
+        });
     }
 
     @Override
@@ -97,7 +102,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     }
 
     public static abstract class PreferenceDialogFragment
-            extends androidx.preference.PreferenceDialogFragment {
+            extends androidx.preference.PreferenceDialogFragmentCompat {
 
         @NonNull
         @Override

@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,8 +17,6 @@
  */
 
 package com.frostwire.android.gui.views;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,6 +42,7 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -99,7 +98,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
         if (uiBittorrentDownload == null && savedInstanceState != null) {
             String infoHash = savedInstanceState.getString("infohash");
-            async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> recoverUIBittorrentDownload(infoHash));
         }
         ensureCommonComponentsReferenced(rootView);
         updateCommonComponents();
@@ -120,7 +119,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
                 String infoHash = intent.getStringExtra("infoHash");
                 if (infoHash != null && !infoHash.isEmpty()) {
                     if (TaskThrottle.isReadyToSubmitTask("AbstractTransferDetailFragment::recoverUIBittorrentDownload", 1000)) {
-                        async(this, AbstractTransferDetailFragment::recoverUIBittorrentDownload, infoHash);
+                        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> recoverUIBittorrentDownload(infoHash));
                     } else {
                         System.err.println("AbstractTransferDetailFragment.onTime() Did not submit async task AbstractTransferDetailFragment::recoverUIBittorrentDownload, 1000 ms haven't passed");
                     }
@@ -162,10 +161,10 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             detailProgressStatusTextView.setText(transferStateStrings.get(uiBittorrentDownload.getState()));
         }
         if (detailProgressDownSpeedTextView != null) {
-            detailProgressDownSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed()) + "/s");
+            detailProgressDownSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(uiBittorrentDownload.getDownloadSpeed())));
         }
         if (detailProgressUpSpeedTextView != null) {
-            detailProgressUpSpeedTextView.setText(UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed()) + "/s");
+            detailProgressUpSpeedTextView.setText(MessageFormat.format("{0}/s", UIUtils.getBytesInHuman(uiBittorrentDownload.getUploadSpeed())));
         }
     }
 
@@ -193,7 +192,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
 
     protected void ensureTorrentHandleAsync() {
         if (SystemUtils.isUIThread()) {
-            async(this, AbstractTransferDetailFragment::ensureTorrentHandle);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, this::ensureTorrentHandle);
         } else {
             ensureTorrentHandle();
         }
@@ -264,7 +263,7 @@ public abstract class AbstractTransferDetailFragment extends AbstractFragment {
             RecyclerView.Adapter<TH> adapter,
             List<T> items,
             List<T> freshItems) {
-        if (freshItems != null && freshItems.size() > 0) {
+        if (freshItems != null && !freshItems.isEmpty()) {
             if (items.isEmpty()) {
                 items.addAll(freshItems);
                 adapter.notifyDataSetChanged();
