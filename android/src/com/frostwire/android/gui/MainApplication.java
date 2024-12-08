@@ -88,6 +88,7 @@ public class MainApplication extends MultiDexApplication {
         RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
 
+        // Start the engine
         Engine.instance().onApplicationCreate(this);
 
         new Thread(new BTEngineInitializer()).start();
