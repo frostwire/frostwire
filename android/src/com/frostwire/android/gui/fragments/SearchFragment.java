@@ -552,7 +552,14 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                     fragmentManager = getActivity().getSupportFragmentManager();
                 }
                 if (fragmentManager != null) {
-                    dlg.show(fragmentManager);
+                    String dialogTag = "TELLURIDE_SEARCH_RESULT_DOWNLOAD_DIALOG";
+
+                    // Check if the dialog is already shown
+                    if (fragmentManager.findFragmentByTag(dialogTag) != null) {
+                        LOG.warn("TellurideSearchResultDownloadDialog is already shown.");
+                        return;
+                    }
+                    dlg.show(fragmentManager, dialogTag);
                 }
                 SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
             });

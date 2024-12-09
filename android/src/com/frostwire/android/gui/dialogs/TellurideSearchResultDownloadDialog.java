@@ -21,6 +21,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.frostwire.android.R;
 import com.frostwire.android.gui.fragments.SearchFragment;
 import com.frostwire.android.util.SystemUtils;
@@ -35,6 +37,20 @@ import java.util.Optional;
 public class TellurideSearchResultDownloadDialog extends AbstractConfirmListDialog<TellurideSearchResult> {
 
     private static final Logger LOG = Logger.getLogger(TellurideSearchResultDownloadDialog.class);
+
+    public static void show(Context ctx, FragmentManager fragmentManager, List<TellurideSearchResult> listData) {
+        String dialogTag = "TELLURIDE_SEARCH_RESULT_DOWNLOAD_DIALOG";
+
+        // Check if the dialog is already shown
+        if (fragmentManager.findFragmentByTag(dialogTag) != null) {
+            LOG.warn("TellurideSearchResultDownloadDialog is already shown.");
+            return;
+        }
+
+        TellurideSearchResultDownloadDialog dlg = newInstance(ctx, listData);
+        dlg.show(fragmentManager, dialogTag);
+    }
+
 
     public static TellurideSearchResultDownloadDialog newInstance(
             Context ctx,
