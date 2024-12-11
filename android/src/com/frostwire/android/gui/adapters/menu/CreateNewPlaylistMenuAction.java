@@ -55,7 +55,7 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
     @Override
     public void onClick(Context context) {
         CreateNewPlaylistDialog.newInstance(fileDescriptors).
-                show(((Activity) getContext()).getFragmentManager());
+                show(getFragmentManager());
     }
 
     public static class CreateNewPlaylistDialog extends AbstractDialog {

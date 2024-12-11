@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
-import static com.frostwire.android.util.Asyncs.async;
-
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -38,6 +35,7 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
 import com.frostwire.android.gui.views.TimerObserver;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.Sha1Hash;
@@ -54,6 +52,7 @@ import com.frostwire.util.Ref;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 /**
  * @author gubatron
@@ -151,11 +150,11 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
     }
 
     private void showNoWifiInformationDialog() {
-        ShowNoWifiInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
+        ShowNoWifiInformationDialog.newInstance().show(getFragmentManager());
     }
 
     private void showMobileDataProtectionInformationDialog() {
-        ShowMobileDataProtectionInformationDialog.newInstance().show(((Activity) getContext()).getFragmentManager());
+        ShowMobileDataProtectionInformationDialog.newInstance().show(getFragmentManager());
     }
 
     private void showBittorrentDisconnectedDialog() {
@@ -165,7 +164,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
-        dlg.show(((Activity) getContext()).getFragmentManager());
+        dlg.show(getFragmentManager());
     }
 
     private void showSeedingDialog() {
@@ -175,7 +174,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 R.string.seeding_is_currently_disabled_in_settings,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
-        dlg.show(((Activity) getContext()).getFragmentManager());
+        dlg.show(getFragmentManager());
     }
 
     @Override
@@ -231,7 +230,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
                 // due to the android providers getting out of sync.
             }
         } else {
-            async(this::buildTorrentAndSeedIt, fd);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> buildTorrentAndSeedIt(fd));
         }
     }
 
@@ -257,7 +256,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             ct.set_creator("FrostWire " + Constants.FROSTWIRE_VERSION_STRING + " build " + Constants.FROSTWIRE_BUILD);
             ct.set_priv(false);
             final error_code ec = new error_code();
-            libtorrent.set_piece_hashes_ex(ct, saveDir.getAbsolutePath(), new set_piece_hashes_listener(), ec);
+            libtorrent.set_piece_hashes_ex(ct, Objects.requireNonNull(saveDir).getAbsolutePath(), new set_piece_hashes_listener(), ec);
             final byte[] torrent_bytes = new Entry(ct.generate()).bencode();
             final TorrentInfo tinfo = TorrentInfo.bdecode(torrent_bytes);
             // so the TorrentHandle object is created and added to the libtorrent session.

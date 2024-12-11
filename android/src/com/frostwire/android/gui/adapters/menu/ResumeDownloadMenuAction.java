@@ -87,6 +87,6 @@ public final class ResumeDownloadMenuAction extends MenuAction implements Abstra
                 R.string.bittorrent_is_currently_disconnected_would_you_like_me_to_start_it_for_you,
                 YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.setOnDialogClickListener(this);
-        dlg.show(((Activity) getContext()).getFragmentManager());
+        dlg.show(getFragmentManager());
     }
 }

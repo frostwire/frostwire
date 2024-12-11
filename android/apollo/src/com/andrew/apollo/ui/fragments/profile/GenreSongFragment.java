@@ -1,13 +1,13 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,8 +18,9 @@
 
 package com.andrew.apollo.ui.fragments.profile;
 
-import android.app.Fragment;
-import android.content.Loader;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.loader.content.Loader;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,6 +34,7 @@ import com.andrew.apollo.utils.PreferenceUtils;
 import com.frostwire.android.R;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class is used to display all of the songs from a particular playlist.
@@ -66,8 +68,9 @@ public final class GenreSongFragment extends ApolloFragment<ProfileSongAdapter, 
         onSongItemClick(position);
     }
 
+    @NonNull
     @Override
     public Loader<List<Song>> onCreateLoader(final int id, final Bundle args) {
-        return new GenreSongLoader(getActivity(), args.getLong(Config.ID));
+        return new GenreSongLoader(getActivity(), Objects.requireNonNull(args).getLong(Config.ID));
     }
 }

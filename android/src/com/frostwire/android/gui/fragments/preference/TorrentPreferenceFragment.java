@@ -18,7 +18,7 @@
 
 package com.frostwire.android.gui.fragments.preference;
 
-import android.app.DialogFragment;
+import androidx.fragment.app.DialogFragment;
 
 import androidx.preference.SwitchPreference;
 import androidx.preference.CheckBoxPreference;

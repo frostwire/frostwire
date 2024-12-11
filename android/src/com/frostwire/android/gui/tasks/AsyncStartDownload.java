@@ -24,6 +24,8 @@ import static com.frostwire.android.util.SystemUtils.postToUIThreadAtFront;
 import android.app.Activity;
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.dialogs.HandpickedTorrentDownloadDialogOnFetch;
@@ -102,7 +104,7 @@ public class AsyncStartDownload {
             if (sr instanceof TorrentSearchResult &&
                     !(sr instanceof TorrentCrawledSearchResult)) {
                 transfer = TransferManager.instance().downloadTorrent(((TorrentSearchResult) sr).getTorrentUrl(),
-                        new HandpickedTorrentDownloadDialogOnFetch((Activity) ctx, false), sr.getDisplayName());
+                        new HandpickedTorrentDownloadDialogOnFetch((AppCompatActivity) ctx, false), sr.getDisplayName());
             } else {
                 transfer = TransferManager.instance().download(sr);
                 if (!(transfer instanceof InvalidDownload)) {

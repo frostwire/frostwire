@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (marcelinkaaa)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
  */
 
 package com.frostwire.android.gui.activities;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -87,7 +85,7 @@ public final class BuyActivity extends AbstractActivity {
 
     public BuyActivity() {
         super(R.layout.activity_buy);
-        async(BuyActivity::getRewardFreeAdMinutesFromConfigTask, new WeakReference<>(this)); // in the meantime use the default value Constants.MIN_REWARD_AD_FREE_MINUTES
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getRewardFreeAdMinutesFromConfigTask(new WeakReference<>(this)));
     }
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {

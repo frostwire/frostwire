@@ -1,13 +1,13 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,6 +39,7 @@ import com.frostwire.android.core.MediaType;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractTransferDetailFragment;
 import com.frostwire.android.gui.views.ClickAdapter;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTDownloadItem;
 import com.frostwire.transfers.TransferItem;
 
@@ -49,8 +50,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.frostwire.android.util.Asyncs.async;
 
 /**
  * @author gubatron
@@ -145,16 +144,15 @@ public class TransferDetailFilesFragment extends AbstractTransferDetailFragment 
                 initComponents();
             }
             final Bundle bundle = new Bundle();
-            async(this,
-                    TransferDetailFilesTransferItemViewHolder::updateTransferDataTask,
-                    transferItem,
-                    bundle,
-                    TransferDetailFilesTransferItemViewHolder::updateTransferDataPost);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                updateTransferDataTask(transferItem, bundle);
+                SystemUtils.postToUIThread(() -> updateTransferDataPost(this, transferItem, bundle));
+            });
         }
 
-        private static void updateTransferDataTask(TransferDetailFilesTransferItemViewHolder holder,
-                                                   final TransferItem transferItem,
+        private static void updateTransferDataTask(final TransferItem transferItem,
                                                    final Bundle bundleResult) {
+            SystemUtils.ensureBackgroundThreadOrCrash("TransferDetailFilesTransferItemViewHolder::updateTransferDataTask");
             Thread.currentThread().setName("updateTransferDataTask");
             bundleResult.putInt("fileTypeIconId", MediaType.getFileTypeIconId(FilenameUtils.getExtension(transferItem.getFile().getAbsolutePath())));
             bundleResult.putInt("progress", transferItem.getProgress());

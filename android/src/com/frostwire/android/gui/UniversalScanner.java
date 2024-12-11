@@ -1,25 +1,24 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 
 package com.frostwire.android.gui;
 
-import static com.frostwire.android.util.Asyncs.async;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.media.MediaScannerConnection.MediaScannerConnectionClient;
@@ -97,7 +96,7 @@ final class UniversalScanner {
         public void onMediaScannerConnected() {
             // do not do this on main thread, causing ANRs
             if (SystemUtils.isUIThread()) {
-                async(UniversalScanner::onMediaScannerConnected, connection, files);
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> UniversalScanner.onMediaScannerConnected(connection, files));
             } else {
                 UniversalScanner.onMediaScannerConnected(connection, files);
             }
@@ -199,13 +198,13 @@ final class UniversalScanner {
             Object scanner = mediaScannerC.newInstance(context);
 
             try {
-                Method setLocaleM = clazz.getDeclaredMethod("setLocale", String.class);
+                @SuppressLint("SoonBlockedPrivateApi") Method setLocaleM = clazz.getDeclaredMethod("setLocale", String.class);
                 setLocaleM.invoke(scanner, Locale.US.toString());
             } catch (Throwable e) {
                 e.printStackTrace();
             }
 
-            Field mClientF = clazz.getDeclaredField("mClient");
+            @SuppressLint("SoonBlockedPrivateApi") Field mClientF = clazz.getDeclaredField("mClient");
             mClientF.setAccessible(true);
             Object mClient = mClientF.get(scanner);
 

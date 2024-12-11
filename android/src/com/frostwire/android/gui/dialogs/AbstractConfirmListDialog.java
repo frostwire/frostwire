@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Jose Molina (@votaguz), Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 package com.frostwire.android.gui.dialogs;
 
 import android.app.Dialog;
-import android.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
@@ -108,12 +108,12 @@ public abstract class AbstractConfirmListDialog<T> extends AbstractDialog implem
     abstract public List<T> deserializeData(String listDataInJSON);
 
     public AbstractConfirmListDialog()  {
-        super(TAG, R.layout.dialog_confirm_list);
+        super(R.layout.dialog_confirm_list);
     }
 
-    @Override
     public void show(FragmentManager manager) {
         try {
+            super.show(manager);
             super.show(manager);
         } catch (Throwable e) {
             // java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState

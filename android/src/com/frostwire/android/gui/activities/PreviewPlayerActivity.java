@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -244,7 +244,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (Ref.alive(srRef)) {
             final FileSearchResult fileSearchResult = srRef.get();
             NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
-            dlg.show(getFragmentManager());
+            dlg.show(getSupportFragmentManager());
         } else {
             finish();
         }

@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@
 package com.frostwire.android.gui.views;
 
 import android.app.Dialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -28,8 +27,9 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
 
 import java.lang.reflect.Field;
@@ -38,7 +38,7 @@ import java.lang.reflect.Field;
  * @author gubatron
  * @author aldenml
  */
-public abstract class AbstractPreferenceFragment extends PreferenceFragment {
+public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompat {
 
     protected static final String DIALOG_FRAGMENT_TAG =
             "androidx.preference.PreferenceFragment.DIALOG";
@@ -46,6 +46,9 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     private final int preferencesResId;
 
     public AbstractPreferenceFragment(int preferencesResId) {
+        if (preferencesResId <= 0) {
+            throw new IllegalArgumentException("AbstractPreferenceFragment: Invalid preferences resource ID");
+        }
         this.preferencesResId = preferencesResId;
     }
 
@@ -58,9 +61,8 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Fragment fragmentByTag = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+        Fragment fragmentByTag = getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         // this is necessary to avoid a crash with double rotation of the screen
-        //Fragment f = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
         if (fragmentByTag != null) {
             fragmentByTag.setTargetFragment(this, 0);
         }
@@ -97,7 +99,7 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragment {
     }
 
     public static abstract class PreferenceDialogFragment
-            extends androidx.preference.PreferenceDialogFragment {
+            extends androidx.preference.PreferenceDialogFragmentCompat {
 
         @NonNull
         @Override

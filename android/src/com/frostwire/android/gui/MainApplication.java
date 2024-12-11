@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ package com.frostwire.android.gui;
 import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.multidex.MultiDexApplication;
 
@@ -32,6 +33,7 @@ import com.frostwire.android.core.TellurideCourier;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.util.ImageLoader;
+import com.frostwire.android.util.RunStrict;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
@@ -40,12 +42,15 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.util.Locale;
 import java.util.Random;
+
+import dalvik.system.ZipPathValidator;
 
 /**
  * @author gubatron
@@ -62,24 +67,37 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
+        //RunStrict.disableStrictModePolicyForUnbufferedIO();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ZipPathValidator.clearCallback();
+        }
 
+        Platforms.set(new AndroidPlatform(this));
+
+        LOG.info("MainApplication::onCreate waiting for appContextLock");
         synchronized (appContextLock) {
             if (appContext == null) {
                 appContext = this;
             }
         }
+        LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
+        //asyncFirebaseInitialization(appContext);
 
-        runStrict(this::onCreateSafe);
+        runStrict(this::onCreateStrict);
+        RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
+        //RunStrict.disableStrictModePolicyForUnbufferedIO();
 
-        Platforms.set(new AndroidPlatform(this));
-
+        // Start the engine
         Engine.instance().onApplicationCreate(this);
 
         new Thread(new BTEngineInitializer()).start();
 
-        ThemeManager.loadSavedThemeModeAsync(themeMode -> ThemeManager.applyThemeMode(themeMode));
+        ThemeManager.loadSavedThemeModeAsync(ThemeManager::applyThemeMode);
 
         ImageLoader.start(this);
+
+        //fetchGoogleAdvertisingIdAsync();
 
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.SEARCH_PERFORMER, () -> this.initializeCrawlPagedWebSearchPerformer(this));
 
@@ -103,7 +121,8 @@ public class MainApplication extends MultiDexApplication {
         super.onLowMemory();
     }
 
-    private void onCreateSafe() {
+
+    private void onCreateStrict() {
         ConfigurationManager.create(this);
 
         AbstractActivity.setMenuIconsVisible(true);

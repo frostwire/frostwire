@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2017, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import com.andrew.apollo.utils.ApolloUtils;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
-import com.frostwire.android.util.Asyncs;
+import com.frostwire.android.util.SystemUtils;
 
 /**
  * A custom {@link AppCompatImageButton} that represents the "play and pause" button.
@@ -88,7 +88,10 @@ public final class PlayPauseButton extends AppCompatImageButton
      * Sets the correct drawable for playback.
      */
     public void updateState() {
-        Asyncs.async(MusicUtils::isPlaying, PlayPauseButton::updateStatePost, this);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            boolean isPlaying = MusicUtils.isPlaying();
+            SystemUtils.postToUIThread(() -> updateStatePost(isPlaying));
+        });
     }
 
     public void setOnLongClickListener(OnLongClickListener l) {

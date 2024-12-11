@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  * Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@
 
 package com.frostwire.android.gui.activities.internal;
 
-import android.app.Activity;
-import android.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.view.MenuItem;
@@ -187,7 +187,7 @@ public final class NavigationMenu {
         SoftwareUpdater.getInstance().notifyUserAboutUpdate(mainActivity);
     }
 
-    private AdMenuItemView initAdRemovalMenuItemListener(final Activity activity) {
+    private AdMenuItemView initAdRemovalMenuItemListener(final AppCompatActivity activity) {
         SystemUtils.ensureUIThreadOrCrash("NavigationMenu::initAdRemovalMenuItemListener");
         AdMenuItemView adMenuItemView = activity.findViewById(R.id.slidermenu_ad_menuitem);
         RelativeLayout menuAd = activity.findViewById(R.id.view_ad_menu_item_ad);

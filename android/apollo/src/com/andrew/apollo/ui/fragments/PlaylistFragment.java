@@ -22,10 +22,8 @@ import static com.andrew.apollo.loaders.PlaylistLoader.FAVORITE_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.LAST_ADDED_PLAYLIST_ID;
 import static com.andrew.apollo.loaders.PlaylistLoader.NEW_PLAYLIST_ID;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.Loader;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -39,8 +37,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.loader.content.Loader;
 
 import com.andrew.apollo.Config;
 import com.andrew.apollo.adapters.PlaylistAdapter;
@@ -159,7 +160,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                 case FragmentMenuItems.DELETE:
                     PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog =
                             PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
-                    playlistFragmentDeleteDialog.show(getActivity().getFragmentManager());
+                    playlistFragmentDeleteDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager());
                     return true;
                 default:
                     break;
@@ -224,7 +225,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     }
 
     private void deleteSelectedPlaylist(long playlistId) {
-        Activity activity = getActivity();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
         if (activity != null && activity.getContentResolver() != null) {
             int deleted = MusicUtils.deletePlaylist(activity, playlistId);
             if (deleted > 0) {
@@ -290,8 +291,8 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
 
         void onDelete() {
             dismiss();
-            AbstractActivity act = (AbstractActivity) getActivity();
-            PlaylistFragment f = act.findFragment(PlaylistFragment.class);
+            AbstractActivity activity = (AbstractActivity) getActivity();
+            PlaylistFragment f = activity.findFragment(PlaylistFragment.class);
             if (f != null) {
                 f.deleteSelectedPlaylist(playlistId);
             }

@@ -19,11 +19,13 @@
 package com.andrew.apollo.adapters;
 
 import android.app.Activity;
-import android.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.os.Bundle;
 import com.frostwire.android.gui.views.FragmentPagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.andrew.apollo.ui.fragments.AlbumFragment;
 import com.andrew.apollo.ui.fragments.ArtistFragment;
@@ -55,8 +57,8 @@ public class PagerAdapter extends FragmentPagerAdapter {
      * @param fragmentActivity The {@link Activity} of the
      *                         {@link Fragment}.
      */
-    public PagerAdapter(final Activity fragmentActivity) {
-        super(fragmentActivity.getFragmentManager());
+    public PagerAdapter(final AppCompatActivity fragmentActivity) {
+        super(fragmentActivity.getSupportFragmentManager());
         mFragmentActivity = fragmentActivity;
     }
 
@@ -104,7 +106,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public Fragment getItem(final int position) {
+    public androidx.fragment.app.Fragment getItem(final int position) {
         final Holder mCurrentHolder = mHolderList.get(position);
         return Fragment.instantiate(mFragmentActivity,
                 mCurrentHolder.mClassName, mCurrentHolder.mParams);
