@@ -19,6 +19,7 @@ package com.frostwire.android.gui.activities;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
@@ -66,6 +67,7 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
@@ -85,6 +87,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -481,9 +484,12 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public void onDialogClick(String tag, int which) {
-        if (which != Dialog.BUTTON_POSITIVE || tag == null || tag.isEmpty()) {
+        String[] mainActivityDialogTags = {LAST_BACK_DIALOG_ID, SHUTDOWN_DIALOG_ID};
+        boolean mainActivityShouldHandleThisClick = Arrays.asList(mainActivityDialogTags).contains(tag);
+         if (which != Dialog.BUTTON_POSITIVE || !mainActivityShouldHandleThisClick) {
             return;
         }
+        LOG.info("MainActivity.onDialogClick(tag:" + tag + ", which:" + which + ")");
         if (tag.equals(LAST_BACK_DIALOG_ID)) {
             onLastDialogButtonPositive();
         } else if (tag.equals(SHUTDOWN_DIALOG_ID)) {

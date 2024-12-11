@@ -57,8 +57,9 @@ public class NewTransferDialog extends AbstractDialog {
 
     public static WeakReference<FileSearchResult> srRef;
 
-    public static NewTransferDialog newInstance(FileSearchResult sr, boolean hideCheckShow) {
+    public static NewTransferDialog newInstance(FileSearchResult sr, boolean hideCheckShow, OnDialogClickListener dialogClickListener) {
         NewTransferDialog f = new NewTransferDialog();
+        f.setOnDialogClickListener(dialogClickListener);
 
         Bundle args = new Bundle();
         srRef = Ref.weak(sr);

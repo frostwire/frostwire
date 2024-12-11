@@ -570,8 +570,8 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
         if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
             if (sr instanceof FileSearchResult) {
                 try {
-                    NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false);
-                    dlg.show(getFragmentManager());
+                    NewTransferDialog dlg = NewTransferDialog.newInstance((FileSearchResult) sr, false, this);
+                    dlg.show(getChildFragmentManager(), AbstractDialog.getSuggestedTAG(NewTransferDialog.class));
                 } catch (IllegalStateException e) {
                     // android.app.FragmentManagerImpl.checkStateLoss:1323 -> java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
                     // just start the download then if the dialog crapped out.
