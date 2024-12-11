@@ -41,7 +41,7 @@ import java.util.List;
  */
 public abstract class AbstractDialog extends DialogFragment {
 
-    private final String tag;
+    protected final String tag;
     private final int layoutResId;
 
     private OnDialogClickListener onDialogClickListener;
@@ -55,7 +55,7 @@ public abstract class AbstractDialog extends DialogFragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (context instanceof OnDialogClickListener) {
+        if (context instanceof OnDialogClickListener && onDialogClickListener == null) {
             onDialogClickListener = (OnDialogClickListener) context;
         }
     }

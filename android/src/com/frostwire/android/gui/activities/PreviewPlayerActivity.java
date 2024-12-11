@@ -243,7 +243,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
     private void onDownloadButtonClick() {
         if (Ref.alive(srRef)) {
             final FileSearchResult fileSearchResult = srRef.get();
-            NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false);
+            NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false, this);
             dlg.show(getSupportFragmentManager());
         } else {
             finish();
