@@ -69,7 +69,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     private final AtomicReference<Byte> stateReference = new AtomicReference<>(STATE_UNSTARTED);
     private final Object instanceLock = new Object();
     public byte STATE_DISCONNECTED = 14;
-    private NotificationUpdateDaemon notificationDaemon;
+    private NotificationUpdateDaemon notificationUpdateDaemon;
     private NotifiedStorage notifiedStorage;
 
     public static EngineForegroundService getInstance() {
@@ -106,12 +106,11 @@ public class EngineForegroundService extends Service implements IEngineService {
         updateState(STATE_UNSTARTED);
 
         // Initialize helpers
-        notificationDaemon = new NotificationUpdateDaemon(this);
-        // Start notification daemon
-        notificationDaemon.start();
 
         // Initialize Notified Storage in a background thread
         initializeNotifiedStorage();
+        // Start notification daemon
+        startPermanentNotificationUpdatesTask(this);
 
         // Schedule initial tasks
         scheduleTorrentEngineWork();
@@ -132,8 +131,8 @@ public class EngineForegroundService extends Service implements IEngineService {
         LOG.info("EngineForegroundService::onStartCommand() - intent: " + intent + " flags: " + flags + " startId: " + startId);
 
         if (intent != null && SHUTDOWN_ACTION.equals(intent.getAction())) {
-            LOG.info("onStartCommand() - Received SHUTDOWN_ACTION");
-            new Thread("EngineService-onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
+            LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN_ACTION");
+            new Thread("EngineForegroundService::onStartCommand(SHUTDOWN_ACTION) -> shutdownSupport") {
                 @Override
                 public void run() {
                     shutdownSupport();
@@ -142,30 +141,39 @@ public class EngineForegroundService extends Service implements IEngineService {
             return START_NOT_STICKY;
         }
 
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> cancelAllNotificationsTask(this));
+
+        if (intent == null) {
+            return START_NOT_STICKY;
+        }
+        LOG.info("FrostWire's EngineService started by this intent:");
+        LOG.info("FrostWire:" + intent);
+        LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
+
         // Create and display persistent notification
         Notification notification = createPersistentNotification();
+        showPersistentNotification(notification);
 
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> startPermanentNotificationUpdatesTask(this));
+
+        return START_STICKY;
+    }
+
+    private void showPersistentNotification(Notification notification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(Constants.NOTIFICATION_FROSTWIRE_STATUS, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
         } else {
             startForeground(Constants.NOTIFICATION_FROSTWIRE_STATUS, notification);
         }
-
-        if (intent != null && "com.frostwire.android.engine.SHUTDOWN".equals(intent.getAction())) {
-            LOG.info("EngineForegroundService::onStartCommand() - Received SHUTDOWN action");
-            shutdown();
-            return START_NOT_STICKY;
-        }
-
-        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         LOG.info("EngineForegroundService::onDestroy() - Stopping service");
-        if (notificationDaemon != null) {
-            notificationDaemon.stop();
+        if (notificationUpdateDaemon != null) {
+            cancelAllNotificationsTask(this);
+            notificationUpdateDaemon.stop();
         }
     }
 
@@ -229,8 +237,8 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     public void shutdown() {
         LOG.info("EngineForegroundService::shutdown() - Performing shutdown");
-        if (notificationDaemon != null) {
-            notificationDaemon.stop();
+        if (notificationUpdateDaemon != null) {
+            notificationUpdateDaemon.stop();
         }
         stopServices(false);
         stopForeground(true);
@@ -254,9 +262,10 @@ public class EngineForegroundService extends Service implements IEngineService {
         updateState(STATE_STOPPED);
         stopSelf();
     }
+
     private void stopPermanentNotificationUpdates() {
-        if (notificationDaemon != null) {
-            notificationDaemon.stop();
+        if (notificationUpdateDaemon != null) {
+            notificationUpdateDaemon.stop();
         }
     }
 
@@ -286,6 +295,19 @@ public class EngineForegroundService extends Service implements IEngineService {
             }
         } catch (Throwable t) {
             LOG.warn("EngineForegroundService::cancelAllNotificationsTask(EngineForegroundService)" + t.getMessage(), t);
+        }
+    }
+
+    private static void startPermanentNotificationUpdatesTask(EngineForegroundService engineForegroundService) {
+        try {
+            if (engineForegroundService.notificationUpdateDaemon == null) {
+                engineForegroundService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineForegroundService.getApplicationContext());
+            } else {
+                LOG.warn("EngineForegroundService::startPermanentNotificationUpdatesTask(EngineService) notificationUpdateDaemon is not null");
+            }
+            engineForegroundService.notificationUpdateDaemon.start();
+        } catch (Throwable t) {
+            LOG.warn(t.getMessage(), t);
         }
     }
 
@@ -389,12 +411,12 @@ public class EngineForegroundService extends Service implements IEngineService {
                     .setSmallIcon(getNotificationIcon())
                     .setContentIntent(pi)
                     .build();
-            notification.vibrate = ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null;
             notification.number = TransferManager.instance().getDownloadsToReview();
             notification.flags |= Notification.FLAG_AUTO_CANCEL;
             if (manager != null) {
                 NotificationChannel channel = new NotificationChannel(Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID, "FrostWire", NotificationManager.IMPORTANCE_MIN);
                 channel.setSound(null, null);
+                channel.setVibrationPattern(ConfigurationManager.instance().vibrateOnFinishedDownload() ? VENEZUELAN_VIBE : null);
                 manager.createNotificationChannel(channel);
                 manager.notify(Constants.NOTIFICATION_DOWNLOAD_TRANSFER_FINISHED, notification);
             }
@@ -412,6 +434,7 @@ public class EngineForegroundService extends Service implements IEngineService {
     private int getNotificationIcon() {
         return R.drawable.frostwire_notification_flat;
     }
+
     private static long[] buildVenezuelanVibe() {
 
         long shortVibration = 80;
