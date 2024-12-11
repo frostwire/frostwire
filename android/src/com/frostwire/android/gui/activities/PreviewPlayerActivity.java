@@ -244,7 +244,7 @@ public final class PreviewPlayerActivity extends AbstractActivity implements
         if (Ref.alive(srRef)) {
             final FileSearchResult fileSearchResult = srRef.get();
             NewTransferDialog dlg = NewTransferDialog.newInstance(fileSearchResult, false, this);
-            dlg.show(getSupportFragmentManager());
+            dlg.show(getSupportFragmentManager(), AbstractDialog.getSuggestedTAG(NewTransferDialog.class));
         } else {
             finish();
         }
