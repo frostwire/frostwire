@@ -65,6 +65,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel;
 import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
+import com.frostwire.android.util.SystemUtils;
 
 import java.util.List;
 
@@ -506,7 +507,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         if (force || (System.currentTimeMillis() - lastRestartLoader) >= 5000 && isAdded()) {
             lastRestartLoader = System.currentTimeMillis();
             try {
-                getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+                getActivity().runOnUiThread(() -> {
+                    try {
+                        LoaderManager.getInstance(this).restartLoader(LOADER_ID, getArguments(), this);
+                        //getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -516,7 +524,17 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     private void initLoader() {
         final Intent intent = getActivity().getIntent();
         if (intent != null && intent.getExtras() != null && isAdded()) {
-            getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+            if (SystemUtils.isUIThread()) {
+                getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+            } else {
+                SystemUtils.postToUIThread(() -> {
+                    try {
+                        getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
         } else {
             restartLoader(true);
         }

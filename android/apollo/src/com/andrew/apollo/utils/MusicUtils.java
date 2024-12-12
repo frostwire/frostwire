@@ -34,7 +34,6 @@ import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -129,15 +128,10 @@ public final class MusicUtils {
     public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
         // MusicPlaybackService has to be a foreground service
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                LOG.info("MusicUtils::startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
-                // should end with a android.app.Service#startForeground(int, android.app.Notification) call
-                // otherwise if in 5 seconds it's not invoked, the system will crash the app
-                context.startForegroundService(intent);
-            } else {
-                LOG.info("MusicUtils::startMusicPlaybackService() startService(MusicPlaybackService)", true);
-                context.startService(intent);
-            }
+            LOG.info("MusicUtils::startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
+            // should end with a android.app.Service#startForeground(int, android.app.Notification) call
+            // otherwise if in 5 seconds it's not invoked, the system will crash the app
+            context.startForegroundService(intent);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }

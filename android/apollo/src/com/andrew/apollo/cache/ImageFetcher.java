@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import com.andrew.apollo.Config;
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.util.ImageLoader;
 
 /**
  * A subclass of {@link ImageWorker} that fetches images from a URL.

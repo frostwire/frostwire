@@ -1,14 +1,9 @@
 package com.frostwire.android.gui.services;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.LongSparseArray;
 
-import androidx.annotation.RequiresApi;
-
-import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
-import com.frostwire.android.AndroidPaths;
 import com.frostwire.android.core.Constants;
 import com.frostwire.android.core.FWFileDescriptor;
 import com.frostwire.android.core.player.CoreMediaPlayer;

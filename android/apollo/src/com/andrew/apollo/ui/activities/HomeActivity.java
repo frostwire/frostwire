@@ -38,15 +38,19 @@ import com.frostwire.android.offers.Offers;
  */
 public final class HomeActivity extends BaseActivity {
 
+    private static HomeActivity instance;
+
     private DangerousPermissionsChecker dangerousPermissionsChecker;
 
     public HomeActivity() {
         super(R.layout.activity_base);
+        instance = this;
     }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        instance = this;
         // Load the music browser fragment
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -76,5 +80,15 @@ public final class HomeActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        instance = null;
+    }
+
+    public static HomeActivity instance() {
+        return instance;
     }
 }
