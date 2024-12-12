@@ -19,15 +19,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Activity;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-
 import android.content.Intent;
-
-import androidx.loader.content.Loader;
-
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -40,6 +32,11 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.MusicStateListener;
@@ -294,7 +291,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     onRemoveFromFavorites();
                     return true;
                 case FragmentMenuItems.NEW_PLAYLIST:
-                    CreateNewPlaylist.getInstance(songList).show(getFragmentManager(), "CreatePlaylist");
+                    CreateNewPlaylist.getInstance(songList).show(getParentFragmentManager(), "CreatePlaylist");
                     return true;
                 case FragmentMenuItems.PLAYLIST_SELECTED:
                     final long playlistId = item.getIntent().getLongExtra("playlist", 0);
@@ -510,7 +507,6 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 getActivity().runOnUiThread(() -> {
                     try {
                         LoaderManager.getInstance(this).restartLoader(LOADER_ID, getArguments(), this);
-                        //getLoaderManager().restartLoader(LOADER_ID, getArguments(), this);
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
@@ -525,11 +521,11 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         final Intent intent = getActivity().getIntent();
         if (intent != null && intent.getExtras() != null && isAdded()) {
             if (SystemUtils.isUIThread()) {
-                getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+                LoaderManager.getInstance(this).initLoader(LOADER_ID, intent.getExtras(), this);
             } else {
                 SystemUtils.postToUIThread(() -> {
                     try {
-                        getLoaderManager().initLoader(LOADER_ID, intent.getExtras(), this);
+                        LoaderManager.getInstance(this).initLoader(LOADER_ID, intent.getExtras(), this);
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
