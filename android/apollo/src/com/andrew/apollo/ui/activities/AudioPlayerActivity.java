@@ -188,13 +188,21 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private String lastArtistAndAlbumNames;
     private long lastTrackId = -1;
 
+    private static AudioPlayerActivity lastInstance;
+
     public AudioPlayerActivity() {
         super(R.layout.activity_player_base);
+        lastInstance = this;
+    }
+
+    public static AudioPlayerActivity instance() {
+        return lastInstance;
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        lastInstance = this;
         try {
             super.onCreate(savedInstanceState);
         } catch (Throwable t) {
@@ -404,6 +412,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        lastInstance = this;
         if (requestCode == BuyActivity.PURCHASE_SUCCESSFUL_RESULT_CODE &&
                 data != null &&
                 data.hasExtra(BuyActivity.EXTRA_KEY_PURCHASE_TIMESTAMP)) {
@@ -420,6 +429,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     @Override
     protected void onResume() {
+        lastInstance = this;
         super.onResume();
 
         Intent intentFromFileExplorer = getIntent();
@@ -503,6 +513,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        lastInstance = null;
 
         mIsPaused = false;
 
@@ -769,24 +780,28 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void onLastKnownUpdatePostTask() {
-        if (mTrackName == null || mArtistName == null || mTotalTime == null) {
-            initPlaybackControls();
-        }
-        if (mTrackName != null && lastTrackName != null) {
-            // Set the track name
-            mTrackName.setText(lastTrackName);
-        }
-        if (mArtistName != null && lastArtistAndAlbumNames != null) {
-            // Set the artist name
-            mArtistName.setText(lastArtistAndAlbumNames);
-        }
-        if (mTotalTime != null) {
-            // Set the total time
-            mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
-        }
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            loadCurrentAlbumArt();
+            runOnUiThread(() -> {
+                if (mTrackName == null || mArtistName == null || mTotalTime == null) {
+                    initPlaybackControls();
+                }
+                if (mTrackName != null && lastTrackName != null) {
+                    // Set the track name
+                    mTrackName.setText(lastTrackName);
+                }
+                if (mArtistName != null && lastArtistAndAlbumNames != null) {
+                    // Set the artist name
+                    mArtistName.setText(lastArtistAndAlbumNames);
+                }
+                if (mTotalTime != null) {
+                    // Set the total time
+                    mTotalTime.setText(MusicUtils.makeTimeString(this, lastKnownDuration(false) / 1000));
+                }
 
-        loadCurrentAlbumArt();
-        updateQueueFragmentCurrentSong();
+                updateQueueFragmentCurrentSong();
+            });
+        });
     }
 
     private void loadCurrentAlbumArt() {
@@ -901,8 +916,10 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     }
 
     private void updateQueueFragmentCurrentSong() {
-        QueueFragment qFragment = (QueueFragment) mPagerAdapter.getFragment(0);
-        qFragment.notifyAdapterDataSetChanged();
+        runOnUiThread(() -> {
+            final QueueFragment qFragment = (QueueFragment) mPagerAdapter.getFragment(0);
+            qFragment.notifyAdapterDataSetChanged();
+        });
     }
 
     /**
@@ -1102,28 +1119,35 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             return 500L;
         }
 
+
         try {
             final long pos = mPosOverride < 0 ? lastKnownPosition(blockingMusicServiceRequest) : mPosOverride;
             long duration = lastKnownDuration(false);
             if (pos >= 0 && duration > 0) {
                 refreshCurrentTimeText(pos);
                 final int progress = (int) (1000 * pos / duration);
-                mProgress.setProgress(progress);
+
+                runOnUiThread(() -> {
+                    if (mProgress != null) {
+                        mProgress.setProgress(progress); // Ensure this runs on the UI thread
+                    }
+                });
 
                 if (mFromTouch) {
                     return 500L;
                 } else if (lastKnownIsPlaying(blockingMusicServiceRequest)) {
-                    mCurrentTime.setVisibility(View.VISIBLE);
+                    runOnUiThread(() -> mCurrentTime.setVisibility(View.VISIBLE));
                 } else {
                     // blink the counter
                     final int vis = mCurrentTime.getVisibility();
-                    mCurrentTime.setVisibility(vis == View.INVISIBLE ? View.VISIBLE
-                            : View.INVISIBLE);
+                    runOnUiThread(() -> mCurrentTime.setVisibility(vis == View.INVISIBLE ? View.VISIBLE : View.INVISIBLE));
                     return 500L;
                 }
             } else {
-                mCurrentTime.setText("--:--");
-                mProgress.setProgress(1000);
+                runOnUiThread(() -> {
+                    mCurrentTime.setText("--:--");
+                    mProgress.setProgress(1000);
+                });
             }
             // calculate the number of milliseconds until the next full second,
             // so the counter can be updated at just the right time
@@ -1366,13 +1390,15 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             }
             switch (action) {
                 case MusicPlaybackService.META_CHANGED:
-                    // Current info
-                    LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.META_CHANGED)");
-                    activity.updateNowPlayingInfo();
-                    // Update the favorites icon
-                    activity.invalidateOptionsMenu();
-                    activity.updateQueueFragmentCurrentSong();
-                    activity.deferredInitAlbumArtBanner();
+                    activity.runOnUiThread(() -> {
+                        // Current info
+                        LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.META_CHANGED)");
+                        activity.updateNowPlayingInfo();
+                        // Update the favorites icon
+                        activity.invalidateOptionsMenu();
+                        activity.updateQueueFragmentCurrentSong();
+                        activity.deferredInitAlbumArtBanner();
+                    });
                     break;
                 case MusicPlaybackService.PLAYSTATE_CHANGED:
                     LOG.info("PlaybackStatus::onReceive(MusicPlaybackService.PLAYSTATE_CHANGED)");

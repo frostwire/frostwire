@@ -25,9 +25,11 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.andrew.apollo.model.Playlist;
+import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+import com.andrew.apollo.ui.activities.HomeActivity;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +37,19 @@ import java.util.List;
 /**
  * Used to query MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI and
  * return the playlists on a user's device.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  */
-public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> implements ActivityCompat.OnRequestPermissionsResultCallback  {
+public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final int FAVORITE_PLAYLIST_ID = -1;
     public static final int LAST_ADDED_PLAYLIST_ID = -2;
     public static final int NEW_PLAYLIST_ID = -3;
 
+    private static final Logger LOG = Logger.getLogger(PlaylistLoader.class);
+
     /**
      * Constructor of <code>PlaylistLoader</code>
-     * 
+     *
      * @param context The {@link Context} to use
      */
     public PlaylistLoader(final Context context) {
@@ -102,7 +106,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> imple
 
     /**
      * Creates the {@link Cursor} used to run the query.
-     * 
+     *
      * @param context The {@link Context} to use.
      * @return The {@link Cursor} used to run the playlist query.
      */
@@ -120,16 +124,23 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> imple
                 t.printStackTrace();
                 return null;
             }
-        } else {
-            SystemUtils.postToUIThread(() -> {
+        } else if (HomeActivity.instance() != null) {
+            HomeActivity.instance().runOnUiThread(() -> {
                 try {
-                    ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 111010);
+                    if (context instanceof Activity) {
+                        ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 111010);
+                    } else if (HomeActivity.instance() != null) {
+                        ActivityCompat.requestPermissions(HomeActivity.instance(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 111010);
+                    } else {
+                        LOG.error("PlaylistLoader::makePlaylistCursor: Context is not an Activity. Permission request cannot proceed.");
+                    }
                 } catch (Throwable t) {
                     t.printStackTrace();
+
                 }
             });
-            return null;
         }
+        return null;
     }
 
     @Override

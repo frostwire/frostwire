@@ -317,11 +317,15 @@
                 android:name="com.frostwire.android.gui.services.EngineForegroundService"
                 android:foregroundServiceType="dataSync"
                 android:exported="false" />
+<!--        <service-->
+<!--                android:name="com.andrew.apollo.MusicPlaybackService"-->
+<!--                android:foregroundServiceType="mediaPlayback"-->
+<!--                android:permission="android.permission.BIND_JOB_SERVICE"-->
+<!--                android:protectionLevel="dangerous" />-->
         <service
                 android:name="com.andrew.apollo.MusicPlaybackService"
                 android:foregroundServiceType="mediaPlayback"
-                android:permission="android.permission.BIND_JOB_SERVICE"
-                android:protectionLevel="dangerous" />
+                android:exported="false" />
 
         <!-- receivers -->
 

@@ -97,6 +97,16 @@ public class NotificationHelper {
         }
     }
 
+    public Notification buildBasicNotification(Context context, String title, String text, String channelId) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.menu_icon_my_music) // Replace with your app icon
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true); // Mark it as ongoing for a foreground service
+        return builder.build();
+    }
+
     /**
      * Call this to build the {@link Notification}.
      */
