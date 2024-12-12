@@ -44,6 +44,7 @@
 
     <!-- new in Android 14, SDK 34 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- External refers not to SD Cards, but to SHARED files outside our app's
          internal storage -->
