@@ -16,6 +16,7 @@ import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -56,6 +57,7 @@ import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -63,6 +65,7 @@ import com.andrew.apollo.cache.ImageFetcher;
 import com.andrew.apollo.provider.FavoritesStore;
 import com.andrew.apollo.provider.RecentStore;
 import com.andrew.apollo.ui.activities.AudioPlayerActivity;
+import com.andrew.apollo.ui.activities.HomeActivity;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
@@ -99,6 +102,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MusicPlaybackService extends Service {
     private Object cursorLock = new Object();
+    private Notification tempNotification;
 
     public static void safePost(Runnable runnable) {
         if (MusicPlaybackService.mPlayerHandler == null) {
@@ -414,6 +418,9 @@ public class MusicPlaybackService extends Service {
     }
 
     public void onNotificationCreated(Notification notification) {
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             if (notification != null) {
                 LOG.info("MusicPlaybackService::onNotificationCreated() invoking startForeground(ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)");
@@ -451,12 +458,22 @@ public class MusicPlaybackService extends Service {
         boolean permissionGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)
         );
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                if (HomeActivity.instance() != null) {
+                    ActivityCompat.requestPermissions(HomeActivity.instance(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, 69420);
+                }
+            }
+        }
+
         if (permissionGranted) {
             mNotificationHelper = new NotificationHelper(this);
             // let's send a dummy notification asap to not get shutdown for not sending startForeground in time
-            Notification initialNotification = mNotificationHelper.buildBasicNotification(this, "Loading...", "Preparing music player.",
+            tempNotification = mNotificationHelper.buildBasicNotification(this, "Loading...", "Preparing music player.",
                     Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-            startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, initialNotification);
+            startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
 
             mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
