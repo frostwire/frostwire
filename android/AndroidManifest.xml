@@ -317,7 +317,7 @@
         <service
                 android:name="com.andrew.apollo.MusicPlaybackService"
                 android:foregroundServiceType="mediaPlayback"
-                android:exported="false" />
+                android:exported="true" />
 
         <!-- receivers -->
 

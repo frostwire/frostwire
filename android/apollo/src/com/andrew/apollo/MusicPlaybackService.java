@@ -15,7 +15,6 @@ package com.andrew.apollo;
 import static com.frostwire.android.util.RunStrict.runStrict;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -28,7 +27,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ServiceInfo;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.StaleDataException;
 import android.graphics.Bitmap;
@@ -58,7 +56,6 @@ import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.JobIntentService;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -71,7 +68,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.ThemeManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -337,6 +333,8 @@ public class MusicPlaybackService extends Service {
             }
         }
     };
+
+    private final MediaButtonIntentReceiver mMediaButtonReceiver = new MediaButtonIntentReceiver();
 
     private final OnAudioFocusChangeListener mAudioFocusListener = new OnAudioFocusChangeListener() {
         @Override
@@ -830,6 +828,7 @@ public class MusicPlaybackService extends Service {
         try {
             if (mAudioManager != null) {
                 mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
+
             }
         } catch (SecurityException e) {
             e.printStackTrace();
@@ -859,7 +858,7 @@ public class MusicPlaybackService extends Service {
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(mIntentReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+                registerReceiver(mIntentReceiver, filter, Context.RECEIVER_EXPORTED);
             } else {
                 registerReceiver(mIntentReceiver, filter);
             }
@@ -870,6 +869,17 @@ public class MusicPlaybackService extends Service {
             // for now will just catch the exception and check the code on how this service
             // is getting destroyed and making sure the unregisterReceiver code is invoked.
             LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
+        }
+
+        IntentFilter actionMediaButtonFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(mMediaButtonReceiver, actionMediaButtonFilter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(mMediaButtonReceiver, actionMediaButtonFilter);
+            }
+        } catch (Throwable t) {
+            LOG.error("initService() requestAudioFocus error: " + t.getMessage(), t);
         }
 
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
