@@ -71,6 +71,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -116,6 +117,9 @@ public class MusicPlaybackService extends Service {
     private static final boolean D = BuildConfig.DEBUG;
 
     private static MusicPlaybackService INSTANCE = null;
+
+    private static final CountDownLatch initLatch = new CountDownLatch(1);
+
     private static final LocalBinder binder = new LocalBinder();
 
     /**
@@ -360,7 +364,7 @@ public class MusicPlaybackService extends Service {
         mPlayerHandler = setupMPlayerHandler();
     }
 
-    private CountDownLatch initServiceLatch = new CountDownLatch(1);
+    private static CountDownLatch initServiceLatch = new CountDownLatch(1);
     private AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
     private static MusicPlayerHandler setupMPlayerHandler() {
@@ -394,6 +398,41 @@ public class MusicPlaybackService extends Service {
         return INSTANCE;
     }
 
+    public static boolean instanceReady() {
+        return INSTANCE != null && initServiceLatch.getCount() == 0;
+    }
+
+    private static CountDownLatch getInitLatch() {
+        return initLatch;
+    }
+
+    /**
+     * If we are on the UI thread, we go to a background service and wait for the
+     * MusicPlaybackService instance latch to let us know we have an instance ready
+     * then calls onCreate.
+     */
+    public static void onCreateSafe() {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                try {
+                    MusicPlaybackService.getInitLatch().await();
+                    assert MusicPlaybackService.getInstance() != null;
+                    MusicPlaybackService.getInstance().onCreate();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else {
+            try {
+                MusicPlaybackService.getInitLatch().await();
+                assert MusicPlaybackService.getInstance() != null;
+                MusicPlaybackService.getInstance().onCreate();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public static MusicPlayerHandler getMusicPlayerHandler() {
         return MusicPlaybackService.mPlayerHandler;
     }
@@ -414,6 +453,7 @@ public class MusicPlaybackService extends Service {
     @Override
     public void onRebind(final Intent intent) {
         INSTANCE = this;
+        initServiceLatch.countDown();
         mServiceInUse = true;
     }
 
@@ -449,31 +489,43 @@ public class MusicPlaybackService extends Service {
     @Override
     public void onCreate() {
         INSTANCE = this;
+        initServiceLatch.countDown();
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
         prepareAudioFocusRequest();
         String permission = SystemUtils.hasAndroid13OrNewer() ?
                 Manifest.permission.READ_MEDIA_AUDIO :
                 Manifest.permission.READ_EXTERNAL_STORAGE;
-        boolean permissionGranted = runStrict(() ->
+        boolean mediaReadPermissionsGranted = runStrict(() ->
                 PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, permission)
         );
 
+        boolean postNotificationsPermissionGranted = true;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                if (HomeActivity.instance() != null) {
-                    ActivityCompat.requestPermissions(HomeActivity.instance(), new String[]{Manifest.permission.POST_NOTIFICATIONS}, 69420);
-                }
-            }
+            postNotificationsPermissionGranted = runStrict(() ->
+                    PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            );
         }
 
-        if (permissionGranted) {
+        if (!postNotificationsPermissionGranted && HomeActivity.instance() != null) {
+            // See HomeActivity::onCreate() for the permission request
+            // See HomeActivity::onRequestPermissionsResult() for the service initialization, which calls this again when the permission is granted
+            HomeActivity.instance().requestForPostNotificationsPermission();
+            return;
+        }
+
+        if (mediaReadPermissionsGranted) {
             mNotificationHelper = new NotificationHelper(this);
             // let's send a dummy notification asap to not get shutdown for not sending startForeground in time
-            tempNotification = mNotificationHelper.buildBasicNotification(this, "Loading...", "Preparing music player.",
-                    Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-            startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+            if (postNotificationsPermissionGranted) {
+                tempNotification = mNotificationHelper.buildBasicNotification(
+                        this,
+                        "Loading...",
+                        "Preparing music player.",
+                        Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
+                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+            }
 
             mPlayerHandler = setupMPlayerHandler();
             SystemUtils.exceptionSafePost(mPlayerHandler, this::initService);
@@ -848,7 +900,7 @@ public class MusicPlaybackService extends Service {
 
             }
         } catch (SecurityException e) {
-            e.printStackTrace();
+            LOG.error("initService() registerMediaButtonEventReceiver error: " + e.getMessage(), e);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -872,6 +924,7 @@ public class MusicPlaybackService extends Service {
         filter.addAction(PREVIOUS_ACTION);
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
+        filter.addAction(Intent.ACTION_MEDIA_BUTTON);
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -886,17 +939,6 @@ public class MusicPlaybackService extends Service {
             // for now will just catch the exception and check the code on how this service
             // is getting destroyed and making sure the unregisterReceiver code is invoked.
             LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
-        }
-
-        IntentFilter actionMediaButtonFilter = new IntentFilter(Intent.ACTION_MEDIA_BUTTON);
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                registerReceiver(mMediaButtonReceiver, actionMediaButtonFilter, Context.RECEIVER_EXPORTED);
-            } else {
-                registerReceiver(mMediaButtonReceiver, actionMediaButtonFilter);
-            }
-        } catch (Throwable t) {
-            LOG.error("initService() requestAudioFocus error: " + t.getMessage(), t);
         }
 
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);

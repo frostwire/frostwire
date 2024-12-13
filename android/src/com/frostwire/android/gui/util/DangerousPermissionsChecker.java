@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.webkit.internal.ApiFeature;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
@@ -41,7 +43,7 @@ import java.lang.reflect.Method;
  * @author gubatron
  * @author aldenml
  */
-public final class DangerousPermissionsChecker implements ActivityCompat.OnRequestPermissionsResultCallback {
+public final class DangerousPermissionsChecker<T extends ActivityCompat.OnRequestPermissionsResultCallback> implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final Logger LOG = Logger.getLogger(DangerousPermissionsChecker.class);
 
@@ -50,6 +52,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
      */
     public static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE = 0x000A; // 10
 
+    public static final int POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE = 0x000B; // 11
+
     // HACK: just couldn't find another way, and this saved a lot of overcomplicated logic in the onActivityResult handling activities.
     static long AUDIO_ID_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
     static byte FILE_TYPE_FOR_WRITE_SETTINGS_RINGTONE_CALLBACK = -1;
@@ -57,10 +61,10 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     private final WeakReference<Activity> activityRef;
     private final int requestCode;
 
-    public DangerousPermissionsChecker(Activity activity, int requestCode) {
-        if (activity instanceof ActivityCompat.OnRequestPermissionsResultCallback) {
+    public DangerousPermissionsChecker(T activity, int requestCode) {
+        if (activity != null) {
             this.requestCode = requestCode;
-            this.activityRef = Ref.weak(activity);
+            this.activityRef = Ref.weak((Activity) activity);
         } else {
             throw new IllegalArgumentException("The activity must implement ActivityCompat.OnRequestPermissionsResultCallback");
         }
@@ -93,6 +97,8 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
                 // Android 10 (29) + android:requestLegacyExternalStorage should make it work
                 permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
             }
+        } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
+            permissions = new String[]{Manifest.permission.POST_NOTIFICATIONS};
         }
 
         if (permissions != null) {
@@ -104,6 +110,19 @@ public final class DangerousPermissionsChecker implements ActivityCompat.OnReque
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
             onExternalStoragePermissionsResult(permissions, grantResults);
+        } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
+            // do nothing for now
+            LOG.info("DangerousPermissionsChecker.onRequestPermissionsResult() requestCode=" + requestCode);
+            onPostNotificationsPermissionsResult(permissions, grantResults);
+        }
+    }
+
+    private void onPostNotificationsPermissionsResult(String[] permissions, int[] grantResults) {
+        for (int i = 0; i < permissions.length; i++) {
+            if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals(Manifest.permission.POST_NOTIFICATIONS)) {
+                LOG.info("onPostNotificationsPermissionsResult() " + Manifest.permission.POST_NOTIFICATIONS + " granted");
+                MusicPlaybackService.onCreateSafe();
+            }
         }
     }
 

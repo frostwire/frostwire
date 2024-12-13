@@ -17,6 +17,9 @@
  */
 package com.andrew.apollo.ui.activities;
 
+import static android.icu.text.Normalizer.NO;
+
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
@@ -55,7 +58,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.viewpager.widget.ViewPager;
 
@@ -72,7 +74,6 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
-import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
@@ -87,6 +88,7 @@ import com.frostwire.util.TaskThrottle;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -99,8 +101,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public final class AudioPlayerActivity extends AbstractActivity implements
         OnSeekBarChangeListener,
-        DeleteDialog.DeleteDialogCallback,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+        DeleteDialog.DeleteDialogCallback {
 
     private static final Logger LOG = Logger.getLogger(AudioPlayerActivity.class);
 
@@ -172,8 +173,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     private long mLastSeekEventTime;
 
     private long mLastShortSeekEventTime;
-
-    private long lastInitAlbumArtBanner;
 
     private boolean mIsPaused = false;
 
@@ -247,11 +246,8 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
                     () -> {
                         if (getIntent() != null && getIntent().getData() != null) {
-                            //Uri fileUri = getIntent().getData();
-                            //MusicUtils.playFileFromUri(fileUri);
                             onNewIntent(getIntent());
                         }
-
                         loadCurrentAlbumArt();
                     });
         }
@@ -333,7 +329,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         final SearchView searchView = (SearchView) menu.findItem(R.id.menu_player_search).getActionView();
         // Add voice search
         final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        if (searchManager != null) {
+        if (searchManager != null && searchView != null) {
             final SearchableInfo searchableInfo = searchManager.getSearchableInfo(getComponentName());
             searchView.setSearchableInfo(searchableInfo);
             // Perform the search
@@ -436,8 +432,6 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         Intent intentFromFileExplorer = getIntent();
         if (intentFromFileExplorer != null) {
-            Uri dataUri = intentFromFileExplorer.getData();
-
             if (MusicUtils.getMusicPlaybackService() == null) {
                 MusicUtils.startMusicPlaybackService(getApplicationContext(),
                         MusicUtils.buildStartMusicPlaybackServiceIntent(getApplicationContext()),
@@ -867,7 +861,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         String mimeType = intent.getType();
         boolean handled = false;
 
-        if (uri != null && uri.toString().length() > 0) {
+        if (uri != null && !uri.toString().isEmpty()) {
             MusicUtils.playFileFromUri(uri);
             handled = true;
         } else if (Playlists.CONTENT_TYPE.equals(mimeType)) {
@@ -1309,7 +1303,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     albumId,
                     MusicUtils.getSongListForAlbum(AudioPlayerActivity.this, albumId));
         } catch (Throwable ignored) {
-            ignored.printStackTrace();
+            LOG.error("AudioPlayerActivity::mOpenAlbumProfile onClick listener", ignored);
         }
     };
 

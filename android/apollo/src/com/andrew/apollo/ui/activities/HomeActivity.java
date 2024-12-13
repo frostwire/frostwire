@@ -18,17 +18,28 @@
 
 package com.andrew.apollo.ui.activities;
 
+import static com.frostwire.android.util.RunStrict.runStrict;
+
+import android.Manifest;
 import android.app.Fragment;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
+
+import java.util.Arrays;
 
 /**
  * This class is used to display the {@link ViewPager} used to swipe between the
@@ -40,11 +51,14 @@ public final class HomeActivity extends BaseActivity {
 
     private static HomeActivity instance;
 
-    private DangerousPermissionsChecker dangerousPermissionsChecker;
+    private static Logger LOG = Logger.getLogger(HomeActivity.class);
+
+    private final DangerousPermissionsChecker dangerousPermissionsChecker;
 
     public HomeActivity() {
         super(R.layout.activity_base);
         instance = this;
+        dangerousPermissionsChecker = new DangerousPermissionsChecker(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
     }
 
     @Override
@@ -56,10 +70,20 @@ public final class HomeActivity extends BaseActivity {
             getFragmentManager().beginTransaction()
                     .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment()).commit();
         }
+        requestForPostNotificationsPermission();
+    }
 
-        dangerousPermissionsChecker = new DangerousPermissionsChecker(this,
-                DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
-        dangerousPermissionsChecker.requestPermissions();
+    public void requestForPostNotificationsPermission() {
+        boolean postNotificationsPermissionGranted = true;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            postNotificationsPermissionGranted = runStrict(() ->
+                    PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            );
+            if (!postNotificationsPermissionGranted) {
+                dangerousPermissionsChecker.requestPermissions();
+            }
+        }
     }
 
     @Override
@@ -79,7 +103,20 @@ public final class HomeActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LOG.info("HomeActivity::onRequestPermissionsResult() invoked");
+        LOG.info("HomeActivity::onRequestPermissionsResult() requestCode=" + requestCode);
+
+        for (String p : permissions) {
+            LOG.info("HomeActivity::onRequestPermissionsResult() permission=" + p);
+        }
+        LOG.info("HomeActivity::onRequestPermissionsResult() grantResults=" + Arrays.toString(grantResults));
         dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (MusicPlaybackService.instanceReady() ) {
+            MusicPlaybackService.getInstance().onCreate();
+        } else {
+            MusicPlaybackService.onCreateSafe();
+        }
     }
 
     @Override
