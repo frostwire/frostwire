@@ -77,12 +77,12 @@ public class MediaButtonIntentReceiver extends WakefulBroadcastReceiver {
                     final String command;
 
                     if (DEBUG) LOG.info( "Handling headset click, count = " + clickCount);
-                    switch (clickCount) {
-                        case 1: command = MusicPlaybackService.CMDTOGGLEPAUSE; break;
-                        case 2: command = MusicPlaybackService.CMDNEXT; break;
-                        case 3: command = MusicPlaybackService.CMDPREVIOUS; break;
-                        default: command = null; break;
-                    }
+                    command = switch (clickCount) {
+                        case 1 -> MusicPlaybackService.CMDTOGGLEPAUSE;
+                        case 2 -> MusicPlaybackService.CMDNEXT;
+                        case 3 -> MusicPlaybackService.CMDPREVIOUS;
+                        default -> null;
+                    };
 
                     if (command != null) {
                         final Context context = (Context) msg.obj;
