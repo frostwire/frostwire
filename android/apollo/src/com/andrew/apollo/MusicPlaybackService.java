@@ -924,13 +924,29 @@ public class MusicPlaybackService extends Service {
         filter.addAction(PREVIOUS_ACTION);
         filter.addAction(REPEAT_ACTION);
         filter.addAction(SHUFFLE_ACTION);
-        filter.addAction(Intent.ACTION_MEDIA_BUTTON);
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(mIntentReceiver, filter, Context.RECEIVER_EXPORTED);
             } else {
                 registerReceiver(mIntentReceiver, filter);
+            }
+        } catch (Throwable t) {
+            // this can happen if the service got destroyed and didn't have a chance to
+            // register the receiver, current workarounds are extending receiver classes
+            // to track if they've been registered, or using a static map<Receiver,boolean>
+            // for now will just catch the exception and check the code on how this service
+            // is getting destroyed and making sure the unregisterReceiver code is invoked.
+            LOG.error("initService() registerReceiver error: " + t.getMessage(), t);
+        }
+
+        IntentFilter filterMediaButton = new IntentFilter();
+        filterMediaButton.addAction(Intent.ACTION_MEDIA_BUTTON);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(mMediaButtonReceiver, filter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(mMediaButtonReceiver, filterMediaButton);
             }
         } catch (Throwable t) {
             // this can happen if the service got destroyed and didn't have a chance to
