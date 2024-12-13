@@ -112,7 +112,7 @@ public final class ImageCache {
      * @return A new instance of this class.
      */
     public static ImageCache getInstance(final Context context) {
-        LOG.info("ImageCache.getInstance()...", true);
+        LOG.info("ImageCache.getInstance()...", false);
         if (sInstance == null) {
             sInstance = new ImageCache(context.getApplicationContext());
         }

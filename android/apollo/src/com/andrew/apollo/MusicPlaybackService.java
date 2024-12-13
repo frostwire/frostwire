@@ -537,12 +537,12 @@ public class MusicPlaybackService extends Service {
         final String action = intent.getAction();
         final String command = SERVICECMD.equals(action) ? intent.getStringExtra(CMDNAME) : null;
 
-        LOG.info("MusicPlaybackService::handleCommandIntent: action = " + action + ", command = " + command, true);
-
         if (action == null) {
             LOG.info("MusicPlaybackService::handleCommandIntent: nothing to be done here, exiting.");
             return;
         }
+
+        LOG.info("MusicPlaybackService::handleCommandIntent: action = " + action + ", command = " + command, true);
 
         if (SHUTDOWN_ACTION.equals(action)) {
             boolean exiting = intent.hasExtra("force");
@@ -2307,7 +2307,7 @@ public class MusicPlaybackService extends Service {
                     AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         }
         if (D) {
-            LOG.info("Starting playback: audio focus request status = " + status);
+            LOG.info("play(): Starting playback: audio focus request status = " + status);
         }
         if (status != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             return;
@@ -2842,10 +2842,14 @@ public class MusicPlaybackService extends Service {
                 return;
             }
             if (setDataSource(TargetPlayer.NEXT, path)) {
-                try {
-                    mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
-                } catch (Throwable e) {
-                    LOG.error("setNextDataSource() Media player fatal error: " + e.getMessage(), e);
+                if (mCurrentMediaPlayer.isPlaying()) {
+                    try {
+                        mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                    } catch (Throwable e) {
+                        LOG.error("setNextDataSource() Media player fatal error: " + e.getMessage(), e);
+                    }
+                } else {
+                    LOG.warn("setNextDataSource(): setNextMediaPlayer skipped: mCurrentMediaPlayer is not playing");
                 }
             } else {
                 releaseNextMediaPlayer();
@@ -2855,14 +2859,14 @@ public class MusicPlaybackService extends Service {
 
         private boolean setDataSource(TargetPlayer designatedPlayer, String path) {
             if (MusicPlaybackService.INSTANCE == null) {
-                LOG.warn("setDataSourceTask() aborted, no MusicPlaybackService available");
+                LOG.warn("MusicPlaybackService::MultiPlayer::setDataSourceTask() aborted, no MusicPlaybackService available");
                 return false;
             }
             String permission = SystemUtils.hasAndroid13OrNewer() ?
                     Manifest.permission.READ_MEDIA_AUDIO :
                     Manifest.permission.READ_EXTERNAL_STORAGE;
             if (PackageManager.PERMISSION_GRANTED != ContextCompat.checkSelfPermission(MusicPlaybackService.INSTANCE, permission)) {
-                LOG.error("setDataSource failed, " + permission + " not granted");
+                LOG.error("MusicPlaybackService::MultiPlayer::setDataSource failed, " + permission + " not granted");
                 return false;
             }
             MediaPlayer player = mCurrentMediaPlayer;

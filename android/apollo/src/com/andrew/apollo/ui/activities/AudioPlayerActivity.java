@@ -29,6 +29,7 @@ import android.content.res.ColorStateList;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -71,6 +72,7 @@ import com.andrew.apollo.widgets.RepeatButton;
 import com.andrew.apollo.widgets.RepeatingImageButton;
 import com.andrew.apollo.widgets.ShuffleButton;
 import com.frostwire.android.R;
+import com.frostwire.android.core.Constants;
 import com.frostwire.android.gui.activities.BuyActivity;
 import com.frostwire.android.gui.adapters.menu.AddToPlaylistMenuAction;
 import com.frostwire.android.gui.util.UIUtils;
@@ -494,7 +496,11 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mPlaybackStatus = new PlaybackStatus(this);
         }
         try {
-            registerReceiver(mPlaybackStatus, filter);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(mPlaybackStatus, filter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(mPlaybackStatus, filter);
+            }
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }

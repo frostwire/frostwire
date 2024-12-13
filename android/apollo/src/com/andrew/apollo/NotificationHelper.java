@@ -224,7 +224,7 @@ public class NotificationHelper {
     @RequiresApi(api = Build.VERSION_CODES.S)
     private PendingIntent pendingIntent() {
         return PendingIntent.getActivity(mService, 0, new Intent(INTENT_AUDIO_PLAYER)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_MUTABLE);
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
