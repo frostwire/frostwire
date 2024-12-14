@@ -512,7 +512,6 @@ public class MusicPlaybackService extends Service {
             // See HomeActivity::onCreate() for the permission request
             // See HomeActivity::onRequestPermissionsResult() for the service initialization, which calls this again when the permission is granted
             HomeActivity.instance().requestForPostNotificationsPermission();
-            return;
         }
 
         if (mediaReadPermissionsGranted) {
