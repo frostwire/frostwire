@@ -57,7 +57,6 @@ import android.provider.MediaStore.Audio.AudioColumns;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.andrew.apollo.cache.ImageCache;
@@ -71,7 +70,6 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
-import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -999,8 +997,6 @@ public class MusicPlaybackService extends Service {
     private void closeExternalStorageFiles() {
         stop(true);
         MusicUtils.requestMusicPlaybackServiceShutdown(this);
-//        notifyChange(QUEUE_CHANGED);
-//        notifyChange(META_CHANGED);
     }
 
     /**

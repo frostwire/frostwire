@@ -18,9 +18,9 @@
 
 package com.andrew.apollo.utils;
 
+import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
+
 import android.app.Activity;
-import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.core.content.ContextCompat;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -33,7 +33,6 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -51,6 +50,8 @@ import android.view.Menu;
 import android.view.SubMenu;
 import android.widget.ArrayAdapter;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.loader.content.CursorLoader;
 
 import com.andrew.apollo.MusicPlaybackService;
@@ -82,8 +83,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static android.provider.MediaStore.Audio.AudioColumns.ALBUM_ID;
 
 
 /**

@@ -438,6 +438,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         } else {
             waitingToInitAlbumArtBanner.set(false);
             // Set the playback drawables
+            initPlaybackControls();
             updatePlaybackControls();
             // Current info
             updateNowPlayingInfo();
@@ -749,15 +750,20 @@ public final class AudioPlayerActivity extends AbstractActivity implements
             mAlbumArt.setVisibility(View.VISIBLE);
         }
         if (fwBannerView == null) {
-            LOG.info("initAlbumArtBanner() aborted: mMopubBannerView == null");
+            LOG.info("AudioPlayerActivity::initAlbumArtBanner() aborted: mMopubBannerView == null");
             return;
         }
         if (Offers.disabledAds()) {
-            LOG.info("initAlbumArtBanner() aborted: Ads are disabled");
+            LOG.info("AudioPlayerActivity::initAlbumArtBanner() aborted: Ads are disabled");
             fwBannerView.setLayersVisibility(FWBannerView.Layers.ALL, false);
             return;
         }
-        fwBannerView.loadMaxBanner();
+
+        try {
+            fwBannerView.loadMaxBanner();
+        } catch (Throwable t) {
+            LOG.error("AudioPlayerActivity::initAlbumArtBanner() error: " + t.getMessage(), t);
+        }
     }
 
     /**
@@ -849,7 +855,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         Intent intent = getIntent();
 
         if (intent == null || MusicUtils.getMusicPlaybackService() == null) {
-            LOG.info("AudioPlayerActivity.startPlayback aborted, intent null or music playback service null", true);
+            LOG.warn("AudioPlayerActivity.startPlayback aborted, intent null or music playback service null", true);
             return;
         }
 
@@ -1068,14 +1074,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
     private void updateLastKnown(MusicServiceRequestType requestType, boolean callOnLastKnownUpdatePostTaskAfter) {
         if (TaskThrottle.isReadyToSubmitTask("AudioPlayerActivity::musicServiceRequestTask(" + requestType.name() + ")", MUSIC_SERVICE_REQUEST_TASK_REFRESH_INTERVAL_IN_MS)) {
-            if (callOnLastKnownUpdatePostTaskAfter) {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-                    musicServiceRequestTask(this, requestType);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                musicServiceRequestTask(this, requestType);
+                if (callOnLastKnownUpdatePostTaskAfter) {
                     onLastKnownUpdatePostTask();
-                });
-            } else {
-                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> musicServiceRequestTask(this, requestType));
-            }
+                }
+            });
         }
     }
 
