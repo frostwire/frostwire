@@ -111,12 +111,6 @@ public final class HomeActivity extends BaseActivity {
         }
         LOG.info("HomeActivity::onRequestPermissionsResult() grantResults=" + Arrays.toString(grantResults));
         dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (MusicPlaybackService.instanceReady() ) {
-            MusicPlaybackService.getInstance().onCreate();
-        } else {
-            MusicPlaybackService.onCreateSafe();
-        }
     }
 
     @Override

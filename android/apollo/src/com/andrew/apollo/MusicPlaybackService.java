@@ -2724,6 +2724,9 @@ public class MusicPlaybackService extends Service {
                     mediaPlayer.start();
                     return;
                 case RELEASE:
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                    }
                     mediaPlayer.release(); //after a release, it's gone and you can end up in Illegal states
                     return;
                 case RESET:
@@ -2900,14 +2903,11 @@ public class MusicPlaybackService extends Service {
                 return;
             }
             if (setDataSource(TargetPlayer.NEXT, path)) {
-                if (mCurrentMediaPlayer.isPlaying()) {
-                    try {
-                        mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
-                    } catch (Throwable e) {
-                        LOG.error("setNextDataSource() Media player fatal error: " + e.getMessage(), e);
-                    }
-                } else {
-                    LOG.warn("setNextDataSource(): setNextMediaPlayer skipped: mCurrentMediaPlayer is not playing");
+                try {
+                    mCurrentMediaPlayer.setNextMediaPlayer(mNextMediaPlayer);
+                    LOG.info("MusicPlaybackService.setNextDataSource() set next media player successfully");
+                } catch (Throwable e) {
+                    LOG.error("MusicPlaybackService.setNextDataSource() Media player fatal error: " + e.getMessage(), e);
                 }
             } else {
                 releaseNextMediaPlayer();

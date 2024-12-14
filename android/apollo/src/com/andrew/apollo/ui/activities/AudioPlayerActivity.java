@@ -17,9 +17,6 @@
  */
 package com.andrew.apollo.ui.activities;
 
-import static android.icu.text.Normalizer.NO;
-
-import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
@@ -88,7 +85,6 @@ import com.frostwire.util.TaskThrottle;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**

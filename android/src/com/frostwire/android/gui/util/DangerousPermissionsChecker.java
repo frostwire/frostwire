@@ -117,6 +117,7 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
         }
     }
 
+    /** If Post notification permissions are granted, we start the MusicPlaybackService */
     private void onPostNotificationsPermissionsResult(String[] permissions, int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals(Manifest.permission.POST_NOTIFICATIONS)) {
