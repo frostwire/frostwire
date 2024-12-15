@@ -1,3 +1,30 @@
+FrostWire 2.9.0 build 741 DEC/15/2024
+ - Upgraded targetSdkVersion to 34 (Android 14).
+ - Upgraded compileSdk to 35 (Android 14).
+ - Increased minSdkVersion to 26 (Android 8.0 Oreo).
+ - Updated Java source and target compatibility to Java 17.
+ - androidx.core:core:1.15.0
+ - com.google.firebase:firebase-bom:33.7.0
+ - com.google.android.ump:user-messaging-platform:3.1.0
+ - Removed deprecated dependencies:
+ - com.google.android.gms:play-services-location:21.3.0
+ - com.google.android.gms:play-services-ads-identifier:18.1.0
+ - Improved handling of POST_NOTIFICATIONS permission for Android 13 and 14 compliance.
+ - Migrated background services to Android's Workers API for improved performance and maintainability.
+ - Added CountDownLatch for thread-safe initialization of services.
+ - Improved thread safety by introducing AtomicReference for state management.
+ - Enhanced strict mode policy handling for Android 14, including updates to RunStrict.
+ - Refactored MusicPlaybackService to modernize notification handling
+ - Added buildBasicNotification() for creating notifications.
+ - Fixed MediaPlayer issues to comply with Android 14’s stricter policies.
+ - Introduced defensive checks to improve error handling and logging across services.
+ - Updated EngineForegroundService:
+ - Refactored state management for better lifecycle handling.
+ - Improved notification updates and shutdown logic.
+ - Refactored ApplicationPreferencesFragment for null safety and consistent logging.
+ - Streamlined dependency management by removing unused imports and redundant code.
+ - Prepared codebase for compliance with Android 14, leveraging newer APIs for permissions and notifications.
+
 FrostWire 2.8.2 build 740 NOV/28/2024
  - yt_dlp-2024.11.18
  - Python runtime upgraded from 3.8 to 3.11
