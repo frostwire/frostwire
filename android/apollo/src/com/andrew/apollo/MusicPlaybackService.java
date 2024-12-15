@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2020 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
+ * Copyright (C) 2012-2025 Andrew Neal, Angel Leon, Alden Torres, Jose Molina
  * Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
@@ -39,6 +39,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
+import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -100,8 +101,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * - assertInMusicPlayerHandlerThread()
  */
 public class MusicPlaybackService extends Service {
-    private Object cursorLock = new Object();
-    private Notification tempNotification;
+    private final Object cursorLock = new Object();
 
     public static void safePost(Runnable runnable) {
         if (MusicPlaybackService.mPlayerHandler == null) {
@@ -255,7 +255,6 @@ public class MusicPlaybackService extends Service {
     private static final int FOCUS_CHANGE = 5;
     private static final int FADE_DOWN = 6;
     private static final int FADE_UP = 7;
-    private static final int IDLE_DELAY = 60000;
     private static final long REWIND_INSTEAD_PREVIOUS_THRESHOLD = 3000;
 
     private static final String AUDIO_ID_COLUMN_NAME = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ? "_id" : "audio._id AS _id";
@@ -295,7 +294,6 @@ public class MusicPlaybackService extends Service {
     private String mSimplePlayerPlayingFile;
 
     private WakeLock mWakeLock;
-    private boolean mShutdownScheduled;
     private Cursor mCursor;
     private Cursor mAlbumCursor;
     private volatile AudioManager mAudioManager;
@@ -363,7 +361,7 @@ public class MusicPlaybackService extends Service {
     }
 
     private static CountDownLatch initServiceLatch = new CountDownLatch(1);
-    private AtomicBoolean serviceInitialized = new AtomicBoolean(false);
+    private final AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
     private static MusicPlayerHandler setupMPlayerHandler() {
         if (mPlayerHandler != null) {
@@ -389,7 +387,6 @@ public class MusicPlaybackService extends Service {
         ConfigurationManager CM = ConfigurationManager.instance();
         service.setRepeatMode(CM.getInt(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE));
         service.enableShuffle(CM.getBoolean(Constants.PREF_KEY_GUI_PLAYER_SHUFFLE_ENABLED));
-        MusicUtils.isShuffleEnabled();
     }
 
     public static MusicPlaybackService getInstance() {
@@ -516,7 +513,7 @@ public class MusicPlaybackService extends Service {
             mNotificationHelper = new NotificationHelper(this);
             // let's send a dummy notification asap to not get shutdown for not sending startForeground in time
             if (postNotificationsPermissionGranted) {
-                tempNotification = mNotificationHelper.buildBasicNotification(
+                Notification tempNotification = mNotificationHelper.buildBasicNotification(
                         this,
                         "Loading...",
                         "Preparing music player.",
@@ -655,11 +652,7 @@ public class MusicPlaybackService extends Service {
         }
 
         if (mAudioManager != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
-            } else {
-                mAudioManager.abandonAudioFocus(mAudioFocusListener);
-            }
+            mAudioManager.abandonAudioFocusRequest(AUDIO_FOCUS_REQUEST);
             mAudioManager.unregisterRemoteControlClient(mRemoteControlClient);
         }
 
@@ -754,24 +747,22 @@ public class MusicPlaybackService extends Service {
     }
 
     private void prepareAudioFocusRequest() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            AudioAttributes.Builder attributeBuilder = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA);
+        AudioAttributes.Builder attributeBuilder = new AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .setLegacyStreamType(AudioManager.STREAM_MUSIC)
+                .setUsage(AudioAttributes.USAGE_MEDIA);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                attributeBuilder.setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL);
-            }
-
-            AudioAttributes audioAttributes = attributeBuilder.build();
-            AUDIO_FOCUS_REQUEST =
-                    new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).
-                            setOnAudioFocusChangeListener(mAudioFocusListener).
-                            setAudioAttributes(audioAttributes).
-                            setWillPauseWhenDucked(true).
-                            build();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            attributeBuilder.setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_ALL);
         }
+
+        AudioAttributes audioAttributes = attributeBuilder.build();
+        AUDIO_FOCUS_REQUEST =
+                new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN).
+                        setOnAudioFocusChangeListener(mAudioFocusListener).
+                        setAudioAttributes(audioAttributes).
+                        setWillPauseWhenDucked(true).
+                        build();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
@@ -3062,7 +3053,7 @@ public class MusicPlaybackService extends Service {
         }
 
         private boolean initMediaPlayer(@NonNull MediaPlayer mediaPlayer) {
-            if (MusicPlaybackService.getInstance() != null) {
+            if (MusicPlaybackService.instanceReady()) {
                 try {
                     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.setWakeMode(MusicPlaybackService.getInstance(), PowerManager.PARTIAL_WAKE_LOCK);
