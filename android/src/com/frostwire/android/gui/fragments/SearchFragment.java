@@ -532,25 +532,35 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
     }
 
     private void startTellurideDownloadDialog(final YTSearchResult sr, final String toastMessage) {
+        // Show a toast message on the UI thread
         SystemUtils.postToUIThread(() -> UIUtils.showShortMessage(getActivity(), toastMessage));
 
+        // Perform download-related operations on a background thread
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.DOWNLOADER, () -> {
-            TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter tellurideSearchResultDownloadDialogAdapter = new TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter(getContext(), new ArrayList<>(), AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION);
+            TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter tellurideSearchResultDownloadDialogAdapter =
+                    new TellurideSearchResultDownloadDialog.TellurideSearchResultDownloadDialogAdapter(
+                            getContext(),
+                            new ArrayList<>(),
+                            AbstractConfirmListDialog.SelectionMode.SINGLE_SELECTION
+                    );
             TellurideCourier.SearchPerformer<ConfirmListDialogDefaultAdapter<TellurideSearchResult>> searchPerformer =
-                    new TellurideCourier.SearchPerformer<>(1,
-                            sr.getDetailsUrl(),
-                            tellurideSearchResultDownloadDialogAdapter);
+                    new TellurideCourier.SearchPerformer<>(1, sr.getDetailsUrl(), tellurideSearchResultDownloadDialogAdapter);
             searchPerformer.perform();
+
+            // Return to the UI thread to display the dialog
             SystemUtils.postToUIThread(() -> {
                 Context ctx = getContext() != null ? getContext() : getApplicationContext();
-                TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(ctx, tellurideSearchResultDownloadDialogAdapter.getFullList());
-
+                TellurideSearchResultDownloadDialog dlg = TellurideSearchResultDownloadDialog.newInstance(
+                        ctx,
+                        tellurideSearchResultDownloadDialogAdapter.getFullList()
+                );
 
                 FragmentManager fragmentManager = getFragmentManager();
 
                 if (fragmentManager == null && getActivity() != null) {
                     fragmentManager = getActivity().getSupportFragmentManager();
                 }
+
                 if (fragmentManager != null) {
                     String dialogTag = "TELLURIDE_SEARCH_RESULT_DOWNLOAD_DIALOG";
 
@@ -559,12 +569,20 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                         LOG.warn("TellurideSearchResultDownloadDialog is already shown.");
                         return;
                     }
-                    dlg.show(fragmentManager, dialogTag);
+
+                    // Check if the FragmentManager is in a valid state
+                    if (!fragmentManager.isStateSaved()) {
+                        dlg.show(fragmentManager, dialogTag);
+                    } else {
+                        LOG.warn("Cannot show dialog, FragmentManager state already saved.");
+                    }
                 }
+                // Perform additional actions after dialog setup
                 SearchManager.getInstance().perform(SearchEngine.FROSTCLICK.getPerformer(1, "https://plus.youtube.com"));
             });
         });
     }
+
 
     private void startTransfer(final SearchResult sr, final String toastMessage) {
         if (!(sr instanceof AbstractTorrentSearchResult || sr instanceof TorrentPromotionSearchResult) && ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_SHOW_NEW_TRANSFER_DIALOG)) {
