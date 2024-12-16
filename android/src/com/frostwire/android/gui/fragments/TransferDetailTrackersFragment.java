@@ -283,23 +283,25 @@ public class TransferDetailTrackersFragment extends AbstractTransferDetailFragme
                 }
                 int trackerOffset = vhRef.get().trackerOffset;
                 List<AnnounceEntry> trackers = vhRef.get().torrentHandle.trackers();
-                AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
-                UIUtils.showYesNoDialog(fm,
-                        trackerToRemove.url(),
-                        R.string.remove_tracker,
-                        (dialog, which) -> {
-                            if (Ref.alive(vhRef)) {
-                                TrackerItemViewHolder viewHolder = vhRef.get();
-                                List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
-                                trackers1.remove(viewHolder.trackerOffset);
-                                viewHolder.torrentHandle.replaceTrackers(trackers1);
-                                viewHolder.torrentHandle.saveResumeData();
-                                viewHolder.torrentHandle.forceReannounce();
-                                if (Ref.alive(viewHolder.adapterRef)) {
-                                    viewHolder.adapterRef.get().notifyDataSetChanged();
+                if (!trackers.isEmpty()) {
+                    AnnounceEntry trackerToRemove = trackers.get(trackerOffset);
+                    UIUtils.showYesNoDialog(fm,
+                            trackerToRemove.url(),
+                            R.string.remove_tracker,
+                            (dialog, which) -> {
+                                if (Ref.alive(vhRef)) {
+                                    TrackerItemViewHolder viewHolder = vhRef.get();
+                                    List<AnnounceEntry> trackers1 = viewHolder.torrentHandle.trackers();
+                                    trackers1.remove(viewHolder.trackerOffset);
+                                    viewHolder.torrentHandle.replaceTrackers(trackers1);
+                                    viewHolder.torrentHandle.saveResumeData();
+                                    viewHolder.torrentHandle.forceReannounce();
+                                    if (Ref.alive(viewHolder.adapterRef)) {
+                                        viewHolder.adapterRef.get().notifyDataSetChanged();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                }
             }
         }
     }
