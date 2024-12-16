@@ -378,10 +378,12 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
+        if (currentFragment != null && currentFragment.isAdded()) {
+            getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, currentFragment);
+        }
+        saveFragmentsStack(outState);
         outState.putBoolean("updateAvailable", getIntent().getBooleanExtra("updateAvailable", false));
         super.onSaveInstanceState(outState);
-        saveLastFragment(outState);
-        saveFragmentsStack(outState);
     }
 
     @Override
@@ -537,16 +539,27 @@ public class MainActivity extends AbstractActivity implements
 
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
+
+        // Attempt to retrieve the fragment from savedInstanceState
         if (savedInstanceState != null) {
-            fragment = getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+            try {
+                fragment = getSupportFragmentManager().getFragment(savedInstanceState, CURRENT_FRAGMENT_KEY);
+            } catch (IllegalStateException e) {
+                LOG.warn("Fragment no longer exists for key: " + CURRENT_FRAGMENT_KEY, e);
+            }
             restoreFragmentsStack(savedInstanceState);
         }
-        if (fragment == null) {
-            fragment = search;
+
+        // If no valid fragment is found, fall back to the default fragment
+        if (fragment == null || !fragment.isAdded()) {
+            fragment = search; // Default to the search fragment
             setCheckedItem(R.id.menu_main_search);
         }
+
+        // Safely switch to the retrieved or default fragment
         switchContent(fragment);
     }
+
 
     private void setCheckedItem(int navMenuItemId) {
         if (navigationMenu != null) {
