@@ -17,9 +17,6 @@
 
 package com.frostwire.android.gui.activities;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.ActionBar;
 import android.app.Dialog;
@@ -39,10 +36,13 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.andrew.apollo.utils.MusicUtils;
@@ -67,7 +67,6 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
-import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.AbstractDialog.OnDialogClickListener;
 import com.frostwire.android.gui.views.MiniPlayerView;
 import com.frostwire.android.gui.views.TimerService;
@@ -105,7 +104,7 @@ public class MainActivity extends AbstractActivity implements
     private static boolean firstTime = true;
     private boolean externalStoragePermissionsRequested = false;
 
-    private final SparseArray<DangerousPermissionsChecker> permissionsCheckers;
+    private final SparseArray<DangerousPermissionsChecker<MainActivity>> permissionsCheckers;
     private final Stack<Integer> fragmentsStack;
     private final MainController controller;
     private NavigationMenu navigationMenu;
@@ -150,9 +149,7 @@ public class MainActivity extends AbstractActivity implements
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public void handleOnBackPressed() {
         if (navigationMenu.isOpen()) {
             navigationMenu.hide();
         } else if (fragmentsStack.size() > 1) {
@@ -199,7 +196,7 @@ public class MainActivity extends AbstractActivity implements
             final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
             finishAndRemoveTaskMethod.invoke(this);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("MainActivity.finishAndRemoveTaskViaReflection()",e);
             super.finish();
         }
     }
@@ -368,10 +365,10 @@ public class MainActivity extends AbstractActivity implements
         localBroadcastReceiver.unregister(this);
     }
 
-    private SparseArray<DangerousPermissionsChecker> initPermissionsCheckers() {
-        SparseArray<DangerousPermissionsChecker> checkers = new SparseArray<>();
-        final DangerousPermissionsChecker externalStorageChecker =
-                new DangerousPermissionsChecker(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
+    private SparseArray<DangerousPermissionsChecker<MainActivity>> initPermissionsCheckers() {
+        SparseArray<DangerousPermissionsChecker<MainActivity>> checkers = new SparseArray<>();
+        final DangerousPermissionsChecker<MainActivity> externalStorageChecker =
+                new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
         return checkers;
     }
@@ -391,10 +388,16 @@ public class MainActivity extends AbstractActivity implements
         setTheme(R.style.Theme_FrostWire);
         super.onCreate(savedInstanceState);
         lastInstance = this;
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                MainActivity.this.handleOnBackPressed();
+            }
+        });
     }
 
     private void checkExternalStoragePermissions() {
-        DangerousPermissionsChecker checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
+        DangerousPermissionsChecker<MainActivity> checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         boolean shouldShowRequestPermissionRationaleForReadExternal = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noAccess())) {
             checker.requestPermissions();
@@ -413,13 +416,6 @@ public class MainActivity extends AbstractActivity implements
             playerSubscription.unsubscribe();
         }
         lastInstance = null;
-    }
-
-    private void saveLastFragment(Bundle outState) {
-        Fragment fragment = getCurrentFragment();
-        if (fragment != null) {
-            getSupportFragmentManager().putFragment(outState, CURRENT_FRAGMENT_KEY, fragment);
-        }
     }
 
     private void mainResume() {
@@ -519,23 +515,14 @@ public class MainActivity extends AbstractActivity implements
 
     private void hideFragments() {
         try {
-            getFragmentManager().executePendingTransactions();
+            androidx.fragment.app.FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+            tx.hide(search).hide(transfers);
+            tx.commitNowAllowingStateLoss(); // Ensures immediate execution and allows state loss
         } catch (Throwable t) {
-            LOG.warn(t.getMessage(), t);
-        }
-        androidx.fragment.app.FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-        tx.hide(search).hide(transfers);
-        try {
-            tx.commit();
-        } catch (IllegalStateException e) {
-            LOG.warn("Error running commit in fragment transaction, using weaker option", e);
-            try {
-                tx.commitAllowingStateLoss();
-            } catch (IllegalStateException e2) {
-                LOG.warn("Error running commit in fragment transaction", e2);
-            }
+            LOG.warn("Error hiding fragments", t);
         }
     }
+
 
     private void setupInitialFragment(Bundle savedInstanceState) {
         Fragment fragment = null;
@@ -553,7 +540,7 @@ public class MainActivity extends AbstractActivity implements
         // If no valid fragment is found, fall back to the default fragment
         if (fragment == null || !fragment.isAdded()) {
             fragment = search; // Default to the search fragment
-            setCheckedItem(R.id.menu_main_search);
+            setMainMenuSearchCheckedItem();
         }
 
         // Safely switch to the retrieved or default fragment
@@ -561,9 +548,9 @@ public class MainActivity extends AbstractActivity implements
     }
 
 
-    private void setCheckedItem(int navMenuItemId) {
+    private void setMainMenuSearchCheckedItem() {
         if (navigationMenu != null) {
-            navigationMenu.updateCheckedItem(navMenuItemId);
+            navigationMenu.updateCheckedItem(R.id.menu_main_search);
         }
     }
 
@@ -708,7 +695,7 @@ public class MainActivity extends AbstractActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        DangerousPermissionsChecker checker = permissionsCheckers.get(requestCode);
+        DangerousPermissionsChecker<MainActivity> checker = permissionsCheckers.get(requestCode);
         if (checker != null) {
             checker.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;

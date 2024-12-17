@@ -1,4 +1,5 @@
-FrostWire 2.9.1 build 742 DEC/16/2024
+FrostWire 2.9.2 build 743 DEC/17/2024
+ - Fixed issue saving, renaming music playlists.
  - Upgraded targetSdkVersion to 34 (Android 14).
  - Upgraded compileSdk to 35 (Android 14).
  - Increased minSdkVersion to 26 (Android 8.0 Oreo).
