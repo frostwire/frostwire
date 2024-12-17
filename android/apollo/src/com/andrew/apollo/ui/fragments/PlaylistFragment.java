@@ -41,6 +41,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
 import com.andrew.apollo.Config;
@@ -126,6 +127,17 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                 DrawableCompat.setTint(deleteIcon, tintColor);
                 deleteItem.setIcon(deleteIcon);
             }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Restart the loader to refresh the list of playlists
+        if (isAdded()) {
+            MusicUtils.refresh();
+            LoaderManager loaderManager = LoaderManager.getInstance(this);
+            loaderManager.restartLoader(Fragments.PLAYLIST_FRAGMENT_LOADER_ID, null, this);
         }
     }
 
