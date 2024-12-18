@@ -50,6 +50,7 @@ import java.lang.ref.WeakReference;
 public final class HeaderBanner extends LinearLayout {
 
     private static final Logger LOG = Logger.getLogger(HeaderBanner.class);
+    private long lastLoadAttemptTimestamp = 0L;
 
     public enum VisibleBannerType {
         APPLOVIN,
@@ -64,6 +65,8 @@ public final class HeaderBanner extends LinearLayout {
     private TextView fallbackBannerTextView;
 
     private HeaderBannerListener moPubBannerListener;
+
+    private boolean isAdLoaded = false;  // Track ad loading state
 
     public static void onResumeHideOrUpdate(HeaderBanner component) {
         if (component != null) {
@@ -126,6 +129,16 @@ public final class HeaderBanner extends LinearLayout {
         if (Offers.disabledAds()) {
             return;
         }
+
+        // Add a simple debounce check: don't reload if loaded recently
+        long now = System.currentTimeMillis();
+        if ((now - lastLoadAttemptTimestamp) < 2000) {
+            // e.g., 2-second debounce
+            LOG.info("HeaderBanner.updateComponents() - Debounced repeated reload");
+            return;
+        }
+        lastLoadAttemptTimestamp = now;
+
         boolean adsDisabled = Offers.disabledAds();
         Activity activity = (Activity) getContext();
         // check how long getting display metrics twice is, if expensive gotta refactor these methods

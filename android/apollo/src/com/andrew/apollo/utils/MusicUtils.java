@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1167,15 +1167,9 @@ public final class MusicUtils {
 
     public static List<Playlist> getPlaylists(final Context context) {
         final List<Playlist> result = new ArrayList<>();
-        final ContentResolver resolver = context.getContentResolver();
-        final String[] projection = new String[]{
-                BaseColumns._ID,
-                MediaStore.Audio.PlaylistsColumns.NAME
-        };
 
         try {
-            final Cursor cursor = resolver.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    projection, null, null, null);
+            final Cursor cursor = PlaylistLoader.makePlaylistCursor(context);
 
             if (cursor != null) {
                 if (cursor.moveToFirst()) {

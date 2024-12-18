@@ -23,6 +23,8 @@ import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.util.Logger;
 
+import java.util.Objects;
+
 /**
  * Alert dialog used to rename playlists.
  * 
@@ -81,7 +83,7 @@ public class RenamePlaylist extends BasePlaylistDialog {
         }
         final String playlistName = mPlaylist.getText().toString();
         if (!playlistName.isEmpty()) {
-            final ContentResolver resolver = getActivity().getContentResolver();
+            final ContentResolver resolver = Objects.requireNonNull(getActivity()).getContentResolver();
             final ContentValues values = new ContentValues(1);
             values.put(MediaStore.Audio.Playlists.NAME, Capitalize.capitalize(playlistName));
 
@@ -103,7 +105,7 @@ public class RenamePlaylist extends BasePlaylistDialog {
                 LOG.error("RenamePlaylist.onSaveClick() Invalid URI: " + specificPlaylistUri, e);
             }
 
-            getDialog().dismiss();
+            Objects.requireNonNull(getDialog()).dismiss();
         }
     }
 

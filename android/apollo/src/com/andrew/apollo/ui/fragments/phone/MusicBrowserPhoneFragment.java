@@ -20,17 +20,17 @@
 
 package com.andrew.apollo.ui.fragments.phone;
 
-import android.app.Fragment;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.adapters.PagerAdapter;
 import com.andrew.apollo.adapters.PagerAdapter.MusicFragments;
@@ -43,6 +43,8 @@ import com.andrew.apollo.utils.NavUtils;
 import com.andrew.apollo.utils.PreferenceUtils;
 import com.andrew.apollo.utils.SortOrder;
 import com.frostwire.android.R;
+
+import java.util.Objects;
 
 /**
  * This class is used to hold the {@link ViewPager} used for swiping between the
@@ -92,7 +94,7 @@ public final class MusicBrowserPhoneFragment extends Fragment {
                 R.layout.fragment_music_browser_phone, container, false);
 
         // Initialize the adapter
-        mPagerAdapter = new PagerAdapter((AppCompatActivity) getActivity());
+        mPagerAdapter = new PagerAdapter((AppCompatActivity) requireActivity());
         final MusicFragments[] mFragments = MusicFragments.values();
         for (final MusicFragments mFragment : mFragments) {
             mPagerAdapter.add(mFragment.getFragmentClass(), null);

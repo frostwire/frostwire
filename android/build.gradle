@@ -100,9 +100,7 @@ android {
     defaultConfig {
         applicationId "com.frostwire.android"
         versionName project.ext.versionName
-        //minSdkVersion 24 // Android 7.0 Nougat, they added ifaddr (as an option to netlink)
         minSdkVersion 26 // Android 8.0 Oreo
-        //minSdkVersion 28 // Android 9.0 Pie
         targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 34)
         multiDexEnabled true
 
@@ -249,7 +247,7 @@ dependencies {
     implementation 'com.applovin:applovin-sdk:13.0.1'
 
     // AppLovin + Unity
-    implementation 'com.applovin.mediation:unityads-adapter:4.12.4.0'
+    implementation 'com.applovin.mediation:unityads-adapter:4.12.5.0'
 
     def jlibtorrent_version = '1.2.19.0'
     implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')

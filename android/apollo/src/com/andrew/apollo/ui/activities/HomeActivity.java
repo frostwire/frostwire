@@ -18,75 +18,139 @@
 
 package com.andrew.apollo.ui.activities;
 
-import static com.frostwire.android.util.RunStrict.runStrict;
-
 import android.Manifest;
-import android.app.Fragment;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
 
 import com.andrew.apollo.ui.fragments.phone.MusicBrowserPhoneFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.util.DangerousPermissionsChecker;
+import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.offers.Offers;
 import com.frostwire.util.Logger;
 
-import java.util.Arrays;
-
-/**
- * This class is used to display the {@link ViewPager} used to swipe between the
- * main {@link Fragment}s used to browse the user's music.
- *
- * @author Andrew Neal (andrewdneal@gmail.com)
- */
 public final class HomeActivity extends BaseActivity {
 
+    @SuppressLint("StaticFieldLeak")
     private static HomeActivity instance;
 
-    private static Logger LOG = Logger.getLogger(HomeActivity.class);
+    private static final Logger LOG = Logger.getLogger(HomeActivity.class);
+    private final DangerousPermissionsChecker<HomeActivity> dangerousPermissionsChecker;
 
-    private final DangerousPermissionsChecker dangerousPermissionsChecker;
+    private boolean hasCheckedPermissions = false; // Single flag to prevent redundant checks
 
     public HomeActivity() {
         super(R.layout.activity_base);
         instance = this;
-        dangerousPermissionsChecker = new DangerousPermissionsChecker(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
+        dangerousPermissionsChecker = new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
     }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         instance = this;
-        // Load the music browser fragment
+
+        // Load the main fragment
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment()).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.activity_base_content, new MusicBrowserPhoneFragment())
+                    .commit();
         }
-        requestForPostNotificationsPermission();
+
+        // Add back pressed handling
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                HomeActivity.this.handleOnBackPressed();
+            }
+        });
+
+        // Check permissions once
+        if (!hasCheckedPermissions) {
+            hasCheckedPermissions = true;
+            requestForPostNotificationsPermission();
+        }
     }
 
     public void requestForPostNotificationsPermission() {
-        boolean postNotificationsPermissionGranted = true;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            postNotificationsPermissionGranted = runStrict(() ->
-                    PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-            );
-            if (!postNotificationsPermissionGranted) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                LOG.info("Requesting POST_NOTIFICATIONS permission...");
                 dangerousPermissionsChecker.requestPermissions();
+            } else {
+                LOG.info("POST_NOTIFICATIONS permission already granted.");
             }
         }
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
+            LOG.info("HomeActivity::onRequestPermissionsResult() invoked with requestCode=" + requestCode);
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                LOG.info("POST_NOTIFICATIONS permission granted.");
+            } else {
+                LOG.warn("POST_NOTIFICATIONS permission denied.");
+                if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                    showPostNotificationsRationaleDialog();
+                } else {
+                    showSettingsRedirectDialog();
+                }
+            }
+        }
+    }
+
+    private void showPostNotificationsRationaleDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Notification Permission Required")
+                .setMessage("We need permission to show notifications about the music player status. "
+                        + "Without this, Android may kill the app when it runs in the background.")
+                .setPositiveButton("Allow", (dialog, which) -> {
+                    LOG.info("User agreed to allow POST_NOTIFICATIONS permission.");
+                    dangerousPermissionsChecker.requestPermissions();
+                })
+                .setNegativeButton("Deny", (dialog, which) -> {
+                    LOG.warn("POST_NOTIFICATIONS permission denied by user.");
+                    UIUtils.showLongMessage(this, "Permission denied. The app may close in the background.");
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void showSettingsRedirectDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Permission Required")
+                .setMessage("We need permission to show notifications about the music player status. "
+                        + "Please enable the permission from App Settings to avoid app interruptions.")
+                .setPositiveButton("Open Settings", (dialog, which) -> {
+                    Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", getPackageName(), null));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    LOG.warn("User declined to open App Settings.");
+                    UIUtils.showLongMessage(this, "Notification permission denied. Some features may not work properly.");
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    public void handleOnBackPressed() {
         if (MusicUtils.isPlaying()) {
             return;
         }
@@ -96,19 +160,6 @@ public final class HomeActivity extends BaseActivity {
                 false,
                 false,
                 true);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LOG.info("HomeActivity::onRequestPermissionsResult() invoked");
-        LOG.info("HomeActivity::onRequestPermissionsResult() requestCode=" + requestCode);
-
-        for (String p : permissions) {
-            LOG.info("HomeActivity::onRequestPermissionsResult() permission=" + p);
-        }
-        LOG.info("HomeActivity::onRequestPermissionsResult() grantResults=" + Arrays.toString(grantResults));
-        dangerousPermissionsChecker.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override

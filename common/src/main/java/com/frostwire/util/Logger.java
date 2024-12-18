@@ -20,6 +20,7 @@ package com.frostwire.util;
 import java.util.logging.Level;
 
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
 
 /**
  * @author gubatron
@@ -97,9 +98,9 @@ public final class Logger {
 
     public void warn(String msg, boolean showCallingMethodInfo) {
         if (contextPrefix == null) {
-            jul.logp(INFO, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+            jul.logp(WARNING, name, "", ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
         } else {
-            jul.logp(INFO, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
+            jul.logp(WARNING, name, "", contextPrefix + ((showCallingMethodInfo) ? appendCallingMethodInfo(msg) : msg));
         }
     }
 

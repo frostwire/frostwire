@@ -56,6 +56,7 @@ import com.andrew.apollo.widgets.ProfileTabCarousel.Listener;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.services.Engine;
 import com.frostwire.android.offers.Offers;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
@@ -217,21 +218,26 @@ public final class ProfileActivity extends BaseActivity implements OnPageChangeL
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        if (isEmptyPlaylist()) {
-            menu.removeItem(R.id.menu_player_shuffle);
-        } else {
-            // Set the shuffle all title to "play all" if a playlist.
-            final MenuItem shuffle = menu.findItem(R.id.menu_player_shuffle);
-            if (shuffle != null) {
-                String title;
-                if (isFavorites() || isLastAdded() || isPlaylist()) {
-                    title = getString(R.string.menu_play_all);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC,() -> {
+            boolean emptyPlaylist = isEmptyPlaylist();
+            SystemUtils.postToUIThread(() -> {
+                if (emptyPlaylist) {
+                    menu.removeItem(R.id.menu_player_shuffle);
                 } else {
-                    title = getString(R.string.menu_shuffle);
+                    // Set the shuffle all title to "play all" if a playlist.
+                    final MenuItem shuffle = menu.findItem(R.id.menu_player_shuffle);
+                    if (shuffle != null) {
+                        String title;
+                        if (isFavorites() || isLastAdded() || isPlaylist()) {
+                            title = getString(R.string.menu_play_all);
+                        } else {
+                            title = getString(R.string.menu_shuffle);
+                        }
+                        shuffle.setTitle(title);
+                    }
                 }
-                shuffle.setTitle(title);
-            }
-        }
+            });
+        });
 
         return super.onPrepareOptionsMenu(menu);
     }

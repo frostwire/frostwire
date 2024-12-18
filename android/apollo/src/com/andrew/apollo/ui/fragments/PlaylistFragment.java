@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2012 Andrew Neal
  * Modified by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2013-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2013-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,10 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
 import com.andrew.apollo.Config;
@@ -58,7 +57,9 @@ import com.frostwire.android.R;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
+import com.frostwire.util.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,13 +72,14 @@ import java.util.List;
  */
 public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> {
 
+    private boolean playlistLoaderFinished;
+
     public PlaylistFragment() {
         super(Fragments.PLAYLIST_FRAGMENT_GROUP_ID, Fragments.PLAYLIST_FRAGMENT_LOADER_ID);
     }
 
     @Override
-    public void onCreateContextMenu(final ContextMenu menu, final View v,
-                                    final ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         // Get the position of the selected item
         final AdapterContextMenuInfo info = (AdapterContextMenuInfo) menuInfo;
@@ -130,14 +132,18 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         }
     }
 
+    private static final Logger LOG = Logger.getLogger(PlaylistFragment.class);
+
     @Override
     public void onResume() {
         super.onResume();
-        // Restart the loader to refresh the list of playlists
         if (isAdded()) {
             MusicUtils.refresh();
-            LoaderManager loaderManager = LoaderManager.getInstance(this);
-            loaderManager.restartLoader(Fragments.PLAYLIST_FRAGMENT_LOADER_ID, null, this);
+        }
+
+        if (isAdded()) {
+            MusicUtils.refresh();
+            restartLoader(false);
         }
     }
 
@@ -170,8 +176,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
                     RenamePlaylist.getInstance(mItem.mPlaylistId).show(getFragmentManager(), "RenameDialog");
                     return true;
                 case FragmentMenuItems.DELETE:
-                    PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog =
-                            PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
+                    PlaylistFragmentDeleteDialog playlistFragmentDeleteDialog = PlaylistFragmentDeleteDialog.newInstance(mItem.mPlaylistName, mItem.mPlaylistId);
                     playlistFragmentDeleteDialog.show(((AppCompatActivity) getActivity()).getSupportFragmentManager());
                     return true;
                 default:
@@ -192,8 +197,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int position,
-                            final long id) {
+    public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
         final Bundle bundle = new Bundle();
         mItem = mAdapter.getItem(position);
         String playlistName = "<no name>";
@@ -226,6 +230,7 @@ public class PlaylistFragment extends ApolloFragment<PlaylistAdapter, Playlist> 
         startActivity(intent);
     }
 
+    @NonNull
     @Override
     public Loader<List<Playlist>> onCreateLoader(final int id, final Bundle args) {
         return new PlaylistLoader(getActivity());

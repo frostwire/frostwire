@@ -18,6 +18,7 @@
 
 package com.andrew.apollo.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
@@ -26,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SearchView.OnQueryTextListener;
 import androidx.appcompat.widget.Toolbar;
@@ -56,9 +59,11 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.offers.HeaderBanner;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A base {@link Activity} used to update the bottom bar and
@@ -111,6 +116,8 @@ public abstract class BaseActivity extends AbstractActivity {
 
     private HeaderBanner headerBanner;
 
+    private static final Logger LOG = Logger.getLogger(BaseActivity.class);
+
     public BaseActivity(int layoutResId) {
         super(layoutResId);
     }
@@ -129,6 +136,8 @@ public abstract class BaseActivity extends AbstractActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         headerBanner = findViewById(R.id.activity_base_header_banner);
+        HeaderBanner.onResumeHideOrUpdate(headerBanner);
+
         // Control the media volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         // Bind Apollo's service
@@ -173,17 +182,17 @@ public abstract class BaseActivity extends AbstractActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
+        return switch (item.getItemId()) {
+            case android.R.id.home -> {
                 getBackHome();
-                return true;
-            case R.id.menu_player_new_playlist:
+                yield true;
+            }
+            case R.id.menu_player_new_playlist -> {
                 onOptionsItemNewPlaylistSelected();
-                return true;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+                yield true;
+            }
+            default -> super.onOptionsItemSelected(item);
+        };
     }
 
     protected void onOptionsItemNewPlaylistSelected() {
@@ -207,9 +216,32 @@ public abstract class BaseActivity extends AbstractActivity {
         updateBottomActionBarInfo();
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onStart() {
         super.onStart();
+        final IntentFilter filter = getIntentFilter();
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(mPlaybackStatus, filter, RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(mPlaybackStatus, filter);
+            }
+        } catch (Throwable t) {
+            LOG.error("BaseActivity("+getClass().getSimpleName()+") " + t.getMessage(), t);
+        }
+
+        // We ask here because we don't yet need to ask for the music service to be started.
+        // On AudioPlayerActivity, it's another story, if we get there, it's because
+        // we're playing a track.
+        if (MusicUtils.isPlaying()) {
+            MusicUtils.notifyForegroundStateChanged(this, true);
+        }
+    }
+
+    @NonNull
+    private static IntentFilter getIntentFilter() {
         final IntentFilter filter = new IntentFilter();
         // Play and pause changes
         filter.addAction(MusicPlaybackService.PLAYSTATE_CHANGED);
@@ -220,19 +252,7 @@ public abstract class BaseActivity extends AbstractActivity {
         filter.addAction(MusicPlaybackService.META_CHANGED);
         // Update a list, probably the playlist fragment's
         filter.addAction(MusicPlaybackService.REFRESH);
-
-        try {
-            registerReceiver(mPlaybackStatus, filter, RECEIVER_EXPORTED);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
-        // We ask here because we don't yet need to ask for the music service to be started.
-        // On AudioPlayerActivity, it's another story, if we get there, it's because
-        // we're playing a track.
-        if (MusicUtils.isPlaying()) {
-            MusicUtils.notifyForegroundStateChanged(this, true);
-        }
+        return filter;
     }
 
     @Override
@@ -319,9 +339,7 @@ public abstract class BaseActivity extends AbstractActivity {
             mArtistName.setText(MusicUtils.getArtistName());
             // Set the album art
             ImageFetcher imageFetcher = ApolloUtils.getImageFetcher(this);
-            if (imageFetcher != null) {
-                imageFetcher.loadCurrentArtwork(mAlbumArt);
-            }
+            imageFetcher.loadCurrentArtwork(mAlbumArt);
         }
     }
 
@@ -407,36 +425,41 @@ public abstract class BaseActivity extends AbstractActivity {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
-            if (action.equals(MusicPlaybackService.META_CHANGED)) {
-                // Current info
-                mReference.get().updateBottomActionBarInfo();
-                // Update the favorites icon
-                mReference.get().invalidateOptionsMenu();
-                // Let the listener know to the meta changed
-                for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
-                    if (listener != null) {
-                        listener.onMetaChanged();
+            switch (Objects.requireNonNull(action)) {
+                case MusicPlaybackService.META_CHANGED -> {
+                    // Current info
+                    mReference.get().updateBottomActionBarInfo();
+                    // Update the favorites icon
+                    mReference.get().invalidateOptionsMenu();
+                    // Let the listener know to the meta changed
+                    for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
+                        if (listener != null) {
+                            listener.onMetaChanged();
+                        }
                     }
                 }
-            } else if (action.equals(MusicPlaybackService.PLAYSTATE_CHANGED)) {
-                // Set the play and pause image
-                if (!MusicUtils.isStopped() && mReference.get() != null && mReference.get().mPlayPauseButton != null) {
-                    mReference.get().mPlayPauseButton.updateState();
+                case MusicPlaybackService.PLAYSTATE_CHANGED -> {
+                    // Set the play and pause image
+                    if (!MusicUtils.isStopped() && mReference.get() != null && mReference.get().mPlayPauseButton != null) {
+                        mReference.get().mPlayPauseButton.updateState();
+                    }
                 }
-            } else if (action.equals(MusicPlaybackService.REPEATMODE_CHANGED)
-                    || action.equals(MusicPlaybackService.SHUFFLEMODE_CHANGED)) {
-                if (!MusicUtils.isStopped() && mReference.get() != null && mReference.get().mRepeatButton != null &&
-                        mReference.get().mShuffleButton != null) {
-                    // Set the repeat image
-                    mReference.get().mRepeatButton.updateRepeatState();
-                    // Set the shuffle image
-                    mReference.get().mShuffleButton.updateShuffleState();
+                case MusicPlaybackService.REPEATMODE_CHANGED,
+                     MusicPlaybackService.SHUFFLEMODE_CHANGED -> {
+                    if (!MusicUtils.isStopped() && mReference.get() != null && mReference.get().mRepeatButton != null &&
+                            mReference.get().mShuffleButton != null) {
+                        // Set the repeat image
+                        mReference.get().mRepeatButton.updateRepeatState();
+                        // Set the shuffle image
+                        mReference.get().mShuffleButton.updateShuffleState();
+                    }
                 }
-            } else if (action.equals(MusicPlaybackService.REFRESH)) {
-                // Let the listener know to update a list
-                for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
-                    if (listener != null) {
-                        listener.restartLoader();
+                case MusicPlaybackService.REFRESH -> {
+                    // Let the listener know to update a list
+                    for (final MusicStateListener listener : mReference.get().mMusicStateListener) {
+                        if (listener != null) {
+                            listener.restartLoader();
+                        }
                     }
                 }
             }

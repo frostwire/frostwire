@@ -17,6 +17,8 @@
 
 package com.frostwire.android.gui.adapters.menu;
 
+import static com.frostwire.android.util.SystemUtils.HandlerThreadName.MISC;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -26,6 +28,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
@@ -33,6 +37,11 @@ import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.gui.views.AbstractActivity;
 import com.frostwire.android.gui.views.AbstractDialog;
 import com.frostwire.android.gui.views.MenuAction;
+import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Ref;
+
+import java.lang.ref.WeakReference;
+import java.util.Objects;
 
 /**
  * Created by gubatron on 12/18/14.
@@ -120,22 +129,26 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
         }
 
         private void onClickCreatePlaylistButton(CharSequence text) {
-            Context ctx = getActivity();
+            final Context ctx = getActivity();
 
-            long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
-            MusicUtils.refresh();
+            SystemUtils.postToHandler(MISC, () -> {
+                long playlistId = MusicUtils.createPlaylist(ctx, text.toString());
+                MusicUtils.refresh();
 
-            if (fileDescriptors != null) {
-                MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
-            }
-
-            if (ctx instanceof AbstractActivity) {
-                PlaylistFragment f = ((AbstractActivity) ctx).findFragment(PlaylistFragment.class);
-                if (f != null) {
-                    f.restartLoader(true);
-                    f.refresh();
+                if (fileDescriptors != null) {
+                    MusicUtils.addToPlaylist(ctx, fileDescriptors, playlistId);
                 }
-            }
+
+                SystemUtils.postToUIThread(() -> {
+                    if (ctx instanceof AbstractActivity) {
+                        PlaylistFragment f = ((AbstractActivity) ctx).findFragment(PlaylistFragment.class);
+                        if (f != null) {
+                            f.restartLoader(true);
+                            f.refresh();
+                        }
+                    }
+                });
+            });
         }
 
         private final class DialogButtonClickListener implements View.OnClickListener {
@@ -151,14 +164,24 @@ public class CreateNewPlaylistMenuAction extends MenuAction {
                 if (!positive) {
                     dismiss();
                 } else {
-                    String playlistName = getPlaylistName();
-                    if (MusicUtils.getIdForPlaylist(getActivity(), playlistName) != -1) {
-                        playlistName += "+";
-                        updatePlaylistName(playlistName);
-                    } else {
-                        onClickCreatePlaylistButton(playlistName);
-                        dismiss();
-                    }
+                    final String playlistName = getPlaylistName();
+                    WeakReference<FragmentActivity> fragmentActivityWeakRef = Ref.weak(requireActivity());
+                    SystemUtils.postToHandler(MISC, () -> {
+                        if (!Ref.alive(fragmentActivityWeakRef)) {
+                            return;
+                        }
+                        FragmentActivity fragmentActivity = fragmentActivityWeakRef.get();
+                        final long playlistId = MusicUtils.getIdForPlaylist(fragmentActivity, playlistName);
+
+                        SystemUtils.postToUIThread(() -> {
+                            if (playlistId != -1) {
+                                updatePlaylistName(playlistName + "+");
+                            } else {
+                                onClickCreatePlaylistButton(playlistName);
+                                dismiss();
+                            }
+                        });
+                    });
                 }
             }
         }

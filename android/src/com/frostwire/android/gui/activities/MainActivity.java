@@ -350,6 +350,7 @@ public class MainActivity extends AbstractActivity implements
         checkLastSeenVersionBuild();
         syncNavigationMenu();
         updateNavigationMenu();
+
         if (CM.getBoolean(Constants.PREF_KEY_GUI_TOS_ACCEPTED)) {
             checkExternalStoragePermissions();
         }
@@ -370,6 +371,9 @@ public class MainActivity extends AbstractActivity implements
         final DangerousPermissionsChecker<MainActivity> externalStorageChecker =
                 new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
+        final DangerousPermissionsChecker<MainActivity> postNotificationsChecker =
+                new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
+        checkers.put(DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE, postNotificationsChecker);
         return checkers;
     }
 
@@ -399,7 +403,7 @@ public class MainActivity extends AbstractActivity implements
     private void checkExternalStoragePermissions() {
         DangerousPermissionsChecker<MainActivity> checker = permissionsCheckers.get(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         boolean shouldShowRequestPermissionRationaleForReadExternal = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noAccess())) {
+        if (shouldShowRequestPermissionRationaleForReadExternal || (!externalStoragePermissionsRequested && checker != null && checker.noExternalStorageAccess())) {
             checker.requestPermissions();
             externalStoragePermissionsRequested = true;
         }

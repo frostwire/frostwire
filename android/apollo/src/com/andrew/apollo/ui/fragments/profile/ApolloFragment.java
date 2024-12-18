@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *            Jose Molina (@votaguz)
- * Copyright (c) 2011-2021, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ import com.andrew.apollo.widgets.VerticalScrollListener;
 import com.devspark.appmsg.AppMsg;
 import com.frostwire.android.R;
 import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
 
 import java.util.List;
 
@@ -78,6 +79,8 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         LoaderManager.LoaderCallbacks<List<I>>,
         AdapterView.OnItemClickListener,
         MusicStateListener {
+
+    private static final Logger LOG = Logger.getLogger(ApolloFragment.class);
 
     private final int GROUP_ID;
     /**
@@ -261,7 +264,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
 
         // More by artist
-        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
+            menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
                 .setIcon(R.drawable.contextmenu_icon_artist);
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
@@ -365,6 +368,10 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     }
 
     private void onAddToFavorites() {
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, this::onAddToFavorites);
+            return;
+        }
         FavoritesStore favoritesStore = FavoritesStore.getInstance(getActivity());
         if (mSongList != null) {
             int added = 0;
@@ -385,7 +392,9 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
             }
         } else if (mSelectedId != -1 && favoritesStore != null) {
-            favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
+            });
         }
     }
 
@@ -412,6 +421,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
+        lastRestartLoader = 0;
         super.onSaveInstanceState(outState);
         outState.putAll(getArguments() != null ? getArguments() : new Bundle());
     }
@@ -462,6 +472,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
     public void onLoaderReset(final Loader<List<I>> loader) {
         // Clear the data in the adapter
         if (mAdapter != null) {
+            LOG.info("ApolloFragment::onLoaderReset: unloading adapter");
             mAdapter.unload();
         }
     }
@@ -507,13 +518,16 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 getActivity().runOnUiThread(() -> {
                     try {
                         LoaderManager.getInstance(this).restartLoader(LOADER_ID, getArguments(), this);
+                        LOG.info("ApolloFragment::restartLoader: restarted (" + LOADER_ID + ")");
                     } catch (Throwable t) {
-                        t.printStackTrace();
+                        LOG.error("ApolloFragment::restartLoader: ", t);
                     }
                 });
             } catch (Throwable t) {
-                t.printStackTrace();
+                LOG.error("ApolloFragment::restartLoader: ", t);
             }
+        } else {
+            LOG.info("ApolloFragment::restartLoader: not restarting loader (" + LOADER_ID + "), too soon.");
         }
     }
 

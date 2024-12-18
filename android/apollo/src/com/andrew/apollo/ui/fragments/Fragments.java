@@ -52,7 +52,7 @@ public class Fragments {
     public static final int LAST_ADDED_FRAGMENT_LOADER_ID = 0;
 
     public static final int PLAYLIST_FRAGMENT_GROUP_ID = TabFragmentOrder.PLAYLISTS_POSITION;
-    public static final int PLAYLIST_FRAGMENT_LOADER_ID = 0;
+    public static final int PLAYLIST_FRAGMENT_LOADER_ID = 7;
 
     public static final int RECENT_FRAGMENT_GROUP_ID = TabFragmentOrder.RECENT_POSITION;
     public static final int RECENT_FRAGMENT_LOADER_ID = 0;

@@ -506,6 +506,7 @@ public class MusicPlaybackService extends Service {
         if (!postNotificationsPermissionGranted && HomeActivity.instance() != null) {
             // See HomeActivity::onCreate() for the permission request
             // See HomeActivity::onRequestPermissionsResult() for the service initialization, which calls this again when the permission is granted
+            LOG.info("MusicPlaybackService::onCreate() requesting post notifications permission from HomeActivity.instance().requestForPostNotificationPermission()");
             HomeActivity.instance().requestForPostNotificationsPermission();
         }
 

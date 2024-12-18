@@ -26,7 +26,6 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.webkit.internal.ApiFeature;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.andrew.apollo.utils.MusicUtils;
@@ -129,12 +128,12 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
 
     // EXTERNAL STORAGE PERMISSIONS
 
-    public boolean noAccess() {
+    public boolean noExternalStorageAccess() {
         // simplified until otherwise necessary.
-        return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccess();
+        return requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE && noExternalStorageAccessInternal();
     }
 
-    private boolean noExternalStorageAccess() {
+    private boolean noExternalStorageAccessInternal() {
         if (!Ref.alive(activityRef)) {
             return true;
         }
