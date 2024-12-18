@@ -1,5 +1,4 @@
 FrostWire 2.9.2 build 743 DEC/17/2024
- - Fixed issue saving, renaming music playlists.
  - Upgraded targetSdkVersion to 34 (Android 14).
  - Upgraded compileSdk to 35 (Android 14).
  - Increased minSdkVersion to 26 (Android 8.0 Oreo).
@@ -25,6 +24,17 @@ FrostWire 2.9.2 build 743 DEC/17/2024
  - Refactored ApplicationPreferencesFragment for null safety and consistent logging.
  - Streamlined dependency management by removing unused imports and redundant code.
  - Prepared codebase for compliance with Android 14, leveraging newer APIs for permissions and notifications.
+ - Fixed "Add to Playlist" action not displaying user-created playlists.
+ - Unified playlist fetching logic using MusicUtils.getPlaylists().
+ - Refactored PlaylistLoader to simplify playlist loading and improve code maintainability.
+ - Removed redundant permission checks in PlaylistLoader for cleaner permission handling.
+ - Improved loader restarts and logging in ApolloFragment and PlaylistFragment.
+ - Fixed permission management in HomeActivity to include rationale dialogs and settings redirection.
+ - Enhanced error handling and logging across the app, particularly in playlist management.
+ - Fixed debounce issues with ad loading in HeaderBanner to prevent excessive reloads.
+ - Refactored CreateNewPlaylistMenuAction for thread safety and UI responsiveness.
+ - Improved menu preparation logic in ProfileActivity for better thread handling.
+
 
 FrostWire 2.8.2 build 740 NOV/28/2024
  - yt_dlp-2024.11.18
