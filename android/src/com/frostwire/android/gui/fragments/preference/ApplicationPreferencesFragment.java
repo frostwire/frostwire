@@ -127,7 +127,7 @@ public final class ApplicationPreferencesFragment extends AbstractPreferenceFrag
             return true;
         });
         LOG.info("ApplicationPreferencesFragment.setupTheme(): about to setupThemeAsync()");
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> loadTheme(listPreference));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> loadTheme(listPreference));
     }
 
     /**

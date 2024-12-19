@@ -20,7 +20,9 @@ package com.andrew.apollo.menu;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+
 import androidx.fragment.app.DialogFragment;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -37,6 +39,10 @@ import com.andrew.apollo.ui.fragments.PlaylistFragment;
 import com.andrew.apollo.utils.MusicUtils;
 import com.frostwire.android.R;
 import com.frostwire.android.gui.views.AbstractActivity;
+import com.frostwire.android.util.SystemUtils;
+import com.frostwire.util.Logger;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * A simple base class for the playlist dialogs.
@@ -48,17 +54,16 @@ abstract class BasePlaylistDialog extends DialogFragment {
     /* The actual dialog */
     private AlertDialog mPlaylistDialog;
 
-    /* Used to make new playlist names */
-    EditText mPlaylist;
+    /* Used to make new playlist names */ EditText mPlaylist;
 
     /* The dialog save button */
     private Button mSaveButton;
 
-    /* The dialog prompt */
-    String mPrompt;
+    /* The dialog prompt */ String mPrompt;
 
-    /* The default edit text text */
-    String mDefaultname;
+    /* The default edit text text */ String mDefaultname;
+
+    private final static Logger LOG = Logger.getLogger(BasePlaylistDialog.class);
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -78,8 +83,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
         // To show the "done" button on the soft keyboard
         mPlaylist.setSingleLine(true);
         // All caps
-        mPlaylist.setInputType(mPlaylist.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-                | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        mPlaylist.setInputType(mPlaylist.getInputType() | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
 
         // Set the save button action
         Button noButton = view.findViewById(R.id.dialog_default_input_button_no);
@@ -101,20 +105,29 @@ abstract class BasePlaylistDialog extends DialogFragment {
             }
         });
 
-        initObjects(savedInstanceState);
-        mPlaylist.setText(mDefaultname);
-        mPlaylist.setSelection(mDefaultname.length());
-        mPlaylist.addTextChangedListener(mTextWatcher);
-        mPlaylist.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
+
+        final CountDownLatch latch = new CountDownLatch(1);
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            initObjects(savedInstanceState);
+            mPlaylist.setText(mDefaultname);
+            mPlaylist.setSelection(mDefaultname.length());
+            mPlaylist.addTextChangedListener(mTextWatcher);
+            mPlaylist.setOnFocusChangeListener((v, hasFocus) -> {
                 if (hasFocus) {
-                    mPlaylistDialog.getWindow().setSoftInputMode(
-                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    mPlaylistDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
-            }
+                mPlaylistDialog.show();
+            });
+            latch.countDown();
         });
-        mPlaylistDialog.show();
+
+        try {
+            LOG.info("BasePlaylistDialog.onCreateDialog() waiting for latch...");
+            latch.await();
+            LOG.info("BasePlaylistDialog.onCreateDialog() done waiting for latch...");
+        } catch (InterruptedException e) {
+            LOG.error("BasePlaylistDialog.onCreateDialog() interrupted", e);
+        }
         return mPlaylistDialog;
     }
 
@@ -172,11 +185,12 @@ abstract class BasePlaylistDialog extends DialogFragment {
             mSaveButton.setEnabled(false);
         } else {
             mSaveButton.setEnabled(true);
-            if (MusicUtils.getIdForPlaylist(getActivity(), playlistName) >= 0) {
-                mSaveButton.setText(R.string.overwrite);
-            } else {
-                mSaveButton.setText(R.string.save);
-            }
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                int saveButtonResourceTextId = MusicUtils.getIdForPlaylist(getActivity(), playlistName) >= 0 ?
+                        R.string.overwrite :
+                        R.string.save;
+                SystemUtils.postToUIThread(() -> mSaveButton.setText(saveButtonResourceTextId));
+            });
         }
     }
 
@@ -186,8 +200,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
     private final TextWatcher mTextWatcher = new TextWatcher() {
 
         @Override
-        public void onTextChanged(final CharSequence s, final int start, final int before,
-                                  final int count) {
+        public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
             onTextChangedListener();
         }
 
@@ -197,8 +210,7 @@ abstract class BasePlaylistDialog extends DialogFragment {
         }
 
         @Override
-        public void beforeTextChanged(final CharSequence s, final int start, final int count,
-                                      final int after) {
+        public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
             /* Nothing to do */
         }
     };

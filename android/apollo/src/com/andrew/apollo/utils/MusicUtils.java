@@ -1663,31 +1663,35 @@ public final class MusicUtils {
         subMenu.add(groupId, FragmentMenuItems.NEW_PLAYLIST, Menu.NONE, R.string.new_empty_playlist)
                 .setIcon(R.drawable.contextmenu_icon_playlist_add_dark);
 
-        Cursor cursor = PlaylistLoader.makePlaylistCursor(context);
-        if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                final Intent intent = new Intent();
-                String name = cursor.getString(1);
-                if (name != null) {
-                    intent.putExtra("playlist", getIdForPlaylist(context, name));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            final Cursor cursor = PlaylistLoader.makePlaylistCursor(context);
 
-                    // Apply tint color to the icon
-                    Drawable icon = ContextCompat.getDrawable(context, R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
-                    if (icon != null) {
-                        icon = DrawableCompat.wrap(icon);
-                        DrawableCompat.setTint(icon, UIUtils.getAppIconPrimaryColor(context));
+            if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    final Intent intent = new Intent();
+                    String name = cursor.getString(1);
+                    if (name != null) {
+                        intent.putExtra("playlist", getIdForPlaylist(context, name));
+
+                        // Apply tint color to the icon
+                        Drawable icon = ContextCompat.getDrawable(context, R.drawable.contextmenu_icon_add_to_existing_playlist_dark);
+                        if (icon != null) {
+                            icon = DrawableCompat.wrap(icon);
+                            DrawableCompat.setTint(icon, UIUtils.getAppIconPrimaryColor(context));
+                        }
+                        final Drawable icon2 = icon;
+
+                        SystemUtils.postToUIThread(() -> subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE, name)
+                                .setIntent(intent)
+                                .setIcon(icon2));
                     }
-
-                    subMenu.add(groupId, FragmentMenuItems.PLAYLIST_SELECTED, Menu.NONE, name)
-                            .setIntent(intent)
-                            .setIcon(icon);
+                    cursor.moveToNext();
                 }
-                cursor.moveToNext();
             }
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
+            if (cursor != null) {
+                cursor.close();
+            }
+        });
     }
 
     /**

@@ -11,6 +11,7 @@
 
 package com.andrew.apollo.menu;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -21,13 +22,16 @@ import android.provider.MediaStore;
 
 import com.andrew.apollo.format.Capitalize;
 import com.andrew.apollo.utils.MusicUtils;
+import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
+import com.frostwire.util.Ref;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 /**
  * Alert dialog used to rename playlists.
- * 
+ *
  * @author Andrew Neal (andrewdneal@gmail.com)
  * @author Angel Leon (@gubatron)
  */
@@ -83,29 +87,50 @@ public class RenamePlaylist extends BasePlaylistDialog {
         }
         final String playlistName = mPlaylist.getText().toString();
         if (!playlistName.isEmpty()) {
-            final ContentResolver resolver = Objects.requireNonNull(getActivity()).getContentResolver();
-            final ContentValues values = new ContentValues(1);
-            values.put(MediaStore.Audio.Playlists.NAME, Capitalize.capitalize(playlistName));
-
-            // Use the specific URI for the playlist
-            Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-            }
-            Uri specificPlaylistUri = ContentUris.withAppendedId(playlistUri, mRenameId);
-
             try {
-                int rowsUpdated = resolver.update(specificPlaylistUri, values, null, null);
-                if (rowsUpdated > 0) {
-                    LOG.info("RenamePlaylist.onSaveClick() Playlist renamed successfully");
-                } else {
-                    LOG.error("RenamePlaylist.onSaveClick() Failed to rename playlist");
-                }
-            } catch (IllegalArgumentException e) {
-                LOG.error("RenamePlaylist.onSaveClick() Invalid URI: " + specificPlaylistUri, e);
-            }
+                final ContentResolver resolver = requireActivity().getContentResolver();
+                final ContentValues values = new ContentValues(1);
+                values.put(MediaStore.Audio.Playlists.NAME, Capitalize.capitalize(playlistName));
 
-            Objects.requireNonNull(getDialog()).dismiss();
+                // Use the specific URI for the playlist
+                Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                    playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+                }
+                Uri specificPlaylistUri = ContentUris.withAppendedId(playlistUri, mRenameId);
+
+                final WeakReference<Dialog> dialogRef = new WeakReference<>(getDialog());
+
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+                    LOG.info("RenamePlaylist.onSaveClick() Renaming playlist: " + mDefaultname + " to: " + playlistName);
+                    try {
+                        int rowsUpdated = resolver.update(specificPlaylistUri, values, null, null);
+                        if (rowsUpdated > 0) {
+                            LOG.info("RenamePlaylist.onSaveClick() Playlist renamed successfully");
+                        } else {
+                            LOG.error("RenamePlaylist.onSaveClick() Failed to rename playlist");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        LOG.error("RenamePlaylist.onSaveClick() Invalid URI: " + specificPlaylistUri, e);
+                    }
+
+                    SystemUtils.postToUIThread(() -> {
+                        try {
+                            if (Ref.alive(dialogRef)) {
+                                Dialog dialog = dialogRef.get();
+                                if (dialog != null) {
+                                    dialog.dismiss();
+                                    LOG.info("RenamePlaylist.onSaveClick() Dismissed dialog successfully");
+                                }
+                            }
+                        } catch (Throwable t) {
+                            LOG.error("RenamePlaylist.onSaveClick() Failed to dismiss dialog", t);
+                        }
+                    });
+                });
+            } catch (Throwable e) {
+                LOG.error("RenamePlaylist.onSaveClick() Failed to rename playlist", e);
+            }
         }
     }
 
@@ -116,10 +141,10 @@ public class RenamePlaylist extends BasePlaylistDialog {
      */
     private String getPlaylistNameFromId(final long id) {
         Cursor cursor = getActivity().getContentResolver().query(
-                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[] {
-                    MediaStore.Audio.Playlists.NAME
-                }, MediaStore.Audio.Playlists._ID + "=?", new String[] {
-                    String.valueOf(id)
+                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[]{
+                        MediaStore.Audio.Playlists.NAME
+                }, MediaStore.Audio.Playlists._ID + "=?", new String[]{
+                        String.valueOf(id)
                 }, MediaStore.Audio.Playlists.NAME);
         return MusicUtils.getFirstStringResult(cursor, true);
     }

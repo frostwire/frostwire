@@ -85,7 +85,7 @@ public final class BuyActivity extends AbstractActivity {
 
     public BuyActivity() {
         super(R.layout.activity_buy);
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> getRewardFreeAdMinutesFromConfigTask(new WeakReference<>(this)));
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.CONFIG_MANAGER, () -> getRewardFreeAdMinutesFromConfigTask(new WeakReference<>(this)));
     }
 
     private static void getRewardFreeAdMinutesFromConfigTask(WeakReference<BuyActivity> buyActivityRef) {
