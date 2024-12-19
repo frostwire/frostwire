@@ -389,11 +389,14 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
             if (added > 0) {
                 final String message = getResources().getQuantityString(
                         R.plurals.NNNtrackstoplaylist, added, added);
-                AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show();
+
+                SystemUtils.postToUIThread(()-> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
             }
         } else if (mSelectedId != -1 && favoritesStore != null) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
                 favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
+                final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, 1);
+                SystemUtils.postToUIThread(()-> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
             });
         }
     }

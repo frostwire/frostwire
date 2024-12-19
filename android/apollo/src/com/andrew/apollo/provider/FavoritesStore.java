@@ -119,7 +119,6 @@ public class FavoritesStore extends SQLiteOpenHelper {
         writeableDatabase.insert(FavoriteColumns.NAME, null, values);
         writeableDatabase.setTransactionSuccessful();
         writeableDatabase.endTransaction();
-
     }
 
     /**
