@@ -39,7 +39,6 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.RemoteControlClient;
 import android.media.audiofx.AudioEffect;
-import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;

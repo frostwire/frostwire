@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,12 +127,15 @@ public final class SystemUtils {
 
     /**
      * Used to determine if the device is running Android12 or greater
+     * @noinspection unused
      */
     public static boolean hasAndroid12OrNewer() {
         return hasSdkOrNewer(VERSION_SDK_ANDROID_12_S);
     }
 
-    public static boolean hasAndroid13OrNewer() { return hasSdkOrNewer(VERSION_SDK_ANDROID_13_TIRAMISU); }
+    public static boolean hasAndroid13OrNewer() {
+        return hasSdkOrNewer(VERSION_SDK_ANDROID_13_TIRAMISU);
+    }
 
     /**
      * We call it "safe" because if any exceptions are thrown,
