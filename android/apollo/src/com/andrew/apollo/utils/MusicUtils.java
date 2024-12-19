@@ -134,6 +134,10 @@ public final class MusicUtils {
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
+        if (onServiceBoundCallback==null) {
+            LOG.info("MusicUtils::startMusicPlaybackService() onServiceBoundCallback is null, returning early");
+            return;
+        }
         try {
             synchronized (startMusicPlaybackServiceLock) {
                 serviceConnectionListener = new ServiceConnectionListener(onServiceBoundCallback);
@@ -143,6 +147,17 @@ public final class MusicUtils {
             LOG.info("MusicUtils::startMusicPlaybackService() ServiceConnectionListener bound");
         } catch (Throwable t) {
             LOG.error("MusicUtils::startMusicPlaybackService() error, ServiceConnectionListener not bound " + t.getMessage(), t);
+        }
+    }
+
+    public static void executeWithMusicPlaybackService(Context context, Runnable runnable) {
+        if (MusicPlaybackService.getInstance() == null) {
+            MusicUtils.startMusicPlaybackService(
+                    context,
+                    MusicUtils.buildStartMusicPlaybackServiceIntent(context),
+                    runnable);
+        } else {
+            MusicPlaybackService.safePost(runnable);
         }
     }
 

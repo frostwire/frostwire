@@ -19,6 +19,7 @@
 package com.andrew.apollo.ui.fragments.profile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -264,7 +265,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
         MusicUtils.makePlaylistMenu(getActivity(), GROUP_ID, subMenu, true);
 
         // More by artist
-            menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
+        menu.add(GROUP_ID, FragmentMenuItems.MORE_BY_ARTIST, Menu.NONE, getString(R.string.context_menu_more_by_artist))
                 .setIcon(R.drawable.contextmenu_icon_artist);
         // Delete the album
         menu.add(GROUP_ID, FragmentMenuItems.DELETE, Menu.NONE, getString(R.string.context_menu_delete))
@@ -279,13 +280,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                     new long[]{mSelectedId};
             switch (item.getItemId()) {
                 case FragmentMenuItems.PLAY_SELECTION:
-                    MusicPlaybackService.safePost(() -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
+                    MusicUtils.executeWithMusicPlaybackService(getActivity(), () -> MusicUtils.playFDs(songList, 0, MusicUtils.isShuffleEnabled()));
                     return true;
                 case FragmentMenuItems.PLAY_NEXT:
-                    MusicPlaybackService.safePost(() -> MusicUtils.playNext(songList));
+                    MusicUtils.executeWithMusicPlaybackService(getActivity(), () -> MusicUtils.playNext(songList));
                     return true;
                 case FragmentMenuItems.ADD_TO_QUEUE:
-                    MusicPlaybackService.safePost(() -> MusicUtils.addToQueue(getActivity(), songList));
+                    MusicUtils.executeWithMusicPlaybackService(getActivity(), () -> MusicUtils.addToQueue(getActivity(), songList));
                     return true;
                 case FragmentMenuItems.ADD_TO_FAVORITES:
                     onAddToFavorites();
@@ -390,13 +391,13 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
                 final String message = getResources().getQuantityString(
                         R.plurals.NNNtrackstoplaylist, added, added);
 
-                SystemUtils.postToUIThread(()-> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
+                SystemUtils.postToUIThread(() -> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
             }
         } else if (mSelectedId != -1 && favoritesStore != null) {
             SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
                 favoritesStore.addSongId(mSelectedId, mSongName, mAlbumName, mArtistName);
                 final String message = getResources().getQuantityString(R.plurals.NNNtrackstoplaylist, 1);
-                SystemUtils.postToUIThread(()-> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
+                SystemUtils.postToUIThread(() -> AppMsg.makeText(getActivity(), message, AppMsg.STYLE_CONFIRM).show());
             });
         }
     }
