@@ -34,7 +34,8 @@ FrostWire 2.9.2 build 743 DEC/17/2024
  - Fixed debounce issues with ad loading in HeaderBanner to prevent excessive reloads.
  - Refactored CreateNewPlaylistMenuAction for thread safety and UI responsiveness.
  - Improved menu preparation logic in ProfileActivity for better thread handling.
-
+ - Fixed Rename Playlist issue.
+ - Context menu "Play" and "Play Next" actions now work.
 
 FrostWire 2.8.2 build 740 NOV/28/2024
  - yt_dlp-2024.11.18

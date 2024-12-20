@@ -36,7 +36,7 @@ public class TellurideCourierCallback<T extends AbstractListAdapter> {
 
     private static Logger LOG = Logger.getLogger(TellurideCourierCallback.class);
 
-    public TellurideCourierCallback(TellurideCourier.SearchPerformer searchPerformer, String pageUrl, T adapter) {
+    public TellurideCourierCallback(TellurideCourier.SearchPerformer<T> searchPerformer, String pageUrl, T adapter) {
         this.searchPerformer = searchPerformer;
         this.url = pageUrl;
         this.adapter = adapter;

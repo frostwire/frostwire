@@ -283,8 +283,8 @@ public abstract class SearchEngine {
         }
 
         @Override
-        public TellurideCourier.SearchPerformer getTelluridePerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
-            return new TellurideCourier.SearchPerformer(token, pageUrl, adapter);
+        public TellurideCourier.SearchPerformer<SearchResultListAdapter> getTelluridePerformer(long token, String pageUrl, SearchResultListAdapter adapter) {
+            return new TellurideCourier.SearchPerformer<>(token, pageUrl, adapter);
         }
     };
 

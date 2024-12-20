@@ -125,13 +125,9 @@ public final class TellurideLauncher {
                     processListener.onFinished(process.exitValue());
                 }
             } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+                LOG.error("TellurideLauncher::launchRunnable", e);
             }
         };
     }
 
-    private static class TelluridePong {
-        int build;
-        String message;
-    }
 }

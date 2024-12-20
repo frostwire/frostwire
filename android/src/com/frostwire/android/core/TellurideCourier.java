@@ -146,7 +146,7 @@ public final class TellurideCourier {
         public SearchPerformer(long token, String pageUrl, T adapter) {
             super(token);
             this.pageUrl = pageUrl;
-            this.courierCallback = new TellurideCourierCallback<T>(this, pageUrl, adapter);
+            this.courierCallback = new TellurideCourierCallback<>(this, pageUrl, adapter);
         }
 
         @Override
