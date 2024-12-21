@@ -1279,8 +1279,6 @@ public class MusicPlaybackService extends Service {
                 setNextTrack();
             }
         } else {
-            //final String path = MediaStore.Audio.Media. + "/" + mCursor.getLong(IDCOLIDX);
-            //MediaStore.Audio.Media.EXTERNAL_CONTENT_URI + "/" + mCursor.getLong(IDCOLIDX);
             long fileId = mCursor.getLong(IDCOLIDX);
             String contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI.toString();
             if (SystemUtils.hasAndroid10OrNewer()) {

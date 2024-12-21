@@ -108,7 +108,12 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE) {
-            onExternalStoragePermissionsResult(permissions, grantResults);
+            boolean externalStorageGranted = onExternalStoragePermissionsResult(permissions, grantResults);
+            if (externalStorageGranted) {
+                // if there are playlists with no owner, we fix them by recreating them and copying all their songs
+                // to properly created playlists
+                SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> MusicUtils.fixPlaylistsOwnership());
+            }
         } else if (requestCode == POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE) {
             // do nothing for now
             LOG.info("DangerousPermissionsChecker.onRequestPermissionsResult() requestCode=" + requestCode);
@@ -116,7 +121,9 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
         }
     }
 
-    /** If Post notification permissions are granted, we start the MusicPlaybackService */
+    /**
+     * If Post notification permissions are granted, we start the MusicPlaybackService
+     */
     private void onPostNotificationsPermissionsResult(String[] permissions, int[] grantResults) {
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_GRANTED && permissions[i].equals(Manifest.permission.POST_NOTIFICATIONS)) {
@@ -194,13 +201,7 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
         for (int i = 0; i < permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                 if (permissions[i].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setIcon(R.drawable.sd_card_notification);
-                    builder.setTitle(R.string.why_we_need_storage_permissions);
-                    builder.setMessage(R.string.why_we_need_storage_permissions_summary);
-                    builder.setNegativeButton(R.string.exit, (dialog, which) -> shutdownFrostWire());
-                    builder.setPositiveButton(R.string.request_again, (dialog, which) -> requestPermissions());
-                    AlertDialog alertDialog = builder.create();
+                    AlertDialog alertDialog = getAlertDialogStoragePermissionsRationale(activity);
                     alertDialog.show();
                     return false;
                 }
@@ -209,6 +210,17 @@ public final class DangerousPermissionsChecker<T extends ActivityCompat.OnReques
 
         LOG.info("onExternalStoragePermissionsResult() " + Manifest.permission.READ_EXTERNAL_STORAGE + " granted");
         return true;
+    }
+
+    private AlertDialog getAlertDialogStoragePermissionsRationale(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setIcon(R.drawable.sd_card_notification);
+        builder.setTitle(R.string.why_we_need_storage_permissions);
+        builder.setMessage(R.string.why_we_need_storage_permissions_summary);
+        builder.setNegativeButton(R.string.exit, (dialog, which) -> shutdownFrostWire());
+        builder.setPositiveButton(R.string.request_again, (dialog, which) -> requestPermissions());
+        AlertDialog alertDialog = builder.create();
+        return alertDialog;
     }
 
     private void shutdownFrostWire() {

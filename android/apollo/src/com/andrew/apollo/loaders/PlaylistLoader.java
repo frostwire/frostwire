@@ -107,14 +107,26 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
                 playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
 
+            String selection = null;
+            String[] selectionArgs = null;
+
+            // Add a filter for OWNER_PACKAGE_NAME on Android 11+, turns out we were saving playlists using the wrong
+            // playlistUri for newer androids and they end up without an owner, and then we cannot add songs nor rename, nor delete them
+            // therefore, we should just filter playlists by the owner package name, so that we only get playlists created by this app
+            // or playlists created properly
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                selection = MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME + " = ?";
+                selectionArgs = new String[]{context.getPackageName()};
+            }
+
             return context.getContentResolver().query(
                     playlistUri,
                     new String[]{BaseColumns._ID, MediaStore.Audio.PlaylistsColumns.NAME},
-                    null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER
+                    selection, selectionArgs, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER
             );
 
         } catch (Throwable t) {
-            LOG.error("Error querying playlists", t);
+            LOG.error("PlaylistLoader.makePlaylistCursor(): Error querying playlists", t);
             return null;
         }
     }

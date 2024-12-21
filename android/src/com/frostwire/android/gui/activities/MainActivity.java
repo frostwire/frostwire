@@ -90,10 +90,7 @@ import java.util.Arrays;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MainActivity extends AbstractActivity implements
-        OnDialogClickListener,
-        ServiceConnection,
-        ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends AbstractActivity implements OnDialogClickListener, ServiceConnection, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final Logger LOG = Logger.getLogger(MainActivity.class);
     public static final int PROMO_VIDEO_PREVIEW_RESULT_CODE = 100;
@@ -196,7 +193,7 @@ public class MainActivity extends AbstractActivity implements
             final Method finishAndRemoveTaskMethod = clazz.getMethod("finishAndRemoveTask");
             finishAndRemoveTaskMethod.invoke(this);
         } catch (Throwable e) {
-            LOG.error("MainActivity.finishAndRemoveTaskViaReflection()",e);
+            LOG.error("MainActivity.finishAndRemoveTaskViaReflection()", e);
             super.finish();
         }
     }
@@ -310,10 +307,7 @@ public class MainActivity extends AbstractActivity implements
             final String uri = intent.getDataString();
             intent.setAction(null);
             if (uri != null) {
-                if (uri.startsWith("file") ||
-                        uri.startsWith("http") ||
-                        uri.startsWith("https") ||
-                        uri.startsWith("magnet")) {
+                if (uri.startsWith("file") || uri.startsWith("http") || uri.startsWith("https") || uri.startsWith("magnet")) {
                     TransferManager.instance().downloadTorrent(uri, new HandpickedTorrentDownloadDialogOnFetch(this, false));
                 } else if (uri.startsWith("content")) {
                     String newUri = saveViewContent(this, Uri.parse(uri));
@@ -368,11 +362,9 @@ public class MainActivity extends AbstractActivity implements
 
     private SparseArray<DangerousPermissionsChecker<MainActivity>> initPermissionsCheckers() {
         SparseArray<DangerousPermissionsChecker<MainActivity>> checkers = new SparseArray<>();
-        final DangerousPermissionsChecker<MainActivity> externalStorageChecker =
-                new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
+        final DangerousPermissionsChecker<MainActivity> externalStorageChecker = new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE);
         checkers.put(DangerousPermissionsChecker.EXTERNAL_STORAGE_PERMISSIONS_REQUEST_CODE, externalStorageChecker);
-        final DangerousPermissionsChecker<MainActivity> postNotificationsChecker =
-                new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
+        final DangerousPermissionsChecker<MainActivity> postNotificationsChecker = new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
         checkers.put(DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE, postNotificationsChecker);
         return checkers;
     }
@@ -425,8 +417,7 @@ public class MainActivity extends AbstractActivity implements
     private void mainResume() {
         syncNavigationMenu();
         if (firstTime) {
-            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
-                    !NetworkManager.instance().isTunnelUp()) {
+            if (ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) && !NetworkManager.instance().isTunnelUp()) {
                 UIUtils.showDismissableMessage(findView(R.id.activity_main_parent_layout), R.string.cannot_start_engine_without_vpn);
             } else {
                 firstTime = false;
@@ -468,27 +459,19 @@ public class MainActivity extends AbstractActivity implements
     }
 
     private void showLastBackDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(
-                LAST_BACK_DIALOG_ID,
-                R.string.minimize_frostwire,
-                R.string.are_you_sure_you_wanna_leave,
-                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
+        YesNoDialog dlg = YesNoDialog.newInstance(LAST_BACK_DIALOG_ID, R.string.minimize_frostwire, R.string.are_you_sure_you_wanna_leave, YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getSupportFragmentManager());
     }
 
     public void showShutdownDialog() {
-        YesNoDialog dlg = YesNoDialog.newInstance(
-                SHUTDOWN_DIALOG_ID,
-                R.string.app_shutdown_dlg_title,
-                R.string.app_shutdown_dlg_message,
-                YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
+        YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message, YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getSupportFragmentManager());
     }
 
     public void onDialogClick(String tag, int which) {
         String[] mainActivityDialogTags = {LAST_BACK_DIALOG_ID, SHUTDOWN_DIALOG_ID};
         boolean mainActivityShouldHandleThisClick = Arrays.asList(mainActivityDialogTags).contains(tag);
-         if (which != Dialog.BUTTON_POSITIVE || !mainActivityShouldHandleThisClick) {
+        if (which != Dialog.BUTTON_POSITIVE || !mainActivityShouldHandleThisClick) {
             return;
         }
         LOG.info("MainActivity.onDialogClick(tag:" + tag + ", which:" + which + ")");
@@ -708,10 +691,7 @@ public class MainActivity extends AbstractActivity implements
     }
 
     public static void refreshTransfers(Context context) {
-        Intent intent = new Intent(context,
-                MainActivity.class).
-                setAction(Constants.ACTION_SHOW_TRANSFERS).
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = new Intent(context, MainActivity.class).setAction(Constants.ACTION_SHOW_TRANSFERS).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         try {
             context.startActivity(intent);
         } catch (Throwable t) {
@@ -804,8 +784,7 @@ public class MainActivity extends AbstractActivity implements
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
                 if (!isDataUp) {
-                    UIUtils.showDismissableMessage(findView(android.R.id.content),
-                            R.string.no_data_check_internet_connection);
+                    UIUtils.showDismissableMessage(findView(android.R.id.content), R.string.no_data_check_internet_connection);
                 }
                 SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
             }

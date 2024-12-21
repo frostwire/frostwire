@@ -87,19 +87,8 @@ public class RenamePlaylist extends BasePlaylistDialog {
         if (mPlaylist.getText() == null) {
             return;
         }
-        LOG.info("Manifest.permission.READ_EXTERNAL_STORAGE Permissions granted: " +
-                (getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
-
-        LOG.info("Manifest.permission.READ_MEDIA_AUDIO Permissions granted: " +
-                (getContext().checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED));
-
-        LOG.info("Manifest.permission.WRITE_EXTERNAL_STORAGE Permissions granted: " +
-                (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
-
 
         final WeakReference<Dialog> dialogRef = new WeakReference<>(getDialog());
-
-
 
         final String playlistName = mPlaylist.getText().toString();
         if (!playlistName.isEmpty()) {
