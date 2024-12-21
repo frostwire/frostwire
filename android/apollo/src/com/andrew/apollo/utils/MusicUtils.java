@@ -1245,22 +1245,41 @@ public final class MusicUtils {
         long result = -1;
         if (context != null && name != null && !name.isEmpty()) {
             final ContentResolver resolver = context.getContentResolver();
-            final String[] projection = new String[]{PlaylistsColumns.NAME};
+            final String[] projection = new String[]{PlaylistsColumns.NAME, PlaylistsColumns.OWNER_PACKAGE_NAME};
 
-            // Use the correct URI based on Android version
             Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             }
 
-            final String selection = PlaylistsColumns.NAME + " = ?";
-            Cursor cursor = resolver.query(playlistUri,  // Corrected URI
-                    projection, selection, new String[]{name}, null);
+            final String selection = PlaylistsColumns.NAME + " = ? OR " + PlaylistsColumns.NAME + " = ?";
+            Cursor cursor = resolver.query(
+                    playlistUri,
+                    projection,
+                    selection,
+                    new String[]{name, name + " "},
+                    null
+            );
 
-            if (cursor != null && (fixingOwnerlessPlaylist || cursor.getCount() <= 0)) {
+            String ownerPackageName;
+            boolean alreadyFixed = false;
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    ownerPackageName = cursor.getString(cursor.getColumnIndex(PlaylistsColumns.OWNER_PACKAGE_NAME));
+                    if (fixingOwnerlessPlaylist && ownerPackageName != null && ownerPackageName.equals(context.getPackageName())) {
+                        alreadyFixed = true;
+                        break;
+                    }
+                } while (cursor.moveToNext());
+            }
+
+            if (cursor != null) {
+                cursor.close();
+            }
+
+            if (!alreadyFixed) {
                 final ContentValues values = new ContentValues();
-                // add an empty (invisible) space at the end of the name if there was an existing playlist
-                // with the same name but it had no owner (which we filter out in the PlaylistLoader.makePlaylistCursor)
                 values.put(PlaylistsColumns.NAME, name + (fixingOwnerlessPlaylist ? " " : ""));
                 values.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis() / 1000);
                 values.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000);
@@ -1270,14 +1289,13 @@ public final class MusicUtils {
                 if (newPlaylistUri != null && newPlaylistUri.getLastPathSegment() != null) {
                     result = Long.parseLong(newPlaylistUri.getLastPathSegment());
                 }
-            }
-
-            if (cursor != null) {
-                cursor.close();
+            } else {
+                LOG.info("createPlaylist() Playlist with name '" + name + "' already fixed, skipping.");
             }
         }
         return result;
     }
+
 
     public static long createPlaylist(final Context context, final String name) {
         return createPlaylist(context, name, false);
