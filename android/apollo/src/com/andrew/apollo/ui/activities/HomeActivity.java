@@ -44,14 +44,15 @@ public final class HomeActivity extends BaseActivity {
     private static HomeActivity instance;
 
     private static final Logger LOG = Logger.getLogger(HomeActivity.class);
-    private final DangerousPermissionsChecker<HomeActivity> dangerousPermissionsChecker;
+    private final DangerousPermissionsChecker<HomeActivity> notificationsPermissionsChecker;
 
     private boolean hasCheckedPermissions = false; // Single flag to prevent redundant checks
 
     public HomeActivity() {
         super(R.layout.activity_base);
         instance = this;
-        dangerousPermissionsChecker = new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
+        notificationsPermissionsChecker = new DangerousPermissionsChecker<>(this, DangerousPermissionsChecker.POST_NOTIFICATIONS_PERMISSIONS_REQUEST_CODE);
+
     }
 
     @Override
@@ -87,7 +88,7 @@ public final class HomeActivity extends BaseActivity {
                     != PackageManager.PERMISSION_GRANTED) {
 
                 LOG.info("Requesting POST_NOTIFICATIONS permission...");
-                dangerousPermissionsChecker.requestPermissions();
+                notificationsPermissionsChecker.requestPermissions();
             } else {
                 LOG.info("POST_NOTIFICATIONS permission already granted.");
             }
@@ -121,7 +122,7 @@ public final class HomeActivity extends BaseActivity {
                         + "Without this, Android may kill the app when it runs in the background.")
                 .setPositiveButton("Allow", (dialog, which) -> {
                     LOG.info("User agreed to allow POST_NOTIFICATIONS permission.");
-                    dangerousPermissionsChecker.requestPermissions();
+                    notificationsPermissionsChecker.requestPermissions();
                 })
                 .setNegativeButton("Deny", (dialog, which) -> {
                     LOG.warn("POST_NOTIFICATIONS permission denied by user.");

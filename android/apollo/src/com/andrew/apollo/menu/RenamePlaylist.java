@@ -15,7 +15,10 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.Manifest;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -27,7 +30,6 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 
 import java.lang.ref.WeakReference;
-import java.util.Objects;
 
 /**
  * Alert dialog used to rename playlists.
@@ -85,6 +87,20 @@ public class RenamePlaylist extends BasePlaylistDialog {
         if (mPlaylist.getText() == null) {
             return;
         }
+        LOG.info("Manifest.permission.READ_EXTERNAL_STORAGE Permissions granted: " +
+                (getContext().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
+
+        LOG.info("Manifest.permission.READ_MEDIA_AUDIO Permissions granted: " +
+                (getContext().checkSelfPermission(Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED));
+
+        LOG.info("Manifest.permission.WRITE_EXTERNAL_STORAGE Permissions granted: " +
+                (getContext().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
+
+
+        final WeakReference<Dialog> dialogRef = new WeakReference<>(getDialog());
+
+
+
         final String playlistName = mPlaylist.getText().toString();
         if (!playlistName.isEmpty()) {
             try {
@@ -99,8 +115,6 @@ public class RenamePlaylist extends BasePlaylistDialog {
                 }
                 Uri specificPlaylistUri = ContentUris.withAppendedId(playlistUri, mRenameId);
 
-                final WeakReference<Dialog> dialogRef = new WeakReference<>(getDialog());
-
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
                     LOG.info("RenamePlaylist.onSaveClick() Renaming playlist: " + mDefaultname + " to: " + playlistName);
                     try {
@@ -110,8 +124,8 @@ public class RenamePlaylist extends BasePlaylistDialog {
                         } else {
                             LOG.error("RenamePlaylist.onSaveClick() Failed to rename playlist");
                         }
-                    } catch (IllegalArgumentException e) {
-                        LOG.error("RenamePlaylist.onSaveClick() Invalid URI: " + specificPlaylistUri, e);
+                    } catch (Throwable e) {
+                        LOG.error("RenamePlaylist.onSaveClick() resolver.update(uri=" + specificPlaylistUri + "...) failed", e);
                     }
 
                     SystemUtils.postToUIThread(() -> {

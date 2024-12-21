@@ -1213,17 +1213,32 @@ public final class MusicUtils {
             final String[] projection = new String[]{
                     PlaylistsColumns.NAME
             };
-            final String selection = PlaylistsColumns.NAME + " = ?";
-            Cursor cursor = resolver.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                    projection, selection, new String[]{name}, null);
-            if (cursor != null && cursor.getCount() <= 0) {
-                final ContentValues values = new ContentValues(1);
-                values.put(PlaylistsColumns.NAME, name);
-                final Uri uri = resolver.insert(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                        values);
 
-                if (uri != null && uri.getLastPathSegment() != null) {
-                    result = Long.parseLong(uri.getLastPathSegment());
+            // Use the correct URI based on Android version
+            Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            }
+
+            final String selection = PlaylistsColumns.NAME + " = ?";
+            Cursor cursor = resolver.query(
+                    playlistUri,  // Corrected URI
+                    projection,
+                    selection,
+                    new String[]{name},
+                    null
+            );
+
+            if (cursor != null && cursor.getCount() <= 0) {
+                final ContentValues values = new ContentValues();
+                values.put(PlaylistsColumns.NAME, name);
+                values.put(MediaStore.Audio.Playlists.DATE_ADDED, System.currentTimeMillis() / 1000);
+                values.put(MediaStore.Audio.Playlists.DATE_MODIFIED, System.currentTimeMillis() / 1000);
+
+                final Uri newPlaylistUri = resolver.insert(playlistUri, values);
+
+                if (newPlaylistUri != null && newPlaylistUri.getLastPathSegment() != null) {
+                    result = Long.parseLong(newPlaylistUri.getLastPathSegment());
                 }
             }
 
@@ -1280,7 +1295,9 @@ public final class MusicUtils {
         final String[] projection = new String[]{
                 MediaStore.Audio.Playlists.Members._ID
         };
-        final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistid);
+
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY, playlistid);
+
         Cursor cursor = null;
         try {
             cursor = resolver.query(uri, projection, null, null, null);
@@ -1299,6 +1316,7 @@ public final class MusicUtils {
                 try {
                     numinserted += resolver.bulkInsert(uri, mContentValuesCache);
                 } catch (Throwable ignored) {
+                    LOG.error("MusicUtils.addToPlaylist() resolver.bulkInsert() failed", ignored, true);
                 }
             }
             if (updateQueue) {
@@ -1314,6 +1332,37 @@ public final class MusicUtils {
             );
         } else {
             LOG.warn("Unable to complete addToPlaylist, review the logic");
+        }
+    }
+
+    public static boolean isPlaylistOwnershipFrostWires(Context context, Uri specificPlaylistUri) {
+        String[] projection = new String[]{
+                MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME
+        };
+
+        Cursor cursor = context.getContentResolver().query(
+                specificPlaylistUri,
+                projection,
+                null,
+                null,
+                null
+        );
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String ownerPackage = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME));
+            LOG.info("Playlist owner: " + ownerPackage);
+
+            if (ownerPackage != null && ownerPackage.equals(context.getPackageName())) {
+                LOG.info("Your app owns this playlist and should have write access.");
+            } else {
+                LOG.warn("Your app does not own this playlist. Write access may not be allowed.");
+            }
+            cursor.close();
+
+            return ownerPackage != null && ownerPackage.equals(context.getPackageName());
+        } else {
+            LOG.error("Unable to query playlist owner.");
+            return false;
         }
     }
 
@@ -1357,6 +1406,7 @@ public final class MusicUtils {
             });
         } catch (Throwable ignored) {
             // could not acquire provider for uri
+            LOG.error("MusicUtils.removeFromPlaylist() resolver.delete() failed", ignored, true);
         }
     }
 
