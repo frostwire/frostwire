@@ -464,6 +464,10 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
     }
 
     public void showShutdownDialog() {
+        if (getSupportFragmentManager().isStateSaved()) {
+            LOG.warn("showShutdownDialog() aborted: FragmentManager state is already saved.");
+            return;
+        }
         YesNoDialog dlg = YesNoDialog.newInstance(SHUTDOWN_DIALOG_ID, R.string.app_shutdown_dlg_title, R.string.app_shutdown_dlg_message, YesNoDialog.FLAG_DISMISS_ON_OK_BEFORE_PERFORM_DIALOG_CLICK);
         dlg.show(getSupportFragmentManager());
     }
