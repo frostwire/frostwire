@@ -22,6 +22,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
+import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -31,6 +33,7 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
@@ -87,6 +90,24 @@ public final class NotificationUpdateDaemon {
             } catch (SecurityException t) {
                 LOG.warn(t.getMessage(), t);
             }
+        }
+    }
+
+    public static void showTempNotification(MusicPlaybackService service) {
+        // Prepare a temporary notification for startForeground
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(service, Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID)
+                .setContentTitle("FrostWire Music Player")
+                .setContentText("Player starting...")
+                .setSmallIcon(R.drawable.menu_icon_my_music) // Replace with your app icon
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true); // Mark it as ongoing for a foreground service
+        Notification notification = builder.build();
+
+        // Call startForeground early
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        } else {
+            service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
         }
     }
 

@@ -70,6 +70,7 @@ import com.frostwire.android.BuildConfig;
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
 import com.frostwire.android.core.Constants;
+import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.util.Logger;
@@ -486,6 +487,7 @@ public class MusicPlaybackService extends Service {
         initServiceLatch.countDown();
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
+        NotificationUpdateDaemon.showTempNotification(this);
         prepareAudioFocusRequest();
         String permission = SystemUtils.hasAndroid13OrNewer() ?
                 Manifest.permission.READ_MEDIA_AUDIO :
