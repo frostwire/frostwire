@@ -131,7 +131,7 @@ public final class MusicUtils {
             LOG.info("MusicUtils::startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
             // should end with a android.app.Service#startForeground(int, android.app.Notification) call
             // otherwise if in 5 seconds it's not invoked, the system will crash the app
-            context.startForegroundService(intent);
+            ContextCompat.startForegroundService(context, intent);
         } catch (Throwable t) {
             LOG.error(t.getMessage(), t);
         }
