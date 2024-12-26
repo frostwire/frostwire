@@ -1,4 +1,4 @@
-FrostWire 2.9.3 build 745 DEC/23/2024
+FrostWire 2.9.4 build 746 DEC/26/2024
  - Upgraded targetSdkVersion to 34 (Android 14).
  - Upgraded compileSdk to 35 (Android 15).
  - Increased minSdkVersion to 26 (Android 8.0 Oreo).
