@@ -98,10 +98,7 @@ public class RenamePlaylist extends BasePlaylistDialog {
                 values.put(MediaStore.Audio.Playlists.NAME, Capitalize.capitalize(playlistName));
 
                 // Use the specific URI for the playlist
-                Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                    playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-                }
+                Uri playlistUri = MusicUtils.getPlaylistContentUri();
                 Uri specificPlaylistUri = ContentUris.withAppendedId(playlistUri, mRenameId);
 
                 SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
@@ -143,8 +140,9 @@ public class RenamePlaylist extends BasePlaylistDialog {
      * @return The name of the playlist
      */
     private String getPlaylistNameFromId(final long id) {
+        Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
         Cursor cursor = getActivity().getContentResolver().query(
-                MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[]{
+                playlistContentUri, new String[]{
                         MediaStore.Audio.Playlists.NAME
                 }, MediaStore.Audio.Playlists._ID + "=?", new String[]{
                         String.valueOf(id)

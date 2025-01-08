@@ -32,6 +32,7 @@ import android.database.CursorIndexOutOfBoundsException;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
 import android.provider.BaseColumns;
@@ -238,14 +239,18 @@ public final class MusicUtils {
             return;
         }
 
-        Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Uri playlistUri = MusicUtils.getPlaylistContentUri();
 
-        // Use the proper content URI for Android 11+
+        List<String> projectionList = new ArrayList<>();
+        projectionList.add(MediaStore.Audio.Playlists._ID);
+        projectionList.add(MediaStore.Audio.Playlists.NAME);
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+            projectionList.add(MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME);
         }
 
-        String[] projection = new String[]{MediaStore.Audio.Playlists._ID, MediaStore.Audio.Playlists.NAME, MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME};
+
+        String[] projection = projectionList.toArray(new String[0]);
 
         try (Cursor cursor = context.getContentResolver().query(playlistUri, projection, null, null, Playlists.DEFAULT_SORT_ORDER)) {
 
@@ -253,9 +258,13 @@ public final class MusicUtils {
                 while (cursor.moveToNext()) {
                     long playlistId = cursor.getLong(cursor.getColumnIndex(Playlists._ID));
                     String playlistName = cursor.getString(cursor.getColumnIndex(Playlists.NAME));
-                    String ownerPackage = cursor.getString(cursor.getColumnIndex(Playlists.OWNER_PACKAGE_NAME));
+                    String ownerPackage = null;
 
-                    // Check if the playlist is ownerless
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        ownerPackage = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME));
+                    }
+
+                    // Check if the playlist is owner less
                     if (ownerPackage == null || !ownerPackage.equals(context.getPackageName())) {
                         LOG.info("MusicUtils.fixPlaylistsOwnership: Fixing ownerless playlist: " + playlistName);
 
@@ -327,10 +336,7 @@ public final class MusicUtils {
         if (context.getContentResolver() == null) {
             return 0;
         }
-        Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        }
+        Uri playlistUri = MusicUtils.getPlaylistContentUri();
         return context.getContentResolver().delete(playlistUri, Playlists._ID + " = ?", new String[]{String.valueOf(playlistId)});
     }
 
@@ -1133,7 +1139,8 @@ public final class MusicUtils {
      * @return The ID for a playlist.
      */
     public static long getIdForPlaylist(final Context context, final String name) {
-        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, new String[]{BaseColumns._ID}, PlaylistsColumns.NAME + "=?", new String[]{name}, PlaylistsColumns.NAME);
+        Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
+        Cursor cursor = context.getContentResolver().query(playlistContentUri, new String[]{BaseColumns._ID}, PlaylistsColumns.NAME + "=?", new String[]{name}, PlaylistsColumns.NAME);
         return getFirstId(cursor, -1);
     }
 
@@ -1214,6 +1221,19 @@ public final class MusicUtils {
         }
     }
 
+    /**
+     * Resolves the appropriate playlist content URI based on the Android version.
+     *
+     * @return the appropriate content URI for accessing playlists
+     */
+    public static Uri getPlaylistContentUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+        } else {
+            return MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        }
+    }
+
     public static List<Playlist> getPlaylists(final Context context) {
         final List<Playlist> result = new ArrayList<>();
 
@@ -1245,13 +1265,14 @@ public final class MusicUtils {
         long result = -1;
         if (context != null && name != null && !name.isEmpty()) {
             final ContentResolver resolver = context.getContentResolver();
-            final String[] projection = new String[]{PlaylistsColumns.NAME, PlaylistsColumns.OWNER_PACKAGE_NAME};
+            List<String> projectionList = new ArrayList<>();
+            projectionList.add(PlaylistsColumns.NAME);
 
-            Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+            Uri playlistUri = MusicUtils.getPlaylistContentUri();;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
+                projectionList.add(PlaylistsColumns.OWNER_PACKAGE_NAME);
             }
-
+            final String[] projection = projectionList.toArray(new String[0]);
             final String selection = PlaylistsColumns.NAME + " = ? OR " + PlaylistsColumns.NAME + " = ?";
             Cursor cursor = resolver.query(
                     playlistUri,
@@ -1261,12 +1282,18 @@ public final class MusicUtils {
                     null
             );
 
-            String ownerPackageName;
+            String ownerPackageName = null;
             boolean alreadyFixed = false;
 
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    ownerPackageName = cursor.getString(cursor.getColumnIndex(PlaylistsColumns.OWNER_PACKAGE_NAME));
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                        try {
+                            ownerPackageName = cursor.getString(cursor.getColumnIndex(PlaylistsColumns.OWNER_PACKAGE_NAME));
+                        } catch (Throwable t) {
+                            LOG.error("createPlaylist() cursor.getString() failed: " + t.getMessage(), t, true);
+                        }
+                    }
                     if (fixingOwnerlessPlaylist && ownerPackageName != null && ownerPackageName.equals(context.getPackageName())) {
                         alreadyFixed = true;
                         break;

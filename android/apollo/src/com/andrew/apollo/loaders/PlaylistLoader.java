@@ -100,12 +100,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
      */
     public static Cursor makePlaylistCursor(final Context context) {
         try {
-            Uri playlistUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
-
-            // Use the proper content URI for Android 11+
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                playlistUri = MediaStore.Audio.Playlists.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-            }
+            Uri playlistUri = MusicUtils.getPlaylistContentUri();
 
             String selection = null;
             String[] selectionArgs = null;

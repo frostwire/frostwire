@@ -20,6 +20,7 @@ package com.andrew.apollo.menu;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -100,7 +101,10 @@ public final class CreateNewPlaylist extends BasePlaylistDialog {
         };
         final ContentResolver resolver = getActivity().getContentResolver();
         final String selection = MediaStore.Audio.Playlists.NAME + " != ''";
-        Cursor cursor = resolver.query(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI, projection,
+
+        Uri playlistContentUri = MusicUtils.getPlaylistContentUri();
+
+        Cursor cursor = resolver.query(playlistContentUri, projection,
                 selection, null, MediaStore.Audio.Playlists.NAME);
         if (cursor == null) {
             return null;
