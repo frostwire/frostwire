@@ -788,8 +788,9 @@ public final class MusicUtils {
 
         if (cursor != null && cursor.getCount() == 1) {
             cursor.moveToFirst();
+            Song result = new Song(songId, cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
             cursor.close();
-            return new Song(songId, cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
+            return result;
         } else {
             return null;
         }
