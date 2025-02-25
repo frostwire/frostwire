@@ -1,3 +1,11 @@
+build 37 - feb/25/2025
+ - yt_dlp-2025.2.19
+ - dev: astroid-3.3.8
+ - dev: pylint-3.34
+ - dev: pyinstaller-6.12.0
+ - dev: pip-25.0.1
+
+
 build 36 - nov/23/2024
  - yt_dlp-2024.11.18
  - dev: pyinstaller-6.11.1
