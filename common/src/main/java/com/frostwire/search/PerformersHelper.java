@@ -294,14 +294,14 @@ public final class PerformersHelper {
             int matchedInResult1 = countMatchedTokens(normalizedResult1, searchTokens);
             int matchedInResult2 = countMatchedTokens(normalizedResult2, searchTokens);
             if (matchedInResult1 != matchedInResult2) {
-                LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " != matchedInResult2: " + matchedInResult2);
+                //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " != matchedInResult2: " + matchedInResult2);
                 return Integer.compare(matchedInResult2, matchedInResult1); // Descending order
             }
-            LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " == matchedInResult2: " + matchedInResult2);
+            //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " == matchedInResult2: " + matchedInResult2);
             // If the number of matched tokens is the same, we use levenshtein distances to sort
             int distance1 = levenshteinDistance(normalizedResult1, currentQuery.toLowerCase());
             int distance2 = levenshteinDistance(normalizedResult2, currentQuery.toLowerCase());
-            LOG.info(String.format("sortByRelevance() distance to \"{}\" distance1: " + distance1 + " == distance2: ", currentQuery) + distance2);
+            //LOG.info(String.format("sortByRelevance() distance to \"{}\" distance1: " + distance1 + " == distance2: ", currentQuery) + distance2);
 
             if (distance1 != distance2 || (!(o1 instanceof TorrentSearchResult))) {
                 Integer.compare(distance1, distance2); // smallest distance first for descending order
