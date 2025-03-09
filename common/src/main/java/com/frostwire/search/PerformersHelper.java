@@ -22,7 +22,6 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.regex.Pattern;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
@@ -295,26 +294,13 @@ public final class PerformersHelper {
             int matchedInResult2 = countMatchedTokens(normalizedResult2, searchTokens);
             if (matchedInResult1 != matchedInResult2) {
                 //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " != matchedInResult2: " + matchedInResult2);
-                return Integer.compare(matchedInResult2, matchedInResult1); // Descending order
+                return Integer.compare(matchedInResult2, matchedInResult1); // biggest count first
             }
             //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " == matchedInResult2: " + matchedInResult2);
             // If the number of matched tokens is the same, we use levenshtein distances to sort
             int distance1 = levenshteinDistance(normalizedResult1, currentQuery.toLowerCase());
             int distance2 = levenshteinDistance(normalizedResult2, currentQuery.toLowerCase());
-            //LOG.info(String.format("sortByRelevance() distance to \"{}\" distance1: " + distance1 + " == distance2: ", currentQuery) + distance2);
-
-            if (distance1 != distance2 || (!(o1 instanceof TorrentSearchResult))) {
-                Integer.compare(distance1, distance2); // smallest distance first for descending order
-            }
-
-            if (o1 instanceof TorrentSearchResult) {
-                TorrentSearchResult tsr1 = (TorrentSearchResult) o1;
-                TorrentSearchResult tsr2 = (TorrentSearchResult) o2;
-                if (tsr1.getSeeds() != tsr2.getSeeds()) {
-                    return Integer.compare(tsr2.getSeeds(), tsr1.getSeeds());
-                }
-            }
-            return Integer.compare(distance1, distance2);
+            return Integer.compare(distance1, distance2); // shortest distance first
         });
 
         return sortedResults;
