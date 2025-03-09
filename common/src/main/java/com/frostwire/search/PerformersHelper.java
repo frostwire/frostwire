@@ -26,7 +26,13 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.text.Normalizer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
  * @author gubatron
@@ -228,6 +234,7 @@ public final class PerformersHelper {
 
     /**
      * Similar to someSearchTokensMatchSearchResult but using fuzzy matching
+     *
      * @param keywords
      * @param sr
      * @return
@@ -269,5 +276,45 @@ public final class PerformersHelper {
 
     private static int costOfSubstitution(char a, char b) {
         return a == b ? 0 : 1;
+    }
+
+    // Currently being tested on Android, SearchFragment when results are being added to the adapter
+    public static List<? extends SearchResult> sortByRelevance(String currentQuery, List<? extends SearchResult> newResults) {
+        if (newResults == null || newResults.isEmpty()) {
+            return newResults;
+        }
+
+        List<SearchResult> sortedResults = new ArrayList<>(newResults);
+        List<String> searchTokens = tokenizeSearchKeywords(currentQuery);
+        sortedResults.sort((o1, o2) -> {
+            String normalizedResult1 = searchResultAsNormalizedString(o1).toLowerCase();
+            String normalizedResult2 = searchResultAsNormalizedString(o2).toLowerCase();
+
+            // Count how many search tokens are in each result
+            int matchedInResult1 = countMatchedTokens(normalizedResult1, searchTokens);
+            int matchedInResult2 = countMatchedTokens(normalizedResult2, searchTokens);
+            if (matchedInResult1 != matchedInResult2) {
+                LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " != matchedInResult2: " + matchedInResult2);
+                return Integer.compare(matchedInResult2, matchedInResult1); // Descending order
+            }
+            LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " == matchedInResult2: " + matchedInResult2);
+            // If the number of matched tokens is the same, we use levenshtein distances to sort
+            int distance1 = levenshteinDistance(normalizedResult1, currentQuery.toLowerCase());
+            int distance2 = levenshteinDistance(normalizedResult2, currentQuery.toLowerCase());
+            LOG.info(String.format("sortByRelevance() distance to \"{}\" distance1: " + distance1 + " == distance2: ", currentQuery) + distance2);
+            return Integer.compare(distance1, distance2); // smallest distance first for descending order
+        });
+
+        return sortedResults;
+    }
+
+    private static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
+        int count = 0;
+        for (String token : searchTokens) {
+            if (normalizedResult.contains(token)) {
+                count++;
+            }
+        }
+        return count;
     }
 }
