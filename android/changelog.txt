@@ -2,6 +2,7 @@ FrostWire 2.9.5 build 747 MAR/09/2025
  - Torrent search works much better
  - Filter out search results with no keyword matches
  - yt_dlp-2025.2.19
+ - com.google.firebase:firebase-crashlytics-gradle:3.0.3
 
 FrostWire 2.9.4 build 746 DEC/26/2024
  - Upgraded targetSdkVersion to 34 (Android 14).
