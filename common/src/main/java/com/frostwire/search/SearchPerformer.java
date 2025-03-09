@@ -18,6 +18,8 @@
 package com.frostwire.search;
 
 /**
+ * NOTE: Doesn't have Keywords because some search performers depend on solely URIs.
+ * See WebSearchPerformer.
  * @author gubatron
  * @author aldenml
  */

@@ -22,11 +22,11 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.UrlUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.frostwire.util.http.HttpClient;
-
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +39,8 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     private static final String[] STREAMABLE_EXTENSIONS = new String[]{"mp3", "ogg", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "mov", "mpg", "mpeg", "3gp", "m4v", "webm"};
     private final String domainName;
     private final String keywords;
+
+    private final List<String> keywordsList;
     private final String encodedKeywords;
     private final int timeout;
     private final HttpClient client;
@@ -50,6 +52,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         }
         this.domainName = domainName;
         this.keywords = keywords;
+        this.keywordsList = PerformersHelper.tokenizeSearchKeywords(keywords);
         this.encodedKeywords = UrlUtils.encode(keywords);
         this.timeout = timeoutInMilliseconds;
         this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
@@ -57,10 +60,6 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     public static boolean isStreamable(String filename) {
         return Arrays.asList(STREAMABLE_EXTENSIONS).contains(FilenameUtils.getExtension(filename));
-    }
-
-    public final String getKeywords() {
-        return keywords;
     }
 
     public String getEncodedKeywords() {
@@ -115,5 +114,14 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     public String getDomainName() {
         return domainName;
+    }
+
+
+    public List<String> getKeywords() {
+        return keywordsList;
+    }
+
+    public String getKeywordsString() {
+        return keywords;
     }
 }

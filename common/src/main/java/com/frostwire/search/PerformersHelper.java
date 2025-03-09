@@ -75,8 +75,17 @@ public final class PerformersHelper {
             if (matcherFound) {
                 SearchResult sr = performer.fromMatcher(matcher);
                 if (sr != null) {
-                    result.add(sr);
-                    i++;
+                    if (sr instanceof WebSearchPerformer) {
+                        List<String> keywords = ((WebSearchPerformer) sr).getKeywords();
+                        if (oneKeywordMatchedOrFuzzyMatchedFilter(keywords, sr)) {
+                            result.add(sr);
+                            i++;
+                        }
+                    } else {
+                        result.add(sr);
+                        i++;
+                    }
+
                 }
             }
         } while (matcherFound && i < regexMaxResults && !performer.isStopped());
@@ -150,7 +159,7 @@ public final class PerformersHelper {
     }
 
     public static boolean someSearchTokensMatchSearchResult(List<String> keywords, SearchResult sr) {
-        String str = searchResultAsNormalizedString(sr);
+        String str = searchResultAsNormalizedString(sr).toLowerCase();
         for (String keyword : keywords) {
             if (str.contains(keyword)) {
                 return true;
@@ -215,5 +224,50 @@ public final class PerformersHelper {
         }
 
         return normalizedTokens;
+    }
+
+    /**
+     * Similar to someSearchTokensMatchSearchResult but using fuzzy matching
+     * @param keywords
+     * @param sr
+     * @return
+     */
+    public static boolean oneKeywordMatchedOrFuzzyMatchedFilter(List<String> keywords, SearchResult sr) {
+        String normalizedSearchResultAsLowerCaseString = searchResultAsNormalizedString(sr).toLowerCase();
+
+        for (String keyword : keywords) {
+            String lowerKeyword = keyword.toLowerCase();
+            if (normalizedSearchResultAsLowerCaseString.contains(lowerKeyword) || isFuzzyMatch(normalizedSearchResultAsLowerCaseString, lowerKeyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isFuzzyMatch(String str, String keyword) {
+        int distance = levenshteinDistance(str, keyword);
+        int threshold = Math.max(str.length(), keyword.length()) / 2; // Adjust threshold as needed
+        return distance <= threshold;
+    }
+
+    private static int levenshteinDistance(String a, String b) {
+        int[][] dp = new int[a.length() + 1][b.length() + 1];
+        for (int i = 0; i <= a.length(); i++) {
+            for (int j = 0; j <= b.length(); j++) {
+                if (i == 0) {
+                    dp[i][j] = j;
+                } else if (j == 0) {
+                    dp[i][j] = i;
+                } else {
+                    dp[i][j] = Math.min(dp[i - 1][j - 1] + costOfSubstitution(a.charAt(i - 1), b.charAt(j - 1)),
+                            Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1));
+                }
+            }
+        }
+        return dp[a.length()][b.length()];
+    }
+
+    private static int costOfSubstitution(char a, char b) {
+        return a == b ? 0 : 1;
     }
 }
