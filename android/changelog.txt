@@ -5,6 +5,7 @@ FrostWire 2.9.5 build 747 MAR/09/2025
  - com.google.firebase:firebase-crashlytics-gradle:3.0.3
  - com.google.firebase:firebase-bom:33.10.0
  - com.applovin:applovin-sdk:13.1.0
+ - com.applovin.mediation:unityads-adapter:4.13.1.1
 
 FrostWire 2.9.4 build 746 DEC/26/2024
  - Upgraded targetSdkVersion to 34 (Android 14).
