@@ -50,10 +50,10 @@ import com.frostwire.android.util.ImageLoader;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.licenses.Licenses;
 import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
-import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.search.yt.YTSearchResult;
 import com.frostwire.util.Logger;
@@ -145,6 +145,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     public void addResults(List<? extends SearchResult> allNewResults) {
         synchronized (listLock) {
             fullList.addAll(allNewResults);
+
         }
     }
 
@@ -348,21 +349,22 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     private int getFileTypeIconId() {
-        switch (fileType) {
-            case Constants.FILE_TYPE_APPLICATIONS:
-                return R.drawable.list_item_application_icon;
-            case Constants.FILE_TYPE_AUDIO:
-                return R.drawable.list_item_audio_icon;
-            case Constants.FILE_TYPE_DOCUMENTS:
-                return R.drawable.list_item_document_icon;
-            case Constants.FILE_TYPE_PICTURES:
-                return R.drawable.list_item_picture_icon;
-            case Constants.FILE_TYPE_VIDEOS:
-                return R.drawable.list_item_video_icon;
-            case Constants.FILE_TYPE_TORRENTS:
-                return R.drawable.list_item_torrent_icon;
-            default:
-                return R.drawable.list_item_question_mark;
+        return switch (fileType) {
+            case Constants.FILE_TYPE_APPLICATIONS -> R.drawable.list_item_application_icon;
+            case Constants.FILE_TYPE_AUDIO -> R.drawable.list_item_audio_icon;
+            case Constants.FILE_TYPE_DOCUMENTS -> R.drawable.list_item_document_icon;
+            case Constants.FILE_TYPE_PICTURES -> R.drawable.list_item_picture_icon;
+            case Constants.FILE_TYPE_VIDEOS -> R.drawable.list_item_video_icon;
+            case Constants.FILE_TYPE_TORRENTS -> R.drawable.list_item_torrent_icon;
+            default -> R.drawable.list_item_question_mark;
+        };
+    }
+
+    public void sortByKeywordsRelevance(String currentQuery) {
+        synchronized (listLock) {
+            List<SearchResult>  sorted = (List<SearchResult>) PerformersHelper.sortByRelevance(currentQuery, fullList);
+            fullList.clear();
+            fullList.addAll(sorted);
         }
     }
 

@@ -673,7 +673,11 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
             }
             final int fileType = searchFragment.searchInput.getSelectedFileType();
             // Add new newResults to the adapter
+
+
             searchFragment.adapter.addResults(newResults);
+            searchFragment.adapter.sortByKeywordsRelevance(searchFragment.currentQuery);
+
             // Sets the file type in the adapter and filters search results by file type
             boolean differentFileType = searchFragment.adapter.getFileType() != fileType;
             searchFragment.adapter.setFileType(fileType, () -> {
@@ -685,7 +689,7 @@ public final class SearchFragment extends AbstractFragment implements MainFragme
                 } else {
                     searchFragment.fileTypeCounter.add(fsr);
                 }
-                SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, differentFileType));
+                SystemUtils.postToUIThread(() -> searchFragment.updateFilteredSearchResults(fsr.mediaTypeFiltered, true));
             }); //background call
         }
 

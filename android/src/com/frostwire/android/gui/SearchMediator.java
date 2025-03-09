@@ -185,11 +185,13 @@ public final class SearchMediator {
 
         try {
             list = results.stream().parallel().filter(sr -> {
-                if (sr instanceof CrawledSearchResult && PerformersHelper.allQueryTokensExistInSearchResult(new LinkedList<>(currentSearchTokens), sr)) {
+                if (sr instanceof CrawledSearchResult && PerformersHelper.oneKeywordMatchedOrFuzzyMatchedFilter(new LinkedList<>(currentSearchTokens), sr)) {
                     return true;
                 }
                 return !(sr instanceof CrawledSearchResult);
             }).collect(Collectors.toList());
+
+
         } catch (Throwable t) {
             list = new LinkedList<>();
         }
