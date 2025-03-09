@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml),
  *            Marcelina Knitter (@marcelinkaaa)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,6 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     /**
      * Changes the fileType, extracts all the file search results, then filters them by type
      * and updates (FilteredSearchResults) filteredSearchResults (see getFilteredSearchResults())
-     *
-     * @param fileType
      */
     public void setFileType(final int fileType, boolean appendToPreviouslyFilteredResults, Runnable callback) {
         boolean differentFileType = this.fileType != fileType;
@@ -362,7 +360,7 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
 
     public void sortByKeywordsRelevance(String currentQuery) {
         synchronized (listLock) {
-            List<SearchResult>  sorted = (List<SearchResult>) PerformersHelper.sortByRelevance(currentQuery, fullList);
+            List<SearchResult> sorted = (List<SearchResult>) PerformersHelper.sortByRelevance(currentQuery, fullList);
             fullList.clear();
             fullList.addAll(sorted);
         }
