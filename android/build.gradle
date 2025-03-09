@@ -115,7 +115,7 @@ android {
                 }
             }
             pip {
-                install "yt_dlp==2024.11.18"
+                install "yt_dlp==2025.2.19"
                 // helps a lot with debugging
                 //options "--verbose"
             }
