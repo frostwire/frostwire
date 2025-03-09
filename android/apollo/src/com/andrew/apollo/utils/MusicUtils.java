@@ -1269,7 +1269,8 @@ public final class MusicUtils {
             List<String> projectionList = new ArrayList<>();
             projectionList.add(PlaylistsColumns.NAME);
 
-            Uri playlistUri = MusicUtils.getPlaylistContentUri();;
+            Uri playlistUri = MusicUtils.getPlaylistContentUri();
+            ;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                 projectionList.add(PlaylistsColumns.OWNER_PACKAGE_NAME);
             }
@@ -1433,17 +1434,20 @@ public final class MusicUtils {
      * Removes a single track from a given playlist
      *
      * @param context    The {@link Context} to use.
-     * @param id         The id of the song to remove.
-     * @param playlistId The id of the playlist being removed from.
+     * @param songId         The songId of the song to remove.
+     * @param playlistId The songId of the playlist being removed from.
      */
-    public static void removeFromPlaylist(final Context context, final long id, final long playlistId) {
+    public static void removeFromPlaylist(final Context context, final long songId, final long playlistId) {
         if (context == null) {
             return;
         }
-        final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
+        Uri baseUri = getPlaylistContentUri();
+        Uri uri = Uri.withAppendedPath(baseUri, playlistId + "/members");
+
         final ContentResolver resolver = context.getContentResolver();
         try {
-            resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{Long.toString(id)});
+            int num_deleted = resolver.delete(uri, Playlists.Members.AUDIO_ID + " = ? ", new String[]{Long.toString(songId)});
+            LOG.info("MusicUtils.removeFromPlaylist: Removed " + num_deleted + " songs from playlist " + playlistId);
         } catch (Throwable ignored) {
             // could not acquire provider for uri
             LOG.error("MusicUtils.removeFromPlaylist() resolver.delete() failed", ignored, true);
