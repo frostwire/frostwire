@@ -42,6 +42,22 @@ public final class PerformersHelper {
     private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
     private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]{40})");
 
+    private static Set<String> stopwords = Set.of(
+            // English
+            "and", "the", "a", "on", "in", "of", "for", "to", "is", "it", "at", "by", "an", "or", "as", "be", "with",
+            "this", "that", "these", "those", "from", "but", "about", "which", "some", "so", "out", "then", "than", "too",
+
+            // Spanish
+            "y", "el", "la", "los", "las", "un", "una", "unos", "unas", "en", "de", "para", "por", "con", "como", "sobre",
+            "al", "lo", "es", "del", "más", "ya", "o", "sin", "sus", "le", "se", "me", "te", "tu", "mi", "esto",
+            "eso", "estos", "esos", "aquel", "aquella", "aquellos", "aquellas",
+
+            // German
+            "und", "der", "die", "ein", "eine", "einer", "einem", "einen", "im", "auf", "am",  "zu",
+            "mit", "von", "über", "für", "ist", "war", "sein", "sie", "er", "wir", "ihr", "denn", "doch", "nicht",
+            "weil", "als", "aber", "wenn", "dann", "dies", "diese", "dieser", "dieses", "das", "jenes", "solche"
+    );
+
     private PerformersHelper() {
     }
 
@@ -284,7 +300,10 @@ public final class PerformersHelper {
         }
 
         List<SearchResult> sortedResults = new ArrayList<>(newResults);
-        List<String> searchTokens = tokenizeSearchKeywords(currentQuery);
+        List<String> searchTokens = tokenizeSearchKeywords(currentQuery.toLowerCase());
+        // filter out tokens like "the" and "a", "on", "in"...
+        searchTokens.removeIf(stopwords::contains);
+
         sortedResults.sort((o1, o2) -> {
             String normalizedResult1 = searchResultAsNormalizedString(o1).toLowerCase();
             String normalizedResult2 = searchResultAsNormalizedString(o2).toLowerCase();
