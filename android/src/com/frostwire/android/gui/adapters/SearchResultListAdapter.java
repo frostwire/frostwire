@@ -359,11 +359,22 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public void sortByKeywordsRelevance(String currentQuery) {
-        synchronized (listLock) {
-            List<SearchResult> sorted = (List<SearchResult>) PerformersHelper.sortByRelevance(currentQuery, fullList);
-            fullList.clear();
-            fullList.addAll(sorted);
-        }
+        SystemUtils.postToHandler(
+                SystemUtils.HandlerThreadName.MISC,
+                () -> {
+                    final List<SearchResult> fullListSorted = new ArrayList<>();
+
+                    synchronized (listLock) {
+                        fullListSorted.addAll(PerformersHelper.sortByRelevance(currentQuery, fullList));
+                    }
+
+                    SystemUtils.postToUIThread(() -> {
+                        synchronized (listLock) {
+                            fullList.clear();
+                            fullList.addAll(fullListSorted);
+                        }
+                    });
+                });
     }
 
     private static class OnLinkClickListener implements OnClickListener {
