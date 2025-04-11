@@ -1,3 +1,16 @@
+FrostWire 2.9.6 build 748 APR/11/2025
+ - Fix: Avoid possible freeze sorting too many search results
+ - yt_dlp-2025.03.31
+ - gradle-8.11.1
+ - com.android.tools.build:gradle:8.8.2
+ - androidx.core:core:1.16.0
+ - com.google.android.ump:user-messaging-platform:3.2.0
+ - org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21
+ - org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21
+ - com.google.firebase:firebase-bom:33.12.0
+ - com.applovin:applovin-sdk:13.2.0
+ - com.applovin.mediation:unityads-adapter:4.14.1.0
+
 FrostWire 2.9.5 build 747 MAR/09/2025
  - Search works much better
  - Filter out search results with no keyword matches
@@ -6,6 +19,7 @@ FrostWire 2.9.5 build 747 MAR/09/2025
  - com.google.firebase:firebase-bom:33.10.0
  - com.applovin:applovin-sdk:13.1.0
  - com.applovin.mediation:unityads-adapter:4.13.1.1
+ - com.applovin.mediation:unityads-adapter:4.14.1.0
 
 FrostWire 2.9.4 build 746 DEC/26/2024
  - Upgraded targetSdkVersion to 34 (Android 14).
