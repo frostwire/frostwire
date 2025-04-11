@@ -1,3 +1,10 @@
+build 38 - apr/11/2025
+ - yt_dlp-2024.3.31
+ - python 3.13.3
+ - dev: pylint-3.3.6
+ - dev: astroid-3.3.9
+
+
 build 37 - feb/25/2025
  - yt_dlp-2025.2.19
  - dev: astroid-3.3.8
