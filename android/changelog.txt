@@ -1,3 +1,6 @@
+FrostWire 2.9.7 build 749 UNRELEASED
+ - Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
+
 FrostWire 2.9.6 build 748 APR/11/2025
  - Fix: Avoid possible freeze sorting too many search results
  - yt_dlp-2025.03.31

@@ -356,8 +356,8 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
 
     @Override
     protected void onPause() {
-        super.onPause();
         localBroadcastReceiver.unregister(this);
+        super.onPause();
     }
 
     private SparseArray<DangerousPermissionsChecker<MainActivity>> initPermissionsCheckers() {
@@ -787,7 +787,7 @@ public class MainActivity extends AbstractActivity implements OnDialogClickListe
             }
             if (Constants.ACTION_NOTIFY_DATA_INTERNET_CONNECTION.equals(action)) {
                 boolean isDataUp = intent.getBooleanExtra("isDataUp", true);
-                if (!isDataUp) {
+                if (!isDataUp && !!MainActivity.this.isPaused() && !MainActivity.this.isFinishing()) {
                     UIUtils.showDismissableMessage(findView(android.R.id.content), R.string.no_data_check_internet_connection);
                 }
                 SystemUtils.postToUIThread(() -> search.setDataUp(isDataUp));
