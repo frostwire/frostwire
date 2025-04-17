@@ -139,6 +139,10 @@ android {
                 srcDir 'src'
             }
             jniLibs.srcDirs = ['libs']
+            // Ensure Chaquopy packages our Python code from src/main/python
+            python {
+                srcDir 'src/main/python'
+            }
         }
     }
 
