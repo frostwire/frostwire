@@ -67,6 +67,10 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        // schedule our forever‐running status notification update exactly once
+        runStrict(this::onCreateStrict);
+        new NotificationUpdateDaemon(this).start();
+
         RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -84,7 +88,6 @@ public class MainApplication extends MultiDexApplication {
         LOG.info("MainApplication::onCreate DONE waiting for appContextLock");
         //asyncFirebaseInitialization(appContext);
 
-        runStrict(this::onCreateStrict);
         RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
 

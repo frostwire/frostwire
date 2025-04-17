@@ -23,7 +23,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -32,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
-import androidx.preference.PreferenceManager;
 
 import com.frostwire.android.R;
 import com.frostwire.android.core.ConfigurationManager;
@@ -44,11 +42,6 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.swig.bloom_filter_256;
-import com.frostwire.jlibtorrent.swig.byte_vector;
-import com.frostwire.jlibtorrent.swig.sha1_hash;
-import com.frostwire.util.Hex;
 import com.frostwire.util.Logger;
 import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OkHttpClientWrapper;
@@ -85,11 +78,6 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
     @Override
     public void onCreate() {
         super.onCreate();
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
-            notifiedStorage = new NotifiedStorage(this);
-            cancelAllNotificationsTask(this);
-            startPermanentNotificationUpdatesTask(this);
-        });
     }
 
     @Override
@@ -119,8 +107,6 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
         LOG.info("FrostWire's EngineService started by this intent:");
         LOG.info("FrostWire:" + intent);
         LOG.info("FrostWire: flags:" + flags + " startId: " + startId);
-
-        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> startPermanentNotificationUpdatesTask(this));
 
         return START_STICKY;
     }
@@ -380,19 +366,6 @@ public class EngineIntentService extends JobIntentService implements IEngineServ
             }
         } catch (Throwable t) {
             LOG.warn("EngineService::cancelAllNotificationsTask(EngineService)" + t.getMessage(), t);
-        }
-    }
-
-    private static void startPermanentNotificationUpdatesTask(EngineIntentService engineIntentService) {
-        try {
-            if (engineIntentService.notificationUpdateDaemon == null) {
-                engineIntentService.notificationUpdateDaemon = new NotificationUpdateDaemon(engineIntentService.getApplicationContext());
-            } else {
-                LOG.warn("EngineService::startPermanentNotificationUpdatesTask(EngineService) notificationUpdateDaemon is not null");
-            }
-            engineIntentService.notificationUpdateDaemon.start();
-        } catch (Throwable t) {
-            LOG.warn(t.getMessage(), t);
         }
     }
 }
