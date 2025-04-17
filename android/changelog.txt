@@ -1,5 +1,7 @@
 FrostWire 2.9.7 build 749 UNRELEASED
- - Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
+ - crash: Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
+ - crash: Guard against showing UI after activity paused in LocalBroadcastReceiver
+ - crash: Move startForeground call from onCreate to onStartCommand in MusicPlaybackService
 
 FrostWire 2.9.6 build 748 APR/11/2025
  - Fix: Avoid possible freeze sorting too many search results
