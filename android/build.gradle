@@ -183,13 +183,6 @@ android {
     flavorDimensions "classicApp"
 
     productFlavors {
-        /*
-        basic {
-            // OLD BASIC CODE VERSION SUFFIX 9060000
-            versionCode 9080000 + project.ext.versionCode
-            resValue "string", "application_label", "FrostWire"
-        }
-        */
         plus1 {
             // OLD PLUS CODE VERSION SUFFIX 9070000
             dimension "classicApp"
