@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.frostwire.android.gui.dialogs;
 
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,7 +31,6 @@ import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TorrentFetcherDownload;
 import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
-import com.frostwire.android.offers.Offers;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
@@ -49,13 +47,18 @@ import com.frostwire.util.Ref;
 
 import org.apache.commons.io.FilenameUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 /**
  * @author gubatron
@@ -67,7 +70,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
     private String magnetUri;
     private long torrentFetcherDownloadTokenId;
     private boolean openTransfersOnCancel;
-    private static final String BUNDLE_KEY_TORRENT_INFO_DATA = "torrentInfoData";
+    private static final String BUNDLE_KEY_TORRENT_INFO_PATH = "torrentInfoPath";
     private static final String BUNDLE_KEY_MAGNET_URI = "magnetUri";
     private static final String BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID = "torrentFetcherDownloadTokenId";
     private static final String BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL = "openTransfersOnCancel";
@@ -103,11 +106,24 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 JsonUtils.toJson(torrentInfoList),
                 SelectionMode.MULTIPLE_SELECTION);
         final Bundle arguments = dlg.getArguments();
-        arguments.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, tinfo.bencode());
-        arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
-        arguments.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
-        arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
-        arguments.putBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL, openTransfersOnCancel);
+        // write torrent metadata to a temp file to avoid large Bundles
+        String infoHash = tinfo.infoHash().toString();
+        File cacheFile = new File(ctx.getCacheDir(), "torrent_" + infoHash);
+        try {
+            FileOutputStream fos = new FileOutputStream(cacheFile);
+            fos.write(tinfo.bencode());
+            fos.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write torrent metadata to cache", e);
+        }
+
+        if (arguments != null) {
+            arguments.putString(BUNDLE_KEY_TORRENT_INFO_PATH, cacheFile.getAbsolutePath());
+            arguments.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
+            arguments.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
+            arguments.putBooleanArray(BUNDLE_KEY_CHECKED_OFFSETS, allChecked);
+            arguments.putBoolean(BUNDLE_KEY_OPEN_TRANSFERS_ON_CANCEL, openTransfersOnCancel);
+        }
 
         return dlg;
     }
@@ -146,21 +162,34 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState != null && torrentInfo != null) {
-            outState.putByteArray(BUNDLE_KEY_TORRENT_INFO_DATA, torrentInfo.bencode());
-            outState.putString(BUNDLE_KEY_MAGNET_URI, magnetUri);
-            outState.putLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID, torrentFetcherDownloadTokenId);
-        }
-        super.onSaveInstanceState(outState); //saves the torrentInfo in bytes.
+        // We persist only the file path; raw data lives on disk
+        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void initComponents(Dialog dlg, Bundle savedInstanceState) {
-        byte[] torrentInfoData;
         Bundle arguments = getArguments();
-        if (this.torrentInfo == null &&
-                arguments != null &&
-                (torrentInfoData = arguments.getByteArray(BUNDLE_KEY_TORRENT_INFO_DATA)) != null) {
+        byte[] torrentInfoData = null;
+        if (arguments != null) {
+            String path = arguments.getString(BUNDLE_KEY_TORRENT_INFO_PATH);
+            if (path != null) {
+                File cacheFile = new File(path);
+                if (cacheFile.exists()) {
+                    try (FileInputStream fis = new FileInputStream(cacheFile);
+                         ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+                        byte[] buf = new byte[8192];
+                        int read;
+                        while ((read = fis.read(buf)) != -1) {
+                            bos.write(buf, 0, read);
+                        }
+                        torrentInfoData = bos.toByteArray();
+                    } catch (IOException ignored) {
+                    }
+                    cacheFile.delete();
+                }
+            }
+        }
+        if (this.torrentInfo == null && torrentInfoData != null) {
             torrentInfo = TorrentInfo.bdecode(torrentInfoData);
             magnetUri = arguments.getString(BUNDLE_KEY_MAGNET_URI, null);
             torrentFetcherDownloadTokenId = arguments.getLong(BUNDLE_KEY_TORRENT_FETCHER_DOWNLOAD_TOKEN_ID);
@@ -180,8 +209,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
             List<Transfer> transfers = TransferManager.instance().getTransfers();
             if (!transfers.isEmpty()) {
                 for (Transfer i : transfers) {
-                    if (i instanceof TorrentFetcherDownload) {
-                        TorrentFetcherDownload tempTransfer = (TorrentFetcherDownload) i;
+                    if (i instanceof TorrentFetcherDownload tempTransfer) {
                         if (tempTransfer.tokenId == torrentFetcherDownloadTokenId) {
                             TransferManager.instance().remove(i);
                             return;
@@ -208,7 +236,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
         }
     }
 
-    static class TorrentFileEntry {
+    public static class TorrentFileEntry {
         private final int index;
         private final String name;
         private final String path;
@@ -272,7 +300,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 return null;
             }
             long totalBytes = 0;
-            for (TorrentFileEntry entry : (Set<TorrentFileEntry>) checked) {
+            for (TorrentFileEntry entry : checked) {
                 totalBytes += entry.getSize();
             }
             return UIUtils.getBytesInHuman(totalBytes);
@@ -402,7 +430,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 handpickedTorrentDownloadDialog.removeTorrentFetcherDownloadFromTransfers();
                 // can't use dlgRef.get().getContext() since that call exists only for API >= 23
                 if (dlgRef.get().openTransfersOnCancel) {
-                    MainActivity.refreshTransfers(dlgRef.get().getDialog().getContext());
+                    MainActivity.refreshTransfers(Objects.requireNonNull(dlgRef.get().getDialog()).getContext());
                 }
             }
         }

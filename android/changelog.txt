@@ -4,6 +4,7 @@ FrostWire 2.9.7 build 749 UNRELEASED
  - crash: Move startForeground call from onCreate to onStartCommand in MusicPlaybackService
  - crash: Centralize NotificationUpdateDaemon start in MainApplication and remove redundant scheduling from EngineIntentService
  - crash: Replace DrawerLayout with SafeDrawerLayout to prevent measure‑spec crashes
+ - crash: Avoid TransactionTooLargeException by caching torrent metadata in temporary file, not passing it through an Intent Bundle
 
 FrostWire 2.9.6 build 748 APR/11/2025
  - Fix: Avoid possible freeze sorting too many search results
