@@ -3,6 +3,7 @@ FrostWire 2.9.7 build 749 UNRELEASED
  - crash: Guard against showing UI after activity paused in LocalBroadcastReceiver
  - crash: Move startForeground call from onCreate to onStartCommand in MusicPlaybackService
  - crash: Centralize NotificationUpdateDaemon start in MainApplication and remove redundant scheduling from EngineIntentService
+ - crash: Replace DrawerLayout with SafeDrawerLayout to prevent measure‑spec crashes
 
 FrostWire 2.9.6 build 748 APR/11/2025
  - Fix: Avoid possible freeze sorting too many search results
