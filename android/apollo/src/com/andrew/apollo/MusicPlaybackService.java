@@ -487,7 +487,6 @@ public class MusicPlaybackService extends Service {
         initServiceLatch.countDown();
         if (D) LOG.info("onCreate: Creating service");
         super.onCreate();
-        NotificationUpdateDaemon.showTempNotification(this);
         prepareAudioFocusRequest();
         String permission = SystemUtils.hasAndroid13OrNewer() ?
                 Manifest.permission.READ_MEDIA_AUDIO :
@@ -532,6 +531,7 @@ public class MusicPlaybackService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        NotificationUpdateDaemon.showTempNotification(this);
         LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
         mServiceStartId = startId;
 
