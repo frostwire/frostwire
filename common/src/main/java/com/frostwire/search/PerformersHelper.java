@@ -17,6 +17,8 @@
 
 package com.frostwire.search;
 
+import androidx.annotation.Nullable;
+
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.regex.Pattern;
@@ -199,7 +201,10 @@ public final class PerformersHelper {
         return tokens.isEmpty();
     }
 
-    public static List<String> tokenizeSearchKeywords(String keywords) {
+    public static List<String> tokenizeSearchKeywords(@Nullable String keywords) {
+        if (keywords == null || keywords.trim().isEmpty()) {
+            return new ArrayList<>(0);
+        }
         keywords = sanitize(keywords);
         Set<String> tokens = new HashSet<>(Arrays.asList(keywords.toLowerCase(Locale.US).split(" ")));
         return new ArrayList<>(normalizeTokens(tokens));
@@ -294,8 +299,8 @@ public final class PerformersHelper {
     }
 
     // Currently being tested on Android, SearchFragment when results are being added to the adapter
-    public static List<? extends SearchResult> sortByRelevance(String currentQuery, List<? extends SearchResult> newResults) {
-        if (newResults == null || newResults.isEmpty()) {
+    public static List<? extends SearchResult> sortByRelevance(@Nullable String currentQuery, List<? extends SearchResult> newResults) {
+        if (newResults == null || newResults.isEmpty() || currentQuery == null || currentQuery.trim().isEmpty()) {
             return newResults;
         }
 
