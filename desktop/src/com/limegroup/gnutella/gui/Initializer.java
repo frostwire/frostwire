@@ -19,6 +19,9 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTContext;
 import com.frostwire.bittorrent.BTEngine;
+import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.service.ErrorService;
+import com.frostwire.util.OSUtils;
 import com.frostwire.util.UserAgentGenerator;
 import com.limegroup.gnutella.ExternalControl;
 import com.limegroup.gnutella.LimeCoreGlue;
@@ -27,17 +30,12 @@ import com.limegroup.gnutella.LimeWireCore;
 import com.limegroup.gnutella.gui.bugs.BugManager;
 import com.limegroup.gnutella.gui.init.SetupManager;
 import com.limegroup.gnutella.gui.notify.NotifyUserProxy;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.ConnectionSettings;
-import com.limegroup.gnutella.settings.SharingSettings;
-import com.limegroup.gnutella.settings.StartupSettings;
+import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import com.limegroup.gnutella.util.MacOSXUtils;
-import com.frostwire.service.ErrorService;
 import org.limewire.util.CommonUtils;
 import org.limewire.util.I18NConvert;
 import org.limewire.util.NetworkUtils;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicHTML;
@@ -66,6 +64,9 @@ final class Initializer {
     void initialize(String[] args, Frame awtSplash) {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
         preinit();
+        // Apply the theme the user chose last time (falls back to DEFAULT)
+        ThemeMediator.Theme saved = ThemeMediator.Theme.valueOf(UISettings.UI_THEME.getValue());
+        ThemeMediator.switchTheme(saved);
         // Various startup tasks...
         //System.out.println("Initializer.initialize() setup callbacks and listeners");
         setupCallbacksAndListeners();

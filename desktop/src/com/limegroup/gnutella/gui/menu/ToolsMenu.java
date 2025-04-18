@@ -1,33 +1,36 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.limegroup.gnutella.gui.menu;
 
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.gui.updates.UpdateMediator;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.AbstractAction;
 import com.limegroup.gnutella.gui.iTunesMediator;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
- * Contains all of the menu items for the tools menu.
+ * Contains all the menu items for the tools menu.
  */
 final class ToolsMenu extends AbstractMenu {
     private final UpdateAction updateAction;
@@ -45,6 +48,32 @@ final class ToolsMenu extends AbstractMenu {
         }
         addMenuItem(new ShowOptionsAction());
         addMenuItem(updateAction);
+        addSeparator();
+        JMenu switchThemeMenu = new JMenu(I18n.tr("Switch Theme"));
+        ButtonGroup themeGroup = new ButtonGroup();
+        // Default theme
+        JRadioButtonMenuItem defaultItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Default")) {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ThemeMediator.switchTheme(ThemeMediator.Theme.DEFAULT);
+            }
+        });
+        defaultItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.Theme.DEFAULT);
+        themeGroup.add(defaultItem);
+        switchThemeMenu.add(defaultItem);
+        // Dark theme
+        JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark")) {
+            private static final long serialVersionUID = 1L;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ThemeMediator.switchTheme(ThemeMediator.Theme.DARK);
+            }
+        });
+        darkItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.Theme.DARK);
+        themeGroup.add(darkItem);
+        switchThemeMenu.add(darkItem);
+        MENU.add(switchThemeMenu);
     }
 
     @Override

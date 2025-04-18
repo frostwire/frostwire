@@ -1,13 +1,13 @@
 /*
  Usage:
- gradle build - builds code and creates a single jar in build/libs/frostwire.jar
- gradle clean - cleans the build.
- gradle tasks - shows available tasks.
- gradle run - runs the app
+ ./gradlew build - builds code and creates a single jar in build/libs/frostwire.jar
+ ./gradlew clean - cleans the build.
+ ./gradlew tasks - shows available tasks.
+ ./gradlew run - runs the app
 
  Make sure ${ANT_HOME} is properly set for these tasks to work
- gradle gettextExtract - extract all the strings from the sourcecode into frostwire.pot
- gradle gettextBundle  - create messages.jar with the extracted strings.
+ ./gradlew gettextExtract - extract all the strings from the sourcecode into frostwire.pot
+ ./gradlew gettextBundle  - create messages.jar with the extracted strings.
 */
 plugins {
     id 'java'
@@ -56,13 +56,19 @@ repositories {
 }
 
 dependencies {
+    // @Nullable cross-os annotation
+    implementation 'org.jetbrains:annotations:26.0.1'
+
     implementation 'com.google.re2j:re2j:1.7'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
+
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
+    // FlatLaf for dark theme support
+    implementation 'com.formdev:flatlaf:3.6'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 

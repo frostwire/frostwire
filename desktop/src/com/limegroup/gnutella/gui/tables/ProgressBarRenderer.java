@@ -38,7 +38,13 @@ class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
      * Sets the font, border, and colors for the progress bar.
      */
     ProgressBarRenderer() {
-        setUI(SkinProgressBarUI.createUI(this));
+        // Use custom Synth-based UI only if Synth L&F is installed
+        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+            setUI(SkinProgressBarUI.createUI(this));
+        } else {
+            // otherwise use default UI
+            setUI(UIManager.getUI(this));
+        }
         setStringPainted(true);
     }
 

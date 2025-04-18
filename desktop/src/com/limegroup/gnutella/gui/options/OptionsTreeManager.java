@@ -34,7 +34,7 @@ import java.util.Enumeration;
  * the <tt>JTree</tt> instance and provides access to that
  * <tt>Component</tt>.
  */
-final class OptionsTreeManager {
+public final class OptionsTreeManager {
     /**
      * Handle to the main <tt>JScrollPane</tt> instance for the main window
      * that contains the <tt>JTree</tt>.

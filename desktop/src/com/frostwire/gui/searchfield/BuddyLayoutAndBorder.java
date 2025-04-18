@@ -175,7 +175,7 @@ public class BuddyLayoutAndBorder extends CompoundBorder implements LayoutManage
      */
     public Insets getRealBorderInsets() {
         if (borderDelegate == null) {
-            return null;
+            return new Insets(0, 0, 0, 0);
         }
         Insets insets = borderDelegate.getBorderInsets(textField);
         // for some reason, all LnFs add the margin to the insets.

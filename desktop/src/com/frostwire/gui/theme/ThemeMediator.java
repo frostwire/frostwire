@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,17 @@
 package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.settings.UISettings;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -61,30 +64,155 @@ public final class ThemeMediator {
     private ThemeMediator() {
     }
 
-    public static void changeTheme() {
+    /**
+     * Available UI themes.
+     */
+    public enum Theme {
+        DEFAULT,
+        DARK
+    }
+
+    /**
+     * Currently selected UI theme.
+     */
+    private static Theme currentTheme = Theme.DEFAULT;
+
+    static {
+        // Load persisted UI theme from settings
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    try {
-                        UIManager.setLookAndFeel(new NimbusLookAndFeel() {
-                            @Override
-                            public UIDefaults getDefaults() {
-                                return modifyNimbusDefaults(super.getDefaults());
-                            }
-                        });
-                        applySkinSettings();
-                        setupGlobalKeyManager();
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                        throw new RuntimeException("Unable to change the L&F", e);
-                    }
+            UISettings.UI_THEME.setAlwaysSave(true);
+            currentTheme = Theme.valueOf(UISettings.UI_THEME.getValue());
+        } catch (Exception e) {
+            currentTheme = Theme.DEFAULT;
+        }
+    }
+
+    /**
+     * Returns the current UI theme.
+     *
+     * @return the current theme
+     */
+    public static Theme getCurrentTheme() {
+        return currentTheme;
+    }
+
+    /**
+     * Switches the application UI theme.
+     *
+     * @param theme the theme to apply
+     */
+    public static void switchTheme(final Theme theme) {
+        // Delegate theme loading to ThemeMediator
+        if (theme == Theme.DEFAULT) {
+            com.frostwire.gui.theme.ThemeMediator.changeTheme();
+        } else if (theme == Theme.DARK) {
+            com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
+        } else {
+            return;
+        }
+        // Update current theme and persist selection
+        currentTheme = theme;
+        UISettings.UI_THEME.setValue(theme.name());
+        // Refresh UI for all open windows
+        for (Window w : Window.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(w);
+            w.invalidate();
+            w.validate();
+        }
+    }
+
+    public static void changeTheme() {
+        Runnable themeChanger = new Runnable() {
+            public void run() {
+                try {
+                    UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+                        @Override
+                        public UIDefaults getDefaults() {
+                            return modifyNimbusDefaults(super.getDefaults());
+                        }
+                    });
+                    applySkinSettings();
+                    setupGlobalKeyManager();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    throw new RuntimeException("Unable to change the L&F", e);
                 }
-            });
+            }
+        };
+
+        try {
+            // Check if we're already on the EDT
+            if (SwingUtilities.isEventDispatchThread()) {
+                // If we are, run directly
+                themeChanger.run();
+            } else {
+                // If not, use invokeAndWait
+                SwingUtilities.invokeAndWait(themeChanger);
+            }
         } catch (Throwable e) {
             if (e instanceof InvocationTargetException) {
                 e = ((InvocationTargetException) e).getTargetException();
             }
             throw new RuntimeException("Unable to change the L&F", e);
+        }
+    }
+
+//    public static void changeTheme() {
+//        try {
+//            SwingUtilities.invokeAndWait(new Runnable() {
+//                public void run() {
+//                    try {
+//                        UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+//                            @Override
+//                            public UIDefaults getDefaults() {
+//                                return modifyNimbusDefaults(super.getDefaults());
+//                            }
+//                        });
+//                        applySkinSettings();
+//                        setupGlobalKeyManager();
+//                    } catch (Throwable e) {
+//                        e.printStackTrace();
+//                        throw new RuntimeException("Unable to change the L&F", e);
+//                    }
+//                }
+//            });
+//        } catch (Throwable e) {
+//            if (e instanceof InvocationTargetException) {
+//                e = ((InvocationTargetException) e).getTargetException();
+//            }
+//            throw new RuntimeException("Unable to change the L&F", e);
+//        }
+//    }
+
+    /**
+     * Loads the default UI theme (FlatLaf light).
+     */
+    public static void loadLightTheme() {
+        Runnable task = FlatLightLaf::setup;
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load default theme", ex);
+            }
+        }
+    }
+
+    /**
+     * Loads the dark UI theme (FlatLaf Dark).
+     */
+    public static void loadDarkTheme() {
+        Runnable task = FlatDarkLaf::setup;
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load dark theme", ex);
+            }
         }
     }
 
@@ -274,30 +402,32 @@ public final class ThemeMediator {
     }
 
     private static void applyCommonSkinUI() {
-        UIManager.put("PopupMenuUI", "com.frostwire.gui.theme.SkinPopupMenuUI");
-        UIManager.put("MenuItemUI", "com.frostwire.gui.theme.SkinMenuItemUI");
-        UIManager.put("MenuUI", "com.frostwire.gui.theme.SkinMenuUI");
-        UIManager.put("CheckBoxMenuItemUI", "com.frostwire.gui.theme.SkinCheckBoxMenuItemUI");
-        UIManager.put("MenuBarUI", "com.frostwire.gui.theme.SkinMenuBarUI");
-        UIManager.put("RadioButtonMenuItemUI", "com.frostwire.gui.theme.SkinRadioButtonMenuItemUI");
-        UIManager.put("PopupMenuSeparatorUI", "com.frostwire.gui.theme.SkinPopupMenuSeparatorUI");
-        UIManager.put("FileChooserUI", "com.frostwire.gui.theme.SkinFileChooserUI");
-        //UIManager.put("FileChooserUI", "javax.swing.plaf.FileChooserUI");
-        UIManager.put("TabbedPaneUI", "com.frostwire.gui.theme.SkinTabbedPaneUI");
-        UIManager.put("OptionPaneUI", "com.frostwire.gui.theme.SkinOptionPaneUI");
-        UIManager.put("LabelUI", "com.frostwire.gui.theme.SkinLabelUI");
-        UIManager.put("ProgressBarUI", "com.frostwire.gui.theme.SkinProgressBarUI");
-        UIManager.put("PanelUI", "com.frostwire.gui.theme.SkinPanelUI");
-        UIManager.put("ScrollBarUI", "com.frostwire.gui.theme.SkinScrollBarUI");
-        UIManager.put("ScrollPaneUI", "com.frostwire.gui.theme.SkinScrollPaneUI");
-        UIManager.put("SplitPaneUI", "com.frostwire.gui.theme.SkinSplitPaneUI");
-        UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
-        UIManager.put("MultilineToolTipUI", "com.frostwire.gui.theme.SkinMultilineToolTipUI");
-        UIManager.put("TreeUI", "com.frostwire.gui.theme.SkinTreeUI");
-        UIManager.put("TextFieldUI", "com.frostwire.gui.theme.SkinTextFieldUI");
-        UIManager.put("RangeSliderUI", "com.frostwire.gui.theme.SkinRangeSliderUI");
-        UIManager.put("TableUI", "com.frostwire.gui.theme.SkinTableUI");
-        UIManager.put("RadioButtonUI", "com.frostwire.gui.theme.SkinRadioButtonUI");
+        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+            UIManager.put("PopupMenuUI", "com.frostwire.gui.theme.SkinPopupMenuUI");
+            UIManager.put("MenuItemUI", "com.frostwire.gui.theme.SkinMenuItemUI");
+            UIManager.put("MenuUI", "com.frostwire.gui.theme.SkinMenuUI");
+            UIManager.put("CheckBoxMenuItemUI", "com.frostwire.gui.theme.SkinCheckBoxMenuItemUI");
+            UIManager.put("MenuBarUI", "com.frostwire.gui.theme.SkinMenuBarUI");
+            UIManager.put("RadioButtonMenuItemUI", "com.frostwire.gui.theme.SkinRadioButtonMenuItemUI");
+            UIManager.put("PopupMenuSeparatorUI", "com.frostwire.gui.theme.SkinPopupMenuSeparatorUI");
+            UIManager.put("FileChooserUI", "com.frostwire.gui.theme.SkinFileChooserUI");
+            //UIManager.put("FileChooserUI", "javax.swing.plaf.FileChooserUI");
+            UIManager.put("TabbedPaneUI", "com.frostwire.gui.theme.SkinTabbedPaneUI");
+            UIManager.put("OptionPaneUI", "com.frostwire.gui.theme.SkinOptionPaneUI");
+            UIManager.put("LabelUI", "com.frostwire.gui.theme.SkinLabelUI");
+            UIManager.put("ProgressBarUI", "com.frostwire.gui.theme.SkinProgressBarUI");
+            UIManager.put("PanelUI", "com.frostwire.gui.theme.SkinPanelUI");
+            UIManager.put("ScrollBarUI", "com.frostwire.gui.theme.SkinScrollBarUI");
+            UIManager.put("ScrollPaneUI", "com.frostwire.gui.theme.SkinScrollPaneUI");
+            UIManager.put("SplitPaneUI", "com.frostwire.gui.theme.SkinSplitPaneUI");
+            UIManager.put("ApplicationHeaderUI", "com.frostwire.gui.theme.SkinApplicationHeaderUI");
+            UIManager.put("MultilineToolTipUI", "com.frostwire.gui.theme.SkinMultilineToolTipUI");
+            UIManager.put("TreeUI", "com.frostwire.gui.theme.SkinTreeUI");
+            UIManager.put("TextFieldUI", "com.frostwire.gui.theme.SkinTextFieldUI");
+            UIManager.put("RangeSliderUI", "com.frostwire.gui.theme.SkinRangeSliderUI");
+            UIManager.put("TableUI", "com.frostwire.gui.theme.SkinTableUI");
+            UIManager.put("RadioButtonUI", "com.frostwire.gui.theme.SkinRadioButtonUI");
+        }
     }
 
     private static FontUIResource getControlFont() {
@@ -518,7 +648,7 @@ public final class ThemeMediator {
         // editorpane
         defaults.put("EditorPane[Enabled].backgroundPainter", SkinColors.LIGHT_BACKGROUND_COLOR);
         // radio buttons
-        //defaults.put("RadioButton.icon", new IconUIResource()); 
+        //defaults.put("RadioButton.icon", new IconUIResource());
         defaults.put("RadioButton[Disabled+Selected].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.DisabledSelected));
         defaults.put("RadioButton[Disabled].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Disabled));
         defaults.put("RadioButton[Enabled].iconPainter", new SkinRadioButtonIconPainter(SkinRadioButtonIconPainter.State.Enabled));

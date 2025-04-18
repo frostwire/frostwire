@@ -17,9 +17,8 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.gui.theme.SkinRangeSliderUI;
-
 import javax.swing.*;
+import javax.swing.plaf.SliderUI;
 
 /**
  * @author gubatron
@@ -111,9 +110,19 @@ public class RangeSlider extends JSlider {
         return sliderModels[index];
     }
 
+
     @Override
     public void updateUI() {
-        super.setUI(new SkinRangeSliderUI(this));
+        // The first call comes from JSlider’s ctor, before we’ve built the models.
+        if (sliderModels == null) {
+            return;           // Too early – exit silently.
+        }
+
+        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+            setUI(new com.frostwire.gui.theme.SkinRangeSliderUI(this));
+        } else {
+            setUI((SliderUI) UIManager.getUI(this));   // FlatLaf, Metal, etc.
+        }
     }
 
     private void createThumbs(int n) {

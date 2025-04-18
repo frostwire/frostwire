@@ -86,6 +86,10 @@ public final class UISettings extends LimeProps {
      * GENERAL -> "G" by default
      */
     public static final StringSetting LAST_SELECTED_TRANSFER_DETAIL_JPANEL = FACTORY.createStringSetting("LAST_SELECTED_TRANSFER_DETAIL_JPANEL", "G");
+    /**
+     * Persisted UI theme selection (DEFAULT or DARK).
+     */
+    public static final StringSetting UI_THEME = (StringSetting) FACTORY.createStringSetting("UI_THEME", "DEFAULT").setAlwaysSave(true);
 
     private UISettings() {
     }

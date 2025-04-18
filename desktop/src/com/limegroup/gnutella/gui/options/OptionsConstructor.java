@@ -93,7 +93,7 @@ public final class OptionsConstructor {
     private final Map<String, OptionsTreeNode> keysToNodes;
 
     /**
-     * The constructor create all of the options windows and their
+     * The constructor create all the options windows and their
      * components.
      *
      * @param treeManager the <tt>OptionsTreeManager</tt> instance to

@@ -173,7 +173,13 @@ final class SchemaBox extends JPanel {
             button.setToolTipText(toolTip);
         }
         buttonGroup.add(button);
-        button.setUI(new SchemaButtonUI(button));
+        // Install custom Synth UI only if Synth L&F is active
+        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+            button.setUI(new SchemaButtonUI(button));
+        } else {
+            // Use default UI for current LookAndFeel
+            button.updateUI();
+        }
         panel.add(button);
         button.addActionListener(new SchemaButtonActionListener(type));
         button.setSelected(isMediaTypeSelected(type));

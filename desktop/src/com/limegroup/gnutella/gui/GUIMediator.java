@@ -42,10 +42,7 @@ import com.limegroup.gnutella.gui.options.OptionsMediator;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
 import com.limegroup.gnutella.gui.shell.ShellAssociationManager;
-import com.limegroup.gnutella.settings.ApplicationSettings;
-import com.limegroup.gnutella.settings.LibrarySettings;
-import com.limegroup.gnutella.settings.QuestionsHandler;
-import com.limegroup.gnutella.settings.StartupSettings;
+import com.limegroup.gnutella.settings.*;
 import com.limegroup.gnutella.util.LaunchException;
 import com.limegroup.gnutella.util.Launcher;
 import org.limewire.setting.IntSetting;
@@ -123,13 +120,15 @@ public final class GUIMediator {
      * The shell association manager.
      */
     private static ShellAssociationManager ASSOCIATION_MANAGER;
+
+
     /**
-     * Flag for whether or not the app has ever been made visible during this
+     * Flag for whether the app has ever been made visible during this
      * session.
      */
     private static boolean _visibleOnce = false;
     /**
-     * Flag for whether or not the app is allowed to become visible.
+     * Flag for whether the app is allowed to become visible.
      */
     private static boolean _allowVisible = false;
     private final RefreshTimer timer;

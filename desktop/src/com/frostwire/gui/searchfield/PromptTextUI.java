@@ -62,18 +62,28 @@ public abstract class PromptTextUI extends TextUI {
      * or loses the focus.
      */
     public void installUI(JComponent c) {
-        delegate.installUI(c);
-        JTextComponent txt = (JTextComponent) c;
-        // repaint to correctly highlight text if FocusBehavior is
-        // HIGHLIGHT_LABEL in Metal and Windows LnF
-        txt.addFocusListener(focusHandler);
+        boolean lafIsSynth = UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel;
+        /*  ►  Always install the delegate UNLESS it is a Synth UI on a non‑Synth L&F  */
+        if (lafIsSynth || !(delegate instanceof javax.swing.plaf.synth.SynthTextFieldUI)) {
+            delegate.installUI(c);        // <-- ensures editor & sizes are initialised
+        }
+
+        // add focus listener only once the delegate is installed
+        if (lafIsSynth) {
+            JTextComponent txt = (JTextComponent) c;
+            txt.addFocusListener(focusHandler);
+        }
     }
 
     /**
      * Delegates, then uninstalls the focus listener.
      */
     public void uninstallUI(JComponent c) {
-        delegate.uninstallUI(c);
+        boolean lafIsSynth = UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel;
+
+        if (lafIsSynth || !(delegate instanceof javax.swing.plaf.synth.SynthTextFieldUI)) {
+            delegate.uninstallUI(c);
+        }
         c.removeFocusListener(focusHandler);
         promptComponent = null;
     }
@@ -88,7 +98,14 @@ public abstract class PromptTextUI extends TextUI {
     JTextComponent getPromptComponent(JTextComponent txt) {
         if (promptComponent == null) {
             promptComponent = createPromptComponent();
-            promptComponent.setUI(new SynthTextFieldUI());
+            /* Install a UI that matches the current Look‑and‑Feel */
+            if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+                promptComponent.setUI(new SynthTextFieldUI());        // Nimbus/Synth path
+            } else {
+            /* For FlatLaf, Metal, etc. just call updateUI() so Swing picks
+               the default (FlatTextFieldUI, BasicTextUI, ...). */
+                promptComponent.updateUI();
+            }
         }
         if (txt.isFocusOwner() && PromptSupport.getFocusBehavior(txt) == FocusBehavior.HIDE_PROMPT) {
             promptComponent.setText(null);

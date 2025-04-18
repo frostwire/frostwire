@@ -17,7 +17,6 @@
 
 package com.limegroup.gnutella.gui;
 
-import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
@@ -31,7 +30,7 @@ import java.net.URL;
 
 /**
  * This class constructs an <tt>Initializer</tt> instance that constructs
- * all of the necessary classes for the application.
+ * all the necessary classes for the application.
  */
 public class Main {
     private static URL CHOSEN_SPLASH_URL = null;
@@ -43,7 +42,6 @@ public class Main {
      * @param args the array of command line arguments
      */
     public static void main(String[] args) {
-        ThemeMediator.changeTheme();
         System.setProperty("sun.awt.noerasebackground", "true");
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
