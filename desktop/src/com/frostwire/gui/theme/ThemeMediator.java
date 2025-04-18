@@ -20,6 +20,7 @@ package com.frostwire.gui.theme;
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.util.ColorFunctions;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -205,6 +206,13 @@ public final class ThemeMediator {
      */
     public static void loadDarkTheme() {
         Runnable task = FlatDarkLaf::setup;
+        /* -------- define an alternate row colour -------- */
+        Color bg = UIManager.getColor("Table.background");   // flatlaf base grey
+        // pick something ~8–10% darker; you can tweak the factor
+        Color alt = ColorFunctions.shade(bg, 0.85f);      // 15% darker instead of 8%
+
+        UIManager.put("Table.alternateRowColor", alt);
+
         if (SwingUtilities.isEventDispatchThread()) {
             task.run();
         } else {

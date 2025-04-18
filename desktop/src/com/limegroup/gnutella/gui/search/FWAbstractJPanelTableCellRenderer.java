@@ -19,7 +19,6 @@
 package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.theme.SkinTableUI;
-import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
 
@@ -60,11 +59,28 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
         return this;
     }
 
+    //    private void updateRowBackgroundColor(boolean isSelected, int row) {
+//        if (isSelected) {
+//            setBackground(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
+//        } else {
+//            setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
+//        }
+//    }
     private void updateRowBackgroundColor(boolean isSelected, int row) {
         if (isSelected) {
-            setBackground(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
+                /* Ask the JTable – it already knows the correct colors for the
+           current Look‑and‑Feel (FlatLaf, Nimbus, etc.)                  */
+            setBackground(table.getSelectionBackground());
+            setForeground(table.getSelectionForeground());
         } else {
-            setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
+            /* Alternate rows: try UIManager key first, fall back to table bg */
+            Color alt = UIManager.getColor("Table.alternateRowColor");
+            if (alt == null) {
+                alt = table.getBackground().darker();
+            }
+            setBackground((row & 1) == 1 ? alt : table.getBackground());
+            setForeground(table.getForeground());
+
         }
     }
 

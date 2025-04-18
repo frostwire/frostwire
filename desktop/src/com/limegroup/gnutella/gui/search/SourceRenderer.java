@@ -17,7 +17,6 @@
 
 package com.limegroup.gnutella.gui.search;
 
-import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
 
@@ -66,13 +65,20 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int columns) {
-        setOpaque(true);
-        setEnabled(true);
+        setEnabled(table.isEnabled());
+        /* --- colours that match the active Look‑and‑Feel ------------------- */
         if (isSelected) {
-            setBackground(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
+            setBackground(table.getSelectionBackground());
+            setForeground(table.getSelectionForeground());
         } else {
-            setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
+            Color alt = UIManager.getColor("Table.alternateRowColor");
+            if (alt == null)
+                alt = table.getBackground().darker();  // fallback shade
+            setBackground((row & 1) == 1 ? alt : table.getBackground());
+            setForeground(table.getForeground());
         }
+        setOpaque(true);        // only after the background has been decided
+
         updateUI((SourceHolder) value, table);
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
     }
