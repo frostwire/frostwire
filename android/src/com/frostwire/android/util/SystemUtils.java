@@ -34,6 +34,7 @@ import com.frostwire.util.Logger;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -127,6 +128,7 @@ public final class SystemUtils {
 
     /**
      * Used to determine if the device is running Android12 or greater
+     *
      * @noinspection unused
      */
     public static boolean hasAndroid12OrNewer() {
@@ -209,6 +211,10 @@ public final class SystemUtils {
     public static boolean isAppInForeground(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+            if (appProcesses == null) {
+                return false;
+            }
             for (ActivityManager.RunningAppProcessInfo appProcess : activityManager.getRunningAppProcesses()) {
                 if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND &&
                         appProcess.processName.equals(context.getPackageName())) {
