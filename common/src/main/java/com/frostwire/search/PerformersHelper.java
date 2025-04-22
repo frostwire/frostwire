@@ -44,7 +44,7 @@ public final class PerformersHelper {
     private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
     private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]{40})");
 
-    private static Set<String> stopwords = Set.of(
+    public static Set<String> stopwords = Set.of(
             // English
             "and", "the", "a", "on", "in", "of", "for", "to", "is", "it", "at", "by", "an", "or", "as", "be", "with",
             "this", "that", "these", "those", "from", "but", "about", "which", "some", "so", "out", "then", "than", "too",
@@ -93,7 +93,7 @@ public final class PerformersHelper {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 matcherFound = false;
-                LOG.error("performSearch(...): " + pattern.toString() + " has failed.\n" + t.getMessage(), t);
+                LOG.error("performSearch(...): " + pattern + " has failed.\n" + t.getMessage(), t);
             }
 
             if (matcherFound) {
@@ -129,7 +129,7 @@ public final class PerformersHelper {
         try {
             ti = TorrentInfo.bdecode(data);
         } catch (Throwable t) {
-            //LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
+            LOG.error("Can't bdecode:\n" + new String(data) + "\n\n");
             throw t;
         }
         int numFiles = ti.numFiles();
@@ -182,25 +182,6 @@ public final class PerformersHelper {
         return html;
     }
 
-    public static boolean someSearchTokensMatchSearchResult(List<String> keywords, SearchResult sr) {
-        String str = searchResultAsNormalizedString(sr).toLowerCase();
-        for (String keyword : keywords) {
-            if (str.contains(keyword)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Using properties of the search result, we build a lowercase string and then we return true if ALL the tokens are to be found in that string
-     */
-    public static boolean allQueryTokensExistInSearchResult(List<String> tokens, SearchResult sr) {
-        String str = searchResultAsNormalizedString(sr);
-        tokens.removeIf(str::contains);
-        return tokens.isEmpty();
-    }
-
     public static List<String> tokenizeSearchKeywords(@Nullable String keywords) {
         if (keywords == null || keywords.trim().isEmpty()) {
             return new ArrayList<>(0);
@@ -210,7 +191,7 @@ public final class PerformersHelper {
         return new ArrayList<>(normalizeTokens(tokens));
     }
 
-    private static String searchResultAsNormalizedString(SearchResult sr) {
+    public static String searchResultAsNormalizedString(SearchResult sr) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(sr.getDisplayName());
@@ -255,10 +236,6 @@ public final class PerformersHelper {
 
     /**
      * Similar to someSearchTokensMatchSearchResult but using fuzzy matching
-     *
-     * @param keywords
-     * @param sr
-     * @return
      */
     public static boolean oneKeywordMatchedOrFuzzyMatchedFilter(List<String> keywords, SearchResult sr) {
         String normalizedSearchResultAsLowerCaseString = searchResultAsNormalizedString(sr).toLowerCase();
@@ -278,7 +255,7 @@ public final class PerformersHelper {
         return distance <= threshold;
     }
 
-    private static int levenshteinDistance(String a, String b) {
+    public static int levenshteinDistance(String a, String b) {
         int[][] dp = new int[a.length() + 1][b.length() + 1];
         for (int i = 0; i <= a.length(); i++) {
             for (int j = 0; j <= b.length(); j++) {
@@ -298,39 +275,7 @@ public final class PerformersHelper {
         return a == b ? 0 : 1;
     }
 
-    // Currently being tested on Android, SearchFragment when results are being added to the adapter
-    public static List<? extends SearchResult> sortByRelevance(@Nullable String currentQuery, List<? extends SearchResult> newResults) {
-        if (newResults == null || newResults.isEmpty() || currentQuery == null || currentQuery.trim().isEmpty()) {
-            return newResults;
-        }
-
-        List<SearchResult> sortedResults = new ArrayList<>(newResults);
-        List<String> searchTokens = tokenizeSearchKeywords(currentQuery.toLowerCase());
-        // filter out tokens like "the" and "a", "on", "in"...
-        searchTokens.removeIf(stopwords::contains);
-
-        sortedResults.sort((o1, o2) -> {
-            String normalizedResult1 = searchResultAsNormalizedString(o1).toLowerCase();
-            String normalizedResult2 = searchResultAsNormalizedString(o2).toLowerCase();
-
-            // Count how many search tokens are in each result
-            int matchedInResult1 = countMatchedTokens(normalizedResult1, searchTokens);
-            int matchedInResult2 = countMatchedTokens(normalizedResult2, searchTokens);
-            if (matchedInResult1 != matchedInResult2) {
-                //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " != matchedInResult2: " + matchedInResult2);
-                return Integer.compare(matchedInResult2, matchedInResult1); // biggest count first
-            }
-            //LOG.info("sortByRelevance() matchedInResult1: " + matchedInResult1 + " == matchedInResult2: " + matchedInResult2);
-            // If the number of matched tokens is the same, we use levenshtein distances to sort
-            int distance1 = levenshteinDistance(normalizedResult1, currentQuery.toLowerCase());
-            int distance2 = levenshteinDistance(normalizedResult2, currentQuery.toLowerCase());
-            return Integer.compare(distance1, distance2); // shortest distance first
-        });
-
-        return sortedResults;
-    }
-
-    private static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
+    public static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
         int count = 0;
         for (String token : searchTokens) {
             if (normalizedResult.contains(token)) {
