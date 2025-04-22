@@ -63,7 +63,9 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -359,22 +361,38 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public void sortByKeywordsRelevance(String currentQuery) {
-        SystemUtils.postToHandler(
-                SystemUtils.HandlerThreadName.MISC,
-                () -> {
-                    final List<SearchResult> fullListSorted = new ArrayList<>();
+        SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
+            // 1.  Pre–compute and remember the expensive bits only once
+            Map<SearchResult, String> normalized   = new HashMap<>();
+            Map<SearchResult, Integer> levenshtein = new HashMap<>();
 
-                    synchronized (listLock) {
-                        fullListSorted.addAll(PerformersHelper.sortByRelevance(currentQuery, fullList));
-                    }
+            List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
+            tokens.removeIf(PerformersHelper.stopwords::contains);
 
-                    SystemUtils.postToUIThread(() -> {
-                        synchronized (listLock) {
-                            fullList.clear();
-                            fullList.addAll(fullListSorted);
-                        }
-                    });
-                });
+            synchronized (listLock) {
+                for (SearchResult r : fullList) {
+                    String n  = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
+                    normalized.put(r, n);
+                    levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
+                }
+            }
+
+            List<SearchResult> sorted = new ArrayList<>(fullList);
+
+            sorted.sort((a, b) -> {
+                int m1 = PerformersHelper.countMatchedTokens(normalized.get(a), tokens);
+                int m2 = PerformersHelper.countMatchedTokens(normalized.get(b), tokens);
+                if (m1 != m2) return Integer.compare(m2, m1);   // best ► first
+                return Integer.compare(levenshtein.get(a), levenshtein.get(b));
+            });
+
+            SystemUtils.postToUIThread(() -> {
+                synchronized (listLock) {
+                    fullList.clear();          // replace the list atomically
+                    fullList.addAll(sorted);
+                }
+            });
+        });
     }
 
     private static class OnLinkClickListener implements OnClickListener {
