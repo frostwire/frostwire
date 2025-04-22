@@ -17,8 +17,6 @@
 
 package com.frostwire.search;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.regex.Pattern;
@@ -26,6 +24,8 @@ import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.StringUtils;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.text.Normalizer;
 import java.util.ArrayList;

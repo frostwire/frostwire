@@ -440,44 +440,54 @@ public class StringUtils {
         return hash;
     }
 
+    private static final class HtmlPatterns {
+        private static final Pattern HTML_COMMENT  =
+                Pattern.compile("(?s)<!--.*?-->");
+        private static final Pattern INLINE_STYLE =
+                Pattern.compile("(?i)<(\\w+)\\s+style=\"[^\"]*\">");
+        private static final Pattern SCRIPT       =
+                Pattern.compile("(?i)<script.*?</script>", Pattern.DOTALL);
+        private static final Pattern BR_TAG       =
+                Pattern.compile("(?i)<br\\s*/?>");
+        private static final Pattern EMPHASIS     =
+                Pattern.compile("(?i)<(em|i)>(.*?)</\\1>");
+        private static final Pattern STRONG       =
+                Pattern.compile("(?i)<(strong|b)>(.*?)</\\1>");
+        private static final Pattern ANY_TAG      =
+                Pattern.compile("<.*?>", Pattern.DOTALL);
+        private static final Pattern MULTI_SPACE  =
+                Pattern.compile("\\s+");
+    }
+
     public static String fromHtml(String html) {
-        // Remove HTML comments
-        html = html.replaceAll("(?s)<!--.*?-->", "");
+        if (html == null || html.indexOf('<') < 0) {
+            // fast‑path when the string clearly contains no markup
+            return html;
+        }
 
-        // Remove inline CSS styles
-        html = html.replaceAll("<(\\w+)\\s+style=\"[^\"]*\">", "<$1>");
+        // --- strip blocks we don’t want -------------------------------------------------
+        html = HtmlPatterns.HTML_COMMENT.matcher(html).replaceAll("");
+        html = HtmlPatterns.INLINE_STYLE.matcher(html).replaceAll("<$1>");
+        html = HtmlPatterns.SCRIPT.matcher(html).replaceAll("");
 
-        // Remove JavaScript
-        html = html.replaceAll("(?i)<script.*?</script>", "");
+        // --- cheap, literal replacements (no regex) ------------------------------------
+        html = html.replace("&nbsp;",  " ")
+                .replace("&amp;",   "&")
+                .replace("&lt;",    "<")
+                .replace("&gt;",    ">")
+                .replace("&quot;",  "\"")
+                .replace("&apos;",  "'");
 
-        // Replace HTML entities with their plain text equivalents
-        html = html.replaceAll("&nbsp;", " ");
-        html = html.replaceAll("&amp;", "&");
-        html = html.replaceAll("&lt;", "<");
-        html = html.replaceAll("&gt;", ">");
-        html = html.replaceAll("&quot;", "\"");
-        html = html.replaceAll("&apos;", "'");
+        // --- small regexes that need capturing groups ----------------------------------
+        html = HtmlPatterns.BR_TAG.matcher(html)
+                .replaceAll(System.lineSeparator());
+        html = HtmlPatterns.EMPHASIS.matcher(html).replaceAll("_$2_");
+        html = HtmlPatterns.STRONG.matcher(html).replaceAll("*$2*");
 
-        // Convert <br> tags to line breaks
-        html = html.replaceAll("(?i)<br\\s*/?>", System.lineSeparator());
+        // --- final cleanup --------------------------------------------------------------
+        html = HtmlPatterns.ANY_TAG.matcher(html).replaceAll("");
+        html = HtmlPatterns.MULTI_SPACE.matcher(html).replaceAll(" ");
 
-        // Convert <em> and <i> tags to emphasized text
-        html = html.replaceAll("(?i)<(em|i)>(.*?)</\\1>", "_$2_");
-
-        // Convert <strong> and <b> tags to strong text
-        html = html.replaceAll("(?i)<(strong|b)>(.*?)</\\1>", "*$2*");
-
-        // Remove all other HTML tags
-        Pattern pattern = Pattern.compile("<.*?>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(html);
-        html = matcher.replaceAll("");
-
-        // Normalize whitespace
-        html = html.replaceAll("\\s+", " ");
-
-        // Trim leading and trailing whitespace
-        html = html.trim();
-
-        return html;
+        return html.trim();
     }
 }
