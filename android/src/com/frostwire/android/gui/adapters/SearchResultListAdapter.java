@@ -369,15 +369,18 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             List<String> tokens = PerformersHelper.tokenizeSearchKeywords(currentQuery.toLowerCase());
             tokens.removeIf(PerformersHelper.stopwords::contains);
 
+            // atomically snapshot and build maps from it
+            List<SearchResult> snapshot;
             synchronized (listLock) {
-                for (SearchResult r : fullList) {
+                snapshot = new ArrayList<>(fullList);
+                for (SearchResult r : snapshot) {
                     String n  = PerformersHelper.searchResultAsNormalizedString(r).toLowerCase();
                     normalized.put(r, n);
                     levenshtein.put(r, PerformersHelper.levenshteinDistance(n, currentQuery));
                 }
             }
 
-            List<SearchResult> sorted = new ArrayList<>(fullList);
+            List<SearchResult> sorted = snapshot;
 
             sorted.sort((a, b) -> {
                 int m1 = PerformersHelper.countMatchedTokens(normalized.get(a), tokens);
