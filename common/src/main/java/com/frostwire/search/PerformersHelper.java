@@ -55,7 +55,7 @@ public final class PerformersHelper {
             "eso", "estos", "esos", "aquel", "aquella", "aquellos", "aquellas",
 
             // German
-            "und", "der", "die", "ein", "eine", "einer", "einem", "einen", "im", "auf", "am",  "zu",
+            "und", "der", "die", "ein", "eine", "einer", "einem", "einen", "im", "auf", "am", "zu",
             "mit", "von", "über", "für", "ist", "war", "sein", "sie", "er", "wir", "ihr", "denn", "doch", "nicht",
             "weil", "als", "aber", "wenn", "dann", "dies", "diese", "dieser", "dieses", "das", "jenes", "solche"
     );
@@ -277,9 +277,11 @@ public final class PerformersHelper {
 
     public static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
         int count = 0;
-        for (String token : searchTokens) {
-            if (normalizedResult.contains(token)) {
-                count++;
+        if (normalizedResult != null && normalizedResult.isEmpty()) {
+            for (String token : searchTokens) {
+                if (normalizedResult.contains(token)) {
+                    count++;
+                }
             }
         }
         return count;
