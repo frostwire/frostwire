@@ -59,13 +59,6 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
         return this;
     }
 
-    //    private void updateRowBackgroundColor(boolean isSelected, int row) {
-//        if (isSelected) {
-//            setBackground(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
-//        } else {
-//            setBackground(row % 2 == 1 ? ThemeMediator.TABLE_ALTERNATE_ROW_COLOR : Color.WHITE);
-//        }
-//    }
     private void updateRowBackgroundColor(boolean isSelected, int row) {
         if (isSelected) {
                 /* Ask the JTable – it already knows the correct colors for the

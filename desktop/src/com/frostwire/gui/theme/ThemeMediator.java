@@ -26,6 +26,7 @@ import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIMediator.Tabs;
+import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.settings.ApplicationSettings;
@@ -41,8 +42,10 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * Class that mediates between themes and FrostWire.
@@ -103,6 +106,17 @@ public final class ThemeMediator {
      * @param theme the theme to apply
      */
     public static void switchTheme(final Theme theme) {
+        /* ------------------------------------------------------------------
+         * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
+         *    immediate change (handy when they click around in Options);
+         * 2.  tell the user that a **restart is required** for a 100 % clean
+         *    switch (many colours, borders & cached icons only update at
+         *    start‑up);
+         * 3.  spawn a fresh copy of FrostWire and let this process exit.
+         * ----------------------------------------------------------------*/
+
+        final Theme old = currentTheme;
+
         // Delegate theme loading to ThemeMediator
         if (theme == Theme.DEFAULT) {
             com.frostwire.gui.theme.ThemeMediator.changeTheme();
@@ -111,16 +125,29 @@ public final class ThemeMediator {
         } else {
             return;
         }
-        // Update current theme and persist selection
+        // Persist selection immediately (used by the relaunch below)
         currentTheme = theme;
         UISettings.UI_THEME.setValue(theme.name());
-        // Refresh UI for all open windows
-        for (Window w : Window.getWindows()) {
+
+        // refresh *this* instance so users see the effect right away
+        for (Window w : Window.getWindows())
             SwingUtilities.updateComponentTreeUI(w);
-            w.invalidate();
-            w.validate();
+
+        /* ---------- ask & restart --------------------------------------- */
+        if (old != theme) {     // only when the choice actually changed
+            int res = JOptionPane.showConfirmDialog(
+                    null,
+                    I18n.tr("FrostWire needs to restart to finish applying the new theme.\nRestart now?"),
+                    I18n.tr("Restart required"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            if (res == JOptionPane.YES_OPTION)
+                restartApplication();
         }
     }
+
+
 
     public static void changeTheme() {
         Runnable themeChanger = new Runnable() {
