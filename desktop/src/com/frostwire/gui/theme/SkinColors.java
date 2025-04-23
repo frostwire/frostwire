@@ -98,6 +98,8 @@ final class SkinColors {
     public static final Color[] APPLICATION_HEADER_GRADIENT_COLORS = new Color[]{APPLICATION_HEADER_COLOR1, APPLICATION_HEADER_COLOR2};
     public static final Color TEXT_FONT_FOREGROUND_COLOR = new ColorUIResource(55, 69, 82);
     public static final Color TRANSPARENT_COLOR = new ColorUIResource(new Color(255, 255, 255, 0));
+    public static final Color APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_TOP = new Color(0x2b2b2b);
+    public static final Color APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM = new Color(0x1e1e1e);
 
     private SkinColors() {
     }

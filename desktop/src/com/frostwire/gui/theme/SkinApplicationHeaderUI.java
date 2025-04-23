@@ -40,6 +40,15 @@ public final class SkinApplicationHeaderUI extends BasicPanelUI {
         Point2D end = new Point2D.Float(0, c.getHeight());
         float[] dist = {0.0f, 1.0f};
         Color[] colors = SkinColors.APPLICATION_HEADER_GRADIENT_COLORS;
+
+        if (ThemeMediator.getCurrentTheme() == ThemeMediator.Theme.DARK) {
+            // dark mode gradient
+            colors = new Color[]{
+                    SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_TOP,
+                    SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM
+            };
+        }
+
         LinearGradientPaint paint = new LinearGradientPaint(start, end, dist, colors);
         Graphics2D graphics = (Graphics2D) g.create();
         // optimization - do not call fillRect on graphics
