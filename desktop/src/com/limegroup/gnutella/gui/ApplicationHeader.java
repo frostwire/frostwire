@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,16 +83,19 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         headerButtonBackgroundUnselected = GUIMediator.getThemeImage("unselected_header_button_background").getImage();
         cloudSearchField = new GoogleSearchField();
         searchPanels = createSearchPanel();
+        searchPanels.setOpaque(false);
         add(searchPanels, "wmin 250px, wmax 450px, growprio 50, growx, gapright 10px, gapleft 5px");
         addTabButtons(tabs);
         createUpdateButton();
         JPanel logoUpdateButtonsPanel = new JPanel();
+        logoUpdateButtonsPanel.setOpaque(false);
         logoPanel = new LogoPanel();
         //only one will be shown at the time.
         logoUpdateButtonsPanel.add(logoPanel);
         logoUpdateButtonsPanel.add(updateButton);
         add(logoUpdateButtonsPanel, "growx, alignx center");
         JComponent player = new MediaPlayerComponent().getMediaPanel();
+        player.setOpaque(false);
         add(player, "dock east, growy, gapafter 10px!");
         GUIMediator.addRefreshListener(this);
         final ActionListener schemaListener = new SchemaListener();
@@ -135,6 +138,7 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     private void addTabButtons(final Map<Tabs, Tab> tabs) {
         JPanel buttonContainer = new JPanel(new MigLayout("insets 0, gap 0"));
+        buttonContainer.setOpaque(false);
         ButtonGroup group = new ButtonGroup();
         Font buttonFont = new Font("Helvetica", Font.BOLD, 10);
         buttonContainer.add(ThemeMediator.createAppHeaderSeparator(), "growy");

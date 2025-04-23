@@ -42,10 +42,8 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * Class that mediates between themes and FrostWire.
@@ -63,7 +61,6 @@ public final class ThemeMediator {
     private static final Logger LOG = Logger.getLogger(ThemeMediator.class);
     private static final int TABLE_FONT_SIZE_MIN = 10;
     private static final int TABLE_FONT_SIZE_MAX = 20;
-    private static final Color APPLICATION_HEADER_SEPARATOR_COLOR = new Color(0x295164);
 
     private ThemeMediator() {
     }
@@ -133,20 +130,17 @@ public final class ThemeMediator {
         for (Window w : Window.getWindows())
             SwingUtilities.updateComponentTreeUI(w);
 
-        /* ---------- ask & restart --------------------------------------- */
-        if (old != theme) {     // only when the choice actually changed
-            int res = JOptionPane.showConfirmDialog(
+        // Inform the user that a restart is needed for a 100% clean switch,
+        // but do not actually restart the JVM
+        if (old != theme) {
+            JOptionPane.showMessageDialog(
                     null,
-                    I18n.tr("FrostWire needs to restart to finish applying the new theme.\nRestart now?"),
-                    I18n.tr("Restart required"),
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            if (res == JOptionPane.YES_OPTION)
-                restartApplication();
+                    I18n.tr("The new theme has been applied temporarily.\nFor the full effect, please restart FrostWire."),
+                    I18n.tr("Theme Change"),
+                    JOptionPane.INFORMATION_MESSAGE
+            );
         }
     }
-
 
 
     public static void changeTheme() {
@@ -286,7 +280,10 @@ public final class ThemeMediator {
     }
 
     public static JSeparator createAppHeaderSeparator() {
-        return createVerticalSeparator(APPLICATION_HEADER_SEPARATOR_COLOR);
+        return createVerticalSeparator(
+                currentTheme == Theme.DARK ?
+                        SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
+                        SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
     }
 
     private static Font getDefaultFont() {

@@ -609,6 +609,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
                 return false;
             }
         };
+        background.setOpaque(false);
+        if (ThemeMediator.Theme.DARK == ThemeMediator.getCurrentTheme()) {
+            background.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
+        }
         background.setLayout(new OverlayLayout(background));
 
         JPanel centerPanel = new JPanel();
@@ -618,6 +622,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         // Search Box
         GoogleSearchField searchBox = new GoogleSearchField();
+        searchBox.setOpaque(false);
         searchBox.setPrompt(I18n.tr("Search something or paste a torrent URL, magnet URL or video page URL. (Search hints provided by Google)"));
         centerPanel.add(searchBox, "center, w 570px!, growx 0");
 
@@ -632,8 +637,10 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         centerPanel.add(southButtonsPanel, "south");
 
         JScrollPane scrollPane = new JScrollPane(centerPanel);
+        scrollPane.setOpaque(false);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getViewport().setOpaque(false);
         scrollPane.getViewport().setBackground(Color.WHITE);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(28, 10, 4, 10));
         JComponent table = getScrolledTablePane();

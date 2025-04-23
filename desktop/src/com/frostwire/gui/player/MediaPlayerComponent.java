@@ -1,16 +1,18 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.player;
@@ -135,6 +137,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         // setup buttons
         registerListeners();
         JPanel panel = new JPanel();
+        panel.setOpaque(false);
         panel.setLayout(new MigLayout("insets 0, gap 0, fillx", //component constraints
                 "[][]"));
         panel.setPreferredSize(new Dimension(480, 55));
@@ -148,6 +151,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     private JPanel createPlaybackButtonsPanel() {
         JPanel panel = new JPanel();
+        panel.setOpaque(false);
         panel.setLayout(new MigLayout("insets 0, filly"));
         panel.add(ThemeMediator.createAppHeaderSeparator(), "growy");
         panel.add(PREV_BUTTON, "w 30px!");
@@ -164,6 +168,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     private JPanel createTrackDetailPanel() {
         JPanel panel = new JPanel();
+        panel.setOpaque(false);
         Cursor theHand = new Cursor(Cursor.HAND_CURSOR);
         panel.setLayout(new MigLayout("insets 0, gap 4px, fillx, w 340px!", //layout
                 "[][][grow][][][]", //columns
@@ -174,6 +179,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         panel.add(socialButton, "w 18px!");
         //only one of these 2 buttons is shown at the time, that's why it's on the same container.
         JPanel shareAndSourceButtonPanel = new JPanel();
+        shareAndSourceButtonPanel.setOpaque(false);
         shareButton = new MediaButton(I18n.tr("Send this file to a friend"), "player_share_on", "player_share_off");
         shareButton.setCursor(theHand);
         shareButton.addActionListener(new SendToFriendActionListener());
@@ -216,6 +222,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
     private JPanel createProgressPanel() {
         JPanel panel = new JPanel();
+        panel.setOpaque(false);
         panel.setLayout(new MigLayout("insets 0 0 5px 0 5px, fillx", "[][grow][]"));
         Font f = panel.getFont();
         f = f.deriveFont(10f);

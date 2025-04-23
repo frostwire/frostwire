@@ -95,6 +95,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      */
     SearchResultDisplayer() {
         MAIN_PANEL = new BoxPanel(BoxPanel.Y_AXIS);
+        MAIN_PANEL.setOpaque(false);
         MAIN_PANEL.setMinimumSize(new Dimension(0, 0));
         tabbedPane = new SearchTabbedPane();
         results = new JPanel();
@@ -122,9 +123,11 @@ public final class SearchResultDisplayer implements RefreshListener {
          * object so that I can refresh the image that it contains.
          */
         JPanel mainScreen = new JPanel(new BorderLayout());
+        mainScreen.setOpaque(false);
         promoSlides.setupContainerAndControls(mainScreen, true);
         mainScreen.add(DUMMY.getComponent(), BorderLayout.CENTER);
         results.add("dummy", mainScreen);
+        results.setOpaque(false);
         cardLayoutSwitcher.first(results);
         setupTabbedPane();
         MAIN_PANEL.add(results);
