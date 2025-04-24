@@ -138,7 +138,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         registerListeners();
         JPanel panel = new JPanel();
         panel.setOpaque(false);
-        panel.setLayout(new MigLayout("insets 0, gap 0, fillx", //component constraints
+        panel.setLayout(new MigLayout("insets 0, gap 0, fillx, filly", //component constraints
                 "[][]"));
         panel.setPreferredSize(new Dimension(480, 55));
         panel.setMinimumSize(new Dimension(480, 55));
@@ -202,8 +202,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             public void mousePressed(MouseEvent e) {
                 if (MediaPlayer.instance().getCurrentMedia().getFile() != null) {
                     showCurrentMedia();
-                } else if (MediaPlayer.instance().getCurrentMedia() instanceof StreamMediaSource) {
-                    StreamMediaSource mediaSource = (StreamMediaSource) MediaPlayer.instance().getCurrentMedia();
+                } else if (MediaPlayer.instance().getCurrentMedia() instanceof StreamMediaSource mediaSource) {
                     if (mediaSource.getDetailsUrl() != null) {
                         GUIMediator.openURL(mediaSource.getDetailsUrl());
                     }
@@ -401,11 +400,11 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             String currentText = null;
             if (mediaSource instanceof StreamMediaSource) {
                 currentText = ((StreamMediaSource) mediaSource).getTitle();
-            } else if (mediaSource != null && mediaSource.getFile() != null) {
+            } else if (mediaSource.getFile() != null) {
                 //playing from Audio.
                 currentText = mediaSource.getFile().getName();
                 trackTitle.setToolTipText(mediaSource.getFile().getAbsolutePath());
-            } else if (mediaSource != null && mediaSource.getFile() == null && mediaSource.getURL() != null) {
+            } else if (mediaSource.getFile() == null && mediaSource.getURL() != null) {
                 //
                 //System.out.println("StreamURL: " + currentMedia.getURL().toString());
                 //sString streamURL = currentMedia.getURL().toString();
@@ -413,7 +412,9 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                 //Matcher matcher = urlStart.matcher(streamURL);
                 currentText = "internet "; // generic internet stream
             }
-            setTitleHelper(currentText);
+            if (currentText != null) {
+                setTitleHelper(currentText);
+            }
         } catch (Throwable e) {
             LOG.error("Error doing UI updates", e);
         }
@@ -546,7 +547,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
 
             private void setupSocialButtonAction() {
                 String artist = getArtistFromMP3(currentMedia);
-                if (artist.equals("")) {
+                if (artist.isEmpty()) {
                     artist = I18n.tr("this artist(s)");
                 }
                 if (socialLink.contains("facebook")) {
@@ -597,7 +598,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
             private boolean isLocalFile;
             private boolean isSC;
             private boolean isAR;
-            private String playlistName;
+            //private String playlistName;
 
             @Override
             protected Void doInBackground() {
@@ -608,8 +609,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
                     //won't be shown in 5.6.x, code here for 6.x
                     isLocalFile = true;
                 }
-                if (currentMedia instanceof StreamMediaSource) {
-                    StreamMediaSource streamMedia = (StreamMediaSource) currentMedia;
+                if (currentMedia instanceof StreamMediaSource streamMedia) {
                     if (streamMedia.getDetailsUrl() != null) {
                         isSC = streamMedia.getDetailsUrl().contains("soundcloud");
                         isAR = streamMedia.getDetailsUrl().contains("archive");
@@ -735,7 +735,7 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         }
     }
 
-    private final class SendToFriendActionListener implements ActionListener {
+    private static final class SendToFriendActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             MediaSource currentMedia = MediaPlayer.instance().getCurrentMedia();
@@ -758,15 +758,14 @@ public final class MediaPlayerComponent implements MediaPlayerListener, RefreshL
         }
     }
 
-    private final class ShowSourceActionListener implements ActionListener {
+    private static final class ShowSourceActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             MediaSource currentMedia = MediaPlayer.instance().getCurrentMedia();
             if (currentMedia == null) {
                 return;
             }
-            if (currentMedia instanceof StreamMediaSource) {
-                StreamMediaSource streamMedia = (StreamMediaSource) currentMedia;
+            if (currentMedia instanceof StreamMediaSource streamMedia) {
                 if (!StringUtils.isNullOrEmpty(streamMedia.getDetailsUrl())) {
                     GUIMediator.openURL(streamMedia.getDetailsUrl());
                 }
