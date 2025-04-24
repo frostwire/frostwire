@@ -361,6 +361,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     }
 
     public void sortByKeywordsRelevance(String currentQuery) {
+        if (currentQuery == null || currentQuery.isEmpty()) {
+            return;
+        }
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             // 1.  Pre–compute and remember the expensive bits only once
             Map<SearchResult, String> normalized   = new HashMap<>();
