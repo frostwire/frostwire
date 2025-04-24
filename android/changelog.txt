@@ -1,4 +1,4 @@
-FrostWire 2.9.7 build 751 APR/23/2025
+FrostWire 2.9.7 build 752 APR/24/2025
  - crash: Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
  - crash: Guard against showing UI after activity paused in LocalBroadcastReceiver
  - crash: Move startForeground call from onCreate to onStartCommand in MusicPlaybackService
@@ -6,6 +6,7 @@ FrostWire 2.9.7 build 751 APR/23/2025
  - crash: Replace DrawerLayout with SafeDrawerLayout to prevent measure‑spec crashes
  - crash: Avoid TransactionTooLargeException by caching torrent metadata in temporary file, not passing it through an Intent Bundle
  - crash: Chaquopy marshall data too short fix. Ensure chaquopy packages python code from src/main/python
+ - crash: Protect from race condition registering media button in MusicPlaybackService
  - freeze: StringUtils.fromHTML() method to prevent freezing when parsing large HTML strings
 
 FrostWire 2.9.6 build 748 APR/11/2025
