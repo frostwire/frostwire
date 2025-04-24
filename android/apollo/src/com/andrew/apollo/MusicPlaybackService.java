@@ -363,6 +363,8 @@ public class MusicPlaybackService extends Service {
     private static CountDownLatch initServiceLatch = new CountDownLatch(1);
     private final AtomicBoolean serviceInitialized = new AtomicBoolean(false);
 
+    private final Object  mediaButtonLock = new Object();
+
     private static MusicPlayerHandler setupMPlayerHandler() {
         if (mPlayerHandler != null) {
             try {
@@ -868,6 +870,12 @@ public class MusicPlaybackService extends Service {
         }
     }
 
+    private void safeRegisterMediaButton(ComponentName comp) {
+        synchronized (mediaButtonLock) {
+            mAudioManager.registerMediaButtonEventReceiver(comp);
+        }
+    }
+
     private void initService() {
         if (mPlayerHandler == null) {
             throw new RuntimeException("check your logic, can't init service without mPlayerHandler.");
@@ -886,11 +894,10 @@ public class MusicPlaybackService extends Service {
                 MediaButtonIntentReceiver.class.getName());
         try {
             if (mAudioManager != null) {
-                mAudioManager.registerMediaButtonEventReceiver(mMediaButtonReceiverComponent);
-
+                safeRegisterMediaButton(mMediaButtonReceiverComponent);
             }
         } catch (SecurityException e) {
-            LOG.error("initService() registerMediaButtonEventReceiver error: " + e.getMessage(), e);
+            LOG.error("initService() safeRegisterMediaButton error: " + e.getMessage(), e);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -2357,8 +2364,7 @@ public class MusicPlaybackService extends Service {
             return;
         }
         try {
-            mAudioManager.registerMediaButtonEventReceiver(new ComponentName(getPackageName(),
-                    MediaButtonIntentReceiver.class.getName()));
+            safeRegisterMediaButton(new ComponentName(getPackageName(), MediaButtonIntentReceiver.class.getName()));
         } catch (SecurityException e) {
             LOG.error("play() " + e.getMessage(), e);
             // see explanation in initService
