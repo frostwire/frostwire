@@ -20,7 +20,6 @@ package com.limegroup.gnutella.gui.search;
 
 import com.frostwire.gui.theme.SkinTableUI;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
-import com.limegroup.gnutella.gui.tables.BeveledCellPainter;
 
 import javax.swing.*;
 import javax.swing.plaf.TableUI;
@@ -220,13 +219,5 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
             //don't risk painting the table over a tooltip
         }
         return super.getToolTipText(event);
-    }
-
-    @Override
-    protected void paintBorder(Graphics g) {
-        super.paintBorder(g);
-        if (!isSelected) {
-            BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
-        }
     }
 }
