@@ -143,16 +143,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         return lists;
     }
 
-    private static boolean hasExtension(String filename, String... extensionsWithoutDot) {
-        String extension = FilenameUtils.getExtension(filename).toLowerCase();
-        for (String ext : extensionsWithoutDot) {
-            if (ext.equalsIgnoreCase(extension)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Build some extra listeners
      */
@@ -570,14 +560,14 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
                 boolean atLeastOneIsPlayable = false;
                 for (int i : sel) {
                     File f = getFile(i);
-                    if (MediaPlayer.isPlayableFile(f) || hasExtension(f.getAbsolutePath(), "mp4")) {
+                    if (MediaPlayer.isPlayableFile(f) || FileUtils.hasExtension(f.getAbsolutePath(), "mp4")) {
                         atLeastOneIsPlayable = true;
                         break;
                     }
                 }
                 SEND_TO_ITUNES_ACTION.setEnabled(atLeastOneIsPlayable);
             } else {
-                SEND_TO_ITUNES_ACTION.setEnabled(getMediaType().equals(MediaType.getAudioMediaType()) || hasExtension(selectedFile.getAbsolutePath(), "mp4"));
+                SEND_TO_ITUNES_ACTION.setEnabled(getMediaType().equals(MediaType.getAudioMediaType()) || FileUtils.hasExtension(selectedFile.getAbsolutePath(), "mp4"));
             }
         }
         OPEN_IN_FOLDER_ACTION.setEnabled(sel.length == 1 && selectedFile != null && selectedFile.isFile() && selectedFile.getParentFile() != null);
