@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,20 +30,15 @@ import java.awt.*;
  * @author aldenml
  */
 public class DefaultTableBevelledCellRenderer extends DefaultTableCellRenderer {
-    private boolean isSelected;
 
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
-        if (!isSelected) {
-            BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
-        }
         setBorder(new EmptyBorder(3, 3, 3, 3));
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        this.isSelected = isSelected;
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
     }
 }
