@@ -21,6 +21,7 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.theme.SkinProgressBarUI;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
@@ -32,8 +33,6 @@ import java.awt.*;
  * @author aldenml
  */
 class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
-    private boolean isSelected;
-
     /**
      * Sets the font, border, and colors for the progress bar.
      */
@@ -46,13 +45,37 @@ class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
             setUI(UIManager.getUI(this));
         }
         setStringPainted(true);
+        setBorder(new EmptyBorder(5, 5, 5, 5));
+        setOpaque(false); // we'll paint the background ourselves
     }
 
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSel, boolean hasFocus, int row, int column) {
-        this.isSelected = isSel;
-        setValue(Math.min(100, getBarStatus(value)));
-        setString(getDescription(value));
+    public Component getTableCellRendererComponent(JTable table,
+                                                   Object value,
+                                                   boolean isSelected,
+                                                   boolean hasFocus,
+                                                   int row,
+                                                   int column) {
+        // progress value & text -------------------------------------------------
+        int pct = value == null ? 0 : (Integer) value;
+        setValue(Math.min(100, pct));
+        setString(pct + " %");
+
+        // font sync -------------------------------------------------------------
         syncFont(table, this);
+
+        // background / foreground colours ---------------------------------------
+        Color rowBg;
+        if (isSelected) {
+            rowBg = table.getSelectionBackground();         // full-row highlight
+        } else {
+            Color alt = UIManager.getColor("Table.alternateRowColor");
+            if (alt == null) alt = table.getBackground().darker();
+            rowBg = (row & 1) == 0 ? table.getBackground() : alt;
+        }
+
+        /* give the UI delegate the same track colour */
+        setBackground(rowBg);
+
         return this;
     }
 
@@ -72,17 +95,9 @@ class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
         return value == null ? 0 : (Integer) value;
     }
 
-    @Override
-    protected void paintBorder(Graphics g) {
-        super.paintBorder(g);
-        if (!isSelected) {
-            BeveledCellPainter.paintBorder(g, getWidth(), getHeight());
-        }
-    }
-
     /*
      * The following methods are overridden as a performance measure to
-     * to prune code-paths are often called in the case of renders
+     * prune code-paths are often called in the case of renders
      * but which we know are unnecessary.  Great care should be taken
      * when writing your own renderer to weigh the benefits and
      * drawbacks of overriding methods like these.
@@ -100,7 +115,7 @@ class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
             p = p.getParent();
         }
         JComponent jp = (JComponent) p;
-        // p should now be the JTable. 
+        // p should now be the JTable.
         boolean colorMatch = (back != null) && (p != null) && back.equals(p.getBackground()) && jp.isOpaque();
         return !colorMatch && super.isOpaque();
     }
