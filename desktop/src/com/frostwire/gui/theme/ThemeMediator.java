@@ -20,7 +20,6 @@ package com.frostwire.gui.theme;
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.util.ColorFunctions;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -228,11 +227,16 @@ public final class ThemeMediator {
     public static void loadDarkTheme() {
         Runnable task = FlatDarkLaf::setup;
         /* -------- define an alternate row colour -------- */
-        Color bg = UIManager.getColor("Table.background");   // flatlaf base grey
-        // pick something ~8–10% darker; you can tweak the factor
-        Color alt = ColorFunctions.shade(bg, 0.85f);      // 15% darker instead of 8%
+        Color original_table_bg = UIManager.getColor("Table.background");   // flatlaf base grey
+        Color darker_table_bg = original_table_bg.darker().darker().darker();
+        Color much_darker_table_bg = original_table_bg.darker().darker();
 
-        UIManager.put("Table.alternateRowColor", alt);
+        //UIManager.put("Table.background", LIGHT_BORDER_COLOR);
+        UIManager.put("Table.background", new ColorUIResource(darker_table_bg));
+        UIManager.put("Table.alternateRowColor", new ColorUIResource(much_darker_table_bg));
+
+        // pick something ~8–10% darker; you can tweak the factor
+        //Color alt = ColorFunctions.shade(bg, 0.85f);      // 15% darker instead of 8%
 
         if (SwingUtilities.isEventDispatchThread()) {
             task.run();
