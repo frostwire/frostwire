@@ -77,7 +77,7 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             setBackground((row & 1) == 1 ? alt : table.getBackground());
             setForeground(table.getForeground());
         }
-        setOpaque(true);        // only after the background has been decided
+        setOpaque(false);        // only after the background has been decided
 
         updateUI((SourceHolder) value, table);
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
