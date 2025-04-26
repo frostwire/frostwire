@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.tables;
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
 import com.frostwire.gui.bittorrent.TorrentUtil;
+import com.frostwire.gui.theme.IconRepainter;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.FWAbstractJPanelTableCellRenderer;
@@ -42,11 +43,11 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private static final ImageIcon share_solid;
 
     static {
-        play_solid = GUIMediator.getThemeImage("search_result_play_over");
+        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = GUIMediator.getThemeImage("search_result_download_over");
+        download_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
         download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
+        share_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
     }
 
     protected AbstractActionsHolder actionsHolder;
@@ -129,7 +130,7 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
 
     private void updatePlayButton() {
         cancelEdit();
-        labelPlay.setIcon(actionsHolder.isPlaying() ? GUIMediator.getThemeImage("speaker") : (showSolid) ? play_solid : play_transparent);
+        labelPlay.setIcon(actionsHolder.isPlaying() ? IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker")) : (showSolid) ? play_solid : play_transparent);
     }
 
     private void labelPlay_mouseReleased(MouseEvent e) {

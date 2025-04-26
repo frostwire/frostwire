@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui.search;
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.tabs.TransfersTab;
+import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.StreamableSearchResult;
@@ -53,13 +54,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private final static ImageIcon speaker_icon;
 
     static {
-        play_solid = GUIMediator.getThemeImage("search_result_play_over");
+        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = GUIMediator.getThemeImage("search_result_download_over");
+        download_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
         download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        details_solid = GUIMediator.getThemeImage("search_result_details_over");
+        details_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
         details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-        speaker_icon = GUIMediator.getThemeImage("speaker");
+        speaker_icon = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
     }
 
     private JLabel labelPlay;

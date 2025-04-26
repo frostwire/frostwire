@@ -21,6 +21,7 @@ package com.frostwire.gui.bittorrent;
 import com.frostwire.gui.AlphaIcon;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
+import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -43,9 +44,9 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private static final AlphaIcon share_faded;
 
     static {
-        play_solid = GUIMediator.getThemeImage("search_result_play_over");
+        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, 0.1f);
-        share_solid = GUIMediator.getThemeImage("transfers_sharing_over");
+        share_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
         share_faded = new AlphaIcon(share_solid, 0.1f);
     }
 
@@ -107,7 +108,7 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
 
     private void updatePlayButton() {
         final boolean playable = dl.canPreview();
-        labelPlay.setIcon((isDlBeingPlayed()) ? GUIMediator.getThemeImage("speaker") : (playable) ? play_solid : play_transparent);
+        labelPlay.setIcon((isDlBeingPlayed()) ? IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker")) : (playable) ? play_solid : play_transparent);
     }
 
     private void onPlay() {
