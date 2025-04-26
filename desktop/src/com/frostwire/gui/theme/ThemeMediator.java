@@ -67,7 +67,7 @@ public final class ThemeMediator {
     /**
      * Available UI themes.
      */
-    public enum Theme {
+    public enum ThemeEnum {
         DEFAULT,
         DARK
     }
@@ -75,15 +75,15 @@ public final class ThemeMediator {
     /**
      * Currently selected UI theme.
      */
-    private static Theme currentTheme = Theme.DEFAULT;
+    private static ThemeEnum currentTheme = ThemeEnum.DEFAULT;
 
     static {
         // Load persisted UI theme from settings
         try {
             UISettings.UI_THEME.setAlwaysSave(true);
-            currentTheme = Theme.valueOf(UISettings.UI_THEME.getValue());
+            currentTheme = ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
         } catch (Exception e) {
-            currentTheme = Theme.DEFAULT;
+            currentTheme = ThemeEnum.DEFAULT;
         }
     }
 
@@ -92,7 +92,7 @@ public final class ThemeMediator {
      *
      * @return the current theme
      */
-    public static Theme getCurrentTheme() {
+    public static ThemeEnum getCurrentTheme() {
         return currentTheme;
     }
 
@@ -101,7 +101,7 @@ public final class ThemeMediator {
      *
      * @param theme the theme to apply
      */
-    public static void switchTheme(final Theme theme) {
+    public static void switchTheme(final ThemeEnum theme) {
         /* ------------------------------------------------------------------
          * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
          *    immediate change (handy when they click around in Options);
@@ -111,12 +111,12 @@ public final class ThemeMediator {
          * 3.  spawn a fresh copy of FrostWire and let this process exit.
          * ----------------------------------------------------------------*/
 
-        final Theme old = currentTheme;
+        final ThemeEnum old = currentTheme;
 
         // Delegate theme loading to ThemeMediator
-        if (theme == Theme.DEFAULT) {
+        if (theme == ThemeEnum.DEFAULT) {
             com.frostwire.gui.theme.ThemeMediator.changeTheme();
-        } else if (theme == Theme.DARK) {
+        } else if (theme == ThemeEnum.DARK) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
         } else {
             return;
@@ -285,7 +285,7 @@ public final class ThemeMediator {
 
     public static JSeparator createAppHeaderSeparator() {
         return createVerticalSeparator(
-                currentTheme == Theme.DARK ?
+                currentTheme == ThemeEnum.DARK ?
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
     }

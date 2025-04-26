@@ -65,7 +65,7 @@ final class Initializer {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
         preinit();
         // Apply the theme the user chose last time (falls back to DEFAULT)
-        ThemeMediator.Theme saved = ThemeMediator.Theme.valueOf(UISettings.UI_THEME.getValue());
+        ThemeMediator.ThemeEnum saved = ThemeMediator.ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
         ThemeMediator.switchTheme(saved);
         // Various startup tasks...
         //System.out.println("Initializer.initialize() setup callbacks and listeners");

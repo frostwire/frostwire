@@ -18,7 +18,7 @@
 
 package com.frostwire.gui.library;
 
-import com.frostwire.gui.theme.ThemeMediator;
+import com.frostwire.gui.theme.IconRepainter;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
@@ -40,11 +40,6 @@ class NodeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        if (sel) {
-            setBackgroundSelectionColor(ThemeMediator.TABLE_SELECTED_BACKGROUND_ROW_COLOR);
-        } else {
-            setBackgroundNonSelectionColor(row % 2 == 0 ? Color.WHITE : ThemeMediator.TABLE_ALTERNATE_ROW_COLOR);
-        }
         if (value instanceof DirectoryHolderNode) {
             DirectoryHolderNode node = (DirectoryHolderNode) value;
             DirectoryHolder dh = node.getDirectoryHolder();
@@ -52,7 +47,7 @@ class NodeRenderer extends DefaultTreeCellRenderer {
             setToolTipText(dh.getDescription());
             Icon icon = dh.getIcon();
             if (icon != null) {
-                setIcon(icon);
+                setIcon(IconRepainter.brightenIfDarkTheme(icon));
                 setBorder(DIRECTORY_HOLDER_NODE_BORDER);
             }
         }

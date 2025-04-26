@@ -56,10 +56,10 @@ final class ToolsMenu extends AbstractMenu {
             private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
-                ThemeMediator.switchTheme(ThemeMediator.Theme.DEFAULT);
+                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DEFAULT);
             }
         });
-        defaultItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.Theme.DEFAULT);
+        defaultItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT);
         themeGroup.add(defaultItem);
         switchThemeMenu.add(defaultItem);
         // Dark theme
@@ -67,10 +67,10 @@ final class ToolsMenu extends AbstractMenu {
             private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
-                ThemeMediator.switchTheme(ThemeMediator.Theme.DARK);
+                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DARK);
             }
         });
-        darkItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.Theme.DARK);
+        darkItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK);
         themeGroup.add(darkItem);
         switchThemeMenu.add(darkItem);
         MENU.add(switchThemeMenu);
