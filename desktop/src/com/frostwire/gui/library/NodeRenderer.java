@@ -46,8 +46,8 @@ class NodeRenderer extends DefaultTreeCellRenderer {
             setText(dh.getName());
             setToolTipText(dh.getDescription());
             Icon icon = dh.getIcon();
-            if (icon != null) {
-                setIcon(IconRepainter.brightenIfDarkTheme(icon));
+            if (icon instanceof ImageIcon) {
+                setIcon(IconRepainter.brightenIfDarkTheme((ImageIcon) icon));
                 setBorder(DIRECTORY_HOLDER_NODE_BORDER);
             }
         }

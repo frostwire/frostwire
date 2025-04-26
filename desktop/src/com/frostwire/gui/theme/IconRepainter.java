@@ -10,7 +10,7 @@ import java.awt.image.RescaleOp;
  * don't want to redesign all the icons, maybe we can paint them lighter
  */
 public class IconRepainter {
-    public static Icon brightenIfDarkTheme(Icon icon) {
+    public static ImageIcon brightenIfDarkTheme(ImageIcon icon) {
         //if (!(icon instanceof ImageIcon imgIcon)) return icon;
 
         if (ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT) {

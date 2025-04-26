@@ -19,6 +19,7 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.gui.AlphaIcon;
+import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.transfers.TransferState;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
@@ -39,9 +40,9 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     private static final ImageIcon loading;
 
     static {
-        seed_solid = GUIMediator.getThemeImage("transfers_seeding_over");
+        seed_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_seeding_over"));
         seed_faded = new AlphaIcon(seed_solid, 0.5f);
-        loading = GUIMediator.getThemeImage("indeterminate_small_progress");
+        loading = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("indeterminate_small_progress"));
     }
 
     private JLabel labelSeed;
