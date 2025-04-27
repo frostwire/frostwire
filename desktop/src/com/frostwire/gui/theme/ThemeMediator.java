@@ -19,7 +19,6 @@ package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -53,6 +52,7 @@ import java.lang.reflect.Method;
 public final class ThemeMediator {
     public static final Font DIALOG_FONT = new Font(Font.DIALOG, Font.PLAIN, 12);
     public static final Color LIGHT_BORDER_COLOR = SkinColors.GENERAL_BORDER_COLOR;
+    public static final Color APP_REALLY_DARK_COLOR = SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_BOTTOM;
     public static final Color TABLE_ALTERNATE_ROW_COLOR = SkinColors.TABLE_ALTERNATE_ROW_COLOR;
     public static final Color TABLE_SELECTED_BACKGROUND_ROW_COLOR = SkinColors.TABLE_SELECTED_BACKGROUND_ROW_COLOR;
     public static final Color TAB_BUTTON_FOREGROUND_COLOR = new Color(0xFFFFFF);
@@ -178,48 +178,6 @@ public final class ThemeMediator {
         }
     }
 
-//    public static void changeTheme() {
-//        try {
-//            SwingUtilities.invokeAndWait(new Runnable() {
-//                public void run() {
-//                    try {
-//                        UIManager.setLookAndFeel(new NimbusLookAndFeel() {
-//                            @Override
-//                            public UIDefaults getDefaults() {
-//                                return modifyNimbusDefaults(super.getDefaults());
-//                            }
-//                        });
-//                        applySkinSettings();
-//                        setupGlobalKeyManager();
-//                    } catch (Throwable e) {
-//                        e.printStackTrace();
-//                        throw new RuntimeException("Unable to change the L&F", e);
-//                    }
-//                }
-//            });
-//        } catch (Throwable e) {
-//            if (e instanceof InvocationTargetException) {
-//                e = ((InvocationTargetException) e).getTargetException();
-//            }
-//            throw new RuntimeException("Unable to change the L&F", e);
-//        }
-//    }
-
-    /**
-     * Loads the default UI theme (FlatLaf light).
-     */
-    public static void loadLightTheme() {
-        Runnable task = FlatLightLaf::setup;
-        if (SwingUtilities.isEventDispatchThread()) {
-            task.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(task);
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to load default theme", ex);
-            }
-        }
-    }
 
     /**
      * Loads the dark UI theme (FlatLaf Dark).
@@ -227,7 +185,7 @@ public final class ThemeMediator {
     public static void loadDarkTheme() {
         Runnable task = FlatDarkLaf::setup;
         /* -------- define an alternate row colour -------- */
-        ColorUIResource reallyDark = new ColorUIResource(0x1e1e1e);
+        ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
         UIManager.put("Table.alternateRowColor", reallyDark);

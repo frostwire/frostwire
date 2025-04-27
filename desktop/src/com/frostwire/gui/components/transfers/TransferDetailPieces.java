@@ -19,6 +19,7 @@
 package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.PieceIndexBitfield;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -40,12 +41,14 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     TransferDetailPieces() {
         super(new MigLayout("fillx, insets 0 0 0 0, gap 0 5px"));
+        int backgroundColor = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ?
+                0xffffff : ThemeMediator.APP_REALLY_DARK_COLOR.getRGB();
         hexHivePanel = new HexHivePanel(
                 16,
                 0x264053,
                 0xf2f2f2,
                 0x33b5e5,
-                0xffffff,
+                backgroundColor,
                 5,
                 0,
                 0,
@@ -60,7 +63,9 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         hexHivePanel.setOpaque(true);
         JScrollPane jScrollPane = new JScrollPane(hexHivePanel);
         jScrollPane.setOpaque(true);
-        jScrollPane.setBackground(Color.WHITE);
+        jScrollPane.getViewport().setOpaque(true);
+        jScrollPane.getViewport().setBackground(new Color(backgroundColor));
+        jScrollPane.setBackground(new Color(backgroundColor));
         jScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -94,7 +99,8 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
         totalPiecesLabel.setText("<html><b>" + I18n.tr("Total Pieces") + "</b>:" + totalPieces + "</html>");
         totalPiecesLabel.paintImmediately(totalPiecesLabel.getVisibleRect());
     }
-    ////////////////////////////////////////////////////////////////////////////////
+
+    /// /////////////////////////////////////////////////////////////////////////////
 
     private final static class HexHiveAdapter implements HexHivePanel.HexDataAdapter<BittorrentDownload> {
         private BittorrentDownload bittorrentDownload;
