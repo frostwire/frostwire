@@ -21,6 +21,7 @@ package com.frostwire.gui.components.transfers;
 import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadDataLine;
 import com.frostwire.gui.bittorrent.BittorrentDownload;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.jlibtorrent.TorrentStatus;
@@ -80,11 +81,25 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // (Component) gap <left right top bottom> (FML)
         // (Component) pad <top left bottom right> (like insets, why not just re-use insets, FML)
         super(new MigLayout("insets 0 0 0 0, gap 0 0, fillx"));
+
+        Color defaultBG = UIManager.getColor("Panel.background");
+        Color defaultFG = UIManager.getColor("Label.foreground");
+
+        Color backgroundColor = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ?
+                defaultBG : ThemeMediator.APP_REALLY_DARK_COLOR;
+        Color foregroundColor = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ?
+                defaultFG : ThemeMediator.APP_REALLY_DARK_COLOR;
+
+        setForeground(foregroundColor);
+        setBackground(backgroundColor);
+        setOpaque(true);
         // Upper panel with Name, Percentage labels [future share button]
         // progress bar
         // slightly darker background color (0xf3f5f7)
         JPanel upperPanel = new JPanel(new MigLayout("insets 17px, gap 0 5px, fill"));
-        upperPanel.setBackground(new Color(0xf3f5f7));
+        //upperPanel.setBackground(new Color(0xf3f5f7));
+        upperPanel.setForeground(foregroundColor);
+        upperPanel.setBackground(backgroundColor);
         upperPanel.setOpaque(true);
         upperPanel.add(new JLabel("<html><b>" + I18n.tr("Name") + ":</b></html>"), "left, gapleft 2px, gapright 10px");
         upperPanel.add(torrentNameLabel = new JLabel(""), "left, gapright 10px");
@@ -94,7 +109,8 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         upperPanel.add(completionPercentageProgressbar = new JProgressBar(), "span 5, growx");
         // 2nd Section (TRANSFER)
         JPanel midPanel = new JPanel(new MigLayout("insets 18px, gap 5px 5px"));
-        midPanel.setBackground(Color.WHITE);
+        midPanel.setForeground(foregroundColor);
+        midPanel.setBackground(backgroundColor.brighter());
         midPanel.setOpaque(true);
         // time elapsed, time left, download speed, status
         midPanel.add(new JGrayLabel(I18n.tr("Time elapsed") + ":"), "split 2, gapright 10");
@@ -135,7 +151,8 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         // Created On
         // Comment
         JPanel lowerPanel = new JPanel(new MigLayout("insets 5px 18px 18px 18px, gap 5px 5px"));
-        lowerPanel.setBackground(Color.WHITE);
+        lowerPanel.setForeground(foregroundColor);
+        lowerPanel.setBackground(backgroundColor.brighter());
         lowerPanel.setOpaque(true);
         saveLocationGrayLabel = new JGrayLabel("<html><a href=\"#\">" + I18n.tr("Save location") + "</a>:</html>");
         lowerPanel.add(saveLocationGrayLabel, "split 2, gapright 10");
