@@ -227,18 +227,32 @@ public final class ThemeMediator {
     public static void loadDarkTheme() {
         Runnable task = FlatDarkLaf::setup;
         /* -------- define an alternate row colour -------- */
-        Color original_table_bg = UIManager.getColor("Table.background");   // flatlaf base grey
-        Color darker_table_bg = original_table_bg.darker().darker().darker();
-        Color much_darker_table_bg = original_table_bg.darker().darker();
+        ColorUIResource reallyDark = new ColorUIResource(0x1e1e1e);
+        ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
+        UIManager.put("Table.background", reallyDark);
+        UIManager.put("Table.alternateRowColor", reallyDark);
 
-        //UIManager.put("Table.background", LIGHT_BORDER_COLOR);
-        UIManager.put("Table.background", new ColorUIResource(darker_table_bg));
-        UIManager.put("Table.alternateRowColor", new ColorUIResource(much_darker_table_bg));
+        // test: make all table-header backgrounds bright yellow
+        UIManager.put("TableHeader.background", dark);
+        // (you’ll almost certainly want a contrasting foreground as well)
+        UIManager.put("TableHeader.foreground", new ColorUIResource(Color.WHITE));
 
-        // pick something ~8–10% darker; you can tweak the factor
-        //Color alt = ColorFunctions.shade(bg, 0.85f);      // 15% darker instead of 8%
+        // everything that is a JPanel will now be dark:
+        UIManager.put("Panel.background", reallyDark);
+        // any JScrollPane border / background:
+        UIManager.put("ScrollPane.background", reallyDark);
+        // the viewport inside the scroll-pane:
+        UIManager.put("Viewport.background", reallyDark);
+
+        // all JToggleButtons get this bg:
+        UIManager.put("ToggleButton.background",       reallyDark);
+        // when they are “selected”:
+        UIManager.put("ToggleButton.select",           reallyDark.darker());
 
         if (SwingUtilities.isEventDispatchThread()) {
+            for(Window w: Window.getWindows()){
+                SwingUtilities.updateComponentTreeUI(w);
+            }
             task.run();
         } else {
             try {
