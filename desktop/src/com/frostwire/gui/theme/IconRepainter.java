@@ -10,30 +10,58 @@ import java.awt.image.RescaleOp;
  * don't want to redesign all the icons, maybe we can paint them lighter
  */
 public class IconRepainter {
-    public static ImageIcon brightenIfDarkTheme(ImageIcon icon) {
-        //if (!(icon instanceof ImageIcon imgIcon)) return icon;
+    /**
+     * Brightens the icon if the current theme is not the default one.
+     * It uses a default scale factor of 4f to make the icon pretty much white.
+     *
+     * @param original The original icon to be brightened.
+     * @return A new ImageIcon that is brightened if the current theme is not the default one.
+     */
+    public static Icon brightenIfDarkTheme(Icon original) {
+        return brightenIfDarkTheme(original, 4f);
+    }
 
-        if (ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT) {
-            return icon; // only modify on dark themes
+
+    /**
+     * Brightens the icon if the current theme is not the default one.
+     * The scale factor determines how much brighter the icon will be.
+     * 1.2f = 20% brighter, 3f = 300% brighter.
+     *
+     * @param original    The original icon to be brightened.
+     * @param scaleFactor The scale factor for brightness adjustment.
+     * @return A new ImageIcon that is brightened if the current theme is not the default one.
+     */
+    public static Icon brightenIfDarkTheme(Icon original, float scaleFactor) {
+        if (original == null || ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT) {
+            if (original instanceof ImageIcon) {
+                return original;
+            }
+            // Always ensure the returned icon is an ImageIcon
+            return toImageIcon(original);
         }
 
-        Image image = ((ImageIcon) icon).getImage();
-        BufferedImage buffered = toBufferedImage(image);
+        BufferedImage buffered = toBufferedImage(original);
 
         // Apply a brightness scale (1.2f = 20% brighter, 3f = 300% brighter)
-        RescaleOp op = new RescaleOp(4f, 0, null);
+        RescaleOp op = new RescaleOp(scaleFactor, 0, null);
         BufferedImage brighter = op.filter(buffered, null);
 
         return new ImageIcon(brighter);
     }
 
-    private static BufferedImage toBufferedImage(Image img) {
-        if (img instanceof BufferedImage) return (BufferedImage) img;
+    public static BufferedImage toBufferedImage(Icon icon) {
         BufferedImage bimage = new BufferedImage(
-                img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D bGr = bimage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
+                icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D bufferedImageGraphics = bimage.createGraphics();
+        icon.paintIcon(null, bufferedImageGraphics, 0, 0);
+        bufferedImageGraphics.dispose();
         return bimage;
+    }
+
+    public static ImageIcon toImageIcon(Icon icon) {
+        if (icon instanceof ImageIcon) {
+            return (ImageIcon) icon;
+        }
+        return new ImageIcon(toBufferedImage(icon));
     }
 }

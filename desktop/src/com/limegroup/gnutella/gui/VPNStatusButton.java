@@ -32,7 +32,7 @@ public final class VPNStatusButton extends JPanel implements VPNStatusRefresher.
     private boolean lastVPNStatus;
 
     VPNStatusButton() {
-        iconButton = new IconButton("vpn_off");
+        iconButton = new IconButton("vpn_off", true);
         iconButton.setBorder(null);
         vpnDropGuardLabel = createVPNDisconnectLabel();
         initActionListener();

@@ -19,6 +19,7 @@ package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
+import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.gui.theme.SkinCheckBoxMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
 import com.limegroup.gnutella.gui.actions.LimeAction;
@@ -142,7 +143,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private JPanel centerPanel;
     ///////////////////////////////////////////////////////////////////////////
     //  Construction
-    ///////////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////////
     private Component centerComponent;
     private long _nextUpdateTime = System.currentTimeMillis();
 
@@ -227,28 +228,28 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
     private void createTwitterButton() {
-        twitterButton = new IconButton("TWITTER");
+        twitterButton = new IconButton("TWITTER", true);
         initSocialButton(twitterButton, I18n.tr("Follow us @frostwire"), GUIConstants.TWITTER_FROSTWIRE_URL);
     }
 
     private void createInstagramButton() {
-        instagramButton = new IconButton("INSTAGRAM");
+        instagramButton = new IconButton("INSTAGRAM", true);
         initSocialButton(instagramButton, I18n.tr("Follow FrostWire on Instagram"), GUIConstants.INSTAGRAM_FROSTWIRE_URL);
         instagramButton.setPreferredSize(new Dimension(22, 16));
     }
 
     private void createFacebookButton() {
-        facebookButton = new IconButton("FACEBOOK");
+        facebookButton = new IconButton("FACEBOOK", true);
         initSocialButton(facebookButton, I18n.tr("Like FrostWire on Facebook and stay in touch with the community. Get Help and Help Others."), GUIConstants.FACEBOOK_FROSTWIRE_URL);
     }
 
     private void createDiscordButton() {
-        discordButton = new IconButton("DISCORD");
+        discordButton = new IconButton("DISCORD", true);
         initSocialButton(discordButton, I18n.tr("Join the FrostWire community on Discord"), GUIConstants.FROSTWIRE_CHAT_URL);
     }
 
     private void createSettingsButton() {
-        settingsButton = new IconButton("SETTINGS_GEAR");
+        settingsButton = new IconButton("SETTINGS_GEAR", true);
         settingsButton.setAction(new SettingsButtonAction());
     }
 
@@ -428,6 +429,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      */
     private void createFirewallLabel() {
         firewallStatus = new JLabel();
+        firewallStatus.setOpaque(false);
         updateFirewall();
         // don't allow easy clipping
         firewallStatus.setMinimumSize(new Dimension(20, 20));
@@ -440,8 +442,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Sets up the 'Bandwidth Usage' label.
      */
     private void createBandwidthLabel() {
-        bandwidthUsageDown = new LazyTooltip(GUIMediator.getThemeImage("downloading_small"));
-        bandwidthUsageUp = new LazyTooltip(GUIMediator.getThemeImage("uploading_small"));
+        bandwidthUsageDown = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("downloading_small")));
+        bandwidthUsageUp = new LazyTooltip((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("uploading_small")));
         //updateBandwidth();
         // don't allow easy clipping
         bandwidthUsageDown.setMinimumSize(new Dimension(60, 20));
@@ -501,6 +503,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             // Update the label text and icon
             String newText = seedingStatus ? I18n.tr("Seeding") : I18n.tr("Not Seeding");
             ImageIcon newIcon = seedingStatus ? GUIMediator.getThemeImage("seeding_small") : GUIMediator.getThemeImage("not_seeding_small");
+            newIcon = (ImageIcon) IconRepainter.brightenIfDarkTheme(newIcon);
 
             // Avoid flicker by checking if the content is already the same
             if (!seedingStatusButton.getText().equals(newText)) {
@@ -521,7 +524,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
 
-
     /**
      * Updates the status text.
      */
@@ -533,13 +535,14 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
      * Updates the firewall text.
      */
     private void updateFirewallLabel(boolean notFirewalled) {
+        String iconName = "firewall";
+        String tooltip = I18n.tr("FrostWire has detected a firewall");
         if (notFirewalled) {
-            firewallStatus.setIcon(GUIMediator.getThemeImage("firewall_no"));
-            firewallStatus.setToolTipText(I18n.tr("FrostWire has not detected a firewall"));
-        } else {
-            firewallStatus.setIcon(GUIMediator.getThemeImage("firewall"));
-            firewallStatus.setToolTipText(I18n.tr("FrostWire has detected a firewall"));
+            iconName = "firewall_no";
+            tooltip = I18n.tr("FrostWire has not detected a firewall");
         }
+        firewallStatus.setIcon(IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage(iconName)));
+        firewallStatus.setToolTipText(tooltip);
     }
 
     /**
@@ -761,6 +764,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     private class LazyTooltip extends JLabel {
         LazyTooltip(ImageIcon icon) {
             super(icon);
+            setOpaque(false);
             ToolTipManager.sharedInstance().registerComponent(this);
         }
 

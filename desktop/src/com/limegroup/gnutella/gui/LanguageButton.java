@@ -1,5 +1,23 @@
+/*
+ * Created by Angel Leon (@gubatron)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.IconRepainter;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 
 import javax.swing.*;
@@ -10,14 +28,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class LanguageButton extends JPanel {
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1795381168007012403L;
-    private final JButton bheader;
+    private final JButton bHeader;
 
     LanguageButton() {
-        bheader = new JButton();
+        bHeader = new JButton();
         updateLanguageFlag();
         //when pressed displays a dialog that allows you to change the language.
         ActionListener languageButtonListener = e -> {
@@ -25,7 +39,7 @@ public class LanguageButton extends JPanel {
             GUIUtils.centerOnScreen(lw);
             lw.setVisible(true);
         };
-        bheader.addActionListener(languageButtonListener);
+        bHeader.addActionListener(languageButtonListener);
         MouseListener languageMouseListener = new MouseAdapter() {
             //simulate active cursor, we could choose another cursor though
             public void mouseEntered(MouseEvent e) {
@@ -37,15 +51,15 @@ public class LanguageButton extends JPanel {
                 e.getComponent().setCursor(Cursor.getDefaultCursor());
             }
         };
-        bheader.addMouseListener(languageMouseListener);
+        bHeader.addMouseListener(languageMouseListener);
         zeroInsets(this);
         setBorder(null);
-        adjustSizes(bheader, 28, 16);
-        add(bheader);
+        adjustSizes(bHeader);
+        add(bHeader);
     }
 
-    private static void setSizes(JButton b, int width, int height) {
-        Dimension d = new Dimension(width, height);
+    private static void setSizes(JButton b) {
+        Dimension d = new Dimension(28, 16);
         b.setMaximumSize(d);
         b.setMinimumSize(d);
         b.setPreferredSize(d);
@@ -60,27 +74,30 @@ public class LanguageButton extends JPanel {
     }
 
     void updateLanguageFlag() {
-        bheader.setContentAreaFilled(false);
-        bheader.setBorderPainted(false);
-        bheader.setOpaque(false);
-        bheader.setIcon(LanguageFlagFactory.getFlag(ApplicationSettings.COUNTRY.getValue(),
+        bHeader.setContentAreaFilled(false);
+        bHeader.setBorderPainted(false);
+        bHeader.setOpaque(false);
+        ImageIcon flag = LanguageFlagFactory.getFlag(ApplicationSettings.COUNTRY.getValue(),
                 ApplicationSettings.LANGUAGE.getValue(),
-                true));
+                true);
+        flag = (ImageIcon) IconRepainter.brightenIfDarkTheme(flag);
+        bHeader.setIcon(flag);
         String tip = GUIMediator.getLocale().getDisplayName();
-        bheader.setToolTipText(tip);
+        bHeader.setToolTipText(tip);
         setToolTipText(tip);
     }
 
     /**
-     * We overide addMouseListener to pass the StatusBar MouseListener
+     * We override addMouseListener to pass the StatusBar MouseListener
      * to our internal Button.
      */
+    @Override
     public void addMouseListener(MouseListener m) {
-        bheader.addMouseListener(m);
+        bHeader.addMouseListener(m);
     }
 
-    private void adjustSizes(JComponent jc, int width, int height) {
+    private void adjustSizes(JComponent jc) {
         zeroInsets(jc);
-        setSizes((JButton) jc, width, height);
+        setSizes((JButton) jc);
     }
 }

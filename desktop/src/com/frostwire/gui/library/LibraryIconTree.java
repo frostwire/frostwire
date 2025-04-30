@@ -72,7 +72,7 @@ class LibraryIconTree extends JTree {
     }
 
     private void loadIcons() {
-        speaker = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker")).getImage();
+        speaker = ((ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"))).getImage();
     }
 
     private void paintIcon(Graphics g, Image image, TreePath path) {

@@ -40,9 +40,9 @@ public final class TransferSeedingRenderer extends FWAbstractJPanelTableCellRend
     private static final ImageIcon loading;
 
     static {
-        seed_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_seeding_over"));
+        seed_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_seeding_over"));
         seed_faded = new AlphaIcon(seed_solid, 0.5f);
-        loading = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("indeterminate_small_progress"));
+        loading = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("indeterminate_small_progress"));
     }
 
     private JLabel labelSeed;

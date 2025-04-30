@@ -1,5 +1,6 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.IconRepainter;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.settings.UISettings;
 
@@ -27,6 +28,8 @@ public class IconButton extends JButton {
     private PropertyChangeListener listener = null;
     private boolean iconOnly;
 
+    private boolean brightenIfDarkTheme;
+
     /**
      * @param text
      * @param iconName
@@ -53,18 +56,19 @@ public class IconButton extends JButton {
     /**
      * Constructs a new IconButton with the an icon only.
      */
-    IconButton(String iconName) {
+    IconButton(String iconName, boolean brightenIfDarkTheme) {
         setRolloverEnabled(true);
         this.iconName = iconName;
         this.message = "";
         this.iconOnly = true;
+        this.brightenIfDarkTheme = brightenIfDarkTheme;
         initialized = true;
         useTransparentBackground = true;
         updateButton();
     }
 
     public IconButton(String iconName, int w, int h) {
-        this(iconName);
+        this(iconName, false);
         resizedWidth = w;
         resizedHeight = h;
         updateButton();
@@ -161,6 +165,9 @@ public class IconButton extends JButton {
             if (resizedWidth > 0 && resizedHeight > 0) {
                 icon = ImageManipulator.resize(icon, resizedWidth, resizedHeight);
             }
+            if (brightenIfDarkTheme) {
+                icon = IconRepainter.brightenIfDarkTheme((ImageIcon) icon);
+            }
             setIcon(icon);
             Icon rollover = IconManager.instance().getIconForButton(rollOverIconName);
             if (rollover == null) {
@@ -168,6 +175,9 @@ public class IconButton extends JButton {
             }
             if (resizedHeight > 0 && resizedWidth > 0) {
                 rollover = ImageManipulator.resize(rollover, resizedWidth, resizedHeight);
+            }
+            if (rollover != null && brightenIfDarkTheme) {
+                rollover = IconRepainter.brightenIfDarkTheme(rollover);
             }
             setRolloverIcon(rollover);
             if (!horizontalText) {
@@ -189,18 +199,18 @@ public class IconButton extends JButton {
             if (!iconOnly &&
                     UISettings.TEXT_WITH_ICONS.getValue() &&
                     message != null &&
-                    message.length() > 0) {
+                    !message.isEmpty()) {
                 super.setText(message);
                 setPreferredSize(null);
             } else {
                 super.setText(null);
                 int height = icon.getIconHeight();
                 int width = icon.getIconWidth();
-                if (message == null || message.length() > 0) {
+                if (message == null || !message.isEmpty()) {
                     height += 15;
                     width += 15;
                 }
-                setPreferredSize(new Dimension(height, width));
+                setPreferredSize(new Dimension(width, height));
             }
         }
     }

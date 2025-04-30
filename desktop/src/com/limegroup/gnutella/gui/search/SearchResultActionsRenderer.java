@@ -54,13 +54,13 @@ public final class SearchResultActionsRenderer extends FWAbstractJPanelTableCell
     private final static ImageIcon speaker_icon;
 
     static {
-        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
+        download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
         download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        details_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
+        details_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_details_over"));
         details_transparent = new AlphaIcon(details_solid, BUTTONS_TRANSPARENCY);
-        speaker_icon = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
+        speaker_icon = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker"));
     }
 
     private JLabel labelPlay;

@@ -44,9 +44,9 @@ public final class TransferActionsRenderer extends FWAbstractJPanelTableCellRend
     private static final AlphaIcon share_faded;
 
     static {
-        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, 0.1f);
-        share_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
+        share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
         share_faded = new AlphaIcon(share_solid, 0.1f);
     }
 

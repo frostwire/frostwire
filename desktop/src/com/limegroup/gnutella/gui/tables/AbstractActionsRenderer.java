@@ -43,11 +43,11 @@ public abstract class AbstractActionsRenderer extends FWAbstractJPanelTableCellR
     private static final ImageIcon share_solid;
 
     static {
-        play_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
+        play_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_play_over"));
         play_transparent = new AlphaIcon(play_solid, BUTTONS_TRANSPARENCY);
-        download_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
+        download_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("search_result_download_over"));
         download_transparent = new AlphaIcon(download_solid, BUTTONS_TRANSPARENCY);
-        share_solid = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
+        share_solid = (ImageIcon) IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("transfers_sharing_over"));
     }
 
     protected AbstractActionsHolder actionsHolder;
