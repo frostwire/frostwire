@@ -19,6 +19,7 @@
 package com.frostwire.gui.library;
 
 import com.frostwire.gui.player.MediaPlayer;
+import com.frostwire.gui.theme.IconRepainter;
 import com.frostwire.mplayer.MediaPlaybackState;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -46,6 +47,7 @@ class LibraryIconTree extends JTree {
     public LibraryIconTree(TreeModel dataModel) {
         super(dataModel);
         loadIcons();
+        setOpaque(false);
     }
 
     @Override
@@ -70,7 +72,7 @@ class LibraryIconTree extends JTree {
     }
 
     private void loadIcons() {
-        speaker = GUIMediator.getThemeImage("speaker").getImage();
+        speaker = IconRepainter.brightenIfDarkTheme(GUIMediator.getThemeImage("speaker")).getImage();
     }
 
     private void paintIcon(Graphics g, Image image, TreePath path) {
