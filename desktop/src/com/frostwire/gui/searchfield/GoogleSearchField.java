@@ -61,6 +61,7 @@ public class GoogleSearchField extends SearchField {
         this.dict = createDefaultDictionary();
         setPrompt(I18n.tr("Hints by Google"));
         setSearchMode(SearchMode.REGULAR);
+        setBackground(UIManager.getColor("TextField.background"));
         initCloudSearchField(this);
     }
 
@@ -150,7 +151,6 @@ public class GoogleSearchField extends SearchField {
             return entryPanel;
         entryPanel = new JPanel(new GridBagLayout());
         entryPanel.setBorder(UIManager.getBorder("List.border"));
-        entryPanel.setBackground(UIManager.getColor("List.background"));
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridwidth = GridBagConstraints.REMAINDER;

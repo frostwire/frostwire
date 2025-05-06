@@ -622,7 +622,6 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
 
         // Search Box
         GoogleSearchField searchBox = new GoogleSearchField();
-        searchBox.setOpaque(false);
         searchBox.setPrompt(I18n.tr("Search something or paste a torrent URL, magnet URL or video page URL. (Search hints provided by Google)"));
         centerPanel.add(searchBox, "center, w 570px!, growx 0");
 
