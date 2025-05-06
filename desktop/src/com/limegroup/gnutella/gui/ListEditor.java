@@ -1,4 +1,23 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui;
+
+import com.frostwire.gui.theme.ThemeMediator;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -57,6 +76,9 @@ public class ListEditor extends JPanel {
         setLayout(new GridBagLayout());
         //Top half of the editor
         editor = new LimeTextField("");
+        boolean isOpaquePanel = ThemeMediator.getCurrentTheme() != ThemeMediator.ThemeEnum.DARK;
+        setOpaque(isOpaquePanel);
+        editor.setOpaque(isOpaquePanel);
         editor.setColumns(DEFAULT_COLUMNS);
         editor.setPreferredSize(new Dimension(500, 20));
         editor.setMaximumSize(new Dimension(500, 20));
@@ -80,6 +102,7 @@ public class ListEditor extends JPanel {
         add(removeButton, gbc);
         //Bottom half of the editor
         list = new JList<>();
+        list.setOpaque(isOpaquePanel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.addListSelectionListener(new ListListener());
         GUIUtils.bindKeyToAction(list,
@@ -88,6 +111,7 @@ public class ListEditor extends JPanel {
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         setModel(model);
+        scrollPane.setOpaque(isOpaquePanel);
         scrollPane.setPreferredSize(new Dimension(500, 50));
         scrollPane.setMaximumSize(new Dimension(500, 50));
         gbc = new GridBagConstraints();

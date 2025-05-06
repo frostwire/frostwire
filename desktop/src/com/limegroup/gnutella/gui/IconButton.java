@@ -166,7 +166,7 @@ public class IconButton extends JButton {
                 icon = ImageManipulator.resize(icon, resizedWidth, resizedHeight);
             }
             if (brightenIfDarkTheme) {
-                icon = IconRepainter.brightenIfDarkTheme((ImageIcon) icon);
+                icon = IconRepainter.brightenIfDarkTheme(icon);
             }
             setIcon(icon);
             Icon rollover = IconManager.instance().getIconForButton(rollOverIconName);

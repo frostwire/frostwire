@@ -189,6 +189,7 @@ public final class ThemeMediator {
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
         UIManager.put("Table.alternateRowColor", reallyDark);
+        UIManager.put("TextField.background", reallyDark);
 
         // test: make all table-header backgrounds bright yellow
         UIManager.put("TableHeader.background", dark);

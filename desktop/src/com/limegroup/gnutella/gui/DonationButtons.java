@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.ThemeMediator;
 import net.miginfocom.swing.MigLayout;
 import com.frostwire.util.OSUtils;
 
@@ -30,6 +31,7 @@ import java.awt.*;
  */
 class DonationButtons extends JPanel {
     private static final Color FONT_COLOR = new Color(0x1F3545);
+    private static final Color FONT_COLOR_DARK_THEME = new Color(0xFFFFFF);
 
     DonationButtons() {
         setLayout(new MigLayout("insets 0, nogrid, ltr, gapx 6", "", "[align center]"));
@@ -48,7 +50,7 @@ class DonationButtons extends JPanel {
     private JLabel createDonateLabel() {
         Font labelFont = getFont().deriveFont(Font.BOLD);
         JLabel donateLabel = new JLabel(I18n.tr("Donate") + ":");
-        donateLabel.setForeground(FONT_COLOR);
+        donateLabel.setForeground(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK ? FONT_COLOR_DARK_THEME : FONT_COLOR);
         donateLabel.setFont(labelFont);
         return donateLabel;
     }
@@ -59,14 +61,15 @@ class DonationButtons extends JPanel {
         }
 
         private void initComponent(String text, final String donationURL, String tipText) {
+            boolean isDarkTheme = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
             Font buttonFont = new Font("Dialog", Font.BOLD, 12);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
-            setBorder(null);
+            setBorder(isDarkTheme ? BorderFactory.createLineBorder(Color.BLACK) : null);
             setContentAreaFilled(false);
             setOpaque(false);
             setFont(buttonFont);
-            setForeground(FONT_COLOR);
-            setBackground(new Color(0xedf1f4));
+            setForeground(isDarkTheme ? FONT_COLOR_DARK_THEME : FONT_COLOR);
+            setBackground(isDarkTheme ? Color.darkGray : new Color(0xedf1f4));
             setText(text);
             setHorizontalTextPosition(SwingConstants.CENTER);
             setVerticalTextPosition(SwingConstants.CENTER);

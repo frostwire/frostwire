@@ -108,10 +108,6 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
                 jcbmi = new SkinCheckBoxMenuItem(new ShowBandwidthConsumptionAction());
                 jcbmi.setState(StatusBarSettings.BANDWIDTH_DISPLAY_ENABLED.getValue());
                 jpm.add(jcbmi);
-                //  add 'Show Donation Buttons' menu item
-                jcbmi = new SkinCheckBoxMenuItem(new ShowDonationButtonsAction());
-                jcbmi.setState(StatusBarSettings.DONATION_BUTTONS_DISPLAY_ENABLED.getValue());
-                jpm.add(jcbmi);
 
                 jpm.pack();
                 jpm.show(clickedComponent, me.getX(), me.getY());

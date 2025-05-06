@@ -1,3 +1,20 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.limegroup.gnutella.gui.options.panes;
 
 import com.limegroup.gnutella.gui.I18n;
@@ -35,7 +52,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
     public IgnoreResultsPaneItem() {
         super(TITLE, LABEL);
         /*
-          Key for the locale-specifis string for the adult content check box
+          Key for the locale-specifics string for the adult content check box
           label.
          */
         String ADULT_BOX_LABEL = I18n.tr("Ignore Adult Content");
