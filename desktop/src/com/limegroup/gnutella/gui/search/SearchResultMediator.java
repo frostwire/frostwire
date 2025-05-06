@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -329,7 +329,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
         setButtonEnabled(SearchButtons.STOP_SEARCH_BUTTON_INDEX, !isStopped());
         // Buy button only enabled for single selection.
         SearchResultDataLine[] allSelectedLines = getAllSelectedLines();
-        setButtonEnabled(SearchButtons.TORRENT_DETAILS_BUTTON_INDEX, allSelectedLines != null && allSelectedLines.length == 1);
+        setButtonEnabled(SearchButtons.TORRENT_DETAILS_BUTTON_INDEX, allSelectedLines.length == 1);
     }
 
     @Override
