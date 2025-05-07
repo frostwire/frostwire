@@ -69,7 +69,7 @@ public class BuddySupport {
         try {
             textField.add(c, pos.toString());
         } catch (Throwable e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -117,10 +117,18 @@ public class BuddySupport {
 
     static void ensureBuddiesAreInComponentHierarchy(JTextField textField) {
         for (Component c : BuddySupport.getLeft(textField)) {
-            addToComponentHierarchy(c, Position.LEFT, textField);
+            try {
+                addToComponentHierarchy(c, Position.LEFT, textField);
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
         }
         for (Component c : BuddySupport.getRight(textField)) {
-            addToComponentHierarchy(c, Position.RIGHT, textField);
+            try {
+                addToComponentHierarchy(c, Position.RIGHT, textField);
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
         }
     }
 

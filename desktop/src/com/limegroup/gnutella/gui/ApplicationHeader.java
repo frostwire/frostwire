@@ -320,11 +320,13 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
 
     @Override
     public void updateUI() {
-        ComponentUI ui = UIManager.getUI(this);
-        if (ui == null) {
-            ui = new SkinApplicationHeaderUI();
-        }
-        setUI(ui);
+        try {
+            ComponentUI ui = UIManager.getUI(this);
+            if (ui == null) {
+                ui = new SkinApplicationHeaderUI();
+            }
+            setUI(ui);
+        } catch (Throwable ignored) {}
     }
 
     @Override

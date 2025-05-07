@@ -1,5 +1,7 @@
 package com.frostwire.gui.searchfield;
 
+import com.frostwire.gui.theme.ThemeMediator;
+
 import javax.swing.*;
 import javax.swing.text.Document;
 import java.awt.*;
@@ -78,7 +80,8 @@ public class JXSearchField extends JXTextField {
     private JXSearchField(String prompt) {
         super(prompt);
         // use the native search field if possible.
-        setUseNativeSearchFieldIfPossible(true);
+        boolean isDarkTheme = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+        setUseNativeSearchFieldIfPossible(!isDarkTheme);
         // install default actions
         setCancelAction(new ClearAction());
         setFindAction(new FindAction());

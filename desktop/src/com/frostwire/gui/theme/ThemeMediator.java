@@ -114,20 +114,23 @@ public final class ThemeMediator {
         final ThemeEnum old = currentTheme;
 
         // Delegate theme loading to ThemeMediator
-        if (theme == ThemeEnum.DEFAULT) {
-            com.frostwire.gui.theme.ThemeMediator.changeTheme();
-        } else if (theme == ThemeEnum.DARK) {
-            com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
-        } else {
-            return;
+        if (theme != old) {
+            if (theme == ThemeEnum.DEFAULT) {
+                com.frostwire.gui.theme.ThemeMediator.changeTheme();
+            } else if (theme == ThemeEnum.DARK) {
+                com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
+            }
         }
         // Persist selection immediately (used by the relaunch below)
         currentTheme = theme;
         UISettings.UI_THEME.setValue(theme.name());
 
         // refresh *this* instance so users see the effect right away
-        for (Window w : Window.getWindows())
-            SwingUtilities.updateComponentTreeUI(w);
+        for (Window w : Window.getWindows()) {
+            try {
+                SwingUtilities.updateComponentTreeUI(w);
+            } catch (Throwable ignored) {}
+        }
 
         // Inform the user that a restart is needed for a 100% clean switch,
         // but do not actually restart the JVM
@@ -204,12 +207,12 @@ public final class ThemeMediator {
         UIManager.put("Viewport.background", reallyDark);
 
         // all JToggleButtons get this bg:
-        UIManager.put("ToggleButton.background",       reallyDark);
+        UIManager.put("ToggleButton.background", reallyDark);
         // when they are “selected”:
-        UIManager.put("ToggleButton.select",           reallyDark.darker());
+        UIManager.put("ToggleButton.select", reallyDark.darker());
 
         if (SwingUtilities.isEventDispatchThread()) {
-            for(Window w: Window.getWindows()){
+            for (Window w : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(w);
             }
             task.run();
