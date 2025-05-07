@@ -61,6 +61,25 @@ public final class ThemeMediator {
     private static final int TABLE_FONT_SIZE_MIN = 10;
     private static final int TABLE_FONT_SIZE_MAX = 20;
 
+    private static final String[] SYNTH_KEYS = {
+            /* ---------- popup / menu plumbing ---------- */
+            "PopupMenuUI", "MenuUI", "MenuItemUI",
+            "CheckBoxMenuItemUI", "RadioButtonMenuItemUI", "PopupMenuSeparatorUI",
+
+            /* ---------- dialogs ---------- */
+            "OptionPaneUI", "FileChooserUI",
+
+            /* ---------- containers ---------- */
+            "TabbedPaneUI", "ScrollBarUI", "ScrollPaneUI", "SplitPaneUI",
+
+            /* ---------- widgets that had Synth‑specific skins ---------- */
+            "RangeSliderUI",       // custom component
+            "TableUI", "TreeUI",   // data views
+            "TextFieldUI",         // buddies / prompt skin
+            "RadioButtonUI",       // custom painter variant
+            "LabelUI"              // custom painter variant
+    };
+
     private ThemeMediator() {
     }
 
@@ -75,11 +94,14 @@ public final class ThemeMediator {
     /**
      * Currently selected UI theme.
      */
-    private static ThemeEnum currentTheme = ThemeEnum.DEFAULT;
+    private static ThemeEnum currentTheme;
 
     static {
         // Load persisted UI theme from settings
         try {
+            UIManager.put("ApplicationHeaderUI",
+                    "com.frostwire.gui.theme.SkinApplicationHeaderUI");
+
             UISettings.UI_THEME.setAlwaysSave(true);
             currentTheme = ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
         } catch (Exception e) {
@@ -114,13 +136,12 @@ public final class ThemeMediator {
         final ThemeEnum old = currentTheme;
 
         // Delegate theme loading to ThemeMediator
-        if (theme != old) {
-            if (theme == ThemeEnum.DEFAULT) {
-                com.frostwire.gui.theme.ThemeMediator.changeTheme();
-            } else if (theme == ThemeEnum.DARK) {
-                com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
-            }
+        if (theme == ThemeEnum.DEFAULT) {
+            com.frostwire.gui.theme.ThemeMediator.changeTheme();
+        } else if (theme == ThemeEnum.DARK) {
+            com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
         }
+
         // Persist selection immediately (used by the relaunch below)
         currentTheme = theme;
         UISettings.UI_THEME.setValue(theme.name());
@@ -129,7 +150,9 @@ public final class ThemeMediator {
         for (Window w : Window.getWindows()) {
             try {
                 SwingUtilities.updateComponentTreeUI(w);
-            } catch (Throwable ignored) {}
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         }
 
         // Inform the user that a restart is needed for a 100% clean switch,
@@ -137,7 +160,7 @@ public final class ThemeMediator {
         if (old != theme) {
             JOptionPane.showMessageDialog(
                     null,
-                    I18n.tr("The new theme has been applied temporarily.\nFor the full effect, please restart FrostWire."),
+                    I18n.tr("The new theme has been applied partially.\nFor the full theme to load please restart FrostWire."),
                     I18n.tr("Theme Change"),
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -186,8 +209,28 @@ public final class ThemeMediator {
      * Loads the dark UI theme (FlatLaf Dark).
      */
     public static void loadDarkTheme() {
-        Runnable task = FlatDarkLaf::setup;
-        /* -------- define an alternate row colour -------- */
+        purgeSynthOverrides();
+        Runnable task = () -> {
+          purgeSynthOverrides();
+            FlatDarkLaf.setup();
+            installFlatLafDefaults();
+            for (Window w : Window.getWindows()) {
+                SwingUtilities.updateComponentTreeUI(w);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load dark theme", ex);
+            }
+        }
+    }
+
+    private static void installFlatLafDefaults() {
         ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
@@ -210,19 +253,6 @@ public final class ThemeMediator {
         UIManager.put("ToggleButton.background", reallyDark);
         // when they are “selected”:
         UIManager.put("ToggleButton.select", reallyDark.darker());
-
-        if (SwingUtilities.isEventDispatchThread()) {
-            for (Window w : Window.getWindows()) {
-                SwingUtilities.updateComponentTreeUI(w);
-            }
-            task.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(task);
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to load dark theme", ex);
-            }
-        }
     }
 
     public static Font fixLabelFont(JLabel label) {
@@ -245,8 +275,8 @@ public final class ThemeMediator {
         return new SkinTitledBorder(title);
     }
 
-    private static JSeparator createSeparator(int orientation, Color color) {
-        JSeparator sep = new JSeparator(orientation);
+    private static JSeparator createSeparator(Color color) {
+        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
         UIDefaults defaults = new UIDefaults();
         defaults.put("Separator[Enabled].backgroundPainter", new SkinSeparatorBackgroundPainter(SkinSeparatorBackgroundPainter.State.Enabled, color));
         defaults.put("Separator.thickness", 1);
@@ -256,7 +286,7 @@ public final class ThemeMediator {
     }
 
     private static JSeparator createVerticalSeparator(Color color) {
-        return createSeparator(SwingConstants.VERTICAL, color);
+        return createSeparator(color);
     }
 
     public static JSeparator createAppHeaderSeparator() {
@@ -487,8 +517,7 @@ public final class ThemeMediator {
 
     private static boolean canDisplayMessage(Font f, Object msg) {
         boolean result = true;
-        if (msg instanceof String) {
-            String s = (String) msg;
+        if (msg instanceof String s) {
             result = f.canDisplayUpTo(s) == -1;
         }
         return result;
@@ -717,5 +746,10 @@ public final class ThemeMediator {
         }
         defaults.put("Table.font", new FontUIResource(f));
         return f;
+    }
+
+    private static void purgeSynthOverrides() {
+        UIDefaults defs = UIManager.getDefaults();
+        for( String k : SYNTH_KEYS ) defs.remove( k );
     }
 }

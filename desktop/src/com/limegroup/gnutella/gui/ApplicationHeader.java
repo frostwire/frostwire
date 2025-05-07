@@ -326,7 +326,9 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
                 ui = new SkinApplicationHeaderUI();
             }
             setUI(ui);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+            ignored.printStackTrace();
+        }
     }
 
     @Override

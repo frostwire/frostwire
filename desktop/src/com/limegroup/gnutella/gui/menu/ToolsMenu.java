@@ -63,7 +63,7 @@ final class ToolsMenu extends AbstractMenu {
         themeGroup.add(defaultItem);
         switchThemeMenu.add(defaultItem);
         // Dark theme
-        JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark")) {
+        JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark (beta)")) {
             private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {

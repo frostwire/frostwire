@@ -65,12 +65,13 @@ abstract public class FWAbstractJPanelTableCellRenderer extends JPanel implement
             setBackground(table.getSelectionBackground());
             setForeground(table.getSelectionForeground());
         } else {
-            /* Alternate rows: try UIManager key first, fall back to table bg */
-            Color alt = UIManager.getColor("Table.alternateRowColor");
-            if (alt == null) {
-                alt = table.getBackground().darker();
-            }
-            setBackground((row & 1) == 1 ? alt : table.getBackground());
+//            /* Alternate rows: try UIManager key first, fall back to table bg */
+//            Color alt = UIManager.getColor("Table.alternateRowColor");
+//            if (alt == null) {
+//                alt = table.getBackground().darker();
+//            }
+//            setBackground((row & 1) == 1 ? alt : table.getBackground());
+            setBackground(table.getBackground());
             setForeground(table.getForeground());
 
         }

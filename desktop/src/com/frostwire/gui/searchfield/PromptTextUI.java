@@ -16,6 +16,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -253,12 +254,22 @@ public abstract class PromptTextUI extends TextUI {
         return delegate.getEditorKit(t);
     }
 
-    public Dimension getMaximumSize(JComponent c) {
-        return delegate.getMaximumSize(c);
+    @Override
+    public Dimension getMinimumSize(JComponent c) {
+        JTextComponent txt = (JTextComponent) c;
+        if (shouldPaintPrompt(txt)) {
+            return getPromptComponent(txt).getMinimumSize();
+        }
+        return safeSize(delegate::getMinimumSize, c);
     }
 
-    public Dimension getMinimumSize(JComponent c) {
-        return delegate.getMinimumSize(c);
+    @Override
+    public Dimension getMaximumSize(JComponent c) {
+        JTextComponent txt = (JTextComponent) c;
+        if (shouldPaintPrompt(txt)) {
+            return getPromptComponent(txt).getMaximumSize();
+        }
+        return safeSize(delegate::getMaximumSize, c);
     }
 
     public int getNextVisualPositionFrom(JTextComponent t, int pos, Bias b, int direction, Bias[] biasRet)
@@ -308,6 +319,15 @@ public abstract class PromptTextUI extends TextUI {
         } catch (Exception ex) {
             // ignore
             return -2;
+        }
+    }
+
+    /** Executes the supplier, falls back to preferredSize when the delegate is dead. */
+    private Dimension safeSize(Function<JComponent, Dimension> f, JComponent c) {
+        try {
+            return f.apply(c);
+        } catch (NullPointerException ex) {      // delegate.editor is null
+            return delegate.getPreferredSize(c);
         }
     }
 

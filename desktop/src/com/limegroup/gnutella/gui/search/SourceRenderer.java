@@ -71,14 +71,14 @@ public class SourceRenderer extends DefaultTableBevelledCellRenderer implements 
             setBackground(table.getSelectionBackground());
             setForeground(table.getSelectionForeground());
         } else {
-            Color alt = UIManager.getColor("Table.alternateRowColor");
-            if (alt == null)
-                alt = table.getBackground().darker();  // fallback shade
-            setBackground((row & 1) == 1 ? alt : table.getBackground());
+//            Color alt = UIManager.getColor("Table.alternateRowColor");
+//            if (alt == null)
+//                alt = table.getBackground().darker();  // fallback shade
+//            setBackground((row & 1) == 1 ? alt : table.getBackground());
+            setBackground(table.getBackground());
             setForeground(table.getForeground());
         }
-        setOpaque(false);        // only after the background has been decided
-
+        setOpaque(true);        // only after the background has been decided
         updateUI((SourceHolder) value, table);
         return super.getTableCellRendererComponent(table, getText(), isSelected, hasFocus, row, columns);
     }

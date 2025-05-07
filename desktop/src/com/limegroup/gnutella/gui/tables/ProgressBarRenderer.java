@@ -46,7 +46,8 @@ class ProgressBarRenderer extends JProgressBar implements TableCellRenderer {
         }
         setStringPainted(true);
         setBorder(new EmptyBorder(5, 5, 5, 5));
-        setOpaque(false); // we'll paint the background ourselves
+        //setOpaque(ThemeMediator.getCurrentTheme() != ThemeMediator.ThemeEnum.DARK); // we'll paint the background ourselves
+        setOpaque(true);
     }
 
     public Component getTableCellRendererComponent(JTable table,

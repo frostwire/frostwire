@@ -66,11 +66,16 @@ public class BuddySupport {
     }
 
     private static void addToComponentHierarchy(Component c, Position pos, JTextField textField) {
-        try {
-            textField.add(c, pos.toString());
-        } catch (Throwable e) {
-            //e.printStackTrace();
+        // make sure the wrapper set the layout, but be defensive:
+        if (!(textField.getLayout() instanceof BorderLayout)) {
+            textField.setLayout(new BorderLayout());
         }
+
+        Object constraint = (pos == Position.LEFT)
+                ? BorderLayout.LINE_START    // LTR = West, RTL = East
+                : BorderLayout.LINE_END;     // LTR = East, RTL = West
+
+        textField.add(c, pos.constraint);
     }
 
     static List<Component> getLeft(JTextField textField) {
@@ -119,15 +124,15 @@ public class BuddySupport {
         for (Component c : BuddySupport.getLeft(textField)) {
             try {
                 addToComponentHierarchy(c, Position.LEFT, textField);
-            } catch (IllegalArgumentException e) {
-                // ignore
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
         for (Component c : BuddySupport.getRight(textField)) {
             try {
                 addToComponentHierarchy(c, Position.RIGHT, textField);
-            } catch (IllegalArgumentException e) {
-                // ignore
+            } catch (Throwable e) {
+                e.printStackTrace();
             }
         }
     }
@@ -140,6 +145,12 @@ public class BuddySupport {
     }
 
     public enum Position {
-        LEFT, RIGHT
+        LEFT  (BorderLayout.LINE_START),
+        RIGHT (BorderLayout.LINE_END);
+
+        private final Object constraint;
+        Position(Object c) { this.constraint = c; }
+
+        Object constraint() { return constraint; }
     }
 }
