@@ -18,6 +18,7 @@
 
 package com.limegroup.gnutella.gui.search;
 
+import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.GUIMediator;
 import net.miginfocom.swing.MigLayout;
 
@@ -72,6 +73,7 @@ final class SearchTabbedPane extends JTabbedPane {
 
         SearchTabHeader(Component component, String text) {
             this.component = component;
+            setOpaque(ThemeMediator.isDefaultThemeOn());
             setLayout(new MigLayout("insets 0, gap 0"));
             JButton buttonClose = new JButton(CancelSearchIconProxy.createSelected());
             buttonClose.setOpaque(false);
@@ -80,6 +82,7 @@ final class SearchTabbedPane extends JTabbedPane {
             buttonClose.addActionListener(new CloseActionHandler());
             add(buttonClose, "h 17!, w 23!");
             labelText = new JLabel(text.trim());
+            labelText.setOpaque(false);
             labelText.setHorizontalTextPosition(SwingConstants.LEADING);
             labelText.setAlignmentX(SwingConstants.RIGHT);
             labelText.setIcon(GUIMediator.getThemeImage("indeterminate_small_progress"));

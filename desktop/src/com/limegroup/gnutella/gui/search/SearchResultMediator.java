@@ -610,7 +610,7 @@ public final class SearchResultMediator extends AbstractTableMediator<TableRowFi
             }
         };
         background.setOpaque(false);
-        if (ThemeMediator.ThemeEnum.DARK == ThemeMediator.getCurrentTheme()) {
+        if (ThemeMediator.isDarkThemeOn()) {
             background.putClientProperty(ThemeMediator.SKIN_PROPERTY_DARK_BOX_BACKGROUND, Boolean.TRUE);
         }
         background.setLayout(new OverlayLayout(background));

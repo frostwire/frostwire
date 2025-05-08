@@ -32,7 +32,7 @@ public class IconRepainter {
      * @return A new ImageIcon that is brightened if the current theme is not the default one.
      */
     public static Icon brightenIfDarkTheme(Icon original, float scaleFactor) {
-        if (original == null || ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT) {
+        if (original == null || ThemeMediator.isDefaultThemeOn()) {
             if (original instanceof ImageIcon) {
                 return original;
             }

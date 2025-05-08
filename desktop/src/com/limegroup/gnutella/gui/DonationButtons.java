@@ -50,7 +50,7 @@ class DonationButtons extends JPanel {
     private JLabel createDonateLabel() {
         Font labelFont = getFont().deriveFont(Font.BOLD);
         JLabel donateLabel = new JLabel(I18n.tr("Donate") + ":");
-        donateLabel.setForeground(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK ? FONT_COLOR_DARK_THEME : FONT_COLOR);
+        donateLabel.setForeground(ThemeMediator.isDarkThemeOn() ? FONT_COLOR_DARK_THEME : FONT_COLOR);
         donateLabel.setFont(labelFont);
         return donateLabel;
     }
@@ -61,7 +61,7 @@ class DonationButtons extends JPanel {
         }
 
         private void initComponent(String text, final String donationURL, String tipText) {
-            boolean isDarkTheme = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+            boolean isDarkTheme = ThemeMediator.isDarkThemeOn();
             Font buttonFont = new Font("Dialog", Font.BOLD, 12);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setBorder(isDarkTheme ? BorderFactory.createLineBorder(Color.BLACK) : null);

@@ -80,7 +80,7 @@ public class JXSearchField extends JXTextField {
     private JXSearchField(String prompt) {
         super(prompt);
         // use the native search field if possible.
-        boolean isDarkTheme = ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+        boolean isDarkTheme = ThemeMediator.isDarkThemeOn();
         setUseNativeSearchFieldIfPossible(!isDarkTheme);
         // install default actions
         setCancelAction(new ClearAction());

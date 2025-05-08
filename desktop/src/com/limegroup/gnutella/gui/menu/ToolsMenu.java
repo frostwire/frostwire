@@ -59,7 +59,7 @@ final class ToolsMenu extends AbstractMenu {
                 ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DEFAULT);
             }
         });
-        defaultItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT);
+        defaultItem.setSelected(ThemeMediator.isDefaultThemeOn());
         themeGroup.add(defaultItem);
         switchThemeMenu.add(defaultItem);
         // Dark theme
@@ -70,7 +70,7 @@ final class ToolsMenu extends AbstractMenu {
                 ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DARK);
             }
         });
-        darkItem.setSelected(ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK);
+        darkItem.setSelected(ThemeMediator.isDarkThemeOn());
         themeGroup.add(darkItem);
         switchThemeMenu.add(darkItem);
         MENU.add(switchThemeMenu);

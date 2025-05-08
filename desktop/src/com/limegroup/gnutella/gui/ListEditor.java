@@ -76,7 +76,7 @@ public class ListEditor extends JPanel {
         setLayout(new GridBagLayout());
         //Top half of the editor
         editor = new LimeTextField("");
-        boolean isOpaquePanel = ThemeMediator.getCurrentTheme() != ThemeMediator.ThemeEnum.DARK;
+        boolean isOpaquePanel = ThemeMediator.isDefaultThemeOn();
         setOpaque(isOpaquePanel);
         editor.setOpaque(isOpaquePanel);
         editor.setColumns(DEFAULT_COLUMNS);

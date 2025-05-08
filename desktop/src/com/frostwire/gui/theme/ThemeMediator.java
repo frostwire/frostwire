@@ -118,6 +118,14 @@ public final class ThemeMediator {
         return currentTheme;
     }
 
+    public static boolean isDarkThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+    }
+
+    public static boolean isDefaultThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
+    }
+
     /**
      * Switches the application UI theme.
      *
