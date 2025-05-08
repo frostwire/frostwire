@@ -1,5 +1,6 @@
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.service.Switch;
 import org.limewire.setting.IntSetting;
 
@@ -85,7 +86,7 @@ public final class MessageService {
             });
             editorPane.setText(message);
             optionPane.setMessage(editorPane);
-            optionPane.setOpaque(true);
+            optionPane.setOpaque(ThemeMediator.isDefaultThemeOn());
             JDialog dialog = optionPane.createDialog(getParentComponent(), I18n.tr("Error"));
             dialog.setVisible(true);
         });

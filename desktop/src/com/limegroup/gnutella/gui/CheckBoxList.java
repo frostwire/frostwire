@@ -17,6 +17,7 @@
 
 package com.limegroup.gnutella.gui;
 
+import com.frostwire.gui.theme.ThemeMediator;
 import com.limegroup.gnutella.gui.tables.DefaultTableBevelledCellRenderer;
 
 import javax.swing.Timer;
@@ -102,12 +103,15 @@ public class CheckBoxList<E> extends BoxPanel {
     private CheckBoxList(Collection<E> elements, Collection<E> notCheckedElements, TextProvider<E> provider, ExtrasProvider<E> separatorProvider, int mode) {
         this.provider = provider;
         this.extrasProvider = separatorProvider;
+
         if (provider == null) {
             throw new NullPointerException("provider must not be null");
         }
+
         this.parent = this;
         this.selectionListener = null;
         this.selectOff = (mode == SELECT_FIRST_OFF);
+
         this.initialize();
         this.setElements(elements, notCheckedElements);
     }
@@ -374,6 +378,7 @@ public class CheckBoxList<E> extends BoxPanel {
         this.setBorder(new EmptyBorder(0, 0, 0, 0));
         this.editor = new CheckBoxCellEditor();
         this.checkBoxList = new CustomJTable();
+        this.checkBoxList.setOpaque(ThemeMediator.isDefaultThemeOn());
         this.checkBoxList.setDefaultRenderer(Object.class, new CheckBoxCellRenderer());
         this.checkBoxList.setDefaultEditor(Object.class, editor);
         this.checkBoxList.setRowHeight(DEFAULT_ROW_HEIGHT);
@@ -382,6 +387,8 @@ public class CheckBoxList<E> extends BoxPanel {
         this.checkBoxList.getTableHeader().setVisible(false);
         this.checkBoxList.getTableHeader().setSize(0, 0);
         this.scrollPane = new JScrollPane(checkBoxList);
+        //this.scrollPane.setOpaque(ThemeMediator.isDefaultThemeOn());
+        this.setOpaque(true);
         this.add(scrollPane);
         this.updateUI();
     }
@@ -392,10 +399,9 @@ public class CheckBoxList<E> extends BoxPanel {
         if (this.checkBoxList == null) {
             return;
         }
-        this.setBackground(UIManager.getColor("List.textBackground"));
+
+        // the color behind the checkboxes
         this.checkBoxList.setBackground(UIManager.getColor("List.background"));
-        this.checkBoxList.setGridColor(UIManager.getColor("List.background"));
-        this.scrollPane.getViewport().setBackground(UIManager.getColor("List.background"));
     }
 
     /**

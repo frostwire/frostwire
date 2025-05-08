@@ -77,7 +77,8 @@ public final class ThemeMediator {
             "TableUI", "TreeUI",   // data views
             "TextFieldUI",         // buddies / prompt skin
             "RadioButtonUI",       // custom painter variant
-            "LabelUI"              // custom painter variant
+            "LabelUI",              // custom painter variant
+            "MultilineToolTipUI" // custom painter variant
     };
 
     private ThemeMediator() {
@@ -219,7 +220,7 @@ public final class ThemeMediator {
     public static void loadDarkTheme() {
         purgeSynthOverrides();
         Runnable task = () -> {
-          purgeSynthOverrides();
+            purgeSynthOverrides();
             FlatDarkLaf.setup();
             installFlatLafDefaults();
             for (Window w : Window.getWindows()) {
@@ -247,6 +248,8 @@ public final class ThemeMediator {
 
         // test: make all table-header backgrounds bright yellow
         UIManager.put("TableHeader.background", dark);
+        // Delete dialog buttons background gets fixed with this
+        UIManager.put("OptionPane.background", reallyDark);
         // (you’ll almost certainly want a contrasting foreground as well)
         UIManager.put("TableHeader.foreground", new ColorUIResource(Color.WHITE));
 
@@ -758,6 +761,6 @@ public final class ThemeMediator {
 
     private static void purgeSynthOverrides() {
         UIDefaults defs = UIManager.getDefaults();
-        for( String k : SYNTH_KEYS ) defs.remove( k );
+        for (String k : SYNTH_KEYS) defs.remove(k);
     }
 }

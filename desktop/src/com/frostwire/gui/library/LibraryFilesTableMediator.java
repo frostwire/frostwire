@@ -26,6 +26,7 @@ import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.SkinMenu;
 import com.frostwire.gui.theme.SkinMenuItem;
 import com.frostwire.gui.theme.SkinPopupMenu;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
 import com.frostwire.util.OSUtils;
@@ -121,6 +122,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         fileList.setVisibleRowCount(5);
         fileList.setCellRenderer(new FileNameListCellRenderer());
         fileList.setFocusable(false);
+        fileList.setOpaque(ThemeMediator.isDefaultThemeOn());
         return fileList;
     }
 
