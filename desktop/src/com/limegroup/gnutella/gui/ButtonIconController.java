@@ -37,6 +37,7 @@ class ButtonIconController {
                 p.load(is);
             }
         } catch (IOException ignored) {
+            ignored.printStackTrace();
         } finally {
             IOUtils.closeQuietly(is);
         }

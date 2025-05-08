@@ -245,7 +245,8 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
     private void createSettingsButton() {
-        settingsButton = new IconButton("SETTINGS_GEAR", true);
+        // see icon_mapping.properties for the icon name (settings_gray_large.png)
+        settingsButton = new IconButton("STATUS_LINE_SETTINGS_BUTTON", true);
         settingsButton.setAction(new SettingsButtonAction());
     }
 
@@ -747,7 +748,7 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             putValue(Action.NAME, I18n.tr("Settings"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Settings"));
             putValue(Action.SHORT_DESCRIPTION, I18n.tr("Settings"));
-            putValue(LimeAction.ICON_NAME, "SETTINGS_GEAR");
+            putValue(LimeAction.ICON_NAME, "STATUS_LINE_SETTINGS_BUTTON");
         }
 
         @Override
