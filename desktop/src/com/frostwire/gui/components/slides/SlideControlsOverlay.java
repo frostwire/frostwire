@@ -19,6 +19,7 @@
 package com.frostwire.gui.components.slides;
 
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.JsonUtils;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UrlUtils;
@@ -132,6 +133,14 @@ final class SlideControlsOverlay extends JPanel {
         JPanel container = new JPanel(new MigLayout("fillx, ins 0"));
         JLabel labelAuthor = new JLabel(slide.author + " " + I18n.tr("on"));
         //labelAuthor.putClientProperty(SubstanceTextUtilities.ENFORCE_FG_COLOR, Boolean.TRUE);
+
+        if (ThemeMediator.isDarkThemeOn()) {
+            labelAuthor.setOpaque(true);
+            labelAuthor.setBackground(Color.BLACK);
+            container.setOpaque(true);
+            container.setBackground(Color.BLACK);
+        }
+
         labelAuthor.setForeground(TEXT_FOREGROUND);
         labelAuthor.setFont(deriveFont(false, BASE_TEXT_FONT_SIZE_DELTA));
         container.add(labelAuthor, "aligny baseline");
