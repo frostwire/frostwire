@@ -118,6 +118,7 @@ final class SlideControlsOverlay extends JPanel {
     private void setupButtons() {
         final Slide slide = controller.getSlide();
         JPanel centerButtonsPanel = new JPanel(new MigLayout("fill"));
+        centerButtonsPanel.setOpaque(false);
         if (slide.hasFlag(Slide.SHOW_PREVIEW_BUTTONS_ON_THE_LEFT)) {
             addPreviewButtons(centerButtonsPanel, slide);
             addDownloadInstallButton(centerButtonsPanel, slide);
