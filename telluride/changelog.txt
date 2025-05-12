@@ -1,3 +1,8 @@
+build 39 - may/12/2025
+ - yt_dlp-2025.4.30
+ - dev: pip-25.1.1
+ - dev: pyinstaller-6.13.0
+
 build 38 - apr/11/2025
  - yt_dlp-2024.3.31
  - python 3.13.3
