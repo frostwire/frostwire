@@ -107,7 +107,7 @@ public class Main {
     public static URL getChosenSplashURL() {
         if (CHOSEN_SPLASH_URL != null)
             return CHOSEN_SPLASH_URL;
-        final String splashPath = "org/limewire/gui/images/app_splash.jpg";
+        final String splashPath = "org/limewire/gui/images/app_splash.png";
         CHOSEN_SPLASH_URL = ClassLoader.getSystemResource(splashPath);
         return CHOSEN_SPLASH_URL;
     }
