@@ -1,8 +1,46 @@
-frostwire (6.13.6) stable; urgency=high
- * Telluride Video Downloader build 37
+frostwire (6.14.0) stable; urgency=high
+ * Telluride Video Downloader build 38
  * Filter out search results with no keyword matches, considers fuzzy matches
+ * New app_splash image
+ * FrostWire 6.14.0 build 326
+ * Make download button on slide panel transparent
+ * Black background behind author on slide controls overlay
+ * Don't paint search tabbed pane background on default theme either
+ * Settings button on status bar (StatusLine) now looks good
+ * Dark theme fixes for delete files dialog
+ * Dark theme for search tab headers, refactor checking what theme is on
+ * Robust runtime theme switch & readable dialogs in FlatLaf dark mode
+ * Ignore some exceptions while updating window hierarchy on theme change
+ * General UI cleanup
+ * Background color for main searchboxes fixed when focused
+ * Refine dark theme UI, panel and textfield backgrounds darker
+ * Icon brightening support and clean-up sweep
+ * LibraryExplorer Tree background is darker for dark theme, speaker icon is brightened
+ * TransferDetailGeneral: support dark theme backgrounds and text
+ * Make transfer-detail pieces & tables use dark theme background
+ * Dark theme: unify table, panel and toggle-button backgrounds
+ * Actions for transfers, library and search had icons brightened in dark mode
+ * Transfer seeding renderer icon brightened for dark mode
+ * Enhanced icon repainting capabilities for dark mode
+ * ThemeMediator: Improved handling of table row alternate colors
+ * DefaultTableBevelledCellRenderer: Don't paint border when not selected, removed useless isSelected property
+ * Source renderer fix
+ * Fix progress bar renderer to preserve row striping and selection highlights
+ * FWAbstractJPanelTableCellRenderer: Don't paint beveled border
+ * LibraryFilesTableMediator cleanup
+ * LibraryFilesTableDataLine cleanup
+ * MediaPlayerComponent cleanup, layout uses all vertical space available
+ * Dark theme polish: transparent media panels, dynamic separators, dark result background
+ * Add dark mode gradient colors for application header
+ * Dark-theme table polish – dynamic striping & renderer fixes
+ * ThemeMediator.loadDarkTheme(): define UIManager "Table.alternateRowColor" (15% darker than background).
+ * FWAbstractJPanelTableCellRenderer: use Look-and-Feel selection/alternate colours instead of hard-coded white; keep foreground in sync.
+ * SourceRenderer: make cell opaque and apply same dynamic row / selection colours.
+ * Basic theme switching working
+ * Updated changelog file
+ * Added script to open test reports
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 9 Mar 2025 13:37:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Tue, 13 May 2025 15:11:00 -0600
 
 frostwire (6.13.5) stable; urgency=high
   * Telluride Video Downloader build 36
