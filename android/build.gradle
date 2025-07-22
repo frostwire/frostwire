@@ -50,6 +50,7 @@ repositories {
     google()
     mavenCentral()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://dl.frostwire.com/maven" }
 }
 
 def manifestVersionCode() {
@@ -250,18 +251,11 @@ dependencies {
     implementation 'com.applovin.mediation:unityads-adapter:4.14.1.0'
 
     def jlibtorrent_version = '1.2.19.0'
-    implementation files('libs/jlibtorrent-' + jlibtorrent_version + '.jar')
-
-    // att free phones use this and crashes
-    implementation files('libs/jlibtorrent-android-arm-' + jlibtorrent_version + '.jar')
-
-    // oneplus hd1905 uses this
-    implementation files('libs/jlibtorrent-android-arm64-' + jlibtorrent_version + '.jar')
-
-    // used by android emulator on macos
-    implementation files('libs/jlibtorrent-android-x86-' + jlibtorrent_version + '.jar')
-
-    implementation files('libs/jlibtorrent-android-x86_64-' + jlibtorrent_version + '.jar')
+    implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
+    implementation 'com.frostwire:jlibtorrent-android-arm:' + jlibtorrent_version
+    implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
+    implementation 'com.frostwire:jlibtorrent-android-x86:' + jlibtorrent_version
+    implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
 }
 
 afterEvaluate {
