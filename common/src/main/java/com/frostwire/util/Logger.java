@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,38 +32,40 @@ public final class Logger {
 
     private static String contextPrefix;
 
+    private static final Object lock = new Object();
+
     private Logger(java.util.logging.Logger jul) {
         this.jul = jul;
         this.name = jul.getName();
     }
 
     public static void setContextPrefix(String prefix) {
-        contextPrefix = prefix;
+        synchronized (lock) {
+            contextPrefix = prefix;
+        }
     }
 
     public static void clearContextPrefix() {
-        contextPrefix = null;
+        synchronized (lock) {
+            contextPrefix = null;
+        }
     }
 
     public static Logger getLogger(Class<?> clazz) {
         return new Logger(java.util.logging.Logger.getLogger(clazz.getSimpleName()));
     }
 
-    /**
-     * TODO: When Android's Java has Thread.threadId() we'll be able to fix this warning
-     * @return
-     */
     private static String getCallingMethodInfo() {
         Thread currentThread = Thread.currentThread();
         StackTraceElement[] stackTrace = currentThread.getStackTrace();
         String caller = " - <Thread not scheduled yet>";
         if (stackTrace.length >= 5) {
             StackTraceElement stackElement = stackTrace[5];
-            caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
+            caller = " - Called from <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + ">";
         }
         if (stackTrace.length >= 6) {
             StackTraceElement stackElement = stackTrace[6];
-            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + "(tid=" + currentThread.getId() + ")>";
+            caller = "\n - invoked by  <" + stackElement.getFileName() + "::" + stackElement.getMethodName() + ":" + stackElement.getLineNumber() + " on thread:" + currentThread.getName() + ">";
         }
         return caller;
     }
