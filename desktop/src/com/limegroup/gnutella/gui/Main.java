@@ -51,6 +51,32 @@ public class Main {
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
+        //load_jlibtorrent();
+        //System.out.println("1: Main.main("+args+")");
+        // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
+        libtorrent_jni.version();
+        Frame splash = null;
+        try {
+            // show initial splash screen only if there are no arguments
+            if (args == null || args.length == 0)
+                splash = showInitialSplash();
+            // load the GUI through reflection so that we don't reference classes here,
+            // which would slow the speed of class-loading, causing the splash to be
+            // displayed later.
+            try {
+                Class.forName("com.limegroup.gnutella.gui.GUILoader").
+                        getMethod("load", new Class[]{String[].class, Frame.class}).
+                        invoke(null, args, splash);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private static void load_jlibtorrent() {
         try {
             String jlibtorrent_library_path = loadJlibtorrentJNIFromClassloaderResource();
             if (jlibtorrent_library_path != null) {
@@ -73,30 +99,6 @@ public class Main {
             if (OSUtils.isLinux()) {
                 System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
             }
-        }
-
-
-        //System.out.println("1: Main.main("+args+")");
-        // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
-        libtorrent_jni.version();
-        Frame splash = null;
-        try {
-            // show initial splash screen only if there are no arguments
-            if (args == null || args.length == 0)
-                splash = showInitialSplash();
-            // load the GUI through reflection so that we don't reference classes here,
-            // which would slow the speed of class-loading, causing the splash to be
-            // displayed later.
-            try {
-                Class.forName("com.limegroup.gnutella.gui.GUILoader").
-                        getMethod("load", new Class[]{String[].class, Frame.class}).
-                        invoke(null, args, splash);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.exit(1);
         }
     }
 

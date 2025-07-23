@@ -315,21 +315,7 @@ public class TorrentFetcherDownload implements BTDownload {
                 if (uri.startsWith("http")) {
                     data = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(uri, 15000, UserAgentGenerator.getUserAgent(), referer, cookie);
                 } else {
-                    LOG.info("Attempting to fetch magnet URI: " + uri);
-                    try {
-                        data = BTEngine.getInstance().fetchMagnet(uri, 90, true);
-                    } catch (IllegalArgumentException e) {
-                        LOG.error("Invalid magnet URI format: " + uri, e);
-                        // Extract and log the info hash portion for debugging
-                        if (uri.contains("xt=urn:btih:")) {
-                            String[] parts = uri.split("xt=urn:btih:");
-                            if (parts.length > 1) {
-                                String infoHashPart = parts[1].split("&")[0];
-                                LOG.error("Extracted info hash: '" + infoHashPart + "' (length: " + infoHashPart.length() + ")");
-                            }
-                        }
-                        throw e;
-                    }
+                    data = BTEngine.getInstance().fetchMagnet(uri, 90, true);
                 }
                 if (state == TransferState.CANCELED) {
                     return;
