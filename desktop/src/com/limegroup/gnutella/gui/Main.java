@@ -25,8 +25,13 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 /**
  * This class constructs an <tt>Initializer</tt> instance that constructs
@@ -45,17 +50,32 @@ public class Main {
         System.setProperty("sun.awt.noerasebackground", "true");
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-        if (OSUtils.isWindows()) {
-            System.setProperty("jlibtorrent.jni.path", getWindowsJLibtorrentPath());
+
+        try {
+            String jlibtorrent_library_path = loadJlibtorrentJNIFromClassloaderResource();
+            if (jlibtorrent_library_path != null) {
+                System.out.println("jlibtorrent JNI library loaded from classloader resource path: " + jlibtorrent_library_path);
+                System.setProperty("jlibtorrent.jni.path", jlibtorrent_library_path);
+            } else {
+                System.err.println("Failed to load jlibtorrent JNI library from classpath, using fallback paths.");
+            }
+        } catch (IOException e) {
+            System.err.println("Failed to load jlibtorrent JNI library from classpath: " + e.getMessage());
+            e.printStackTrace();
+            if (OSUtils.isWindows()) {
+                System.setProperty("jlibtorrent.jni.path", getWindowsJLibtorrentPath());
+            }
+            if (OSUtils.isMacOSX()) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
+                System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
+                System.setProperty("jlibtorrent.jni.path", getMacOSJLibtorrentPath());
+            }
+            if (OSUtils.isLinux()) {
+                System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
+            }
         }
-        if (OSUtils.isMacOSX()) {
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
-            System.setProperty("jlibtorrent.jni.path", getMacOSJLibtorrentPath());
-        }
-        if (OSUtils.isLinux()) {
-            System.setProperty("jlibtorrent.jni.path", getLinuxJLibtorrentPath());
-        }
+
+
         //System.out.println("1: Main.main("+args+")");
         // make sure jlibtorrent is statically loaded on time to avoid jni symbols not found issues.
         libtorrent_jni.version();
@@ -152,5 +172,74 @@ public class Main {
         }
         System.out.println("Using jlibtorrent (fallback): " + "../../lib/native/" + libraryName + libraryExtension);
         return ".." + File.separator + ".." + File.separator + "lib" + File.separator + "native" + File.separator + libraryName + libraryExtension;
+    }
+
+    // DELETE EVERYTHING BELOW WHEN WE BRING JLIBTORRENT TO 2.0.12.0
+
+    public static boolean isMacOS() {
+        String os = System.getProperty("os.name").toLowerCase(java.util.Locale.US);
+        return os.startsWith("mac os");
+    }
+
+    public static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase(java.util.Locale.US).contains("win");
+    }
+
+    public static boolean isLinux() {
+        return System.getProperty("os.name").toLowerCase(java.util.Locale.US).contains("linux");
+    }
+
+    private static String loadJlibtorrentJNIFromClassloaderResource() throws java.io.IOException {
+        String os = System.getProperty("os.name").toLowerCase(java.util.Locale.US);
+        String arch = System.getProperty("os.arch").toLowerCase(java.util.Locale.US);
+        boolean isArm64 = arch.equals("aarch64") || arch.equals("arm64");
+        String version = "1.2.19.0";
+        String libraryName;
+        String pathToLibraryInJar;
+
+        // Determine platform-specific library path
+        if (isWindows()) {
+            libraryName = "libjlibtorrent-" + version;
+            pathToLibraryInJar = "lib/x86_64/" + libraryName + ".dll";
+        } else if (isMacOS()) {
+            if (isArm64) {
+                libraryName = "libjlibtorrent.arm64-" + version;
+                pathToLibraryInJar = "lib/arm64/" + libraryName + ".dylib";
+            } else {
+                libraryName = "libjlibtorrent.x86_64-" + version;
+                pathToLibraryInJar = "lib/x86_64/" + libraryName + ".dylib";
+            }
+        } else {
+            throw new java.io.IOException("Unsupported OS: " + os);
+        }
+
+        try {
+            // Get the native library resource from the classpath
+            System.out.println("Loading jlibtorrent from classloader path: " + pathToLibraryInJar);
+            InputStream libStream = libtorrent_jni.class.getClassLoader().getResourceAsStream(pathToLibraryInJar);
+            if (libStream == null) {
+                System.err.println("jlibtorrent: Could not find native library in JAR: " + pathToLibraryInJar);
+                throw new FileNotFoundException("Could not find native library in JAR: " + pathToLibraryInJar);
+            }
+
+            // Create temp file
+            String suffix = pathToLibraryInJar.substring(pathToLibraryInJar.lastIndexOf('.')); // e.g., ".dylib"
+            Path tempLib = Files.createTempFile("jni-", suffix);
+            tempLib.toFile().deleteOnExit();
+
+            // Extract to temp file
+            try (InputStream in = libStream) {
+                Files.copy(in, tempLib, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // Load the library
+            String absolutePath = tempLib.toAbsolutePath().toString();
+            System.out.println("jlibtorrent: Extracted and loading native library from classpath to: " + absolutePath);
+            System.load(absolutePath);
+            return absolutePath;
+        } catch (IOException e) {
+            System.err.println("jlibtorrent: Failed to extract/load native library: " + e.getMessage());
+            return null;
+        }
     }
 }

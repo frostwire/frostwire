@@ -53,18 +53,43 @@ application {
 
 repositories {
     mavenCentral()
+    maven { url 'https://dl.frostwire.com/maven' }
 }
 
 dependencies {
     // @Nullable cross-os annotation
     implementation 'org.jetbrains:annotations:26.0.1'
 
-    implementation 'com.google.re2j:re2j:1.7'
+    implementation 'com.google.re2j:re2j:1.8'
     implementation 'com.google.code.gson:gson:2.10'
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
+    def jlibtorrent_version = '1.2.19.0'
+    def os = OperatingSystem.current()
+    def arch = System.getProperty('os.arch').toLowerCase()
+    def is_arm64 = arch == "aarch64" || arch == "arm64"
+
+    // jlibtorrent java wrappers
+    implementation "com.frostwire:jlibtorrent:${jlibtorrent_version}"
+
+    // jlibtorrent native libraries
+    // if we are on windows, we need to use the windows native libraries
+    if (os.isWindows()) {
+        implementation "com.frostwire:jlibtorrent-windows:${jlibtorrent_version}"
+    } else if (os.isLinux()) {
+        implementation "com.frostwire:jlibtorrent-linux64:${jlibtorrent_version}"
+    } else if (os.isMacOsX()) {
+        // if it's arm mac
+        if (is_arm64) {
+            implementation "com.frostwire:jlibtorrent-macosx-arm64:${jlibtorrent_version}"
+        }
+        // intel
+        else {
+            implementation "com.frostwire:jlibtorrent-macosx-x86_64:${jlibtorrent_version}"
+        }
+    }
 
     implementation fileTree(dir: 'lib/jars', include: ['*.jar'])
     // FlatLaf for dark theme support
@@ -117,7 +142,7 @@ jar {
 
 // gettext tasks
 
-task gettextInit {
+tasks.register('gettextInit') {
     description 'Loads and define the ant gettext related tasks'
 
     doLast {
@@ -128,7 +153,7 @@ task gettextInit {
     }
 }
 
-task gettextExtract {
+tasks.register('gettextExtract') {
     description 'Extracts message keys from the source code'
 
     doLast {
@@ -146,7 +171,7 @@ task gettextExtract {
     }
 }
 
-task gettextBundle {
+tasks.register('gettextBundle') {
     description 'Rebuilds messages and bundles them into messages.jar'
 
     doLast {
