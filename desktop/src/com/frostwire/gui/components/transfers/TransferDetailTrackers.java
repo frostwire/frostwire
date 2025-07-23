@@ -20,6 +20,8 @@ package com.frostwire.gui.components.transfers;
 
 import com.frostwire.gui.bittorrent.BittorrentDownload;
 import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.swig.announce_endpoint;
+import com.frostwire.jlibtorrent.swig.announce_infohash;
 import com.frostwire.util.Logger;
 import net.miginfocom.swing.MigLayout;
 
@@ -156,13 +158,30 @@ public final class TransferDetailTrackers extends JPanel implements TransferDeta
             int p = 0;
             long d = 0;
             boolean a = false;
+
             for (AnnounceEndpoint endPoint : announceEntry.endpoints()) {
-                s = Math.max(endPoint.scrapeComplete(), s);
-                p = Math.max(endPoint.scrapeIncomplete(), p);
-                d = Math.max(endPoint.scrapeDownloaded(), d);
-                if (!a && endPoint.isWorking()) {
-                    a = true;
+                announce_endpoint announceEndpoint = endPoint.swig();
+
+                announce_infohash infohashV1 = announceEndpoint.get_infohash_v1();
+                announce_infohash infohashV2 = announceEndpoint.get_infohash_v2();
+
+                if (infohashV1 != null) {
+                    s = Math.max(infohashV1.getScrape_complete(), s);
+                    p = Math.max(infohashV1.getScrape_incomplete(), p);
+                    d = Math.max(infohashV1.getScrape_downloaded(), d);
                 }
+                if (infohashV2 != null) {
+                    s = Math.max(infohashV2.getScrape_complete(), s);
+                    p = Math.max(infohashV2.getScrape_incomplete(), p);
+                    d = Math.max(infohashV2.getScrape_downloaded(), d);
+                }
+
+                if (!a && announceEndpoint.getEnabled()) {
+                    boolean v1IsWorking = infohashV1.getFails() == 0;
+                    boolean v2IsWorking = infohashV2.getFails() == 0;
+                    a = v1IsWorking || v2IsWorking;
+                }
+
             }
             this.trackerOffset = trackerOffset;
             this.url = announceEntry.url();
