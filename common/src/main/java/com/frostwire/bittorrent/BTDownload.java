@@ -588,7 +588,7 @@ public final class BTDownload implements BittorrentDownload {
             if (!th.isValid()) {
                 return s;
             }
-            long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+            long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
             TorrentInfo ti = th.torrentFile();
             if (ti == null) {
                 // still downloading the info (from magnet)
@@ -653,7 +653,7 @@ public final class BTDownload implements BittorrentDownload {
                 String infoHash = th.infoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
                 entry e = add_torrent_params.write_resume_data(alert.swig().getParams());
-                e.dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
+                e.dict().put(EXTRA_DATA_KEY, Entry.fromMap(extra).swig());
                 FileUtils.writeByteArrayToFile(file, Vectors.byte_vector2bytes(e.bencode()));
             }
         } catch (Throwable e) {
@@ -687,7 +687,7 @@ public final class BTDownload implements BittorrentDownload {
                 byte[] arr = FileUtils.readFileToByteArray(file);
                 entry e = entry.bdecode(Vectors.bytes2byte_vector(arr));
                 string_entry_map d = e.dict();
-                if (d.has_key(EXTRA_DATA_KEY)) {
+                if (d.containsKey(EXTRA_DATA_KEY)) {
                     readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
                 }
             }
@@ -698,10 +698,8 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     private void readExtra(string_entry_map dict, Map<String, String> map) {
-        string_vector keys = dict.keys();
-        int size = (int) keys.size();
-        for (int i = 0; i < size; i++) {
-            String k = keys.get(i);
+        string_vector keys = new string_vector(dict.keySet());
+        for (String k : keys) {
             entry e = dict.get(k);
             if (e.type() == entry.data_type.string_t) {
                 map.put(k, e.string());

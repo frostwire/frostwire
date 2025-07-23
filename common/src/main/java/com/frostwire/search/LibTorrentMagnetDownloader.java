@@ -19,6 +19,9 @@ package com.frostwire.search;
 
 import com.frostwire.bittorrent.BTEngine;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -28,6 +31,16 @@ public class LibTorrentMagnetDownloader implements MagnetDownloader {
     }
 
     public byte[] download(String magnet, int timeout) {
-        return BTEngine.getInstance().fetchMagnet(magnet, timeout, true);
+        return BTEngine.getInstance().fetchMagnet(magnet, timeout, getTempDir());
+    }
+
+    public static File getTempDir() {
+        File fwDummy = null;
+        try {
+            fwDummy = File.createTempFile("fw_dummy_", ".txt");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return fwDummy.getParentFile();
     }
 }
