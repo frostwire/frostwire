@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -327,7 +327,7 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, selection, peers, false);
     }
 
-    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean dontSaveTorrentFile) {
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection, List<TcpEndpoint> peers, boolean saveTorrentFile) {
         if (swig() == null) {
             return;
         }
@@ -361,7 +361,7 @@ public final class BTEngine extends SessionManager {
         download(ti, saveDir, priorities, null, peers);
 
         saveResumeTorrent(ti);
-        if (!dontSaveTorrentFile) {
+        if (saveTorrentFile) {
             saveTorrent(ti);
         }
     }

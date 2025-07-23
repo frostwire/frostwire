@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,10 +110,13 @@ class InstallerUpdater implements Runnable {
         // save the torrent locally if you have to
         if (saveLocation != null && contents != null && contents.length > 0) {
             if (saveLocation.exists()) {
-                saveLocation.delete();
+                boolean deleted = saveLocation.delete();
+                if (!deleted) {
+                    LOG.warn("InstallerUpdater::downloadTorrentFile: Failed to delete existing torrent file at " + saveLocation.getAbsolutePath() + ". Will overwrite it.");
+                }
             }
             //Create all the route necessary to save the .torrent file if it does not exit.
-            saveLocation.getParentFile().mkdirs();
+            boolean __ = saveLocation.getParentFile().mkdirs();
             saveLocation.createNewFile();
             saveLocation.setWritable(true);
             FileOutputStream fos = new FileOutputStream(saveLocation, false);
@@ -311,7 +314,7 @@ class InstallerUpdater implements Runnable {
         };
         try {
             BTEngine.getInstance().addListener(updateTorrentListener);
-            BTEngine.getInstance().download(tinfo, new File(saveDataPath), null, null, null);
+            BTEngine.getInstance().download(tinfo, new File(saveDataPath), null, null, false);
         } catch (Throwable e) {
             e.printStackTrace();
         }
