@@ -76,7 +76,7 @@ public class BTDownloadItem implements TransferItem {
         if (!th.isValid()) {
             return 0;
         }
-        long[] progress = th.fileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+        long[] progress = th.fileProgress(TorrentHandle.PIECE_GRANULARITY);
         return progress[index];
     }
 

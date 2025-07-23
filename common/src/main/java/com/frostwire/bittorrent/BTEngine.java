@@ -17,57 +17,21 @@
 
 package com.frostwire.bittorrent;
 
-import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
-import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
-import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
-import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
-import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
-
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.ErrorCode;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionManager;
-import com.frostwire.jlibtorrent.SessionParams;
-import com.frostwire.jlibtorrent.SettingsPack;
-import com.frostwire.jlibtorrent.TcpEndpoint;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
-import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
-import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.swig.bdecode_node;
-import com.frostwire.jlibtorrent.swig.byte_vector;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.error_code;
-import com.frostwire.jlibtorrent.swig.libtorrent;
-import com.frostwire.jlibtorrent.swig.session_params;
-import com.frostwire.jlibtorrent.swig.settings_pack;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
+
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -144,7 +108,6 @@ public final class BTEngine extends SessionManager {
             sp.maxQueuedDiskBytes(maxQueuedDiskBytes / 2);
             int sendBufferWatermark = sp.sendBufferWatermark();
             sp.sendBufferWatermark(sendBufferWatermark / 2);
-            sp.cacheSize(256);
             sp.activeDownloads(4);
             sp.activeSeeds(4);
             sp.maxPeerlistSize(200);
@@ -174,7 +137,7 @@ public final class BTEngine extends SessionManager {
     @Override
     public void start() {
         SessionParams params = loadSettings();
-        settings_pack sp = params.settings().swig();
+        settings_pack sp = params.swig().getSettings();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
         sp.set_str(settings_pack.string_types.dht_bootstrap_nodes.swigValue(), dhtBootstrapNodes());
@@ -259,7 +222,7 @@ public final class BTEngine extends SessionManager {
                     if (!STATE_VERSION_VALUE.equals(stateVersion)) {
                         return defaultParams();
                     }
-                    session_params params = libtorrent.read_session_params(n);
+                    session_params params = session_params.read_session_params(n);
                     buffer.clear(); // prevents GC
                     return new SessionParams(params);
                 } else {
@@ -290,8 +253,15 @@ public final class BTEngine extends SessionManager {
         if (swig() == null) {
             return null;
         }
-        entry e = new entry();
-        swig().save_state(e);
+
+        com.frostwire.jlibtorrent.swig.session session = swig();
+        session_params params = session.session_state();
+        if (params == null) {
+            LOG.warn("Unable to save session state, session_params is null");
+            return null;
+        }
+        entry e = session_params.write_session_params(params, save_state_flags_t.all());
+        //entry e = entry.from_string_bytes(session_params.write_session_params_buf(params, save_state_flags_t.all()));
         e.set(STATE_VERSION_KEY, STATE_VERSION_VALUE);
         return Vectors.byte_vector2bytes(e.bencode());
     }
@@ -519,7 +489,7 @@ public final class BTEngine extends SessionManager {
         try {
             String name = getEscapedFilename(ti);
             entry e = ti.toEntry().swig();
-            e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
+            e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
         } catch (Throwable e) {
@@ -685,7 +655,9 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            download(ti, saveDir, resumeFile, priorities, peers);
+            // constexpr torrent_flags_t auto_managed = 5_bit;
+            // jul.22.2025 gubatron: NOT SURE OF THIS, but it seems to be the right flag to use
+            download(ti, saveDir, resumeFile, priorities, peers, torrent_flags_t.from_int(1 << 5));
             th = find(ti.infoHash());
             if (th != null) {
                 fireDownloadUpdate(th);
@@ -781,7 +753,7 @@ public final class BTEngine extends SessionManager {
         @Override
         public void run() {
             try {
-                download(new TorrentInfo(torrent), saveDir, resume, priorities, null);
+                download(new TorrentInfo(torrent), saveDir, resume, priorities, null, torrent_flags_t.from_int(1 << 5));
             } catch (Throwable e) {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
