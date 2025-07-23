@@ -737,7 +737,6 @@ public final class BTEngine extends SessionManager {
         public void run() {
             try {
                 download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
-
             } catch (Throwable e) {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
