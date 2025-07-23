@@ -32,6 +32,7 @@ import com.limegroup.gnutella.gui.search.TorrentUISearchResult;
 import com.limegroup.gnutella.gui.search.UISearchResult;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -39,6 +40,7 @@ import java.io.FileOutputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author gubatron
@@ -181,21 +183,29 @@ public final class TorrentUtil {
         try {
             file_storage fs = new file_storage();
             libtorrent.add_files(fs, file.getAbsolutePath());
-            create_torrent torrentCreator = new create_torrent(fs);
-            if (!dhtTrackedOnly) {
-                torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80", 0);
-                torrentCreator.add_tracker("udp://tracker.publicbt.com:80", 0);
-                torrentCreator.add_tracker("udp://open.demonii.com:1337", 0);
-                torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969", 0);
-                torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969", 0);
-                torrentCreator.add_tracker("udp://exodus.desync.com:6969", 0);
-                torrentCreator.add_tracker("udp://tracker.pomf.se", 0);
-            }
-            torrentCreator.set_priv(false);
-            torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
+            create_torrent torrentCreator = getCreateTorrent(dhtTrackedOnly, fs);
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
-            libtorrent.set_piece_hashes(torrentCreator, file.getParentFile().getAbsolutePath(), ec);
+
+            libtorrent.set_piece_hashes_ex(torrentCreator, file.getParentFile().getAbsolutePath(), new set_piece_hashes_listener() {
+                final AtomicBoolean progressInvoked = new AtomicBoolean(false);
+                final int totalPieces = torrentCreator.num_pieces();
+
+                @Override
+                public void progress(int n_piece) {
+                    if (uiTorrentMakerListener != null) {
+                        if (!progressInvoked.get()) {
+                            progressInvoked.set(true);
+                            GUIMediator.safeInvokeLater(() -> uiTorrentMakerListener.beforeOpenForSeedInUIThread());
+                        }
+                        GUIMediator.safeInvokeLater(() -> {
+                            uiTorrentMakerListener.onPieceProgress(n_piece, totalPieces);
+                        });
+                    }
+                    
+                }
+            }, ec);
+
             if (ec.value() != 0 && uiTorrentMakerListener != null) {
                 uiTorrentMakerListener.onCreateTorrentError(ec);
                 return;
@@ -225,11 +235,29 @@ public final class TorrentUtil {
         }
     }
 
+    private static @NotNull create_torrent getCreateTorrent(boolean dhtTrackedOnly, file_storage fs) {
+        create_torrent torrentCreator = new create_torrent(fs);
+        if (!dhtTrackedOnly) {
+            torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80", 0);
+            torrentCreator.add_tracker("udp://tracker.publicbt.com:80", 0);
+            torrentCreator.add_tracker("udp://open.demonii.com:1337", 0);
+            torrentCreator.add_tracker("udp://tracker.coppersurfer.tk:6969", 0);
+            torrentCreator.add_tracker("udp://tracker.leechers-paradise.org:6969", 0);
+            torrentCreator.add_tracker("udp://exodus.desync.com:6969", 0);
+            torrentCreator.add_tracker("udp://tracker.pomf.se", 0);
+        }
+        torrentCreator.set_priv(false);
+        torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
+        return torrentCreator;
+    }
+
     interface UITorrentMakerListener {
         void onCreateTorrentError(final error_code ec);
 
         void beforeOpenForSeedInUIThread();
 
         void onException();
+
+        void onPieceProgress(int nPiece, int totalPieces);
     }
 }
