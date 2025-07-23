@@ -88,6 +88,7 @@ dependencies {
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
+
     def jlibtorrent_version = '2.0.12.5'
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
