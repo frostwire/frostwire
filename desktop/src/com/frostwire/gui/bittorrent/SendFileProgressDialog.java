@@ -154,5 +154,10 @@ public class SendFileProgressDialog extends JDialog {
         public void onException() {
             GUIMediator.safeInvokeLater(() -> _progressBar.setString("There was an error. Make sure the file/folder is not empty."));
         }
+
+        @Override
+        public void onPieceProgress(int nPiece, int totalPieces) {
+            GUIMediator.safeInvokeLater(() -> _progressBar.setValue((nPiece/totalPieces) * 100));
+        }
     }
 }

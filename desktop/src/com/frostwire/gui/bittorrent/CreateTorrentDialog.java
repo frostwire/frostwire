@@ -113,19 +113,19 @@ public class CreateTorrentDialog extends JDialog {
             String k = (String) o;
             Object v = map.get(k);
             if (v instanceof String) {
-                d.set(k, new entry((String) v));
+                d.put(k, new entry((String) v));
             } else if (v instanceof Integer) {
-                d.set(k, new entry((Integer) v));
+                d.put(k, new entry((Integer) v));
             } else if (v instanceof Entry) {
-                d.set(k, ((Entry) v).swig());
+                d.put(k, ((Entry) v).swig());
             } else if (v instanceof entry) {
-                d.set(k, (entry) v);
+                d.put(k, (entry) v);
             } else if (v instanceof List) {
-                d.set(k, Entry.fromList((List<?>) v).swig());
+                d.put(k, Entry.fromList((List<?>) v).swig());
             } else if (v instanceof Map) {
-                d.set(k, entryFromMap((Map<?, ?>) v).swig());
+                d.put(k, entryFromMap((Map<?, ?>) v).swig());
             } else {
-                d.set(k, new entry(v.toString()));
+                d.put(k, new entry(v.toString()));
             }
         }
         return new Entry(e);
@@ -515,7 +515,7 @@ public class CreateTorrentDialog extends JDialog {
                 reportCurrentTask(I18n.tr("Calculating piece hashes..."));
                 saveDir = f.getParentFile();
                 error_code ec = new error_code();
-                libtorrent.set_piece_hashes(torrent, saveDir.getAbsolutePath(), ec);
+                libtorrent.set_piece_hashes_ex(torrent, saveDir.getAbsolutePath(), null, ec);
                 reportCurrentTask(I18n.tr("Generating torrent entry..."));
                 Entry entry = new Entry(torrent.generate());
                 Map<String, Entry> entryMap = entry.dictionary();
