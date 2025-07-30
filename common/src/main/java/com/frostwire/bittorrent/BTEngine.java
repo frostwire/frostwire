@@ -310,15 +310,10 @@ public final class BTEngine extends SessionManager {
             priorities = Priority.array(Priority.IGNORE, ti.numFiles());
         }
 
-        boolean changed = false;
         if (priorities != null) {
             for (int i = 0; i < selection.length; i++) {
                 if (selection[i] && priorities[i] == Priority.IGNORE) {
                     priorities[i] = Priority.NORMAL;
-                    changed = true;
-                }
-                if (!changed) { // nothing to do
-                    return;
                 }
             }
         }
