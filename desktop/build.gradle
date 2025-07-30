@@ -121,6 +121,7 @@ dependencies {
         // we are currently at frostwire/desktop
         def jlibtorrent_built_jars_path = '../../frostwire-jlibtorrent/build/libs'
         System.out.println("Using jlibtorrent jars from development environment at ${jlibtorrent_built_jars_path}")
+
         def main_jar = files("${jlibtorrent_built_jars_path}/jlibtorrent-${jlibtorrent_version}.jar")
         // print everything in the main_jar file collection
         // print the absolute path of the main jar
