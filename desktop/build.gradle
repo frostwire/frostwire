@@ -14,8 +14,8 @@ plugins {
     id 'application'
 }
 
-group 'com.frostwire'
-version '1.0-SNAPSHOT'
+group = 'com.frostwire'
+version = '1.0-SNAPSHOT'
 
 import org.gradle.internal.os.OperatingSystem
 
@@ -53,7 +53,7 @@ application {
 
 repositories {
     mavenCentral()
-    maven { url 'https://dl.frostwire.com/maven' }
+    maven { url = 'https://dl.frostwire.com/maven' }
 }
 
 dependencies {
@@ -177,7 +177,7 @@ jar {
 // gettext tasks
 
 tasks.register('gettextInit') {
-    description 'Loads and define the ant gettext related tasks'
+    description = 'Loads and define the ant gettext related tasks'
 
     doLast {
         ant.taskdef(name: 'gettextExtract', classname: 'org.xnap.commons.ant.gettext.GettextExtractKeysTask', classpath: 'lib/jars/gettext-ant-tasks-0.9.7.jar')
@@ -188,7 +188,7 @@ tasks.register('gettextInit') {
 }
 
 tasks.register('gettextExtract') {
-    description 'Extracts message keys from the source code'
+    description = 'Extracts message keys from the source code'
 
     doLast {
         println 'gettext extract...'
@@ -206,7 +206,7 @@ tasks.register('gettextExtract') {
 }
 
 tasks.register('gettextBundle') {
-    description 'Rebuilds messages and bundles them into messages.jar'
+    description = 'Rebuilds messages and bundles them into messages.jar'
 
     doLast {
         // clean up
@@ -265,9 +265,9 @@ test {
 
     testLogging {
         events "passed", "failed", "standardError"
-        showExceptions true
-        showCauses true
-        showStackTraces false
-        exceptionFormat "full"
+        showExceptions = true
+        showCauses = true
+        showStackTraces = false
+        exceptionFormat = "full"
     }
 }
