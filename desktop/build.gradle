@@ -72,23 +72,56 @@ dependencies {
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    // jlibtorrent java wrappers
-    implementation "com.frostwire:jlibtorrent:${jlibtorrent_version}"
+    def use_maven_jlibtorrent = false
 
-    // jlibtorrent native libraries
-    // if we are on windows, we need to use the windows native libraries
-    if (os.isWindows()) {
-        implementation "com.frostwire:jlibtorrent-windows:${jlibtorrent_version}"
-    } else if (os.isLinux()) {
-        implementation "com.frostwire:jlibtorrent-linux64:${jlibtorrent_version}"
-    } else if (os.isMacOsX()) {
-        // if it's arm mac
-        if (is_arm64) {
-            implementation "com.frostwire:jlibtorrent-macosx-arm64:${jlibtorrent_version}"
+    if (use_maven_jlibtorrent) {
+        // jlibtorrent java wrappers
+        implementation "com.frostwire:jlibtorrent:${jlibtorrent_version}"
+
+        // jlibtorrent native libraries
+        // if we are on windows, we need to use the windows native libraries
+        if (os.isWindows()) {
+            implementation "com.frostwire:jlibtorrent-windows:${jlibtorrent_version}"
+        } else if (os.isLinux()) {
+            implementation "com.frostwire:jlibtorrent-linux64:${jlibtorrent_version}"
+        } else if (os.isMacOsX()) {
+            // if it's arm mac
+            if (is_arm64) {
+                implementation "com.frostwire:jlibtorrent-macosx-arm64:${jlibtorrent_version}"
+            }
+            // intel
+            else {
+                implementation "com.frostwire:jlibtorrent-macosx-x86_64:${jlibtorrent_version}"
+            }
         }
-        // intel
-        else {
-            implementation "com.frostwire:jlibtorrent-macosx-x86_64:${jlibtorrent_version}"
+    } else {
+        // assume use has frostwire-jlibtorrent project checked out (dev mode) at the same level as the frostwire project
+        // we are currently at frostwire/desktop
+        def jlibtorrent_built_jars_path = '../../frostwire-jlibtorrent/build/libs'
+        System.out.println("Using jlibtorrent jars from: ${jlibtorrent_built_jars_path}")
+        def main_jar = files("${jlibtorrent_built_jars_path}/jlibtorrent-${jlibtorrent_version}.jar")
+        // print everything in the main_jar file collection
+        // print the absolute path of the main jar
+        main_jar.each { file ->
+            System.out.println("Using jlibtorrent jar: ${file.name}")
+            System.out.println("Absolute path: ${file.absolutePath}")
+        }
+
+        implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-${jlibtorrent_version}.jar")
+
+        if (os.isWindows()) {
+            implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-windows-${jlibtorrent_version}.jar")
+        } else if (os.isLinux()) {
+            implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-linux-${jlibtorrent_version}.jar")
+        } else if (os.isMacOsX()) {
+            // if it's arm mac
+            if (is_arm64) {
+                implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-macosx-arm64-${jlibtorrent_version}.jar")
+            }
+            // intel
+            else {
+                implementation files("${jlibtorrent_built_jars_path}/jlibtorrent-macosx-x86_64-${jlibtorrent_version}.jar")
+            }
         }
     }
 
