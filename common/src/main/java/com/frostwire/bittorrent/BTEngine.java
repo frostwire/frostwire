@@ -299,24 +299,30 @@ public final class BTEngine extends SessionManager {
             selection = new boolean[ti.numFiles()];
             Arrays.fill(selection, true);
         }
-        Priority[] priorities;
+        Priority[] priorities = null;
         TorrentHandle th = find(ti.infoHash());
         boolean exists = th != null;
         if (th != null) {
-            priorities = th.filePriorities();
+            if (th.isValid()) {
+                priorities = th.filePriorities();
+            }
         } else {
             priorities = Priority.array(Priority.IGNORE, ti.numFiles());
         }
+
         boolean changed = false;
-        for (int i = 0; i < selection.length; i++) {
-            if (selection[i] && priorities[i] == Priority.IGNORE) {
-                priorities[i] = Priority.NORMAL;
-                changed = true;
+        if (priorities != null) {
+            for (int i = 0; i < selection.length; i++) {
+                if (selection[i] && priorities[i] == Priority.IGNORE) {
+                    priorities[i] = Priority.NORMAL;
+                    changed = true;
+                }
+                if (!changed) { // nothing to do
+                    return;
+                }
             }
         }
-        if (!changed) { // nothing to do
-            return;
-        }
+
         download(ti, saveDir, priorities, null, null);
         if (!exists) {
             saveResumeTorrent(ti);
@@ -344,7 +350,9 @@ public final class BTEngine extends SessionManager {
         boolean torrentHandleExists = th != null;
         if (torrentHandleExists) {
             try {
-                priorities = th.filePriorities();
+                if (th.isValid()) {
+                    priorities = th.filePriorities();
+                }
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -657,7 +665,8 @@ public final class BTEngine extends SessionManager {
         } else { // new download
             // constexpr torrent_flags_t auto_managed = 5_bit;
             // jul.22.2025 gubatron: NOT SURE OF THIS, but it seems to be the right flag to use
-            download(ti, saveDir, resumeFile, priorities, peers, torrent_flags_t.from_int(1 << 5));
+            //System.out.println("BTEngine.download() - torrent_handle is in session? " + th.inSession());
+            download(ti, saveDir, resumeFile, priorities, peers, new torrent_flags_t());
             th = find(ti.infoHash());
             if (th != null) {
                 fireDownloadUpdate(th);
