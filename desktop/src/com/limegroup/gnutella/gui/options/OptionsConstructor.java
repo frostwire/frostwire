@@ -160,8 +160,12 @@ public final class OptionsConstructor {
         Component treeComponent = TREE_MANAGER.getComponent();
         treePanel.add(treeComponent);
         Component paneComponent = paneManager.getComponent();
+
+        // Setup the settings content
+        JScrollPane scrollPanel = new JScrollPane(paneComponent);
         splitBox.add(treePanel);
-        splitBox.add(paneComponent);
+        splitBox.add(scrollPanel);
+
         mainPanel.add(splitBox);
         mainPanel.add(Box.createVerticalStrut(17));
         mainPanel.add(new OptionsButtonPanel().getComponent());
