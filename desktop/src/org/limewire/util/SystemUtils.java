@@ -49,10 +49,6 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-            if (OSUtils.isLinux()) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
@@ -129,13 +125,6 @@ public class SystemUtils {
         if (OSUtils.isWindows() && isLoaded) {
             setWindowIconNative(frame, System.getProperty("sun.boot.library.path"), icon.getPath());
         }
-    }
-
-    public static long getWindowHandle(Component frame) {
-        if ((OSUtils.isWindows() || OSUtils.isLinux()) && isLoaded) {
-            return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
-        }
-        return 0;
     }
 
     public static boolean toggleFullScreen(long hwnd) {
@@ -320,8 +309,6 @@ public class SystemUtils {
     private static native void openFileParamsNative(String path, String params);
 
     private static native String setWindowIconNative(Component frame, String bin, String icon);
-
-    private static native long getWindowHandleNative(Component frame, String bin);
 
     private static native boolean flushIconCacheNative();
 
