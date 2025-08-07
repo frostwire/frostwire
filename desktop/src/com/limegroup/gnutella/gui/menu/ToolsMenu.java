@@ -62,6 +62,18 @@ final class ToolsMenu extends AbstractMenu {
         defaultItem.setSelected(ThemeMediator.isDefaultThemeOn());
         themeGroup.add(defaultItem);
         switchThemeMenu.add(defaultItem);
+        // Light flat theme
+        JRadioButtonMenuItem lightItem = new JRadioButtonMenuItem(
+                new AbstractAction(I18n.tr("&Light (beta)")) {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.LIGHT_LAF);
+                    }
+                }
+        );
+        lightItem.setSelected(ThemeMediator.isLightLafThemeOn());
+        themeGroup.add(lightItem);
+        switchThemeMenu.add(lightItem);
         // Dark theme
         JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark (beta)")) {
             private static final long serialVersionUID = 1L;
