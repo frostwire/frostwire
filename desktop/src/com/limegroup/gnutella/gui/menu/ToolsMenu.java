@@ -51,17 +51,31 @@ final class ToolsMenu extends AbstractMenu {
         addSeparator();
         JMenu switchThemeMenu = new JMenu(I18n.tr("Switch Theme"));
         ButtonGroup themeGroup = new ButtonGroup();
-        // Default theme
-        JRadioButtonMenuItem defaultItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Legacy")) {
+
+        // (New) Default theme
+        JRadioButtonMenuItem defaultItem = new JRadioButtonMenuItem(
+            new AbstractAction(I18n.tr("&Default")) {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DEFAULT);
+                }
+            }
+        );
+        defaultItem.setSelected(ThemeMediator.isDefaultThemeOn());
+        themeGroup.add(defaultItem);
+        switchThemeMenu.add(defaultItem);
+
+        // Legacy default theme
+        JRadioButtonMenuItem legacyDefaultItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Legacy Default")) {
             private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
                 ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.LEGACY_DEFAULT);
             }
         });
-        defaultItem.setSelected(ThemeMediator.isLegacyDefaultThemeOn());
-        themeGroup.add(defaultItem);
-        switchThemeMenu.add(defaultItem);
+        legacyDefaultItem.setSelected(ThemeMediator.isLegacyDefaultThemeOn());
+        themeGroup.add(legacyDefaultItem);
+        switchThemeMenu.add(legacyDefaultItem);
         // Dark theme
         JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark (beta)")) {
             private static final long serialVersionUID = 1L;

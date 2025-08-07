@@ -19,6 +19,7 @@ package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -88,6 +89,7 @@ public final class ThemeMediator {
      * Available UI themes.
      */
     public enum ThemeEnum {
+        DEFAULT,
         LEGACY_DEFAULT, /// Legacy default theme
         DARK     /// Experimental dark theme
     }
@@ -123,6 +125,10 @@ public final class ThemeMediator {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
     }
 
+    public static boolean isDefaultThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
+    }
+
     public static boolean isLegacyDefaultThemeOn() {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LEGACY_DEFAULT;
     }
@@ -149,6 +155,9 @@ public final class ThemeMediator {
             com.frostwire.gui.theme.ThemeMediator.loadLegacyDefaultTheme();
         } else if (theme == ThemeEnum.DARK) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
+        } else if (theme == ThemeEnum.DEFAULT)
+        {
+            com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
         }
 
         // Persist selection immediately (used by the relaunch below)
@@ -176,6 +185,27 @@ public final class ThemeMediator {
         }
     }
 
+    public static void loadDefaultTheme() {
+        purgeSynthOverrides();
+        Runnable task = () -> {
+            purgeSynthOverrides();
+            FlatLightLaf.setup();
+
+            for (Window w : Window.getWindows()) {
+                SwingUtilities.updateComponentTreeUI(w);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load new light theme", ex);
+            }
+        }
+    }
 
     public static void loadLegacyDefaultTheme() {
         Runnable themeChanger = new Runnable() {
@@ -222,7 +252,7 @@ public final class ThemeMediator {
         Runnable task = () -> {
             purgeSynthOverrides();
             FlatDarkLaf.setup();
-            installFlatLafDefaults();
+            installFlatDarkLafDefaults();
             for (Window w : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(w);
             }
@@ -239,7 +269,7 @@ public final class ThemeMediator {
         }
     }
 
-    private static void installFlatLafDefaults() {
+    private static void installFlatDarkLafDefaults() {
         ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
