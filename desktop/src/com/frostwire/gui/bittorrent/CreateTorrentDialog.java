@@ -706,7 +706,7 @@ public class CreateTorrentDialog extends JDialog {
             System.setProperty("com.apple.eawt.CocoaComponent.CompatibilityMode", "false");
         }
 
-       // ThemeMediator.changeTheme();
+       // ThemeMediator.loadDefaultTheme();
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
