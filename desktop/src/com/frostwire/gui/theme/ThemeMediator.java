@@ -88,8 +88,8 @@ public final class ThemeMediator {
      * Available UI themes.
      */
     public enum ThemeEnum {
-        DEFAULT,
-        DARK
+        DEFAULT, /// Default theme
+        DARK     /// Experimental dark theme
     }
 
     /**
@@ -136,7 +136,7 @@ public final class ThemeMediator {
         /* ------------------------------------------------------------------
          * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
          *    immediate change (handy when they click around in Options);
-         * 2.  tell the user that a **restart is required** for a 100 % clean
+         * 2.  tell the user that a **restart is required** for a 100 % clelegacan
          *    switch (many colours, borders & cached icons only update at
          *    start‑up);
          * 3.  spawn a fresh copy of FrostWire and let this process exit.
@@ -146,7 +146,7 @@ public final class ThemeMediator {
 
         // Delegate theme loading to ThemeMediator
         if (theme == ThemeEnum.DEFAULT) {
-            com.frostwire.gui.theme.ThemeMediator.changeTheme();
+            com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
         } else if (theme == ThemeEnum.DARK) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
         }
@@ -177,7 +177,7 @@ public final class ThemeMediator {
     }
 
 
-    public static void changeTheme() {
+    public static void loadDefaultTheme() {
         Runnable themeChanger = new Runnable() {
             public void run() {
                 try {
