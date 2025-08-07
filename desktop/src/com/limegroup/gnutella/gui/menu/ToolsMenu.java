@@ -52,14 +52,14 @@ final class ToolsMenu extends AbstractMenu {
         JMenu switchThemeMenu = new JMenu(I18n.tr("Switch Theme"));
         ButtonGroup themeGroup = new ButtonGroup();
         // Default theme
-        JRadioButtonMenuItem defaultItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Default")) {
+        JRadioButtonMenuItem defaultItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Legacy")) {
             private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent e) {
-                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DEFAULT);
+                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.LEGACY_DEFAULT);
             }
         });
-        defaultItem.setSelected(ThemeMediator.isDefaultThemeOn());
+        defaultItem.setSelected(ThemeMediator.isLegacyDefaultThemeOn());
         themeGroup.add(defaultItem);
         switchThemeMenu.add(defaultItem);
         // Dark theme

@@ -378,7 +378,7 @@ public class CheckBoxList<E> extends BoxPanel {
         this.setBorder(new EmptyBorder(0, 0, 0, 0));
         this.editor = new CheckBoxCellEditor();
         this.checkBoxList = new CustomJTable();
-        this.checkBoxList.setOpaque(ThemeMediator.isDefaultThemeOn());
+        this.checkBoxList.setOpaque(ThemeMediator.isLegacyDefaultThemeOn());
         this.checkBoxList.setDefaultRenderer(Object.class, new CheckBoxCellRenderer());
         this.checkBoxList.setDefaultEditor(Object.class, editor);
         this.checkBoxList.setRowHeight(DEFAULT_ROW_HEIGHT);
@@ -387,7 +387,7 @@ public class CheckBoxList<E> extends BoxPanel {
         this.checkBoxList.getTableHeader().setVisible(false);
         this.checkBoxList.getTableHeader().setSize(0, 0);
         this.scrollPane = new JScrollPane(checkBoxList);
-        //this.scrollPane.setOpaque(ThemeMediator.isDefaultThemeOn());
+        //this.scrollPane.setOpaque(ThemeMediator.isLegacyDefaultThemeOn());
         this.setOpaque(true);
         this.add(scrollPane);
         this.updateUI();
