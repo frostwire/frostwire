@@ -27,6 +27,8 @@ import org.limewire.util.SystemUtils;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,55 +76,23 @@ public final class Launcher {
      * recognizes the url as one that should be opened in a browser,
      * namely a url that ends in .htm or .html.
      *
-     * @param url The url to open
+     * @param url The url to open. Should not be null
      * @return An int indicating the success of the browser launch
-     * @throws IOException if the url cannot be loaded do to an IO problem
+     * @throws NullPointerException The URL was null.
+     * @throws IOException Either a default browser wasn't found (maybe not set
+     * somehow) or failed to be launched.
+     * @throws URISyntaxException The URL was invalid.
+     * @throws UnsupportedOperationException Opening a URL isn't supported on
+     * the current platform.
      */
-    public static int openURL(String url) throws IOException {
+    public static int openURL(String url)
+            throws NullPointerException, UnsupportedOperationException, URISyntaxException, IOException {
         if (url == null) {
-            return -1;
+            throw new NullPointerException("Attempted to open null URL");
         }
-        if (OSUtils.isWindows()) {
-            return openURLWindows(url);
-        } else if (OSUtils.isMacOSX()) {
-            openURLMac(url);
-        } else {
-            // Other OS
-            // Uses URLHandlerSettings's VIDEO_PLAYER, AUDIO_PLAYER, IMAGE_VIEWER, BROWSER
-            launchFileOther(url);
-        }
-        return -1;
-    }
 
-    /**
-     * Opens the default web browser on windows, passing it the specified
-     * url.
-     *
-     * @param url the url to open in the browser
-     * @return the error code of the native call, -1 if the call failed
-     * for any reason
-     */
-    private static int openURLWindows(String url) throws IOException {
-        //Windows like escaping of '&' character when passed as part of a parameter
-        //& -> ^&
-        url = url.replace("&", "^&");
-        String[] command = new String[]{"cmd.exe", "/c", "start", url};
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.start();
+        Desktop.getDesktop().browse(new URI(url));
         return 0;
-    }
-
-    /**
-     * Opens the specified url in the default browser on the Mac.
-     * This makes use of the dynamically-loaded MRJ classes.
-     *
-     * @param url the url to load
-     * @throws <tt>IOException</tt> if the necessary mac classes were not
-     *                              loaded successfully or if another exception was
-     *                              throws -- it wraps these exceptions in an <tt>IOException</tt>
-     */
-    private static void openURLMac(String url) throws IOException {
-        Runtime.getRuntime().exec(new String[]{"open", url});
     }
 
     /**
