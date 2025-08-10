@@ -811,6 +811,14 @@ public final class GUIMediator {
     public static int openURL(String url) {
         try {
             return Launcher.openURL(url);
+        } catch (UnsupportedOperationException e) {
+            if (OSUtils.isLinux()) {
+                GUIMediator.showError(I18n.tr("Cannot open URLs. Try installing GVFS and restarting FrostWire to solve the issue."));
+            } else {
+                GUIMediator.showError(I18n.tr("ERROR: Opening URLs isn't supported on this platform!"));
+            }
+
+            return -1;
         } catch (Throwable e) {
             GUIMediator.showError(I18n.tr("FrostWire could not locate your web browser to display the following web page: {0}.", url));
             return -1;
