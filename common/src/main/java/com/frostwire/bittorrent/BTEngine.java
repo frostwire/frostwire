@@ -314,7 +314,6 @@ public final class BTEngine extends SessionManager {
             Arrays.fill(selection, true);
         }
         Priority[] priorities = null;
-
         TorrentHandle th = find(ti.infoHashV1());
         boolean exists = th != null;
         if (th != null) {
@@ -443,6 +442,7 @@ public final class BTEngine extends SessionManager {
                 runNextRestoreDownloadTask();
             }
         }
+
 
     }
 
