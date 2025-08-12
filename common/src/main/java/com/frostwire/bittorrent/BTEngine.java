@@ -300,7 +300,7 @@ public final class BTEngine extends SessionManager {
             Arrays.fill(selection, true);
         }
         Priority[] priorities = null;
-        TorrentHandle th = find(ti.infoHash());
+        TorrentHandle th = find(ti.infoHashV1());
         boolean exists = th != null;
         if (th != null) {
             if (th.isValid()) {
@@ -312,9 +312,7 @@ public final class BTEngine extends SessionManager {
 
         if (priorities != null) {
             for (int i = 0; i < selection.length; i++) {
-                if (selection[i] && priorities[i] == Priority.IGNORE) {
-                    priorities[i] = Priority.NORMAL;
-                }
+                priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
             }
         }
 
@@ -341,7 +339,7 @@ public final class BTEngine extends SessionManager {
             Arrays.fill(selection, true);
         }
         Priority[] priorities = null;
-        TorrentHandle th = find(ti.infoHash());
+        TorrentHandle th = find(ti.infoHashV1());
         boolean torrentHandleExists = th != null;
         if (torrentHandleExists) {
             try {
@@ -351,15 +349,13 @@ public final class BTEngine extends SessionManager {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
-        } else {
+        }
+        if (priorities == null) {
             priorities = Priority.array(Priority.IGNORE, ti.numFiles());
         }
-        if (priorities != null) {
-            for (int i = 0; i < selection.length; i++) {
-                if (selection[i] && i < priorities.length && priorities[i] == Priority.IGNORE) {
-                    priorities[i] = Priority.NORMAL;
-                }
-            }
+        // Update priorities based on selection
+        for (int i = 0; i < selection.length && i < priorities.length; i++) {
+            priorities[i] = selection[i] ? Priority.NORMAL : Priority.IGNORE;
         }
         download(ti, saveDir, priorities, null, peers);
 
@@ -383,7 +379,7 @@ public final class BTEngine extends SessionManager {
         }
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
-        TorrentHandle th = find(ti.infoHash());
+        TorrentHandle th = find(ti.infoHashV1());
         boolean exists = th != null;
         if (th != null) {
             Priority[] priorities = th.filePriorities();
@@ -431,7 +427,6 @@ public final class BTEngine extends SessionManager {
                 }
             }
         }
-        migrateVuzeDownloads();
         runNextRestoreDownloadTask();
     }
 
@@ -494,7 +489,7 @@ public final class BTEngine extends SessionManager {
             entry e = ti.toEntry().swig();
             e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHash().toString()), arr);
+            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHashV1().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
         }
@@ -503,7 +498,7 @@ public final class BTEngine extends SessionManager {
     private String getEscapedFilename(TorrentInfo ti) {
         String name = ti.name();
         if (name == null || name.length() == 0) {
-            name = ti.infoHash().toString();
+            name = ti.infoHashV1().toString();
         }
         return escapeFilename(name);
     }
@@ -565,43 +560,6 @@ public final class BTEngine extends SessionManager {
         LOG.info("Listen failed on " + s + " (error: " + message + ")");
     }
 
-    private void migrateVuzeDownloads() {
-        try {
-            File dir = new File(ctx.homeDir.getParent(), "azureus");
-            File file = new File(dir, "downloads.config");
-            if (file.exists()) {
-                Entry configEntry = Entry.bdecode(file);
-                List<Entry> downloads = Objects.requireNonNull(configEntry.dictionary().get("downloads")).list();
-                for (Entry d : downloads) {
-                    try {
-                        Map<String, Entry> map = d.dictionary();
-                        File saveDir = new File(Objects.requireNonNull(map.get("save_dir")).string());
-                        File torrent = new File(Objects.requireNonNull(map.get("torrent")).string());
-                        List<Entry> filePriorities = Objects.requireNonNull(map.get("file_priorities")).list();
-                        Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
-                        for (int i = 0; i < filePriorities.size(); i++) {
-                            long p = filePriorities.get(i).integer();
-                            if (p != 0) {
-                                priorities[i] = Priority.NORMAL;
-                            }
-                        }
-                        if (torrent.exists() && saveDir.exists()) {
-                            LOG.info("Restored old vuze download: " + torrent);
-                            restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
-                            saveResumeTorrent(new TorrentInfo(torrent));
-                        }
-                    } catch (Throwable e) {
-                        LOG.error("Error restoring vuze torrent download", e);
-                    }
-                }
-                //noinspection ResultOfMethodCallIgnored
-                file.delete();
-            }
-        } catch (Throwable e) {
-            LOG.error("Error migrating old vuze downloads", e);
-        }
-    }
-
     private File setupSaveDir(File saveDir) {
         File result = null;
         if (saveDir == null) {
@@ -640,7 +598,7 @@ public final class BTEngine extends SessionManager {
     }
 
     private void download(TorrentInfo ti, File saveDir, Priority[] priorities, @SuppressWarnings("SameParameterValue") File resumeFile, List<TcpEndpoint> peers) {
-        TorrentHandle th = find(ti.infoHash());
+        TorrentHandle th = find(ti.infoHashV1());
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
             if (priorities != null) {
@@ -662,7 +620,7 @@ public final class BTEngine extends SessionManager {
             // jul.22.2025 gubatron: NOT SURE OF THIS, but it seems to be the right flag to use
             //System.out.println("BTEngine.download() - torrent_handle is in session? " + th.inSession());
             download(ti, saveDir, resumeFile, priorities, peers, new torrent_flags_t());
-            th = find(ti.infoHash());
+            th = find(ti.infoHashV1());
             if (th != null) {
                 fireDownloadUpdate(th);
             }
@@ -672,7 +630,7 @@ public final class BTEngine extends SessionManager {
     private void onExternalIpAlert(ExternalIpAlert alert) {
         try {
             // libtorrent perform all kind of tests
-            // to avoid non usable addresses
+            // to avoid non-usable addresses
             String address = alert.externalAddress().toString();
             LOG.info("External IP: " + address);
         } catch (Throwable e) {

@@ -28,6 +28,7 @@ compileJava {
     options.encoding = '8859_1'
     options.fork = true
     options.compilerArgs += ['-Xlint:deprecation']
+    options.compilerArgs += ['-Xlint:unchecked']
 }
 
 application {
@@ -45,7 +46,8 @@ application {
             '-Djava.rmi.server.hostname=127.0.0.1',
             '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
             '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
-            '-Ddebug=1'
+            '-Ddebug=1',
+//            '-XX:NativeMemoryTracking=detail',
     ]
 
     def flight_recorder = false
