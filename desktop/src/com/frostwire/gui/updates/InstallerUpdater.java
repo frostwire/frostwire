@@ -234,7 +234,7 @@ class InstallerUpdater implements Runnable {
 
     private void startTorrentDownload(String torrentFile, String saveDataPath) {
         TorrentInfo tinfo = new TorrentInfo(new File(torrentFile));
-        final Sha1Hash updateInfoHash = tinfo.infoHash();
+        final Sha1Hash updateInfoHash = tinfo.infoHashV1();
         AlertListener updateTorrentListener = new AlertListener() {
             TorrentHandle th = null;
 
