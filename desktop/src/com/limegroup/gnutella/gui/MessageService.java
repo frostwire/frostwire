@@ -86,7 +86,7 @@ public final class MessageService {
             });
             editorPane.setText(message);
             optionPane.setMessage(editorPane);
-            optionPane.setOpaque(ThemeMediator.isDefaultThemeOn());
+            optionPane.setOpaque(ThemeMediator.isLightThemeOn());
             JDialog dialog = optionPane.createDialog(getParentComponent(), I18n.tr("Error"));
             dialog.setVisible(true);
         });

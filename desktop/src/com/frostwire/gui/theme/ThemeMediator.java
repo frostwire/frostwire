@@ -125,6 +125,19 @@ public final class ThemeMediator {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
     }
 
+    /** Helper for checking if a light theme is enabled.
+     * <p>
+     * Possible light themes in FrostWire are either the default theme or
+     * FlatLaf Light (also known as simply "Light (beta)")
+     *
+     * @return Whether or not the dark theme is disabled (i.e., either the
+     * default theme or the new light theme is enabled).
+     */
+    public static boolean isLightThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ||
+                ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_LAF;
+    }
+
     public static boolean isDefaultThemeOn() {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
     }
