@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ public final class BTDownload implements BittorrentDownload {
         this.created = new Date(th.status().addedTime());
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? new File(savePath, "." + ti.infoHash() + ".parts") : null;
+        this.parts = ti != null ? new File(savePath, "." + ti.infoHashV1() + ".parts") : null;
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();

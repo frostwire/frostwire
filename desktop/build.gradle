@@ -28,6 +28,7 @@ compileJava {
     options.encoding = '8859_1'
     options.fork = true
     options.compilerArgs += ['-Xlint:deprecation']
+    options.compilerArgs += ['-Xlint:unchecked']
 }
 
 application {
@@ -44,7 +45,8 @@ application {
             '-Dcom.sun.management.jmxremote.authenticate=false',
             '-Djava.rmi.server.hostname=127.0.0.1',
             '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
-            '-Ddebug=1'
+            '-Ddebug=1',
+//            '-XX:NativeMemoryTracking=detail',
     ]
     if (OperatingSystem.current().isMacOsX()) {
         applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true']
