@@ -122,7 +122,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         fileList.setVisibleRowCount(5);
         fileList.setCellRenderer(new FileNameListCellRenderer());
         fileList.setFocusable(false);
-        fileList.setOpaque(ThemeMediator.isLegacyDefaultThemeOn());
+        fileList.setOpaque(ThemeMediator.isLightThemeOn());
         return fileList;
     }
 

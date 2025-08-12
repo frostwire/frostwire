@@ -125,6 +125,15 @@ public final class ThemeMediator {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
     }
 
+    /** Helper for checking if a light theme is enabled.
+     *
+     * @return Whether or not the dark theme is disabled (i.e., either the
+     * legacy default theme or the new default theme is enabled).
+     */
+    public static boolean isLightThemeOn() {
+        return !isDarkThemeOn();
+    }
+
     public static boolean isDefaultThemeOn() {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
     }

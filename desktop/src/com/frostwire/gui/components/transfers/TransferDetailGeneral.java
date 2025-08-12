@@ -85,9 +85,9 @@ public final class TransferDetailGeneral extends JPanel implements TransferDetai
         Color defaultBG = UIManager.getColor("Panel.background");
         Color defaultFG = UIManager.getColor("Label.foreground");
 
-        Color backgroundColor = ThemeMediator.isLegacyDefaultThemeOn() ?
+        Color backgroundColor = ThemeMediator.isLightThemeOn() ?
                 defaultBG : ThemeMediator.APP_REALLY_DARK_COLOR;
-        Color foregroundColor = ThemeMediator.isLegacyDefaultThemeOn() ?
+        Color foregroundColor = ThemeMediator.isLightThemeOn() ?
                 defaultFG : ThemeMediator.APP_REALLY_DARK_COLOR;
 
         setForeground(foregroundColor);
