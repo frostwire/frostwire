@@ -1153,7 +1153,7 @@ public final class GUIMediator {
             showTransfers(TransfersTab.FilterMode.ALL);
             TorrentInfo ti = new TorrentInfo(torrentFile);
             for (BTDownload btDownload : downloads) {
-                if (btDownload.getHash().equals(ti.infoHash().toHex())) {
+                if (btDownload.getHash().equals(ti.infoHashV1().toHex())) {
                     btDownloadMediator.selectBTDownload(btDownload);
                 }
             }

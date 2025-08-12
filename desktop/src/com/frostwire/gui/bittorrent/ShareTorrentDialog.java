@@ -215,7 +215,7 @@ public class ShareTorrentDialog extends JDialog {
     }
 
     private void initInfoHash() {
-        info_hash = torrent.infoHash().toString();
+        info_hash = torrent.infoHashV1().toString();
     }
 
     private String getLink() {
