@@ -20,6 +20,7 @@ import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.awt.Desktop;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.DirectoryStream;
@@ -162,80 +163,14 @@ public class FileUtils {
             return false;
         }
         if (moveToTrash) {
-            if (OSUtils.isMacOSX()) {
-                return moveToTrashOSX(file);
-            } else if (OSUtils.isWindows()) {
-                return SystemUtils.recycle(file);
+            if (OSUtils.supportsTrash()) {
+                return Desktop.getDesktop().moveToTrash(file);
             } else {
                 throw new IllegalArgumentException("OS does not support trash");
             }
         } else {
             return deleteRecursive(file);
         }
-    }
-
-    /**
-     * Moves the given file or directory to Trash.
-     *
-     * @param file The file or directory to move to Trash
-     * @return true on success
-     * @throws IOException if the canonical path cannot be resolved
-     *                     or if the move process is interrupted
-     */
-    private static boolean moveToTrashOSX(File file) {
-        try {
-            String[] command = moveToTrashCommand(file);
-            ProcessBuilder builder = new ProcessBuilder(command);
-            builder.redirectErrorStream();
-            Process process = builder.start();
-            consumeAllInput(process);
-            process.waitFor();
-        } catch (InterruptedException err) {
-            LOG.error("InterruptedException", err);
-        } catch (IOException err) {
-            LOG.error("IOException", err);
-        }
-        return !file.exists();
-    }
-
-    /**
-     * Consumes all input from a Process. See also
-     * ProcessBuilder.redirectErrorStream()
-     */
-    private static void consumeAllInput(Process p) throws IOException {
-        try (InputStream in = new BufferedInputStream(p.getInputStream())) {
-            byte[] buf = new byte[1024];
-            while (in.read(buf, 0, buf.length) >= 0) ;
-        }
-    }
-
-    /**
-     * Creates and returns the osascript command to move
-     * a file or directory to the Trash
-     *
-     * @param file The file or directory to move to Trash
-     * @return OSAScript command
-     * @throws IOException if the canonical path cannot be resolved
-     */
-    private static String[] moveToTrashCommand(File file) {
-        String path = null;
-        try {
-            path = file.getCanonicalPath();
-        } catch (IOException err) {
-            LOG.error("IOException", err);
-            path = file.getAbsolutePath();
-        }
-        String fileOrFolder = (file.isFile() ? "file" : "folder");
-        return new String[]{
-                "osascript",
-                "-e", "set unixPath to \"" + path + "\"",
-                "-e", "set hfsPath to POSIX file unixPath",
-                "-e", "tell application \"Finder\"",
-                "-e", "if " + fileOrFolder + " hfsPath exists then",
-                "-e", "move " + fileOrFolder + " hfsPath to trash",
-                "-e", "end if",
-                "-e", "end tell"
-        };
     }
 
     /**
