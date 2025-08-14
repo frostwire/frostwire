@@ -94,56 +94,6 @@ public class FileUtils {
     }
 
     /**
-     * Utility method to set a file as non read only.
-     * If the file is already writable, does nothing.
-     *
-     * @param f the <tt>File</tt> instance whose read only flag should
-     *          be unset.
-     * @return whether or not <tt>f</tt> is writable after trying to make it
-     * writeable -- note that if the file doesn't exist, then this returns
-     * <tt>true</tt>
-     */
-    public static boolean setWriteable(File f) {
-        if (!f.exists())
-            return true;
-        // non Windows-based systems return the wrong value
-        // for canWrite when the argument is a directory --
-        // writing is based on the 'x' attribute, not the 'w'
-        // attribute for directories.
-        if (f.canWrite()) {
-            if (OSUtils.isWindows())
-                return true;
-            else if (!f.isDirectory())
-                return true;
-        }
-        String fName;
-        try {
-            fName = f.getCanonicalPath();
-        } catch (IOException ioe) {
-            fName = f.getPath();
-        }
-        String[] cmds = null;
-        if (OSUtils.isWindows() || OSUtils.isMacOSX())
-            SystemUtils.setWriteable(fName);
-        else if (OSUtils.isOS2())
-            ;//cmds = null; // Find the right command for OS/2 and fill in
-        else {
-            if (f.isDirectory())
-                cmds = new String[]{"chmod", "u+w+x", fName};
-            else
-                cmds = new String[]{"chmod", "u+w", fName};
-        }
-        if (cmds != null) {
-            try {
-                Process p = Runtime.getRuntime().exec(cmds);
-                p.waitFor();
-            } catch (SecurityException | InterruptedException | IOException ignored) {
-            }
-        }
-        return f.canWrite();
-    }
-
-    /**
      * @param directory Gets all files under this directory RECURSIVELY.
      * @param filter    If null, then returns all files.  Else, only returns files
      *                  extensions in the filter array.

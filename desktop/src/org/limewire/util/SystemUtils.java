@@ -65,16 +65,6 @@ public class SystemUtils {
     }
 
     /**
-     * Sets a file to be writeable.  Package-access so FileUtils can delegate
-     * the filename given should ideally be a canonicalized filename.
-     */
-    static void setWriteable(String fileName) {
-        if (isLoaded && (OSUtils.isWindows() || OSUtils.isMacOSX())) {
-            setFileWriteable(fileName);
-        }
-    }
-
-    /**
      * Gets the path to the Windows launcher .exe file that is us running right now.
      *
      * @return A String like "c:\Program Files\LimeWire\LimeWire.exe".
@@ -342,7 +332,6 @@ public class SystemUtils {
 
     /*
      * The following methods are implemented in C++ code in SystemUtilities.dll.
-     * In addition, setFileWritable(String) may be implemented in FrostWire's native library for another platform, like Mac or Linux.
      * The idea is that the Windows, Mac, and Linux libraries have methods with the same names.
      * Call a method, and it will run platform-specific code to complete the task in the appropriate platform-specific way.
      */
@@ -354,8 +343,6 @@ public class SystemUtils {
     private static native void openFileParamsNative(String path, String params);
 
     private static native boolean recycleNative(String path);
-
-    private static native int setFileWriteable(String path);
 
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
