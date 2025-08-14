@@ -66,7 +66,6 @@ public final class OptionsConstructor {
     private static final String ITUNES_KEY = "OPTIONS_ITUNES_MAIN_TITLE";
     private static final String ITUNES_IMPORT_KEY = "OPTIONS_ITUNES_PREFERENCE_MAIN_TITLE";
     private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
-    private static final String APPS_KEY = "OPTIONS_APPS_MAIN_TITLE";
     private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
     private static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
     private static final String RESULTS_KEY = "OPTIONS_RESULTS_MAIN_TITLE";
@@ -191,9 +190,6 @@ public final class OptionsConstructor {
         if (isItunesSupported()) {
             addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ITUNES_KEY, I18n.tr("iTunes"));
             addOption(ITUNES_KEY, ITUNES_IMPORT_KEY, I18n.tr("Importing"), iTunesPreferencePaneItem.class);
-        }
-        if (!OSUtils.isWindows() && !OSUtils.isAnyMac()) {
-            addOption(OptionsMediator.ROOT_NODE_KEY, APPS_KEY, I18n.tr("Helper Apps"), BrowserPaneItem.class, ImageViewerPaneItem.class, VideoPlayerPaneItem.class, AudioPlayerPaneItem.class);
         }
         //view options
         if (OSUtils.isWindows()) {
