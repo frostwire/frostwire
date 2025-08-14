@@ -268,29 +268,6 @@ public class SystemUtils {
     }
 
     /**
-     * Moves a file to the platform-specific trash can or recycle bin.
-     *
-     * @param file The file to trash
-     * @return True on success
-     */
-    static boolean recycle(File file) {
-        if (OSUtils.isWindows() && isLoaded) {
-            // Get the path to the file
-            String path;
-            try {
-                path = file.getCanonicalPath();
-            } catch (IOException err) {
-                LOG.error("IOException", err);
-                path = file.getAbsolutePath();
-            }
-            // Use native code to move the file at that path to the recycle bin
-            return recycleNative(path);
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * @return the default String that the shell will execute to open
      * a file with the provided extension.
      * Only supported on windows.
@@ -341,8 +318,6 @@ public class SystemUtils {
     private static native String getShortFileNameNative(String fileName);
 
     private static native void openFileParamsNative(String path, String params);
-
-    private static native boolean recycleNative(String path);
 
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
