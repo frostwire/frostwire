@@ -17,12 +17,8 @@
 
 package com.limegroup.gnutella.util;
 
-import com.limegroup.gnutella.MediaType;
-import com.limegroup.gnutella.settings.URLHandlerSettings;
 import org.apache.commons.io.FilenameUtils;
 import com.frostwire.util.OSUtils;
-import org.limewire.util.StringUtils;
-import org.limewire.util.SystemUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -116,16 +112,14 @@ public final class Launcher {
                 .getExtension(file.getName()))) {
             throw new SecurityException();
         }
-        String path = file.getCanonicalPath();
-        if (OSUtils.isWindows()) {
-            launchFileWindows(path);
-            return null;
-        } else if (OSUtils.isMacOSX()) {
-            return launchFileMacOSX(path);
-        } else {
-            // Other OS, use helper apps
-            return launchFileOther(path);
+
+        try {
+            Desktop.getDesktop().open(file);
+        } catch (UnsupportedOperationException e) {
+            System.err.println("Attempted to open an unsupported file!");
         }
+
+        return null;
     }
 
     /**
@@ -162,35 +156,6 @@ public final class Launcher {
     }
 
     /**
-     * Launches the given file on Windows.
-     *
-     * @param path the path of the file to launch
-     * @return an int for the exit code of the native method
-     */
-    private static int launchFileWindows(String path) throws IOException {
-        try {
-            return SystemUtils.openFile(path);
-        } catch (IOException iox) {
-            throw new LaunchException(iox, path);
-        }
-    }
-
-    /**
-     * Launches a file on OSX, appending the full path of the file to the
-     * "open" command that opens files in their associated applications
-     * on OSX.
-     *
-     * @param file the <tt>File</tt> instance denoting the abstract pathname
-     *             of the file to launch
-     * @return
-     * @throws IOException if an I/O error occurs in making the runtime.exec()
-     *                     call or in getting the canonical path of the file
-     */
-    private static FWProcess launchFileMacOSX(final String file) throws IOException {
-        return FWProcess.exec(new String[]{"open", file});
-    }
-
-    /**
      * Launches the Finder and selects the given File
      */
     private static String[] selectFileCommand(File file) {
@@ -211,29 +176,4 @@ public final class Launcher {
         };
     }
 
-    /**
-     * Attempts to launch the given file.
-     *
-     * @throws IOException if the call to Runtime.exec throws an IOException
-     *                     or if the Process created by the Runtime.exec call
-     *                     throws an InterruptedException
-     */
-    private static FWProcess launchFileOther(String path) throws IOException {
-        String handler;
-        if (MediaType.getAudioMediaType().matches(path)) {
-            handler = URLHandlerSettings.AUDIO_PLAYER.getValue();
-        } else if (MediaType.getVideoMediaType().matches(path)) {
-            handler = URLHandlerSettings.VIDEO_PLAYER.getValue();
-        } else if (MediaType.getImageMediaType().matches(path)) {
-            handler = URLHandlerSettings.IMAGE_VIEWER.getValue();
-        } else {
-            handler = URLHandlerSettings.BROWSER.getValue();
-        }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(handler);
-        String[] strs = new String[tok.countTokens()];
-        for (int i = 0; i < strs.length; i++) {
-            strs[i] = StringUtils.replace(tok.nextToken(), "$URL$", path);
-        }
-        return FWProcess.exec(strs);
-    }
 }
