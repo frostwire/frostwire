@@ -126,31 +126,13 @@ public final class FrostWireUtils {
     }
 
     public static File getUserMusicFolder() {
-        File musicFile;
-        if (OSUtils.isMacOSX()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else if (OSUtils.isWindows()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else if (OSUtils.isUbuntu()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        }
-        return musicFile;
+        return new File(CommonUtils.getUserHomeDir(), "Music");
     }
 
     public static File getUserVideoFolder() {
-        File videoFile;
-        if (OSUtils.isMacOSX()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Movies");
-        } else if (OSUtils.isWindows()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        } else if (OSUtils.isUbuntu()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        } else {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
-        }
-        return videoFile;
+        return (OSUtils.isMacOSX()) ?
+                new File(CommonUtils.getUserHomeDir(), "Movies") : // Videos dir for macOS
+                new File(CommonUtils.getUserHomeDir(), "Videos");  // Videos dir for all other platforms
     }
 
     /**
