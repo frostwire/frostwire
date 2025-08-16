@@ -17,7 +17,7 @@ public class WindowsUtils {
      * Determines if we know how to set the login status.
      */
     public static boolean isLoginStatusAvailable() {
-        return OSUtils.isModernWindows();
+        return OSUtils.isWindows();
     }
 
     /**
@@ -43,7 +43,7 @@ public class WindowsUtils {
     }
 
     private static File getUserStartMenu() {
-        if (OSUtils.isModernWindows()) {
+        if (OSUtils.isWindows()) {
             return new File(System.getenv("appdata"), "Microsoft\\Windows\\Start Menu");
         } else {
             return null;

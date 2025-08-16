@@ -41,7 +41,7 @@ public class SystemUtils {
     static {
         boolean canLoad = false;
         try {
-            if ((OSUtils.isWindows() && OSUtils.isGoodWindows())) {
+            if (OSUtils.isWindows()) {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }

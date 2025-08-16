@@ -216,7 +216,7 @@ final class UpdateMessageReader implements ContentHandler {
         if (msg.getOs() == null || "*".equals(msg.getOs()))
             return true;
         boolean im_mac_msg_for_me = msg.getOs().equals("mac." + OSUtils.getMacOSArchitecture()) && OSUtils.isMacOSX();
-        boolean im_windows_msg_for_me = msg.getOs().equals("windows") && (OSUtils.isWindows() || OSUtils.isWindowsXP() || OSUtils.isWindowsNT() || OSUtils.isWindows98() || OSUtils.isWindows95() || OSUtils.isWindowsMe() || OSUtils.isWindowsVista());
+        boolean im_windows_msg_for_me = msg.getOs().equals("windows") && OSUtils.isWindows();
         boolean im_linux_msg_for_me = msg.getOs().equals("linux") && OSUtils.isLinux();
         LOG.info("isMessageEligibleForMyOs(" + msg.getOs() + "): im_mac_msg_for_me=" + im_mac_msg_for_me + " || im_windows_msg_for_me=" + im_windows_msg_for_me + " || im_linux_msg_for_me=" + im_linux_msg_for_me);
         return im_mac_msg_for_me || im_windows_msg_for_me || im_linux_msg_for_me;
