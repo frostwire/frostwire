@@ -87,14 +87,6 @@ CString GetSpecialPath(LPCTSTR name) {
 	return path; // If SHGetSpecialFolderPath failed, path will still be blank
 }
 
-// Takes a path to a file like "C:\Folder\Song.mp3" or a Web address like "http://www.site.com/"
-// Opens it with the default program or the default Web browser
-JNIEXPORT void JNICALL Java_org_limewire_util_SystemUtils_openURLNative(JNIEnv *e, jclass c, jstring url) {
-	Run(GetJavaString(e, url));
-}
-JNIEXPORT void JNICALL Java_org_limewire_util_SystemUtils_openFileNative(JNIEnv *e, jclass c, jstring path) {
-	Run(GetJavaString(e, path));
-}
 JNIEXPORT void JNICALL Java_org_limewire_util_SystemUtils_openFileParamsNative(JNIEnv *e, jclass c, jstring path, jstring params) {
 	Run(GetJavaString(e, path), GetJavaString(e, params));
 }
