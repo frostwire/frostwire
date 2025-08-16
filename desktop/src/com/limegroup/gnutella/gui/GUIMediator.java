@@ -209,24 +209,10 @@ public final class GUIMediator {
                 getAppFrame().setVisible(visible);
             } catch (NullPointerException npe) {
                 System.out.println("GUIMediator - NULL POINTER EXCEPTION HAPPENED");
-                if (OSUtils.isNativeThemeWindows()) {
-                    try {
-                        GUIMediator
-                                .showError(I18n
-                                        .tr("FrostWire has encountered a problem during startup and cannot proceed. You may be able to fix this problem by changing FrostWire's Windows Compatibility. Right-click on the FrostWire icon on your Desktop and select 'Properties' from the popup menu. Click the 'Compatibility' tab at the top, then click the 'Run this program in compatibility mode for' check box, and then select 'Windows 2000' in the box below the check box. Then click the 'OK' button at the bottom and restart FrostWire."));
-                        System.exit(0);
-                    } catch (Throwable t) {
-                        if (visible)
-                            FatalBugManager.handleFatalBug(npe);
-                        else
-                            ErrorService.error(npe);
-                    }
-                } else {
-                    if (visible)
-                        FatalBugManager.handleFatalBug(npe);
-                    else
-                        ErrorService.error(npe);
-                }
+                if (visible)
+                    FatalBugManager.handleFatalBug(npe);
+                else
+                    ErrorService.error(npe);
             } catch (Throwable t) {
                 if (visible)
                     FatalBugManager.handleFatalBug(t);

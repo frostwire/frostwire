@@ -196,7 +196,7 @@ public final class SetupManager {
         dialog.setLocation((screenSize.width - d.width) / 2, (screenSize.height - d.height) / 2);
         dialog.setSize((int) d.getWidth(), (int) d.getHeight());
         // create the setup buttons panel
-        if (OSUtils.isGoodWindows()) {
+        if (OSUtils.isWindows()) {
             _setupWindowHolder.setPreferredSize(holderPreferredSize);
         }
         setupPanel.add(_setupWindowHolder);
@@ -214,7 +214,7 @@ public final class SetupManager {
         show(firstWindow);
         // add the panel and make it visible
         container.add(setupPanel);
-        if (!OSUtils.isGoodWindows()) {
+        if (!OSUtils.isWindows()) {
             container.setPreferredSize(new Dimension(SetupWindow.SETUP_WIDTH, SetupWindow.SETUP_HEIGHT));
         }
         dialog.pack();

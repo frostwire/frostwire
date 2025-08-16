@@ -27,13 +27,6 @@ import java.util.Locale;
  */
 public class OSUtils {
     private static boolean _isWindows;
-    private static boolean _isWindowsNT;
-    private static boolean _isWindowsXP;
-    private static boolean _isWindows95;
-    private static boolean _isWindows98;
-    private static boolean _isWindowsMe;
-    private static boolean _isWindowsVista;
-    private static boolean _isWindows7;
     /**
      * Variable for whether the operating system allows the
      * application to be reduced to the system tray.
@@ -82,13 +75,6 @@ public class OSUtils {
      */
     private static void setOperatingSystems() {
         _isWindows = false;
-        _isWindows7 = false;
-        _isWindowsVista = false;
-        _isWindowsXP = false;
-        _isWindowsMe = false;
-        _isWindowsNT = false;
-        _isWindows98 = false;
-        _isWindows95 = false;
         _isLinux = false;
         _isUbuntu = false;
         _isFedora = false;
@@ -103,15 +89,6 @@ public class OSUtils {
         _isSolaris = os.contains("solaris");
         _isLinux = os.contains("linux");
         _isOS2 = os.contains("os/2");
-        if (_isWindows) {
-            _isWindows7 = os.contains("windows 7");
-            _isWindowsVista = os.contains("windows vista");
-            _isWindowsXP = os.contains("windows xp");
-            _isWindowsNT = os.contains("windows nt");
-            _isWindowsMe = os.contains("windows me");
-            _isWindows98 = os.contains("windows 98");
-            _isWindows95 = os.contains("windows 95");
-        }
         if (_isLinux) {
             String unameStr = UnameReader.read();
             _isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
@@ -160,66 +137,6 @@ public class OSUtils {
      */
     public static boolean isWindows() {
         return _isWindows;
-    }
-
-    /**
-     * Returns whether the OS is WinXP.
-     *
-     * @return <tt>true</tt> if the application is running on WinXP,
-     * <tt>false</tt> otherwise
-     */
-    public static boolean isWindowsXP() {
-        return _isWindowsXP;
-    }
-
-    /**
-     * @return true if the application is running on Windows NT
-     */
-    public static boolean isWindowsNT() {
-        return _isWindowsNT;
-    }
-
-    /**
-     * @return true if the application is running on Windows 95
-     */
-    public static boolean isWindows95() {
-        return _isWindows95;
-    }
-
-    /**
-     * @return true if the application is running on Windows 98
-     */
-    public static boolean isWindows98() {
-        return _isWindows98;
-    }
-
-    /**
-     * @return true if the application is running on Windows ME
-     */
-    public static boolean isWindowsMe() {
-        return _isWindowsMe;
-    }
-
-    /**
-     * @return true if the application is running on Windows Vista
-     */
-    public static boolean isWindowsVista() {
-        return _isWindowsVista;
-    }
-
-    /**
-     * @return true if the application is running on Windows 7
-     */
-    public static boolean isWindows7() {
-        return _isWindows7;
-    }
-
-    /**
-     * @return true if the application is running on a windows
-     * that supports native theme.
-     */
-    public static boolean isNativeThemeWindows() {
-        return isWindowsVista() || isWindowsXP();
     }
 
     /**
@@ -298,30 +215,6 @@ public class OSUtils {
      */
     public static boolean isUnix() {
         return _isLinux || _isSolaris;
-    }
-
-    /**
-     * Returns whether this operating system is considered
-     * capable of meeting the requirements of a high load server.
-     *
-     * @return <tt>true</tt> if this OS meets high load server requirements,
-     * <tt>false</tt> otherwise
-     */
-    private static boolean isHighLoadOS() {
-        return !(_isWindows98 || _isWindows95 || _isWindowsMe || _isWindowsNT);
-    }
-
-    /**
-     * @return true if this is a well-supported version of windows.
-     * (not 95, 98, nt or me)
-     */
-    public static boolean isGoodWindows() {
-        return isWindows() && isHighLoadOS();
-    }
-
-    public static boolean isModernWindows() {
-        return isWindows()
-                && !(_isWindows98 || _isWindows95 || _isWindowsMe || _isWindowsNT || _isWindowsXP);
     }
 
     /**

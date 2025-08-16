@@ -246,7 +246,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
             throws RegisterFailedException {
         //LOCAL_MACHINE. Association, in this case, should only be written into LOCAL_MACHINE rather
         //than the CURRENT_USER.
-        if (!OSUtils.isGoodWindows()) {
+        if (!OSUtils.isWindows()) {
             regLevel = AppConstants.SYSTEM_LEVEL;
         }
         BackupAssociation backupAssoc = new BackupAssociation(assoc, regLevel);
@@ -317,7 +317,7 @@ public class WinAppAssociationWriter implements AppAssociationWriter {
         //Note: Windows 98, Windows ME & Windows NT will only take care of registry information from
         //LOCAL_MACHINE. Association, in this case, should only be unregistered from LOCAL_MACHINE rather
         //than the CURRENT_USER.
-        if (!OSUtils.isGoodWindows()) {
+        if (!OSUtils.isWindows()) {
             regLevel = AppConstants.SYSTEM_LEVEL;
         }
         BackupAssociation backupAssoc = new BackupAssociation(assoc, regLevel);

@@ -92,9 +92,7 @@ public final class FrostWireUtils {
      */
     public static File getFrostWireRootFolder() {
         String root = null;
-        if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
-            root = SystemUtils.getSpecialPath(SpecialLocations.DOWNLOADS);
-        } else if (OSUtils.isWindows()) {
+        if (OSUtils.isWindows()) {
             root = SystemUtils.getSpecialPath(SpecialLocations.DOCUMENTS);
         }
         if (root == null || "".equals(root))
@@ -130,9 +128,7 @@ public final class FrostWireUtils {
         File musicFile;
         if (OSUtils.isMacOSX()) {
             musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
-        } else if (OSUtils.isWindowsXP()) {
-            musicFile = new File(CommonUtils.getUserHomeDir(), "My Documents" + File.separator + "My Music");
-        } else if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
+        } else if (OSUtils.isWindows()) {
             musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
         } else if (OSUtils.isUbuntu()) {
             musicFile = new File(CommonUtils.getUserHomeDir(), "Music");
@@ -146,9 +142,7 @@ public final class FrostWireUtils {
         File videoFile;
         if (OSUtils.isMacOSX()) {
             videoFile = new File(CommonUtils.getUserHomeDir(), "Movies");
-        } else if (OSUtils.isWindowsXP()) {
-            videoFile = new File(CommonUtils.getUserHomeDir(), "My Documents" + File.separator + "My Videos");
-        } else if (OSUtils.isWindowsVista() || OSUtils.isWindows7()) {
+        } else if (OSUtils.isWindows()) {
             videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
         } else if (OSUtils.isUbuntu()) {
             videoFile = new File(CommonUtils.getUserHomeDir(), "Videos");
