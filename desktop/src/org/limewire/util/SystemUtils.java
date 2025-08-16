@@ -250,23 +250,6 @@ public class SystemUtils {
     }
 
     /**
-     * Opens a Web address using the default browser on the native platform.
-     * <p>
-     * This method returns immediately, not later after the browser exits.
-     * On Windows, this method does the same thing as Start, Run.
-     *
-     * @param url The Web address to open, like "http://www.frostwire.com/"
-     * @return 0, in place of the process exit code
-     */
-    public static int openURL(String url) throws IOException {
-        if (OSUtils.isWindows() && isLoaded) {
-            openURLNative(url);
-            return 0; // program's still running, no way of getting an exit code.
-        }
-        throw new IOException("native code not linked");
-    }
-
-    /**
      * Runs a path using the default program on the native platform.
      * <p>
      * Given a path to a program, runs that program.
@@ -367,8 +350,6 @@ public class SystemUtils {
     private static native String getSpecialPathNative(String name);
 
     private static native String getShortFileNameNative(String fileName);
-
-    private static native void openURLNative(String url);
 
     private static native void openFileParamsNative(String path, String params);
 
