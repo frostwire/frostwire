@@ -107,7 +107,7 @@ final class AboutWindow {
         sb.append("<body text='#").append(hex).append("'>");
         sb.append("<h1>Powered by</h1>").
                 append("<ul>").
-                append("<li><a href='https://jlibtorrent.org'>JLibTorrent</a>").append(LibTorrent.jlibtorrentVersion()).append("</li>").
+                append("<li><a href='https://jlibtorrent.org'>JLibTorrent</a> ").append(LibTorrent.jlibtorrentVersion()).append("</li>").
                 append("<li><a href='https://www.boost.org/'>Boost</a> ").append(LibTorrent.boostVersion()).append("</li>").
                 append("<li><a href='https://www.openssl.org/'>OpenSSL</a> ").append(LibTorrent.opensslVersion());
 
