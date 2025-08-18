@@ -74,7 +74,7 @@ dependencies {
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    def use_maven_jlibtorrent = false
+    def use_maven_jlibtorrent = true
 
     if (use_maven_jlibtorrent) {
         // jlibtorrent java wrappers
