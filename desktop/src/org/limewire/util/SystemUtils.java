@@ -138,17 +138,6 @@ public class SystemUtils {
         }
     }
 
-    public static long getWindowHandle(Component frame) {
-        if (OSUtils.isWindows() && isLoaded) {
-            return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
-        }
-        return 0;
-    }
-
-    public static boolean toggleFullScreen(long hwnd) {
-        return isLoaded && OSUtils.isWindows() && toggleFullScreenNative(hwnd);
-    }
-
     /**
      * Flushes the icon cache on the OS, forcing any icons to be redrawn
      * with the current-most icon.
@@ -356,11 +345,7 @@ public class SystemUtils {
 
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
-    private static native long getWindowHandleNative(Component frame, String bin);
-
     private static native boolean flushIconCacheNative();
-
-    private static native boolean toggleFullScreenNative(long hwnd);
 
     private static native String registryReadTextNative(String root, String path, String name) throws IOException;
 
