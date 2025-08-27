@@ -49,10 +49,7 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-            if (OSUtils.isLinux()) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
+            // Linux support for SystemUtilities removed - native library not needed
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
@@ -142,14 +139,14 @@ public class SystemUtils {
     }
 
     public static long getWindowHandle(Component frame) {
-        if ((OSUtils.isWindows() || OSUtils.isLinux()) && isLoaded) {
+        if (OSUtils.isWindows() && isLoaded) {
             return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
         }
         return 0;
     }
 
     public static boolean toggleFullScreen(long hwnd) {
-        return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) && toggleFullScreenNative(hwnd);
+        return isLoaded && OSUtils.isWindows() && toggleFullScreenNative(hwnd);
     }
 
     /**
