@@ -116,29 +116,15 @@ public class FileUtils {
             else if (!f.isDirectory())
                 return true;
         }
-        String fName;
+        // Use Java's built-in setWritable method instead of platform-specific native/command approaches
         try {
-            fName = f.getCanonicalPath();
-        } catch (IOException ioe) {
-            fName = f.getPath();
-        }
-        String[] cmds = null;
-        if (OSUtils.isWindows() || OSUtils.isMacOSX())
-            SystemUtils.setWriteable(fName);
-        else if (OSUtils.isOS2())
-            ;//cmds = null; // Find the right command for OS/2 and fill in
-        else {
-            if (f.isDirectory())
-                cmds = new String[]{"chmod", "u+w+x", fName};
-            else
-                cmds = new String[]{"chmod", "u+w", fName};
-        }
-        if (cmds != null) {
-            try {
-                Process p = Runtime.getRuntime().exec(cmds);
-                p.waitFor();
-            } catch (SecurityException | InterruptedException | IOException ignored) {
+            f.setWritable(true);
+            // For directories on Unix-like systems, also ensure execute permission is set
+            if (f.isDirectory() && !OSUtils.isWindows()) {
+                f.setExecutable(true);
             }
+        } catch (SecurityException ignored) {
+            // If we can't set permissions due to security manager, that's okay
         }
         return f.canWrite();
     }
