@@ -130,17 +130,6 @@ public class SearchFieldUI extends BuddyTextFieldUI {
                             insets.right += overSize;
                         }
                     }
-                    
-                    // Additional safety check: ensure visible clear button always has adequate space
-                    // This addresses cases where the clear button might overlap with text
-                    if (clearButton().isVisible()) {
-                        int clearButtonWidth = clearButton().getPreferredSize().width;
-                        // Ensure there's at least a small margin (2 pixels) beyond the button width
-                        int minimumRightInset = clearButtonWidth + 2;
-                        if (insets.right < minimumRightInset) {
-                            insets.right = minimumRightInset;
-                        }
-                    }
                 }
                 return insets;
             }
@@ -157,6 +146,8 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addRight(searchButton(), searchField);
         }
+        // Add a small gap before the clear button to prevent text overlap
+        BuddySupport.addRight(BuddySupport.createGap(4), searchField);
         BuddySupport.addRight(clearButton(), searchField);
         if (usingSeperatePopupButton()) {
             BuddySupport.addRight(BuddySupport.createGap(getPopupOffset()), searchField);
@@ -324,7 +315,6 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * the icons when the search field is in instant search mode.
      */
     private void updateButtons() {
-        boolean clearWasVisible = clearButton().isVisible();
         clearButton().setVisible((!searchField.isRegularSearchMode() || searchField.isMacLayoutStyle()) && hasText());
         boolean clearNotHere = (searchField.isMacLayoutStyle() || !clearButton().isVisible());
         searchButton().setVisible(
@@ -342,12 +332,6 @@ public class SearchFieldUI extends BuddyTextFieldUI {
             if (shouldReplaceResource(searchButton().getPressedIcon())) {
                 searchButton().setPressedIcon(null);
             }
-        }
-        
-        // If clear button visibility changed, ensure layout is updated
-        if (clearWasVisible != clearButton().isVisible()) {
-            searchField.revalidate();
-            searchField.repaint();
         }
     }
 
