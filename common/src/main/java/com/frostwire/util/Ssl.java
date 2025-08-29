@@ -139,6 +139,7 @@ public final class Ssl {
                 "thepiratebay10.xyz",
                 "thepiratebay7.com",
                 "torrent-paradise.ml",
+                "torrents-csv.com",
                 "torrentz2.nz",
                 "tpb.party",
                 "update.frostwire.com",
