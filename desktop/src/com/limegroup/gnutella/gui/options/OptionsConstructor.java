@@ -174,7 +174,7 @@ public final class OptionsConstructor {
     private OptionsTreeNode initializePanels() {
         //bittorrent
         addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, BITTORRENT_KEY, I18n.tr("BitTorrent"));
-        addOption(BITTORRENT_KEY, BITTORRENT_BASIC_KEY, I18n.tr("Basic"), TorrentSaveFolderPaneItem.class, TorrentSeedingSettingPaneItem.class);
+        addOption(BITTORRENT_KEY, BITTORRENT_BASIC_KEY, I18n.tr("Basic"), TorrentSaveFolderPaneItem.class, TorrentFilesFolderPaneItem.class, TorrentSeedingSettingPaneItem.class);
         addOption(BITTORRENT_KEY, BITTORRENT_ADVANCED_KEY, I18n.tr("Advanced"), TorrentGlobalSpeedPaneItem.class, TorrentConnectionPaneItem.class);
         // library
         // REMOVE:WI-FI
