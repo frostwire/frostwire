@@ -132,9 +132,16 @@ public class TorrentsCSVSearchPerformer extends SimpleTorrentSearchPerformer {
                 return null;
             }
 
+            // Validate and normalize info hash
+            infoHash = validateAndNormalizeInfoHash(infoHash);
+            if (StringUtils.isNullOrEmpty(infoHash)) {
+                LOG.warn("Invalid info hash format for torrent: " + name);
+                return null;
+            }
+
             // Generate magnet URL if not provided
             if (StringUtils.isNullOrEmpty(magnetUrl) && !StringUtils.isNullOrEmpty(infoHash)) {
-                magnetUrl = "magnet:?xt=urn:btih:" + infoHash + UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS;
+                magnetUrl = UrlUtils.buildMagnetUrl(infoHash, name, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
             }
 
             // Generate details URL
@@ -198,6 +205,51 @@ public class TorrentsCSVSearchPerformer extends SimpleTorrentSearchPerformer {
             }
         }
         return 0;
+    }
+
+    private String validateAndNormalizeInfoHash(String infoHash) {
+        if (StringUtils.isNullOrEmpty(infoHash)) {
+            return null;
+        }
+        
+        // Remove any whitespace and convert to lowercase
+        infoHash = infoHash.trim().toLowerCase();
+        
+        // Log the original hash for debugging
+        LOG.info("Processing info hash: '" + infoHash + "' (length: " + infoHash.length() + ")");
+        
+        // Valid hex info hash should be exactly 40 characters and contain only hex characters
+        if (infoHash.length() == 40 && infoHash.matches("^[a-f0-9]{40}$")) {
+            LOG.info("Valid hex info hash: " + infoHash);
+            return infoHash;
+        }
+        
+        // Check if it's base32 encoded (32 characters, uppercase)
+        String upperInfoHash = infoHash.toUpperCase();
+        if (upperInfoHash.length() == 32 && upperInfoHash.matches("^[A-Z2-7]{32}$")) {
+            LOG.info("Valid base32 info hash, returning as-is: " + upperInfoHash);
+            // BitTorrent magnet links often use base32 encoding for info hashes
+            return upperInfoHash;
+        }
+        
+        // Try to handle other formats that might need cleanup
+        // Remove any non-hex characters and try again
+        String cleanedHash = infoHash.replaceAll("[^a-f0-9]", "");
+        if (cleanedHash.length() == 40 && cleanedHash.matches("^[a-f0-9]{40}$")) {
+            LOG.info("Cleaned and validated hex info hash: " + cleanedHash);
+            return cleanedHash;
+        }
+        
+        // Log detailed failure information
+        LOG.warn("Invalid info hash format rejected:");
+        LOG.warn("  Original: '" + infoHash + "'");
+        LOG.warn("  Length: " + infoHash.length());
+        LOG.warn("  Hex pattern (40 chars): " + infoHash.matches("^[a-f0-9]{40}$"));
+        LOG.warn("  Base32 pattern (32 chars): " + upperInfoHash.matches("^[A-Z2-7]{32}$"));
+        LOG.warn("  Contains only hex chars: " + infoHash.matches("^[a-f0-9]+$"));
+        LOG.warn("  Contains only base32 chars: " + upperInfoHash.matches("^[A-Z2-7]+$"));
+        
+        return null;
     }
 
     private List<TorrentsCSVSearchResult> parseHtmlResponse(String htmlPage) throws Exception {
