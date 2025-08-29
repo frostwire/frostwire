@@ -26,7 +26,6 @@ import java.util.Locale;
  * @author gubatron
  */
 public final class TorrentsCSVSearchResult extends AbstractTorrentSearchResult {
-    private final String detailsUrl;
     private final String infoHash;
     private final String filename;
     private final String displayName;
@@ -35,10 +34,9 @@ public final class TorrentsCSVSearchResult extends AbstractTorrentSearchResult {
     private final long creationTime;
     private final int seeds;
 
-    public TorrentsCSVSearchResult(String detailsUrl, String infoHash, String filename, 
+    public TorrentsCSVSearchResult(String infoHash, String filename, 
                                    String displayName, String magnetUrl, long size, 
                                    String creationTimeStr, int seeds) {
-        this.detailsUrl = detailsUrl;
         this.infoHash = infoHash;
         this.filename = filename;
         this.displayName = displayName;
@@ -60,7 +58,7 @@ public final class TorrentsCSVSearchResult extends AbstractTorrentSearchResult {
 
     @Override
     public String getDetailsUrl() {
-        return detailsUrl;
+        return null;
     }
 
     @Override

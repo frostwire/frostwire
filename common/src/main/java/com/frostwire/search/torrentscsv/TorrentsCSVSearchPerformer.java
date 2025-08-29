@@ -144,11 +144,7 @@ public class TorrentsCSVSearchPerformer extends SimpleTorrentSearchPerformer {
                 magnetUrl = UrlUtils.buildMagnetUrl(infoHash, name, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
             }
 
-            // Generate details URL
-            String detailsUrl = "https://" + getDomainName() + "/" + infoHash;
-
             return new TorrentsCSVSearchResult(
-                detailsUrl,
                 infoHash,
                 name + ".torrent",
                 name,

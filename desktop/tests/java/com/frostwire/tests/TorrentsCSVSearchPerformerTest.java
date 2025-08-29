@@ -82,8 +82,9 @@ public class TorrentsCSVSearchPerformerTest {
                     failedTests.add("getSource is null or empty");
                 }
 
-                if (StringUtils.isNullOrEmpty(sr.getDetailsUrl())) {
-                    failedTests.add("getDetailsUrl is null or empty");
+                // TorrentsCSV doesn't have detail pages, so we expect null for details URL
+                if (sr.getDetailsUrl() != null) {
+                    failedTests.add("getDetailsUrl should be null for TorrentsCSV results");
                 }
 
                 if (StringUtils.isNullOrEmpty(sr.getFilename())) {

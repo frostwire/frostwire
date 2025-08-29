@@ -56,7 +56,12 @@ public class TorrentUISearchResult extends AbstractUISearchResult {
     public JPopupMenu createMenu(JPopupMenu popupMenu, SearchResultDataLine[] lines, SearchResultMediator resultPanel) {
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_STRING, e -> download(false), popupMenu, lines.length > 0, 1);
         PopupUtils.addMenuItem(SearchMediator.DOWNLOAD_PARTIAL_FILES_STRING, resultPanel.DOWNLOAD_PARTIAL_FILES_LISTENER, popupMenu, lines.length == 1, 2);
-        PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1, 3);
+        
+        // Only add "Torrent Details" menu item if details URL is available
+        String detailsUrl = getDetailsUrl();
+        boolean hasDetailsUrl = detailsUrl != null && !detailsUrl.trim().isEmpty();
+        PopupUtils.addMenuItem(SearchMediator.TORRENT_DETAILS_STRING, e -> showSearchResultWebPage(true), popupMenu, lines.length == 1 && hasDetailsUrl, 3);
+        
         return popupMenu;
     }
 
