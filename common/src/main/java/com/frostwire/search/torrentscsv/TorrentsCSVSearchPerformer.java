@@ -1,0 +1,212 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2024, FrostWire(R). All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.frostwire.search.torrentscsv;
+
+import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
+import com.frostwire.util.Logger;
+import com.frostwire.util.UrlUtils;
+import com.frostwire.util.StringUtils;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * Search performer for torrents-csv.com
+ * @author gubatron
+ */
+public class TorrentsCSVSearchPerformer extends SimpleTorrentSearchPerformer {
+    private static final Logger LOG = Logger.getLogger(TorrentsCSVSearchPerformer.class);
+
+    public TorrentsCSVSearchPerformer(long token, String keywords, int timeout) {
+        super("torrents-csv.com", token, keywords, timeout, 1, 0);
+    }
+
+    @Override
+    protected String getSearchUrl(int page, String encodedKeywords) {
+        // Try the search API endpoint first
+        return "https://" + getDomainName() + "/service/search?q=" + encodedKeywords + "&size=50";
+    }
+
+    @Override
+    protected List<? extends TorrentsCSVSearchResult> searchPage(String page) {
+        if (StringUtils.isNullOrEmpty(page)) {
+            return Collections.emptyList();
+        }
+
+        // Try to parse as JSON first
+        try {
+            return parseJsonResponse(page);
+        } catch (Exception e) {
+            LOG.warn("Failed to parse JSON response, trying HTML parsing: " + e.getMessage());
+            try {
+                return parseHtmlResponse(page);
+            } catch (Exception e2) {
+                LOG.error("Failed to parse both JSON and HTML responses", e2);
+                return Collections.emptyList();
+            }
+        }
+    }
+
+    private List<TorrentsCSVSearchResult> parseJsonResponse(String jsonPage) throws Exception {
+        List<TorrentsCSVSearchResult> results = new ArrayList<>();
+        
+        JsonElement root = JsonParser.parseString(jsonPage);
+        
+        JsonArray torrents;
+        if (root.isJsonObject()) {
+            JsonObject rootObj = root.getAsJsonObject();
+            if (rootObj.has("torrents")) {
+                torrents = rootObj.getAsJsonArray("torrents");
+            } else if (rootObj.has("results")) {
+                torrents = rootObj.getAsJsonArray("results");
+            } else if (rootObj.has("data")) {
+                torrents = rootObj.getAsJsonArray("data");
+            } else {
+                throw new Exception("No recognized torrents array found");
+            }
+        } else if (root.isJsonArray()) {
+            torrents = root.getAsJsonArray();
+        } else {
+            throw new Exception("Unexpected JSON structure");
+        }
+
+        int maxResults = 50;
+        int count = 0;
+        
+        for (JsonElement element : torrents) {
+            if (count >= maxResults || isStopped()) {
+                break;
+            }
+            
+            try {
+                JsonObject torrent = element.getAsJsonObject();
+                TorrentsCSVSearchResult result = fromJsonObject(torrent);
+                if (result != null) {
+                    results.add(result);
+                    count++;
+                }
+            } catch (Exception e) {
+                LOG.warn("Failed to parse torrent JSON object: " + e.getMessage());
+            }
+        }
+        
+        return results;
+    }
+
+    private TorrentsCSVSearchResult fromJsonObject(JsonObject torrent) {
+        try {
+            // Common field names for torrent APIs
+            String name = getJsonString(torrent, "name", "title", "filename");
+            String infoHash = getJsonString(torrent, "infohash", "info_hash", "hash");
+            String magnetUrl = getJsonString(torrent, "magnet", "magnet_uri", "magnetUri");
+            long size = getJsonLong(torrent, "size", "length", "bytes");
+            String creationTime = getJsonString(torrent, "created", "createdAt", "date", "uploaded");
+            int seeds = getJsonInt(torrent, "seeds", "seeders", "seeder");
+            
+            if (StringUtils.isNullOrEmpty(name) || StringUtils.isNullOrEmpty(infoHash)) {
+                return null;
+            }
+
+            // Generate magnet URL if not provided
+            if (StringUtils.isNullOrEmpty(magnetUrl) && !StringUtils.isNullOrEmpty(infoHash)) {
+                magnetUrl = "magnet:?xt=urn:btih:" + infoHash + UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS;
+            }
+
+            // Generate details URL
+            String detailsUrl = "https://" + getDomainName() + "/" + infoHash;
+
+            return new TorrentsCSVSearchResult(
+                detailsUrl,
+                infoHash,
+                name + ".torrent",
+                name,
+                magnetUrl,
+                size,
+                creationTime,
+                seeds
+            );
+            
+        } catch (Exception e) {
+            LOG.warn("Error parsing JSON torrent object: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private String getJsonString(JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                return obj.get(key).getAsString();
+            }
+        }
+        return "";
+    }
+
+    private long getJsonLong(JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                try {
+                    return obj.get(key).getAsLong();
+                } catch (Exception e) {
+                    try {
+                        // Try parsing as string in case it's a string number
+                        return Long.parseLong(obj.get(key).getAsString());
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private int getJsonInt(JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                try {
+                    return obj.get(key).getAsInt();
+                } catch (Exception e) {
+                    try {
+                        // Try parsing as string in case it's a string number  
+                        return Integer.parseInt(obj.get(key).getAsString());
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    private List<TorrentsCSVSearchResult> parseHtmlResponse(String htmlPage) throws Exception {
+        // Fallback HTML parsing in case JSON API is not available
+        List<TorrentsCSVSearchResult> results = new ArrayList<>();
+        
+        // This is a basic implementation - would need to be refined based on actual HTML structure
+        // For now, just throw an exception to indicate JSON parsing should be used
+        throw new Exception("HTML parsing not implemented - JSON API expected");
+    }
+
+    @Override
+    public boolean isCrawler() {
+        return false;
+    }
+}
