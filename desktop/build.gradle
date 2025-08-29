@@ -237,3 +237,32 @@ test {
         exceptionFormat "full"
     }
 }
+
+// Snap packaging tasks
+tasks.register('buildSnap') {
+    description = 'Build FrostWire Snap package'
+    group = 'distribution'
+    
+    dependsOn 'build'
+    
+    doLast {
+        println 'Building Snap package...'
+        exec {
+            commandLine 'snapcraft'
+        }
+    }
+}
+
+tasks.register('cleanSnap') {
+    description = 'Clean Snap build artifacts'
+    group = 'distribution'
+    
+    doLast {
+        delete fileTree('.') {
+            include '**/*.snap'
+            include 'parts/'
+            include 'stage/'
+            include 'prime/'
+        }
+    }
+}
