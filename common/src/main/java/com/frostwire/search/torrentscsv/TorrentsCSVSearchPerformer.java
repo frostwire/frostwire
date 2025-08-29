@@ -111,6 +111,10 @@ public class TorrentsCSVSearchPerformer extends SimpleTorrentSearchPerformer {
             }
         }
         
+        if (results.isEmpty()) {
+            LOG.warn("TorrentsCSVSearchPerformer: No results found - API may have changed or be unavailable");
+        }
+        
         return results;
     }
 
