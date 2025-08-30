@@ -49,10 +49,7 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-            if (OSUtils.isLinux()) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
+            // Linux support for SystemUtilities removed - native library not needed
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
@@ -62,16 +59,6 @@ public class SystemUtils {
     }
 
     private SystemUtils() {
-    }
-
-    /**
-     * Sets a file to be writeable.  Package-access so FileUtils can delegate
-     * the filename given should ideally be a canonicalized filename.
-     */
-    static void setWriteable(String fileName) {
-        if (isLoaded && (OSUtils.isWindows() || OSUtils.isMacOSX())) {
-            setFileWriteable(fileName);
-        }
     }
 
     /**
@@ -139,17 +126,6 @@ public class SystemUtils {
         if (OSUtils.isWindows() && isLoaded) {
             setWindowIconNative(frame, System.getProperty("sun.boot.library.path"), icon.getPath());
         }
-    }
-
-    public static long getWindowHandle(Component frame) {
-        if ((OSUtils.isWindows() || OSUtils.isLinux()) && isLoaded) {
-            return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
-        }
-        return 0;
-    }
-
-    public static boolean toggleFullScreen(long hwnd) {
-        return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) && toggleFullScreenNative(hwnd);
     }
 
     /**
@@ -355,15 +331,9 @@ public class SystemUtils {
 
     private static native boolean recycleNative(String path);
 
-    private static native int setFileWriteable(String path);
-
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
-    private static native long getWindowHandleNative(Component frame, String bin);
-
     private static native boolean flushIconCacheNative();
-
-    private static native boolean toggleFullScreenNative(long hwnd);
 
     private static native String registryReadTextNative(String root, String path, String name) throws IOException;
 
