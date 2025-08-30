@@ -129,6 +129,8 @@ public class SearchFieldUI extends BuddyTextFieldUI {
                         if (overSize > 0) {
                             insets.right += overSize;
                         }
+                        // Account for the 4px gap added before clear button
+                        insets.right += 4;
                     }
                 }
                 return insets;
