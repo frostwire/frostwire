@@ -146,7 +146,6 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addRight(searchButton(), searchField);
         }
-        // Add popup button and gap first, then clear button at rightmost position
         if (usingSeperatePopupButton()) {
             BuddySupport.addRight(BuddySupport.createGap(getPopupOffset()), searchField);
         }
@@ -155,7 +154,8 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addLeft(popupButton(), searchField);
         }
-        // Clear button at rightmost position to prevent text overlap
+        // Add a small gap before clear button to prevent text overlap
+        BuddySupport.addRight(BuddySupport.createGap(4), searchField);
         BuddySupport.addRight(clearButton(), searchField);
     }
 
