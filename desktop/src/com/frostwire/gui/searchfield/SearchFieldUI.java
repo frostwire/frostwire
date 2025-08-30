@@ -141,13 +141,15 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         if (isNativeSearchField()) {
             return;
         }
+        
+        // Add a gap first to create space between text and buttons
+        BuddySupport.addRight(BuddySupport.createGap(6), searchField);
+        
         if (isMacLayoutStyle()) {
             BuddySupport.addLeft(searchButton(), searchField);
         } else {
             BuddySupport.addRight(searchButton(), searchField);
         }
-        // Add a small gap before the clear button to prevent text overlap
-        BuddySupport.addRight(BuddySupport.createGap(4), searchField);
         BuddySupport.addRight(clearButton(), searchField);
         if (usingSeperatePopupButton()) {
             BuddySupport.addRight(BuddySupport.createGap(getPopupOffset()), searchField);
