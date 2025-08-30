@@ -1,3 +1,6 @@
+FrostWire 2.9.8 build <UNRELEASED> AUG/30/2025
+ - freeze: ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
+
 FrostWire 2.9.7 build 752 APR/24/2025
  - crash: Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
  - crash: Guard against showing UI after activity paused in LocalBroadcastReceiver
