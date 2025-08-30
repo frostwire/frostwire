@@ -114,22 +114,9 @@ public class SearchFieldUI extends BuddyTextFieldUI {
             public Insets getBorderInsets(Component c) {
                 Insets insets = super.getBorderInsets(c);
                 if (searchField != null && !isNativeSearchField()) {
-                    if (isMacLayoutStyle()) {
-                        if (!clearButton().isVisible()) {
-                            insets.right += clearButton().getPreferredSize().width;
-                        }
-                    } else {
-                        JButton refButton = popupButton();
-                        if (searchField.getFindPopupMenu() == null ^ searchField.isUseSeperatePopupButton()) {
-                            refButton = searchButton();
-                        }
-                        int clearWidth = clearButton().getPreferredSize().width;
-                        int refWidth = refButton.getPreferredSize().width;
-                        int overSize = clearButton().isVisible() ? refWidth - clearWidth : clearWidth - refWidth;
-                        if (overSize > 0) {
-                            insets.right += overSize;
-                        }
-                    }
+                    // Always reserve space for clear button width plus padding to prevent text overlap
+                    int clearButtonWidth = clearButton().getPreferredSize().width;
+                    insets.right += clearButtonWidth + 4; // 4px padding
                 }
                 return insets;
             }
