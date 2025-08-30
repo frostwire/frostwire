@@ -1441,6 +1441,14 @@ public final class MusicUtils {
         if (context == null) {
             return;
         }
+        
+        // Avoid ANR by ensuring ContentResolver operations run on background thread
+        if (SystemUtils.isUIThread()) {
+            SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> 
+                removeFromPlaylist(context, songId, playlistId));
+            return;
+        }
+        
         Uri baseUri = getPlaylistContentUri();
         Uri uri = Uri.withAppendedPath(baseUri, playlistId + "/members");
 
