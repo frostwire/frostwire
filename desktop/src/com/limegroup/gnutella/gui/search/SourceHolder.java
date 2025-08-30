@@ -33,8 +33,14 @@ public class SourceHolder implements Comparable<SourceHolder> {
     SourceHolder(UISearchResult uiSearchResult) {
         this.uiSearchResult = uiSearchResult;
         this.sourceName = uiSearchResult.getSource();
-        this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr><a href=\"#\">" + sourceName + "</a></nobr></div></html>";
-        this.sourceURL = uiSearchResult.getSearchResult().getDetailsUrl();
+
+        if (uiSearchResult.getSearchResult().getDetailsUrl() != null) {
+            this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr><a href=\"#\">" + sourceName + "</a></nobr></div></html>";
+            this.sourceURL = uiSearchResult.getSearchResult().getDetailsUrl();
+        } else {
+            this.sourceNameHTML = "<html><div width=\"1000000px\"><nobr>" + sourceName + "</nobr></div></html>";
+            this.sourceURL = null;
+        }
     }
 
     @Override

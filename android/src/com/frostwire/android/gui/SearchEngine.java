@@ -40,6 +40,7 @@ import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
+import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
@@ -276,6 +277,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine TORRENTSCSV = new SearchEngine("TorrentsCSV", Constants.PREF_KEY_SEARCH_USE_TORRENTSCSV) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new TorrentsCSVSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -322,5 +330,6 @@ public abstract class SearchEngine {
             TORRENTDOWNLOADS,
             LIMETORRENTS,
             NYAA,
-            GLOTORRENTS);
+            GLOTORRENTS,
+            TORRENTSCSV);
 }

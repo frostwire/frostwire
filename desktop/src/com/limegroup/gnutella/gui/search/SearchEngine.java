@@ -33,6 +33,7 @@ import com.frostwire.search.telluride.TellurideSearchPerformer;
 import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
+import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
@@ -74,7 +75,8 @@ public abstract class SearchEngine {
         TORRENTPARADISE_ID,
         GLOTORRENTS_ID,
         TELLURIDE_ID,
-        YT_ID
+        YT_ID,
+        TORRENTSCSV_ID
     }
 
     private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "BTDigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
@@ -196,6 +198,13 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine TORRENTSCSV = new SearchEngine(SearchEngineID.TORRENTSCSV_ID, "TorrentsCSV", SearchEnginesSettings.TORRENTSCSV_SEARCH_ENABLED, "torrents-csv.com") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new TorrentsCSVSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -233,6 +242,7 @@ public abstract class SearchEngine {
                 TORLOCK,
                 TORRENTDOWNLOADS,
                 TORRENTZ2,
+                TORRENTSCSV,
                 SOUNDCLOUD,
                 FROSTCLICK);
     }
