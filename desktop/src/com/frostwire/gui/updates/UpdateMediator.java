@@ -74,6 +74,10 @@ public final class UpdateMediator {
                 String[] commands = new String[]{"CMD.EXE", "/C", executableFile.getAbsolutePath()};
                 ProcessBuilder pbuilder = new ProcessBuilder(commands);
                 pbuilder.start();
+            } else if (OSUtils.isLinux() && OSUtils.isSnap()) {
+                // If we're running as a Snap, updates are handled by the Snap system
+                // We can't install updates manually, but we can notify the user
+                showSnapUpdateMessage();
             } else if (OSUtils.isLinux() && OSUtils.isUbuntu()) {
                 installUbuntu(executableFile);
             } else if (OSUtils.isMacOSX()) {
@@ -144,6 +148,10 @@ public final class UpdateMediator {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private static void showSnapUpdateMessage() {
+        GUIMediator.showMessage(I18n.tr("FrostWire is running as a Snap package. Updates are managed automatically by your system. You can update using 'snap refresh frostwire' or through your system's software center."));
     }
 
     public boolean isUpdated() {

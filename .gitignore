@@ -84,3 +84,10 @@ desktop/lib/native-src/osx/machine_name.x86_64
 telluride/.vscode/
 telluride/telluride.build/
 telluride/telluride.dist/
+
+# Snap build artifacts
+*.snap
+parts/
+stage/
+prime/
+snap/.snapcraft/

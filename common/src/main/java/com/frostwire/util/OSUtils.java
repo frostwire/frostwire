@@ -72,6 +72,11 @@ public class OSUtils {
      * Variable for whether we're on OS/2.
      */
     private static boolean _isOS2;
+    
+    /**
+     * Variable for whether we're running as a Snap package.
+     */
+    private static boolean _isSnap;
 
     static {
         setOperatingSystems();
@@ -95,6 +100,7 @@ public class OSUtils {
         _isMacOSX = false;
         _isSolaris = false;
         _isOS2 = false;
+        _isSnap = false;
         String os = System.getProperty("os.name");
         System.out.println("os.name=\"" + os + "\"");
         os = os.toLowerCase(Locale.US);
@@ -116,6 +122,14 @@ public class OSUtils {
             String unameStr = UnameReader.read();
             _isUbuntu = unameStr.contains("buntu") || unameStr.contains("ebian");
             _isFedora = unameStr.contains("edora") || unameStr.contains("ed Hat");
+            
+            // Check if we're running as a Snap package
+            String snapEnv = System.getenv("SNAP");
+            String snapNameEnv = System.getenv("SNAP_NAME");
+            String snapInstanceNameEnv = System.getenv("SNAP_INSTANCE_NAME");
+            _isSnap = (snapEnv != null && !snapEnv.isEmpty()) || 
+                     (snapNameEnv != null && !snapNameEnv.isEmpty()) ||
+                     (snapInstanceNameEnv != null && !snapInstanceNameEnv.isEmpty());
         }
         if (_isWindows || _isLinux)
             _supportsTray = true;
@@ -290,6 +304,16 @@ public class OSUtils {
      */
     public static boolean isFedora() {
         return _isFedora;
+    }
+
+    /**
+     * Returns whether the application is running as a Snap package.
+     *
+     * @return <tt>true</tt> if the application is running as a Snap package,
+     * <tt>false</tt> otherwise
+     */
+    public static boolean isSnap() {
+        return _isSnap;
     }
 
     /**

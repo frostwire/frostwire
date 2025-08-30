@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=FrostWire
+Comment=BitTorrent Client and Cloud Downloader
+GenericName=P2P File Sharing
+Exec=frostwire %f
+Icon=frostwire
+Categories=Network;FileTransfer;P2P;AudioVideo;Audio;Video;
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+StartupNotify=true
+StartupWMClass=frostwire
+Keywords=torrent;p2p;bittorrent;download;

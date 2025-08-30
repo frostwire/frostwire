@@ -1,0 +1,151 @@
+name: frostwire
+version: git
+summary: BitTorrent Client and Cloud Downloader from FrostWire
+description: |
+  FrostWire is a free and open source BitTorrent client first released in 
+  September 2004, as a fork of LimeWire. It was initially very similar to 
+  LimeWire in appearance and functionality, but over time has diverged to 
+  become a multi-platform BitTorrent client, media player and media library 
+  organizer.
+
+  Features include:
+  * BitTorrent downloading and sharing
+  * Built-in media player
+  * Creative Commons search
+  * Cloud-based media search and download
+  * Media library management
+
+  This snap is built from the official FrostWire source code and includes
+  all necessary dependencies.
+
+base: core22
+grade: stable
+confinement: strict
+
+architectures:
+  - build-on: amd64
+    build-for: amd64
+
+slots:
+  frostwire-dbus:
+    interface: dbus
+    bus: session
+    name: com.frostwire.FrostWire
+
+plugs:
+  network: {}
+  network-bind: {}
+  audio-playback: {}
+  audio-record: {}
+  home: {}
+  desktop: {}
+  desktop-legacy: {}
+  x11: {}
+  wayland: {}
+  unity7: {}
+  opengl: {}
+  removable-media: {}
+  optical-drive: {}
+
+apps:
+  frostwire:
+    command: bin/frostwire
+    common-id: com.frostwire.FrostWire
+    desktop: share/applications/frostwire.desktop
+    plugs:
+      - network
+      - network-bind
+      - audio-playback
+      - audio-record
+      - home
+      - desktop
+      - desktop-legacy
+      - x11
+      - wayland
+      - unity7
+      - opengl
+      - removable-media
+      - optical-drive
+    slots:
+      - frostwire-dbus
+
+parts:
+  frostwire:
+    plugin: gradle
+    source: .
+    gradle-options:
+      - -Dorg.gradle.daemon=false
+      - -x
+      - test
+    stage-packages:
+      - openjdk-19-jre-headless
+      - ca-certificates
+      - fontconfig
+    build-packages:
+      - openjdk-19-jdk-headless
+      - ca-certificates
+    override-build: |
+      craftctl default
+      
+      # Create wrapper script
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cat > $CRAFT_PART_INSTALL/bin/frostwire << 'EOF'
+      #!/bin/bash
+      
+      # Set up Java environment
+      export JAVA_HOME=/usr/lib/jvm/java-19-openjdk-amd64
+      export PATH=$JAVA_HOME/bin:$PATH
+      
+      # Set up application directories
+      export FROSTWIRE_HOME=$SNAP_USER_DATA
+      
+      # JVM arguments optimized for snap environment
+      JAVA_OPTS="-Djava.library.path=$SNAP/lib/native"
+      JAVA_OPTS="$JAVA_OPTS --add-opens=java.desktop/java.awt=ALL-UNNAMED"
+      JAVA_OPTS="$JAVA_OPTS --add-opens=java.desktop/javax.swing=ALL-UNNAMED" 
+      JAVA_OPTS="$JAVA_OPTS -Xms64m -Xmx512m -Xss768k"
+      JAVA_OPTS="$JAVA_OPTS -Djava.awt.headless=false"
+      JAVA_OPTS="$JAVA_OPTS -Duser.home=$SNAP_USER_DATA"
+      
+      # Run FrostWire
+      exec java $JAVA_OPTS -jar $SNAP/lib/frostwire.jar "$@"
+      EOF
+      
+      chmod +x $CRAFT_PART_INSTALL/bin/frostwire
+      
+      # Copy the built jar
+      mkdir -p $CRAFT_PART_INSTALL/lib
+      if [ -f build/libs/frostwire.jar ]; then
+        cp build/libs/frostwire.jar $CRAFT_PART_INSTALL/lib/
+      else
+        echo "Warning: frostwire.jar not found in build/libs/"
+      fi
+      
+      # Copy native libraries if they exist
+      if [ -d lib/native ]; then
+        cp -r lib/native $CRAFT_PART_INSTALL/lib/
+      fi
+      
+      # Copy icons
+      mkdir -p $CRAFT_PART_INSTALL/share/icons/hicolor
+      if [ -d lib/icons/hicolor ]; then
+        cp -r lib/icons/hicolor/* $CRAFT_PART_INSTALL/share/icons/hicolor/
+      fi
+      
+      # Create desktop file
+      mkdir -p $CRAFT_PART_INSTALL/share/applications
+      cat > $CRAFT_PART_INSTALL/share/applications/frostwire.desktop << 'EOF'
+      [Desktop Entry]
+      Version=1.0
+      Type=Application
+      Name=FrostWire
+      Comment=BitTorrent Client and Cloud Downloader
+      GenericName=P2P File Sharing
+      Exec=frostwire %f
+      Icon=frostwire
+      Categories=Network;FileTransfer;P2P;AudioVideo;Audio;Video;
+      MimeType=application/x-bittorrent;x-scheme-handler/magnet;
+      StartupNotify=true
+      StartupWMClass=frostwire
+      Keywords=torrent;p2p;bittorrent;download;
+      EOF
