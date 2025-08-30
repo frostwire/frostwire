@@ -114,24 +114,9 @@ public class SearchFieldUI extends BuddyTextFieldUI {
             public Insets getBorderInsets(Component c) {
                 Insets insets = super.getBorderInsets(c);
                 if (searchField != null && !isNativeSearchField()) {
-                    if (isMacLayoutStyle()) {
-                        if (!clearButton().isVisible()) {
-                            insets.right += clearButton().getPreferredSize().width;
-                        }
-                    } else {
-                        JButton refButton = popupButton();
-                        if (searchField.getFindPopupMenu() == null ^ searchField.isUseSeperatePopupButton()) {
-                            refButton = searchButton();
-                        }
-                        int clearWidth = clearButton().getPreferredSize().width;
-                        int refWidth = refButton.getPreferredSize().width;
-                        int overSize = clearButton().isVisible() ? refWidth - clearWidth : clearWidth - refWidth;
-                        if (overSize > 0) {
-                            insets.right += overSize;
-                        }
-                        // Account for the 4px gap added before clear button
-                        insets.right += 4;
-                    }
+                    // Always reserve space for clear button width plus padding to prevent text overlap
+                    int clearButtonWidth = clearButton().getPreferredSize().width;
+                    insets.right += clearButtonWidth + 4; // 4px padding
                 }
                 return insets;
             }
@@ -148,6 +133,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addRight(searchButton(), searchField);
         }
+        BuddySupport.addRight(clearButton(), searchField);
         if (usingSeperatePopupButton()) {
             BuddySupport.addRight(BuddySupport.createGap(getPopupOffset()), searchField);
         }
@@ -156,9 +142,6 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addLeft(popupButton(), searchField);
         }
-        // Add a small gap before clear button to prevent text overlap
-        BuddySupport.addRight(BuddySupport.createGap(4), searchField);
-        BuddySupport.addRight(clearButton(), searchField);
     }
 
     private boolean isMacLayoutStyle() {
