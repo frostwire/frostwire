@@ -247,7 +247,7 @@ tasks.register('buildSnap') {
     
     doLast {
         println 'Building Snap package...'
-        exec {
+        project.exec {
             commandLine 'snapcraft'
         }
     }
