@@ -33,10 +33,12 @@ public class BuddySupport {
         add(c, Position.LEFT, textField);
     }
 
+    // Add a buddy component to the right side of the text field.
     static void addRight(Component c, JTextField textField) {
         add(c, Position.RIGHT, textField);
     }
 
+    // Adds a buddy component to the specified position of the text field.
     private static void add(Component c, Position pos, JTextField textField) {
         TextUIWrapper.getDefaultWrapper().install(textField, true);
         List<Component> leftBuddies = buddies(Position.LEFT, textField);
