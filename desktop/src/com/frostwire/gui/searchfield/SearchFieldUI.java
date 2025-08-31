@@ -76,10 +76,8 @@ public class SearchFieldUI extends BuddyTextFieldUI {
     @Override
     protected BuddyLayoutAndBorder createBuddyLayoutAndBorder() {
         return new BuddyLayoutAndBorder() {
-            private static final long serialVersionUID = 2126978772989855919L;
-
             /**
-             * This does nothing, if the search field is rendered natively on
+             * This does nothing if the search field is rendered natively on
              * Leopard.
              */
             @Override
@@ -103,12 +101,12 @@ public class SearchFieldUI extends BuddyTextFieldUI {
             }
 
             /**
-             * Prevent 'jumping' when text is entered: Include the clear button,
+             * Prevent 'jumping' when text is entered: Include the clear button
              * when layout style is Mac. When layout style is Vista: Take the
-             * clear button's preferred width if its either greater than the
+             * clear button's preferred width if it's either greater than the
              * search button's pref. width or greater than the popup button's
              * pref. width when a popup menu is installed and not using a
-             * seperate popup button.
+             *  separate popup button.
              */
             @Override
             public Insets getBorderInsets(Component c) {
@@ -146,11 +144,14 @@ public class SearchFieldUI extends BuddyTextFieldUI {
         } else {
             BuddySupport.addRight(searchButton(), searchField);
         }
+
         BuddySupport.addRight(clearButton(), searchField);
-        if (usingSeperatePopupButton()) {
+
+        if (usingSeparatePopupButton()) {
             BuddySupport.addRight(BuddySupport.createGap(getPopupOffset()), searchField);
         }
-        if (usingSeperatePopupButton() || !isMacLayoutStyle()) {
+
+        if (usingSeparatePopupButton() || !isMacLayoutStyle()) {
             BuddySupport.addRight(popupButton(), searchField);
         } else {
             BuddySupport.addLeft(popupButton(), searchField);
@@ -285,7 +286,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      *
      * @return the popup button is used in addition to the search button
      */
-    private boolean usingSeperatePopupButton() {
+    private boolean usingSeparatePopupButton() {
         return searchField.isUseSeperatePopupButton() && searchField.getFindPopupMenu() != null;
     }
 
@@ -293,13 +294,13 @@ public class SearchFieldUI extends BuddyTextFieldUI {
      * Returns the number of pixels between the popup button and the clear (or
      * search) button as specified in the default table by
      * 'SearchField.popupOffset'. Returns 0 if
-     * {@link #usingSeperatePopupButton()} returns <code>false</code>
+     * {@link #usingSeparatePopupButton()} returns <code>false</code>
      *
      * @return number of pixels between the popup button and the clear (or
      * search) button
      */
     private int getPopupOffset() {
-        if (usingSeperatePopupButton()) {
+        if (usingSeparatePopupButton()) {
             return UIManager.getInt("SearchField.popupOffset");
         }
         return 0;
@@ -307,18 +308,18 @@ public class SearchFieldUI extends BuddyTextFieldUI {
 
     /**
      * Sets the visibility of the search, clear and popup buttons depending on
-     * the search mode, layout stye, search text, search popup menu and the use
-     * of a seperate popup button. Also resets the search buttons pressed and
-     * rollover icons if the search field is in regular search mode or clears
+     * the search mode, layout style, search text, search popup menu and the use
+     * of a separate popup button. Also, resets the search buttons pressed and
+     * roll-over icons if the search field is in regular search mode or clears
      * the icons when the search field is in instant search mode.
      */
     private void updateButtons() {
         clearButton().setVisible((!searchField.isRegularSearchMode() || searchField.isMacLayoutStyle()) && hasText());
         boolean clearNotHere = (searchField.isMacLayoutStyle() || !clearButton().isVisible());
         searchButton().setVisible(
-                (searchField.getFindPopupMenu() == null || usingSeperatePopupButton()) && clearNotHere);
+                (searchField.getFindPopupMenu() == null || usingSeparatePopupButton()) && clearNotHere);
         popupButton().setVisible(
-                searchField.getFindPopupMenu() != null && (clearNotHere || usingSeperatePopupButton()));
+                searchField.getFindPopupMenu() != null && (clearNotHere || usingSeparatePopupButton()));
         if (searchField.isRegularSearchMode()) {
             searchButton().setRolloverIcon(getNewIcon(searchButton().getRolloverIcon(), "SearchField.rolloverIcon"));
             searchButton().setPressedIcon(getNewIcon(searchButton().getPressedIcon(), "SearchField.pressedIcon"));
@@ -334,7 +335,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
     }
 
     private boolean hasText() {
-        return searchField.getText() != null && searchField.getText().length() > 0;
+        return searchField.getText() != null && !searchField.getText().isEmpty();
     }
 
     class Handler implements PropertyChangeListener, ActionListener, DocumentListener {
@@ -369,7 +370,7 @@ public class SearchFieldUI extends BuddyTextFieldUI {
                         .getString("SearchField.popupSource")) ? searchField : (Component) e.getSource();
                 Rectangle r = SwingUtilities.getLocalBounds(src);
                 int popupWidth = searchField.getFindPopupMenu().getPreferredSize().width;
-                int x = searchField.isVistaLayoutStyle() || usingSeperatePopupButton() ? r.x + r.width - popupWidth
+                int x = searchField.isVistaLayoutStyle() || usingSeparatePopupButton() ? r.x + r.width - popupWidth
                         : r.x;
                 searchField.getFindPopupMenu().show(src, x, r.y + r.height);
             }

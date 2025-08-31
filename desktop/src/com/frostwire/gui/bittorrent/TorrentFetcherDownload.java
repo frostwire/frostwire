@@ -292,6 +292,7 @@ public class TorrentFetcherDownload implements BTDownload {
         }
     }
 
+    /** Returns a boolean array with true for the files that match the given path */
     private boolean[] calculateSelection(TorrentInfo ti, String path) {
         boolean[] selection = new boolean[ti.numFiles()];
         FileStorage fs = ti.files();
