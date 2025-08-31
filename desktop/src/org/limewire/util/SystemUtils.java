@@ -224,30 +224,6 @@ public class SystemUtils {
         }
     }
 
-    /**
-     * Runs a path using the default program on the native platform.
-     * <p>
-     * Given a path to a program, runs that program.
-     * Given a path to a document, opens it in the default program for that kind of document.
-     * Given a path to a folder, opens it in the shell.
-     * <p>
-     * Note: this method accepts a parameter list thus should
-     * be generally used with executable files
-     * <p>
-     * This method returns immediately, not later after the program exits.
-     * On Windows, this method does the same thing as Start, Run.
-     *
-     * @param path   The complete path to run, like "C:\folder\file.ext"
-     * @param params The list of parameters to pass to the file
-     */
-    public static void openFile(String path, String params) throws IOException {
-        if (OSUtils.isWindows() && isLoaded) {
-            openFileParamsNative(path, params);
-            return; // program's running, no way to get exit code.
-        }
-        throw new IOException("native code not linked");
-    }
-
     public static String getShortFileName(String fileName) {
         return (OSUtils.isWindows() && isLoaded) ? getShortFileNameNative(fileName) : fileName;
     }
@@ -301,8 +277,6 @@ public class SystemUtils {
     private static native String getSpecialPathNative(String name);
 
     private static native String getShortFileNameNative(String fileName);
-
-    private static native void openFileParamsNative(String path, String params);
 
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
