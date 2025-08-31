@@ -25,11 +25,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Returns system information, where supported, for Windows and OSX. Most methods
- * in <code>SystemUtils</code> rely on native code and fail gracefully if the
+ * Returns system information, where supported, for Windows. Most methods in
+ * <code>SystemUtils</code> rely on native code and fail gracefully if the
  * native code library isn't found. <code>SystemUtils</code> uses
- * SystemUtilities.dll for Window environments and libSystemUtilities.jnilib
- * for OSX.
+ * SystemUtilities.dll.
  */
 public class SystemUtils {
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
@@ -42,10 +41,6 @@ public class SystemUtils {
         boolean canLoad = false;
         try {
             if ((OSUtils.isWindows() && OSUtils.isGoodWindows())) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
-            if (OSUtils.isMacOSX()) {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
