@@ -1,12 +1,12 @@
 /*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2019, FrostWire(R). All rights reserved.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml), Avery King (generic-pers0n)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,8 @@
 
 package com.frostwire.gui.searchfield;
 
+import com.frostwire.util.Logger;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class BuddySupport {
+    private static final Logger LOG = Logger.getLogger(BuddySupport.class);
     private static final String OUTER_MARGIN = "outerMargin";
 
     static void addLeft(Component c, JTextField textField) {
@@ -41,7 +44,7 @@ public class BuddySupport {
         // ensure buddies are added
         setLeft(textField, leftBuddies);
         setRight(textField, rightBuddies);
-        // check if component is already here
+        // check if the component is already here
         if (leftBuddies.contains(c) || rightBuddies.contains(c)) {
             throw new IllegalStateException("Component already added.");
         }
@@ -69,7 +72,7 @@ public class BuddySupport {
         try {
             textField.add(c, pos.constraint);
         } catch (NullPointerException e) {
-            System.err.println("ERROR: BuddySupport: Attempted to add null component to hierarchy.");
+            LOG.error("BuddySupport.addToComponentHierarchy: Attempted to add null component to hierarchy.");
         }
     }
 
@@ -120,14 +123,14 @@ public class BuddySupport {
             try {
                 addToComponentHierarchy(c, Position.LEFT, textField);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOG.error("BuddySupport.ensureBuddiesAreInComponentHierarchy: ", e);
             }
         }
         for (Component c : BuddySupport.getRight(textField)) {
             try {
                 addToComponentHierarchy(c, Position.RIGHT, textField);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOG.error("BuddySupport.ensureBuddiesAreInComponentHierarchy: ", e);
             }
         }
     }
@@ -140,12 +143,17 @@ public class BuddySupport {
     }
 
     public enum Position {
-        LEFT  (BorderLayout.LINE_START),
-        RIGHT (BorderLayout.LINE_END);
+        LEFT(BorderLayout.LINE_START),
+        RIGHT(BorderLayout.LINE_END);
 
         private final Object constraint;
-        Position(Object c) { this.constraint = c; }
 
-        Object constraint() { return constraint; }
+        Position(Object c) {
+            this.constraint = c;
+        }
+
+        Object constraint() {
+            return constraint;
+        }
     }
 }
