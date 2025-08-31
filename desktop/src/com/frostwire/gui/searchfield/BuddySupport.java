@@ -66,16 +66,11 @@ public class BuddySupport {
     }
 
     private static void addToComponentHierarchy(Component c, Position pos, JTextField textField) {
-        // make sure the wrapper set the layout, but be defensive:
-        if (!(textField.getLayout() instanceof BorderLayout)) {
-            textField.setLayout(new BorderLayout());
+        try {
+            textField.add(c, pos.constraint);
+        } catch (NullPointerException e) {
+            System.err.println("ERROR: BuddySupport: Attempted to add null component to hierarchy.");
         }
-
-        Object constraint = (pos == Position.LEFT)
-                ? BorderLayout.LINE_START    // LTR = West, RTL = East
-                : BorderLayout.LINE_END;     // LTR = East, RTL = West
-
-        textField.add(c, pos.constraint);
     }
 
     static List<Component> getLeft(JTextField textField) {
