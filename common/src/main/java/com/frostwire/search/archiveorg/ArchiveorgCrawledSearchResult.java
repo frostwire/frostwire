@@ -28,7 +28,7 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult implements HttpSearchResult {
+public class ArchiveorgCrawledSearchResult extends AbstractCrawledSearchResult<ArchiveorgSearchResult> implements HttpSearchResult {
     private static final String DOWNLOAD_URL = "https://%s/download/%s/%s";
     private final String filename;
     private final String displayName;
