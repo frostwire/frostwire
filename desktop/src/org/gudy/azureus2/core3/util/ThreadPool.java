@@ -29,14 +29,14 @@ public class ThreadPool {
     private static final boolean NAME_THREADS = false;
     private static final boolean LOG_WARNINGS = false;
     private static final int WARN_TIME = 10000;
-    private static final List busy_pools = new ArrayList();
-    private static final ThreadLocal tls =
+    private static final List<ThreadPool> busy_pools = new ArrayList<>();
+    private static final ThreadLocal<threadPoolWorker> tls =
             ThreadLocal.withInitial(() -> (null));
     private static boolean busy_pool_timer_set = false;
     private final String name;
-    private final List busy;
+    private final List<threadPoolWorker> busy;
     private final boolean queue_when_full;
-    private final List task_queue = new ArrayList();
+    private final List<Runnable> task_queue = new ArrayList<>();
     private final AESemaphore thread_sem;
     private final Average task_average = Average.getInstance(WARN_TIME, 120);
     private int thread_name_index = 1;
@@ -57,19 +57,19 @@ public class ThreadPool {
         name = _name;
         queue_when_full = _queue_when_full;
         thread_sem = new AESemaphore(_max_size);
-        busy = new ArrayList(_max_size);
+        busy = new ArrayList<>(_max_size);
     }
 
     private static void
     checkAllTimeouts() {
-        List pools;
+        List<ThreadPool> pools;
         // copy the busy pools to avoid potential deadlock due to synchronization
         // nestings
         synchronized (busy_pools) {
-            pools = new ArrayList(busy_pools);
+            pools = new ArrayList<>(busy_pools);
         }
-        for (Object pool : pools) {
-            ((ThreadPool) pool).checkTimeouts();
+        for (ThreadPool pool : pools) {
+            pool.checkTimeouts();
         }
     }
 
@@ -99,8 +99,7 @@ public class ThreadPool {
                     thread_sem.reserve();
                 } else {
                     // run immediately
-                    if (runnable instanceof ThreadPoolTask) {
-                        ThreadPoolTask task = (ThreadPoolTask) runnable;
+                    if (runnable instanceof ThreadPoolTask task) {
                         runIt(runnable);
                         task.join();
                     } else {
@@ -131,16 +130,15 @@ public class ThreadPool {
             StringBuilder task_names = new StringBuilder();
             try {
                 synchronized (ThreadPool.this) {
-                    for (Object o : busy) {
-                        threadPoolWorker x = (threadPoolWorker) o;
-                        AERunnable r = x.runnable;
+                    for (threadPoolWorker worker : busy) {
+                        AERunnable r = worker.runnable;
                         if (r != null) {
                             String name;
-                            if (r instanceof ThreadPoolTask)
-                                name = ((ThreadPoolTask) r).getName();
+                            if (r instanceof ThreadPoolTask t)
+                                name = t.getName();
                             else
                                 name = r.getClass().getName();
-                            task_names.append(task_names.length() == 0 ? "" : ",").append(name);
+                            task_names.append(task_names.isEmpty() ? "" : ",").append(name);
                         }
                     }
                 }
@@ -158,11 +156,10 @@ public class ThreadPool {
             task_average.addValue(diff);
             task_total_last = task_total;
             long now = SystemTime.getMonotonousTime();
-            for (Object o : busy) {
-                threadPoolWorker x = (threadPoolWorker) o;
-                long elapsed = now - x.run_start_time;
-                if (elapsed > ((long) WARN_TIME * (x.warn_count + 1))) {
-                    x.warn_count++;
+            for (threadPoolWorker worker : busy) {
+                long elapsed = now - worker.run_start_time;
+                if (elapsed > ((long) WARN_TIME * (worker.warn_count + 1))) {
+                    worker.warn_count++;
                 }
             }
         }
@@ -194,7 +191,7 @@ public class ThreadPool {
                 do {
                     try {
                         synchronized (ThreadPool.this) {
-                            if (task_queue.size() > 0)
+                            if (!task_queue.isEmpty())
                                 runnable = (AERunnable) task_queue.remove(0);
                             else
                                 break;
@@ -216,8 +213,7 @@ public class ThreadPool {
                                 }
                             }
                         }
-                        if (runnable instanceof ThreadPoolTask) {
-                            ThreadPoolTask tpt = (ThreadPoolTask) runnable;
+                        if (runnable instanceof ThreadPoolTask tpt) {
                             String task_name = NAME_THREADS ? tpt.getName() : null;
                             try {
                                 if (task_name != null)
@@ -245,7 +241,7 @@ public class ThreadPool {
                                 busy.remove(threadPoolWorker.this);
                                 // if debug is on we leave the pool registered so that we
                                 // can trace on the timeout events
-                                if (busy.size() == 0)
+                                if (busy.isEmpty())
                                     synchronized (busy_pools) {
                                         busy_pools.remove(ThreadPool.this);
                                     }
@@ -266,7 +262,7 @@ public class ThreadPool {
                         }
                     }
                 }
-                tls.set(null);
+                tls.remove();
             }
         }
 
