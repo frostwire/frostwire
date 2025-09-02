@@ -56,7 +56,7 @@ public final class Grid {
      */
     private static final ResizeConstraint GAP_RC_CONST = new ResizeConstraint(200, ResizeConstraint.WEIGHT_100, 50, null);
     private static final ResizeConstraint GAP_RC_CONST_PUSH = new ResizeConstraint(200, ResizeConstraint.WEIGHT_100, 50, ResizeConstraint.WEIGHT_100);
-    private static WeakHashMap[] PARENT_ROWCOL_SIZES_MAP = null;
+    private static ArrayList<WeakHashMap<Object, int[][]>> PARENT_ROWCOL_SIZES_MAP = null;
     private static WeakHashMap<Object, LinkedHashMap<Integer, Cell>> PARENT_GRIDPOS_MAP = null;
 
     static {
@@ -844,9 +844,17 @@ public final class Grid {
     }
 
     private static synchronized void putSizesAndIndexes(Object parComp, int[] sizes, int[] ixArr, boolean isRows) {
-        if (PARENT_ROWCOL_SIZES_MAP == null)    // Lazy since only if designing in IDEs
-            PARENT_ROWCOL_SIZES_MAP = new WeakHashMap[]{new WeakHashMap(4), new WeakHashMap(4)};
-        PARENT_ROWCOL_SIZES_MAP[isRows ? 0 : 1].put(parComp, new int[][]{ixArr, sizes});
+        int index = isRows ? 0 : 1; // Used for determining what index in the ArrayList we allocate and access
+        if (PARENT_ROWCOL_SIZES_MAP == null) {  // Lazy since only if designing in IDEs
+            PARENT_ROWCOL_SIZES_MAP = new ArrayList<>(2);
+
+            // It only ever seems that we access either the first or second
+            // element, so only allocate that for now.
+            // Actually, we don't use this map outside here, so I'm not sure if
+            // we really need it. I'll leave it here for now.
+            PARENT_ROWCOL_SIZES_MAP.add(index, new WeakHashMap<>(4));
+        }
+        PARENT_ROWCOL_SIZES_MAP.get(isRows ? 0 : 1).put(parComp, new int[][]{ixArr, sizes});
     }
 
     private static synchronized void saveGrid(ComponentWrapper parComp, LinkedHashMap<Integer, Cell> grid) {
