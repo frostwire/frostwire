@@ -418,7 +418,7 @@ public class CommonUtils {
         File userDir = CommonUtils.getUserHomeDir();
         // Changing permissions without permission in Unix is rude
         if (OSUtils.isWindows() && userDir.exists())
-            FileUtils.setWriteable(userDir);
+            userDir.setWritable(true);
         File settingsDir = new File(userDir, FROSTWIRE_500_PREFS_DIR_NAME);
         if (OSUtils.isMacOSX()) {
             settingsDir = new File(CommonUtils.getUserHomeDir(), "Library/Preferences/FrostWire5");
@@ -445,7 +445,7 @@ public class CommonUtils {
         File userDir = CommonUtils.getUserHomeDir();
         //        // Changing permissions without permission in Unix is rude
         //        if(!OSUtils.isPOSIX() && userDir != null && userDir.exists())
-        //            FileUtils.setWriteable(userDir);
+        //            userDir.setWritable(true);
         File settingsDir = new File(userDir, FROSTWIRE_420_PREFS_DIR_NAME);
         if (OSUtils.isMacOSX()) {
             settingsDir = new File(CommonUtils.getUserHomeDir(), "Library/Preferences/FrostWire");
@@ -522,7 +522,7 @@ public class CommonUtils {
                 portableMetaDir.mkdirs();
             }
             if (OSUtils.isWindows()) {
-                FileUtils.setWriteable(portableMetaDir);
+                portableMetaDir.setWritable(true);
             }
         }
         return portableMetaDir;
