@@ -1,8 +1,9 @@
 frostwire (6.14.1) stable; urgency=high
  * New TorrentCSV search performer
  * MacEventHandler is now compatible with JDK 23 and JDK 24
+ * New: Settings panel to pick location for .torrent files
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 31 Aug 2025 11:58:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 3 Sep 2025 13:24:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
