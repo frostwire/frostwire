@@ -25,11 +25,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Returns system information, where supported, for Windows and OSX. Most methods
- * in <code>SystemUtils</code> rely on native code and fail gracefully if the
+ * Returns system information, where supported, for Windows. Most methods in
+ * <code>SystemUtils</code> rely on native code and fail gracefully if the
  * native code library isn't found. <code>SystemUtils</code> uses
- * SystemUtilities.dll for Window environments and libSystemUtilities.jnilib
- * for OSX.
+ * SystemUtilities.dll.
  */
 public class SystemUtils {
     private static final Logger LOG = Logger.getLogger(SystemUtils.class);
@@ -45,14 +44,6 @@ public class SystemUtils {
                 System.loadLibrary("SystemUtilities");
                 canLoad = true;
             }
-            if (OSUtils.isMacOSX()) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
-            if (OSUtils.isLinux()) {
-                System.loadLibrary("SystemUtilities");
-                canLoad = true;
-            }
         } catch (Throwable noGo) {
             System.out.println("ERROR: " + noGo.getMessage());
             canLoad = false;
@@ -62,16 +53,6 @@ public class SystemUtils {
     }
 
     private SystemUtils() {
-    }
-
-    /**
-     * Sets a file to be writeable.  Package-access so FileUtils can delegate
-     * the filename given should ideally be a canonicalized filename.
-     */
-    static void setWriteable(String fileName) {
-        if (isLoaded && (OSUtils.isWindows() || OSUtils.isMacOSX())) {
-            setFileWriteable(fileName);
-        }
     }
 
     /**
@@ -139,17 +120,6 @@ public class SystemUtils {
         if (OSUtils.isWindows() && isLoaded) {
             setWindowIconNative(frame, System.getProperty("sun.boot.library.path"), icon.getPath());
         }
-    }
-
-    public static long getWindowHandle(Component frame) {
-        if ((OSUtils.isWindows() || OSUtils.isLinux()) && isLoaded) {
-            return getWindowHandleNative(frame, System.getProperty("sun.boot.library.path"));
-        }
-        return 0;
-    }
-
-    public static boolean toggleFullScreen(long hwnd) {
-        return (isLoaded && (OSUtils.isWindows() || OSUtils.isLinux())) && toggleFullScreenNative(hwnd);
     }
 
     /**
@@ -249,55 +219,8 @@ public class SystemUtils {
         }
     }
 
-    /**
-     * Runs a path using the default program on the native platform.
-     * <p>
-     * Given a path to a program, runs that program.
-     * Given a path to a document, opens it in the default program for that kind of document.
-     * Given a path to a folder, opens it in the shell.
-     * <p>
-     * Note: this method accepts a parameter list thus should
-     * be generally used with executable files
-     * <p>
-     * This method returns immediately, not later after the program exits.
-     * On Windows, this method does the same thing as Start, Run.
-     *
-     * @param path   The complete path to run, like "C:\folder\file.ext"
-     * @param params The list of parameters to pass to the file
-     */
-    public static void openFile(String path, String params) throws IOException {
-        if (OSUtils.isWindows() && isLoaded) {
-            openFileParamsNative(path, params);
-            return; // program's running, no way to get exit code.
-        }
-        throw new IOException("native code not linked");
-    }
-
     public static String getShortFileName(String fileName) {
         return (OSUtils.isWindows() && isLoaded) ? getShortFileNameNative(fileName) : fileName;
-    }
-
-    /**
-     * Moves a file to the platform-specific trash can or recycle bin.
-     *
-     * @param file The file to trash
-     * @return True on success
-     */
-    static boolean recycle(File file) {
-        if (OSUtils.isWindows() && isLoaded) {
-            // Get the path to the file
-            String path;
-            try {
-                path = file.getCanonicalPath();
-            } catch (IOException err) {
-                LOG.error("IOException", err);
-                path = file.getAbsolutePath();
-            }
-            // Use native code to move the file at that path to the recycle bin
-            return recycleNative(path);
-        } else {
-            return false;
-        }
     }
 
     /**
@@ -342,7 +265,6 @@ public class SystemUtils {
 
     /*
      * The following methods are implemented in C++ code in SystemUtilities.dll.
-     * In addition, setFileWritable(String) may be implemented in FrostWire's native library for another platform, like Mac or Linux.
      * The idea is that the Windows, Mac, and Linux libraries have methods with the same names.
      * Call a method, and it will run platform-specific code to complete the task in the appropriate platform-specific way.
      */
@@ -351,19 +273,9 @@ public class SystemUtils {
 
     private static native String getShortFileNameNative(String fileName);
 
-    private static native void openFileParamsNative(String path, String params);
-
-    private static native boolean recycleNative(String path);
-
-    private static native int setFileWriteable(String path);
-
     private static native String setWindowIconNative(Component frame, String bin, String icon);
 
-    private static native long getWindowHandleNative(Component frame, String bin);
-
     private static native boolean flushIconCacheNative();
-
-    private static native boolean toggleFullScreenNative(long hwnd);
 
     private static native String registryReadTextNative(String root, String path, String name) throws IOException;
 

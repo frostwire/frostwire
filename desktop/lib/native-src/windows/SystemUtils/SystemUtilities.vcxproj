@@ -319,7 +319,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Firewall.cpp" />
-    <ClCompile Include="FullScreen.cpp" />
     <ClCompile Include="Registry.cpp" />
     <ClCompile Include="Shell.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -328,7 +327,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Firewall.h" />
-    <ClInclude Include="FullScreen.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="Shell.h" />
     <ClInclude Include="stdafx.h" />

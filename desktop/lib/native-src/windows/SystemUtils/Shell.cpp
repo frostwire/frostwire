@@ -87,64 +87,6 @@ CString GetSpecialPath(LPCTSTR name) {
 	return path; // If SHGetSpecialFolderPath failed, path will still be blank
 }
 
-JNIEXPORT void JNICALL Java_org_limewire_util_SystemUtils_openFileParamsNative(JNIEnv *e, jclass c, jstring path, jstring params) {
-	Run(GetJavaString(e, path), GetJavaString(e, params));
-}
-void Run(LPCTSTR path) {
-
-	// Call ShellExecute() with all the defaults, this acts exactly like Run on the Start menu, and returns immediately
-	ShellExecute(NULL, NULL, path, _T(""), _T(""), SW_SHOWNORMAL);
-}
-
-void Run(LPCTSTR path, LPCTSTR params) {
-
-	ShellExecute(NULL, NULL, path, params, _T(""), SW_SHOWNORMAL);
-}
-
-// Takes a path to a file on the disk, like "C:\Folder\file.ext", or a whole folder like "C:\Folder" without a trailing slash
-// Moves it to the Windows Recycle Bin
-// Returns false on error
-JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_recycleNative(JNIEnv *e, jclass c, jstring path) {
-	return Recycle(GetJavaString(e, path));
-}
-bool Recycle(LPCTSTR path) {
-
-	// Make a buffer that contains the text of the path followed by 2 null terminators, as SHFILEOPSTRUCT.pFrom requires
-	CString s = path;                                 // Make a CString from the given path text
-	int length = lstrlen(s);                          // Get the number of characters not including the null terminator, "hello" is 5
-	LPTSTR buffer = s.GetBufferSetLength(length + 1); // Expand the buffer to hold one more character before the null terminator, like "hello0-"
-	buffer[length + 1] = 0;                           // Set the character beyond the null terminator to 0, making it "hello00"
-
-	// Move the file to the Recycle Bin
-	SHFILEOPSTRUCT info;                 // Make a shell file operation structure to fill out with the details of the operation
-	ZeroMemory(&info, sizeof(info));     // Zero the memory of the structure, setting parts not mentioned here to NULL and 0
-	info.wFunc = FO_DELETE;              // Delete operation
-	info.pFrom = buffer;                 // The path and file name, terminated by 2 zero characters
-	info.fFlags = FOF_ALLOWUNDO      |   // Move the file into the Recycle Bin instead of deleting it
-				  FOF_NOCONFIRMATION |   // Don't ask the user if they're sure
-				  FOF_NOERRORUI      |   // Don't show the user an error if one happens
-				  FOF_SILENT;            // Hide the progress bar dialog box
-	int result = SHFileOperation(&info); // Have the Windows shell perform the operation, and get the result code
-
-	// Remember to release the CString buffer we obtained
-	s.ReleaseBuffer();
-
-	// If SHFileOperation() succeeds, it returns 0, have this method return true
-	return !result;
-}
-
-// Takes a path to a file on the disk, like "C:\Folder\file.txt"
-// Removes its read-only setting
-// Returns the result from _chmod
-JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setFileWriteable(JNIEnv *e, jclass c, jstring path) {
-	return SetFileWritable(GetJavaString(e, path));
-}
-int SetFileWritable(LPCTSTR path) {
-
-	// Use the Windows implementation of the Unix chmod command
-	return _tchmod(path, _S_IWRITE);
-}
-
 // Takes the JNI environment and class
 // The jobject frame is a AWT Component like a JFrame that is backed by a real Windows window
 // bin is the path to the folder that has the file "jawt.dll", like "C:\Program Files\Java\jre1.5.0_05\bin"
@@ -170,12 +112,6 @@ CString SetWindowIcon(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, LPCTSTR i
 
 	// Return blank on success
 	return _T("");
-}
-
-JNIEXPORT jlong JNICALL Java_org_limewire_util_SystemUtils_getWindowHandleNative(JNIEnv *e, jclass c, jobject frame, jstring bin)
-{
-	CString message;
-	return (jlong)GetJavaWindowHandle(e, c, frame, GetJavaString(e, bin), &message);
 }
 
 // Tell Windows we changed a file type association, so it needs to refresh icons in the shell

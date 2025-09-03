@@ -263,7 +263,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
             if (parent != null) {
                 parent.mkdirs();
             }
-            FileUtils.setWriteable(SETTINGS_FILE);
+            SETTINGS_FILE.setWritable(true);
             if (SETTINGS_FILE.exists() && !SETTINGS_FILE.canRead()) {
                 SETTINGS_FILE.delete();
             }

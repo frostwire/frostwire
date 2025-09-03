@@ -14,14 +14,6 @@ FLAGS_ARM64="-fPIC -mmacosx-version-min=11.5 -fno-strict-aliasing -fvisibility=d
 OUTPUT_PATH="../../native"
 
 ###############################################################################################
-# libSystemUtilities.dylib
-###############################################################################################
-echo "Building libSystemUtilities.dylib..."
-cc ${INCLUDE_PATH} ${FLAGS_X86_64} -o libSystemUtilities.x86_64 SystemUtilities.m
-cc ${INCLUDE_PATH} ${FLAGS_ARM64} -o libSystemUtilities.arm64 SystemUtilities.m
-lipo -create -output ${OUTPUT_PATH}/libSystemUtilities.dylib libSystemUtilities.x86_64 libSystemUtilities.arm64
-
-###############################################################################################
 # libMacOSXUtil.dylib
 ###############################################################################################
 echo "Building libMacOSXUtil.dylib..."

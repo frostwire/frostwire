@@ -237,7 +237,7 @@ public final class BugManager {
      */
     private void logBugToDisk(LocalClientInfo info) {
         File f = BugSettings.BUG_LOG_FILE.getValue();
-        FileUtils.setWriteable(f);
+        f.setWritable(true);
         OutputStream os = null;
         try {
             synchronized (WRITE_LOCK) {

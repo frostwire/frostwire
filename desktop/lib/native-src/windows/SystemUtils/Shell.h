@@ -22,11 +22,7 @@ extern "C" {
 	JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_getRunningPathNative(JNIEnv *e, jclass c);
 	JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_getSpecialPathNative(JNIEnv *e, jclass c, jstring name);
 	JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_getShortFileNameNative(JNIEnv *e, jclass c, jstring name);
-	JNIEXPORT void JNICALL Java_org_limewire_util_SystemUtils_openFileParamsNative(JNIEnv *e, jclass c, jstring path, jstring params);
-	JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_recycleNative(JNIEnv *e, jclass c, jstring path);
-	JNIEXPORT jint JNICALL Java_org_limewire_util_SystemUtils_setFileWriteable(JNIEnv *e, jclass c, jstring path);
 	JNIEXPORT jstring JNICALL Java_org_limewire_util_SystemUtils_setWindowIconNative(JNIEnv *e, jclass c, jobject frame, jstring bin, jstring icon);
-	JNIEXPORT jlong JNICALL Java_org_limewire_util_SystemUtils_getWindowHandleNative(JNIEnv *e, jclass c, jobject frame, jstring bin);
 	JNIEXPORT jboolean JNICALL Java_org_limewire_util_SystemUtils_flushIconCacheNative(JNIEnv *e, jclass c);
 
 #ifdef __cplusplus
@@ -37,10 +33,6 @@ extern "C" {
 // Functions in Shell.cpp
 CString GetRunningPath();
 CString GetSpecialPath(LPCTSTR name);
-void Run(LPCTSTR path);
-void Run(LPCTSTR path, LPCTSTR params);
-bool Recycle(LPCTSTR path);
-int SetFileWritable(LPCTSTR path);
 CString SetWindowIcon(JNIEnv *e, jclass c, jobject frame, LPCTSTR bin, LPCTSTR icon);
 bool FlushIconCache();
 void GetIcons(LPCTSTR icon);
