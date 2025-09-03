@@ -41,7 +41,11 @@ public final class MultilineToolTip extends JToolTip {
 
     @Override
     public void updateUI() {
-        setUI(new SkinMultilineToolTipUI());
+        if (UIManager.getLookAndFeel() instanceof javax.swing.plaf.synth.SynthLookAndFeel) {
+            setUI(new SkinMultilineToolTipUI());
+        } else {
+            setUI(UIManager.getUI(this)); // FlatLaf, Metal, etc.
+        }
     }
 
     private String join(String[] arr) {
