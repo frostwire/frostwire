@@ -286,4 +286,136 @@ public final class PerformersHelper {
         }
         return count;
     }
+
+    // JSON Helper Functions for Search Performers
+
+    /**
+     * Safely extracts a string value from a JSON object using multiple possible key names.
+     * This is useful for APIs that might use different field naming conventions.
+     *
+     * @param obj  the JSON object to extract from
+     * @param keys array of possible key names to try, in order of preference
+     * @return the string value, or empty string if none found
+     */
+    public static String getJsonString(com.google.gson.JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                return obj.get(key).getAsString();
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Safely extracts a long value from a JSON object using multiple possible key names.
+     * Handles both numeric and string representations.
+     *
+     * @param obj  the JSON object to extract from
+     * @param keys array of possible key names to try, in order of preference
+     * @return the long value, or 0 if none found or parsing fails
+     */
+    public static long getJsonLong(com.google.gson.JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                try {
+                    return obj.get(key).getAsLong();
+                } catch (Exception e) {
+                    try {
+                        // Try parsing as string in case it's a string number
+                        return Long.parseLong(obj.get(key).getAsString());
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Safely extracts an int value from a JSON object using multiple possible key names.
+     * Handles both numeric and string representations.
+     *
+     * @param obj  the JSON object to extract from
+     * @param keys array of possible key names to try, in order of preference
+     * @return the int value, or 0 if none found or parsing fails
+     */
+    public static int getJsonInt(com.google.gson.JsonObject obj, String... keys) {
+        for (String key : keys) {
+            if (obj.has(key) && !obj.get(key).isJsonNull()) {
+                try {
+                    return obj.get(key).getAsInt();
+                } catch (Exception e) {
+                    try {
+                        // Try parsing as string in case it's a string number  
+                        return Integer.parseInt(obj.get(key).getAsString());
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Attempts to find a JSON array within a JSON response using common field names.
+     * Many torrent APIs wrap their results in objects with various array field names.
+     *
+     * @param root the root JSON element (can be object or array)
+     * @return the JSON array containing the results, or null if not found
+     */
+    public static com.google.gson.JsonArray findJsonArrayInResponse(com.google.gson.JsonElement root) {
+        if (root.isJsonArray()) {
+            return root.getAsJsonArray();
+        }
+        
+        if (root.isJsonObject()) {
+            com.google.gson.JsonObject rootObj = root.getAsJsonObject();
+            // Try common field names for torrent results
+            String[] arrayFieldNames = {"torrents", "results", "data", "items", "response"};
+            for (String fieldName : arrayFieldNames) {
+                if (rootObj.has(fieldName) && rootObj.get(fieldName).isJsonArray()) {
+                    return rootObj.getAsJsonArray(fieldName);
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Validates and normalizes a BitTorrent info hash string.
+     * Accepts both hex (40 chars) and base32 (32 chars) formats.
+     *
+     * @param infoHash the raw info hash string
+     * @return normalized info hash, or null if invalid format
+     */
+    public static String validateAndNormalizeInfoHash(String infoHash) {
+        if (StringUtils.isNullOrEmpty(infoHash)) {
+            return null;
+        }
+        
+        // Remove any whitespace and convert to lowercase
+        infoHash = infoHash.trim().toLowerCase();
+        
+        // Valid hex info hash should be exactly 40 characters and contain only hex characters
+        if (infoHash.length() == 40 && infoHash.matches("^[a-f0-9]{40}$")) {
+            return infoHash;
+        }
+        
+        // Check if it's base32 encoded (32 characters, uppercase)
+        String upperInfoHash = infoHash.toUpperCase();
+        if (upperInfoHash.length() == 32 && upperInfoHash.matches("^[A-Z2-7]{32}$")) {
+            // BitTorrent magnet links often use base32 encoding for info hashes
+            return upperInfoHash;
+        }
+        
+        // Try to handle other formats that might need cleanup
+        // Remove any non-hex characters and try again
+        String cleanedHash = infoHash.replaceAll("[^a-f0-9]", "");
+        if (cleanedHash.length() == 40 && cleanedHash.matches("^[a-f0-9]{40}$")) {
+            return cleanedHash;
+        }
+        
+        return null;
+    }
 }
