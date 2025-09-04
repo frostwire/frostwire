@@ -635,20 +635,28 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
+        // If this is called from a UI thread, it needs to be moved to a background thread, ideally
+        // reusing an executor
+        if (SwingUtilities.isEventDispatchThread()) {
+            BackgroundExecutorService.schedule(() -> openTorrentFileForSeed(torrentFile, saveDir));
+            return;
+        }
+
         if (VPNDropGuard.canUseBitTorrent()) {
-            GUIMediator.safeInvokeLater(() -> {
-                try {
-                    BTEngine.getInstance().download(torrentFile, saveDir, null);
-                } catch (Throwable e) {
-                    LOG.error(e.toString(), e);
+            try {
+                BTEngine.getInstance().download(torrentFile, saveDir, null);
+            } catch (Throwable e) {
+                GUIMediator.safeInvokeLater(() -> {
+                    LOG.error("openTorrentFileForSeed(): BTEngine.getInstance().download(torrentFile, saveDir, null) failed: ", e);
                     if (!e.toString().contains("No files selected by user")) {
                         // could not read torrent file or bad torrent file.
                         GUIMediator.showError(
                                 I18n.tr("FrostWire was unable to load the torrent file \"{0}\", - it may be malformed or FrostWire does not have permission to access this file.",
                                         torrentFile.getName()), QuestionsHandler.TORRENT_OPEN_FAILURE);
                     }
-                }
-            });
+                });
+            }
+
         }
     }
 
