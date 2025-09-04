@@ -515,7 +515,7 @@ public class CreateTorrentDialog extends JDialog {
                 reportCurrentTask(I18n.tr("Calculating piece hashes..."));
                 saveDir = f.getParentFile();
                 error_code ec = new error_code();
-                // DO NOT PASS NULL LISTENERS TO THE HASH LISTENER, JLIBTORRENT WILL CRASH
+                // DO NOT PASS NULL LISTENERS TO THE HASH LISTENER, JLIBTORRENT 2.0.12.3 WILL CRASH, 2.0.12.4 FIXED IT
                 set_piece_hashes_listener no_op_listener = new set_piece_hashes_listener();
                 libtorrent.set_piece_hashes_ex(torrent, saveDir.getAbsolutePath(), no_op_listener, ec);
                 reportCurrentTask(I18n.tr("Generating torrent entry..."));
