@@ -129,6 +129,10 @@ final class AboutWindow {
         sb.append("<li>Marcelina Knitter - <a href='https://twitter.com/#!/marcelinkaaa'>@Marcelinkaaa</a></li>");
         sb.append("</ul>");
         sb.append("<h1>").append(I18n.tr("Thanks to Former FrostWire Developers")).append("</h1>");
+        sb.append("<li>Alden Torres (<a href='https://github.com/frostwire/frostwire/commits?author=aldenml'>@aldenml</a>)</li>");
+        sb.append("<li>Marcelina Knitter (<a href='https://github.com/frostwire/frostwire/commits?author=marcelinkaaa'>@marcelinkaaa</a>)</li>");
+        sb.append("<li>Erika Acosta (<a href='https://github.com/frostwire/frostwire/commits?author=muckachina'>@muckachina</a>)</li>");
+        sb.append("<li>Alejandro Martinez (<a href='https://github.com/frostwire/frostwire/commits?author=alejandroarturom'>@alejandroarturom</a>)</li>");
         sb.append("<li>Gregorio Roper (Germany)</li>");
         sb.append("<li>Fernando Toussaint '<strong>FTA</strong>' - <a href='http://www.cybercultura.com'>Web</a></li>");
         sb.append("<li>Erich Pleny</li>");
@@ -223,10 +227,7 @@ final class AboutWindow {
         sb.append("<h1>").append("FrostWire Dev Team").append("</h1>");
         sb.append("<ul>\n");
         sb.append("<li>Angel Leon (<a href='https://github.com/frostwire/frostwire/commits?author=gubatron'>@gubatron</a>)</li>");
-        sb.append("<li>Alden Torres (<a href='https://github.com/frostwire/frostwire/commits?author=aldenml'>@aldenml</a>)</li>");
-        sb.append("<li>Marcelina Knitter (<a href='https://github.com/frostwire/frostwire/commits?author=marcelinkaaa'>@marcelinkaaa</a>)</li>");
-        sb.append("<li>Erika Acosta (<a href='https://github.com/frostwire/frostwire/commits?author=muckachina'>@muckachina</a>)</li>");
-        sb.append("<li>Alejandro Martinez (<a href='https://github.com/frostwire/frostwire/commits?author=alejandroarturom'>@alejandroarturom</a>)</li>");
+        sb.append("<li>Avery King (<a href='https://github.com/frostwire/frostwire/commits?author=generic-pers0n'>@gubatron</a>)</li>");
         sb.append("</ul>");
         // bt notice
         sb.append("<small>");
