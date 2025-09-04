@@ -40,7 +40,9 @@ application {
             '--enable-native-access=ALL-UNNAMED',
             '-Xms64m',
             '-Xmx512m',
-            '-Xss2m',
+            //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
+            //'-Xss768k', // 768k stack (development)
+            '-Xss256k', // 256k stack (production)
 	    '-Xcheck:jni',
             '-Dcom.sun.management.jmxremote.port=9595',
             '-Dcom.sun.management.jmxremote.ssl=false',
@@ -89,7 +91,6 @@ dependencies {
     implementation 'com.googlecode.gettext-commons:gettext-commons:0.9.8'
     implementation 'org.xerial:sqlite-jdbc:3.43.0.0'
 
-    //def jlibtorrent_version = '1.2.19.0'
     def jlibtorrent_version = '2.0.12.3'
     def os = OperatingSystem.current()
     def arch = System.getProperty('os.arch').toLowerCase()
