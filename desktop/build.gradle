@@ -37,6 +37,7 @@ application {
             '-Djava.library.path=lib/native',
             '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
             '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
+            '--enable-native-access=ALL-UNNAMED',
             '-Xms64m',
             '-Xmx512m',
             '-Xss2m',
@@ -94,7 +95,7 @@ dependencies {
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    def use_maven_jlibtorrent = true
+    def use_maven_jlibtorrent = false
 
     if (use_maven_jlibtorrent) {
         // jlibtorrent java wrappers
