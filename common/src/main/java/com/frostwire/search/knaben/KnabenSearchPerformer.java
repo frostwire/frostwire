@@ -103,61 +103,46 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     private KnabenSearchResult createSearchResultFromJson(Gson gson, JsonElement element) {
-        // Try different possible JSON structures that the API might return
-        TorrentData torrentData = null;
-        
-        // Try the primary structure first
         try {
-            torrentData = gson.fromJson(element, TorrentData.class);
-        } catch (Exception e) {
-            LOG.debug("Failed to parse with primary structure: " + e.getMessage());
-        }
-        
-        // Try alternative structure if the first one fails
-        if (torrentData == null || (!torrentData.isValid())) {
-            try {
-                TorrentDataAlt altData = gson.fromJson(element, TorrentDataAlt.class);
-                if (altData.isValid()) {
-                    torrentData = altData.toTorrentData();
-                }
-            } catch (Exception e) {
-                LOG.debug("Failed to parse with alternative structure: " + e.getMessage());
+            TorrentData torrentData = gson.fromJson(element, TorrentData.class);
+            
+            if (torrentData == null || !torrentData.isValid()) {
+                return null;
             }
-        }
-        
-        if (torrentData == null || !torrentData.isValid()) {
+            
+            // Validate and normalize info hash
+            String infoHash = validateAndNormalizeInfoHash(torrentData.getInfoHash());
+            if (StringUtils.isNullOrEmpty(infoHash)) {
+                LOG.warn("Invalid info hash format for torrent: " + torrentData.getName());
+                return null;
+            }
+
+            // Generate magnet URL if not provided
+            String magnetUrl = torrentData.getMagnetUrl();
+            if (StringUtils.isNullOrEmpty(magnetUrl) && !StringUtils.isNullOrEmpty(infoHash)) {
+                magnetUrl = UrlUtils.buildMagnetUrl(infoHash, torrentData.getName(), UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+            }
+
+            // Generate details URL if not provided (fallback to base domain)
+            String detailsUrl = torrentData.getDetailsUrl();
+            if (StringUtils.isNullOrEmpty(detailsUrl)) {
+                detailsUrl = "https://" + getDomainName() + "/torrent/" + infoHash;
+            }
+
+            return new KnabenSearchResult(
+                infoHash,
+                torrentData.getName() + ".torrent",
+                torrentData.getName(),
+                magnetUrl,
+                detailsUrl,
+                torrentData.getSize(),
+                torrentData.getCreationTime(),
+                torrentData.getSeeds()
+            );
+        } catch (Exception e) {
+            LOG.warn("Failed to parse torrent JSON object: " + e.getMessage());
             return null;
         }
-        
-        // Validate and normalize info hash
-        String infoHash = validateAndNormalizeInfoHash(torrentData.getInfoHash());
-        if (StringUtils.isNullOrEmpty(infoHash)) {
-            LOG.warn("Invalid info hash format for torrent: " + torrentData.getName());
-            return null;
-        }
-
-        // Generate magnet URL if not provided
-        String magnetUrl = torrentData.getMagnetUrl();
-        if (StringUtils.isNullOrEmpty(magnetUrl) && !StringUtils.isNullOrEmpty(infoHash)) {
-            magnetUrl = UrlUtils.buildMagnetUrl(infoHash, torrentData.getName(), UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
-        }
-
-        // Generate details URL if not provided (fallback to base domain)
-        String detailsUrl = torrentData.getDetailsUrl();
-        if (StringUtils.isNullOrEmpty(detailsUrl)) {
-            detailsUrl = "https://" + getDomainName() + "/torrent/" + infoHash;
-        }
-
-        return new KnabenSearchResult(
-            infoHash,
-            torrentData.getName() + ".torrent",
-            torrentData.getName(),
-            magnetUrl,
-            detailsUrl,
-            torrentData.getSize(),
-            torrentData.getCreationTime(),
-            torrentData.getSeeds()
-        );
     }
 
     private JsonArray findJsonArrayInResponse(JsonElement root) {
@@ -216,108 +201,83 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
     // Inner static classes to map JSON response structures
     
     /**
-     * Primary JSON structure for torrent data
+     * Flexible JSON structure for torrent data that handles multiple field naming conventions
      */
     public static class TorrentData {
+        // Name field variations
         public String name;
-        public String infohash;
-        public String magnet;
-        public String details_url;
-        public long size;
-        public String created;
-        public int seeds;
-        
-        public String getName() {
-            return name;
-        }
-        
-        public String getInfoHash() {
-            return infohash;
-        }
-        
-        public String getMagnetUrl() {
-            return magnet;
-        }
-        
-        public String getDetailsUrl() {
-            return details_url;
-        }
-        
-        public long getSize() {
-            return size;
-        }
-        
-        public String getCreationTime() {
-            return created;
-        }
-        
-        public int getSeeds() {
-            return seeds;
-        }
-        
-        public boolean isValid() {
-            return !StringUtils.isNullOrEmpty(name) && !StringUtils.isNullOrEmpty(infohash);
-        }
-    }
-    
-    /**
-     * Alternative JSON structure with different field names
-     */
-    public static class TorrentDataAlt {
         public String title;
         public String filename;
+        
+        // Info hash field variations
+        public String infohash;
         public String hash;
         public String info_hash;
+        
+        // Magnet URL field variations
+        public String magnet;
         public String magnet_uri;
         public String magnetUri;
+        
+        // Details URL field variations
+        public String details_url;
         public String detailsUrl;
         public String url;
+        
+        // Size field variations
+        public long size;
         public long length;
         public long bytes;
+        
+        // Creation time field variations
+        public String created;
         public String createdAt;
         public String date;
         public String uploaded;
         public String upload_date;
+        
+        // Seeds field variations
+        public int seeds;
         public int seeders;
         public int seeder;
         
-        public boolean isValid() {
-            String name = getName();
-            String infoHash = getInfoHash();
-            return !StringUtils.isNullOrEmpty(name) && !StringUtils.isNullOrEmpty(infoHash);
-        }
-        
         public String getName() {
+            if (!StringUtils.isNullOrEmpty(name)) return name;
             if (!StringUtils.isNullOrEmpty(title)) return title;
             if (!StringUtils.isNullOrEmpty(filename)) return filename;
             return "";
         }
         
         public String getInfoHash() {
+            if (!StringUtils.isNullOrEmpty(infohash)) return infohash;
             if (!StringUtils.isNullOrEmpty(hash)) return hash;
             if (!StringUtils.isNullOrEmpty(info_hash)) return info_hash;
             return "";
         }
         
         public String getMagnetUrl() {
+            if (!StringUtils.isNullOrEmpty(magnet)) return magnet;
             if (!StringUtils.isNullOrEmpty(magnet_uri)) return magnet_uri;
             if (!StringUtils.isNullOrEmpty(magnetUri)) return magnetUri;
             return "";
         }
         
         public String getDetailsUrl() {
+            if (!StringUtils.isNullOrEmpty(details_url)) return details_url;
             if (!StringUtils.isNullOrEmpty(detailsUrl)) return detailsUrl;
             if (!StringUtils.isNullOrEmpty(url)) return url;
             return "";
         }
         
         public long getSize() {
+            if (size > 0) return size;
             if (length > 0) return length;
             if (bytes > 0) return bytes;
             return 0;
         }
         
         public String getCreationTime() {
+            if (!StringUtils.isNullOrEmpty(created)) return created;
             if (!StringUtils.isNullOrEmpty(createdAt)) return createdAt;
             if (!StringUtils.isNullOrEmpty(date)) return date;
             if (!StringUtils.isNullOrEmpty(uploaded)) return uploaded;
@@ -326,21 +286,14 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         }
         
         public int getSeeds() {
+            if (seeds > 0) return seeds;
             if (seeders > 0) return seeders;
             if (seeder > 0) return seeder;
             return 0;
         }
         
-        public TorrentData toTorrentData() {
-            TorrentData data = new TorrentData();
-            data.name = getName();
-            data.infohash = getInfoHash();
-            data.magnet = getMagnetUrl();
-            data.details_url = getDetailsUrl();
-            data.size = getSize();
-            data.created = getCreationTime();
-            data.seeds = getSeeds();
-            return data;
+        public boolean isValid() {
+            return !StringUtils.isNullOrEmpty(getName()) && !StringUtils.isNullOrEmpty(getInfoHash());
         }
     }
 }
