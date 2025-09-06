@@ -20,6 +20,7 @@ package com.limegroup.gnutella.gui;
 import com.frostwire.jlibtorrent.swig.libtorrent_jni;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.util.FrostWireUtils;
+import org.limewire.util.CommonUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -48,7 +49,14 @@ public class Main {
      */
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
-        com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(1000)); //// fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
+        if (CommonUtils.isDebugMode()) {
+            // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
+            System.out.println("FrostWire is running in DEVELOPMENT environment.");
+            com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(1000));
+            System.out.println("Strict EDT mode is ON. (The application will fail fast if the EDT [Event Dispatcher Thread] stalls for more than 1000 ms)");
+        } else {
+            System.out.println("FrostWire is running in a PRODUCTION environment.");
+        }
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
