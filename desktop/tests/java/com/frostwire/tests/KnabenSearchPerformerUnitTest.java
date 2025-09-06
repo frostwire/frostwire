@@ -134,4 +134,42 @@ public class KnabenSearchPerformerUnitTest {
             fail("Alternative JSON format test failed: " + e.getMessage());
         }
     }
+    
+    @Test
+    public void testHtmlErrorHandling() {
+        // Test that HTML responses are handled gracefully
+        String htmlResponse = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>404 Not Found</title>
+        </head>
+        <body>
+            <h1>404 Not Found</h1>
+            <p>The requested resource was not found.</p>
+        </body>
+        </html>
+        """;
+        
+        KnabenSearchPerformer performer = new KnabenSearchPerformer(1, "ubuntu", 10000);
+        
+        try {
+            Method parseMethod = KnabenSearchPerformer.class.getDeclaredMethod("parseJsonResponse", String.class);
+            parseMethod.setAccessible(true);
+            
+            // This should throw an exception for HTML content
+            Exception exception = assertThrows(Exception.class, () -> {
+                parseMethod.invoke(performer, htmlResponse);
+            });
+            
+            // The exception should contain a helpful message about HTML being returned
+            assertTrue(exception.getCause().getMessage().contains("HTML instead of JSON"));
+            
+            LOG.info("HTML error handling test passed successfully");
+            
+        } catch (Exception e) {
+            LOG.error("HTML error handling test failed", e);
+            fail("HTML error handling test failed: " + e.getMessage());
+        }
+    }
 }
