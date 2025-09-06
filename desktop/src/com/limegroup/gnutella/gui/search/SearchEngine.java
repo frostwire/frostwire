@@ -24,6 +24,7 @@ import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
+import com.frostwire.search.knaben.KnabenSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
@@ -76,7 +77,8 @@ public abstract class SearchEngine {
         GLOTORRENTS_ID,
         TELLURIDE_ID,
         YT_ID,
-        TORRENTSCSV_ID
+        TORRENTSCSV_ID,
+        KNABEN_ID
     }
 
     private static final SearchEngine BT_DIGG = new SearchEngine(SearchEngineID.BT_DIGG, "BTDigg", SearchEnginesSettings.BT_DIGG_SEARCH_ENABLED, "btdig.com") {
@@ -205,6 +207,13 @@ public abstract class SearchEngine {
         }
     };
 
+    private static final SearchEngine KNABEN = new SearchEngine(SearchEngineID.KNABEN_ID, "Knaben", SearchEnginesSettings.KNABEN_SEARCH_ENABLED, "knaben.org") {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new KnabenSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     private final SearchEngineID _id;
     private final String _name;
     private final BooleanSetting _setting;
@@ -234,6 +243,7 @@ public abstract class SearchEngine {
                 ARCHIVEORG,
                 GLOTORRENTS,
                 IDOPE,
+                KNABEN,
                 LIMETORRENTS,
                 MAGNETDL,
                 NYAA,
