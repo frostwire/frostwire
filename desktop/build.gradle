@@ -46,6 +46,24 @@ application {
             '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
             '-Ddebug=1'
     ]
+
+    def flight_recorder = false
+
+    if (flight_recorder) {
+        applicationDefaultJvmArgs.add('-XX:StartFlightRecording=' +
+                'name=FW-Startup,' +
+                'settings=profile,' +                 // higher-detail preset
+                'delay=1s,' +
+                'disk=true,' +
+                'dumponexit=true,' +
+                'maxage=10m,' +                       // keep last 10 minutes
+                'maxsize=256m,' +                     // cap file size
+                'filename=build/frostwire-startup.jfr')
+       // To open the .jfr file with all the recorded data you need JDK Mission Control
+       // $ brew install --cask jdk-mission-control
+       // $ open -a "JDK Mission Control" build/frostwire-startup.jfr
+    }
+
     if (OperatingSystem.current().isMacOsX()) {
         applicationDefaultJvmArgs += ['--add-exports=java.desktop/com.apple.laf=ALL-UNNAMED', '-Dsun.java2d.metal=true']
     }
