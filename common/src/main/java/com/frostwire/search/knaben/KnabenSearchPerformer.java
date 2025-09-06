@@ -27,12 +27,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Search performer for Knaben Database (knaben.org)
+ * 
+ * This implementation uses POST requests to the Knaben API as required by their specification.
+ * The API endpoint is: https://knaben.org/api/v1/search (POST only)
  * 
  * Note: The knaben.org domain and API may not be available or accessible.
  * This search performer is disabled by default and should only be enabled
@@ -49,10 +55,33 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        // Knaben API v1 search endpoint
+        // Knaben API v1 search endpoint (requires POST request)
         // Note: This domain may be unreachable or the API may not exist
         // The search performer is disabled by default in SearchEnginesSettings
-        return "https://" + getDomainName() + "/api/v1/search?q=" + encodedKeywords + "&limit=50";
+        return "https://" + getDomainName() + "/api/v1/search";
+    }
+
+    @Override
+    protected String fetchSearchPage(String url) throws IOException {
+        // The Knaben API requires POST requests, not GET requests
+        // Prepare the form data for the POST request
+        Map<String, String> formData = new HashMap<>();
+        formData.put("q", getKeywordsString()); // Use original keywords, not encoded
+        formData.put("limit", "50");
+        
+        LOG.info("Making POST request to Knaben API: " + url);
+        LOG.info("POST data: q=" + getKeywordsString() + ", limit=50");
+        
+        // Use the post method from WebSearchPerformer
+        String response = post(url, formData);
+        
+        if (response == null) {
+            LOG.warn("POST request to Knaben API returned null response");
+            return "";
+        }
+        
+        LOG.info("Knaben API POST response length: " + response.length() + " characters");
+        return response;
     }
 
     @Override
@@ -75,6 +104,7 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
             preview.toLowerCase().contains("500 internal server") ||
             preview.toLowerCase().contains("service unavailable")) {
             LOG.error("Knaben API returned an HTML error page instead of JSON. The API endpoint may not exist or the service may be down.");
+            LOG.error("This search performer uses POST requests to the API. Ensure the API supports the expected POST format.");
             LOG.error("This search performer is disabled by default. Enable it only if you know the API is working.");
             return Collections.emptyList();
         }
@@ -98,9 +128,9 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         // Check if the response looks like HTML instead of JSON
         if (jsonPage != null && jsonPage.trim().toLowerCase().startsWith("<!doctype") || 
             (jsonPage != null && jsonPage.trim().toLowerCase().startsWith("<html"))) {
-            LOG.error("Received HTML response instead of JSON from Knaben API. This suggests the API endpoint is incorrect or the service is down.");
+            LOG.error("Received HTML response instead of JSON from Knaben API POST request. This suggests the API endpoint is incorrect or the service is down.");
             LOG.error("Response preview: " + jsonPage.substring(0, Math.min(500, jsonPage.length())));
-            throw new Exception("API returned HTML instead of JSON - service may be unavailable");
+            throw new Exception("API returned HTML instead of JSON - service may be unavailable or POST request format may be incorrect");
         }
         
         // Check for empty or invalid response
