@@ -33,6 +33,11 @@ import java.util.List;
 
 /**
  * Search performer for Knaben Database (knaben.org)
+ * 
+ * Note: The knaben.org domain and API may not be available or accessible.
+ * This search performer is disabled by default and should only be enabled
+ * if you have confirmed that the API is working and accessible.
+ * 
  * @author gubatron
  */
 public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
@@ -45,19 +50,40 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
         // Knaben API v1 search endpoint
+        // Note: This domain may be unreachable or the API may not exist
+        // The search performer is disabled by default in SearchEnginesSettings
         return "https://" + getDomainName() + "/api/v1/search?q=" + encodedKeywords + "&limit=50";
     }
 
     @Override
     protected List<? extends KnabenSearchResult> searchPage(String page) {
         if (StringUtils.isNullOrEmpty(page)) {
+            LOG.warn("Received empty page response from Knaben API - this may indicate the domain is unreachable or the API is down");
+            return Collections.emptyList();
+        }
+
+        // Debug logging to understand what we're receiving
+        LOG.info("Knaben API response length: " + page.length() + " characters");
+        String preview = page.substring(0, Math.min(100, page.length())).trim();
+        LOG.info("Response starts with: " + preview);
+        
+        // Check if this looks like an error page or HTML instead of JSON
+        if (preview.toLowerCase().startsWith("<!doctype") || 
+            preview.toLowerCase().startsWith("<html") ||
+            preview.toLowerCase().contains("<title>") ||
+            preview.toLowerCase().contains("404 not found") ||
+            preview.toLowerCase().contains("500 internal server") ||
+            preview.toLowerCase().contains("service unavailable")) {
+            LOG.error("Knaben API returned an HTML error page instead of JSON. The API endpoint may not exist or the service may be down.");
+            LOG.error("This search performer is disabled by default. Enable it only if you know the API is working.");
             return Collections.emptyList();
         }
 
         try {
             return parseJsonResponse(page);
         } catch (Exception e) {
-            LOG.error("Failed to parse Knaben API response", e);
+            LOG.error("Failed to parse Knaben API response: " + e.getMessage(), e);
+            LOG.error("If you're seeing JSON parsing errors, the knaben.org API may not be available or may have changed.");
             return Collections.emptyList();
         }
     }
@@ -65,7 +91,32 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
     private List<KnabenSearchResult> parseJsonResponse(String jsonPage) throws Exception {
         List<KnabenSearchResult> results = new ArrayList<>();
         
-        JsonElement root = JsonParser.parseString(jsonPage);
+        // Debug logging to see what we're actually receiving
+        System.out.println("KnabenSearchPerformer.parseJsonResponse(jsonPage=" + 
+            (jsonPage != null ? jsonPage.substring(0, Math.min(200, jsonPage.length())) : "null") + "...)");
+        
+        // Check if the response looks like HTML instead of JSON
+        if (jsonPage != null && jsonPage.trim().toLowerCase().startsWith("<!doctype") || 
+            (jsonPage != null && jsonPage.trim().toLowerCase().startsWith("<html"))) {
+            LOG.error("Received HTML response instead of JSON from Knaben API. This suggests the API endpoint is incorrect or the service is down.");
+            LOG.error("Response preview: " + jsonPage.substring(0, Math.min(500, jsonPage.length())));
+            throw new Exception("API returned HTML instead of JSON - service may be unavailable");
+        }
+        
+        // Check for empty or invalid response
+        if (StringUtils.isNullOrEmpty(jsonPage) || jsonPage.trim().isEmpty()) {
+            throw new Exception("Empty response from Knaben API");
+        }
+        
+        JsonElement root;
+        try {
+            root = JsonParser.parseString(jsonPage);
+        } catch (Exception e) {
+            LOG.error("Failed to parse JSON response from Knaben API", e);
+            LOG.error("Response content: " + (jsonPage.length() > 1000 ? jsonPage.substring(0, 1000) + "..." : jsonPage));
+            throw new Exception("Invalid JSON response from API: " + e.getMessage());
+        }
+        
         JsonArray torrents = findJsonArrayInResponse(root);
         
         if (torrents == null) {
