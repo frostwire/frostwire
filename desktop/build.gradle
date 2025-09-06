@@ -275,7 +275,6 @@ tasks.register('gettextBundle') {
 gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
 
-
 tasks.register('runWithJSig', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = application.mainClass
