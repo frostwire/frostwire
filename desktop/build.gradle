@@ -235,6 +235,20 @@ tasks.register('gettextBundle') {
 gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
 
+tasks.register('runWithJSig', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = application.mainClass
+    jvmArgs = application.applicationDefaultJvmArgs
+
+    if (OperatingSystem.current().isMacOsX()) {
+        def jsigPath = new File(System.getenv('JAVA_HOME'), 'lib/libjsig.dylib').absolutePath
+        environment 'DYLD_INSERT_LIBRARIES', jsigPath
+    } else if (OperatingSystem.current().isLinux()) {
+        def jsigPath = new File(System.getenv('JAVA_HOME'), 'lib/libjsig.so').absolutePath
+        environment 'LD_PRELOAD', jsigPath
+    }
+}
+
 test {
     failFast = false
     enabled = gradle.startParameter.taskNames.contains("test")
