@@ -4,8 +4,9 @@ frostwire (6.14.1) stable; urgency=high
  * New: Settings panel to pick location for .torrent files
  * Crash: Fix NPE in MultilineToolTip.updateUI() when switching from Synth L&F
  * Fixed Archive.org search
+ * New: Strict EDT Mode to catch long running tasks stalling event dispatch thread
 
- -- FrostWire Team <contact@frostwire.com>  Thu, 4 Sep 2025 20:24:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sat, 6 Sep 2025 09:24:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
