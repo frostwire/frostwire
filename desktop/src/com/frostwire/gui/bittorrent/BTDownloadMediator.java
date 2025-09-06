@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class acts as a mediator between all of the components of the
@@ -98,6 +99,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     private TransfersFilter transfersFilter;
     private Action sendToItunesAction;
     private PlaySingleMediaFileAction playSingleMediaFileAction;
+
+    // coalesce selection updates; only last result applies
+    private final AtomicInteger selectionSeq = new AtomicInteger();
 
     /**
      * Constructs all of the elements of the download window, including
@@ -441,10 +445,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Handles a double-click event in the table.
      */
     public void handleActionKey() {
-        BTDownload[] selectedDownloaders = getSelectedDownloaders();
-        if (selectedDownloaders.length == 1) {
-            playSingleMediaFileAction.setEnabled(selectionHasMediaFiles(selectedDownloaders[0]));
-        }
         if (playSingleMediaFileAction.isEnabled()) {
             playSingleMediaFileAction.actionPerformed(null);
         }
@@ -514,6 +514,48 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     /**
+     * Computes "has media?" flags off the EDT and updates UI if this selection is still current.
+     */
+    private void updateMediaUIAsync(BTDownload dl, boolean isTransferFinished) {
+        final int seq = selectionSeq.incrementAndGet();
+        final File saveLocation = dl.getSaveLocation();
+
+        LibraryUtils.getExecutor().submit(() -> {
+            boolean isSingleFile = saveLocation != null && saveLocation.isFile();
+            boolean hasMediaFiles = false;
+            boolean hasMP4s = false;
+
+            try {
+                if (dl instanceof SoundcloudDownload) {
+                    hasMediaFiles = true;
+                } else if (saveLocation != null) {
+                    if (saveLocation.isFile()) {
+                        hasMediaFiles = MediaPlayer.isPlayableFile(saveLocation);
+                        hasMP4s = org.limewire.util.FileUtils.hasExtension(saveLocation.getAbsolutePath(), "mp4");
+                    } else if (saveLocation.isDirectory()) {
+                        // directory scans are off-EDT here
+                        hasMediaFiles = LibraryUtils.directoryContainsPlayableExtensions(saveLocation);
+                        hasMP4s = LibraryUtils.directoryContainsExtension(saveLocation, "mp4");
+                    }
+                }
+            } catch (Throwable t) {
+                // swallow and leave defaults (disabled)
+            }
+
+            final boolean fHasMediaFiles = hasMediaFiles;
+            final boolean fHasMP4s = hasMP4s;
+            final boolean fIsSingleFile = isSingleFile;
+
+            GUIMediator.safeInvokeLater(() -> {
+                // Drop stale results if selection changed again
+                if (seq != selectionSeq.get()) return;
+                sendToItunesAction.setEnabled(isTransferFinished && (fHasMediaFiles || fHasMP4s));
+                playSingleMediaFileAction.setEnabled(getSelectedDownloaders().length == 1 && fHasMediaFiles && fIsSingleFile);
+            });
+        });
+    }
+
+    /**
      * Handles the deselection of all rows in the download table,
      * disabling all necessary buttons and menu items.
      */
@@ -544,15 +586,20 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * @param row the selected row
      */
     public void handleSelection(int row) {
+        // Avoid doing heavy work while selection is still adjusting
+        if (TABLE.getSelectionModel().getValueIsAdjusting()) {
+            return;
+        }
         BTDownloadDataLine dataLine = DATA_MODEL.get(row);
         BTDownload dl = dataLine.getInitializeObject();
         boolean pausable = dl.isPausable();
         boolean resumable = dl.isResumable();
         boolean isTransferFinished = dl.isCompleted();
-        File saveLocation = dl.getSaveLocation();
-        boolean hasMediaFiles = selectionHasMediaFiles(dataLine.getInitializeObject());
-        boolean hasMP4s = selectionHasMP4s(saveLocation);
-        boolean isSingleFile = selectionIsSingleFile(saveLocation);
+
+        // Defer expensive filesystem checks off-EDT; pessimistic UI for now
+        playSingleMediaFileAction.setEnabled(false);
+        sendToItunesAction.setEnabled(false);
+
         removeAction.putValue(Action.NAME, I18n.tr("Cancel Download"));
         removeAction.putValue(LimeAction.SHORT_NAME, I18n.tr("Cancel"));
         removeAction.putValue(Action.SHORT_DESCRIPTION, I18n.tr("Cancel Selected Downloads"));
@@ -564,9 +611,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         pauseAction.setEnabled(pausable);
         copyMagnetAction.setEnabled(!isHttpTransfer(dl));
         copyHashAction.setEnabled(!isHttpTransfer(dl));
-        sendToItunesAction.setEnabled(isTransferFinished && (hasMediaFiles || hasMP4s));
+
         shareTorrentAction.setEnabled(getSelectedDownloaders().length == 1 && dl.isPausable());
-        playSingleMediaFileAction.setEnabled(getSelectedDownloaders().length == 1 && hasMediaFiles && isSingleFile);
+        // Compute media flags asynchronously and update actions when ready
+        updateMediaUIAsync(dl, isTransferFinished);
+
         removeYouTubeAction.setEnabled(isHttpTransfer(dl));
         BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(!isHttpTransfer(dl));
         BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(!isHttpTransfer(dl));

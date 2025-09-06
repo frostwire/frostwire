@@ -44,6 +44,7 @@ application {
             '-Dcom.sun.management.jmxremote.authenticate=false',
             '-Djava.rmi.server.hostname=127.0.0.1',
             '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
+            '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
             '-Ddebug=1'
     ]
 

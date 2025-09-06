@@ -28,6 +28,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.FileUtils;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
@@ -43,6 +44,9 @@ public class LibraryUtils {
     @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger(LibraryUtils.class);
     private static final ExecutorService executor;
+
+    // Zero behavior change unless you start with -Dfw.debug.assertNoEdtIO=true
+    private static final boolean ASSERT_NO_EDT_IO = Boolean.getBoolean("fw.debug.assertNoEdtIO");
 
     static {
         executor = ExecutorsHelper.newProcessingQueue("LibraryUtils-Executor");
@@ -93,8 +97,7 @@ public class LibraryUtils {
     }
 
     public static boolean directoryContainsPlayableExtensions(File directory) {
-        Set<File> ignore = TorrentUtil.getIgnorableFiles();
-        return directoryContainsExtension(directory, 4, ignore, MediaPlayer.getPlayableExtensions());
+        return directoryContainsAudio(directory);
     }
 
     public static boolean directoryContainsASinglePlayableFile(File directory) {
@@ -109,6 +112,10 @@ public class LibraryUtils {
 
     @SuppressWarnings("SameParameterValue")
     public static boolean directoryContainsExtension(File directory, String extensionWithoutDot) {
+        // Optional safety net to prevent future EDT misuse (off by default)
+        if (ASSERT_NO_EDT_IO && SwingUtilities.isEventDispatchThread()) {
+            throw new IllegalStateException("directoryContainsExtension called on EDT");
+        }
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
         return directoryContainsExtension(directory, 4, ignore, extensionWithoutDot);
     }
