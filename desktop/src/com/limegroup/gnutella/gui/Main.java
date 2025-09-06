@@ -48,6 +48,7 @@ public class Main {
      */
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
+        com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(1000)); //// fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
         ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
