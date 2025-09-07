@@ -1,8 +1,10 @@
 /*
  * Created on Mar 9, 2010
  * Created by Paul Gardner
+ * Hacked by Angel Leon
  *
  * Copyright 2010 Vuze, Inc.  All rights reserved.
+ * Copyright 2010 FrostWire, LLC. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
