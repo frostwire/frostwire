@@ -1,5 +1,5 @@
 /*
- * File    : ViewUtils.java
+ * File    : BTDownloadMediatorAdvancedMenuFactory.java
  * Created : 24-Oct-2003
  * By      : parg
  *
@@ -34,19 +34,40 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
 import net.miginfocom.swing.MigLayout;
-import org.gudy.azureus2.core3.util.DisplayFormatters;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 final class BTDownloadMediatorAdvancedMenuFactory {
     private static final Logger LOG = Logger.getLogger(BTDownloadMediatorAdvancedMenuFactory.class);
+
+    // Units and precision for formatting byte counts
+    private static final String[] UNITS_RATE = {"B/s", "kB/s", "MB/s", "GB/s", "TB/s"};
+    private static final int[] UNITS_PRECISION = {0, 1, 2, 2, 3};
+    private static final int UNITS_STOP_AT = 4; // TB
+
+    // Format byte count to human-readable string (e.g., "123.45 kB/s")
+    private static String formatByteCountToKiBEtcPerSec(long n) {
+        double value = n;
+        int unitIndex = 0;
+        while (value >= 1000 && unitIndex < UNITS_STOP_AT) {
+            value /= 1000;
+            unitIndex++;
+        }
+        int precision = UNITS_PRECISION[unitIndex];
+        DecimalFormat df = new DecimalFormat();
+        df.setGroupingUsed(false); // No commas
+        df.setMinimumFractionDigits(precision);
+        df.setMaximumFractionDigits(precision);
+        return df.format(value) + " " + UNITS_RATE[unitIndex];
+    }
 
     static SkinMenu createAdvancedSubMenu() {
         final com.frostwire.bittorrent.BTDownload[] dms = getSingleSelectedDownloadManagers();
@@ -172,7 +193,6 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         itemCurrentDownSpeed.setEnabled(false);
         StringBuilder speedText = new StringBuilder();
         String separator = "";
-        //itemDownSpeed.                   
         if (downSpeedDisabled) {
             speedText.append(I18n.tr("Disabled"));
             separator = " / ";
@@ -184,7 +204,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
         if (totalDownSpeed > 0) {
             speedText.append(separator);
-            speedText.append(DisplayFormatters.formatByteCountToKiBEtcPerSec(totalDownSpeed));
+            speedText.append(formatByteCountToKiBEtcPerSec(totalDownSpeed));
         }
         itemCurrentDownSpeed.setText(speedText.toString());
         menuDownSpeed.add(itemCurrentDownSpeed);
@@ -215,19 +235,18 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             itemsDownSpeed[i].addActionListener(itemsDownSpeedListener);
             // dms.length has to be > 0 when hasSelection
             int limit = (int) (maxDownload / (10 * num_entries) * (menuEntries - i));
-            itemsDownSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec((long) limit * num_entries));
+            itemsDownSpeed[i].setText(formatByteCountToKiBEtcPerSec((long) limit * num_entries));
             itemsDownSpeed[i].putClientProperty("maxdl", limit);
             menuDownSpeed.add(itemsDownSpeed[i]);
         }
 
-        // advanced >Upload Speed Menu //
+        // advanced > Upload Speed Menu //
         final SkinMenu menuUpSpeed = new SkinMenu(I18n.tr("Set Up Speed"));
         menuAdvanced.add(menuUpSpeed);
         final SkinMenuItem itemCurrentUpSpeed = new SkinMenuItem();
         itemCurrentUpSpeed.setEnabled(false);
         separator = "";
         speedText = new StringBuilder();
-        //itemUpSpeed.                   
         if (upSpeedDisabled) {
             speedText.append(I18n.tr("Disabled"));
             separator = " / ";
@@ -239,11 +258,10 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
         if (totalUpSpeed > 0) {
             speedText.append(separator);
-            speedText.append(DisplayFormatters.formatByteCountToKiBEtcPerSec(totalUpSpeed));
+            speedText.append(formatByteCountToKiBEtcPerSec(totalUpSpeed));
         }
         itemCurrentUpSpeed.setText(speedText.toString());
         menuUpSpeed.add(itemCurrentUpSpeed);
-        // ---
         menuUpSpeed.addSeparator();
         final SkinMenuItem[] itemsUpSpeed = new SkinMenuItem[menuEntries];
         ActionListener itemsUpSpeedListener = e -> {
@@ -272,7 +290,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
             itemsUpSpeed[i] = new SkinMenuItem();
             itemsUpSpeed[i].addActionListener(itemsUpSpeedListener);
             int limit = (int) (maxUpload / (10 * num_entries) * (menuEntries - i));
-            itemsUpSpeed[i].setText(DisplayFormatters.formatByteCountToKiBEtcPerSec((long) limit * num_entries));
+            itemsUpSpeed[i].setText(formatByteCountToKiBEtcPerSec((long) limit * num_entries));
             itemsUpSpeed[i].putClientProperty("maxul", limit);
             menuUpSpeed.add(itemsUpSpeed[i]);
         }
