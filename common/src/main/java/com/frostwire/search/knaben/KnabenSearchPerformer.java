@@ -62,10 +62,22 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
     @Override
     protected String fetchSearchPage(String url) throws IOException {
         // The Knaben API requires POST requests with JSON data
-        // Prepare the JSON data for the POST request
+        // Prepare the JSON data with correct parameters according to API documentation
+        String escapedQuery = getKeywordsString().replace("\"", "\\\""); // Escape quotes in search query
         String jsonData = String.format(
-            "{\"q\":\"%s\",\"search_type\":\"score\",\"limit\":50}",
-            getKeywordsString().replace("\"", "\\\"") // Escape quotes in search query
+            "{" +
+            "\"query\":\"%s\"," +
+            "\"search_type\":\"100%%\"," +
+            "\"search_field\":\"title\"," +
+            "\"order_by\":\"peers\"," +
+            "\"order_direction\":\"desc\"," +
+            "\"from\":0," +
+            "\"size\":50," +
+            "\"hide_unsafe\":true," +
+            "\"hide_xxx\":true," +
+            "\"seconds_since_last_seen\":86400" +
+            "}",
+            escapedQuery
         );
         
         LOG.info("Making POST request to Knaben API: " + url);
