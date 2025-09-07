@@ -94,6 +94,15 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         }
     }
 
+    public String postJson(String url, String jsonContent) {
+        try {
+            return client.post(url, timeout, DEFAULT_USER_AGENT, jsonContent, "application/json", false);
+        } catch (IOException throwable) {
+            LOG.error(throwable.getMessage(), throwable);
+            return null;
+        }
+    }
+
     /**
      * Allow to perform the HTTP operation using the same internal http client.
      *

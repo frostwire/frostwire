@@ -30,9 +30,7 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Search performer for Knaben Database (knaben.org)
@@ -63,18 +61,18 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
 
     @Override
     protected String fetchSearchPage(String url) throws IOException {
-        // The Knaben API requires POST requests, not GET requests
-        // Prepare the form data for the POST request
-        Map<String, String> formData = new HashMap<>();
-        formData.put("query", getKeywordsString()); // Search query
-        formData.put("search_type", "score"); // Use score-based search as mentioned in documentation
-        formData.put("limit", "50"); // Limit results to 50
+        // The Knaben API requires POST requests with JSON data
+        // Prepare the JSON data for the POST request
+        String jsonData = String.format(
+            "{\"q\":\"%s\",\"search_type\":\"score\",\"limit\":50}",
+            getKeywordsString().replace("\"", "\\\"") // Escape quotes in search query
+        );
         
         LOG.info("Making POST request to Knaben API: " + url);
-        LOG.info("POST data: query=" + getKeywordsString() + ", search_type=score, limit=50");
+        LOG.info("POST JSON data: " + jsonData);
         
-        // Use the post method from WebSearchPerformer
-        String response = post(url, formData);
+        // Use the postJson method from WebSearchPerformer
+        String response = postJson(url, jsonData);
         
         if (response == null) {
             LOG.warn("POST request to Knaben API returned null response");
