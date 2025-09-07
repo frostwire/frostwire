@@ -66,19 +66,19 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         // The Knaben API requires POST requests, not GET requests
         // Prepare the form data for the POST request
         Map<String, String> formData = new HashMap<>();
-        formData.put("q", getKeywordsString()); // Search query
+        formData.put("query", getKeywordsString()); // Search query
         formData.put("search_type", "score"); // Use score-based search as mentioned in documentation
         formData.put("limit", "50"); // Limit results to 50
         
         LOG.info("Making POST request to Knaben API: " + url);
-        LOG.info("POST data: q=" + getKeywordsString() + ", search_type=score, limit=50");
+        LOG.info("POST data: query=" + getKeywordsString() + ", search_type=score, limit=50");
         
         // Use the post method from WebSearchPerformer
         String response = post(url, formData);
         
         if (response == null) {
             LOG.warn("POST request to Knaben API returned null response");
-            return "";
+            return null;
         }
         
         LOG.info("Knaben API POST response length: " + response.length() + " characters");
