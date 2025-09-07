@@ -1,5 +1,6 @@
 frostwire (6.14.1) stable; urgency=high
  * New TorrentCSV search performer
+ * New Knaben Database Search Performer
  * MacEventHandler is now compatible with JDK 23 and JDK 24
  * New: settings panel to pick location for .torrent files
  * Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
@@ -8,7 +9,7 @@ frostwire (6.14.1) stable; urgency=high
  * EDT freeze: moved media checks off EDT; coalesce selection; add EDT I/O guard
  * Cleanup: removed all remnants of azureus source code
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 7 Sep 2025 12:12:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Sun, 7 Sep 2025 12:29:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
