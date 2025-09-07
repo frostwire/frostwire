@@ -119,6 +119,7 @@ public final class Ssl {
                 "igcdn.com",
                 "igsonar.com",
                 "instagram.com",
+                "knaben.org",
                 "magnetdl.com",
                 "nyaa.si",
                 "pirate-bay.info",

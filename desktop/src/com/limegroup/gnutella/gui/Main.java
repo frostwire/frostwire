@@ -49,7 +49,12 @@ public class Main {
      */
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
-        if (CommonUtils.isDebugMode()) {
+
+        // check if there's a step debugger attached
+        boolean isDebugging = java.lang.management.ManagementFactory.getRuntimeMXBean().
+                getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
+
+        if (CommonUtils.isDebugMode() && !isDebugging) {
             // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
             System.out.println("FrostWire is running in DEVELOPMENT environment.");
             com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(1000));
