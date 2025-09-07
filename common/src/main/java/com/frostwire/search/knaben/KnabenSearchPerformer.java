@@ -231,8 +231,8 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         }
         
         if (root.isJsonObject()) {
-            // Try common field names for torrent results
-            String[] arrayFieldNames = {"torrents", "results", "data", "items", "response"};
+            // Try common field names for torrent results, including "hits" for Knaben API
+            String[] arrayFieldNames = {"hits", "torrents", "results", "data", "items", "response"};
             for (String fieldName : arrayFieldNames) {
                 if (root.getAsJsonObject().has(fieldName) && root.getAsJsonObject().get(fieldName).isJsonArray()) {
                     return root.getAsJsonObject().getAsJsonArray(fieldName);
@@ -302,6 +302,7 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         // Details URL field variations
         public String details_url;
         public String detailsUrl;
+        public String details;
         public String url;
         
         // Size field variations
@@ -345,6 +346,7 @@ public class KnabenSearchPerformer extends SimpleTorrentSearchPerformer {
         public String getDetailsUrl() {
             if (!StringUtils.isNullOrEmpty(details_url)) return details_url;
             if (!StringUtils.isNullOrEmpty(detailsUrl)) return detailsUrl;
+            if (!StringUtils.isNullOrEmpty(details)) return details;
             if (!StringUtils.isNullOrEmpty(url)) return url;
             return "";
         }

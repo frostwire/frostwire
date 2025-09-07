@@ -136,6 +136,54 @@ public class KnabenSearchPerformerUnitTest {
     }
     
     @Test
+    public void testActualKnabenApiFormat() {
+        // Test with the actual format returned by Knaben API (hits array)
+        String sampleJson = """
+        {
+            "hits": [
+                {
+                    "bytes": 328613232,
+                    "cachedOrigin": "The Pirate Bay (proxy)",
+                    "category": "XXX",
+                    "categoryId": [5000000],
+                    "date": "2019-09-01T22:00:00+00:00",
+                    "details": "https://knaben.xyz/thepiratebay/description.php?id=123456",
+                    "name": "Sample Torrent File",
+                    "infohash": "1234567890abcdef1234567890abcdef12345678",
+                    "seeds": 42
+                }
+            ]
+        }
+        """;
+        
+        KnabenSearchPerformer performer = new KnabenSearchPerformer(1, "test", 10000);
+        
+        try {
+            Method parseMethod = KnabenSearchPerformer.class.getDeclaredMethod("parseJsonResponse", String.class);
+            parseMethod.setAccessible(true);
+            
+            @SuppressWarnings("unchecked")
+            List<KnabenSearchResult> results = (List<KnabenSearchResult>) parseMethod.invoke(performer, sampleJson);
+            
+            assertNotNull(results);
+            assertEquals(1, results.size());
+            
+            KnabenSearchResult result = results.get(0);
+            assertEquals("Sample Torrent File", result.getDisplayName());
+            assertEquals("1234567890abcdef1234567890abcdef12345678", result.getHash());
+            assertEquals(328613232L, result.getSize());
+            assertEquals(42, result.getSeeds());
+            assertTrue(result.getDetailsUrl().contains("knaben.xyz"));
+            
+            LOG.info("Actual Knaben API format test passed successfully");
+            
+        } catch (Exception e) {
+            LOG.error("Actual Knaben API format test failed", e);
+            fail("Actual Knaben API format test failed: " + e.getMessage());
+        }
+    }
+    
+    @Test
     public void testHtmlErrorHandling() {
         // Test that HTML responses are handled gracefully
         String htmlResponse = """
