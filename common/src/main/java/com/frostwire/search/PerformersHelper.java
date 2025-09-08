@@ -327,7 +327,7 @@ public final class PerformersHelper {
 
     public static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
         int count = 0;
-        if (normalizedResult != null && normalizedResult.isEmpty()) {
+        if (normalizedResult != null && !normalizedResult.isEmpty()) {
             for (String token : searchTokens) {
                 if (normalizedResult.contains(token)) {
                     count++;
