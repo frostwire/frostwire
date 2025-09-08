@@ -211,8 +211,12 @@ public final class PerformersHelper {
         str = StringUtils.fromHtml(str);
         
         // Replace specific patterns first (more efficient than regex)
+        // Note: These replacements must match the original regex behavior exactly
         str = str.replace(".torrent", " ");
-        str = str.replace("www.", " ");
+        
+        // Handle www. pattern (must be followed by a dot)
+        str = str.replaceAll("www\\.", " ");
+        
         str = str.replace(".com", " ");
         str = str.replace(".net", " ");
         
