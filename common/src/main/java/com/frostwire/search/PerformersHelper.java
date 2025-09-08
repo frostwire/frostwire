@@ -209,8 +209,58 @@ public final class PerformersHelper {
 
     private static String sanitize(String str) {
         str = StringUtils.fromHtml(str);
-        //noinspection RegExpRedundantEscape
-        str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
+        
+        // Replace specific patterns first (more efficient than regex)
+        str = str.replace(".torrent", " ");
+        str = str.replace("www.", " ");
+        str = str.replace(".com", " ");
+        str = str.replace(".net", " ");
+        
+        // Replace problem characters efficiently without regex
+        char[] chars = str.toCharArray();
+        StringBuilder sb = new StringBuilder(chars.length);
+        
+        for (char c : chars) {
+            switch (c) {
+                case '\\':
+                case '/':
+                case '%':
+                case '_':
+                case ';':
+                case '-':
+                case '.':
+                case '(':
+                case ')':
+                case '[':
+                case ']':
+                case '\n':
+                case '\r':
+                case 'Ð':
+                case '&':
+                case '~':
+                case '{':
+                case '}':
+                case '*':
+                case '@':
+                case '^':
+                case '\'':
+                case '=':
+                case '!':
+                case ',':
+                case '¡':
+                case '|':
+                case '#':
+                case 'À':
+                case 'Á':
+                    sb.append(' ');
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
+        
+        str = sb.toString();
         str = StringUtils.removeDoubleSpaces(str);
         return str.trim();
     }
