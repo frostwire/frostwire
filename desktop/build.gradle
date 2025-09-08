@@ -98,7 +98,7 @@ dependencies {
     if (os.isWindows()) {
         implementation "com.frostwire:jlibtorrent-windows:${jlibtorrent_version}"
     } else if (os.isLinux()) {
-        implementation "com.frostwire:jlibtorrent-linux64:${jlibtorrent_version}"
+        implementation "com.frostwire:jlibtorrent-linux:${jlibtorrent_version}"
     } else if (os.isMacOsX()) {
         // if it's arm mac
         if (is_arm64) {
