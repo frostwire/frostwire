@@ -8,8 +8,9 @@ frostwire (6.14.1) stable; urgency=high
  * New: Strict EDT Mode to catch long running tasks stalling event dispatch thread
  * EDT freeze: moved media checks off EDT; coalesce selection; add EDT I/O guard
  * Cleanup: removed all remnants of azureus source code
+ * New FlatLaf light theme
 
- -- FrostWire Team <contact@frostwire.com>  Sun, 7 Sep 2025 12:29:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 8 Sep 2025 16:32:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
