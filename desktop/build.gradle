@@ -33,42 +33,36 @@ compileJava {
 
 application {
     mainClass = 'com.limegroup.gnutella.gui.Main'
-    applicationDefaultJvmArgs = [
-            '-Djava.library.path=lib/native',
-            '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
-            '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
-            '--enable-native-access=ALL-UNNAMED',
-            '-Xms64m',
-            '-Xmx512m',
-            //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
-            //'-Xss768k', // 768k stack (development)
-            '-Xss256k', // 256k stack (production)
-	    '-Xcheck:jni',
-            '-Dcom.sun.management.jmxremote.port=9595',
-            '-Dcom.sun.management.jmxremote.ssl=false',
-            '-Dcom.sun.management.jmxremote.authenticate=false',
-            '-Djava.rmi.server.hostname=127.0.0.1',
-            '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
-            '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
-            '-Ddebug=1',
-//            '-XX:NativeMemoryTracking=detail',
+    applicationDefaultJvmArgs = ['-Djava.library.path=lib/native',
+                                 '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
+                                 '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
+                                 '--enable-native-access=ALL-UNNAMED',
+                                 '-Xms64m',
+                                 '-Xmx512m',
+                                 //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
+                                 //'-Xss768k', // 768k stack (development)
+                                 '-Xss256k', // 256k stack (production)
+                                 '-Xcheck:jni',
+                                 '-Dcom.sun.management.jmxremote.port=9595',
+                                 '-Dcom.sun.management.jmxremote.ssl=false',
+                                 '-Dcom.sun.management.jmxremote.authenticate=false',
+                                 '-Djava.rmi.server.hostname=127.0.0.1',
+                                 '-agentlib:jdwp=transport=dt_socket,address=9696,server=y,suspend=n',
+                                 '-Dfw.debug.assertNoEdtIO=true', // only in development mode, see LibraryUtils for usage (Boolean.getBoolean("fw.debug.assertNoEdtIO"))
+                                 '-Ddebug=1',
+//'-XX:NativeMemoryTracking=detail',
     ]
 
     def flight_recorder = false
 
     if (flight_recorder) {
-        applicationDefaultJvmArgs.add('-XX:StartFlightRecording=' +
-                'name=FW-Startup,' +
-                'settings=profile,' +                 // higher-detail preset
-                'delay=1s,' +
-                'disk=true,' +
-                'dumponexit=true,' +
-                'maxage=10m,' +                       // keep last 10 minutes
+        applicationDefaultJvmArgs.add('-XX:StartFlightRecording=name=FW-Startup,' + 'settings=profile,' + // higher-detail preset
+                'delay=1s,' + 'disk=true,' + 'dumponexit=true,' + 'maxage=10m,' +                       // keep last 10 minutes
                 'maxsize=256m,' +                     // cap file size
                 'filename=build/frostwire-startup.jfr')
-       // To open the .jfr file with all the recorded data you need JDK Mission Control
-       // $ brew install --cask jdk-mission-control
-       // $ open -a "JDK Mission Control" build/frostwire-startup.jfr
+        // To open the .jfr file with all the recorded data you need JDK Mission Control
+        // $ brew install --cask jdk-mission-control
+        // $ open -a "JDK Mission Control" build/frostwire-startup.jfr
     }
 
     if (OperatingSystem.current().isMacOsX()) {
