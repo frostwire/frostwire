@@ -17,6 +17,7 @@
 
 package com.frostwire.android.gui.services;
 
+import static com.frostwire.android.util.SystemUtils.ensureBackgroundThreadOrCrash;
 import static com.frostwire.android.util.SystemUtils.postToHandler;
 
 import android.content.BroadcastReceiver;
@@ -113,6 +114,7 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void handleDisconnectedNetwork(NetworkInfo networkInfo) {
+        ensureBackgroundThreadOrCrash("EngineBroadcastReceiver.handleDisconnectedNetwork must be called from a background thread");
         LOG.info("Disconnected from network (" + networkInfo.getTypeName() + ")");
 
         if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_NETWORK_BITTORRENT_ON_VPN_ONLY) &&
@@ -121,7 +123,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.instance().stopServices(true));
+        // Already running on background thread (posted from onReceive), no need for additional postToHandler
+        Engine.instance().stopServices(true);
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
