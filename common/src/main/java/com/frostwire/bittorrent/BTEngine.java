@@ -134,6 +134,7 @@ public final class BTEngine extends SessionManager {
     /**
      * @see com.frostwire.android.gui.MainApplication::onCreate() for ctx.interfaces and the rest of the context
      */
+    @SuppressWarnings("JavadocReference")
     @Override
     public void start() {
         SessionParams params = loadSettings();
@@ -347,7 +348,7 @@ public final class BTEngine extends SessionManager {
                     priorities = th.filePriorities();
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                LOG.error("Error loading session state", t);
             }
         }
         if (priorities == null) {
@@ -497,7 +498,7 @@ public final class BTEngine extends SessionManager {
 
     private String getEscapedFilename(TorrentInfo ti) {
         String name = ti.name();
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             name = ti.infoHashV1().toString();
         }
         return escapeFilename(name);
@@ -616,13 +617,19 @@ public final class BTEngine extends SessionManager {
                 th.resume();
             }
         } else { // new download
-            // constexpr torrent_flags_t auto_managed = 5_bit;
-            // jul.22.2025 gubatron: NOT SURE OF THIS, but it seems to be the right flag to use
-            //System.out.println("BTEngine.download() - torrent_handle is in session? " + th.inSession());
-            download(ti, saveDir, resumeFile, priorities, peers, new torrent_flags_t());
+            // Add paused to avoid the race where default priorities are used
+            download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
             th = find(ti.infoHashV1());
+            LOG.info("BTEngine.download() - new download - torrent_handle is in session? " + th.inSession());
             if (th != null) {
+                // Re-apply priorities on the handle to be 100% sure they stick
+                if (priorities != null && priorities.length == ti.numFiles()) {
+                    th.prioritizeFiles(priorities);
+                }
                 fireDownloadUpdate(th);
+                th.resume();
+            } else {
+                LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found by infoHashV1");
             }
         }
     }
@@ -653,7 +660,7 @@ public final class BTEngine extends SessionManager {
     }
 
     private void printAlert(@SuppressWarnings("rawtypes") Alert alert) {
-        System.out.println("Log: " + alert);
+        LOG.info("Log: " + alert);
     }
 
     private static class Loader {
@@ -715,7 +722,8 @@ public final class BTEngine extends SessionManager {
         @Override
         public void run() {
             try {
-                download(new TorrentInfo(torrent), saveDir, resume, priorities, null, torrent_flags_t.from_int(1 << 5));
+                download(new TorrentInfo(torrent), saveDir, resume, priorities, null, TorrentFlags.PAUSED);
+
             } catch (Throwable e) {
                 LOG.error("Unable to restore download from previous session. (" + torrent.getAbsolutePath() + ")", e);
             }
