@@ -239,7 +239,6 @@ public final class PerformersHelper {
                 case ']':
                 case '\n':
                 case '\r':
-                case 'Ð':
                 case '&':
                 case '~':
                 case '{':
@@ -251,11 +250,12 @@ public final class PerformersHelper {
                 case '=':
                 case '!':
                 case ',':
-                case '¡':
                 case '|':
                 case '#':
-                case 'À':
-                case 'Á':
+                case '\u00D0': // Ð
+                case '\u00A1': // ¡
+                case '\u00C0': // À
+                case '\u00C1': // Á
                     sb.append(' ');
                     break;
                 default:
