@@ -269,6 +269,18 @@ tasks.register('gettextBundle') {
 gettextExtract.dependsOn gettextInit
 gettextBundle.dependsOn gettextInit
 
+
+// TENTATIVE: WE MIGHT HAVE TO MAKE JSIG ALWAYS BE LOADED FOR MACOSX AND LINUX
+// which means adding DYLD_INSERT_LIBRARIES AND LD_PRELOAD in the Mac and Linux launchers
+// Arvid Norberg from libtorrent saysa:
+// yes, libtorrent needs to handle certain signals during disk I/O operations.
+// When using memory mapped files, disk writes are made by copying bytes into memory regions.
+// There is no error code return path for memcopy, so the only way the kernel can signal errors (such as EPERM or ENOSPC)
+// is via signals.
+// When libtorrent is copying data into memory mapped files, it installs a temporary signal handle for the thread,
+// and uninstalls it immediately afterwards.
+// I believe the JVM also installs signal handlers for managing its garbage collection, so it sounds plausible
+// that there's some clash.
 tasks.register('runWithJSig', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = application.mainClass
