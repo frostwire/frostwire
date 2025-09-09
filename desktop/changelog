@@ -9,6 +9,8 @@ frostwire (6.14.1) stable; urgency=high
  * EDT freeze: moved media checks off EDT; coalesce selection; add EDT I/O guard
  * Cleanup: removed all remnants of azureus source code
  * New FlatLaf light theme
+ * Optimization: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+ * Fixed: logic bug in PerformersHelper.countMatchedTokens()
 
  -- FrostWire Team <contact@frostwire.com>  Mon, 8 Sep 2025 16:32:00 -0600
 
