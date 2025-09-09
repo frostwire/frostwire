@@ -121,7 +121,8 @@ public class EngineBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        postToHandler(SystemUtils.HandlerThreadName.MISC, () -> Engine.instance().stopServices(true));
+        // Already running on background thread (posted from onReceive), no need for additional postToHandler
+        Engine.instance().stopServices(true);
     }
 
     private void handleConnectedNetwork(Context context, NetworkInfo networkInfo) {
