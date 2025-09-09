@@ -209,8 +209,62 @@ public final class PerformersHelper {
 
     private static String sanitize(String str) {
         str = StringUtils.fromHtml(str);
-        //noinspection RegExpRedundantEscape
-        str = str.replaceAll("\\.torrent|www\\.|\\.com|\\.net|[\\\\\\/%_;\\-\\.\\(\\)\\[\\]\\n\\rÐ&~{}\\*@\\^'=!,¡|#ÀÁ]", " ");
+        
+        // Replace specific patterns first (more efficient than regex)
+        // Note: These replacements must match the original regex behavior exactly
+        str = str.replace(".torrent", " ");
+        
+        // Handle www. pattern (must be followed by a dot)
+        str = str.replaceAll("www\\.", " ");
+        
+        str = str.replace(".com", " ");
+        str = str.replace(".net", " ");
+        
+        // Replace problem characters efficiently without regex
+        char[] chars = str.toCharArray();
+        StringBuilder sb = new StringBuilder(chars.length);
+        
+        for (char c : chars) {
+            switch (c) {
+                case '\\':
+                case '/':
+                case '%':
+                case '_':
+                case ';':
+                case '-':
+                case '.':
+                case '(':
+                case ')':
+                case '[':
+                case ']':
+                case '\n':
+                case '\r':
+                case 'Ð':
+                case '&':
+                case '~':
+                case '{':
+                case '}':
+                case '*':
+                case '@':
+                case '^':
+                case '\'':
+                case '=':
+                case '!':
+                case ',':
+                case '¡':
+                case '|':
+                case '#':
+                case 'À':
+                case 'Á':
+                    sb.append(' ');
+                    break;
+                default:
+                    sb.append(c);
+                    break;
+            }
+        }
+        
+        str = sb.toString();
         str = StringUtils.removeDoubleSpaces(str);
         return str.trim();
     }
@@ -277,7 +331,7 @@ public final class PerformersHelper {
 
     public static int countMatchedTokens(String normalizedResult, List<String> searchTokens) {
         int count = 0;
-        if (normalizedResult != null && normalizedResult.isEmpty()) {
+        if (normalizedResult != null && !normalizedResult.isEmpty()) {
             for (String token : searchTokens) {
                 if (normalizedResult.contains(token)) {
                     count++;
