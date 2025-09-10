@@ -176,7 +176,7 @@ public abstract class SearchEngine {
             return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine GLOTORRENTS = new SearchEngine(SearchEngineID.GLOTORRENTS_ID, "GloTorrents", SearchEnginesSettings.GLOTORRENTS_ENABLED, "gtdb.to") {
+    private static final SearchEngine GLOTORRENTS = new SearchEngine(SearchEngineID.GLOTORRENTS_ID, "GloTorrents", SearchEnginesSettings.GLOTORRENTS_ENABLED, "glodls.to") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new GloTorrentsSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
