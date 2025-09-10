@@ -23,7 +23,7 @@ package com.frostwire.platform;
  */
 public interface VPNMonitor {
     /**
-     * This indicate if the OS networking is under active VPN or not.
+     * This indicates if the OS networking is under active VPN or not.
      * It's based on routing heuristics, and not 100% reliable, but it's usable.
      * The value could be cached for speed and optimization purposes. The actual
      * implementation should not block for a long period of time and should be
