@@ -255,18 +255,24 @@ public abstract class AndroidSearchEngine extends CommonSearchEngine {
      * Get all available search engines, optionally excluding non-ready ones
      */
     public static List<AndroidSearchEngine> getEngines(boolean excludeNonReady) {
-        return ALL_ENGINES.stream()
-                .filter(engine -> !excludeNonReady || engine.isReady())
-                .collect(java.util.stream.Collectors.toList());
+        List<AndroidSearchEngine> result = new java.util.ArrayList<>();
+        for (AndroidSearchEngine engine : ALL_ENGINES) {
+            if (!excludeNonReady || engine.isReady()) {
+                result.add(engine);
+            }
+        }
+        return result;
     }
 
     /**
      * Find a search engine by name
      */
     public static AndroidSearchEngine forName(String name) {
-        return ALL_ENGINES.stream()
-                .filter(engine -> engine.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
+        for (AndroidSearchEngine engine : ALL_ENGINES) {
+            if (engine.getName().equalsIgnoreCase(name)) {
+                return engine;
+            }
+        }
+        return null;
     }
 }
