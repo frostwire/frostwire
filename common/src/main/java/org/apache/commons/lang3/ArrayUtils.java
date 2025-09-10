@@ -253,6 +253,7 @@ public class ArrayUtils {
      * @return the array, not null unless a null array is passed in
      * @since 3.0
      */
+    @SafeVarargs
     public static <T> T[] toArray(final T... items) {
         return items;
     }
@@ -3600,6 +3601,7 @@ public class ArrayUtils {
      * @throws IllegalArgumentException if the array types are incompatible
      * @since 2.1
      */
+    @SafeVarargs
     public static <T> T[] addAll(final T[] array1, final T... array2) {
         if (array1 == null) {
             return clone(array2);

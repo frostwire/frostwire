@@ -264,6 +264,7 @@ public abstract class AbstractSetting implements Setting {
      * Returns the default value
      */
     public <T> T getDefaultValue() {
+        //noinspection unchecked
         return (T) DEFAULT_PROPS.getProperty(KEY);
     }
 }
