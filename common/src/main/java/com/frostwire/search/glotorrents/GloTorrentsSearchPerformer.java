@@ -33,7 +33,7 @@ public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
     private static Pattern pattern;
 
     public GloTorrentsSearchPerformer(long token, String keywords, int timeoutMillis) {
-        super("www.gtdb.to", token, keywords, timeoutMillis, 1, 0);
+        super("glodls.to", token, keywords, timeoutMillis, 1, 0);
         if (pattern == null) {
             pattern = Pattern.compile("(?is)" +
                     "<td class='ttable_col2' nowrap='nowrap'>.*?<a title=\"(?<filename>.*?)\" href=\"(?<detailsURL>.*?)\"><b>.*?" +
@@ -45,7 +45,7 @@ public class GloTorrentsSearchPerformer extends SimpleTorrentSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://www.gtdb.to/search_results.php?search=" + encodedKeywords + "&cat=0&incldead=0&lang=0&sort=seeders&order=desc";
+        return "https://glodls.to/search_results.php?search=" + encodedKeywords + "&cat=0&incldead=0&lang=0&sort=seeders&order=desc";
     }
 
     private GloTorrentsSearchResult fromMatcher(SearchMatcher matcher) {
