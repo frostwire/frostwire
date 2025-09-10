@@ -332,4 +332,24 @@ public abstract class SearchEngine {
             NYAA,
             GLOTORRENTS,
             TORRENTSCSV);
+
+    /**
+     * Bridge method to access the new consolidated search engines.
+     * This allows gradual migration to the consolidated approach.
+     * 
+     * @return list of consolidated AndroidSearchEngine instances
+     */
+    public static List<AndroidSearchEngine> getConsolidatedEngines() {
+        return AndroidSearchEngine.getEngines(false);
+    }
+
+    /**
+     * Bridge method to find a consolidated search engine by name.
+     * 
+     * @param name the engine name to search for
+     * @return the consolidated AndroidSearchEngine or null if not found
+     */
+    public static AndroidSearchEngine getConsolidatedEngineByName(String name) {
+        return AndroidSearchEngine.forName(name);
+    }
 }

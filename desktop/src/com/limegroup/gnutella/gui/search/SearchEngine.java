@@ -323,4 +323,24 @@ public abstract class SearchEngine {
     public boolean isReady() {
         return _domainName != null;
     }
+
+    /**
+     * Bridge method to access the new consolidated search engines.
+     * This allows gradual migration to the consolidated approach.
+     * 
+     * @return list of consolidated DesktopSearchEngine instances
+     */
+    public static List<DesktopSearchEngine> getConsolidatedEngines() {
+        return DesktopSearchEngine.getEngines();
+    }
+
+    /**
+     * Bridge method to find a consolidated search engine by name.
+     * 
+     * @param name the engine name to search for
+     * @return the consolidated DesktopSearchEngine or null if not found
+     */
+    public static DesktopSearchEngine getConsolidatedEngineByName(String name) {
+        return DesktopSearchEngine.getSearchEngineByName(name);
+    }
 }
