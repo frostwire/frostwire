@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@
 
 package com.frostwire.gui.bittorrent;
 
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.jlibtorrent.swig.error_code;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
@@ -71,10 +72,6 @@ public class SendFileProgressDialog extends JDialog {
             public void windowOpened(WindowEvent e) {
                 this_windowOpened();
             }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-            }
         });
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -114,7 +111,7 @@ public class SendFileProgressDialog extends JDialog {
         if (_preselectedFile == null) {
             chooseFile();
         } else {
-            new Thread(() -> onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile())).start();
+            ThreadExecutor.startThread(() -> onApprovedFileSelectionToSend(_preselectedFile.getAbsoluteFile()), "SendFileProgressDialog:onApprovedFileSelectionToSend");
         }
     }
 
@@ -127,7 +124,8 @@ public class SendFileProgressDialog extends JDialog {
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             final File selectedFile = fileChooser.getSelectedFile();
-            new Thread(() -> onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile())).start();
+            ThreadExecutor.startThread(() -> onApprovedFileSelectionToSend(selectedFile.getAbsoluteFile()),
+                    "SendFileProgressDialog:onApprovedFileSelectionToSend");
         } else if (result == JFileChooser.CANCEL_OPTION) {
             onCancelButton();
         } else if (result == JFileChooser.ERROR_OPTION) {
@@ -147,7 +145,7 @@ public class SendFileProgressDialog extends JDialog {
 
         @Override
         public void beforeOpenForSeedInUIThread() {
-            dispose();
+            GUIMediator.safeInvokeLater(SendFileProgressDialog.this::dispose);
         }
 
         @Override
@@ -157,7 +155,7 @@ public class SendFileProgressDialog extends JDialog {
 
         @Override
         public void onPieceProgress(int nPiece, int totalPieces) {
-            GUIMediator.safeInvokeLater(() -> _progressBar.setValue((nPiece/totalPieces) * 100));
+            GUIMediator.safeInvokeLater(() -> _progressBar.setValue((nPiece / totalPieces) * 100));
         }
     }
 }
