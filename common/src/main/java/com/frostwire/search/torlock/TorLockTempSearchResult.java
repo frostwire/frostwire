@@ -31,6 +31,8 @@ public class TorLockTempSearchResult extends AbstractSearchResult implements Cra
 
     public TorLockTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
+        // Try to construct a reasonable details URL for the new site structure
+        // This may need adjustment based on the actual new site structure
         this.detailsUrl = "https://" + domainName + "/torrent/" + itemId;
     }
 
