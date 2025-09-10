@@ -34,31 +34,49 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
-        super("idope.se", token, keywords, timeout, 1, 0);
+        super("idope.io", token, keywords, timeout, 1, 0);
         if (pattern == null) {
-            pattern = Pattern.compile("(?is)<img class=\"resultdivtopimg\".*?" +
-                    "<a href=\"/torrent/(?<keyword>.*?)/(?<infohash>.*?)/\".*?" +
-                    "<div  class=\"resultdivtopname\" >[\n][\\s|\t]+(?<filename>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottontime\">(?<age>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottonlength\">(?<filesize>.*?)\\p{Z}(?<unit>.*?)</div>.*?" +
-                    "<div class=\"resultdivbottonseed\">(?<seeds>.*?)</div>");
+            // Updated pattern for MagnetDL-like structure
+            pattern = Pattern.compile("(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
+                    "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
+                    "<td>(?<age>.*?)</td>" +
+                    "<td class=\"t[0-9]\">.*?</td><td>.*?</td>.*?<td>(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>" +
+                    "<td class=\"s\">(?<seeds>.*?)</td>");
         }
     }
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainName() + "/torrent-list/" + encodedKeywords;
+        return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
     }
 
     private IdopeSearchResult fromMatcher(SearchMatcher matcher) {
-        String infoHash = matcher.group("infohash");
-        String detailsURL = "https://" + getDomainName() + "/torrent/" + matcher.group("keyword") + "/" + infoHash;
-        String filename = matcher.group("filename");
-        String fileSizeMagnitude = matcher.group("filesize");
-        String fileSizeUnit = matcher.group("unit");
+        String magnet = matcher.group("magnet");
+        String detailsURL = "https://" + getDomainName() + matcher.group("detailUrl");
+        String title = matcher.group("title");
         String ageString = matcher.group("age");
-        int seeds = Integer.parseInt(matcher.group("seeds"));
-        return new IdopeSearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+        String fileSizeMagnitude = matcher.group("fileSizeMagnitude");
+        String fileSizeUnit = matcher.group("fileSizeUnit");
+        String seedsStr = matcher.group("seeds");
+        int seeds = 0;
+        try {
+            seeds = Integer.parseInt(seedsStr.trim());
+        } catch (NumberFormatException e) {
+            // Default to 0 if seeds can't be parsed
+        }
+        
+        // Extract info hash from magnet URL
+        String infoHash = "";
+        if (magnet != null && magnet.contains("xt=urn:btih:")) {
+            int start = magnet.indexOf("xt=urn:btih:") + 12;
+            int end = magnet.indexOf("&", start);
+            if (end == -1) end = magnet.length();
+            if (start < magnet.length() && end > start) {
+                infoHash = magnet.substring(start, Math.min(start + 40, end));
+            }
+        }
+        
+        return new IdopeSearchResult(detailsURL, infoHash, title, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
     }
 
     @Override
@@ -68,12 +86,25 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             return Collections.emptyList();
         }
 
-        final String HTML_PREFIX_MARKER = "<div id=\"div2child\">";
-        int htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER) + HTML_PREFIX_MARKER.length();
-        final String HTML_SUFFIX_MARKER = "<div id=\"rightdiv\">";
-        int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER);
+        // Updated HTML markers for MagnetDL-like structure
+        final String HTML_PREFIX_MARKER = "<tbody>";
+        int htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+        if (htmlPrefixIndex == -1) {
+            // Fallback to old structure or check for DDOS protection
+            isDDOSProtectionActive = page.contains("Cloudflare");
+            if (!isDDOSProtectionActive) {
+                LOG.warn("IdopeSearchPerformer search HTML structure not found. Please notify at https://github.com/frostwire/frostwire/issues/new");
+            } else {
+                LOG.warn("IdopeSearchPerformer search disabled. DDOS protection active.");
+            }
+            return Collections.emptyList();
+        }
+        
+        htmlPrefixIndex += HTML_PREFIX_MARKER.length();
+        final String HTML_SUFFIX_MARKER = "</tbody>";
+        int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER, htmlPrefixIndex);
 
-        String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length() - htmlPrefixIndex);
+        String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length());
 
         ArrayList<IdopeSearchResult> results = new ArrayList<>(0);
         SearchMatcher matcher = new SearchMatcher((pattern.matcher(reducedHtml)));
