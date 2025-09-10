@@ -21,12 +21,21 @@ import com.frostwire.regex.Pattern;
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.TorrentRegexCrawlerSearchPerformer;
+import com.frostwire.util.Logger;
 
 /**
+ * TorLock Search Performer for the TorLock torrent search engine.
+ * 
+ * Note: TorLock has moved from www.torlock.com to en.torlock-official.live
+ * and is heavily protected by CloudFlare, which may prevent successful searches.
+ * This search performer is disabled by default and should only be enabled
+ * if you have confirmed that the site is accessible and working.
+ * 
  * @author gubatron
  * @author aldenml
  */
 public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerformer<TorLockSearchResult> {
+    private static final Logger LOG = Logger.getLogger(TorLockSearchPerformer.class);
     private static final int MAX_RESULTS = 15;
     private static final String PRELIMINARY_REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
     private static final String HTML_REGEX = "(?is)<a href=\".*?/tor/(?<torrentid>.*?).torrent\".*?" +
@@ -39,6 +48,8 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
 
     public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, PRELIMINARY_REGEX, HTML_REGEX);
+        LOG.warn("TorLock search performer is enabled but may not work due to CloudFlare protection. " +
+                "Site has moved to " + domainName + " and is heavily protected.");
     }
 
     @Override
@@ -100,6 +111,7 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
     protected boolean isValidHtml(String html) {
         if (html == null || html.isEmpty()) {
             isDDOSProtectionActive = true;
+            LOG.warn("TorLock returned empty HTML response - site may be down or blocked");
             return false;
         }
         
@@ -112,6 +124,10 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
                                 html.contains("DDoS protection") ||
                                 html.contains("Ray ID") ||
                                 html.contains("Security check");
+        
+        if (isDDOSProtectionActive) {
+            LOG.warn("TorLock CloudFlare/DDoS protection detected - search will fail");
+        }
         
         return !isDDOSProtectionActive;
     }
