@@ -103,6 +103,30 @@ Then run the project with:
 
 On Windows, use `gradlew.bat run` instead.
 
+# Updating Flatpak dependencies
+FrostWire uses the [Flatpak Gradle Generator script](https://github.com/flatpak/flatpak-builder-tools/tree/master/gradle)
+to collect dependency information for its Flatpak. If you add, remove, or otherwise update a
+dependency in Gradle, be sure to update the dependencies too.
+
+Before getting started, you want to install the `aiohttp` Python module. Consult your distro's
+documentation (or your favorite search engine) on how to install this module.
+
+To do this, you need to `cd` back into the root of the monorepo. Then, run the following
+commands:
+
+```bash
+# First, download the generator script and make it executable. You can do this using any other
+# preferred method.
+wget https://raw.githubusercontent.com/flatpak/flatpak-builder-tools/refs/heads/master/gradle/flatpak-gradle-generator.py
+chmod +x flatpak-gradle-generator.py
+
+# Next, update the dependencies
+flatpak run --command=bash --share=network --filesystem=`pwd` -d org.freedesktop.Sdk ./update-flatpak-deps.sh
+./flatpak-gradle-generator.py desktop/gradle-log.txt gradle-dependencies.json
+```
+
+Then check the resulting `gradle-dependencies.json` into the Flatpak repo and you're all done!
+
 # HAVING ISSUES BUILDING?
 
 "My environment variables are fine, my requirements are met, there's an error during the build."*
