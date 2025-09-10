@@ -18,6 +18,8 @@
 
 package com.frostwire.concurrent.concurrent;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.*;
 
 /**
@@ -115,7 +117,7 @@ public class ExecutorsHelper {
     }
 
     /**
-     * Returns the a thread factory of daemon threads, using the given name.
+     * Returns a thread factory of daemon threads, using the given name.
      */
     static ThreadFactory daemonThreadFactory(String name) {
         return new DefaultThreadFactory(name, true);
@@ -142,7 +144,7 @@ public class ExecutorsHelper {
             this.daemon = daemon;
         }
 
-        public Thread newThread(Runnable r) {
+        public Thread newThread(@NotNull Runnable r) {
             Thread t = new ManagedThread(r, name);
             if (daemon)
                 t.setDaemon(true);
