@@ -116,6 +116,7 @@ public final class Ssl {
                 "googleapis.com",
                 "gstatic.com",
                 "gtdb.to",
+                "idope.hair",
                 "idope.io",
                 "igcdn.com",
                 "igsonar.com",

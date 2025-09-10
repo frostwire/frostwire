@@ -36,7 +36,8 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
         super("idope.io", token, keywords, timeout, 1, 0);
         if (pattern == null) {
-            // Updated pattern for MagnetDL-like structure
+            // Updated pattern for MagnetDL-like structure (idope.io now uses similar HTML structure)
+            // Alternative domain idope.hair uses different URL pattern: /lmsearch?q=keywords&cat=lmsearch
             pattern = Pattern.compile("(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
                     "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
                     "<td>(?<age>.*?)</td>" +
@@ -73,7 +74,13 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             if (end == -1) end = magnet.length();
             if (start < magnet.length() && end > start) {
                 infoHash = magnet.substring(start, Math.min(start + 40, end));
+                // Ensure we have a valid 40-character hash
+                if (infoHash.length() < 40) {
+                    LOG.warn("IdopeSearchPerformer: Invalid info hash length: " + infoHash.length());
+                }
             }
+        } else {
+            LOG.warn("IdopeSearchPerformer: Could not extract info hash from magnet URL: " + (magnet != null ? magnet.substring(0, Math.min(magnet.length(), 50)) : "null"));
         }
         
         return new IdopeSearchResult(detailsURL, infoHash, title, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
