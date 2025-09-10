@@ -44,8 +44,7 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        String transformedKeywords = encodedKeywords.replace("%20", "-");
-        return "https://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
+        return "https://" + getDomainName() + "/movies?keyword=" + encodedKeywords + "&quality=&genre=&rating=0&year=0&language=&order_by=latest";
     }
 
     @Override
@@ -61,13 +60,35 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
 
     @Override
     protected int htmlPrefixOffset(String html) {
+        // Look for common content start markers that might exist on the new site
         int offset = html.indexOf("SIGN UP</a>");
+        if (offset == -1) {
+            // Try alternative markers for the new site structure
+            offset = html.indexOf("<main");
+            if (offset == -1) {
+                offset = html.indexOf("<div class=\"content");
+                if (offset == -1) {
+                    offset = html.indexOf("class=\"results");
+                }
+            }
+        }
         return Math.max(offset, 0);
     }
 
     @Override
     protected int htmlSuffixOffset(String html) {
+        // Look for common content end markers
         int offset = html.indexOf(">Description</a></li>");
+        if (offset == -1) {
+            // Try alternative markers for the new site structure
+            offset = html.indexOf("</main>");
+            if (offset == -1) {
+                offset = html.indexOf("<footer");
+                if (offset == -1) {
+                    offset = html.indexOf("</body>");
+                }
+            }
+        }
         return Math.max(offset, 0);
     }
 
@@ -78,7 +99,21 @@ public final class TorLockSearchPerformer extends TorrentRegexCrawlerSearchPerfo
 
     @Override
     protected boolean isValidHtml(String html) {
-        isDDOSProtectionActive = !(html != null && !html.contains("Cloudflare"));
+        if (html == null || html.isEmpty()) {
+            isDDOSProtectionActive = true;
+            return false;
+        }
+        
+        // Check for various CloudFlare protection indicators
+        isDDOSProtectionActive = html.contains("Cloudflare") || 
+                                html.contains("cloudflare") ||
+                                html.contains("cf-browser-verification") ||
+                                html.contains("cf-challenge-page") ||
+                                html.contains("Checking your browser") ||
+                                html.contains("DDoS protection") ||
+                                html.contains("Ray ID") ||
+                                html.contains("Security check");
+        
         return !isDDOSProtectionActive;
     }
 

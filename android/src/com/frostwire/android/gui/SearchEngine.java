@@ -189,7 +189,7 @@ public abstract class SearchEngine {
     public static final SearchEngine TORLOCK = new SearchEngine("TorLock", Constants.PREF_KEY_SEARCH_USE_TORLOCK) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorLockSearchPerformer("www.torlock.com", token, keywords, DEFAULT_TIMEOUT);
+            return new TorLockSearchPerformer("en.torlock-official.live", token, keywords, DEFAULT_TIMEOUT);
         }
     };
 

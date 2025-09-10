@@ -128,7 +128,7 @@ public abstract class SearchEngine {
             return new FrostClickSearchPerformer(FROSTCLICK.getDomainName(), token, keywords, DEFAULT_TIMEOUT, userAgent);
         }
     };
-    private static final SearchEngine TORLOCK = new SearchEngine(SearchEngineID.TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "www.torlock.com") {
+    private static final SearchEngine TORLOCK = new SearchEngine(SearchEngineID.TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "en.torlock-official.live") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new TorLockSearchPerformer(TORLOCK.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
