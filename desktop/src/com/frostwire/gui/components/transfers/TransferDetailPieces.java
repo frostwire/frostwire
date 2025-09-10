@@ -41,7 +41,7 @@ public final class TransferDetailPieces extends JPanel implements TransferDetail
 
     TransferDetailPieces() {
         super(new MigLayout("fillx, insets 0 0 0 0, gap 0 5px"));
-        int backgroundColor = ThemeMediator.isDefaultThemeOn() ?
+        int backgroundColor = ThemeMediator.isLightThemeOn() ?
                 0xffffff : ThemeMediator.APP_REALLY_DARK_COLOR.getRGB();
         hexHivePanel = new HexHivePanel(
                 16,
