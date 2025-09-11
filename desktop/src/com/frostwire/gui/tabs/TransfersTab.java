@@ -1,12 +1,12 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@ import com.frostwire.gui.bittorrent.*;
 import com.frostwire.gui.components.transfers.TransferDetailComponent;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.UISettings;
 import net.miginfocom.swing.MigLayout;
 
@@ -194,7 +194,7 @@ public final class TransfersTab extends AbstractTab {
 
     private void onTextFilterKeyTyped() {
         final String text = filterText.getText();
-        if (text.equals("")) {
+        if (text.isEmpty()) {
             restoreFilterTextHint();
         } else {
             filterText.setForeground(Color.BLACK);
@@ -218,7 +218,7 @@ public final class TransfersTab extends AbstractTab {
     }
 
     private void onFilterTextFocusLost() {
-        if (filterText.getText().equals("")) {
+        if (filterText.getText().isEmpty()) {
             restoreFilterTextHint();
         }
     }
@@ -251,14 +251,13 @@ public final class TransfersTab extends AbstractTab {
                     selected instanceof HttpDownload ||
                     selected instanceof TorrentFetcherDownload) {
                 hideTransferDetailsComponent();
-            } else if (selected instanceof BittorrentDownload) {
-                BittorrentDownload bittorrentDownload = (BittorrentDownload) selected;
+            } else if (selected instanceof BittorrentDownload bittorrentDownload) {
                 showTransferDetailsComponent(bittorrentDownload);
                 // TODO: remove this hack and the validate call inside ensureDownloadVisible
                 // Hack. Need to let the UI thread re-calculate the dimensions
                 // of the transfers table in order for downloadMediator.ensureDownloadVisible(btd)
                 // to calculate the new location of the row that's to be scrolled to.
-                BackgroundExecutorService.schedule(() -> {
+                BackgroundQueuedExecutorService.schedule(() -> {
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException ignored) {

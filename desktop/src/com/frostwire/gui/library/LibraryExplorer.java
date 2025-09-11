@@ -29,7 +29,7 @@ import com.limegroup.gnutella.gui.options.OptionsConstructor;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.tables.DefaultMouseListener;
 import com.limegroup.gnutella.gui.tables.TableSettings;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import com.limegroup.gnutella.settings.SharingSettings;
 import org.limewire.util.FileUtils;
@@ -94,7 +94,7 @@ public class LibraryExplorer extends AbstractLibraryListPanel {
                 mtsfdh.clearCache();
             }
             LibraryMediator.instance().updateTableFiles(directoryHolder);
-            BackgroundExecutorService.schedule(new SearchByMediaTypeRunnable(mtsfdh));
+            BackgroundQueuedExecutorService.schedule(new SearchByMediaTypeRunnable(mtsfdh));
         }
         saveLastSelectedDirectoryHolder();
         searchPrompt = I18n.tr("Search your") + " " + node.getUserObject();
