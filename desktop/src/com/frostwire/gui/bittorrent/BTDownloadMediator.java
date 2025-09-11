@@ -19,6 +19,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
@@ -111,7 +112,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         super("DOWNLOAD_TABLE");
         TABLE.setRowHeight(30);
         GUIMediator.addRefreshListener(this);
-        restoreSorting();
+        ThreadExecutor.startThread(this::restoreSorting, "BTDownloadMediator.restoreSorting()");
     }
 
     public static BTDownloadMediator instance() {
@@ -843,6 +844,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Load from the last settings saved the previous sorting preferences of this mediator.
      */
     private void restoreSorting() {
+        if (SwingUtilities.isEventDispatchThread()) {
+            throw new RuntimeException("BTDownloadMediator.restoreSorting() cannot be called from the EDT");
+        }
         int sortIndex = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_INDEX.getValue();
         boolean sortOrder = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_ORDER.getValue();
         LimeTableColumn column = BTDownloadDataLine.staticGetColumn(sortIndex);
