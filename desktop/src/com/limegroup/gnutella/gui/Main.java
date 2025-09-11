@@ -50,15 +50,11 @@ public class Main {
     public static void main(String[] args) {
         System.setProperty("sun.awt.noerasebackground", "true");
 
-        // check if there's a step debugger attached
-        boolean isDebugging = java.lang.management.ManagementFactory.getRuntimeMXBean().
-                getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
-
-        if (CommonUtils.isDebugMode() && !isDebugging) {
+        if (CommonUtils.isRunningFromGradle() || CommonUtils.isStepDebuggerAttached()) {
             // DEVELOPMENT ENVIRONMENT: Fail fast if EDT (Event Dispatcher Thread) stalls > 1000 ms
-            System.out.println("FrostWire is running in DEVELOPMENT environment.");
-            com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(1000));
-            System.out.println("Strict EDT mode is ON. (The application will fail fast if the EDT [Event Dispatcher Thread] stalls for more than 1000 ms)");
+            System.out.println("Main: FrostWire is running in DEVELOPMENT environment.");
+            com.frostwire.util.StrictEdtMode.install(java.time.Duration.ofMillis(2000));
+            System.out.println("Main: Strict EDT mode is ON. (The application will fail fast if the EDT [Event Dispatcher Thread] stalls for more than 2000 ms)");
         } else {
             System.out.println("FrostWire is running in a PRODUCTION environment.");
         }
