@@ -68,7 +68,7 @@ public class FrostAssociations {
         if (OSUtils.isWindows()) {
             String runningPath = SystemUtils.getRunningPath();
             // only to test associations
-            if (CommonUtils.isDebugMode()) {
+            if (CommonUtils.isRunningFromGradle()) {
                 runningPath = PROGRAM + ".exe";
             }
             if (runningPath != null && runningPath.endsWith(PROGRAM + ".exe")) {
