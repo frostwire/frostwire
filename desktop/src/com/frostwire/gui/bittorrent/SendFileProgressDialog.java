@@ -155,7 +155,11 @@ public class SendFileProgressDialog extends JDialog {
 
         @Override
         public void onPieceProgress(int nPiece, int totalPieces) {
-            GUIMediator.safeInvokeLater(() -> _progressBar.setValue((nPiece / totalPieces) * 100));
+            if (SwingUtilities.isEventDispatchThread()) {
+                _progressBar.setValue((nPiece / totalPieces) * 100);
+            } else {
+                GUIMediator.safeInvokeLater(() -> _progressBar.setValue((nPiece / totalPieces) * 100));
+            }
         }
     }
 }
