@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron)
- * Copyright (c) 2007-2020, FrostWire(R). All rights reserved.
+ * Copyright (c) 2007-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import java.util.Properties;
  * <DL>
  * <DT>User Information
  * <DD>Get a username, a user home directory, etc.
- *
+ * <br/>
  * <DT>File Operation
  * <DD>Copy resource files, get the current directory, set, get and validate the
  * directory to store user settings. Also, you can use convertFileName to replace
@@ -136,12 +136,8 @@ public class CommonUtils {
         }
         // Undo conversion to external encoding
         String result = sb.toString();
-        try {
-            byte[] inputBytes = result.getBytes("8859_1");
-            result = new String(inputBytes);
-        } catch (UnsupportedEncodingException e) {
-            // The system should always have 8859_1
-        }
+        byte[] inputBytes = result.getBytes(StandardCharsets.ISO_8859_1);
+        result = new String(inputBytes);
         return result;
     }
 
@@ -205,7 +201,7 @@ public class CommonUtils {
         } catch (CharacterCodingException cce) {
             try {
                 // UTF-8 should always be available
-                return convertFileName(name, maxBytes, Charset.forName("UTF-8"));
+                return convertFileName(name, maxBytes, StandardCharsets.UTF_8);
             } catch (CharacterCodingException e) {
                 // should not happen, UTF-8 can encode unicode and gives us a
                 // good length estimate
@@ -453,9 +449,16 @@ public class CommonUtils {
         return settingsDir;
     }
 
-    public static boolean isDebugMode() {
-        return ManagementFactory.getRuntimeMXBean().getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
+    public static boolean isRunningFromGradle() {
+        String jvmArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toString();
+        return jvmArgs != null && jvmArgs.contains("debug=1");
     }
+
+    public static boolean isStepDebuggerAttached() {
+        String jvmArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toString();
+        return jvmArgs != null && jvmArgs.contains("-agentlib:jdwp");
+    }
+
 
     /**
      * Looks for a ".meta" configuration file on the same folder as the FrostWire executable.
