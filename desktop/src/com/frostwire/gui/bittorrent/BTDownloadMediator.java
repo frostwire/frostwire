@@ -19,6 +19,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
