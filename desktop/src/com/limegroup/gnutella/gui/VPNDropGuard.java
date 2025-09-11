@@ -19,7 +19,7 @@
 package com.limegroup.gnutella.gui;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ConnectionSettings;
 import net.miginfocom.swing.MigLayout;
 
@@ -76,7 +76,7 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
                     }
                 }
                 MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
-                BackgroundExecutorService.schedule(() -> {
+                BackgroundQueuedExecutorService.schedule(() -> {
                     if (BTEngine.getInstance().isPaused()) {
                         BTEngine.getInstance().resume();
                     }

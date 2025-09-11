@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.limegroup.gnutella.gui.init;
 
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.ApplicationSettings;
 import com.limegroup.gnutella.settings.InstallSettings;
 import com.limegroup.gnutella.settings.StartupSettings;
@@ -302,7 +302,7 @@ public final class SetupManager {
             InstallSettings.FIREWALL_WARNING.setValue(true);
         InstallSettings.ASSOCIATION_OPTION.setValue(FrostAssociations.CURRENT_ASSOCIATIONS);
         InstallSettings.LAST_FROSTWIRE_VERSION_WIZARD_INVOKED.setValue(String.valueOf(FrostWireUtils.getBuildNumber()));
-        BackgroundExecutorService.schedule(() -> SettingsGroupManager.instance().save());
+        BackgroundQueuedExecutorService.schedule(() -> SettingsGroupManager.instance().save());
         if (_currentWindow instanceof IntentWindow) {
             IntentWindow intent = (IntentWindow) _currentWindow;
             if (!intent.isConfirmedWillNot()) {

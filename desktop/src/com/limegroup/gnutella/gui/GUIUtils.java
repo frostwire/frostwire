@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.gui.player.MediaSource;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.util.Logger;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.CommonUtils;
 import com.frostwire.util.OSUtils;
@@ -424,9 +424,9 @@ public final class GUIUtils {
         if (GUIMediator.isPlaylistVisible()) {
             if (MediaPlayer.isPlayableFile(file)) {
                 if (false) {
-                    BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
+                    BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
                 } else if (!isPlaying) {
-                    BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
+                    BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> GUIMediator.instance().launchMedia(new MediaSource(file), false)));
                 }
                 return true;
             }

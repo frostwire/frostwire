@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.actions.SearchAction;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.gui.util.GUILauncher;
 import com.limegroup.gnutella.gui.util.GUILauncher.LaunchableProvider;
 import com.limegroup.gnutella.util.QueryUtils;
@@ -311,7 +311,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         List<List<File>> partitionedFiles = split(Arrays.asList(dirHolder.getFiles()));
         for (List<File> partition : partitionedFiles) {
             final List<File> fPartition = partition;
-            BackgroundExecutorService.schedule(() -> {
+            BackgroundQueuedExecutorService.schedule(() -> {
                 for (final File file : fPartition) {
                     GUIMediator.safeInvokeLater(() -> addUnsorted(file));
                 }
@@ -420,7 +420,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             final CheckBoxListPanel<File> listPanel,
             final Object[] removeOptions,
             final int option) {
-        return BackgroundExecutorService.submit(() -> {
+        return BackgroundQueuedExecutorService.submit(() -> {
             // remove still selected files
             List<File> selected = listPanel.getSelectedElements();
             List<String> undeletedFileNames;

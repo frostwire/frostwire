@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import com.limegroup.gnutella.gui.IconManager;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.NameHolder;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
@@ -270,7 +270,7 @@ public final class LibraryFilesTableDataLine extends AbstractLibraryTableDataLin
         boolean iconAvailable = IconManager.instance().isIconForFileAvailable(initializer);
         if (!iconAvailable && !_iconScheduledForLoad) {
             _iconScheduledForLoad = true;
-            BackgroundExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> {
+            BackgroundQueuedExecutorService.schedule(() -> GUIMediator.safeInvokeAndWait(() -> {
                 IconManager.instance().getIconForFile(initializer);
                 _iconLoaded = true;
                 _model.refresh();

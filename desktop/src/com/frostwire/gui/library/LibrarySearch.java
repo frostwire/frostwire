@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.search.SearchInformation;
 import com.limegroup.gnutella.gui.search.SearchMediator;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.LibrarySettings;
 import org.limewire.util.FileUtils;
 import org.limewire.util.StringUtils;
@@ -221,7 +221,7 @@ public class LibrarySearch extends JPanel {
             DirectoryHolder directoryHolder = LibraryMediator.instance().getLibraryExplorer().getSelectedDirectoryHolder();
             if (directoryHolder != null) {
                 currentSearchRunnable = new SearchFilesRunnable(query);
-                BackgroundExecutorService.schedule(currentSearchRunnable);
+                BackgroundQueuedExecutorService.schedule(currentSearchRunnable);
             }
         }
 
