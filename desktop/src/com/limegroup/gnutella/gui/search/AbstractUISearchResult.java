@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,11 +26,11 @@ import com.frostwire.search.telluride.TellurideSearchResult;
 import com.frostwire.search.yt.YTSearchResult;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.SearchSettings;
 import org.apache.commons.io.FilenameUtils;
 
-import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author gubatron
@@ -113,16 +113,12 @@ public abstract class AbstractUISearchResult implements UISearchResult {
     @Override
     public void play() {
         // this gets invoked when clicking on a search result play preview button.
-        if (sr instanceof StreamableSearchResult) {
-            StreamableSearchResult ssr = (StreamableSearchResult) sr;
-
-            String streamUrl;
-            if (SwingUtilities.isEventDispatchThread() && sr instanceof SoundcloudSearchResult) {
-                SoundcloudSearchResult scsr = (SoundcloudSearchResult) sr;
+        if (sr instanceof StreamableSearchResult ssr) {
+            if (EventQueue.isDispatchThread() && sr instanceof SoundcloudSearchResult scsr) {
                 if (scsr.fetchedDownloadUrl()) {
                     playStream(ssr.getStreamUrl());
                 } else {
-                    BackgroundExecutorService.schedule(() -> {
+                    BackgroundQueuedExecutorService.schedule(() -> {
                         String url = ssr.getStreamUrl();
                         GUIMediator.safeInvokeLater(() -> playStream(url));
                     });
