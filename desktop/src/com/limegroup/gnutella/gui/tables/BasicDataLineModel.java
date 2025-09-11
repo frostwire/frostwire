@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2023, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
  */
 
 package com.limegroup.gnutella.gui.tables;
+
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
+import com.limegroup.gnutella.gui.GUIMediator;
 
 import javax.swing.table.AbstractTableModel;
 import java.lang.reflect.InvocationTargetException;
@@ -34,10 +37,6 @@ import java.util.List;
  */
 public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableModel
         implements DataLineModel<T, E> {
-    /**
-     *
-     */
-    private static final long serialVersionUID = -974830504558996194L;
     private static final int ASCENDING = 1;
     private static final int DESCENDING = -1;
     /**
@@ -55,7 +54,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     protected final List<T> _list = new ArrayList<>();
     /**
-     * Variable for whether or not the current sorting scheme
+     * Variable for whether the current sorting scheme
      * is ascending (value 1) or descending (value -1).
      */
     protected int _ascending = ASCENDING;
@@ -122,8 +121,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     // Re-sort the list to provide real-time sorting
     public void resort() {
         if (_isSorted) {
-            doResort();
-            fireTableDataChanged();
+            ThreadExecutor.startThread(() -> {
+                        doResort();
+                        GUIMediator.safeInvokeLater(this::fireTableDataChanged);
+                    }
+                    , "BasicDataLineModel:resort");
         }
     }
 
@@ -206,7 +208,8 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     protected T createDataLine() {
         try {
             return _dataLineClass.getDeclaredConstructor().newInstance();
-        } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (IllegalAccessException | InstantiationException | ClassCastException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
@@ -276,7 +279,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public int add(E o, int row) {
         T dl = getNewDataLine(o);
-        return dl == null ? -1 : add(dl, row);
+        return add(dl, row);
     }
 
     /**
@@ -312,7 +315,7 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public int addSorted(E o) {
         T dl = getNewDataLine(o);
-        return dl == null ? -1 : add(dl, getSortedPosition(dl));
+        return add(dl, getSortedPosition(dl));
     }
 
     /**
