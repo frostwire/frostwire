@@ -243,7 +243,7 @@ public final class ThemeMediator {
 
         try {
             // Check if we're already on the EDT
-            if (SwingUtilities.isEventDispatchThread()) {
+            if (EventQueue.isDispatchThread()) {
                 // If we are, run directly
                 themeChanger.run();
             } else {
@@ -273,7 +273,7 @@ public final class ThemeMediator {
             }
         };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
             try {
@@ -389,7 +389,7 @@ public final class ThemeMediator {
     }
 
     static void testComponentCreationThreadingViolation() {
-        if (!SwingUtilities.isEventDispatchThread()) {
+        if (!EventQueue.isDispatchThread()) {
             UiThreadingViolationException uiThreadingViolationError = new UiThreadingViolationException("Component creation must be done on Event Dispatch Thread");
             uiThreadingViolationError.printStackTrace(System.err);
             throw uiThreadingViolationError;
