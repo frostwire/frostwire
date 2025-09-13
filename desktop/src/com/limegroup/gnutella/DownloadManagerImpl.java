@@ -1,18 +1,19 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package com.limegroup.gnutella;
 
 import com.frostwire.bittorrent.BTDownload;
@@ -22,6 +23,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.settings.UpdateSettings;
 
 import java.io.File;
+import java.util.Objects;
 
 public final class DownloadManagerImpl implements DownloadManager {
     private static final Logger LOG = Logger.getLogger(DownloadManagerImpl.class);
@@ -49,30 +51,26 @@ public final class DownloadManagerImpl implements DownloadManager {
             engine.setListener(new BTEngineAdapter() {
                 @Override
                 public void downloadAdded(BTEngine engine, BTDownload dl) {
+
                     if (engine == null || dl == null) {
+                        LOG.info("DownloadManagerImpl::loadSavedDownloadsAndScheduleWriting::BTEngineListener::downloadAdded: engine or dl are null, aborted.");
                         return;
                     }
                     String name = dl.getName();
+                    LOG.info("DownloadManagerImpl::loadSavedDownloadsAndScheduleWriting::BTEngineListener::downloadAdded: name=" + name);
                     if (name == null || name.contains("fetch_magnet:")) {
                         return;
                     }
                     File savePath = dl.getSavePath();
-                    if (savePath != null && savePath.toString().contains("fetch_magnet")) {
+                    if (savePath.toString().contains("fetch_magnet")) {
                         return;
                     }
                     // don't add frostwire update downloads to the download manager.
-                    if (savePath != null) {
-                        final File parentFile = savePath.getParentFile();
-                        if (parentFile != null) {
-                            if (parentFile.getAbsolutePath().equals(UpdateSettings.UPDATES_DIR.getAbsolutePath())) {
-                                LOG.info("Update download, not adding to transfer manager: " + savePath);
-                                return;
-                            }
-                        } else if (savePath.getAbsolutePath().equals(UpdateSettings.UPDATES_DIR.getAbsolutePath())) {
-                            // save path must have been a root folder, like D:\, so no parent file.
-                            LOG.info("Update download, not adding to transfer manager: " + savePath);
-                            return;
-                        }
+                    final File parentFile = savePath.getParentFile();
+                    // save path must have been a root folder, like D:\, so no parent file.
+                    if (Objects.requireNonNullElse(parentFile, savePath).getAbsolutePath().equals(UpdateSettings.UPDATES_DIR.getAbsolutePath())) {
+                        LOG.info("DownloadManagerImpl::loadSavedDownloadsAndScheduleWriting::BTEngineListener::downloadAdded: Update download, not adding to transfer manager: " + savePath);
+                        return;
                     }
                     addDownload(dl);
                 }
