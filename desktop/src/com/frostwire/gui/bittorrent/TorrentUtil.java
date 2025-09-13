@@ -18,9 +18,8 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
-import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
+import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.util.UrlUtils;
@@ -34,6 +33,7 @@ import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -173,6 +173,15 @@ public final class TorrentUtil {
         makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true);
     }
 
+    public static info_hash_t infoHashTFromTorrentInfo(TorrentInfo ti) {
+        Sha256Hash v2 = ti.infoHashV2();   // may be null or all zeros
+        if (v2 != null && !v2.isAllZeros()) {
+            return new info_hash_t(v2.swig()); // ctor from v2 hash
+        }
+        Sha1Hash v1 = ti.infoHashV1();
+        return new info_hash_t(v1.swig());    // fallback
+    }
+
     /**
      * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
@@ -180,29 +189,47 @@ public final class TorrentUtil {
      * @param dhtTrackedOnly         - if true, no trackers are added, otherwise adds a list of default trackers.
      */
     private static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
+        if (EventQueue.isDispatchThread()) {
+            // DO NOT DO THIS ON THE EDT
+            ThreadExecutor.startThread(() -> makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, dhtTrackedOnly), "TorrentUtil:makeTorrentAndDownload");
+            return;
+        }
+
         try {
             file_storage fs = new file_storage();
-            libtorrent.add_files(fs, file.getAbsolutePath());
+            add_files_listener addf_listener = new add_files_listener() {
+                @Override
+                public boolean pred(String p) {
+                    return true;
+                }
+            };
+            libtorrent.add_files_ex(fs, file.getAbsolutePath(), addf_listener, new create_flags_t());
             create_torrent torrentCreator = getCreateTorrent(dhtTrackedOnly, fs);
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
 
             libtorrent.set_piece_hashes_ex(torrentCreator, file.getParentFile().getAbsolutePath(), new set_piece_hashes_listener() {
                 final AtomicBoolean progressInvoked = new AtomicBoolean(false);
-                final int totalPieces = torrentCreator.num_pieces();
+                int totalPieces = torrentCreator.num_pieces();
 
                 @Override
                 public void progress(int n_piece) {
+                    if (n_piece < 0) {
+                        return;
+                    }
+                    if (totalPieces <= 0) {
+                        totalPieces = torrentCreator.num_pieces();
+                    }
                     if (uiTorrentMakerListener != null) {
                         if (!progressInvoked.get()) {
                             progressInvoked.set(true);
-                            GUIMediator.safeInvokeLater(() -> uiTorrentMakerListener.beforeOpenForSeedInUIThread());
+                            GUIMediator.safeInvokeLater(uiTorrentMakerListener::beforeOpenForSeedInUIThread);
                         }
                         GUIMediator.safeInvokeLater(() -> {
                             uiTorrentMakerListener.onPieceProgress(n_piece, totalPieces);
                         });
                     }
-                    
+
                 }
             }, ec);
 
@@ -251,7 +278,7 @@ public final class TorrentUtil {
         return torrentCreator;
     }
 
-    interface UITorrentMakerListener {
+    public interface UITorrentMakerListener {
         void onCreateTorrentError(final error_code ec);
 
         void beforeOpenForSeedInUIThread();
