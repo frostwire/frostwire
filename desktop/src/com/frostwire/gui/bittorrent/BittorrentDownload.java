@@ -1,37 +1,37 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2018, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.*;
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.iTunesMediator;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.settings.iTunesImportSettings;
 import com.limegroup.gnutella.settings.iTunesSettings;
-import com.frostwire.util.OSUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -439,14 +439,14 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                     new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
                 } else if (dl instanceof SoundcloudDownload || dl instanceof HttpDownload) {
                     if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-                        new Thread(() -> {
+                        BackgroundQueuedExecutorService.schedule(() -> {
                             TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
                             dl.setDeleteDataWhenRemove(false);
                             GUIMediator.safeInvokeLater(() -> {
                                 BTDownloadMediator.instance().remove(dl);
                                 BTDownloadMediator.instance().updateTableFilters();
                             });
-                        }).start();
+                        });
                     }
                 }
             });
