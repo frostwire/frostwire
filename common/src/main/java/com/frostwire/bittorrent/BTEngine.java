@@ -139,6 +139,7 @@ public final class BTEngine extends SessionManager {
     @Override
     public void start() {
         SessionParams params = loadSettings();
+        params.setDefaultDiskIO();
         settings_pack sp = params.swig().getSettings();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
