@@ -21,7 +21,7 @@ import com.frostwire.platform.AbstractPlatform;
 import com.frostwire.platform.DefaultFileSystem;
 import com.frostwire.platform.VPNMonitor;
 
-import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author gubatron
@@ -42,6 +42,6 @@ public final class DesktopPlatform extends AbstractPlatform {
 
     @Override
     public boolean isUIThread() {
-        return SwingUtilities.isEventDispatchThread();
+        return EventQueue.isDispatchThread();
     }
 }

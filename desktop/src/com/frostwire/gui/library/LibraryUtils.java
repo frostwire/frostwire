@@ -28,7 +28,7 @@ import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
 import org.limewire.util.FileUtils;
 
-import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.List;
@@ -113,7 +113,7 @@ public class LibraryUtils {
     @SuppressWarnings("SameParameterValue")
     public static boolean directoryContainsExtension(File directory, String extensionWithoutDot) {
         // Optional safety net to prevent future EDT misuse (off by default)
-        if (ASSERT_NO_EDT_IO && SwingUtilities.isEventDispatchThread()) {
+        if (ASSERT_NO_EDT_IO && EventQueue.isDispatchThread()) {
             throw new IllegalStateException("directoryContainsExtension called on EDT");
         }
         Set<File> ignore = TorrentUtil.getIgnorableFiles();
