@@ -19,7 +19,6 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.bittorrent.PaymentOptions;
-import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.bittorrent.BTDownloadActions.PlaySingleMediaFileAction;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.components.transfers.TransferDetailFiles;
@@ -52,7 +51,7 @@ import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
 import com.limegroup.gnutella.gui.tables.LimeJTable;
 import com.limegroup.gnutella.gui.tables.LimeTableColumn;
 import com.limegroup.gnutella.gui.tables.TableSettings;
-import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
@@ -60,6 +59,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         super("DOWNLOAD_TABLE");
         TABLE.setRowHeight(30);
         GUIMediator.addRefreshListener(this);
-        ThreadExecutor.startThread(this::restoreSorting, "BTDownloadMediator.restoreSorting()");
+        BackgroundQueuedExecutorService.schedule(this::restoreSorting);
     }
 
     public static BTDownloadMediator instance() {
@@ -638,8 +638,8 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     public void openTorrentFileForSeed(final File torrentFile, final File saveDir) {
         // If this is called from a UI thread, it needs to be moved to a background thread, ideally
         // reusing an executor
-        if (SwingUtilities.isEventDispatchThread()) {
-            BackgroundExecutorService.schedule(() -> openTorrentFileForSeed(torrentFile, saveDir));
+        if (EventQueue.isDispatchThread()) {
+            BackgroundQueuedExecutorService.schedule(() -> openTorrentFileForSeed(torrentFile, saveDir));
             return;
         }
 
@@ -836,7 +836,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      * Load from the last settings saved the previous sorting preferences of this mediator.
      */
     private void restoreSorting() {
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             throw new RuntimeException("BTDownloadMediator.restoreSorting() cannot be called from the EDT");
         }
         int sortIndex = BittorrentSettings.BTMEDIATOR_COLUMN_SORT_INDEX.getValue();
@@ -854,7 +854,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     public void downloadSoundcloudFromTrackUrlOrSearchResult(final String trackUrl, final SoundcloudSearchResult sr, boolean fromPastedUrl) {
         if (sr != null) {
-            BackgroundExecutorService.schedule(() -> {
+            BackgroundQueuedExecutorService.schedule(() -> {
                 System.out.println("BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult about to get download url");
                 final String downloadUrl = sr.getDownloadUrl();
                 System.out.println("BTDownloadMediator.downloadSoundcloudFromTrackUrlOrSearchResult: " + downloadUrl);
@@ -869,7 +869,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 });
             });
         } else if (trackUrl != null) {
-            BackgroundExecutorService.schedule(() -> {
+            BackgroundQueuedExecutorService.schedule(() -> {
                 try {
                     String url = trackUrl;
                     if (trackUrl.contains("?in=")) {
@@ -917,7 +917,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                                     LibraryMediator.instance().getLibraryExplorer().refreshSelection(true);
 
                                     // Wait for the table to be loaded in order to select the first row
-                                    BackgroundExecutorService.schedule(() -> {
+                                    BackgroundQueuedExecutorService.schedule(() -> {
                                         Thread.yield();
                                         GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
                                     });
