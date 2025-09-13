@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,9 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.SharingSettings;
 
 import java.io.File;
@@ -433,14 +435,14 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
                     new ShareTorrentDialog(GUIMediator.getAppFrame(), ((BittorrentDownload) dl).getTorrentInfo()).setVisible(true);
                 } else if (dl instanceof SoundcloudDownload || dl instanceof HttpDownload) {
                     if (TorrentUtil.askForPermissionToSeedAndSeedDownloads(null)) {
-                        new Thread(() -> {
+                        BackgroundQueuedExecutorService.schedule(() -> {
                             TorrentUtil.makeTorrentAndDownload(dl.getSaveLocation(), null, showShareTorrentDialog);
                             dl.setDeleteDataWhenRemove(false);
                             GUIMediator.safeInvokeLater(() -> {
                                 BTDownloadMediator.instance().remove(dl);
                                 BTDownloadMediator.instance().updateTableFilters();
                             });
-                        }).start();
+                        });
                     }
                 }
             });
