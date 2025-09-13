@@ -138,6 +138,7 @@ public final class BTEngine extends SessionManager {
     @Override
     public void start() {
         SessionParams params = loadSettings();
+        params.setDefaultDiskIO();
         settings_pack sp = params.swig().getSettings();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
@@ -241,7 +242,9 @@ public final class BTEngine extends SessionManager {
 
     private SessionParams defaultParams() {
         SettingsPack sp = defaultSettings();
-        return new SessionParams(sp);
+        SessionParams params = new SessionParams(sp);
+        params.setDefaultDiskIO();
+        return params;
     }
 
     @Override
@@ -421,14 +424,15 @@ public final class BTEngine extends SessionManager {
                             LOG.warn("Can't create data dir or mount point is not accessible");
                             continue;
                         }
-                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
+                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, savePath, null, resumeFile));
                     }
                 } catch (Throwable e) {
                     LOG.error("Error restoring torrent download: " + t, e);
                 }
+                runNextRestoreDownloadTask();
             }
         }
-        runNextRestoreDownloadTask();
+
     }
 
     File settingsFile() {
