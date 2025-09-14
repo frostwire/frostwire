@@ -24,6 +24,7 @@ import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
+import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -138,7 +139,6 @@ public final class BTEngine extends SessionManager {
     @Override
     public void start() {
         SessionParams params = loadSettings();
-        params.setDefaultDiskIO();
         settings_pack sp = params.swig().getSettings();
         sp.set_str(settings_pack.string_types.listen_interfaces.swigValue(), ctx.interfaces);
         sp.set_int(settings_pack.int_types.max_retry_port_bind.swigValue(), ctx.retries);
@@ -226,7 +226,13 @@ public final class BTEngine extends SessionManager {
                     }
                     session_params params = session_params.read_session_params(n);
                     buffer.clear(); // prevents GC
-                    return new SessionParams(params);
+                    SessionParams result = new SessionParams(params);
+                    if (OSUtils.isMacOSX()) {
+                        result.setPosixDiskIO();
+                    } else {
+                        result.setDefaultDiskIO();
+                    }
+                    return result;
                 } else {
                     LOG.error("Can't decode session state data: " + ec.message());
                     return defaultParams();
@@ -243,7 +249,11 @@ public final class BTEngine extends SessionManager {
     private SessionParams defaultParams() {
         SettingsPack sp = defaultSettings();
         SessionParams params = new SessionParams(sp);
-        params.setDefaultDiskIO();
+        if (OSUtils.isMacOSX()) {
+            params.setPosixDiskIO();
+        } else {
+            params.setDefaultDiskIO();
+        }
         return params;
     }
 
