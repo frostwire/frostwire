@@ -159,7 +159,7 @@ public abstract class SearchEngine {
             return new Torrentz2SearchPerformer(token, keywords, DEFAULT_TIMEOUT);
         }
     };
-    private static final SearchEngine MAGNETDL = new SearchEngine(SearchEngineID.MAGNETDL_ID, "MagnetDL", SearchEnginesSettings.MAGNETDL_ENABLED, "magnetdl.com") {
+    private static final SearchEngine MAGNETDL = new SearchEngine(SearchEngineID.MAGNETDL_ID, "MagnetDL", SearchEnginesSettings.MAGNETDL_ENABLED, "magnetdl.homes") {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new MagnetDLSearchPerformer(token, keywords, DEFAULT_TIMEOUT);

@@ -37,7 +37,7 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     private int minSeeds = 1;
 
     public MagnetDLSearchPerformer(long token, String keywords, int timeout) {
-        super("magnetdl.com", token, keywords, timeout, 1, 0);
+        super("magnetdl.homes", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
         if (pattern == null) {
             pattern = Pattern.compile("(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
@@ -56,7 +56,7 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     protected String getSearchUrl(int page, String encodedKeywords) {
         //disregard encoded keywords when it comes to the URL
         String transformedKeywords = nonEncodedKeywords.replace("%20", "-");
-        return "https://" + getDomainName() + "/" + transformedKeywords.subSequence(0, 1) + "/" + transformedKeywords + "/";
+        return "https://" + getDomainName() + "/lmsearch?q=" + transformedKeywords + "&cat=lmsearch";
     }
 
     @Override
