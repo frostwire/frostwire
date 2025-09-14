@@ -114,7 +114,7 @@ public final class Ssl {
                 "google.com",
                 "googleapis.com",
                 "gstatic.com",
-                "gtdb.to",
+                "gtso.cc",
                 "idope.se",
                 "igcdn.com",
                 "igsonar.com",
