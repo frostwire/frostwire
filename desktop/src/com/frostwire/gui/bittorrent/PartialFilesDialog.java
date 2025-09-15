@@ -265,6 +265,8 @@ class PartialFilesDialog extends JDialog {
     private void onCheckBoxToggleAll() {
         model.setAllSelected(checkBoxToggleAll.isSelected());
         buttonOK.setEnabled(checkBoxToggleAll.isSelected());
+        // Reset last clicked row when using toggle all
+        lastClickedRow = -1;
     }
 
     /**
@@ -307,21 +309,31 @@ class PartialFilesDialog extends JDialog {
             return;
         }
         
+        // Convert view row index to model row index (important for filtered tables)
+        int modelRow = table.getRowSorter() != null ? table.convertRowIndexToModel(clickedRow) : clickedRow;
+        
         // Handle Shift+Click for range selection
-        if (e.isShiftDown() && lastClickedRow >= 0 && lastClickedRow != clickedRow) {
-            handleShiftClick(clickedRow);
+        if (e.isShiftDown() && lastClickedRow >= 0 && lastClickedRow != modelRow) {
+            handleShiftClick(modelRow);
         } else {
             // Regular click - update last clicked row
-            lastClickedRow = clickedRow;
+            lastClickedRow = modelRow;
         }
     }
     
     /**
      * Handles Shift+Click range selection between lastClickedRow and clickedRow
      */
-    private void handleShiftClick(int clickedRow) {
-        int startRow = Math.min(lastClickedRow, clickedRow);
-        int endRow = Math.max(lastClickedRow, clickedRow);
+    private void handleShiftClick(int modelClickedRow) {
+        // Ensure both row indices are valid
+        if (lastClickedRow < 0 || modelClickedRow < 0 || 
+            lastClickedRow >= model.getFileInfos().length || 
+            modelClickedRow >= model.getFileInfos().length) {
+            return;
+        }
+        
+        int startRow = Math.min(lastClickedRow, modelClickedRow);
+        int endRow = Math.max(lastClickedRow, modelClickedRow);
         
         // Determine the target selection state based on the last clicked row
         boolean targetState = model.getFileInfos()[lastClickedRow].selected;
