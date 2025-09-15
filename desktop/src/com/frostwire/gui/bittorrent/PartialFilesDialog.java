@@ -20,6 +20,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
@@ -38,6 +39,7 @@ import java.io.File;
  * @author aldenml
  */
 class PartialFilesDialog extends JDialog {
+    private static final Logger LOG = Logger.getLogger(PartialFilesDialog.class);
     private final TorrentInfo torrent;
     private final String name;
     private final TorrentTableModel model;
@@ -52,6 +54,10 @@ class PartialFilesDialog extends JDialog {
      * Has the table been painted at least once?
      */
     private boolean tablePainted;
+    /**
+     * Index of the last clicked row for Shift+Click range selection
+     */
+    private int lastClickedRow = -1;
 
     PartialFilesDialog(JFrame frame, File torrentFile) {
         this(frame, new TorrentInfo(torrentFile), torrentFile.getName());
@@ -167,6 +173,14 @@ class PartialFilesDialog extends JDialog {
         JScrollPane _scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
+        // Add mouse listener for Shift+Click range selection
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                handleTableMouseClick(e);
+            }
+        });
         c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
         c.gridx = 0;
@@ -253,6 +267,8 @@ class PartialFilesDialog extends JDialog {
     private void onCheckBoxToggleAll() {
         model.setAllSelected(checkBoxToggleAll.isSelected());
         buttonOK.setEnabled(checkBoxToggleAll.isSelected());
+        // Reset last clicked row when using toggle all
+        lastClickedRow = -1;
     }
 
     /**
@@ -281,6 +297,74 @@ class PartialFilesDialog extends JDialog {
 
     private void buttonCancel_actionPerformed(ActionEvent e) {
         GUIUtils.getDisposeAction().actionPerformed(e);
+    }
+
+    /**
+     * Handles mouse clicks on the table to support Shift+Click range selection
+     */
+    private void handleTableMouseClick(MouseEvent e) {
+        int clickedRow = table.rowAtPoint(e.getPoint());
+        int clickedColumn = table.columnAtPoint(e.getPoint());
+
+        // Only handle clicks on the checkbox column (column 0)
+        if (clickedColumn != 0 || clickedRow < 0) {
+            return;
+        }
+        
+        // Convert view row index to model row index (important for filtered tables)
+        int modelRow = table.getRowSorter() != null ? table.convertRowIndexToModel(clickedRow) : clickedRow;
+        // Handle Shift+Click for range selection
+        if (e.isShiftDown() && lastClickedRow >= 0) {
+            handleShiftClick(modelRow);
+        } else {
+            // Regular click - update last clicked row
+            lastClickedRow = modelRow;
+        }
+    }
+    
+    /**
+     * Handles Shift+Click range selection between lastClickedRow and clickedRow
+     */
+    private void handleShiftClick(int modelClickedRow) {
+        // Ensure clicked row is valid
+        if (modelClickedRow < 0 || modelClickedRow >= model.getFileInfos().length) {
+            return;
+        }
+        
+        // Look for the nearest selected checkbox above the clicked row
+        int selectedRowAbove = -1;
+        for (int i = modelClickedRow - 1; i >= 0; i--) {
+            if (model.getFileInfos()[i].selected) {
+                selectedRowAbove = i;
+                break;
+            }
+        }
+
+        if (selectedRowAbove >= 0) {
+            // Found a selected checkbox above - select all unselected checkboxes
+            // between that row and the clicked row (inclusive)
+            for (int i = selectedRowAbove; i <= modelClickedRow; i++) {
+                if (!model.getFileInfos()[i].selected) {
+                    model.getFileInfos()[i].selected = true;
+                }
+            }
+        } else {
+            // No selected checkbox found above - treat current row as starting point
+            // Just toggle the current row and set it as the last clicked row for future operations
+            model.getFileInfos()[modelClickedRow].selected = !model.getFileInfos()[modelClickedRow].selected;
+        }
+
+        // Update last clicked row for future shift-click operations
+        lastClickedRow = modelClickedRow;
+
+        // Update the table display
+        model.fireTableDataChanged();
+        
+        // Update the toggle-all checkbox state
+        checkboxToggleAllSetSelectedNoTrigger(model.isAllSelected());
+        
+        // Update the OK button state
+        buttonOK.setEnabled(!model.isNoneSelected());
     }
 
     boolean[] getFilesSelection() {
@@ -389,6 +473,7 @@ class PartialFilesDialog extends JDialog {
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
                 _fileInfos[rowIndex].selected = (Boolean) aValue;
+                lastClickedRow = rowIndex; // Update last clicked row for future Shift+Click operations
                 fireTableDataChanged();
             }
             checkboxToggleAllSetSelectedNoTrigger(isAllSelected());
