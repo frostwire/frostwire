@@ -1,18 +1,19 @@
-frostwire (6.14.1) stable; urgency=high
+frostwire (UNDEFINED) stable; urgency=high
  * New TorrentCSV search performer
  * New Knaben Database Search Performer
- * MacEventHandler is now compatible with JDK 23 and JDK 24
+ * New: Partial selection file dialog now allows shift-click to select ranges of files in torrents
  * New: settings panel to pick location for .torrent files
+ * New: FlatLaf light theme
+ * Maintenance: MacEventHandler is now compatible with JDK 23 and JDK 24
+ * Maintenance: Archive.org search
  * Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
- * Fixed Archive.org search
  * New: Strict EDT Mode to catch long running tasks stalling event dispatch thread
  * EDT freeze: moved media checks off EDT; coalesce selection; add EDT I/O guard
  * Cleanup: removed all remnants of azureus source code
- * New FlatLaf light theme
  * Optimization: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  * Fixed: logic bug in PerformersHelper.countMatchedTokens()
 
- -- FrostWire Team <contact@frostwire.com>  Mon, 8 Sep 2025 16:32:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Mon, 15 Sep 2025 10:53:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
