@@ -20,6 +20,7 @@ package com.frostwire.gui.bittorrent;
 
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.search.NamedMediaType;
 import com.limegroup.gnutella.gui.tables.SizeHolder;
@@ -38,6 +39,7 @@ import java.io.File;
  * @author aldenml
  */
 class PartialFilesDialog extends JDialog {
+    private static final Logger LOG = Logger.getLogger(PartialFilesDialog.class);
     private final TorrentInfo torrent;
     private final String name;
     private final TorrentTableModel model;
@@ -303,7 +305,7 @@ class PartialFilesDialog extends JDialog {
     private void handleTableMouseClick(MouseEvent e) {
         int clickedRow = table.rowAtPoint(e.getPoint());
         int clickedColumn = table.columnAtPoint(e.getPoint());
-        
+
         // Only handle clicks on the checkbox column (column 0)
         if (clickedColumn != 0 || clickedRow < 0) {
             return;
@@ -311,9 +313,8 @@ class PartialFilesDialog extends JDialog {
         
         // Convert view row index to model row index (important for filtered tables)
         int modelRow = table.getRowSorter() != null ? table.convertRowIndexToModel(clickedRow) : clickedRow;
-        
         // Handle Shift+Click for range selection
-        if (e.isShiftDown() && lastClickedRow >= 0 && lastClickedRow != modelRow) {
+        if (e.isShiftDown() && lastClickedRow >= 0) {
             handleShiftClick(modelRow);
         } else {
             // Regular click - update last clicked row
@@ -325,24 +326,37 @@ class PartialFilesDialog extends JDialog {
      * Handles Shift+Click range selection between lastClickedRow and clickedRow
      */
     private void handleShiftClick(int modelClickedRow) {
-        // Ensure both row indices are valid
-        if (lastClickedRow < 0 || modelClickedRow < 0 || 
-            lastClickedRow >= model.getFileInfos().length || 
-            modelClickedRow >= model.getFileInfos().length) {
+        // Ensure clicked row is valid
+        if (modelClickedRow < 0 || modelClickedRow >= model.getFileInfos().length) {
             return;
         }
         
-        int startRow = Math.min(lastClickedRow, modelClickedRow);
-        int endRow = Math.max(lastClickedRow, modelClickedRow);
-        
-        // Determine the target selection state based on the last clicked row
-        boolean targetState = model.getFileInfos()[lastClickedRow].selected;
-        
-        // Apply the same selection state to all rows in the range
-        for (int i = startRow; i <= endRow; i++) {
-            model.getFileInfos()[i].selected = targetState;
+        // Look for the nearest selected checkbox above the clicked row
+        int selectedRowAbove = -1;
+        for (int i = modelClickedRow - 1; i >= 0; i--) {
+            if (model.getFileInfos()[i].selected) {
+                selectedRowAbove = i;
+                break;
+            }
         }
-        
+
+        if (selectedRowAbove >= 0) {
+            // Found a selected checkbox above - select all unselected checkboxes
+            // between that row and the clicked row (inclusive)
+            for (int i = selectedRowAbove; i <= modelClickedRow; i++) {
+                if (!model.getFileInfos()[i].selected) {
+                    model.getFileInfos()[i].selected = true;
+                }
+            }
+        } else {
+            // No selected checkbox found above - treat current row as starting point
+            // Just toggle the current row and set it as the last clicked row for future operations
+            model.getFileInfos()[modelClickedRow].selected = !model.getFileInfos()[modelClickedRow].selected;
+        }
+
+        // Update last clicked row for future shift-click operations
+        lastClickedRow = modelClickedRow;
+
         // Update the table display
         model.fireTableDataChanged();
         
