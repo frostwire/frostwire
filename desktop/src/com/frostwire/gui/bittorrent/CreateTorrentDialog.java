@@ -26,6 +26,7 @@ import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import com.limegroup.gnutella.settings.SharingSettings;
 import com.limegroup.gnutella.util.FrostWireUtils;
 import net.miginfocom.swing.MigLayout;
@@ -46,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 
 /**
  * @author gubatron
@@ -408,7 +411,7 @@ public class CreateTorrentDialog extends JDialog {
         if (!showSaveAsDialog()) {
             return;
         }
-        new Thread(() -> {
+        BackgroundQueuedExecutorService.schedule(() -> {
             if (makeTorrent()) {
                 revertSaveCloseButtons();
                 progressBar.setString(I18n.tr("Torrent Created."));
@@ -417,7 +420,7 @@ public class CreateTorrentDialog extends JDialog {
                     SwingUtilities.invokeLater(() -> GUIMediator.instance().openTorrentForSeed(new File(dotTorrentSavePath), saveDir));
                 }
             }
-        }).start();
+        });
     }
 
     private boolean showSaveAsDialog() {
@@ -517,7 +520,7 @@ public class CreateTorrentDialog extends JDialog {
                 error_code ec = new error_code();
                 // DO NOT PASS NULL LISTENERS TO THE HASH LISTENER, JLIBTORRENT 2.0.12.3 WILL CRASH, 2.0.12.4 FIXED IT
                 set_piece_hashes_listener no_op_listener = new set_piece_hashes_listener();
-                libtorrent.set_piece_hashes_ex(torrent, saveDir.getAbsolutePath(), no_op_listener, ec);
+                libtorrent.set_piece_hashes_posix_disk_io(torrent, saveDir.getAbsolutePath(), no_op_listener, ec);
                 reportCurrentTask(I18n.tr("Generating torrent entry..."));
                 Entry entry = new Entry(torrent.generate());
                 Map<String, Entry> entryMap = entry.dictionary();
