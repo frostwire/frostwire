@@ -52,6 +52,10 @@ class PartialFilesDialog extends JDialog {
      * Has the table been painted at least once?
      */
     private boolean tablePainted;
+    /**
+     * Index of the last clicked row for Shift+Click range selection
+     */
+    private int lastClickedRow = -1;
 
     PartialFilesDialog(JFrame frame, File torrentFile) {
         this(frame, new TorrentInfo(torrentFile), torrentFile.getName());
@@ -167,6 +171,14 @@ class PartialFilesDialog extends JDialog {
         JScrollPane _scrollPane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        
+        // Add mouse listener for Shift+Click range selection
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                handleTableMouseClick(e);
+            }
+        });
         c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
         c.gridx = 0;
@@ -283,6 +295,52 @@ class PartialFilesDialog extends JDialog {
         GUIUtils.getDisposeAction().actionPerformed(e);
     }
 
+    /**
+     * Handles mouse clicks on the table to support Shift+Click range selection
+     */
+    private void handleTableMouseClick(MouseEvent e) {
+        int clickedRow = table.rowAtPoint(e.getPoint());
+        int clickedColumn = table.columnAtPoint(e.getPoint());
+        
+        // Only handle clicks on the checkbox column (column 0)
+        if (clickedColumn != 0 || clickedRow < 0) {
+            return;
+        }
+        
+        // Handle Shift+Click for range selection
+        if (e.isShiftDown() && lastClickedRow >= 0 && lastClickedRow != clickedRow) {
+            handleShiftClick(clickedRow);
+        } else {
+            // Regular click - update last clicked row
+            lastClickedRow = clickedRow;
+        }
+    }
+    
+    /**
+     * Handles Shift+Click range selection between lastClickedRow and clickedRow
+     */
+    private void handleShiftClick(int clickedRow) {
+        int startRow = Math.min(lastClickedRow, clickedRow);
+        int endRow = Math.max(lastClickedRow, clickedRow);
+        
+        // Determine the target selection state based on the last clicked row
+        boolean targetState = model.getFileInfos()[lastClickedRow].selected;
+        
+        // Apply the same selection state to all rows in the range
+        for (int i = startRow; i <= endRow; i++) {
+            model.getFileInfos()[i].selected = targetState;
+        }
+        
+        // Update the table display
+        model.fireTableDataChanged();
+        
+        // Update the toggle-all checkbox state
+        checkboxToggleAllSetSelectedNoTrigger(model.isAllSelected());
+        
+        // Update the OK button state
+        buttonOK.setEnabled(!model.isNoneSelected());
+    }
+
     boolean[] getFilesSelection() {
         return filesSelection;
     }
@@ -389,6 +447,7 @@ class PartialFilesDialog extends JDialog {
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if (columnIndex == 0) {
                 _fileInfos[rowIndex].selected = (Boolean) aValue;
+                lastClickedRow = rowIndex; // Update last clicked row for future Shift+Click operations
                 fireTableDataChanged();
             }
             checkboxToggleAllSetSelectedNoTrigger(isAllSelected());
