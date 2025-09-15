@@ -6,7 +6,6 @@ Here you will find the sources necessary to build [FrostWire for Android](http:/
  * [/android](https://github.com/frostwire/frostwire/tree/master/android) Sources for FrostWire for Android
  * [/desktop](https://github.com/frostwire/frostwire/tree/master/desktop) Sources for FrostWire for Desktop (Windows, Mac, Linux)
  * [/common](https://github.com/frostwire/frostwire/tree/master/common) Common sources for the desktop and android client
- * [/telluride](https://github.com/frostwire/frostwire/tree/master/telluride) Sources for our Telluride cloud video downloader
 
 # Coding Guidelines
 
@@ -109,15 +108,18 @@ Build with Android studio or go inside the `android` directory and type:
 
 Frostwire Desktop and Frostwire Android are offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
 
+### Other important FrostWire repositories
+[JLibTorrent](https://github.com/frostwire/frostwire-jlibtorrent)
+[Telluride Cloud Video Downloader](https://github.com/frostwire/telluride)
+[FrostWire JMplayer](https://github.com/frostwire/frostwire-jmplayer)
 
 ### Official FrostWire sites
 
-[Main Website Frostwire.com](https://www.frostwire.com) |
+[Main Website Frostwire.com](https://www.frostwire.com)
+[X @frostwire](https://x.com/frostwire)
 [Reddit](https://reddit.com/r/frostwire)
-[Twitter @frostwire](https://twitter.com/frostwire) |
-[Facebook](https://www.facebook.com/FrostWireOfficial) |
-[Discord Chatrooms](https://discord.com/channels/461752211802947585/461752211802947587) |
-[Tumblr](http://tumblr.frostwire.com)
+[Facebook](https://www.facebook.com/FrostWireOfficial)
+[Discord Chatrooms](https://discord.com/channels/461752211802947585/461752211802947587)
 
 
 ### SourceForge Mirror
