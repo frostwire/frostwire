@@ -208,7 +208,12 @@ public final class TorrentUtil {
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
 
-            libtorrent.set_piece_hashes_ex(torrentCreator, file.getParentFile().getAbsolutePath(), new set_piece_hashes_listener() {
+            // libtorrent.set_piece_hashes_ex crashes on macos because of its use of mmap, which handles memory errors via SIGBUS/SIGSEGV
+            // and these signals sometimes leak to java and crash the JVM.
+            // In windows this is not an issue because mmap provides structured exception handling.
+
+            // no such issues with the posix disk io version.
+            libtorrent.set_piece_hashes_posix_disk_io(torrentCreator, file.getParentFile().getAbsolutePath(), new set_piece_hashes_listener() {
                 final AtomicBoolean progressInvoked = new AtomicBoolean(false);
                 int totalPieces = torrentCreator.num_pieces();
 

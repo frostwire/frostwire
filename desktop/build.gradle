@@ -37,6 +37,9 @@ application {
                                  '--add-opens=java.desktop/java.awt=ALL-UNNAMED',
                                  '--add-opens=java.desktop/javax.swing=ALL-UNNAMED',
                                  '--enable-native-access=ALL-UNNAMED',
+'-XX:+PreserveFramePointer',
+'-XX:ErrorFile=./hs_err_pid%p.log',
+'-XX:+CreateCoredumpOnCrash',
                                  '-Xms64m',
                                  '-Xmx512m',
                                  //'-Xss2m', 2MB stack (debugging silent crashes: prolong crashes due to native stack overflows, attach gdb, etc.)
@@ -90,7 +93,7 @@ dependencies {
     def arch = System.getProperty('os.arch').toLowerCase()
     def is_arm64 = arch == "aarch64" || arch == "arm64"
 
-    def use_maven_jlibtorrent = true
+    def use_maven_jlibtorrent = false
 
     if (use_maven_jlibtorrent) {
         // jlibtorrent java wrappers
@@ -116,7 +119,7 @@ dependencies {
         // assume use has frostwire-jlibtorrent project checked out (dev mode) at the same level as the frostwire project
         // we are currently at frostwire/desktop
         def jlibtorrent_built_jars_path = '../../frostwire-jlibtorrent/build/libs'
-        System.out.println("Using jlibtorrent jars from: ${jlibtorrent_built_jars_path}")
+        System.out.println("Using jlibtorrent jars from development environment at ${jlibtorrent_built_jars_path}")
         def main_jar = files("${jlibtorrent_built_jars_path}/jlibtorrent-${jlibtorrent_version}.jar")
         // print everything in the main_jar file collection
         // print the absolute path of the main jar
