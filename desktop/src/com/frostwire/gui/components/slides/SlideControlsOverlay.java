@@ -134,7 +134,7 @@ final class SlideControlsOverlay extends JPanel {
         JLabel labelAuthor = new JLabel(slide.author + " " + I18n.tr("on"));
         //labelAuthor.putClientProperty(SubstanceTextUtilities.ENFORCE_FG_COLOR, Boolean.TRUE);
 
-        if (ThemeMediator.isDarkThemeOn()) {
+        if (ThemeMediator.isDarkLafThemeOn()) {
             labelAuthor.setOpaque(true);
             labelAuthor.setBackground(Color.BLACK);
             container.setOpaque(true);

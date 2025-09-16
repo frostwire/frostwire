@@ -40,7 +40,7 @@ public final class SkinApplicationHeaderUI extends BasicPanelUI {
         float[] dist = {0.0f, 1.0f};
         Color[] colors = SkinColors.APPLICATION_HEADER_GRADIENT_COLORS;
 
-        if (ThemeMediator.isDarkThemeOn()) {
+        if (ThemeMediator.isDarkLafThemeOn()) {
             // dark mode gradient
             colors = new Color[]{
                     SkinColors.APPLICATION_HEADER_DARK_MODE_GRADIENT_COLOR_TOP,
