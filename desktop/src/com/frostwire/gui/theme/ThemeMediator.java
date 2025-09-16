@@ -89,9 +89,11 @@ public final class ThemeMediator {
      * Available UI themes.
      */
     public enum ThemeEnum {
-        DEFAULT,  /// Default theme
-        DARK,     /// Experimental dark theme
-        LIGHT_LAF /// Experimental light theme
+        DEFAULT,
+        /// Default theme
+        DARK_LAF,
+        /// Experimental dark-flat look and feel
+        LIGHT_LAF  /// Experimental light-flat look and feel
     }
 
     /**
@@ -121,11 +123,12 @@ public final class ThemeMediator {
         return currentTheme;
     }
 
-    public static boolean isDarkThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+    public static boolean isDarkLafThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_LAF;
     }
 
-    /** Helper for checking if a light theme is enabled.
+    /**
+     * Helper for checking if a light theme is enabled.
      * <p>
      * Possible light themes in FrostWire are either the default theme or
      * FlatLaf Light (also known as simply "Light (beta)")
@@ -166,10 +169,9 @@ public final class ThemeMediator {
         // Delegate theme loading to ThemeMediator
         if (theme == ThemeEnum.DEFAULT) {
             com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
-        } else if (theme == ThemeEnum.DARK) {
+        } else if (theme == ThemeEnum.DARK_LAF) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
-        } else if (theme == ThemeEnum.LIGHT_LAF)
-        {
+        } else if (theme == ThemeEnum.LIGHT_LAF) {
             com.frostwire.gui.theme.ThemeMediator.loadLightTheme();
         }
 
@@ -345,7 +347,7 @@ public final class ThemeMediator {
 
     public static JSeparator createAppHeaderSeparator() {
         return createVerticalSeparator(
-                currentTheme == ThemeEnum.DARK ?
+                currentTheme == ThemeEnum.DARK_LAF ?
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
     }
