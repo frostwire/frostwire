@@ -430,11 +430,16 @@ public final class BTEngine extends SessionManager {
                     if (infoHash != null) {
                         File resumeFile = resumeDataFile(infoHash);
                         File savePath = readSavePath(infoHash);
-                        if (setupSaveDir(savePath) == null) {
-                            LOG.warn("Can't create data dir or mount point is not accessible");
+                        File checked = setupSaveDir(savePath);
+                        if (checked == null) {
+                            // fallback to default data dir
+                            checked = setupSaveDir(ctx.dataDir);
+                        }
+                        if (checked == null) {
+                            LOG.warn("Can't create data dir or mount point is not accessible for infoHash=" + infoHash);
                             continue;
                         }
-                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, savePath, null, resumeFile));
+                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, checked, null, resumeFile));
                     }
                 } catch (Throwable e) {
                     LOG.error("Error restoring torrent download: " + t, e);
@@ -640,6 +645,12 @@ public final class BTEngine extends SessionManager {
                 // Re-apply priorities on the handle to be 100% sure they stick
                 if (priorities != null && priorities.length == ti.numFiles()) {
                     th.prioritizeFiles(priorities);
+                }
+                try {
+                    th.setFlags(TorrentFlags.NEED_SAVE_RESUME);
+                    th.saveResumeData(TorrentHandle.SAVE_INFO_DICT);
+                } catch (Throwable t) {
+                    LOG.warn("BTEngine.download() - unable to trigger initial resume save", t);
                 }
                 fireDownloadUpdate(th);
                 th.resume();

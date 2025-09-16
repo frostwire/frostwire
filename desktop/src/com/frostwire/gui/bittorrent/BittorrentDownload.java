@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownload {
     private static final Logger LOG = Logger.getLogger(BittorrentDownload.class);
-    private final BTDownload dl;
+    private final com.frostwire.bittorrent.BTDownload dl;
     private String displayName;
     private double size;
     private List<TransferItem> items;

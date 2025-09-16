@@ -17,23 +17,8 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.AlertListener;
-import com.frostwire.jlibtorrent.AnnounceEntry;
-import com.frostwire.jlibtorrent.Entry;
-import com.frostwire.jlibtorrent.FileStorage;
-import com.frostwire.jlibtorrent.PiecesTracker;
-import com.frostwire.jlibtorrent.Priority;
-import com.frostwire.jlibtorrent.SessionHandle;
-import com.frostwire.jlibtorrent.TorrentFlags;
-import com.frostwire.jlibtorrent.TorrentHandle;
-import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.jlibtorrent.TorrentStatus;
-import com.frostwire.jlibtorrent.Vectors;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.PieceFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
@@ -43,18 +28,11 @@ import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -85,6 +63,7 @@ public final class BTDownload implements BittorrentDownload {
     private Set<File> incompleteFilesToRemove;
     private long lastSaveResumeTime;
     private String predominantFileExtension;
+    private volatile boolean removing;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         this.engine = engine;
@@ -373,6 +352,9 @@ public final class BTDownload implements BittorrentDownload {
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
         incompleteFilesToRemove = getIncompleteFiles();
+        // prevent any further resume serialization during removal
+        removing = true;
+        engine.removeListener(innerListener);
         if (th.isValid()) {
             if (deleteData) {
                 engine.remove(th, SessionHandle.DELETE_FILES);
@@ -386,10 +368,32 @@ public final class BTDownload implements BittorrentDownload {
                 Platforms.get().fileSystem().delete(torrent);
             }
         }
-        //noinspection ResultOfMethodCallIgnored
-        engine.resumeDataFile(infoHash).delete();
-        //noinspection ResultOfMethodCallIgnored
-        engine.resumeTorrentFile(infoHash).delete();
+        // remove any leftover resume/torrent sidecar files under both v1 and v2 hash names
+        Set<String> hashesToDelete = new HashSet<>();
+        if (infoHash != null) {
+            hashesToDelete.add(infoHash);
+        }
+        try {
+            TorrentInfo ti = th.torrentFile();
+            if (ti != null) {
+                String v1 = null;
+                try { v1 = ti.infoHashV1() != null ? ti.infoHashV1().toString().toLowerCase() : null; } catch (Throwable ignore) {}
+                if (v1 != null && !v1.isEmpty()) {
+                    hashesToDelete.add(v1);
+                }
+                Sha256Hash v2 = null;
+                try { v2 = ti.infoHashV2(); } catch (Throwable ignore) {}
+                if (v2 != null && !v2.isAllZeros()) {
+                    hashesToDelete.add(v2.toString().toLowerCase());
+                }
+            }
+        } catch (Throwable ignore) { }
+        for (String h : hashesToDelete) {
+            //noinspection ResultOfMethodCallIgnored
+            engine.resumeDataFile(h).delete();
+            //noinspection ResultOfMethodCallIgnored
+            engine.resumeTorrentFile(h).delete();
+        }
     }
 
     @Override
@@ -624,7 +628,7 @@ public final class BTDownload implements BittorrentDownload {
 
     public void setSequentialDownload(boolean sequential) {
         if (!th.isValid()) {
-            System.out.println("BTDownload::setSequentialDownload( " +  sequential + ") aborted. Torrent Handle Invalid.");
+            System.out.println("BTDownload::setSequentialDownload( " + sequential + ") aborted. Torrent Handle Invalid.");
             return;
         }
         if (sequential) {
@@ -649,6 +653,9 @@ public final class BTDownload implements BittorrentDownload {
 
     private void serializeResumeData(SaveResumeDataAlert alert) {
         try {
+            if (removing) {
+                return;
+            }
             if (th.isValid()) {
                 String infoHash = th.infoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
@@ -670,8 +677,8 @@ public final class BTDownload implements BittorrentDownload {
             return;
         }
         try {
-            if (th != null && th.isValid()) {
-                th.saveResumeData(TorrentHandle.SAVE_INFO_DICT);
+            if (th != null && th.isValid() && th.needSaveResumeData()) {
+                th.saveResumeData(TorrentHandle.ONLY_IF_MODIFIED);
             }
         } catch (Throwable e) {
             LOG.warn("Error triggering resume data", e);
