@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2016, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public final class Licenses {
     public static final License UNKNOWN = new License("Unknown", "https://www.google.com/#q=license");
-    public static final License APACHE = new License("Apache License, Version 2.0", "http://www.apache.org/licenses/LICENSE-2.0.html");
+    public static final License APACHE = new License("Apache License, Version 2.0", "https://www.apache.org/licenses/LICENSE-2.0.html");
     public static final License BSD_2_CLAUSE = new License("The FreeBSD Copyright License (BSD 2 Clause)", "http://www.freebsd.org/copyright/freebsd-license.html");
     public static final License BSD_3_CLAUSE = new License("The FreeBSD Copyright License (BSD 3 Clause)", "http://opensource.org/licenses/BSD-3-Clause");
     public static final License GPL3 = new License("GNU General Public License Version 3 (GPL 3)", "https://www.gnu.org/licenses/gpl.html");
