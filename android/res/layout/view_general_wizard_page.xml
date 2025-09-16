@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-<!--
 * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
 
@@ -15,7 +14,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
--->
 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
