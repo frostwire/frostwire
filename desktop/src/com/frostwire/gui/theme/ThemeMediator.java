@@ -158,7 +158,7 @@ public final class ThemeMediator {
         /* ------------------------------------------------------------------
          * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
          *    immediate change (handy when they click around in Options);
-         * 2.  tell the user that a **restart is required** for a 100 % clelegacan
+         * 2.  tell the user that a **restart is required** for a 100 % clean
          *    switch (many colours, borders & cached icons only update at
          *    start‑up);
          * 3.  spawn a fresh copy of FrostWire and let this process exit.
