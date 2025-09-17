@@ -20,6 +20,7 @@ package com.frostwire.android.gui.transfers;
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -292,7 +293,8 @@ public class TorrentFetcherDownload implements BittorrentDownload {
                     // use our http client, since we can handle referer
                     data = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(uri, 30000, referrer);
                 } else {
-                    data = BTEngine.getInstance().fetchMagnet(uri, 30, true);
+                    // use bittorrent engine, since it can handle dht and pex
+                    data = new LibTorrentMagnetDownloader().download(uri, 30);
                 }
 
                 if (state == TransferState.CANCELED) {

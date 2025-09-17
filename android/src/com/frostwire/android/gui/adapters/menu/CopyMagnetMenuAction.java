@@ -21,6 +21,7 @@ import android.content.Context;
 
 import com.frostwire.bittorrent.BTEngine;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.swig.info_hash_t;
 
 import java.io.File;
 
@@ -65,7 +66,12 @@ public final class CopyMagnetMenuAction extends CopyToClipboardMenuAction {
             if (magnet) {
                 result = ti.makeMagnetUri() + BTEngine.getInstance().magnetPeers();
             } else {
-                result = ti.infoHash().toString();
+                info_hash_t infoHashT = ti.infoHashType();
+                if (infoHashT.has_v2()) {
+                    result = ti.infoHashV2().toString();
+                } else if (infoHashT.has_v1()) {
+                    result = ti.infoHashV1().toString();
+                }
             }
         } catch (Throwable e) {
             // not using log, since this method should be moved to a better place

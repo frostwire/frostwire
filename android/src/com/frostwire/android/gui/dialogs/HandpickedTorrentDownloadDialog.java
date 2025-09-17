@@ -107,7 +107,8 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                 SelectionMode.MULTIPLE_SELECTION);
         final Bundle arguments = dlg.getArguments();
         // write torrent metadata to a temp file to avoid large Bundles
-        String infoHash = tinfo.infoHash().toString();
+        String infoHash = tinfo.infoHashType().has_v2() ?
+                tinfo.infoHashV2().toString() : tinfo.infoHashV1().toString();
         File cacheFile = new File(ctx.getCacheDir(), "torrent_" + infoHash);
         try {
             FileOutputStream fos = new FileOutputStream(cacheFile);
@@ -383,7 +384,7 @@ public final class HandpickedTorrentDownloadDialog extends AbstractConfirmListDi
                                     peers,
                                     TransferManager.instance().isDeleteStartedTorrentEnabled());
                             dlg.removeTorrentFetcherDownloadFromTransfers();
-                            TorrentHandle torrentHandle = BTEngine.getInstance().find(torrentInfo.infoHash());
+                            TorrentHandle torrentHandle = BTEngine.getInstance().find(torrentInfo);
                             TransferManager.instance().updateUIBittorrentDownload(torrentHandle);
                             UIUtils.showTransfersOnDownloadStart(ctx);
                             MainActivity.refreshTransfers(ctx);

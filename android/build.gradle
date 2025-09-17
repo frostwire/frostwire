@@ -32,7 +32,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.8.2'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'org.codehaus.groovy:groovy-all:3.0.9'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
@@ -116,7 +116,7 @@ android {
                 }
             }
             pip {
-                install "yt_dlp==2025.03.31"
+                install "yt_dlp==2025.09.05"
                 // helps a lot with debugging
                 //options "--verbose"
             }
@@ -250,7 +250,7 @@ dependencies {
     // AppLovin + Unity
     implementation 'com.applovin.mediation:unityads-adapter:4.14.1.0'
 
-    def jlibtorrent_version = '1.2.19.0'
+    def jlibtorrent_version = '2.0.12.5'
     implementation 'com.frostwire:jlibtorrent:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version

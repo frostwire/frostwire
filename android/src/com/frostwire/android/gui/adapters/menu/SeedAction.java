@@ -248,7 +248,7 @@ public class SeedAction extends MenuAction implements AbstractDialog.OnDialogCli
             File file = new File(fd.filePath);
             File saveDir = file.getParentFile();
             file_storage fs = new file_storage();
-            fs.add_file(file.getName(), file.length());
+            libtorrent.add_files(fs, file.getAbsolutePath());
             fs.set_name(file.getName());
             create_torrent ct = new create_torrent(fs); //, 0, -1, create_torrent.flags_t.merkle.swigValue());
             // commented out the merkle flag above because torrent doesn't appear as "Seeding", piece count doesn't work
