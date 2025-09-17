@@ -55,6 +55,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     protected final List<T> _list = new ArrayList<>();
     /**
+     * Lock object for synchronizing access to _list to prevent ConcurrentModificationException.
+     */
+    private final Object _listLock = new Object();
+    /**
      * Variable for whether or not the current sorting scheme
      * is ascending (value 1) or descending (value -1).
      */
@@ -80,11 +84,15 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     //Implements DataLineModel interface
     public String[] getToolTipArray(int row, int col) {
-        return _list.get(row).getToolTipArray(col);
+        synchronized (_listLock) {
+            return _list.get(row).getToolTipArray(col);
+        }
     }
 
     public boolean isTooltipRequired(int row, int col) {
-        return _list.get(row).isTooltipRequired(col);
+        synchronized (_listLock) {
+            return _list.get(row).isTooltipRequired(col);
+        }
     }
 
     //Implements DataLineModel interface.
@@ -139,7 +147,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Implementation of resorting.
      */
     protected void doResort() {
-        _list.sort(this);
+        synchronized (_listLock) {
+            _list.sort(this);
+        }
     }
 
     /*
@@ -153,15 +163,19 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
 
     //Implements DataLineModel interface
     public void clear() {
-        cleanup();
-        _list.clear();
+        synchronized (_listLock) {
+            cleanup();
+            _list.clear();
+        }
         fireTableDataChanged();
     }
 
     //Cleans up all the data lines.
     protected void cleanup() {
-        for (T t : _list) {
-            t.cleanup();
+        synchronized (_listLock) {
+            for (T t : _list) {
+                t.cleanup();
+            }
         }
     }
 
@@ -175,8 +189,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * @return null
      */
     public Object refresh() {
-        int end = _list.size();
-        for (T t : _list) t.update();
+        int end;
+        synchronized (_listLock) {
+            end = _list.size();
+            for (T t : _list) t.update();
+        }
         fireTableRowsUpdated(0, end);
         return null;
     }
@@ -187,7 +204,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public int update(E o) {
         int row = getRow(o);
-        _list.get(row).update();
+        synchronized (_listLock) {
+            _list.get(row).update();
+        }
         fireTableRowsUpdated(row, row);
         return row;
     }
@@ -245,7 +264,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
         // it is entirely likely that two columns will be the same.
         // If the returned row is < 0, we want to convert it to
         // the insertion point.
-        int row = Collections.binarySearch(_list, dl, this);
+        int row;
+        synchronized (_listLock) {
+            row = Collections.binarySearch(_list, dl, this);
+        }
         if (row < 0) row = -(row + 1);
         return row;
     }
@@ -296,7 +318,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * to maintain a HashMap of any type for speedier access.
      */
     public int add(T dl, int row) {
-        _list.add(row, dl);
+        synchronized (_listLock) {
+            _list.add(row, dl);
+        }
         fireTableRowsInserted(row, row);
         return row;
     }
@@ -331,8 +355,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
     public T get(int row) {
         if (row == -1)
             return null;
-        else
-            return _list.get(row);
+        else {
+            synchronized (_listLock) {
+                return _list.get(row);
+            }
+        }
     }
 
     /**
@@ -343,9 +370,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public T get(E o) {
         int row = getRow(o);
-        if (row != -1)
-            return _list.get(row);
-        else
+        if (row != -1) {
+            synchronized (_listLock) {
+                return _list.get(row);
+            }
+        } else
             return null;
     }
 
@@ -357,9 +386,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      */
     public T get(Object o, int col) {
         int row = getRow(o, col);
-        if (row != -1)
-            return _list.get(row);
-        else
+        if (row != -1) {
+            synchronized (_listLock) {
+                return _list.get(row);
+            }
+        } else
             return null;
     }
 
@@ -367,8 +398,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Calls cleanup on the DataLine and then removes it from the list.
      */
     public void remove(int row) {
-        _list.get(row).cleanup();
-        _list.remove(row);
+        synchronized (_listLock) {
+            _list.get(row).cleanup();
+            _list.remove(row);
+        }
         fireTableRowsDeleted(row, row);
     }
 
@@ -378,7 +411,10 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * If no matching DataLine exists, nothing happens.
      */
     public void remove(T line) {
-        int idx = _list.indexOf(line);
+        int idx;
+        synchronized (_listLock) {
+            idx = _list.indexOf(line);
+        }
         if (idx != -1)
             remove(idx);
     }
@@ -392,25 +428,37 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * a HashMap for more timely access.
      */
     public void remove(Object o) {
-        int end = _list.size();
-        for (int i = 0; i < end; i++) {
-            if (_list.get(i).getInitializeObject().equals(o)) {
-                remove(i);
-                break;
+        int rowToRemove = -1;
+        synchronized (_listLock) {
+            int end = _list.size();
+            for (int i = 0; i < end; i++) {
+                if (_list.get(i).getInitializeObject().equals(o)) {
+                    rowToRemove = i;
+                    break;
+                }
             }
+        }
+        if (rowToRemove != -1) {
+            remove(rowToRemove);
         }
     }
 
     //Implements the TableModel method
     public Object getValueAt(int row, int col) {
-        return _list.get(row).getValueAt(col);
+        synchronized (_listLock) {
+            return _list.get(row).getValueAt(col);
+        }
     }
 
     //Implements the TableModel method
     // Ignores the update if the row doesn't exist.
     public void setValueAt(Object o, int row, int col) {
-        if (row >= 0 && row < _list.size()) {
-            _list.get(row).setValueAt(o, col);
+        synchronized (_listLock) {
+            if (row >= 0 && row < _list.size()) {
+                _list.get(row).setValueAt(o, col);
+            }
+        }
+        if (row >= 0 && row < getRowCount()) {
             fireTableRowsUpdated(row, row);
         }
     }
@@ -422,9 +470,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * the HashMap.
      */
     public boolean contains(Object o, int col) {
-        for (T t : _list) {
-            if (t.getValueAt(col).equals(o))
-                return true;
+        synchronized (_listLock) {
+            for (T t : _list) {
+                if (t.getValueAt(col).equals(o))
+                    return true;
+            }
         }
         return false;
     }
@@ -437,9 +487,11 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * the HashMap.
      */
     public boolean contains(Object o) {
-        for (T t : _list) {
-            if (t.getInitializeObject().equals(o))
-                return true;
+        synchronized (_listLock) {
+            for (T t : _list) {
+                if (t.getInitializeObject().equals(o))
+                    return true;
+            }
         }
         return false;
     }
@@ -448,7 +500,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * @return the index of the matching DataLine.
      */
     public int getRow(T dl) {
-        return _list.indexOf(dl);
+        synchronized (_listLock) {
+            return _list.indexOf(dl);
+        }
     }
 
     /**
@@ -459,10 +513,12 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * the HashMap.
      */
     public int getRow(Object o, int col) {
-        int end = _list.size();
-        for (int i = 0; i < end; i++) {
-            if (_list.get(i).getValueAt(col).equals(o))
-                return i;
+        synchronized (_listLock) {
+            int end = _list.size();
+            for (int i = 0; i < end; i++) {
+                if (_list.get(i).getValueAt(col).equals(o))
+                    return i;
+            }
         }
         return -1;
     }
@@ -474,10 +530,12 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * the HashMap.
      */
     public int getRow(E o) {
-        int end = _list.size();
-        for (int i = 0; i < end; i++) {
-            if (_list.get(i).getInitializeObject().equals(o))
-                return i;
+        synchronized (_listLock) {
+            int end = _list.size();
+            for (int i = 0; i < end; i++) {
+                if (_list.get(i).getInitializeObject().equals(o))
+                    return i;
+            }
         }
         return -1;
     }
@@ -505,7 +563,9 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Returns the size of _list.
      */
     public int getRowCount() {
-        return _list.size();
+        synchronized (_listLock) {
+            return _list.size();
+        }
     }
 
     /**
