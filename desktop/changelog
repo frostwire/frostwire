@@ -13,8 +13,10 @@ frostwire (UNDEFINED) stable; urgency=high
  * Cleanup: removed all remnants of azureus source code
  * Optimization: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  * Fixed: logic bug in PerformersHelper.countMatchedTokens()
+ * Cleanup: apple libdispatch removal
+ * Cleanup: deprecated iTunes integration removed after cleanups. Users can manage their own playlists on Apple Music.
 
- -- FrostWire Team <contact@frostwire.com>  Tue, 16 Sep 2025 04:58:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Wed, 17 Sep 2025 04:58:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
