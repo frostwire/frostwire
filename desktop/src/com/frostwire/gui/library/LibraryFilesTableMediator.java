@@ -28,6 +28,7 @@ import com.frostwire.gui.theme.SkinPopupMenu;
 import com.frostwire.gui.theme.ThemeMediator;
 import com.frostwire.mp4.Mp4Demuxer;
 import com.frostwire.mp4.Mp4Info;
+import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.MediaType;
 import com.limegroup.gnutella.gui.*;
@@ -52,8 +53,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -66,8 +67,9 @@ import java.util.concurrent.Future;
  * @author aldenml
  */
 final public class LibraryFilesTableMediator extends AbstractLibraryTableMediator<LibraryFilesTableModel, LibraryFilesTableDataLine, File> {
+    private static final Logger LOG = Logger.getLogger(LibraryFilesTableMediator.class);
     /**
-     * instance, for singleton access
+     * Instance, for singleton access
      */
     private static LibraryFilesTableMediator INSTANCE;
     /**
@@ -79,7 +81,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
     private Action DEMUX_MP4_AUDIO_ACTION;
     private Action CREATE_TORRENT_ACTION;
     private Action DELETE_ACTION;
-    private Action SEND_TO_ITUNES_ACTION;
 
     /**
      * Note: This is set up for this to work.
@@ -155,7 +156,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         DEMUX_MP4_AUDIO_ACTION = new DemuxMP4AudioAction();
         CREATE_TORRENT_ACTION = new CreateTorrentAction();
         DELETE_ACTION = new RemoveAction();
-        SEND_TO_ITUNES_ACTION = new SendAudioFilesToiTunes();
     }
 
     @Override
@@ -206,7 +206,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         }
         menu.add(new SkinMenuItem(CREATE_TORRENT_ACTION));
         menu.add(new SkinMenuItem(SEND_TO_FRIEND_ACTION));
-        menu.add(new SkinMenuItem(SEND_TO_ITUNES_ACTION));
         menu.addSeparator();
         menu.add(new SkinMenuItem(DELETE_ACTION));
         menu.addSeparator();
@@ -242,24 +241,12 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         return selectionIsAllMP4;
     }
 
-    private boolean areAllSelectedFilesPlayable() {
-        boolean selectionIsAllAudio = true;
-        int[] selectedRows = TABLE.getSelectedRows();
-        for (int i : selectedRows) {
-            if (!MediaPlayer.isPlayableFile(DATA_MODEL.get(i).getInitializeObject())) {
-                selectionIsAllAudio = false;
-                break;
-            }
-        }
-        return selectionIsAllAudio;
-    }
-
     private JMenu createSearchSubMenu(LibraryFilesTableDataLine dl) {
         SkinMenu menu = new SkinMenu(I18n.tr("Search"));
         if (dl != null) {
             File f = dl.getInitializeObject();
             String keywords = QueryUtils.createQueryString(f.getName());
-            if (keywords.length() > 0)
+            if (!keywords.isEmpty())
                 menu.add(new SkinMenuItem(new SearchAction(keywords)));
         }
         if (menu.getItemCount() == 0)
@@ -425,7 +412,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
             super.removeSelection();
 
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            LOG.error(e.getMessage(), e);
         }
     }
 
@@ -557,19 +544,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         }
         if (selectedFile != null) {
             SEND_TO_FRIEND_ACTION.setEnabled(sel.length == 1);
-            if (getMediaType().equals(MediaType.getAnyTypeMediaType())) {
-                boolean atLeastOneIsPlayable = false;
-                for (int i : sel) {
-                    File f = getFile(i);
-                    if (MediaPlayer.isPlayableFile(f) || FileUtils.hasExtension(f.getAbsolutePath(), "mp4")) {
-                        atLeastOneIsPlayable = true;
-                        break;
-                    }
-                }
-                SEND_TO_ITUNES_ACTION.setEnabled(atLeastOneIsPlayable);
-            } else {
-                SEND_TO_ITUNES_ACTION.setEnabled(getMediaType().equals(MediaType.getAudioMediaType()) || FileUtils.hasExtension(selectedFile.getAbsolutePath(), "mp4"));
-            }
         }
         OPEN_IN_FOLDER_ACTION.setEnabled(sel.length == 1 && selectedFile != null && selectedFile.isFile() && selectedFile.getParentFile() != null);
         if (sel.length == 1) {
@@ -588,7 +562,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         SEND_TO_FRIEND_ACTION.setEnabled(false);
         CREATE_TORRENT_ACTION.setEnabled(false);
         DELETE_ACTION.setEnabled(false);
-        SEND_TO_ITUNES_ACTION.setEnabled(false);
     }
 
     @SuppressWarnings("UnusedReturnValue")
@@ -603,7 +576,8 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
     }
     ///////////////////////////////////////////////////////
     //  ACTIONS
-    ///////////////////////////////////////////////////////
+
+    /// ////////////////////////////////////////////////////
 
     private boolean hasExploreAction() {
         return OSUtils.isWindows() || OSUtils.isMacOSX();
@@ -744,33 +718,6 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
         }
     }
 
-    private class SendAudioFilesToiTunes extends AbstractAction {
-        SendAudioFilesToiTunes() {
-            if (!OSUtils.isLinux()) {
-                String actionName = I18n.tr("Send to iTunes");
-                String shortDescription = I18n.tr("Send audio files to iTunes");
-                if (OSUtils.isMacOSCatalina105OrNewer()) {
-                    actionName = I18n.tr("Send to Apple Music");
-                    shortDescription = I18n.tr("Send audio files to Apple Music");
-                }
-
-                putValue(Action.NAME, actionName);
-                putValue(Action.SHORT_DESCRIPTION, shortDescription);
-            }
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] rows = TABLE.getSelectedRows();
-            List<File> files = new ArrayList<>();
-            for (int index : rows) {
-                File file = DATA_MODEL.getFile(index);
-                files.add(file);
-            }
-            iTunesMediator.instance().scanForSongs(files.toArray(new File[0]));
-        }
-    }
-
     private class DemuxMP4AudioAction extends AbstractAction {
         private final ArrayList<File> demuxedFiles;
         private boolean isDemuxing = false;
@@ -852,7 +799,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
                         updateDemuxingStatus(file, files.size(), false);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOG.error(e.toString(), e);
                 }
             }
         }

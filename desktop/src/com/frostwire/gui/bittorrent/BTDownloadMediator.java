@@ -40,9 +40,11 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.Logger;
-import com.frostwire.util.OSUtils;
 import com.frostwire.util.http.HttpClient;
-import com.limegroup.gnutella.gui.*;
+import com.limegroup.gnutella.gui.GUIMediator;
+import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.PaddedPanel;
+import com.limegroup.gnutella.gui.VPNDropGuard;
 import com.limegroup.gnutella.gui.actions.LimeAction;
 import com.limegroup.gnutella.gui.search.GenericCellEditor;
 import com.limegroup.gnutella.gui.tables.AbstractTableMediator;
@@ -53,7 +55,6 @@ import com.limegroup.gnutella.gui.util.BackgroundExecutorService;
 import com.limegroup.gnutella.settings.BittorrentSettings;
 import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.limegroup.gnutella.settings.TablesHandlerSettings;
-import com.limegroup.gnutella.settings.iTunesSettings;
 import org.apache.commons.io.FilenameUtils;
 import org.limewire.util.FileUtils;
 
@@ -66,8 +67,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class acts as a mediator between all of the components of the
- * download window.  It also constructs all of the download window
+ * This class acts as a mediator between all the components of the
+ * download window.  It also constructs all the download window
  * components.
  *
  * @author gubatron
@@ -77,7 +78,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     public static final int MIN_HEIGHT = 150;
     private static final Logger LOG = Logger.getLogger(BTDownloadMediator.class);
     /**
-     * instance, for singleton access
+     * Instance, for singleton access
      */
     private static BTDownloadMediator INSTANCE;
     private BTDownloadSelectionListener transferTabSelectionListener;
@@ -97,7 +98,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     private Action showInLibraryAction;
     private Action clearInactiveAction;
     private TransfersFilter transfersFilter;
-    private Action sendToItunesAction;
     private PlaySingleMediaFileAction playSingleMediaFileAction;
 
     // coalesce selection updates; only last result applies
@@ -201,7 +201,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         copyMagnetAction = BTDownloadActions.COPY_MAGNET_ACTION;
         copyHashAction = BTDownloadActions.COPY_HASH_ACTION;
         shareTorrentAction = BTDownloadActions.SHARE_TORRENT_ACTION;
-        sendToItunesAction = BTDownloadActions.SEND_TO_ITUNES_ACTION;
         playSingleMediaFileAction = BTDownloadActions.PLAY_SINGLE_AUDIO_FILE_ACTION;
     }
 
@@ -466,9 +465,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         menu.add(new SkinMenuItem(exploreAction));
         menu.addSeparator();
         menu.add(new SkinMenuItem(shareTorrentAction));
-        if (OSUtils.isMacOSX() || OSUtils.isWindows()) {
-            menu.add(new SkinMenuItem(sendToItunesAction));
-        }
         menu.add(new SkinMenuItem(copyMagnetAction));
         menu.add(new SkinMenuItem(copyHashAction));
         menu.addSeparator();
@@ -549,7 +545,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
             GUIMediator.safeInvokeLater(() -> {
                 // Drop stale results if selection changed again
                 if (seq != selectionSeq.get()) return;
-                sendToItunesAction.setEnabled(isTransferFinished && (fHasMediaFiles || fHasMP4s));
                 playSingleMediaFileAction.setEnabled(getSelectedDownloaders().length == 1 && fHasMediaFiles && fIsSingleFile);
             });
         });
@@ -570,7 +565,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         copyMagnetAction.setEnabled(false);
         copyHashAction.setEnabled(false);
         shareTorrentAction.setEnabled(false);
-        sendToItunesAction.setEnabled(false);
         playSingleMediaFileAction.setEnabled(false);
         BTDownloadActions.REMOVE_TORRENT_ACTION.setEnabled(false);
         BTDownloadActions.REMOVE_TORRENT_AND_DATA_ACTION.setEnabled(false);
@@ -598,7 +592,6 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
         // Defer expensive filesystem checks off-EDT; pessimistic UI for now
         playSingleMediaFileAction.setEnabled(false);
-        sendToItunesAction.setEnabled(false);
 
         removeAction.putValue(Action.NAME, I18n.tr("Cancel Download"));
         removeAction.putValue(LimeAction.SHORT_NAME, I18n.tr("Cancel"));
@@ -647,7 +640,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 try {
                     BTEngine.getInstance().download(torrentFile, saveDir, null);
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    LOG.error(e.toString(), e);
                     if (!e.toString().contains("No files selected by user")) {
                         // could not read torrent file or bad torrent file.
                         GUIMediator.showError(
@@ -705,7 +698,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                         GUIMediator.instance().openTorrentForSeed(torrentFile, saveDir);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOG.error(e.toString(), e);
                     if (!e.toString().contains("No files selected by user")) {
                         // could not read torrent file or bad torrent file.
                         GUIMediator.showError(
@@ -817,10 +810,9 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                 if (i < DATA_MODEL.getRowCount()) {
                     BTDownloadDataLine line = DATA_MODEL.get(i);
                     BTDownload downloader = line.getInitializeObject();
-                    if (downloader instanceof BittorrentDownload) {
-                        BittorrentDownload bt = (BittorrentDownload) downloader;
+                    if (downloader instanceof BittorrentDownload bt) {
                         if (bt.getHash().equals(dl.getInfoHash())) {
-                            ((BittorrentDownload) downloader).updateUI(dl);
+                            bt.updateUI(dl);
                             break;
                         }
                     }
@@ -876,16 +868,14 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                     String json = client.get(resolveURL, 10000);
                     LinkedList<SoundcloudSearchResult> results = SoundcloudSearchPerformer.fromJson(json, fromPastedUrl);
                     if (results.isEmpty()) {
-                        GUIMediator.safeInvokeLater(() -> {
-                            GUIMediator.showError(I18n.tr("Sorry, Couldn't find a valid download location at") + "<br><br><a href=\"" + trackUrl + "\">" + trackUrl + "</a>");
-                        });
+                        GUIMediator.safeInvokeLater(() -> GUIMediator.showError(I18n.tr("Sorry, Couldn't find a valid download location at") + "<br><br><a href=\"" + trackUrl + "\">" + trackUrl + "</a>"));
                         return;
                     }
                     for (SoundcloudSearchResult urlSr : results) {
                         downloadSoundcloudFromTrackUrlOrSearchResult(trackUrl, urlSr, fromPastedUrl);
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    LOG.error(e.toString(), e);
                 }
             });
         }
@@ -920,18 +910,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
                                         GUIMediator.safeInvokeLater(() -> LibraryFilesTableMediator.instance().setSelectedRow(0));
                                     });
                                 });
-
-                                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(m4a)) {
-                                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                                        iTunesMediator.instance().scanForSongs(m4a);
-                                    }
-                                }
                             }
-                        } else if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(savedFile)) {
-                            if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                                iTunesMediator.instance().scanForSongs(savedFile);
-                            }
-                            GUIMediator.safeInvokeLater(() -> BTDownloadMediator.instance().updateTableFilters());
                         }
                     }
                 }
@@ -962,7 +941,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
      *
      * @author gubatron
      */
-    private class TransfersFilter implements TableLineFilter<BTDownloadDataLine> {
+    private static class TransfersFilter implements TableLineFilter<BTDownloadDataLine> {
         private TransfersTab.FilterMode mode = TransfersTab.FilterMode.ALL;
         private String searchKeywords;
 
@@ -987,7 +966,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
         private boolean matchKeywords(BTDownloadDataLine line, String searchKeywords) {
             // "Steve Jobs" iTune's like search.
             if (searchKeywords == null ||
-                    searchKeywords.equals("") ||
+                    searchKeywords.isEmpty() ||
                     searchKeywords.trim().equals(TransfersTab.FILTER_TEXT_HINT)) {
                 return true;
             }

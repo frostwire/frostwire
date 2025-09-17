@@ -18,22 +18,18 @@
 package com.frostwire.gui.bittorrent;
 
 import com.frostwire.gui.player.MediaPlayer;
-import com.frostwire.mp3.ID3Wrapper;
-import com.frostwire.mp3.ID3v1Tag;
-import com.frostwire.mp3.ID3v23Tag;
-import com.frostwire.mp3.Mp3File;
+import com.frostwire.mp3.*;
 import com.frostwire.search.soundcloud.SoundcloudSearchResult;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.HttpClientFactory;
+import com.frostwire.util.Logger;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.http.HttpClient.HttpClientListener;
-import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
-import com.limegroup.gnutella.settings.iTunesSettings;
 import org.apache.commons.io.FilenameUtils;
-import com.frostwire.util.OSUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -44,6 +40,7 @@ import java.util.concurrent.Executors;
  * @author aldenml
  */
 public class SoundcloudDownload extends HttpBTDownload {
+    private static final Logger LOG = Logger.getLogger(SoundcloudDownload.class);
     private static final Executor SOUNDCLOUD_THREAD_POOL = Executors.newFixedThreadPool(6);
     private final SoundcloudSearchResult sr;
     private final File tempAudio;
@@ -102,7 +99,7 @@ public class SoundcloudDownload extends HttpBTDownload {
                 httpClient.save(downloadUrl, temp, false);
             } catch (Throwable e) {
                 System.err.println("URL at issue: [" + downloadUrl + "]");
-                e.printStackTrace();
+                LOG.error(e.toString(), e);
                 httpClientListener.onError(httpClient, e);
             }
         });
@@ -121,21 +118,25 @@ public class SoundcloudDownload extends HttpBTDownload {
     private boolean setAlbumArt(String mp3Filename, String mp3outputFilename) {
         try {
             byte[] imageBytes = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.DOWNLOAD).getBytes(sr.getThumbnailUrl());
-            Mp3File mp3 = new Mp3File(mp3Filename);
-            ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
-            newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
-            newId3Wrapper.setArtist(sr.getUsername());
-            newId3Wrapper.setTitle(sr.getDisplayName());
-            newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
-            newId3Wrapper.setUrl(sr.getDetailsUrl());
-            newId3Wrapper.getId3v2Tag().setPadding(true);
-            mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
-            mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
-            mp3.save(mp3outputFilename);
-            return true;
+            return prepareMP3File(mp3Filename, mp3outputFilename, imageBytes, sr);
         } catch (Throwable e) {
             return false;
         }
+    }
+
+    public static boolean prepareMP3File(String mp3Filename, String mp3outputFilename, byte[] imageBytes, SoundcloudSearchResult sr) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
+        Mp3File mp3 = new Mp3File(mp3Filename);
+        ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
+        newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
+        newId3Wrapper.setArtist(sr.getUsername());
+        newId3Wrapper.setTitle(sr.getDisplayName());
+        newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
+        newId3Wrapper.setUrl(sr.getDetailsUrl());
+        newId3Wrapper.getId3v2Tag().setPadding(true);
+        mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
+        mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
+        mp3.save(mp3outputFilename);
+        return true;
     }
 
     @Override
@@ -196,11 +197,6 @@ public class SoundcloudDownload extends HttpBTDownload {
                 if (SharingSettings.SEED_FINISHED_TORRENTS.getValue()) {
                     BittorrentDownload.RendererHelper.onSeedTransfer(dl, false);
                     // TODO: Rich DHT announcement.
-                }
-                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(completeFile)) {
-                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                        iTunesMediator.instance().scanForSongs(completeFile);
-                    }
                 }
                 cleanupIncomplete();
             }
