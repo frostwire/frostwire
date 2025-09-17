@@ -82,4 +82,4 @@ If you want to know about legal content you can download and distribute legally 
 
 # License
 
-See [COPYING](COPYING) for the license. Frostwire for Android is offered under the [GNU General Public License](http://www.gnu.org/copyleft/gpl.html).
+See [COPYING](COPYING) for the license. Frostwire for Android is offered under the [Apache License]([http://www.gnu.org/copyleft/gpl.html](https://www.apache.org/licenses/LICENSE-2.0)).
