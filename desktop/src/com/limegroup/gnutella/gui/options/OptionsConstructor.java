@@ -18,6 +18,7 @@
 package com.limegroup.gnutella.gui.options;
 
 import com.frostwire.gui.searchfield.SearchField;
+import com.frostwire.util.OSUtils;
 import com.limegroup.gnutella.gui.*;
 import com.limegroup.gnutella.gui.options.panes.*;
 import com.limegroup.gnutella.gui.shell.FrostAssociations;
@@ -26,7 +27,6 @@ import com.limegroup.gnutella.settings.UISettings;
 import org.limewire.setting.IntSetting;
 import org.limewire.setting.SettingsGroupManager;
 import org.limewire.util.CommonUtils;
-import com.frostwire.util.OSUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,8 +62,6 @@ public final class OptionsConstructor {
     private static final String SHUTDOWN_KEY = "OPTIONS_SHUTDOWN_MAIN_TITLE";
     private static final String PLAYER_KEY = "OPTIONS_PLAYER_MAIN_TITLE";
     private static final String STATUS_BAR_KEY = "OPTIONS_STATUS_BAR_MAIN_TITLE";
-    private static final String ITUNES_KEY = "OPTIONS_ITUNES_MAIN_TITLE";
-    private static final String ITUNES_IMPORT_KEY = "OPTIONS_ITUNES_PREFERENCE_MAIN_TITLE";
     private static final String BUGS_KEY = "OPTIONS_BUGS_MAIN_TITLE";
     private static final String SEARCH_KEY = "OPTIONS_SEARCH_MAIN_TITLE";
     private static final String FILTERS_KEY = "OPTIONS_FILTERS_MAIN_TITLE";
@@ -194,11 +192,6 @@ public final class OptionsConstructor {
         addOption(OptionsMediator.ROOT_NODE_KEY, SEARCH_KEY, I18n.tr("Searching"), SearchEnginesPaneItem.class, MaximumSearchesPaneItem.class, SmartSearchDBPaneItem.class, DetailsPaneItem.class, AutoSearchClipboardURLsPaneItem.class);
         //status bar
         addOption(OptionsMediator.ROOT_NODE_KEY, STATUS_BAR_KEY, I18n.tr("Status Bar"), StatusBarConnectionQualityPaneItem.class, StatusBarFirewallPaneItem.class, StatusBarBandwidthPaneItem.class); // Removed Lime Store
-        //itunes
-        if (isItunesSupported()) {
-            addGroupTreeNode(OptionsMediator.ROOT_NODE_KEY, ITUNES_KEY, I18n.tr("iTunes"));
-            addOption(ITUNES_KEY, ITUNES_IMPORT_KEY, I18n.tr("Importing"), iTunesPreferencePaneItem.class);
-        }
         //view options
         if (OSUtils.isWindows()) {
             addOption(OptionsMediator.ROOT_NODE_KEY, GUI_KEY, I18n.tr("View"), PopupsPaneItem.class, ShowPromoOverlaysPaneItem.class, ShowFrostWireRecommendationsPaneItem.class, AutoCompletePaneItem.class);
@@ -234,10 +227,6 @@ public final class OptionsConstructor {
             node = keysToNodes.get(ApplicationSettings.OPTIONS_LAST_SELECTED_KEY.getValue());
         }
         return node;
-    }
-
-    private boolean isItunesSupported() {
-        return !CommonUtils.isPortable() && (OSUtils.isMacOSX() || OSUtils.isWindows());
     }
 
     /**
@@ -295,7 +284,7 @@ public final class OptionsConstructor {
      *                window should be made visible or not visible
      * @param key     the unique identifying key of the panel to show
      */
-    final void setOptionsVisible(boolean visible, final String key) {
+    void setOptionsVisible(boolean visible, final String key) {
         if (!visible) {
             DIALOG.dispose();
             OptionsMediator.instance().disposeOptions();
@@ -318,7 +307,7 @@ public final class OptionsConstructor {
      *
      * @return true if the Options Box is visible.
      */
-    public final boolean isOptionsVisible() {
+    public boolean isOptionsVisible() {
         return DIALOG.isVisible();
     }
 

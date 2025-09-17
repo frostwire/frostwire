@@ -28,17 +28,19 @@ import com.limegroup.gnutella.gui.DialogOption;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
 import com.limegroup.gnutella.gui.actions.LimeAction;
-import com.limegroup.gnutella.gui.iTunesMediator;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Objects;
 
 /**
  * @author gubatron
  * @author aldenml
  */
 final class BTDownloadActions {
+
+    private final static Logger LOG = Logger.getLogger(BTDownloadActions.class);
     static final ExploreAction EXPLORE_ACTION = new ExploreAction();
     static final ShowInLibraryAction SHOW_IN_LIBRARY_ACTION = new ShowInLibraryAction();
     static final ResumeAction RESUME_ACTION = new ResumeAction();
@@ -51,35 +53,8 @@ final class BTDownloadActions {
     static final RemoveAction REMOVE_TORRENT_AND_DATA_ACTION = new RemoveAction(true, true);
     static final CopyMagnetAction COPY_MAGNET_ACTION = new CopyMagnetAction();
     static final CopyInfoHashAction COPY_HASH_ACTION = new CopyInfoHashAction();
-    static final SendBTDownloaderAudioFilesToiTunes SEND_TO_ITUNES_ACTION = new SendBTDownloaderAudioFilesToiTunes();
     static final ShareTorrentAction SHARE_TORRENT_ACTION = new ShareTorrentAction();
     static final PlaySingleMediaFileAction PLAY_SINGLE_AUDIO_FILE_ACTION = new PlaySingleMediaFileAction();
-
-    private static class SendBTDownloaderAudioFilesToiTunes extends AbstractAction {
-        SendBTDownloaderAudioFilesToiTunes() {
-            putValue(Action.NAME, I18n.tr("Send to iTunes"));
-            putValue(Action.SHORT_DESCRIPTION, I18n.tr("Send files to iTunes"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BTDownload[] downloaders = BTDownloadMediator.instance().getSelectedDownloaders();
-            if (downloaders != null && downloaders.length > 0) {
-                try {
-                    final BTDownload downloader = downloaders[0];
-                    File saveLocation = downloader.getSaveLocation();
-                    if (downloader instanceof BittorrentDownload) {
-                        BittorrentDownload btDownload = (BittorrentDownload) downloader;
-                        saveLocation = new File(btDownload.getSaveLocation(), btDownload.getName());
-                    }
-                    System.out.println("Sending to iTunes " + saveLocation.getAbsolutePath());
-                    iTunesMediator.instance().scanForSongs(saveLocation);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-    }
 
     private static abstract class RefreshingAction extends AbstractAction {
         public final void actionPerformed(ActionEvent e) {
@@ -91,11 +66,6 @@ final class BTDownloadActions {
     }
 
     private static class ExploreAction extends RefreshingAction {
-        /**
-         *
-         */
-        private static final long serialVersionUID = -4648558721588938475L;
-
         ExploreAction() {
             putValue(Action.NAME, I18n.tr("Explore"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Explore"));
@@ -109,25 +79,21 @@ final class BTDownloadActions {
                 // when the downloader is a single file, this is appending a folder to the actual file path
                 // treating it like a bittorrent download.
                 File toExplore = new File(downloaders[0].getSaveLocation(), downloaders[0].getDisplayName());
-                if (toExplore != null) {
-                    // but perhaps it's a single file, make sure it is then... (Re: Issue #366)
-                    if (!toExplore.exists() &&
-                            downloaders[0].getSaveLocation() != null &&
-                            downloaders[0].getSaveLocation().isFile()) {
-                        // (made this if very explicit and dumb on purpose to make logic clear, reverse logic is shorter)
-                        toExplore = downloaders[0].getSaveLocation();
-                    }
-                    if (toExplore.exists()) {
-                        GUIMediator.launchExplorer(toExplore);
-                    }
+                // but perhaps it's a single file, make sure it is then... (Re: Issue #366)
+                if (!toExplore.exists() &&
+                        downloaders[0].getSaveLocation() != null &&
+                        downloaders[0].getSaveLocation().isFile()) {
+                    // (made this if very explicit and dumb on purpose to make logic clear, reverse logic is shorter)
+                    toExplore = downloaders[0].getSaveLocation();
+                }
+                if (toExplore.exists()) {
+                    GUIMediator.launchExplorer(toExplore);
                 }
             }
         }
     }
 
     private static class ShowInLibraryAction extends RefreshingAction {
-        private static final long serialVersionUID = -4648558721588938475L;
-
         ShowInLibraryAction() {
             putValue(Action.NAME, I18n.tr("Show"));
             putValue(LimeAction.SHORT_NAME, I18n.tr("Show"));
@@ -194,7 +160,7 @@ final class BTDownloadActions {
     }
 
     public static class RetryAction extends com.limegroup.gnutella.gui.actions.AbstractAction {
-        private static Logger LOG = Logger.getLogger(RetryAction.class);
+        private static final Logger LOG = Logger.getLogger(RetryAction.class);
 
         RetryAction() {
             putValue(Action.NAME, I18n.tr("Retry Transfer"));
@@ -270,8 +236,6 @@ final class BTDownloadActions {
     }
 
     public static class RemoveYouTubeAction extends RemoveAction {
-        private static final long serialVersionUID = 4101890173830827703L;
-
         RemoveYouTubeAction() {
             super(true, true);
             putValue(Action.NAME, I18n.tr("Remove Download and Data"));
@@ -307,16 +271,14 @@ final class BTDownloadActions {
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < downloaders.length; i++) {
                 BTDownload d = downloaders[i];
-                if (d instanceof BittorrentDownload) {
-                    BittorrentDownload btDownload = (BittorrentDownload) d;
+                if (d instanceof BittorrentDownload btDownload) {
                     String magnetUri = btDownload.makeMagnetUri();
                     str.append(magnetUri);
                     str.append(BTEngine.getInstance().magnetPeers());
                     if (i < downloaders.length - 1) {
                         str.append(System.lineSeparator());
                     }
-                } else if (d instanceof TorrentFetcherDownload) {
-                    TorrentFetcherDownload tfd = (TorrentFetcherDownload) d;
+                } else if (d instanceof TorrentFetcherDownload tfd) {
                     if (tfd.getUri().startsWith("magnet")) {
                         str = new StringBuilder(tfd.getUri());
                     }
@@ -382,7 +344,7 @@ final class BTDownloadActions {
             File file = BTDownloadMediator.instance().getSelectedDownloaders()[0].getSaveLocation();
             if (file.isDirectory() && LibraryUtils.directoryContainsASinglePlayableFile(file)) {
                 try {
-                    file = file.listFiles()[0];
+                    file = Objects.requireNonNull(file.listFiles())[0];
                 } catch (Throwable t) {
                     file = null;
                 }

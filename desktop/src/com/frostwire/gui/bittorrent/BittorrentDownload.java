@@ -17,8 +17,8 @@
 
 package com.frostwire.gui.bittorrent;
 
-import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.bittorrent.*;
+import com.frostwire.bittorrent.BTDownload;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.player.MediaPlayer;
 import com.frostwire.jlibtorrent.TorrentInfo;
@@ -26,11 +26,7 @@ import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import com.frostwire.util.Logger;
 import com.limegroup.gnutella.gui.GUIMediator;
-import com.limegroup.gnutella.gui.iTunesMediator;
 import com.limegroup.gnutella.settings.SharingSettings;
-import com.limegroup.gnutella.settings.iTunesImportSettings;
-import com.limegroup.gnutella.settings.iTunesSettings;
-import com.frostwire.util.OSUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -366,7 +362,7 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
         }
     }
 
-    //Deletes incomplete files and the save location from the iTunes import settings
+    //Deletes incomplete files and empty directories
     private void finalCleanup(Set<File> incompleteFiles) {
         if (incompleteFiles != null) {
             for (File f : incompleteFiles) {
@@ -381,7 +377,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             File saveLocation = dl.getContentSavePath();
             if (saveLocation != null) {
                 deleteEmptyDirectoryRecursive(saveLocation);
-                iTunesImportSettings.IMPORT_FILES.remove(saveLocation);
             }
         }
     }
@@ -461,11 +456,6 @@ public class BittorrentDownload implements com.frostwire.gui.bittorrent.BTDownlo
             }
             if (dl.getName() != null) {
                 File saveLocation = new File(dl.getSavePath(), dl.getName());
-                if (iTunesSettings.ITUNES_SUPPORT_ENABLED.getValue() && !iTunesMediator.instance().isScanned(saveLocation)) {
-                    if ((OSUtils.isMacOSX() || OSUtils.isWindows())) {
-                        iTunesMediator.instance().scanForSongs(saveLocation);
-                    }
-                }
                 if (!LibraryMediator.instance().isScanned(dl.hashCode())) {
                     LibraryMediator.instance().scan(dl.hashCode(), saveLocation);
                 }
