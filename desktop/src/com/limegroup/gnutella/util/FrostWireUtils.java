@@ -38,11 +38,11 @@ public final class FrostWireUtils {
     /**
      * Constant for the current version of FrostWire.
      */
-    private static final String FROSTWIRE_VERSION = "6.14.0";
+    private static final String FROSTWIRE_VERSION = "7.0.0";
     /**
      * Build number for the current version, gets reset to 1 on every version bump
      */
-    private static final int BUILD_NUMBER = 326;
+    private static final int BUILD_NUMBER = 327;
     private static final boolean IS_RUNNING_FROM_SOURCE = new File("README.md").exists();
 
     /**
