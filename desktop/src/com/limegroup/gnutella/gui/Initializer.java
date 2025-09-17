@@ -65,7 +65,14 @@ final class Initializer {
         // ** THE VERY BEGINNING -- DO NOT ADD THINGS BEFORE THIS **
         preinit();
         // Apply the theme the user chose last time (falls back to DEFAULT)
-        ThemeMediator.ThemeEnum saved = ThemeMediator.ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
+        // IMPORTANT: Due to the introduction of the new light theme and
+        // internal changes in ThemeMediator.ThemeEnum, we need to perform some
+        String uiThemeValue = UISettings.UI_THEME.getValue();
+        if (uiThemeValue.equals("DARK")) {
+            uiThemeValue = "DARK_LAF";
+            UISettings.UI_THEME.setValue(uiThemeValue);
+        }
+        ThemeMediator.ThemeEnum saved = ThemeMediator.ThemeEnum.valueOf(uiThemeValue);
         System.out.println("Initializer.initialize() applying theme: " + saved);
         ThemeMediator.switchTheme(saved);
         // Various startup tasks...
