@@ -59,7 +59,7 @@ public final class OptionsTreeManager {
      */
     OptionsTreeManager() {
         TREE = new JTree();
-        boolean opaquePanel = ThemeMediator.isDefaultThemeOn();
+        boolean opaquePanel = ThemeMediator.isLightThemeOn();
         TREE.setOpaque(opaquePanel);
         TREE.setEditable(false);
         TREE.setShowsRootHandles(true);

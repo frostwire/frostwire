@@ -19,6 +19,7 @@ package com.frostwire.gui.theme;
 
 import com.apple.laf.AquaFonts;
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.frostwire.gui.tabs.SearchTab;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
@@ -89,7 +90,10 @@ public final class ThemeMediator {
      */
     public enum ThemeEnum {
         DEFAULT,
-        DARK
+        /// Default theme
+        DARK_LAF,
+        /// Experimental dark-flat look and feel
+        LIGHT_LAF  /// Experimental light-flat look and feel
     }
 
     /**
@@ -119,12 +123,30 @@ public final class ThemeMediator {
         return currentTheme;
     }
 
-    public static boolean isDarkThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DARK;
+    public static boolean isDarkLafThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_LAF;
+    }
+
+    /**
+     * Helper for checking if a light theme is enabled.
+     * <p>
+     * Possible light themes in FrostWire are either the default theme or
+     * FlatLaf Light (also known as simply "Light (beta)")
+     *
+     * @return Whether or not the dark theme is disabled (i.e., either the
+     * default theme or the new light theme is enabled).
+     */
+    public static boolean isLightThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ||
+                ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_LAF;
     }
 
     public static boolean isDefaultThemeOn() {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT;
+    }
+
+    public static boolean isLightLafThemeOn() {
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_LAF;
     }
 
     /**
@@ -136,7 +158,7 @@ public final class ThemeMediator {
         /* ------------------------------------------------------------------
          * 1.  apply the look‑and‑feel *in this JVM* so the user sees an
          *    immediate change (handy when they click around in Options);
-         * 2.  tell the user that a **restart is required** for a 100 % clean
+         * 2.  tell the user that a **restart is required** for a 100 % clean
          *    switch (many colours, borders & cached icons only update at
          *    start‑up);
          * 3.  spawn a fresh copy of FrostWire and let this process exit.
@@ -146,9 +168,11 @@ public final class ThemeMediator {
 
         // Delegate theme loading to ThemeMediator
         if (theme == ThemeEnum.DEFAULT) {
-            com.frostwire.gui.theme.ThemeMediator.changeTheme();
-        } else if (theme == ThemeEnum.DARK) {
+            com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
+        } else if (theme == ThemeEnum.DARK_LAF) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
+        } else if (theme == ThemeEnum.LIGHT_LAF) {
+            com.frostwire.gui.theme.ThemeMediator.loadLightTheme();
         }
 
         // Persist selection immediately (used by the relaunch below)
@@ -176,8 +200,29 @@ public final class ThemeMediator {
         }
     }
 
+    public static void loadLightTheme() {
+        purgeSynthOverrides();
+        Runnable task = () -> {
+            purgeSynthOverrides();
+            FlatLightLaf.setup();
 
-    public static void changeTheme() {
+            for (Window w : Window.getWindows()) {
+                SwingUtilities.updateComponentTreeUI(w);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load new light theme", ex);
+            }
+        }
+    }
+
+    public static void loadDefaultTheme() {
         Runnable themeChanger = new Runnable() {
             public void run() {
                 try {
@@ -222,7 +267,7 @@ public final class ThemeMediator {
         Runnable task = () -> {
             purgeSynthOverrides();
             FlatDarkLaf.setup();
-            installFlatLafDefaults();
+            installFlatDarkLafDefaults();
             for (Window w : Window.getWindows()) {
                 SwingUtilities.updateComponentTreeUI(w);
             }
@@ -239,7 +284,7 @@ public final class ThemeMediator {
         }
     }
 
-    private static void installFlatLafDefaults() {
+    private static void installFlatDarkLafDefaults() {
         ColorUIResource reallyDark = new ColorUIResource(APP_REALLY_DARK_COLOR);
         ColorUIResource dark = new ColorUIResource(reallyDark.brighter());
         UIManager.put("Table.background", reallyDark);
@@ -302,7 +347,7 @@ public final class ThemeMediator {
 
     public static JSeparator createAppHeaderSeparator() {
         return createVerticalSeparator(
-                currentTheme == ThemeEnum.DARK ?
+                currentTheme == ThemeEnum.DARK_LAF ?
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
     }

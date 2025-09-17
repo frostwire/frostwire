@@ -81,7 +81,7 @@ public class RecursiveLibraryDirectoryPanel extends JPanel {
      */
     private RecursiveLibraryDirectoryPanel(boolean precheckFolders, Set<File> blackListSet, File... roots) {
         super(new BorderLayout());
-        boolean isOpaquePanel = ThemeMediator.isDefaultThemeOn();
+        boolean isOpaquePanel = ThemeMediator.isLightThemeOn();
         this.roots = new TreeSet<>(FileTreeModel.DEFAULT_COMPARATOR);
         this.deselected = new HashSet<>(blackListSet);
         if (!precheckFolders) {

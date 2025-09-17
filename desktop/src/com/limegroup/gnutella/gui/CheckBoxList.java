@@ -378,7 +378,7 @@ public class CheckBoxList<E> extends BoxPanel {
         this.setBorder(new EmptyBorder(0, 0, 0, 0));
         this.editor = new CheckBoxCellEditor();
         this.checkBoxList = new CustomJTable();
-        this.checkBoxList.setOpaque(ThemeMediator.isDefaultThemeOn());
+        this.checkBoxList.setOpaque(ThemeMediator.isLightThemeOn());
         this.checkBoxList.setDefaultRenderer(Object.class, new CheckBoxCellRenderer());
         this.checkBoxList.setDefaultEditor(Object.class, editor);
         this.checkBoxList.setRowHeight(DEFAULT_ROW_HEIGHT);
