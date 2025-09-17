@@ -50,9 +50,13 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      * that override add(DataLine, row).
      */
     protected int forceAdd(T dl, int row) {
-        _indexes.put(dl.getInitializeObject(), row);
+        synchronized (getListLock()) {
+            _indexes.put(dl.getInitializeObject(), row);
+        }
         int addedAt = super.add(dl, row);
-        remapIndexes(addedAt + 1);
+        synchronized (getListLock()) {
+            remapIndexes(addedAt + 1);
+        }
         return addedAt;
     }
 
@@ -62,12 +66,12 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      */
     public int add(T dl, int row) {
         E init = dl.getInitializeObject();
-        // If this object is already added, don't add.
-        if (_indexes.containsKey(init)) {
-            return -1;
-        }
-        //otherwise, add it to the indexes list
-        else {
+        synchronized (getListLock()) {
+            // If this object is already added, don't add.
+            if (_indexes.containsKey(init)) {
+                return -1;
+            }
+            //otherwise, add it to the indexes list
             _indexes.put(init, row);
             int addedAt = super.add(dl, row);
             remapIndexes(addedAt + 1);
@@ -82,9 +86,13 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      */
     public void remove(int row) {
         Object init = get(row).getInitializeObject();
-        _indexes.remove(init);
+        synchronized (getListLock()) {
+            _indexes.remove(init);
+        }
         super.remove(row);
-        remapIndexes(row);
+        synchronized (getListLock()) {
+            remapIndexes(row);
+        }
     }
 
     /**
@@ -97,8 +105,10 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      *                                        initialized by o.
      */
     public int getRow(E o) {
-        Integer idx = _indexes.get(o);
-        return Objects.requireNonNullElse(idx, -1);
+        synchronized (getListLock()) {
+            Integer idx = _indexes.get(o);
+            return Objects.requireNonNullElse(idx, -1);
+        }
     }
 
     /**
@@ -107,8 +117,10 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      */
     public void doResort() {
         super.doResort();
-        _indexes.clear(); // it's easier & quicker to just clear & re-input
-        remapIndexes(0);
+        synchronized (getListLock()) {
+            _indexes.clear(); // it's easier & quicker to just clear & re-input
+            remapIndexes(0);
+        }
     }
 
     /**
@@ -120,14 +132,18 @@ public class HashBasedDataLineModel<T extends DataLine<E>, E> extends BasicDataL
      * by Object o.
      */
     public boolean contains(Object o) {
-        return _indexes.containsKey(o);
+        synchronized (getListLock()) {
+            return _indexes.containsKey(o);
+        }
     }
 
     /**
      * Overrides the default clear to erase the indexes HashMap.
      */
     public void clear() {
-        _indexes.clear();
+        synchronized (getListLock()) {
+            _indexes.clear();
+        }
         super.clear();
     }
 

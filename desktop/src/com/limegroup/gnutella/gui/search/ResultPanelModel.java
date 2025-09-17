@@ -98,11 +98,16 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      */
     public void remove(int row) {
         String sha1 = getHash(row);
-        if (sha1 != null)
-            _indexes.remove(sha1);
+        if (sha1 != null) {
+            synchronized (getListLock()) {
+                _indexes.remove(sha1);
+            }
+        }
         super.remove(row);
         _numResults -= 1;
-        remapIndexes(row);
+        synchronized (getListLock()) {
+            remapIndexes(row);
+        }
     }
 
     /**
@@ -133,10 +138,15 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     public int add(SearchResultDataLine tl, int row) {
         _numResults += 1;
         String sha1 = tl.getHash();
-        if (sha1 != null)
-            _indexes.put(sha1, row);
+        if (sha1 != null) {
+            synchronized (getListLock()) {
+                _indexes.put(sha1, row);
+            }
+        }
         int addedAt = super.add(tl, row);
-        remapIndexes(addedAt + 1);
+        synchronized (getListLock()) {
+            remapIndexes(addedAt + 1);
+        }
         return addedAt;
     }
 
@@ -157,8 +167,10 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      */
     protected void doResort() {
         super.doResort();
-        _indexes.clear(); // it's easier & quicker to just clear & re-input
-        remapIndexes(0);
+        synchronized (getListLock()) {
+            _indexes.clear(); // it's easier & quicker to just clear & re-input
+            remapIndexes(0);
+        }
     }
 
     /**
@@ -173,7 +185,9 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      */
     void simpleClear() {
         _numResults = 0;
-        _indexes.clear();
+        synchronized (getListLock()) {
+            _indexes.clear();
+        }
         super.clear();
     }
 
@@ -220,12 +234,14 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
      * Fast match -- lookup in the table.
      */
     private int fastMatch(String sha1) {
-        Integer idx = _indexes.get(sha1);
-        //noinspection ReplaceNullCheck
-        if (idx == null)
-            return -1;
-        else
-            return idx;
+        synchronized (getListLock()) {
+            Integer idx = _indexes.get(sha1);
+            //noinspection ReplaceNullCheck
+            if (idx == null)
+                return -1;
+            else
+                return idx;
+        }
     }
 
     int getTotalResults() {

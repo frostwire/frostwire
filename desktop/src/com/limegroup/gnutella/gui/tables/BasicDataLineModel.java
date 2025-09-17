@@ -58,6 +58,14 @@ public class BasicDataLineModel<T extends DataLine<E>, E> extends AbstractTableM
      * Lock object for synchronizing access to _list to prevent ConcurrentModificationException.
      */
     private final Object _listLock = new Object();
+    
+    /**
+     * Protected access to the list lock for subclasses that need to synchronize
+     * their own operations with list access.
+     */
+    protected Object getListLock() {
+        return _listLock;
+    }
     /**
      * Variable for whether or not the current sorting scheme
      * is ascending (value 1) or descending (value -1).
