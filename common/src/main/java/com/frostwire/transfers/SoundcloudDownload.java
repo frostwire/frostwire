@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2022, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import com.frostwire.util.Logger;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 
-import static com.frostwire.gui.bittorrent.SoundcloudDownload.prepareMP3File;
 
 /**
  * @author gubatron
@@ -70,7 +69,7 @@ public class SoundcloudDownload extends HttpDownload {
 
     private static boolean setAlbumArt(SoundcloudSearchResult sr, byte[] cover, String inPath, String outPath) {
         try {
-            return prepareMP3File(inPath, outPath, cover, sr);
+            return SoundcloudSearchResult.prepareMP3File(inPath, outPath, cover, sr);
         } catch (Throwable e) {
             LOG.error("Error setting art information for soundcloud download", e);
             return false;

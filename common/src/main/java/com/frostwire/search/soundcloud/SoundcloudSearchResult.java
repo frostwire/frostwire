@@ -17,6 +17,7 @@
 
 package com.frostwire.search.soundcloud;
 
+import com.frostwire.mp3.*;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.search.HttpSearchResult;
@@ -27,6 +28,8 @@ import com.frostwire.util.http.HttpClient;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.io.IOException;
+
 
 /**
  * @author gubatron
@@ -233,4 +236,19 @@ public final class SoundcloudSearchResult extends AbstractFileSearchResult imple
     public String getHash() {
         return hash;
     }
+
+    public static boolean prepareMP3File(String mp3Filename, String mp3outputFilename, byte[] imageBytes, SoundcloudSearchResult sr) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
+        Mp3File mp3 = new Mp3File(mp3Filename);
+        ID3Wrapper newId3Wrapper = new ID3Wrapper(new ID3v1Tag(), new ID3v23Tag());
+        newId3Wrapper.setAlbum(sr.getUsername() + ": " + sr.getDisplayName() + " via SoundCloud.com");
+        newId3Wrapper.setArtist(sr.getUsername());
+        newId3Wrapper.setTitle(sr.getDisplayName());
+        newId3Wrapper.setAlbumImage(imageBytes, "image/jpg");
+        newId3Wrapper.setUrl(sr.getDetailsUrl());
+        newId3Wrapper.getId3v2Tag().setPadding(true);
+        mp3.setId3v1Tag(newId3Wrapper.getId3v1Tag());
+        mp3.setId3v2Tag(newId3Wrapper.getId3v2Tag());
+        mp3.save(mp3outputFilename);
+        return true;
+    }    
 }

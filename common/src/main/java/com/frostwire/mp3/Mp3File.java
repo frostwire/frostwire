@@ -400,7 +400,7 @@ public class Mp3File extends FileWrapper {
             }
         }
     }
-
+    
     private void saveMpegFrames(RandomAccessFile saveFile) throws IOException {
         int filePos = xingOffset;
         if (filePos < 0) filePos = startOffset;
