@@ -92,9 +92,9 @@ public final class ThemeMediator {
     public enum ThemeEnum {
         DEFAULT,
         /// Default theme
-        DARK_LAF,
+        DARK_FLAT_LAF,
         /// Experimental dark-flat look and feel
-        LIGHT_LAF  /// Experimental light-flat look and feel
+        LIGHT_FLAT_LAF  /// Experimental light-flat look and feel
     }
 
     /**
@@ -111,7 +111,9 @@ public final class ThemeMediator {
             UISettings.UI_THEME.setAlwaysSave(true);
             currentTheme = ThemeEnum.valueOf(UISettings.UI_THEME.getValue());
         } catch (Exception e) {
+            // Unknown theme enum or other error, fallback to DEFAULT and update settings
             currentTheme = ThemeEnum.DEFAULT;
+            UISettings.UI_THEME.setValue(currentTheme.name());
         }
     }
 
@@ -125,7 +127,7 @@ public final class ThemeMediator {
     }
 
     public static boolean isDarkLafThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_LAF;
+        return ThemeMediator.getCurrentTheme() == ThemeEnum.DARK_FLAT_LAF;
     }
 
     /**
@@ -139,7 +141,7 @@ public final class ThemeMediator {
      */
     public static boolean isLightThemeOn() {
         return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.DEFAULT ||
-                ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_LAF;
+                ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
     }
 
     public static boolean isDefaultThemeOn() {
@@ -147,7 +149,7 @@ public final class ThemeMediator {
     }
 
     public static boolean isLightLafThemeOn() {
-        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_LAF;
+        return ThemeMediator.getCurrentTheme() == ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF;
     }
 
     /**
@@ -170,9 +172,9 @@ public final class ThemeMediator {
         // Delegate theme loading to ThemeMediator
         if (theme == ThemeEnum.DEFAULT) {
             com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
-        } else if (theme == ThemeEnum.DARK_LAF) {
+        } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
             com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
-        } else if (theme == ThemeEnum.LIGHT_LAF) {
+        } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
             com.frostwire.gui.theme.ThemeMediator.loadLightTheme();
         }
 
@@ -348,7 +350,7 @@ public final class ThemeMediator {
 
     public static JSeparator createAppHeaderSeparator() {
         return createVerticalSeparator(
-                currentTheme == ThemeEnum.DARK_LAF ?
+                currentTheme == ThemeEnum.DARK_FLAT_LAF ?
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DARK :
                         SkinColors.APPLICATION_HEADER_SEPARATOR_COLOR_DEFAULT);
     }
