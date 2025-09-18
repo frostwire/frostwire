@@ -17,6 +17,7 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/18/2025
  - com.google.firebase:firebase-crashlytics-gradle:3.0.6
  - androidx.core:core:1.17.0
  - androidx.exifinterface:exifinterface:1.4.1
+ - androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4
 
 
 FrostWire 2.9.7 build 752 APR/24/2025
