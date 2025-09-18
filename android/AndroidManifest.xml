@@ -19,8 +19,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:installLocation="auto"
-        android:versionCode="752"
-        android:versionName="2.9.7">
+        android:versionCode="753"
+        android:versionName="3.0.0">
     <!-- IMPORTANT!! Ignore these, just use as a reference, now it's handled with gradle -->
     <!-- Plus  android:versionCode="9070xyz" (always commit like this, plus!)-->
     <!-- Basic android:versionCode="9060xyz" (don't commit like this) -->
