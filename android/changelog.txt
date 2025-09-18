@@ -19,6 +19,7 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/18/2025
  - androidx.exifinterface:exifinterface:1.4.1
  - androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.4
  - com.google.android.material:material:1.13.0
+ - com.google.code.gson:gson:2.13.2
 
 
 FrostWire 2.9.7 build 752 APR/24/2025

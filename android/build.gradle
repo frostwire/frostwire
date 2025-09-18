@@ -234,7 +234,7 @@ dependencies {
     implementation 'com.google.android.ump:user-messaging-platform:3.2.0'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
     implementation 'com.google.android.material:material:1.13.0'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'com.google.re2j:re2j:1.7'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.12'
     implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
