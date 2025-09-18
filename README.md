@@ -106,7 +106,7 @@ Build with Android studio or go inside the `android` directory and type:
 
 ### License
 
-Frostwire Desktop and Frostwire Android are offered under the [Apache License]([http://www.gnu.org/copyleft/gpl.html](https://www.apache.org/licenses/LICENSE-2.0)).
+Frostwire Desktop and Frostwire Android are offered under the [GNU General Public License Version 3 (GPL 3.0)](https://www.gnu.org/licenses/gpl-3.0.txt).
 
 ### Other important FrostWire repositories
 [JLibTorrent](https://github.com/frostwire/frostwire-jlibtorrent) | 

@@ -193,7 +193,7 @@ be part of the development team._
 
 ### License
 
-Frostwire Desktop is offered under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Frostwire Desktop is offered under the [GNU General Public License Version 3 (GPL 3.0)](https://www.gnu.org/licenses/gpl-3.0.txt).
 
 
 ### Official FrostWire sites
