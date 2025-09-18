@@ -67,12 +67,29 @@ final class Initializer {
         // Apply the theme the user chose last time (falls back to DEFAULT)
         // IMPORTANT: Due to the introduction of the new light theme and
         // internal changes in ThemeMediator.ThemeEnum, we need to perform some
+        // migration for old theme names to prevent crashes
         String uiThemeValue = UISettings.UI_THEME.getValue();
         if (uiThemeValue.equals("DARK")) {
-            uiThemeValue = "DARK_LAF";
+            uiThemeValue = "DARK_FLAT_LAF";
+            UISettings.UI_THEME.setValue(uiThemeValue);
+        } else if (uiThemeValue.equals("DARK_LAF")) {
+            uiThemeValue = "DARK_FLAT_LAF";
+            UISettings.UI_THEME.setValue(uiThemeValue);
+        } else if (uiThemeValue.equals("LIGHT_LAF")) {
+            uiThemeValue = "LIGHT_FLAT_LAF";
             UISettings.UI_THEME.setValue(uiThemeValue);
         }
-        ThemeMediator.ThemeEnum saved = ThemeMediator.ThemeEnum.valueOf(uiThemeValue);
+        
+        // Safely parse theme enum with fallback to DEFAULT to prevent crashes
+        // when user has unknown theme names from newer/older versions
+        ThemeMediator.ThemeEnum saved;
+        try {
+            saved = ThemeMediator.ThemeEnum.valueOf(uiThemeValue);
+        } catch (IllegalArgumentException e) {
+            // Unknown theme enum, fallback to DEFAULT and update settings
+            saved = ThemeMediator.ThemeEnum.DEFAULT;
+            UISettings.UI_THEME.setValue(saved.name());
+        }
         System.out.println("Initializer.initialize() applying theme: " + saved);
         ThemeMediator.switchTheme(saved);
         // Various startup tasks...

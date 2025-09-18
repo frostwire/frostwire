@@ -60,7 +60,7 @@ final class ToolsMenu extends AbstractMenu {
                 new AbstractAction(I18n.tr("&Light Flat (beta)")) {
                     @Override
                     public void actionPerformed(ActionEvent actionEvent) {
-                        ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.LIGHT_LAF);
+                        ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.LIGHT_FLAT_LAF);
                     }
                 }
         );
@@ -71,7 +71,7 @@ final class ToolsMenu extends AbstractMenu {
         JRadioButtonMenuItem darkItem = new JRadioButtonMenuItem(new AbstractAction(I18n.tr("&Dark Flat (beta)")) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DARK_LAF);
+                ThemeMediator.switchTheme(ThemeMediator.ThemeEnum.DARK_FLAT_LAF);
             }
         });
         darkItem.setSelected(ThemeMediator.isDarkLafThemeOn());
