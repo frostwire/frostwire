@@ -227,7 +227,7 @@ final class AboutWindow {
         sb.append("<h1>").append("FrostWire Dev Team").append("</h1>");
         sb.append("<ul>\n");
         sb.append("<li>Angel Leon (<a href='https://github.com/frostwire/frostwire/commits?author=gubatron'>@gubatron</a>)</li>");
-        sb.append("<li>Avery King (<a href='https://github.com/frostwire/frostwire/commits?author=generic-pers0n'>@gubatron</a>)</li>");
+        sb.append("<li>Avery King (<a href='https://github.com/frostwire/frostwire/commits?author=generic-pers0n'>@generic-pers0n</a>)</li>");
         sb.append("</ul>");
         // bt notice
         sb.append("<small>");
