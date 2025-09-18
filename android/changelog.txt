@@ -4,6 +4,7 @@ FrostWire 2.9.8 build <UNRELEASED> SEP/08/2025
  - fix: logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
  - improvement: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  - Avoid possible context leak on EngineBroadcastReceiver
+ - maintenance: all license headers are GPL 3.0
 
 FrostWire 2.9.7 build 752 APR/24/2025
  - crash: Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty

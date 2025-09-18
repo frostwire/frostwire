@@ -19,6 +19,7 @@ frostwire (7.0.0) stable; urgency=high
  * new libtorrent::set_piece_hashes_posix_disk_io to avoid SIGSEGV/SIGBUS leaks to macos when creating torrents
  * crash: don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
  * Cleanup: Remove unused sun.awt.X11 classes (linux)
+ * Maintenance:all license headers are consistent with GPL 3.0
  * jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  * jlibtorrent:g++-9 upgraded to g++-11 for linux build
  * jlibtorrent:new Sha256Hash::swig()
