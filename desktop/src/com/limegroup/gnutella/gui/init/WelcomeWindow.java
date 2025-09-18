@@ -70,7 +70,6 @@ final class WelcomeWindow extends SetupWindow {
         GridBagConstraints c = new GridBagConstraints();
         com.limegroup.gnutella.gui.MultiLineLabel label1 = new com.limegroup.gnutella.gui.MultiLineLabel(text1, 400);
         label1.setFont(label1.getFont().deriveFont(16f));
-        label1.setForeground(GUIUtils.hexToColor("333333"));
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -79,7 +78,6 @@ final class WelcomeWindow extends SetupWindow {
         panel.add(label1, c);
         com.limegroup.gnutella.gui.MultiLineLabel label2 = new com.limegroup.gnutella.gui.MultiLineLabel(text2, 400);
         label2.setFont(label2.getFont().deriveFont(16f));
-        label2.setForeground(GUIUtils.hexToColor("333333"));
         c.anchor = GridBagConstraints.WEST;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -88,7 +86,6 @@ final class WelcomeWindow extends SetupWindow {
         panel.add(label2, c);
         com.limegroup.gnutella.gui.MultiLineLabel label3 = new com.limegroup.gnutella.gui.MultiLineLabel(I18n.tr("FrostWire is free software,") + " ", 400);
         label3.setFont(label3.getFont().deriveFont(16f));
-        label3.setForeground(GUIUtils.hexToColor("333333"));
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = 1;
         c.weightx = 0;
@@ -96,7 +93,6 @@ final class WelcomeWindow extends SetupWindow {
         panel.add(label3, c);
         URLLabel findMore = new URLLabel("http://www.frostwire.com/scams", I18n.tr("Do not pay for FrostWire."));
         findMore.setFont(findMore.getFont().deriveFont(16f));
-        findMore.setForeground(GUIUtils.hexToColor("333333"));
         c.anchor = GridBagConstraints.LINE_START;
         c.gridwidth = GridBagConstraints.REMAINDER;
         c.weightx = 1.0;
