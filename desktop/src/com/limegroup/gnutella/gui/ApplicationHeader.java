@@ -82,19 +82,27 @@ public final class ApplicationHeader extends JPanel implements RefreshListener {
         setLayout(new MigLayout("ins 0, ay 50%, filly,", "[][][grow][][]"));
         headerButtonBackgroundSelected = GUIMediator.getThemeImage("selected_header_button_background").getImage();
         headerButtonBackgroundUnselected = GUIMediator.getThemeImage("unselected_header_button_background").getImage();
-        cloudSearchField = new GoogleSearchField();
-        searchPanels = createSearchPanel();
-        searchPanels.setOpaque(false);
-        add(searchPanels, "wmin 250px, wmax 450px, growprio 50, growx, gapright 10px, gapleft 5px");
-        addTabButtons(tabs);
-        createUpdateButton();
+
+        // Setup the program logo and update buttons
         JPanel logoUpdateButtonsPanel = new JPanel();
         logoUpdateButtonsPanel.setOpaque(false);
         logoPanel = new LogoPanel();
+        createUpdateButton();
         //only one will be shown at the time.
         logoUpdateButtonsPanel.add(logoPanel);
         logoUpdateButtonsPanel.add(updateButton);
         add(logoUpdateButtonsPanel, "growx, alignx center");
+
+        // Setup the tab buttons
+        addTabButtons(tabs);
+
+        // Setup the search field
+        cloudSearchField = new GoogleSearchField();
+        searchPanels = createSearchPanel();
+        searchPanels.setOpaque(false);
+        add(searchPanels, "alignx center, growx");
+
+        // Setup the media player
         JComponent player = new MediaPlayerComponent().getMediaPanel();
         player.setOpaque(false);
         add(player, "dock east, growy, gapafter 10px!");
