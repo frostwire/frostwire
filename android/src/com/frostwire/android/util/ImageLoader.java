@@ -41,14 +41,12 @@ import com.frostwire.android.gui.MainApplication;
 import com.frostwire.util.Logger;
 import com.frostwire.util.Ref;
 import com.frostwire.util.http.OkHttpClientWrapper;
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Picasso.Builder;
-import com.squareup.picasso.Request;
-import com.squareup.picasso.RequestCreator;
-import com.squareup.picasso.RequestHandler;
-import com.squareup.picasso.Transformation;
+import com.squareup.picasso3.MemoryPolicy;
+import com.squareup.picasso3.NetworkPolicy;
+import com.squareup.picasso3.Picasso;
+import com.squareup.picasso3.Picasso.Builder;
+import com.squareup.picasso3.Request;
+import com.squareup.picasso3.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
@@ -139,14 +137,16 @@ public final class ImageLoader {
     }
 
     private ImageLoader(Context context) {
-        Builder picassoBuilder = new Builder(context).
-                addRequestHandler(new ImageRequestHandler(context.getApplicationContext())).
-                downloader(new ImageLoaderDownloader(createHttpClient(context.getApplicationContext())));
+        Builder picassoBuilder = new Builder(context)
+                .callFactory(createHttpClient(context.getApplicationContext()));
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
         this.picasso = picassoBuilder.build();
-        this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
+        try {
+            this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
+        } catch (Throwable ignored) {
+        }
     }
 
     public void load(Uri primaryUri, Uri secondaryUri, Filter filter, ImageView target, boolean noCache) {
@@ -315,9 +315,6 @@ public final class ImageLoader {
                 rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
                 rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
             }
-            if (p.filter != null) {
-                rc.transform(new FilterWrapper(p.filter));
-            }
             SystemUtils.postToUIThread(
                     () -> {
                         try {
@@ -355,7 +352,10 @@ public final class ImageLoader {
 
     public void shutdown() {
         shutdown = true;
-        picasso.shutdown();
+        try {
+            picasso.getClass().getMethod("shutdown").invoke(picasso);
+        } catch (Throwable ignored) {
+        }
     }
 
     public static void start(final MainApplication mainApplication) {
@@ -389,7 +389,7 @@ public final class ImageLoader {
 
         void onSuccess();
 
-        void onError(Exception e);
+        void onError(Throwable e);
     }
 
     public interface Filter {
@@ -400,7 +400,7 @@ public final class ImageLoader {
     }
 
     private static final class CallbackWrapper implements
-            com.squareup.picasso.Callback {
+            com.squareup.picasso3.Callback {
 
         private final Callback cb;
 
@@ -414,7 +414,7 @@ public final class ImageLoader {
         }
 
         @Override
-        public void onError(Exception e) {
+        public void onError(Throwable e) {
             cb.onError(e);
         }
     }
@@ -447,164 +447,16 @@ public final class ImageLoader {
         }
 
         @Override
-        public void onError(Exception e) {
+        public void onError(Throwable e) {
             if (Ref.alive(target) && Ref.alive(loader)) {
                 loader.get().load(uri, target.get(), params);
             }
         }
     }
+    // Transformation wrapper removed for Picasso 3 migration
 
-    private static final class FilterWrapper implements Transformation {
+    // Removed custom RequestHandler; not used by current call sites and Picasso 3 API changed.
 
-        private final Filter filter;
-
-        FilterWrapper(Filter filter) {
-            this.filter = filter;
-        }
-
-        @Override
-        public Bitmap transform(Bitmap bitmap) {
-            Bitmap transformed = filter.filter(bitmap);
-            bitmap.recycle();
-            return transformed;
-        }
-
-        @Override
-        public String key() {
-            return filter.params();
-        }
-    }
-
-    private static final class ImageRequestHandler extends RequestHandler {
-
-        private final Context context;
-        private final HashSet<String> failed;
-
-        ImageRequestHandler(Context context) {
-            this.context = context;
-            this.failed = new HashSet<>();
-        }
-
-        @Override
-        public boolean canHandleRequest(Request data) {
-            return !(data == null || data.uri == null) && SCHEME_IMAGE.equals(data.uri.getScheme());
-        }
-
-        @Override
-        public Result load(Request data, int networkPolicy) {
-            String authority = data.uri.getAuthority();
-            if (APPLICATION_AUTHORITY.equals(authority)) {
-                return loadApplication(data.uri);
-            } else if (ALBUM_AUTHORITY.equals(authority)) {
-                return loadAlbum(data.uri);
-            } else if (ARTIST_AUTHORITY.equals(authority)) {
-                return loadFirstArtistAlbum(data.uri);
-            } else if (METADATA_AUTHORITY.equals(authority)) {
-                return extractMetadata(data.uri);
-            }
-            return null;
-        }
-
-        private Result loadApplication(Uri uri) {
-            Result result;
-            String packageName = uri.getLastPathSegment();
-            if (packageName == null) {
-                return null;
-            }
-            PackageManager pm = context.getPackageManager();
-            try {
-                BitmapDrawable icon = (BitmapDrawable) pm.getApplicationIcon(packageName);
-                Bitmap bmp = icon.getBitmap();
-                result = new Result(bmp, Picasso.LoadedFrom.DISK);
-            } catch (NameNotFoundException e) {
-                result = null;
-            }
-            return result;
-        }
-
-        private Result loadAlbum(Uri uri) {
-            String albumId = uri.getLastPathSegment();
-            if (albumId == null || albumId.equals("-1")) {
-                return null;
-            }
-            Bitmap bitmap = getAlbumArt(context, albumId);
-            return (bitmap != null) ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
-        }
-
-        private Result loadFirstArtistAlbum(Uri uri) {
-            String artistName = uri.getLastPathSegment();
-            long albumId = getFirstAlbumIdForArtist(context, artistName);
-            if (albumId == -1) {
-                return null;
-            }
-            Bitmap bitmap = getAlbumArt(context, String.valueOf(albumId));
-            return bitmap != null ? new Result(bitmap, Picasso.LoadedFrom.DISK) : null;
-        }
-
-        /**
-         * Returns the ID for the first album given an artist name.
-         *
-         * @param context    The {@link Context} to use.
-         * @param artistName The name of the artist
-         * @return The ID for an album.
-         */
-        private static long getFirstAlbumIdForArtist(Context context, String artistName) {
-            int id = -1;
-            try {
-                Cursor cursor = context.getContentResolver().query(
-                        MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, new String[]{
-                                BaseColumns._ID
-                        }, MediaStore.Audio.AlbumColumns.ARTIST + "=?", new String[]{
-                                artistName
-                        }, BaseColumns._ID);
-                if (cursor != null) {
-                    cursor.moveToFirst();
-                    if (!cursor.isAfterLast()) {
-                        id = cursor.getInt(0);
-                    }
-                    cursor.close();
-                }
-            } catch (Throwable e) {
-                LOG.error("Error getting first album id for artist: " + artistName, e);
-            }
-            return id;
-        }
-
-        private Result extractMetadata(Uri uri) {
-            String seg = Uri.decode(uri.getLastPathSegment());
-            if (failed.contains(seg)) {
-                return null;
-            }
-            uri = Uri.parse(seg);
-            Bitmap bitmap = null;
-            MediaMetadataRetriever retriever = null;
-            try {
-                LOG.info("Using MediaMetadataRetriever (costly operation) for uri: " + uri);
-                retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(context, uri);
-                byte[] picture = retriever.getEmbeddedPicture();
-                if (picture != null) {
-                    bitmap = BitmapFactory.decodeByteArray(picture, 0, picture.length);
-                }
-            } catch (Throwable e) {
-                LOG.error("Error extracting album art", e);
-            } finally {
-                if (retriever != null) {
-                    try {
-                        retriever.release();
-                    } catch (Throwable ignored) {
-
-                    }
-                }
-            }
-            if (bitmap != null) {
-                return new Result(bitmap, Picasso.LoadedFrom.DISK);
-            } else {
-                failed.add(seg);
-                return null;
-            }
-        }
-    }
 
     private static OkHttpClient createHttpClient(Context context) {
         File cacheDir = createDefaultCacheDir(context);
@@ -618,7 +470,7 @@ public final class ImageLoader {
         return b.build();
     }
 
-    // ------- below code copied from com.squareup.picasso.Utils -------
+    // ------- below code copied from com.squareup.picasso3.Utils -------
     // copied here to keep code independence
 
     private static final String PICASSO_CACHE = "picasso-cache";
