@@ -5,6 +5,7 @@ frostwire (7.0.0) stable; urgency=high
  * New: Partial selection file dialog now allows shift-click to select ranges of files in torrents
  * New: settings panel to pick location for .torrent files
  * New: FlatLaf light theme
+ * New: Header bar rearranged, search bar goes to the center, nav buttons on the left, FW Logo first
  * Maintenance: MacEventHandler is now compatible with JDK 23 and JDK 24
  * Maintenance: Archive.org search
  * Maintenance: GloTorrents search
