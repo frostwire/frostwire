@@ -102,14 +102,13 @@ boolean isAssembleRelease = gradle.startParameter.taskNames.contains("assembleRe
 android {
     namespace "com.frostwire.android"
 
-    //compileSdk 35  // Android 14 UpsideDownCake
-    compileSdk 36  // Android 15 SnowCone
+    compileSdk = 36  // Android 15 SnowCone
 
     defaultConfig {
         applicationId "com.frostwire.android"
         versionName project.ext.versionName
         minSdkVersion 26 // Android 8.0 Oreo
-        targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 34)
+        targetSdkVersion 34 // Android 14 (more involved upgrade, crashes on targetsdkversion 35)
         multiDexEnabled true
 
         ndk {
@@ -238,7 +237,7 @@ dependencies {
     implementation 'com.google.re2j:re2j:1.8'
     implementation 'com.squareup.okhttp3:okhttp:5.1.0'
     implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0'
     implementation "androidx.work:work-runtime-ktx:2.10.0"
 
     // Firebase Crashlytics
