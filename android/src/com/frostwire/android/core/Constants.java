@@ -87,6 +87,7 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_TELLURIDE_COURIER = "frostwire.prefs.search.use_telluride_courier";
     public static final String PREF_KEY_SEARCH_USE_YT = "frostwire.prefs.search.use_yt";
     public static final String PREF_KEY_SEARCH_USE_TORRENTSCSV = "frostwire.prefs.search.use_torrentscsv";
+    public static final String PREF_KEY_SEARCH_USE_KNABEN = "frostwire.prefs.search.use_knaben";
 
     public static final String PREF_KEY_GUI_VIBRATE_ON_FINISHED_DOWNLOAD = "frostwire.prefs.gui.vibrate_on_finished_download";
     public static final String PREF_KEY_GUI_LAST_MEDIA_TYPE_FILTER = "frostwire.prefs.gui.last_media_type_filter";

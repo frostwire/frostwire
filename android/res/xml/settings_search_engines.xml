@@ -78,6 +78,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_idope" />
     <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_knaben"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_knaben" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_yt"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_yt" />
