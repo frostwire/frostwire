@@ -33,6 +33,7 @@ import com.frostwire.search.frostclick.FrostClickSearchPerformer;
 import com.frostwire.search.frostclick.UserAgent;
 import com.frostwire.search.glotorrents.GloTorrentsSearchPerformer;
 import com.frostwire.search.idope.IdopeSearchPerformer;
+import com.frostwire.search.knaben.KnabenSearchPerformer;
 import com.frostwire.search.limetorrents.LimeTorrentsSearchPerformer;
 import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
@@ -285,6 +286,13 @@ public abstract class SearchEngine {
         }
     };
 
+    public static final SearchEngine KNABEN = new SearchEngine("Knaben", Constants.PREF_KEY_SEARCH_USE_KNABEN) {
+        @Override
+        public SearchPerformer getPerformer(long token, String keywords) {
+            return new KnabenSearchPerformer(token, keywords, DEFAULT_TIMEOUT);
+        }
+    };
+
     public static final SearchEngine TELLURIDE_COURIER = new SearchEngine("Telluride Courier", Constants.PREF_KEY_SEARCH_USE_TELLURIDE_COURIER) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -332,5 +340,6 @@ public abstract class SearchEngine {
             LIMETORRENTS,
             NYAA,
             GLOTORRENTS,
-            TORRENTSCSV);
+            TORRENTSCSV,
+            KNABEN);
 }
