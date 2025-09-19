@@ -181,7 +181,7 @@ android {
             multiDexKeepFile file('multidex-config.txt')
         }
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             multiDexKeepFile file('multidex-config.txt')
@@ -236,7 +236,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'com.google.re2j:re2j:1.8'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.12'
+    implementation 'com.squareup.okhttp3:okhttp:5.1.0'
     implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
     implementation "androidx.work:work-runtime-ktx:2.10.0"

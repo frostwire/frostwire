@@ -21,6 +21,7 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/18/2025
  - com.google.android.material:material:1.13.0
  - com.google.code.gson:gson:2.13.2
  - com.google.re2j:re2j:1.8
+ - com.squareup.okhttp3:okhttp:5.1.0
 
 
 FrostWire 2.9.7 build 752 APR/24/2025
