@@ -207,6 +207,7 @@
     <string name="use_nyaa">Use Nyaa</string>
     <string name="use_eztv">Use Eztv</string>
     <string name="use_glotorrents">Use GloTorrents</string>
+    <string name="use_torrentscsv">Use TorrentsCSV</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">You need a Bitcoin wallet installed on your device to submit a BTC donation.</string>
     <string name="transfers_select_all">all</string>
