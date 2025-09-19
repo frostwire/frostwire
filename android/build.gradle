@@ -238,7 +238,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:5.1.0'
     implementation 'com.squareup.picasso3:picasso:3.0.0-alpha06'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0'
-    implementation "androidx.work:work-runtime-ktx:2.10.0"
+    implementation "androidx.work:work-runtime-ktx:2.10.4"
 
     // Firebase Crashlytics
     implementation platform('com.google.firebase:firebase-bom:33.12.0')
