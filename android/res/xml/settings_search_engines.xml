@@ -34,6 +34,10 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_glotorrents" />
     <CheckBoxPreference
+        android:key="frostwire.prefs.search.use_torrentscsv"
+        android:layout="@layout/view_preference_search_engine"
+        android:title="@string/use_torrentscsv" />
+    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_frostclick"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_frostclick" />
