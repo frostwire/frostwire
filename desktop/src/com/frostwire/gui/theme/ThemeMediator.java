@@ -172,9 +172,9 @@ public final class ThemeMediator {
         if (theme == ThemeEnum.DEFAULT) {
             com.frostwire.gui.theme.ThemeMediator.loadDefaultTheme();
         } else if (theme == ThemeEnum.DARK_FLAT_LAF) {
-            com.frostwire.gui.theme.ThemeMediator.loadDarkTheme();
+            com.frostwire.gui.theme.ThemeMediator.loadFlatDarkLafTheme();
         } else if (theme == ThemeEnum.LIGHT_FLAT_LAF) {
-            com.frostwire.gui.theme.ThemeMediator.loadLightTheme();
+            com.frostwire.gui.theme.ThemeMediator.loadFlatLightLafTheme();
         }
 
         // Persist selection immediately (used by the relaunch below)
@@ -199,28 +199,6 @@ public final class ThemeMediator {
                     I18n.tr("Theme Change"),
                     JOptionPane.INFORMATION_MESSAGE
             );
-        }
-    }
-
-    public static void loadLightTheme() {
-        purgeSynthOverrides();
-        Runnable task = () -> {
-            purgeSynthOverrides();
-            FlatLightLaf.setup();
-
-            for (Window w : Window.getWindows()) {
-                SwingUtilities.updateComponentTreeUI(w);
-            }
-        };
-
-        if (SwingUtilities.isEventDispatchThread()) {
-            task.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(task);
-            } catch (Exception ex) {
-                throw new RuntimeException("Unable to load new light theme", ex);
-            }
         }
     }
 
@@ -260,11 +238,32 @@ public final class ThemeMediator {
         }
     }
 
+    public static void loadFlatLightLafTheme() {
+        purgeSynthOverrides();
+        Runnable task = () -> {
+            purgeSynthOverrides();
+            FlatLightLaf.setup();
+
+            for (Window w : Window.getWindows()) {
+                SwingUtilities.updateComponentTreeUI(w);
+            }
+        };
+
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(task);
+            } catch (Exception ex) {
+                throw new RuntimeException("Unable to load new light theme", ex);
+            }
+        }
+    }
 
     /**
      * Loads the dark UI theme (FlatLaf Dark).
      */
-    public static void loadDarkTheme() {
+    public static void loadFlatDarkLafTheme() {
         purgeSynthOverrides();
         Runnable task = () -> {
             purgeSynthOverrides();
@@ -600,12 +599,6 @@ public final class ThemeMediator {
         UIManager.put("Table.font.bold", bold);
         UIManager.put("Tree.rowHeight", 0);
     }
-//    private static void fixAAFontSettings() {
-//        UIDefaults defaults = UIManager.getLookAndFeelDefaults();
-//        boolean lafCond = SwingUtilities2.isLocalDisplay();
-//        Object aaTextInfo = SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-//        defaults.put(SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
-//    }
 
     // windows font policy http://msdn.microsoft.com/en-us/library/windows/desktop/aa511282.aspx
     // table of languages http://msdn.microsoft.com/en-us/library/ee825488(v=cs.20).aspx
