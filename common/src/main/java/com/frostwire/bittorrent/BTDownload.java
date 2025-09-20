@@ -566,7 +566,7 @@ public final class BTDownload implements BittorrentDownload {
                 FileStorage fs = ti.files();
                 int numFiles = ti.numFiles();
                 for (int i = 0; i < numFiles; i++) {
-                    BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker);
+                    BTDownloadItem item = new BTDownloadItem(th, i, fs.filePath(i), fs.fileSize(i), piecesTracker, savePath);
                     items.add(item);
                 }
                 if (piecesTracker != null) {
