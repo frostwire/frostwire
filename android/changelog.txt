@@ -9,6 +9,8 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/19/2025
  - improvement: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  - Avoid possible context leak on EngineBroadcastReceiver
  - maintenance: all license headers are GPL 3.0
+ - maintenance: archive.org search fixed
+ - maintenance: glotorrents search fixed
  - org.jetbrains:annotations:26.0.2-1
  - androidx.appcompat:appcompat:1.7.1
  - androidx.browser:browser:1.9.0
