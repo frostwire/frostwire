@@ -195,8 +195,15 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
         }
         TextView sourceLink = findView(view, R.id.view_bittorrent_search_result_list_item_text_source);
         sourceLink.setText(sr.getSource() + license); // TODO: ask for design
-        sourceLink.setTag(sr.getDetailsUrl());
-        sourceLink.setPaintFlags(sourceLink.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        boolean hasDetailsUrl = sr.getDetailsUrl() != null && !sr.getDetailsUrl().isEmpty();
+        if (hasDetailsUrl) {
+            sourceLink.setTag(sr.getDetailsUrl());
+        } else {
+            sourceLink.setTag(null);
+        }
+        sourceLink.setClickable(hasDetailsUrl);
+        int underlineFlag = hasDetailsUrl ? Paint.UNDERLINE_TEXT_FLAG : 0;
+        sourceLink.setPaintFlags(sourceLink.getPaintFlags() | underlineFlag);
         sourceLink.setOnClickListener(linkListener);
     }
 
@@ -405,6 +412,9 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
     private static class OnLinkClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
+            if (!v.isClickable() || v.getTag() == null) {
+                return;
+            }
             String url = (String) v.getTag();
             UIUtils.openURL(v.getContext(), url);
         }
