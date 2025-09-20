@@ -135,7 +135,7 @@ public final class TorrentConnectionPaneItem extends AbstractPaneItem {
         boolean vpnDropProtectionSelected = VPN_DROP_PROTECTION_CHECKBOX.isSelected();
         if (vpnDropProtectionSelected && !VPNs.isVPNActive()) {
             btEngine.pause();
-        } else if (!vpnDropProtectionSelected && btEngine.isPaused()) {
+        } else if (!vpnDropProtectionSelected && btEngine.isPausedCached()) {
             btEngine.resume();
         }
         ConnectionSettings.VPN_DROP_PROTECTION.setValue(vpnDropProtectionSelected);

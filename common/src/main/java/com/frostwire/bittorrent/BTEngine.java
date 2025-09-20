@@ -63,6 +63,9 @@ public final class BTEngine extends SessionManager {
     private final InnerListener innerListener;
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
     private BTEngineListener listener;
+    
+    // Cached paused state to avoid blocking EDT calls
+    private volatile boolean cachedPausedState = false;
 
     private BTEngine() {
         super(false);
@@ -188,6 +191,15 @@ public final class BTEngine extends SessionManager {
 
     @Override
     protected void onAfterStart() {
+        // Initialize cached paused state on start in background thread to avoid EDT blocking
+        new Thread(() -> {
+            try {
+                cachedPausedState = super.isPaused();
+            } catch (Exception e) {
+                // If there's an issue getting the initial state, assume not paused
+                cachedPausedState = false;
+            }
+        }, "BTEngine-PausedStateInit").start();
         fireStarted();
     }
 
@@ -299,6 +311,32 @@ public final class BTEngine extends SessionManager {
         }
         SettingsPack sp = defaultSettings();
         applySettings(sp);
+    }
+
+    /**
+     * Override pause method to maintain cached state
+     */
+    @Override
+    public void pause() {
+        super.pause();
+        cachedPausedState = true;
+    }
+
+    /**
+     * Override resume method to maintain cached state
+     */
+    @Override
+    public void resume() {
+        super.resume();
+        cachedPausedState = false;
+    }
+
+    /**
+     * Non-blocking method to check if engine is paused
+     * Uses cached state to avoid EDT blocking calls
+     */
+    public boolean isPausedCached() {
+        return cachedPausedState;
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {
