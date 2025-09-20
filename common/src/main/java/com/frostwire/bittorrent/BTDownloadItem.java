@@ -37,10 +37,10 @@ public class BTDownloadItem implements TransferItem {
     private final long size;
     private PiecesTracker piecesTracker;
 
-    public BTDownloadItem(TorrentHandle th, int index, String filePath, long fileSize, PiecesTracker piecesTracker) {
+    public BTDownloadItem(TorrentHandle th, int index, String filePath, long fileSize, PiecesTracker piecesTracker, File savePath) {
         this.th = th;
         this.index = index;
-        this.file = new File(th.savePath(), filePath);
+        this.file = new File(savePath, filePath);
         this.name = file.getName();
         this.size = fileSize;
         this.piecesTracker = piecesTracker;
