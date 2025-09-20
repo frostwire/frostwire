@@ -72,8 +72,7 @@ frostwire (7.0.0) stable; urgency=high
  * jlibtorrent:Added `--swig-only` and `--build-only` options to swig/build scripts
  * jlibtorrent:Added `prepare-macos.sh` script for macOS build setup
  * jlibtorrent:Updated `run-swig.sh` script for improved SWIG processing
- * jlibtorrent:Upgraded SWIG to 4.2.1
- * jlibtorrent:Enhanced exception handling in SWIG interfaces
+  * jlibtorrent:Enhanced exception handling in SWIG interfaces
  * jlibtorrent:Fixed issues in file_storage.hpp and ip_filter.hpp
  * jlibtorrent:Adjusted build flags and macros for Boost and libtorrent compatibility
  * jlibtorrent:Enabled SWIG directors for specific classes
