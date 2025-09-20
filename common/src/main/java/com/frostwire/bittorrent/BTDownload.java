@@ -121,7 +121,7 @@ public final class BTDownload implements BittorrentDownload {
     }
 
     public boolean isPaused() {
-        return th.isValid() && (isPaused(th.status()) || engine.isPaused() || !engine.isRunning());
+        return th.isValid() && (isPaused(th.status()) || engine.isPausedCached() || !engine.isRunning());
     }
 
     public boolean isSeeding() {
@@ -140,7 +140,8 @@ public final class BTDownload implements BittorrentDownload {
         if (!engine.isRunning()) {
             return TransferState.STOPPED;
         }
-        if (engine.isPaused()) {
+        // Use cached paused state to avoid blocking EDT
+        if (engine.isPausedCached()) {
             return TransferState.PAUSED;
         }
         if (!th.isValid()) {

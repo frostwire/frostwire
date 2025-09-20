@@ -78,7 +78,7 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
                 }
                 MessageService.instance().showMessage(tr("VPN-Drop protection disabled. Restarting BitTorrent engine."));
                 BackgroundQueuedExecutorService.schedule(() -> {
-                    if (BTEngine.getInstance().isPaused()) {
+                    if (BTEngine.getInstance().isPausedCached()) {
                         BTEngine.getInstance().resume();
                     }
                 });
@@ -111,13 +111,13 @@ public class VPNDropGuard implements VPNStatusRefresher.VPNStatusListener {
         boolean vpnDropProtectionOn = ConnectionSettings.VPN_DROP_PROTECTION.getValue();
         BTEngine instance = BTEngine.getInstance();
         if (vpnDropProtectionOn) {
-            if (vpnIsOn && instance.isPaused()) {
+            if (vpnIsOn && instance.isPausedCached()) {
                 instance.resume();
             }
-            if (!vpnIsOn && !instance.isPaused()) {
+            if (!vpnIsOn && !instance.isPausedCached()) {
                 instance.pause();
             }
-        } else if (!vpnDropProtectionOn && instance.isPaused()) {
+        } else if (!vpnDropProtectionOn && instance.isPausedCached()) {
             instance.resume();
         }
     }
