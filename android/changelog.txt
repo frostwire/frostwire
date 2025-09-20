@@ -24,7 +24,8 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/18/2025
  - com.squareup.okhttp3:okhttp:5.1.0
  - androidx.work:work-runtime-ktx:2.10.4
  - com.google.firebase:firebase-bom:34.3.0
- - com.applovin.mediation:unityads-adapter:4.14.1.0
+ - com.applovin:applovin-sdk:13.4.0
+ - com.applovin.mediation:unityads-adapter:4.16.1.0
 
 FrostWire 2.9.7 build 752 APR/24/2025
  - crash: Fix NPE in PerformersHelper.sortByRelevance when currentQuery is null or empty
