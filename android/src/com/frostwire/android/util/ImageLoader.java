@@ -20,20 +20,12 @@ package com.frostwire.android.util;
 
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.os.StatFs;
-import android.provider.BaseColumns;
-import android.provider.MediaStore;
 import android.widget.ImageView;
 
 import com.frostwire.android.BuildConfig;
@@ -45,13 +37,11 @@ import com.squareup.picasso3.MemoryPolicy;
 import com.squareup.picasso3.NetworkPolicy;
 import com.squareup.picasso3.Picasso;
 import com.squareup.picasso3.Picasso.Builder;
-import com.squareup.picasso3.Request;
 import com.squareup.picasso3.RequestCreator;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashSet;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -67,16 +57,6 @@ public final class ImageLoader {
     private static Handler handler;
 
     private static final Logger LOG = Logger.getLogger(ImageLoader.class);
-
-    private static final String SCHEME_IMAGE = "image";
-
-    private static final String APPLICATION_AUTHORITY = "application";
-
-    private static final String ALBUM_AUTHORITY = "album";
-
-    private static final String ARTIST_AUTHORITY = "artist";
-
-    private static final String METADATA_AUTHORITY = "metadata";
 
     private static final Uri ALBUM_THUMBNAILS_URI = Uri.parse("content://media/external/audio/albumart");
 
@@ -96,35 +76,6 @@ public final class ImageLoader {
             instance = new ImageLoader(context);
         }
         return instance;
-    }
-
-    /**
-     * WARNING: this method does not make use of the cache.
-     * it is here to be used only (so far) on the notification window view and the RC Interface
-     * (things like Lock Screen, Android Wear), which run on another process space. If you try
-     * to use a cached image there, you will get some nasty exceptions, therefore you will need
-     * this.
-     * <p>
-     * For loading album art inside the application Activities/Views/Fragments, take a look at
-     * FileListAdapter and how it uses the ImageLoader.
-     */
-    private static Bitmap getAlbumArt(Context context, String albumId) {
-        Bitmap bitmap = null;
-        try {
-            Uri albumUri = Uri.withAppendedPath(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI, albumId);
-            try (Cursor cursor = context.getContentResolver().query(albumUri, new String[]{MediaStore.Audio.AlbumColumns.ALBUM_ART}, null, null, null)) {
-                LOG.info("getAlbumArt(albumId=" + albumId + ") Using album_art path for uri: " + albumUri, true);
-                if (cursor != null && cursor.moveToFirst()) {
-                    String albumArt = cursor.getString(0);
-                    if (albumArt != null) {
-                        bitmap = BitmapFactory.decodeFile(albumArt);
-                    }
-                }
-            }
-        } catch (Throwable e) {
-            LOG.error("getAlbumArt(albumId=" + albumId + ")Error getting album art", e, true);
-        }
-        return bitmap;
     }
 
     public static Uri getAlbumArtUri(long albumId) {
@@ -464,10 +415,9 @@ public final class ImageLoader {
 
         Cache cache = new Cache(cacheDir, maxSize);
 
-        OkHttpClient.Builder b = new OkHttpClient.Builder();
-        b = b.cache(cache);
-        b = OkHttpClientWrapper.configNullSsl(b);
-        return b.build();
+        OkHttpClient.Builder b = new OkHttpClient.Builder().cache(cache);
+        OkHttpClient.Builder nullSslBuilder = OkHttpClientWrapper.configNullSsl(b);
+        return nullSslBuilder.build();
     }
 
     // ------- below code copied from com.squareup.picasso3.Utils -------
