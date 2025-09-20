@@ -1,8 +1,0 @@
-dependencies {
-    // @Nullable cross-os annotation
-    implementation 'org.jetbrains:annotations:26.0.2'
-
-    implementation 'com.google.re2j:re2j:1.8'
-    implementation 'com.google.code.gson:gson:2.13.2'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-}
