@@ -35,24 +35,9 @@ class DonationButtons extends JPanel {
 
     DonationButtons() {
         setLayout(new MigLayout("insets 0, nogrid, ltr, gapx 6", "", "[align center]"));
-        add(createDonateLabel());
-        //MigLayout lesson: Using px explicitly as the unit does make a big difference.
-        int bitcoinWidth = (OSUtils.isLinux()) ? 52 : 40;
-        int usdErc20Width = (OSUtils.isLinux()) ? 78 : 68;
-        add(new DonationButton("$5", "https://www.frostwire.com/?id=donate&amt=5", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
-        add(new DonationButton("$10", "https://www.frostwire.com/?id=donate&amt=10", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
-        add(new DonationButton("$x", "https://www.frostwire.com/?id=donate&amt=open", I18n.tr("Support FrostWire development with a $1 donation")), "w " + bitcoinWidth + "px!, h 18px!");
-        add(new DonationButton("BTC", "https://www.frostwire.com/bitcoin", I18n.tr("Support FrostWire development with a Bitcoin donation")), "w " + bitcoinWidth + "px!, h 18px!");
-        add(new DonationButton("ETH", "https://www.frostwire.com/ethereum", I18n.tr("Support FrostWire development with an Ether donation")), "w " + bitcoinWidth + "px!, h 18px!");
-        add(new DonationButton("USD*/DAI", "https://www.frostwire.com/ethereum", I18n.tr("Support FrostWire development with a Dash donation")), "w " + usdErc20Width + "px!, h 18px!");
-    }
-
-    private JLabel createDonateLabel() {
-        Font labelFont = getFont().deriveFont(Font.BOLD);
-        JLabel donateLabel = new JLabel(I18n.tr("Donate") + ":");
-        donateLabel.setForeground(ThemeMediator.isDarkLafThemeOn() ? FONT_COLOR_DARK_THEME : FONT_COLOR);
-        donateLabel.setFont(labelFont);
-        return donateLabel;
+        // Single simplified donate button
+        int donateButtonWidth = (OSUtils.isLinux()) ? 70 : 60;
+        add(new DonationButton("Donate", "https://www.frostwire.com/give", I18n.tr("Support FrostWire development with a donation")), "w " + donateButtonWidth + "px!, h 18px!");
     }
 
     private class DonationButton extends JButton {
