@@ -309,36 +309,23 @@ public final class TorrentUtil {
 
     private static create_torrent createTorrentWithType(file_storage fs, TorrentType torrentType) {
         create_torrent torrent;
+        int autoPieceSize = 0; // Let libtorrent auto-detect piece size
         
         switch (torrentType) {
             case V1_ONLY:
                 // Create v1-only torrent - use legacy format
-                torrent = new create_torrent(fs);
+                torrent = new create_torrent(fs, autoPieceSize, create_torrent.v1_only);
                 break;
                 
             case V2_ONLY:
                 // Create v2-only torrent - use modern format with v2 features only
-                // Use merkle tree flag which enables v2 features
-                try {
-                    torrent = new create_torrent(fs, 0, -1, 
-                        create_torrent.flags_t.merkle.swigValue());
-                } catch (Exception e) {
-                    // Fallback to standard constructor if merkle flag is not available
-                    torrent = new create_torrent(fs);
-                }
+                torrent = new create_torrent(fs, autoPieceSize, create_torrent.v2_only);
                 break;
                 
             case HYBRID:
             default:
                 // Create hybrid torrent - supports both v1 and v2 protocols (default)
-                // Use canonical files flag which should enable hybrid mode in newer versions
-                try {
-                    torrent = new create_torrent(fs, 0, -1, 
-                        create_torrent.flags_t.canonical_files.swigValue());
-                } catch (Exception e) {
-                    // Fallback to standard constructor
-                    torrent = new create_torrent(fs);
-                }
+                torrent = new create_torrent(fs, autoPieceSize);
                 break;
         }
         
