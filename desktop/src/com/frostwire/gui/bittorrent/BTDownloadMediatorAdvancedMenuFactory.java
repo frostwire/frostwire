@@ -27,6 +27,7 @@ import com.frostwire.util.StringUtils;
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.GUIUtils;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
@@ -167,7 +168,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
                 }
             }
         }
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             return null;
         }
         return list.toArray(new com.frostwire.bittorrent.BTDownload[0]);
@@ -327,7 +328,7 @@ final class BTDownloadMediatorAdvancedMenuFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new Thread(dm::requestTrackerAnnounce).start();
+            BackgroundQueuedExecutorService.schedule(dm::requestTrackerAnnounce);
         }
     }
 
@@ -419,13 +420,13 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         }
 
         private boolean validateTrackersUrls(List<String> urls) {
-            if (urls == null || urls.size() == 0) {
+            if (urls == null || urls.isEmpty()) {
                 return false;
             }
             String patternStr = "^(https?|udp)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
             Pattern pattern = Pattern.compile(patternStr);
             for (String tracker_url : urls) {
-                if (tracker_url.trim().equals("")) {
+                if (tracker_url.trim().isEmpty()) {
                     continue;
                 }
                 Matcher matcher = pattern.matcher(tracker_url.trim());
