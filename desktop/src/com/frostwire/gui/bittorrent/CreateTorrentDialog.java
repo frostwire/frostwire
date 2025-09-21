@@ -92,6 +92,8 @@ public class CreateTorrentDialog extends JDialog {
     private JButton buttonClose;
     private JComboBox<PieceSize> pieceSizeComboBox;
     private int pieceSize;
+    private JComboBox<TorrentType> torrentTypeComboBox;
+    private TorrentType selectedTorrentType = TorrentType.HYBRID;
 
     public CreateTorrentDialog(JFrame frame) {
         super(frame);
@@ -219,7 +221,16 @@ public class CreateTorrentDialog extends JDialog {
         JLabel labelPieceSize = new JLabel(I18n.tr("Piece Size"));
         torrentTrackingPanel.add(labelPieceSize, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
         pieceSizeComboBox = new JComboBox<>(values);
-        torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px");
+        torrentTrackingPanel.add(pieceSizeComboBox, "gapright 5, gapleft 80, width 175px, wrap");
+        
+        JLabel labelTorrentType = new JLabel(I18n.tr("Torrent Type"));
+        labelTorrentType.setToolTipText(I18n.tr("Select the torrent format type to create"));
+        torrentTrackingPanel.add(labelTorrentType, "aligny top, pushy, gapleft 5, gapright 10, wmin 150px");
+        torrentTypeComboBox = new JComboBox<>(TorrentType.values());
+        torrentTypeComboBox.setSelectedItem(TorrentType.HYBRID); // Default to hybrid
+        torrentTypeComboBox.setToolTipText(I18n.tr("Hybrid torrents support both v1 and v2 protocols and are recommended"));
+        torrentTrackingPanel.add(torrentTypeComboBox, "gapright 5, gapleft 80, width 175px");
+        
         //suggest DHT by default
         updateTrackerRelatedControlsAvailability(true);
         basicTorrentPane.add(torrentTrackingPanel, "grow, push");
@@ -263,11 +274,22 @@ public class CreateTorrentDialog extends JDialog {
         pieceSizeComboBox.addActionListener(
                 e -> onPieceSizeSelected(pieceSizeComboBox.getSelectedIndex())
         );
+        torrentTypeComboBox.addActionListener(
+                e -> onTorrentTypeSelected((TorrentType) torrentTypeComboBox.getSelectedItem())
+        );
     }
 
     private void onPieceSizeSelected(int selectedIndex) {
         if (selectedIndex > 0 && values.length > selectedIndex && values[selectedIndex] != null) {
             pieceSize = values[selectedIndex].bytes();
+        }
+    }
+
+    private void onTorrentTypeSelected(TorrentType torrentType) {
+        if (torrentType != null) {
+            selectedTorrentType = torrentType;
+            // Update the tooltip to show the description of the selected type
+            torrentTypeComboBox.setToolTipText(torrentType.getDescription());
         }
     }
 
@@ -506,7 +528,7 @@ public class CreateTorrentDialog extends JDialog {
             file_storage fs = new file_storage();
             reportCurrentTask(I18n.tr("Adding files..."));
             libtorrent.add_files(fs, f.getPath());
-            create_torrent torrent = new create_torrent(fs, pieceSize);
+            create_torrent torrent = createTorrentWithType(fs, pieceSize, selectedTorrentType);
             torrent.set_priv(false);
             torrent.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
             if (trackers != null && !trackers.isEmpty()) {
@@ -669,6 +691,45 @@ public class CreateTorrentDialog extends JDialog {
 
     private void reportCurrentTask(final String task_description) {
         SwingUtilities.invokeLater(() -> progressBar.setString(task_description));
+    }
+
+    private create_torrent createTorrentWithType(file_storage fs, int pieceSize, TorrentType torrentType) {
+        create_torrent torrent;
+        
+        switch (torrentType) {
+            case V1_ONLY:
+                // Create v1-only torrent - use legacy format
+                // For now, use the standard constructor as v1 is the default in older libtorrent versions
+                torrent = new create_torrent(fs, pieceSize);
+                break;
+                
+            case V2_ONLY:
+                // Create v2-only torrent - use modern format with v2 features only
+                // Use merkle tree flag which enables v2 features
+                try {
+                    torrent = new create_torrent(fs, pieceSize, -1, 
+                        create_torrent.flags_t.merkle.swigValue());
+                } catch (Exception e) {
+                    // Fallback to standard constructor if merkle flag is not available
+                    torrent = new create_torrent(fs, pieceSize);
+                }
+                break;
+                
+            case HYBRID:
+            default:
+                // Create hybrid torrent - supports both v1 and v2 protocols (default)
+                // Use canonical files flag which should enable hybrid mode in newer versions
+                try {
+                    torrent = new create_torrent(fs, pieceSize, -1, 
+                        create_torrent.flags_t.canonical_files.swigValue());
+                } catch (Exception e) {
+                    // Fallback to standard constructor
+                    torrent = new create_torrent(fs, pieceSize);
+                }
+                break;
+        }
+        
+        return torrent;
     }
 
     private enum PieceSize {

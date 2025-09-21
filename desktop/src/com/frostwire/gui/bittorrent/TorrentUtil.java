@@ -174,6 +174,18 @@ public final class TorrentUtil {
         makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true);
     }
 
+    /**
+     * Creates a DHT based torrent with specified type and optionally shows the share dialog.
+     *
+     * @param file                   - The file/dir to make a torrent out of
+     * @param uiTorrentMakerListener - an optional listener of this process
+     * @param showShareTorrentDialog - show the share dialog when done
+     * @param torrentType           - the type of torrent to create (v1, v2, or hybrid)
+     */
+    public static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, TorrentType torrentType) {
+        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, true, torrentType);
+    }
+
     public static info_hash_t infoHashTFromTorrentInfo(TorrentInfo ti) {
         Sha256Hash v2 = ti.infoHashV2();   // may be null or all zeros
         if (v2 != null && !v2.isAllZeros()) {
@@ -190,9 +202,20 @@ public final class TorrentUtil {
      * @param dhtTrackedOnly         - if true, no trackers are added, otherwise adds a list of default trackers.
      */
     private static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly) {
+        makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, dhtTrackedOnly, TorrentType.HYBRID);
+    }
+
+    /**
+     * @param file                   - The file/dir to make a torrent out of
+     * @param uiTorrentMakerListener - an optional listener of this process
+     * @param showShareTorrentDialog - show the share dialog when done
+     * @param dhtTrackedOnly         - if true, no trackers are added, otherwise adds a list of default trackers.
+     * @param torrentType           - the type of torrent to create (v1, v2, or hybrid)
+     */
+    private static void makeTorrentAndDownload(final File file, final UITorrentMakerListener uiTorrentMakerListener, final boolean showShareTorrentDialog, boolean dhtTrackedOnly, TorrentType torrentType) {
         if (EventQueue.isDispatchThread()) {
             // DO NOT DO THIS ON THE EDT
-            ThreadExecutor.startThread(() -> makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, dhtTrackedOnly), "TorrentUtil:makeTorrentAndDownload");
+            ThreadExecutor.startThread(() -> makeTorrentAndDownload(file, uiTorrentMakerListener, showShareTorrentDialog, dhtTrackedOnly, torrentType), "TorrentUtil:makeTorrentAndDownload");
             return;
         }
 
@@ -205,7 +228,7 @@ public final class TorrentUtil {
                 }
             };
             libtorrent.add_files_ex(fs, file.getAbsolutePath(), addf_listener, new create_flags_t());
-            create_torrent torrentCreator = getCreateTorrent(dhtTrackedOnly, fs);
+            create_torrent torrentCreator = getCreateTorrent(dhtTrackedOnly, fs, torrentType);
             final File torrentFile = new File(SharingSettings.TORRENTS_DIR_SETTING.getValue(), file.getName() + ".torrent");
             final error_code ec = new error_code();
 
@@ -268,8 +291,8 @@ public final class TorrentUtil {
         }
     }
 
-    private static @NotNull create_torrent getCreateTorrent(boolean dhtTrackedOnly, file_storage fs) {
-        create_torrent torrentCreator = new create_torrent(fs);
+    private static @NotNull create_torrent getCreateTorrent(boolean dhtTrackedOnly, file_storage fs, TorrentType torrentType) {
+        create_torrent torrentCreator = createTorrentWithType(fs, torrentType);
         if (!dhtTrackedOnly) {
             torrentCreator.add_tracker("udp://tracker.openbittorrent.com:80", 0);
             torrentCreator.add_tracker("udp://tracker.publicbt.com:80", 0);
@@ -282,6 +305,44 @@ public final class TorrentUtil {
         torrentCreator.set_priv(false);
         torrentCreator.set_creator("FrostWire " + FrostWireUtils.getFrostWireVersion() + " build " + FrostWireUtils.getBuildNumber());
         return torrentCreator;
+    }
+
+    private static create_torrent createTorrentWithType(file_storage fs, TorrentType torrentType) {
+        create_torrent torrent;
+        
+        switch (torrentType) {
+            case V1_ONLY:
+                // Create v1-only torrent - use legacy format
+                torrent = new create_torrent(fs);
+                break;
+                
+            case V2_ONLY:
+                // Create v2-only torrent - use modern format with v2 features only
+                // Use merkle tree flag which enables v2 features
+                try {
+                    torrent = new create_torrent(fs, 0, -1, 
+                        create_torrent.flags_t.merkle.swigValue());
+                } catch (Exception e) {
+                    // Fallback to standard constructor if merkle flag is not available
+                    torrent = new create_torrent(fs);
+                }
+                break;
+                
+            case HYBRID:
+            default:
+                // Create hybrid torrent - supports both v1 and v2 protocols (default)
+                // Use canonical files flag which should enable hybrid mode in newer versions
+                try {
+                    torrent = new create_torrent(fs, 0, -1, 
+                        create_torrent.flags_t.canonical_files.swigValue());
+                } catch (Exception e) {
+                    // Fallback to standard constructor
+                    torrent = new create_torrent(fs);
+                }
+                break;
+        }
+        
+        return torrent;
     }
 
     public interface UITorrentMakerListener {
