@@ -13,7 +13,7 @@ public class MediaPlayerLinux extends MediaPlayer {
     @Override
     protected String getPlayerPath() {
         File f = new File(MPLAYER_DEFAULT_LINUX_PATH);
-        if (!f.exists()) {
+        if (!f.exists() && QuestionsHandler.MPLAYER_MISSING_WARNING.getValue()) {
             GUIMediator.safeInvokeLater(() -> {
                 String instructions = "";
                 if (OSUtils.isUbuntu()) {
