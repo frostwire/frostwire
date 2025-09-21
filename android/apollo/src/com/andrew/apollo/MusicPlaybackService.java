@@ -527,7 +527,12 @@ public class MusicPlaybackService extends Service {
                         "Loading...",
                         "Preparing music player.",
                         Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
-                startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+                try {
+                    startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
+                } catch (Exception e) {
+                    LOG.error("onCreate: Failed to start foreground service: " + e.getMessage(), e);
+                    // Continue without foreground service - the service may be killed by system but won't crash
+                }
             }
 
             mPlayerHandler = setupMPlayerHandler();
@@ -539,7 +544,25 @@ public class MusicPlaybackService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        NotificationUpdateDaemon.showTempNotification(this);
+        // For Android 14+ (API 34), check if we can legitimately start as foreground service
+        boolean canStartForeground = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            // On Android 14+, be more cautious about when we try to start foreground
+            boolean isAppInForeground = SystemUtils.isAppInForeground(this);
+            boolean isMediaButtonIntent = intent != null && intent.getBooleanExtra(FROM_MEDIA_BUTTON, false);
+            boolean isServiceCommand = intent != null && SERVICECMD.equals(intent.getAction());
+            
+            // Allow foreground start if app is in foreground, or if this is a media button/command
+            canStartForeground = isAppInForeground || isMediaButtonIntent || isServiceCommand;
+            
+            if (!canStartForeground) {
+                LOG.warn("onStartCommand: Cannot start foreground service - app not in foreground and no media intent. Will skip temp notification.");
+            }
+        }
+        
+        if (canStartForeground) {
+            NotificationUpdateDaemon.showTempNotification(this);
+        }
         LOG.info("onStartCommand: Got new intent " + intent + ", startId = " + startId, true);
         mServiceStartId = startId;
 
