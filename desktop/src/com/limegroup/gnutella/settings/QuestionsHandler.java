@@ -47,6 +47,11 @@ public class QuestionsHandler extends LimeWireSettings {
      */
     public static final IntSetting GRAB_ASSOCIATIONS =
             FACTORY.createIntSetting("GRAB_ASSOCIATIONS", 0);
+    /**
+     * Setting for whether or not to display a message that mplayer is missing
+     */
+    public static final BooleanSetting MPLAYER_MISSING_WARNING =
+            FACTORY.createBooleanSetting("MPLAYER_MISSING_WARNING", false);
 
     private QuestionsHandler() {
         super("questions.props", "FrostWire questions file");
