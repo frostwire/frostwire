@@ -1018,6 +1018,24 @@ public final class MusicUtils {
             filename = uri.toString();
         }
 
+        // Check if we're on the music player handler thread to avoid ANR
+        if (MusicPlaybackService.getMusicPlayerHandler() != null && 
+            MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
+            // Post to background thread to avoid ANR
+            final String finalFilename = filename;
+            MusicPlaybackService.safePost(() -> playFileFromUriOnHandlerThread(finalFilename));
+            return true; // Return true optimistically since we've posted the work
+        }
+
+        return playFileFromUriOnHandlerThread(filename);
+    }
+
+    /**
+     * Performs the actual file opening on the music player handler thread
+     * @param filename The filename to open
+     * @return true if successful, false otherwise
+     */
+    private static boolean playFileFromUriOnHandlerThread(String filename) {
         try {
             musicPlaybackService.stopPlayer();
             long fileId = musicPlaybackService.openFile(filename);
