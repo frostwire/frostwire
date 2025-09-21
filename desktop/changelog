@@ -7,6 +7,7 @@ frostwire (7.0.0) stable; urgency=high
  * New: FlatLaf light theme
  * New: Header bar rearranged, search bar goes to the center, nav buttons on the left, FW Logo first
  * New: Torrent Transfer > Advanced > Check local data feature. If a file belonging to a torrent is now on disk it can be force checked.
+ * Removed: Torlock search performer (old site is down, new site is malicious)
  * Maintenance: MacEventHandler is now compatible with JDK 23 and JDK 24
  * Maintenance: Archive.org search
  * Maintenance: GloTorrents search

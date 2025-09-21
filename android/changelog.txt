@@ -3,6 +3,7 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/19/2025
  - new: Knaben search performer, a new torrent search source
  - new: TorrentCSV search performer, a new torrent search source
  - yt_dlp-2025.09.05
+ - removed: Torlock search performer (old site is down, new site is malicious)
  - freeze: ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
  - freeze: sorting through too many results could cause an ANR when cleaning up titles
  - fix: logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
