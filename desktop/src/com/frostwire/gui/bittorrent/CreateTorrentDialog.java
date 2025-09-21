@@ -699,33 +699,18 @@ public class CreateTorrentDialog extends JDialog {
         switch (torrentType) {
             case V1_ONLY:
                 // Create v1-only torrent - use legacy format
-                // For now, use the standard constructor as v1 is the default in older libtorrent versions
-                torrent = new create_torrent(fs, pieceSize);
+                torrent = new create_torrent(fs, pieceSize, create_torrent.v1_only);
                 break;
                 
             case V2_ONLY:
                 // Create v2-only torrent - use modern format with v2 features only
-                // Use merkle tree flag which enables v2 features
-                try {
-                    torrent = new create_torrent(fs, pieceSize, -1, 
-                        create_torrent.flags_t.merkle.swigValue());
-                } catch (Exception e) {
-                    // Fallback to standard constructor if merkle flag is not available
-                    torrent = new create_torrent(fs, pieceSize);
-                }
+                torrent = new create_torrent(fs, pieceSize, create_torrent.v2_only);
                 break;
                 
             case HYBRID:
             default:
                 // Create hybrid torrent - supports both v1 and v2 protocols (default)
-                // Use canonical files flag which should enable hybrid mode in newer versions
-                try {
-                    torrent = new create_torrent(fs, pieceSize, -1, 
-                        create_torrent.flags_t.canonical_files.swigValue());
-                } catch (Exception e) {
-                    // Fallback to standard constructor
-                    torrent = new create_torrent(fs, pieceSize);
-                }
+                torrent = new create_torrent(fs, pieceSize);
                 break;
         }
         
