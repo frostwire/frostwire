@@ -86,6 +86,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -401,7 +402,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             setProgress(progress, download.getProgress());
             String downloadStatus = transferStateStrings.get(download.getState());
             status.setText(downloadStatus);
-            speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
+            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
             size.setText(UIUtils.getBytesInHuman(download.getSize()));
             buttonDetails.setVisibility(View.GONE);
             File previewFile = download.previewFile();
@@ -441,11 +442,18 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             final String downloadStatus = transferStateStrings.get(download.getState());
             status.setText(downloadStatus);
             if (!NetworkManager.instance().isInternetDataConnectionUp()) {
-                status.setText(downloadStatus + " (" + view.getResources().getText(R.string.check_internet_connection) + ")");
+                status.setText(
+                        String.format(
+                                Locale.US,
+                                "%s (%s)",
+                                downloadStatus,
+                                view.getResources().getText(R.string.check_internet_connection)
+                        )
+                );
                 seeds.setText("");
                 peers.setText("");
             }
-            speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
+            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
             size.setText(UIUtils.getBytesInHuman(download.getSize()));
             if (download instanceof UIBittorrentDownload) {
                 UIBittorrentDownload uidl = (UIBittorrentDownload) download;
@@ -464,7 +472,7 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
             title.setCompoundDrawables(null, null, null, null);
             setProgress(progress, download.getProgress());
             status.setText(transferStateStrings.get(download.getState()));
-            speed.setText(UIUtils.getBytesInHuman(download.getDownloadSpeed()) + "/s");
+            speed.setText(String.format(Locale.US, "%s/s", UIUtils.getBytesInHuman(download.getDownloadSpeed())));
             size.setText(UIUtils.getBytesInHuman(download.getSize()));
             buttonDetails.setVisibility(View.GONE);
             File previewFile = download.previewFile();
