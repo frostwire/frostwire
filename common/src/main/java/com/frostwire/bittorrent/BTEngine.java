@@ -594,9 +594,41 @@ public final class BTEngine extends SessionManager {
             if (th != null) {
                 // Check if this is a V2-only torrent with stored priorities
                 String infoHashStr = alert.handle().infoHash().toString();
+                LOG.info("BTEngine.fireDownloadAdded() - alert hash: " + infoHashStr);
+                
                 Priority[] storedPriorities = null;
                 synchronized (pendingV2TorrentPriorities) {
+                    // Try to find stored priorities using the alert hash
                     storedPriorities = pendingV2TorrentPriorities.remove(infoHashStr);
+                    
+                    // If not found, try to find by iterating through stored hashes (for debugging)
+                    if (storedPriorities == null) {
+                        LOG.info("BTEngine.fireDownloadAdded() - stored priority keys: " + pendingV2TorrentPriorities.keySet());
+                        // Try to find a matching key by checking if this torrent is V2-only
+                        try {
+                            TorrentInfo ti = th.torrentFile();
+                            if (ti != null) {
+                                Sha1Hash v1Hash = null;
+                                try {
+                                    v1Hash = ti.infoHashV1();
+                                } catch (Exception e) {
+                                    // V2-only torrent
+                                }
+                                
+                                if (v1Hash == null) {
+                                    // This is a V2-only torrent, try to match by V2 hash
+                                    Sha256Hash v2Hash = ti.infoHashV2();
+                                    if (v2Hash != null) {
+                                        String v2HashStr = v2Hash.toString();
+                                        LOG.info("BTEngine.fireDownloadAdded() - torrent V2 hash: " + v2HashStr);
+                                        storedPriorities = pendingV2TorrentPriorities.remove(v2HashStr);
+                                    }
+                                }
+                            }
+                        } catch (Throwable t) {
+                            LOG.warn("BTEngine.fireDownloadAdded() - unable to get torrent info for hash matching", t);
+                        }
+                    }
                 }
                 
                 if (storedPriorities != null) {
@@ -607,6 +639,8 @@ public final class BTEngine extends SessionManager {
                     } catch (Throwable t) {
                         LOG.warn("BTEngine.fireDownloadAdded() - unable to apply stored priorities", t);
                     }
+                } else {
+                    LOG.info("BTEngine.fireDownloadAdded() - no stored priorities found for hash: " + infoHashStr);
                 }
                 
                 BTDownload dl = new BTDownload(this, th);
