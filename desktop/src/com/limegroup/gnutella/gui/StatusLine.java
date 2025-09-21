@@ -504,11 +504,11 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
             newIcon = (ImageIcon) IconRepainter.brightenIfDarkTheme(newIcon);
 
             // Avoid flicker by checking if the content is already the same
-            if (!seedingStatusButton.getText().equals(newText)) {
+            if (seedingStatusButton.getText() != null && !seedingStatusButton.getText().equals(newText)) {
                 seedingStatusButton.setText(newText);
             }
 
-            if (!seedingStatusButton.getIcon().equals(newIcon)) {
+            if (seedingStatusButton.getIcon() != null && !seedingStatusButton.getIcon().equals(newIcon)) {
                 seedingStatusButton.setIcon(newIcon);
             }
 
