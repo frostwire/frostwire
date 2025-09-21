@@ -354,7 +354,8 @@ public final class BTEngine extends SessionManager {
             Arrays.fill(selection, true);
         }
         Priority[] priorities = null;
-        TorrentHandle th = find(ti.infoHashV1());
+        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
         boolean exists = th != null;
         if (th != null) {
             if (th.isValid()) {
@@ -393,7 +394,8 @@ public final class BTEngine extends SessionManager {
             Arrays.fill(selection, true);
         }
         Priority[] priorities = null;
-        TorrentHandle th = find(ti.infoHashV1());
+        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
         boolean torrentHandleExists = th != null;
         if (torrentHandleExists) {
             try {
@@ -433,7 +435,8 @@ public final class BTEngine extends SessionManager {
         }
         TorrentInfo ti = sr.getTorrentInfo();
         int fileIndex = sr.getFileIndex();
-        TorrentHandle th = find(ti.infoHashV1());
+        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
         boolean exists = th != null;
         if (th != null) {
             Priority[] priorities = th.filePriorities();
@@ -550,7 +553,12 @@ public final class BTEngine extends SessionManager {
             entry e = ti.toEntry().swig();
             e.dict().put(TORRENT_ORIG_PATH_KEY, new entry(torrentFile(name).getAbsolutePath()));
             byte[] arr = Vectors.byte_vector2bytes(e.bencode());
-            FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.infoHashV1().toString()), arr);
+            Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+            if (infoHashV1 != null) {
+                FileUtils.writeByteArrayToFile(resumeTorrentFile(infoHashV1.toString()), arr);
+            } else {
+                LOG.warn("Cannot save resume data for v2-only torrent - no v1 hash available");
+            }
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
         }
@@ -559,7 +567,8 @@ public final class BTEngine extends SessionManager {
     private String getEscapedFilename(TorrentInfo ti) {
         String name = ti.name();
         if (name == null || name.isEmpty()) {
-            name = ti.infoHashV1().toString();
+            Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+            name = infoHashV1 != null ? infoHashV1.toString() : "unknown";
         }
         return escapeFilename(name);
     }
@@ -659,7 +668,8 @@ public final class BTEngine extends SessionManager {
     }
 
     private void download(TorrentInfo ti, File saveDir, Priority[] priorities, @SuppressWarnings("SameParameterValue") File resumeFile, List<TcpEndpoint> peers) {
-        TorrentHandle th = find(ti.infoHashV1());
+        Sha1Hash infoHashV1 = getSafeHashForFind(ti);
+        TorrentHandle th = infoHashV1 != null ? find(infoHashV1) : null;
         if (th != null) {
             // found a download with the same hash, just adjust the priorities if needed
             if (priorities != null) {
@@ -679,7 +689,8 @@ public final class BTEngine extends SessionManager {
         } else { // new download
             // Add paused to avoid the race where default priorities are used
             download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
-            th = find(ti.infoHashV1());
+            infoHashV1 = getSafeHashForFind(ti);
+            th = infoHashV1 != null ? find(infoHashV1) : null;
             LOG.info("BTEngine.download() - new download - torrent_handle is in session? " + th.inSession());
             if (th != null) {
                 // Re-apply priorities on the handle to be 100% sure they stick
@@ -695,7 +706,7 @@ public final class BTEngine extends SessionManager {
                 fireDownloadUpdate(th);
                 th.resume();
             } else {
-                LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found by infoHashV1");
+                LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
             }
         }
     }
@@ -727,6 +738,23 @@ public final class BTEngine extends SessionManager {
 
     private void printAlert(@SuppressWarnings("rawtypes") Alert alert) {
         LOG.info("Log: " + alert);
+    }
+
+    /**
+     * Helper method to safely get a hash that can be used with the find() method.
+     * For v2-only torrents, this will try to use the torrent handle's infoHash() if available,
+     * but for finding existing torrents, we need to handle the case where v1 hash is null.
+     * 
+     * @param ti TorrentInfo object
+     * @return Sha1Hash if available, or null if this is a v2-only torrent
+     */
+    private Sha1Hash getSafeHashForFind(TorrentInfo ti) {
+        try {
+            return ti.infoHashV1();
+        } catch (Exception e) {
+            LOG.warn("TorrentInfo.infoHashV1(): " + e.getMessage());
+            return null;
+        }
     }
 
     private static class Loader {

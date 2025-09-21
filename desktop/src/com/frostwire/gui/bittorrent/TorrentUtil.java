@@ -196,6 +196,32 @@ public final class TorrentUtil {
     }
 
     /**
+     * Gets the appropriate info hash string for the torrent, handling both v1 and v2 torrents.
+     * For v2-only torrents, returns the v2 hash; for v1-only or hybrid torrents, returns the v1 hash.
+     * @param ti The TorrentInfo object
+     * @return The hash string, or null if neither hash is available
+     */
+    public static String getInfoHashString(TorrentInfo ti) {
+        try {
+            // For v2-only torrents, use v2 hash
+            if (ti.infoHashV1() == null) {
+                Sha256Hash v2 = ti.infoHashV2();
+                return v2 != null ? v2.toString() : null;
+            }
+            // For v1-only or hybrid torrents, use v1 hash for compatibility
+            return ti.infoHashV1().toString();
+        } catch (Exception e) {
+            // Fallback: try v2 hash if v1 fails
+            try {
+                Sha256Hash v2 = ti.infoHashV2();
+                return v2 != null ? v2.toString() : null;
+            } catch (Exception e2) {
+                return null;
+            }
+        }
+    }
+
+    /**
      * @param file                   - The file/dir to make a torrent out of
      * @param uiTorrentMakerListener - an optional listener of this process
      * @param showShareTorrentDialog - show the share dialog when done
