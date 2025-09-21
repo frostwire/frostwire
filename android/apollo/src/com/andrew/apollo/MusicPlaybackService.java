@@ -529,9 +529,8 @@ public class MusicPlaybackService extends Service {
                         Constants.FROSTWIRE_NOTIFICATION_CHANNEL_ID);
                 try {
                     startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, tempNotification);
-                } catch (Exception e) {
-                    LOG.error("onCreate: Failed to start foreground service: " + e.getMessage(), e);
-                    // Continue without foreground service - the service may be killed by system but won't crash
+                } catch (Throwable t) {
+                    LOG.error("MusicPlaybackService::onCreate() error calling startForeground() " + t.getMessage(), t);
                 }
             }
 

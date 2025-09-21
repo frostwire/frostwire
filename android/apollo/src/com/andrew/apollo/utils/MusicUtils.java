@@ -128,6 +128,13 @@ public final class MusicUtils {
 
     public static void startMusicPlaybackService(final Context context, final Intent intent, Runnable onServiceBoundCallback) {
         // MusicPlaybackService has to be a foreground service
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Check if conditions are appropriate for starting the service
+            if (!SystemUtils.isAppInForeground(context)) {
+                LOG.warn("MusicUtils::startMusicPlaybackService() - App is not in foreground, delaying start.");
+                return; // Delay or prevent the start if app is not in foreground
+            }
+        }
         try {
             LOG.info("MusicUtils::startMusicPlaybackService() startForegroundService(MusicPlaybackService)", true);
             // should end with a android.app.Service#startForeground(int, android.app.Notification) call
