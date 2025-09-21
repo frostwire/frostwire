@@ -36,8 +36,8 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
-        // Switch to idope.hair as primary since idope.io uses dynamic JavaScript loading
-        super("idope.hair", token, keywords, timeout, 1, 0);
+        // Back to idope.io as primary domain (idope.hair is not accessible)
+        super("idope.io", token, keywords, timeout, 1, 0);
         if (pattern == null) {
             // Updated pattern for MagnetDL-like structure (idope.io now uses similar HTML structure)
             // Alternative domain idope.hair uses different URL pattern: /lmsearch?q=keywords&cat=lmsearch
@@ -70,16 +70,18 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        // Use idope.hair as primary since idope.io loads results via JavaScript
+        // Try different approaches for idope.io to work around JavaScript dynamic loading
+        if (getDomainName().equals("idope.io")) {
+            // Try potential API endpoints that might exist
+            // Common API patterns: /api/search, /search/api, /service/search
+            return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
+        }
+        // Fallback for idope.hair domain (though it's not accessible)
         if (getDomainName().equals("idope.hair")) {
             return "https://" + getDomainName() + "/lmsearch?q=" + encodedKeywords + "&cat=lmsearch";
         }
-        // Fallback for idope.io domain (though it uses dynamic loading)
-        if (getDomainName().equals("idope.io")) {
-            return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
-        }
-        // Default fallback - use idope.hair pattern
-        return "https://idope.hair/lmsearch?q=" + encodedKeywords + "&cat=lmsearch";
+        // Default fallback - use idope.io 
+        return "https://idope.io/search/?q=" + encodedKeywords;
     }
 
     private IdopeSearchResult fromMatcher(SearchMatcher matcher) {
@@ -382,10 +384,17 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
         }
         
-        // If all patterns failed, check for DDOS protection
+        // If all patterns failed, check for DDOS protection and JavaScript dynamic loading
         if (results.isEmpty() && !isStopped()) {
             isDDOSProtectionActive = reducedHtml.contains("Cloudflare") || reducedHtml.contains("ddos") || reducedHtml.contains("bot protection");
-            if (!isDDOSProtectionActive) {
+            boolean isJavaScriptLoading = reducedHtml.contains("<!--firstresult();-->") || reducedHtml.contains("firstresult()");
+            
+            if (isJavaScriptLoading) {
+                LOG.warn("IdopeSearchPerformer: Website uses JavaScript to load search results dynamically.");
+                LOG.warn("The search results are not present in the initial HTML response but loaded via AJAX.");
+                LOG.warn("This requires JavaScript execution which is not supported by the current search framework.");
+                LOG.warn("Consider using alternative torrent search engines or waiting for a static HTML version.");
+            } else if (!isDDOSProtectionActive) {
                 LOG.warn("IdopeSearchPerformer search matcher broken. Tried all patterns (new, modern, old). Please notify at https://github.com/frostwire/frostwire/issues/new");
                 LOG.warn("Reduced HTML length: " + reducedHtml.length() + ", first 500 chars: " + (reducedHtml.length() > 500 ? reducedHtml.substring(0, 500) : reducedHtml));
             } else {
