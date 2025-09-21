@@ -6,6 +6,8 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/21/2025
  - removed: Torlock search performer (old site is down, new site is malicious)
  - freeze: ensure MusicUtils.removeFromPlaylist ContentResolver activity is in the background
  - freeze: sorting through too many results could cause an ANR when cleaning up titles
+ - freeze: ANR in MusicPlaybackService.setDataSource
+ - freeze: ANR in MusicPlaybackService.playFDs
  - fix: logic bug in PerformersHelper.countMatchedTokens(), matched tokens were not counted correctly
  - improvement: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
  - Avoid possible context leak on EngineBroadcastReceiver
