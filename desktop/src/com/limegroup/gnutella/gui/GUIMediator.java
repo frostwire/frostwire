@@ -1139,8 +1139,9 @@ public final class GUIMediator {
         Runnable onOpenRunnable = () -> {
             showTransfers(TransfersTab.FilterMode.ALL);
             TorrentInfo ti = new TorrentInfo(torrentFile);
+            String torrentHash = TorrentUtil.getInfoHashString(ti);
             for (BTDownload btDownload : downloads) {
-                if (btDownload.getHash().equals(ti.infoHashV1().toHex())) {
+                if (torrentHash != null && btDownload.getHash().equals(torrentHash)) {
                     btDownloadMediator.selectBTDownload(btDownload);
                 }
             }

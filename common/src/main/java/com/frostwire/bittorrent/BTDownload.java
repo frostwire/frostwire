@@ -73,7 +73,7 @@ public final class BTDownload implements BittorrentDownload {
         this.created = new Date(th.status().addedTime());
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? new File(savePath, "." + ti.infoHashV1() + ".parts") : null;
+        this.parts = ti != null ? createPartsFile(savePath, ti) : null;
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();
@@ -684,6 +684,33 @@ public final class BTDownload implements BittorrentDownload {
             }
         } catch (Throwable e) {
             LOG.warn("Error triggering resume data", e);
+        }
+    }
+
+    /**
+     * Creates a parts file for the torrent, handling both v1 and v2 torrents.
+     * For v2-only torrents, uses the torrent handle's info hash; for others, uses v1 hash.
+     */
+    private File createPartsFile(String savePath, TorrentInfo ti) {
+        try {
+            String hash;
+            if (ti.infoHashV1() != null) {
+                // Use v1 hash for v1-only and hybrid torrents
+                hash = ti.infoHashV1().toString();
+            } else {
+                // For v2-only torrents, use the torrent handle's hash
+                hash = th.infoHash().toString();
+            }
+            return new File(savePath, "." + hash + ".parts");
+        } catch (Exception e) {
+            LOG.warn("Error creating parts file path: " + e.getMessage());
+            // Fallback to using the torrent handle's hash
+            try {
+                return new File(savePath, "." + th.infoHash().toString() + ".parts");
+            } catch (Exception e2) {
+                LOG.error("Failed to create parts file path", e2);
+                return null;
+            }
         }
     }
 
