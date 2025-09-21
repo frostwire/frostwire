@@ -33,7 +33,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.3'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'org.codehaus.groovy:groovy-all:3.0.25'
 
         classpath 'net.sf.proguard:proguard-gradle:6.2.2'
