@@ -131,6 +131,13 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         if (menuTracker != null) {
             menuAdvanced.add(menuTracker);
         }
+        
+        // Add Check Local Data action to Advanced menu
+        com.frostwire.bittorrent.BTDownload[] checkDataDms = getSingleSelectedDownloadManagers();
+        if (checkDataDms != null) {
+            menuAdvanced.add(new SkinMenuItem(new CheckLocalDataAction(checkDataDms[0])));
+        }
+        
         return menuAdvanced;
     }
 
@@ -335,6 +342,20 @@ final class BTDownloadMediatorAdvancedMenuFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             new Thread(dm::requestTrackerScrape).start();
+        }
+    }
+
+    static class CheckLocalDataAction extends AbstractAction {
+        private final com.frostwire.bittorrent.BTDownload dm;
+
+        CheckLocalDataAction(com.frostwire.bittorrent.BTDownload dm) {
+            this.dm = dm;
+            putValue(Action.NAME, I18n.tr("Check Local Data"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new Thread(dm::forceRecheck).start();
         }
     }
 

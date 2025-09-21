@@ -537,6 +537,13 @@ public final class BTDownload implements BittorrentDownload {
         th.scrapeTracker();
     }
 
+    public void forceRecheck() {
+        if (!th.isValid()) {
+            return;
+        }
+        th.forceRecheck();
+    }
+
     public Set<String> trackers() {
         if (!th.isValid()) {
             return new HashSet<>();
