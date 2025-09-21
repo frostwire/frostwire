@@ -111,7 +111,7 @@ public class PlaylistLoader extends WrappedAsyncTaskLoader<List<Playlist>> {
             // therefore, we should just filter playlists by the owner package name, so that we only get playlists created by this app
             // or playlists created properly
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                selection = MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME + " = ?";
+                selection = "owner_package_name = ?";
                 selectionArgs = new String[]{context.getPackageName()};
             }
 
