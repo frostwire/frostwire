@@ -686,13 +686,20 @@ public final class BTEngine extends SessionManager {
                 fireDownloadUpdate(th);
                 th.resume();
             }
-        } else { // new download
+        } else { // new download (including v2-only torrents)
             // Add paused to avoid the race where default priorities are used
             download(ti, saveDir, resumeFile, priorities, peers, TorrentFlags.PAUSED);
-            infoHashV1 = getSafeHashForFind(ti);
-            th = infoHashV1 != null ? find(infoHashV1) : null;
-            LOG.info("BTEngine.download() - new download - torrent_handle is in session? " + th.inSession());
+            
+            // For v2-only torrents, we can't find by v1 hash, so we need to find it differently
+            // We'll wait a bit and then look for it by iterating through handles or rely on alerts
+            th = null;
+            if (infoHashV1 != null) {
+                // Try to find by v1 hash for v1-only and hybrid torrents
+                th = find(infoHashV1);
+            }
+            
             if (th != null) {
+                LOG.info("BTEngine.download() - new download - torrent_handle found in session");
                 // Re-apply priorities on the handle to be 100% sure they stick
                 if (priorities != null && priorities.length == ti.numFiles()) {
                     th.prioritizeFiles(priorities);
@@ -706,7 +713,11 @@ public final class BTEngine extends SessionManager {
                 fireDownloadUpdate(th);
                 th.resume();
             } else {
-                LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
+                if (infoHashV1 == null) {
+                    LOG.info("BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
+                } else {
+                    LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
+                }
             }
         }
     }

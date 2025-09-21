@@ -73,7 +73,7 @@ public final class BTDownload implements BittorrentDownload {
         this.created = new Date(th.status().addedTime());
         TorrentInfo ti = th.torrentFile();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? createPartsFile(savePath, ti) : null;
+        this.parts = ti != null ? createPartsFile(savePath.getAbsolutePath(), ti) : null;
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
         this.innerListener = new InnerListener();

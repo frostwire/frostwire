@@ -22,6 +22,7 @@ import com.frostwire.concurrent.concurrent.ThreadExecutor;
 import com.frostwire.gui.HideExitDialog;
 import com.frostwire.gui.bittorrent.BTDownload;
 import com.frostwire.gui.bittorrent.BTDownloadMediator;
+import com.frostwire.gui.bittorrent.TorrentUtil;
 import com.frostwire.gui.components.slides.Slide;
 import com.frostwire.gui.library.LibraryMediator;
 import com.frostwire.gui.player.MediaPlayer;
