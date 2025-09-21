@@ -246,7 +246,7 @@ public final class MusicUtils {
         projectionList.add(MediaStore.Audio.Playlists.NAME);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            projectionList.add(MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME);
+            projectionList.add("owner_package_name");
         }
 
 
@@ -261,7 +261,7 @@ public final class MusicUtils {
                     String ownerPackage = null;
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                        ownerPackage = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.OWNER_PACKAGE_NAME));
+                        ownerPackage = cursor.getString(cursor.getColumnIndex("owner_package_name"));
                     }
 
                     // Check if the playlist is owner less
@@ -1307,7 +1307,7 @@ public final class MusicUtils {
             Uri playlistUri = MusicUtils.getPlaylistContentUri();
             ;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                projectionList.add(PlaylistsColumns.OWNER_PACKAGE_NAME);
+                projectionList.add("owner_package_name");
             }
             final String[] projection = projectionList.toArray(new String[0]);
             final String selection = PlaylistsColumns.NAME + " = ? OR " + PlaylistsColumns.NAME + " = ?";
@@ -1326,7 +1326,7 @@ public final class MusicUtils {
                 do {
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
                         try {
-                            ownerPackageName = cursor.getString(cursor.getColumnIndex(PlaylistsColumns.OWNER_PACKAGE_NAME));
+                            ownerPackageName = cursor.getString(cursor.getColumnIndex("owner_package_name"));
                         } catch (Throwable t) {
                             LOG.error("createPlaylist() cursor.getString() failed: " + t.getMessage(), t, true);
                         }
