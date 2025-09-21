@@ -20,6 +20,7 @@ package com.frostwire.search;
 
 import com.frostwire.util.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,10 +71,15 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     }
 
     protected void onResults(List<? extends SearchResult> results) {
+        if (stopped) {
+            return;
+        }
         try {
-            if (results != null && !stopped) {
-                listener.onResults(token, results);
+            if (results == null) {
+                results = new ArrayList<>();
             }
+
+            listener.onResults(token, results);
         } catch (Throwable e) {
             LOG.warn("Error sending results to listener: " + e.getMessage());
         }
