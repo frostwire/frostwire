@@ -1071,6 +1071,23 @@ public final class MusicUtils {
             LOG.info("playFDs() aborted, musicPlaybackService is null");
             return;
         }
+        
+        // Check if we're on the music player handler thread to avoid ANR
+        if (MusicPlaybackService.getMusicPlayerHandler() != null && 
+            MusicPlaybackService.getMusicPlayerHandler().getLooperThread() != Thread.currentThread()) {
+            // Post to background thread to avoid ANR
+            final int finalPosition = position;
+            MusicPlaybackService.safePost(() -> playFDsOnHandlerThread(list, finalPosition, forceShuffle));
+            return;
+        }
+
+        playFDsOnHandlerThread(list, position, forceShuffle);
+    }
+
+    /**
+     * Performs the actual playback operations on the music player handler thread
+     */
+    private static void playFDsOnHandlerThread(final long[] list, int position, final boolean forceShuffle) {
         try {
             musicPlaybackService.enableShuffle(forceShuffle);
             final long currentId = musicPlaybackService.getAudioId();
