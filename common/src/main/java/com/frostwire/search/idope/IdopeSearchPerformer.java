@@ -165,30 +165,45 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     }
 
     private void logHtmlStructureDebug(String page) {
+        LOG.warn("Full page length: " + page.length());
         LOG.warn("First 1000 chars of page: " + (page.length() > 1000 ? page.substring(0, 1000) : page));
         
         // Log what structural elements we can find
         if (page.contains("<main>")) {
-            LOG.warn("Found <main> tag");
+            LOG.warn("Found <main> tag at position: " + page.indexOf("<main>"));
         }
         if (page.contains("container-fluid")) {
-            LOG.warn("Found container-fluid class");
+            LOG.warn("Found container-fluid class at position: " + page.indexOf("container-fluid"));
         }
         if (page.contains("<table")) {
-            LOG.warn("Found table elements");
+            LOG.warn("Found table elements at position: " + page.indexOf("<table"));
         }
         if (page.contains("<tbody")) {
-            LOG.warn("Found tbody elements");
+            LOG.warn("Found tbody elements at position: " + page.indexOf("<tbody"));
         }
         if (page.contains("bootstrap")) {
             LOG.warn("Found Bootstrap framework");
         }
         
         // Look for potential content indicators
-        String[] searchTerms = {"magnet:", "torrent", "download", "size", "seed", "leech"};
+        String[] searchTerms = {"magnet:", "torrent", "download", "size", "seed", "leech", "results", "search-results"};
         for (String term : searchTerms) {
             if (page.toLowerCase().contains(term.toLowerCase())) {
-                LOG.warn("Found potential content indicator: " + term);
+                int pos = page.toLowerCase().indexOf(term.toLowerCase());
+                LOG.warn("Found potential content indicator: " + term + " at position: " + pos);
+                // Show context around the term
+                int start = Math.max(0, pos - 100);
+                int end = Math.min(page.length(), pos + 200);
+                LOG.warn("Context around '" + term + "': " + page.substring(start, end).replaceAll("\\s+", " "));
+            }
+        }
+        
+        // Look for common result container patterns
+        String[] containerPatterns = {"class=\"result", "class=\"item", "class=\"row", "id=\"result", "search-result", "torrent-item"};
+        for (String pattern : containerPatterns) {
+            if (page.toLowerCase().contains(pattern.toLowerCase())) {
+                int pos = page.toLowerCase().indexOf(pattern.toLowerCase());
+                LOG.warn("Found potential result container: " + pattern + " at position: " + pos);
             }
         }
     }
@@ -220,15 +235,8 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             }
             
             if (htmlPrefixIndex == -1) {
-                // Try looking for modern Bootstrap containers
-                HTML_PREFIX_MARKER = "<main>";
-                HTML_SUFFIX_MARKER = "</main>";
-                htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
-            }
-            
-            if (htmlPrefixIndex == -1) {
-                // Try looking for container-fluid or similar modern structures
-                HTML_PREFIX_MARKER = "container-fluid";
+                // Try looking for search results container or content area
+                HTML_PREFIX_MARKER = "search-results";
                 htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
                 if (htmlPrefixIndex > 0) {
                     // Find the start of the div that contains this class
@@ -236,9 +244,41 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
                     if (divStart != -1) {
                         htmlPrefixIndex = divStart;
                         HTML_PREFIX_MARKER = "<div";
-                        HTML_SUFFIX_MARKER = "</main>";  // Try to end at main tag
+                        HTML_SUFFIX_MARKER = "</div>";
                     } else {
                         htmlPrefixIndex = -1;
+                    }
+                }
+            }
+            
+            if (htmlPrefixIndex == -1) {
+                // Try looking for container with results or content
+                HTML_PREFIX_MARKER = "results";
+                htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+                if (htmlPrefixIndex > 0) {
+                    // Find the start of the container that has results
+                    int containerStart = page.lastIndexOf("<div", htmlPrefixIndex);
+                    if (containerStart != -1) {
+                        htmlPrefixIndex = containerStart;
+                        HTML_PREFIX_MARKER = "<div";
+                        HTML_SUFFIX_MARKER = "</section>";  // Try broader end marker
+                    } else {
+                        htmlPrefixIndex = -1;
+                    }
+                }
+            }
+            
+            if (htmlPrefixIndex == -1) {
+                // Try the main section but use the whole body for parsing
+                HTML_PREFIX_MARKER = "<body";
+                HTML_SUFFIX_MARKER = "</body>";
+                htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+                if (htmlPrefixIndex == -1) {
+                    // Last resort: try from main tag onwards but include everything after it
+                    HTML_PREFIX_MARKER = "<main>";
+                    htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+                    if (htmlPrefixIndex != -1) {
+                        HTML_SUFFIX_MARKER = ""; // No end marker, take everything
                     }
                 }
             }
@@ -258,7 +298,10 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
         }
         
         htmlPrefixIndex += HTML_PREFIX_MARKER.length();
-        int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER, htmlPrefixIndex);
+        int htmlSuffixIndex = -1;
+        if (!HTML_SUFFIX_MARKER.isEmpty()) {
+            htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER, htmlPrefixIndex);
+        }
 
         String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length());
 
