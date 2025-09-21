@@ -104,11 +104,17 @@ public final class NotificationUpdateDaemon {
                 .setOngoing(true); // Mark it as ongoing for a foreground service
         Notification notification = builder.build();
 
-        // Call startForeground early
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
-        } else {
-            service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
+        // Call startForeground early with proper error handling
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+            } else {
+                service.startForeground(Constants.JOB_ID_MUSIC_PLAYBACK_SERVICE, notification);
+            }
+        } catch (Exception e) {
+            LOG.error("showTempNotification() failed to start foreground service: " + e.getMessage(), e);
+            // If we can't start as foreground, the service will likely be killed by the system
+            // but we should not crash the app. The service will retry when conditions are better.
         }
     }
 
