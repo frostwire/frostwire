@@ -145,13 +145,26 @@ public class TransferListAdapter extends RecyclerView.Adapter<TransferListAdapte
     }
 
     public void updateList(List<Transfer> g) {
-        if (list != null) {
-            list.clear();
-            list.addAll(g);
-        } else {
-            list = g;
+        List<Transfer> incoming = (g == null) ? Collections.emptyList() : g;
+        int oldSize = (list == null) ? 0 : list.size();
+
+        if (list == null) {
+            list = new ArrayList<>(incoming);
+            if (!list.isEmpty()) {
+                notifyItemRangeInserted(0, list.size());
+            }
+            return;
         }
-        notifyDataSetChanged();
+
+        if (oldSize > 0) {
+            notifyItemRangeRemoved(0, oldSize);
+        }
+        list.clear();
+        list.addAll(incoming);
+        int newSize = list.size();
+        if (newSize > 0) {
+            notifyItemRangeInserted(0, newSize);
+        }
     }
 
     public void dismissDialogs() {
