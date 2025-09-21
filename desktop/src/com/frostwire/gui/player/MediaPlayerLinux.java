@@ -2,6 +2,7 @@ package com.frostwire.gui.player;
 
 import com.limegroup.gnutella.gui.GUIMediator;
 import com.limegroup.gnutella.gui.I18n;
+import com.limegroup.gnutella.settings.QuestionsHandler;
 import com.frostwire.util.OSUtils;
 
 import java.io.File;
@@ -26,7 +27,7 @@ public class MediaPlayerLinux extends MediaPlayer {
                                     + MPLAYER_DEFAULT_LINUX_PATH + "</font></b>");
                 }
                 GUIMediator.showError("<html>" + I18n.tr("<b>FrostWire requires Mplayer to play your media</b> but I could not find it in your computer.<br><br>If you want to use FrostWire as a media player <b>Please install mplayer and restart FrostWire.</b>")
-                        + instructions + "</html>");
+                        + instructions + "</html>", QuestionsHandler.MPLAYER_MISSING_WARNING);
             });
         }
         return MPLAYER_DEFAULT_LINUX_PATH;
