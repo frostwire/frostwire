@@ -67,6 +67,9 @@ public final class BTEngine extends SessionManager {
     
     // Cached paused state to avoid blocking EDT calls
     private volatile boolean cachedPausedState = false;
+    
+    // Store priorities for V2-only torrents that are added as paused and need priority application when ADD_TORRENT alert fires
+    private final Map<String, Priority[]> pendingV2TorrentPriorities = new HashMap<>();
 
     private BTEngine() {
         super(false);
@@ -589,6 +592,23 @@ public final class BTEngine extends SessionManager {
         try {
             TorrentHandle th = find(alert.handle().infoHash());
             if (th != null) {
+                // Check if this is a V2-only torrent with stored priorities
+                String infoHashStr = alert.handle().infoHash().toString();
+                Priority[] storedPriorities = null;
+                synchronized (pendingV2TorrentPriorities) {
+                    storedPriorities = pendingV2TorrentPriorities.remove(infoHashStr);
+                }
+                
+                if (storedPriorities != null) {
+                    LOG.info("BTEngine.fireDownloadAdded() - applying stored priorities for v2-only torrent: " + infoHashStr);
+                    try {
+                        th.prioritizeFiles(storedPriorities);
+                        th.resume(); // Resume the torrent now that priorities are set
+                    } catch (Throwable t) {
+                        LOG.warn("BTEngine.fireDownloadAdded() - unable to apply stored priorities", t);
+                    }
+                }
+                
                 BTDownload dl = new BTDownload(this, th);
                 if (listener != null) {
                     listener.downloadAdded(this, dl);
@@ -715,6 +735,21 @@ public final class BTEngine extends SessionManager {
             } else {
                 if (infoHashV1 == null) {
                     LOG.info("BTEngine.download() - new v2-only torrent added, will be handled by torrent_added alert");
+                    // Store priorities for V2-only torrents to apply them when ADD_TORRENT alert fires
+                    if (priorities != null) {
+                        try {
+                            Sha256Hash v2Hash = ti.infoHashV2();
+                            if (v2Hash != null && !v2Hash.isAllZeros()) {
+                                String hashKey = v2Hash.toString();
+                                synchronized (pendingV2TorrentPriorities) {
+                                    pendingV2TorrentPriorities.put(hashKey, priorities.clone());
+                                }
+                                LOG.info("BTEngine.download() - stored priorities for v2-only torrent: " + hashKey);
+                            }
+                        } catch (Throwable t) {
+                            LOG.warn("BTEngine.download() - unable to store priorities for v2-only torrent", t);
+                        }
+                    }
                 } else {
                     LOG.warn("BTEngine.download() - new download: torrent was not successfully added, torrent handle not found");
                 }
