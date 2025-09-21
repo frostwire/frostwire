@@ -255,9 +255,7 @@
     <string name="clear_search_cache_summary">Очистить кэш поиска</string>
     <string name="no_results_feedback">Ничего не найдено.\n\nПроверьте интернет соединение или\nпопробуйте другие ключевые слова.</string>
     <string name="use_frostclick">Использовать FrostClick</string>
-    <string name="use_torlock">Использовать TorLock</string>
     <string name="use_torrentdownloads">Использовать TorrentDownloads</string>
-    <string name="use_eztv">Использовать Eztv</string>
     <string name="transfer_status_demuxing">Демультиплексирование</string>
     <string name="you_need_a_bitcoin_wallet_app">На вашем устройстве должен быть Bitcoin кошелёк, чтобы отправить BTC для пожертвования.</string>
     <string name="transfers_select_all">все</string>

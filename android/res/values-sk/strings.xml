@@ -47,7 +47,6 @@
     <string name="add_transfer_label">Vložiť magnet alebo torrent URL</string>
     <string name="drawer_open">Otvoriť navigačný panel</string>
     <string name="waiting">Čakanie…</string>
-    <string name="use_torlock">Použiť TorLock</string>
     <string name="search">Vyhľadanie</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">Skončiť</string>
@@ -77,7 +76,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Súbor nemohol byť nasadená. BitTorrent zostane odpojený.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android zmaže stiahnuté súbory, ak FrostWire odinštalovanie.</string>
     <string name="protected_connection">VPN-chránené</string>
-    <string name="use_eztv">Použiť Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Použiť TPB</string>
     <string name="cheaper_than_parking">Lacnejšie ako Parkovanie</string>

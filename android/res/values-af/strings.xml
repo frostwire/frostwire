@@ -52,7 +52,6 @@
     <string name="drawer_open">Open navigasie laai</string>
     <string name="waiting">Wag…</string>
     <string name="delete_started_torrents_summary">Verwyder .torrent lêers na die begin aflaai</string>
-    <string name="use_torlock">Gebruik TorLock</string>
     <string name="seed_stop">Stop saai</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
     <string name="search">Soek</string>
@@ -92,7 +91,6 @@
     <string name="search_preferences_one_engine_checked_always">By verstek moet een soekenjin te alle tye nagegaan word</string>
     <string name="protected_connection">VPN-beskerm</string>
     <string name="use_zooqle">Gebruik Zooqle.com</string>
-    <string name="use_eztv">Gebruik Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Gebruik TPB</string>
     <string name="cheaper_than_parking">Goedkoper as parkering</string>

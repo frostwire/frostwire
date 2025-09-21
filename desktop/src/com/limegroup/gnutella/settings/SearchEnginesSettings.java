@@ -31,11 +31,8 @@ public class SearchEnginesSettings extends LimeProps {
     public static final BooleanSetting SOUNDCLOUD_SEARCH_ENABLED = FACTORY.createBooleanSetting("SOUNDCLOUD_SEARCH2_ENABLED", true);
     public static final BooleanSetting ARCHIVEORG_SEARCH_ENABLED = FACTORY.createBooleanSetting("ARCHIVEORG_SEARCH2_ENABLED", true);
     public static final BooleanSetting FROSTCLICK_SEARCH_ENABLED = FACTORY.createBooleanSetting("FROSTCLICK_SEARCH_ENABLED", true);
-    public static final BooleanSetting TORLOCK_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORLOCK_SEARCH_ENABLED", false);
     public static final BooleanSetting TORRENTDOWNLOADS_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTDOWNLOADS_SEARCH_ENABLED", true);
     public static final BooleanSetting LIMETORRENTS_SEARCH_ENABLED = FACTORY.createBooleanSetting("LIMETORRENTS_SEARCH_ENABLED", true);
-    public static final BooleanSetting EZTV_SEARCH_ENABLED = FACTORY.createBooleanSetting("EZTV_SEARCH_ENABLED", true);
-    public static final BooleanSetting YIFY_SEARCH_ENABLED = FACTORY.createBooleanSetting("YIFY_SEARCH_ENABLED", true);
     public static final BooleanSetting ONE337X_SEARCH_ENABLED = FACTORY.createBooleanSetting("ONE337X_SEARCH_ENABLED", true);
     public static final BooleanSetting IDOPE_SEARCH_ENABLED = FACTORY.createBooleanSetting("IDOPE_SEARCH_ENABLED", true);
     public static final BooleanSetting TORRENTZ2_SEARCH_ENABLED = FACTORY.createBooleanSetting("TORRENTZ2_SEARCH_ENABLED", true);

@@ -200,12 +200,10 @@
     <string name="clear_search_cache_summary">Clear search cache entries</string>
     <string name="no_results_feedback">No results were found.</string>
     <string name="use_frostclick">Use FrostClick</string>
-    <string name="use_torlock">Use TorLock</string>
     <string name="use_torrentdownloads">Use TorrentDownloads</string>
     <string name="use_limetorrents">Use Limetorrents</string>
     <string name="use_magnetdl">Use MagnetDL</string>
     <string name="use_nyaa">Use Nyaa</string>
-    <string name="use_eztv">Use Eztv</string>
     <string name="use_glotorrents">Use GloTorrents</string>
     <string name="use_torrentscsv">Use TorrentsCSV</string>
     <string name="transfer_status_demuxing">Demuxing</string>

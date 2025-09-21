@@ -72,12 +72,10 @@ public final class Constants {
     public static final String PREF_KEY_SEARCH_USE_SOUNDCLOUD = "frostwire.prefs.search.use_soundcloud";
     public static final String PREF_KEY_SEARCH_USE_ARCHIVEORG = "frostwire.prefs.search.use_archiveorg";
     public static final String PREF_KEY_SEARCH_USE_FROSTCLICK = "frostwire.prefs.search.use_frostclick";
-    public static final String PREF_KEY_SEARCH_USE_TORLOCK = "frostwire.prefs.search.use_torlock";
     public static final String PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS = "frostwire.prefs.search.use_torrentdownloads";
     public static final String PREF_KEY_SEARCH_USE_LIMETORRENTS = "frostwire.prefs.search.use_limetorrents";
     public static final String PREF_KEY_SEARCH_USE_NYAA = "frostwire.prefs.search.use_nyaa";
     public static final String PREF_KEY_SEARCH_USE_TPB = "frostwire.prefs.search.use_tpb";
-    public static final String PREF_KEY_SEARCH_USE_YIFY = "frostwire.prefs.search.use_yify";
     public static final String PREF_KEY_SEARCH_USE_ONE337X = "frostwire.prefs.search.use_one337x";
     public static final String PREF_KEY_SEARCH_USE_TORRENTZ2 = "frostwire.prefs.search.use_torrentz2";
     public static final String PREF_KEY_SEARCH_USE_IDOPE = "frostwire.prefs.search.use_idope";
@@ -151,7 +149,7 @@ public final class Constants {
 
     public static final String ACTION_NOTIFY_UPDATE_AVAILABLE = "com.frostwire.android.NOTIFY_UPDATE_AVAILABLE";
     public static final String ACTION_NOTIFY_DATA_INTERNET_CONNECTION = "com.frostwire.android.NOTIFY_CHECK_INTERNET_CONNECTION";
-    //public static final String ACTION_PACKAGE_INSTALLED = "com.frostwire.android.ACTION_PACKAGE_INSTALLED";
+
     public static final String EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_NOTIFICATION";
     public static final String EXTRA_DOWNLOAD_COMPLETE_PATH = "com.frostwire.android.EXTRA_DOWNLOAD_COMPLETE_PATH";
     public static final String EXTRA_REFRESH_FILE_TYPE = "com.frostwire.android.EXTRA_REFRESH_FILE_TYPE";

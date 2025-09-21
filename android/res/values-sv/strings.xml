@@ -48,7 +48,6 @@
     <string name="add_transfer_label">Klistra in en magnet eller torrent URL</string>
     <string name="drawer_open">Öppna navigeringspanelen</string>
     <string name="waiting">Väntar…</string>
-    <string name="use_torlock">Använda TorLock</string>
     <string name="search">Sök</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">Bli färdig</string>
@@ -79,7 +78,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunde inte seedas. BitTorrent förblir frånkopplad.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android kommer att radera nedladdade filer om FrostWire avinstalleras .</string>
     <string name="protected_connection">VPN-skyddad</string>
-    <string name="use_eztv">Använda Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Använda TPB</string>
     <string name="cheaper_than_parking">Billigare än Parkering</string>

@@ -154,11 +154,9 @@
     <string name="drawer_close">Zamknij menu nawigacji</string>
     <string name="add_transfer_label">Wklej magnet lub URL torrentu</string>
     <string name="drawer_open">Otwórz menu nawigacji</string>
-    <string name="use_torlock">Używaj TorLock</string>
     <string name="use_torrentdownloads">Używaj TorrentDownloads</string>
     <string name="use_torrentz2">Używaj Torrentz2</string>
     <string name="transfer_status_demuxing">Demuxing</string>
-    <string name="use_eztv">Używaj Eztv</string>
     <string name="please_check_connection_status_before_resuming_download">Proszę sprawdź status swojego połączenia internetowego zanim wznowisz pobieranie.</string>
     <string name="cloud_downloads_coming">Przepraszam: Pobieranie plików z tego źródła będzie dostępne w przyszłych wersjach.</string>
     <string name="magnet_url_added">URL Magnetu dodana to listy transferów. (Magnety działają najlepiej na Wi-Fi)</string>

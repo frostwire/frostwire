@@ -152,7 +152,6 @@
     <string name="selected">selezionato</string>
     <string name="add_transfer_label">Incollare un magnete o un URL torrente</string>
     <string name="drawer_open">Aprire il cassetto di navigazione</string>
-    <string name="use_torlock">Utilizzare TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Errore imprevisto raccogliendo percorso di memorizzazione.</string>
@@ -168,7 +167,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Il archivio non può essere seminato. BitTorrent rimarrà scollegato.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android cancellerà archivio scaricati se FrostWire viene disinstallato.</string>
     <string name="protected_connection">VPN protetto</string>
-    <string name="use_eztv">Utilizzare Eztv</string>
     <string name="cheaper_than_parking">Più economico di parcheggio</string>
     <string name="please_check_connection_status_before_resuming_download">Si prega di verificare lo stato della connessione a Internet prima di riprendere.</string>
     <string name="dummy_price">$ 99.99</string>

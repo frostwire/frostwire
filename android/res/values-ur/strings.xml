@@ -82,7 +82,6 @@
     <string name="dialog_new_transfer_text_text"> %1$s (%2$s) کیا آپ واقعی ڈاؤن لوڈ، اتارنا کرنا چاہتے ہیں</string>
     <string name="add_transfer_label">ایک مقناطیس یا سیلاب URL پیسٹ</string>
     <string name="drawer_open">نیویگیشن دراز کھولیں</string>
-    <string name="use_torlock">استعمال TorLock</string>
     <string name="search">تلاش کریں</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">ختم</string>
@@ -106,7 +105,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">فائل کو ترجیح نہیں ہوسکی. BitTorrent کے منقطع رہے گا.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">اگر FrostWire ان انسٹال کیا جاتا ہے لوڈ، اتارنا Android ڈاؤن لوڈ فائلوں کو مٹا دے گا.</string>
     <string name="protected_connection">VPN کے ذریعہ محفوظ</string>
-    <string name="use_eztv">استعمال Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">استعمال TPB</string>
     <string name="cheaper_than_parking">پارکنگ سے سستا</string>

@@ -162,7 +162,6 @@
     <string name="selected">seçilmiş</string>
     <string name="add_transfer_label">Bir mıknatıs veya sel URL\'lerini yapıştırın</string>
     <string name="drawer_open">Gezinme çekmecesini aç</string>
-    <string name="use_torlock">TorLock\'u Kullan</string>
     <string name="bittorrent_off">BitTorrent kapalı</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Depolama alanı yolunu seçerken beklenmeyen bir hata oluştu</string>
@@ -175,7 +174,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Dosya eklenemedi. BitTorrent bağlantısı kesik kalacaktır.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">FrostWire kaldırılırsa Android, indirilen dosyaları silecektir.</string>
     <string name="protected_connection">VPN korumalı</string>
-    <string name="use_eztv">Eztv\'u Kullan</string>
     <string name="cheaper_than_parking">Parktan daha ucuz</string>
     <string name="please_check_connection_status_before_resuming_download">Devam etmeden önce internet bağlantınızın durumunu kontrol edin.</string>
     <string name="dummy_price">$ 99.99</string>

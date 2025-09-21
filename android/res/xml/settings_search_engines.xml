@@ -50,10 +50,6 @@
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_tpb" />
     <CheckBoxPreference
-        android:key="frostwire.prefs.search.use_torlock"
-        android:layout="@layout/view_preference_search_engine"
-        android:title="@string/use_torlock" />
-    <CheckBoxPreference
         android:key="frostwire.prefs.search.use_torrentdownloads"
         android:layout="@layout/view_preference_search_engine"
         android:title="@string/use_torrentdownloads" />

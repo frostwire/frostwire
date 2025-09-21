@@ -99,13 +99,10 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_SOUNDCLOUD, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ARCHIVEORG, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_FROSTCLICK, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORLOCK, false);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_LIMETORRENTS, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_NYAA, true);
-        //defaultValues.put(Constants.PREF_KEY_SEARCH_USE_EZTV, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TPB, true);
-        defaultValues.put(Constants.PREF_KEY_SEARCH_USE_YIFY, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_TORRENTZ2, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_MAGNETDL, true);
         defaultValues.put(Constants.PREF_KEY_SEARCH_USE_ONE337X, true);

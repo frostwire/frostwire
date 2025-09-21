@@ -100,8 +100,6 @@
     <string name="retry">Ponovno pokušaj</string>
     <string name="use_archiveorg">Koristi Archive.org</string>
     <string name="use_frostclick">Koristi FrostClick</string>
-    <string name="use_torlock">Koristi TorLock</string>
-    <string name="use_eztv">Koristi Eztv</string>
     <string name="transfers_select_downloading">preuzimanje</string>
     <string name="transfers_select_completed">Završeno</string>
     <string name="drawer_open">Otvori navigacijsku ladicu</string>

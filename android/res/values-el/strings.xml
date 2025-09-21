@@ -153,8 +153,6 @@
     <string name="clear_search_cache_summary">Διαγραφή στοιχείων cache αναζήτησης</string>
     <string name="no_results_feedback">Δεν βρέθηκαν αποτελέσματα.\n\nΈλεγξε τη σύνδεση στο internet ή\nδοκίμασε διαφορετικούς όρους.</string>
     <string name="use_frostclick">Χρήση FrostClick</string>
-    <string name="use_torlock">Χρήση TorLock</string>
-    <string name="use_eztv">Χρήση Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">Χρειάζεται να έχεις εγκατεστημένο κάποιο Bitcoin πορτοφόλι στη συσκευή σου για να στείλεις μία δωρεά σε BTC.</string>
     <string name="transfers_select_all">όλα</string>

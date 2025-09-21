@@ -48,7 +48,6 @@
     <string name="add_transfer_label">Tampal magnet atau URL torrent</string>
     <string name="drawer_open">Laci navigasi terbuka</string>
     <string name="waiting">Menunggu…</string>
-    <string name="use_torlock">Gunakan TorLock</string>
     <string name="search">Carian</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">Selesai</string>
@@ -78,7 +77,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fail tidak boleh diletakkan sebagai pilihan. BitTorrent akan kekal diputuskan.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan memadam fail yang dimuat turun jika FrostWire adalah pemasangan.</string>
     <string name="protected_connection">VPN yang dilindungi</string>
-    <string name="use_eztv">Gunakan Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Gunakan TPB</string>
     <string name="cheaper_than_parking">Lebih murah daripada letak kenderaan</string>

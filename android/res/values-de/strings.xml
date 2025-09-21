@@ -79,10 +79,8 @@
     <string name="media_player_failed">Media Player ist fehlgeschlagen</string>
     <string name="use_zooqle">Benutze Zooqle.com</string>
     <string name="use_tpb">Benutze ThePirateBay.org</string>
-    <string name="use_torlock">Benutze TorLock</string>
     <string name="use_torrentdownloads">Benutze TorrentDownloads</string>
     <string name="use_torrentz2">Benutze Torrentz2</string>
-    <string name="use_eztv">Benutze Eztv</string>
     <string name="use_yify">Benutze Yify</string>
     <string name="use_one337x">Benutze 1337x</string>
     <string name="use_idope">Benutze Idope</string>

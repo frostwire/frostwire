@@ -45,7 +45,6 @@
     <string name="add_transfer_label">Inserați un magnet sau URL-ul torrent</string>
     <string name="drawer_open">Deschideți panoul de navigare</string>
     <string name="waiting">Aşteptare…</string>
-    <string name="use_torlock">Utilizați TorLock</string>
     <string name="search">Căutare</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">Finalizarea</string>
@@ -75,7 +74,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Fișierul nu a putut fi însămânțate. BitTorrent va rămâne deconectat.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va șterge fișierele descărcate în cazul în care FrostWire este dezinstalat.</string>
     <string name="protected_connection">Protejat printr-un VPN</string>
-    <string name="use_eztv">Utilizați Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Utilizați TPB</string>
     <string name="cheaper_than_parking">Mai ieftin decât parcare</string>

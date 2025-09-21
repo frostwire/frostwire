@@ -39,7 +39,6 @@ import com.frostwire.search.magnetdl.MagnetDLSearchPerformer;
 import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
-import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
 import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
@@ -186,13 +185,6 @@ public abstract class SearchEngine {
         }
     };
 
-    public static final SearchEngine TORLOCK = new SearchEngine("TorLock", Constants.PREF_KEY_SEARCH_USE_TORLOCK) {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorLockSearchPerformer("en.torlock-official.live", token, keywords, DEFAULT_TIMEOUT);
-        }
-    };
-
     public static final SearchEngine TORRENTDOWNLOADS = new SearchEngine("TorrentDownloads", Constants.PREF_KEY_SEARCH_USE_TORRENTDOWNLOADS) {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
@@ -335,7 +327,6 @@ public abstract class SearchEngine {
             BT_DIGG,
             SOUNCLOUD,
             ARCHIVE,
-            TORLOCK,
             TORRENTDOWNLOADS,
             LIMETORRENTS,
             NYAA,

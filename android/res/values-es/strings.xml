@@ -155,14 +155,12 @@
     <string name="clear_search_cache_summary">Limpiar entradas en cache de búsquedas</string>
     <string name="no_results_feedback">No se encontraron resultados.\n\nRevisa tu conexión a Internet o\nprueba otra búsqueda.</string>
     <string name="use_frostclick">Usa FrostClick.com</string>
-    <string name="use_torlock">Usar TorLock</string>
     <string name="use_torrentdownloads">Usar TorrentDownloads</string>
     <string name="use_torrentz2">Usar Torrentz2</string>
     <string name="use_limetorrents">Usar Limetorrents</string>
     <string name="use_magnetdl">Usar MagnetDL</string>
     <string name="use_glotorrents">Usar GloTorrents</string>
     <string name="use_nyaa">Usar Nyaa</string>
-    <string name="use_eztv">Usar Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">Necesitas un app de Bitcoin instalado para enviar donaciones en BTC.</string>
     <string name="drawer_close">Cierra el menu de navegación</string>

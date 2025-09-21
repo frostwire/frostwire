@@ -152,7 +152,6 @@
     <string name="selected">vybraný</string>
     <string name="add_transfer_label">Vložit magnet nebo torrent URL</string>
     <string name="drawer_open">Otevřít navigační panel</string>
-    <string name="use_torlock">Použít TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Neočekávaná chyba skladování picking cesta</string>
@@ -167,7 +166,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Soubor nemohl být nasazená. BitTorrent zůstane odpojen.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android smaže stažené soubory, pokud FrostWire odinstalování.</string>
     <string name="protected_connection">VPN-chráněné</string>
-    <string name="use_eztv">Použít Eztv</string>
     <string name="cheaper_than_parking">Levnější než Parkování</string>
     <string name="please_check_connection_status_before_resuming_download">Prosím zkontrolujte stav vašeho internetového připojení před návratem do provozu.</string>
     <string name="dummy_price">$ 99.99</string>

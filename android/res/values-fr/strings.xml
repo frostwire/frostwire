@@ -155,12 +155,10 @@
     <string name="saving_to_internal_memory_description">Vous avez également une carte SD (%1$s disponible)</string>
     <string name="add_transfer_label">Coller un magnet ou torrent URL</string>
     <string name="drawer_open">Ouvrir le tiroir de navigation</string>
-    <string name="use_torlock">Utilisez TorLock</string>
     <string name="use_torrentdownloads">Utilisez TorrentDownloads</string>
     <string name="use_torrentz2">Utilisez Torrentz2</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android va effacer les fichiers téléchargés si FrostWire est désinstallé.</string>
-    <string name="use_eztv">Utilisez Eztv</string>
     <string name="please_check_connection_status_before_resuming_download">S\'il vous plaît vérifier l\'état de votre connexion Internet avant de reprendre.</string>
     <string name="cloud_downloads_coming">Désolé: à partir de téléchargements de nuages ​​à partir d\'ici sera disponible sur d\'autres mises à jour.</string>
     <string name="confirm_download">Confirmez Télécharger</string>

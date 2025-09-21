@@ -47,7 +47,6 @@
     <string name="add_transfer_label">วางแม่เหล็กหรือ URL ฝนตกหนัก</string>
     <string name="drawer_open">เปิดลิ้นชักการนำทาง</string>
     <string name="waiting">ที่รอ…</string>
-    <string name="use_torlock">ใช้ TorLock</string>
     <string name="search">ค้นหา</string>
     <string name="bittorrent_off">BitTorrent ปิด</string>
     <string name="wizard_finish">เสร็จสิ้น</string>
@@ -77,7 +76,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">ไฟล์ที่ไม่สามารถเมล็ด BitTorrent จะยังคงตัดการเชื่อมต่อ</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android จะลบไฟล์ที่ดาวน์โหลด FrostWire ถ้ายกเลิกการติดตั้ง</string>
     <string name="protected_connection">VPN ที่มีการป้องกัน</string>
-    <string name="use_eztv">ใช้ Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">ใช้ TPB</string>
     <string name="cheaper_than_parking">ราคาถูกกว่าที่จอดรถ</string>

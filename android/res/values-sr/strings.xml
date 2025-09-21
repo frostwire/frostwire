@@ -166,10 +166,8 @@
     <string name="clear_search_cache_summary">Цлеар Сеарцх кеш уноса</string>
     <string name="no_results_feedback">Но ресултс вере фоунд.</string>
     <string name="use_frostclick">Користе FrostClick</string>
-    <string name="use_torlock">Користе TorLock</string>
     <string name="use_torrentdownloads">Користе TorrentDownloads</string>
     <string name="use_limetorrents">Користе Limetorrents</string>
-    <string name="use_eztv">Користе Eztv</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="you_need_a_bitcoin_wallet_app">Треба ти Битцоин новчаник инсталиран на уређају да поднесе БТЦ донацију.</string>
     <string name="transfers_select_all">све</string>

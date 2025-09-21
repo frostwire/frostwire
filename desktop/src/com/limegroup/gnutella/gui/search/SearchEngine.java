@@ -1,17 +1,17 @@
 /*
  *     Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  *     Copyright (c) 2011-2025, FrostWire(R). All rights reserved.
- * 
+ *
  *     This program is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
  *     the Free Software Foundation, either version 3 of the License, or
  *     (at your option) any later version.
- * 
+ *
  *     This program is distributed in the hope that it will be useful,
  *     but WITHOUT ANY WARRANTY; without even the implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
- * 
+ *
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -32,10 +32,9 @@ import com.frostwire.search.nyaa.NyaaSearchPerformer;
 import com.frostwire.search.one337x.One337xSearchPerformer;
 import com.frostwire.search.soundcloud.SoundcloudSearchPerformer;
 import com.frostwire.search.telluride.TellurideSearchPerformer;
-import com.frostwire.search.torlock.TorLockSearchPerformer;
 import com.frostwire.search.torrentdownloads.TorrentDownloadsSearchPerformer;
-import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.torrentscsv.TorrentsCSVSearchPerformer;
+import com.frostwire.search.torrentz2.Torrentz2SearchPerformer;
 import com.frostwire.search.tpb.TPBSearchPerformer;
 import com.frostwire.search.yt.YTSearchPerformer;
 import com.frostwire.util.HttpClientFactory;
@@ -63,18 +62,13 @@ public abstract class SearchEngine {
         SOUNDCLOUD_ID,
         ARCHIVEORG_ID,
         FROSTCLICK_ID,
-        TORLOCK_ID,
-        EZTV_ID,
-        YIFI_ID,
         ONE337X_ID,
         IDOPE_ID,
         TORRENTDOWNLOADS_ID,
         LIMETORRENTS_ID,
-        ZOOQLE_ID,
         NYAA_ID,
         TORRENTZ2_ID,
         MAGNETDL_ID,
-        TORRENTPARADISE_ID,
         GLOTORRENTS_ID,
         TELLURIDE_ID,
         YT_ID,
@@ -126,12 +120,6 @@ public abstract class SearchEngine {
         @Override
         public SearchPerformer getPerformer(long token, String keywords) {
             return new FrostClickSearchPerformer(FROSTCLICK.getDomainName(), token, keywords, DEFAULT_TIMEOUT, userAgent);
-        }
-    };
-    private static final SearchEngine TORLOCK = new SearchEngine(SearchEngineID.TORLOCK_ID, "TorLock", SearchEnginesSettings.TORLOCK_SEARCH_ENABLED, "en.torlock-official.live") {
-        @Override
-        public SearchPerformer getPerformer(long token, String keywords) {
-            return new TorLockSearchPerformer(TORLOCK.getDomainName(), token, keywords, DEFAULT_TIMEOUT);
         }
     };
     private static final SearchEngine TORRENTDOWNLOADS = new SearchEngine(SearchEngineID.TORRENTDOWNLOADS_ID, "TorrentDownloads", SearchEnginesSettings.TORRENTDOWNLOADS_SEARCH_ENABLED, "www.torrentdownloads.me") {
@@ -250,7 +238,6 @@ public abstract class SearchEngine {
                 NYAA,
                 ONE337X,
                 TPB,
-                TORLOCK,
                 TORRENTDOWNLOADS,
                 TORRENTZ2,
                 TORRENTSCSV,

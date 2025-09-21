@@ -147,7 +147,6 @@
     <string name="selected">चयनित</string>
     <string name="add_transfer_label">एक चुंबक या धार यूआरएल पेस्ट</string>
     <string name="drawer_open">ओपन नेविगेशन दराज</string>
-    <string name="use_torlock">उपयोग TorLock</string>
     <string name="bittorrent_off">BitTorrent बंद</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">अनपेक्षित त्रुटि उठा भंडारण पथ</string>
@@ -164,7 +163,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">फ़ाइल वरीयता प्राप्त नहीं किया जा सकता है। BitTorrent काट दिया रहेगा।</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">एंड्रॉयड डाउनलोड की फ़ाइलें मिटा देगा यदि FrostWire रद्द की है।</string>
     <string name="protected_connection">वीपीएन की रक्षा की</string>
-    <string name="use_eztv">उपयोग Eztv</string>
     <string name="cheaper_than_parking">पार्किंग की तुलना में सस्ता</string>
     <string name="please_check_connection_status_before_resuming_download">आपके इंटरनेट कनेक्शन की स्थिति की जांच शुरू करने से पहले कृपया</string>
     <string name="dummy_price">$ 99.99</string>

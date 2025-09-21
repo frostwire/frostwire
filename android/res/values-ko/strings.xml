@@ -150,7 +150,6 @@
     <string name="selected">선택된</string>
     <string name="add_transfer_label">자석 또는 토런트 URL 붙여 넣기</string>
     <string name="drawer_open">탐색 창 열기</string>
-    <string name="use_torlock">TorLock사용</string>
     <string name="bittorrent_off">비트 토 런트 해제</string>
     <string name="transfer_status_demuxing">디 먹스</string>
     <string name="storage_picker_treeuri_error">예기치 않은 오류로 스토리지 경로를 선택하는 중입니다.</string>
@@ -166,7 +165,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">파일을 시드 할 수 없습니다. BitTorrent는 연결이 끊긴 상태로 유지됩니다.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android는 FrostWire를 제거하면 다운로드 한 파일을 지 웁니다.</string>
     <string name="protected_connection">VPN으로 보호 된</string>
-    <string name="use_eztv">Eztv사용</string>
     <string name="cheaper_than_parking">주차장보다 저렴</string>
     <string name="please_check_connection_status_before_resuming_download">다시 시작하기 전에 인터넷 연결 상태를 확인하십시오.</string>
     <string name="dummy_price">$ 99.99</string>

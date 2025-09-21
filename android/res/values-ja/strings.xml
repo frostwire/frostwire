@@ -157,8 +157,6 @@
     <string name="clear_search_cache_summary">検索キャッシュのエントリをクリアします</string>
     <string name="no_results_feedback">結果が見つかりませんでした。\n\nインターネット接続を確認するか\n別の検索条件を試してください。</string>
     <string name="use_frostclick">FrostClickを使用する</string>
-    <string name="use_torlock">TorLockを使用する</string>
-    <string name="use_eztv">Eztvを使用する</string>
     <string name="transfer_status_demuxing">分離中</string>
     <string name="you_need_a_bitcoin_wallet_app">BTCで寄付を行うにはデバイスにBitcoinウォレットをインストールする必要があります。</string>
     <string name="transfers_select_all">すべて</string>

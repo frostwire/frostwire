@@ -162,7 +162,6 @@
     <string name="selected">مختار</string>
     <string name="add_transfer_label">لصق المغناطيس أو URL سيل</string>
     <string name="drawer_open">فتح درج الملاحة</string>
-    <string name="use_torlock">استخدام TorLock</string>
     <string name="bittorrent_off">تورنت قبالة</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">خطأ غير متوقع مسار تخزين قطف</string>
@@ -175,7 +174,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">لا يمكن المصنف الملف. ستبقى تورنت قطع.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">الروبوت سوف يمحو الملفات التي تم تحميلها إذا تم إلغاء فروست واير.</string>
     <string name="protected_connection">VPN محمي</string>
-    <string name="use_eztv">استخدام Eztv</string>
     <string name="cheaper_than_parking">أرخص من وقوف السيارات</string>
     <string name="please_check_connection_status_before_resuming_download">يرجى التحقق من حالة الاتصال بالإنترنت لديك قبل استئناف.</string>
     <string name="dummy_price">$ 99.99</string>

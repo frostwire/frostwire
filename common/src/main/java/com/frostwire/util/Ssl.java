@@ -152,7 +152,6 @@ public final class Ssl {
                 "www.limetorrents.pro",
                 "www.magnetdl.com",
                 "www.pirate-bay.net",
-                "www.torlock.com",
                 "www.torrentdownloads.me",
                 "www.torrentdownloads.pro",
                 "youtu.be",

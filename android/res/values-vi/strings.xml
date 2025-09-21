@@ -153,7 +153,6 @@
     <string name="selected">đã chọn</string>
     <string name="add_transfer_label">Dán một nam châm hoặc URL torrent</string>
     <string name="drawer_open">Mở ngăn chuyển hướngn</string>
-    <string name="use_torlock">Chọn TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">đường dẫn lưu trữ hái lỗi không mong muốn</string>
@@ -168,7 +167,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Các tập tin không thể được gieo. BitTorrent sẽ vẫn bị ngắt kết nối.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android sẽ xóa các tập tin đã tải về nếu FrostWire được gỡ cài đặt.</string>
     <string name="protected_connection">VPN được bảo vệ</string>
-    <string name="use_eztv">Chọn Eztv</string>
     <string name="cheaper_than_parking">Rẻ hơn so với xe</string>
     <string name="please_check_connection_status_before_resuming_download">Vui lòng kiểm tra trạng thái kết nối internet của bạn trước khi nối lại.</string>
     <string name="dummy_price">$ 99.99</string>

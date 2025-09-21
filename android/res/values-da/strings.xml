@@ -152,7 +152,6 @@
     <string name="selected">valgt</string>
     <string name="add_transfer_label">Indsæt en magnet eller torrent URL</string>
     <string name="drawer_open">Åbent navigation skuffe</string>
-    <string name="use_torlock">Brug TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Uventet fejl plukning opbevaring sti</string>
@@ -167,7 +166,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Filen kunne ikke seedet. BitTorrent forbliver afbrudt.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android vil slette downloadede filer, hvis FrostWire afinstalleres.</string>
     <string name="protected_connection">VPN-beskyttet</string>
-    <string name="use_eztv">Brug Eztv</string>
     <string name="cheaper_than_parking">Billigere end parkering</string>
     <string name="please_check_connection_status_before_resuming_download">Kontroller status for din internetforbindelse, inden de genoptager.</string>
     <string name="dummy_price">$ 99.99</string>

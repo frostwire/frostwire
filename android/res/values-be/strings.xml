@@ -47,7 +47,6 @@
     <string name="add_transfer_label">Ўставіць магніт або торэнт URL</string>
     <string name="drawer_open">Адкрыць панэль навігацыі</string>
     <string name="waiting">Чаканне…</string>
-    <string name="use_torlock">Выкарыстоўвайце TorLock</string>
     <string name="search">Пошук</string>
     <string name="bittorrent_off">BitTorrent неактыўным</string>
     <string name="wizard_finish">Гатова</string>
@@ -77,7 +76,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Файл не можа быць пасеяны. BitTorrent будзе заставацца адключаны.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android будзе сцерці загружаныя файлы, калі FrostWire выдаляецца.</string>
     <string name="protected_connection">VPN-абаронены</string>
-    <string name="use_eztv">Выкарыстоўвайце Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">Выкарыстоўвайце TPB</string>
     <string name="cheaper_than_parking">Танней, чым паркоўка</string>

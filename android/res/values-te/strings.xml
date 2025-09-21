@@ -52,7 +52,6 @@
     <string name="drawer_open">నావిగేషన్ డ్రాయర్ తెరవండి</string>
     <string name="waiting">వేచి…</string>
     <string name="delete_started_torrents_summary">.torrent ఫైళ్లను డౌన్లోడ్ చేయటం మొదలుపెట్టిన తర్వాత తొలగించండి</string>
-    <string name="use_torlock">TorLock ఉపయోగించండి</string>
     <string name="seed_stop">నాట్లు వేయండి</string>
     <string name="frostwire_features">FROSTWIRE CREATIVE COMMONS FEATURES</string>
     <string name="search">శోధన</string>
@@ -95,7 +94,6 @@
     <string name="search_preferences_one_engine_checked_always">అప్రమేయంగా, ఒక శోధన ఇంజిన్ ఎప్పుడైనా తనిఖీ చేయాలి</string>
     <string name="protected_connection">VPN రక్షిత</string>
     <string name="use_zooqle">Zooqle.com ఉపయోగించండి</string>
-    <string name="use_eztv">Eztv ఉపయోగించండి</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">TPB ఉపయోగించండి</string>
     <string name="cheaper_than_parking">పార్కింగ్ కంటే చీమ</string>

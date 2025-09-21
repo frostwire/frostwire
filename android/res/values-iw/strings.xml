@@ -48,8 +48,7 @@
     <string name="add_transfer_label">דבק מגנט או כתובת אתר טורנט</string>
     <string name="drawer_open">פתח את חלונית הניווט</string>
     <string name="waiting">הַמתָנָה…</string>
-    <string name="use_torlock">השתמש TorLock</string>
-    <string name="search">לחפש</string>
+        <string name="search">לחפש</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="wizard_finish">סִיוּם</string>
     <string name="peer_http_download_status_complete">לְהַשְׁלִים</string>
@@ -79,7 +78,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">הקובץ לא להיות זרע. ביטורנט יישאר מנותק.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android ימחק קבצים שהורדו אם FrostWire יוסר.</string>
     <string name="protected_connection">VPN-מוגן</string>
-    <string name="use_eztv">השתמש Eztv</string>
     <string name="media_type_torrents">Torrents</string>
     <string name="use_tpb">השתמש TPB</string>
     <string name="cheaper_than_parking">זול יותר מאשר חניה</string>

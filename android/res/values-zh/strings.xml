@@ -141,7 +141,6 @@
     <string name="saving_to_internal_memory_description">您也有一张 SD 卡（%1$s 可用）</string>
     <string name="add_transfer_label">贴上 Magnet（磁力）鏈接或 Torrent 鏈接</string>
     <string name="drawer_open">打开导航栏</string>
-    <string name="use_torlock">使用 TorLock</string>
     <string name="use_torrentdownloads">使用 TorrentDownloads</string>
     <string name="transfer_status_demuxing">多路分配中</string>
     <string name="app_shutdown_dlg_message">您确定要关闭所有传输和后台服务吗？</string>
@@ -150,7 +149,6 @@
     <string name="accept">接受</string>
     <string name="retry">重试</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">如果卸載 FrostWire，Android将会清楚所有下载的内容。</string>
-    <string name="use_eztv">使用 Eztv</string>
     <string name="please_check_connection_status_before_resuming_download">请检查网络连接状态再重新开始。</string>
     <string name="cloud_downloads_coming">抱歉：要从这里进行云下载，请等待产品进一步更新。</string>
     <string name="confirm_download">确认下载</string>

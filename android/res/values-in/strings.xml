@@ -149,7 +149,6 @@
     <string name="selected">terpilih</string>
     <string name="add_transfer_label">Tempelkan magnet atau URL torrent</string>
     <string name="drawer_open">Terbuka laci navigasi</string>
-    <string name="use_torlock">Gunakan TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxing</string>
     <string name="storage_picker_treeuri_error">Kesalahan tak terduga path penyimpanan memetik</string>
@@ -165,7 +164,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">File tidak bisa diunggulkan. BitTorrent akan tetap terputus.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android akan menghapus file yang didownload jika FrostWire dihapus.</string>
     <string name="protected_connection">VPN-dilindungi</string>
-    <string name="use_eztv">Gunakan Eztv</string>
     <string name="cheaper_than_parking">Lebih murah dari Parkir</string>
     <string name="please_check_connection_status_before_resuming_download">Silakan periksa status koneksi internet Anda sebelum melanjutkan.</string>
     <string name="dummy_price">$ 99.99</string>

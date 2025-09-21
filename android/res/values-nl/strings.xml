@@ -152,7 +152,6 @@
     <string name="selected">gekozen</string>
     <string name="add_transfer_label">Plak een magneet of torrent URL</string>
     <string name="drawer_open">Open navigatielade</string>
-    <string name="use_torlock">Gebruik TorLock</string>
     <string name="bittorrent_off">BitTorrent off</string>
     <string name="transfer_status_demuxing">Demuxen</string>
     <string name="storage_picker_treeuri_error">Onverwachte fout picking opslagpad</string>
@@ -168,7 +167,6 @@
     <string name="the_file_could_not_be_seeded_bittorrent_will_remain_disconnected">Het bestand kan niet worden gezaaid. BitTorrent wordt losgekoppeld blijven.</string>
     <string name="android_will_erase_files_if_frostwire_is_uninstalled">Android zal de gedownloade bestanden wissen als FrostWire wordt verwijderd.</string>
     <string name="protected_connection">VPN-beschermde</string>
-    <string name="use_eztv">Gebruik Eztv</string>
     <string name="cheaper_than_parking">Goedkoper dan parkeren</string>
     <string name="please_check_connection_status_before_resuming_download">Controleer de status van uw internetverbinding voor hervatting.</string>
     <string name="dummy_price">$ 99.99</string>

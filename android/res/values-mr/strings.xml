@@ -53,7 +53,6 @@
     <string name="drawer_open">नेव्हिगेशन ड्रॉवर उघडा</string>
     <string name="waiting">प्रतीक्षा करीत आहे…</string>
     <string name="delete_started_torrents_summary">सुरवात डाउनलोड केल्यानंतर .torrent फाइल्स काढून टाका</string>
-    <string name="use_torlock">TorLock वापरा</string>
     <string name="seed_stop">बीजन थांबवा</string>
     <string name="frostwire_features">FROSTWIRE क्रिएटिव्ह कॉमन्स वैशिष्ट्ये</string>
     <string name="search">शोध</string>
@@ -97,7 +96,6 @@
     <string name="search_preferences_one_engine_checked_always">डीफॉल्टनुसार, प्रत्येक वेळी एक शोध इंजिन तपासण्याची आवश्यकता असते</string>
     <string name="protected_connection">व्हीपीएन-संरक्षित</string>
     <string name="use_zooqle">Zooqle.com वापरा</string>
-    <string name="use_eztv">Eztv वापरा</string>
     <string name="media_type_torrents">टॉरेंट</string>
     <string name="use_tpb">TPB वापरा</string>
     <string name="cheaper_than_parking">पार्किंग पेक्षा स्वस्त</string>
