@@ -36,7 +36,8 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
-        super("idope.io", token, keywords, timeout, 1, 0);
+        // Switch to idope.hair as primary since idope.io uses dynamic JavaScript loading
+        super("idope.hair", token, keywords, timeout, 1, 0);
         if (pattern == null) {
             // Updated pattern for MagnetDL-like structure (idope.io now uses similar HTML structure)
             // Alternative domain idope.hair uses different URL pattern: /lmsearch?q=keywords&cat=lmsearch
@@ -69,16 +70,16 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
 
     @Override
     protected String getSearchUrl(int page, String encodedKeywords) {
-        // Try idope.io first with the new search format
-        if (getDomainName().equals("idope.io")) {
-            return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
-        }
-        // Fallback for idope.hair domain with different URL pattern
+        // Use idope.hair as primary since idope.io loads results via JavaScript
         if (getDomainName().equals("idope.hair")) {
             return "https://" + getDomainName() + "/lmsearch?q=" + encodedKeywords + "&cat=lmsearch";
         }
-        // Default fallback
-        return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
+        // Fallback for idope.io domain (though it uses dynamic loading)
+        if (getDomainName().equals("idope.io")) {
+            return "https://" + getDomainName() + "/search/?q=" + encodedKeywords;
+        }
+        // Default fallback - use idope.hair pattern
+        return "https://idope.hair/lmsearch?q=" + encodedKeywords + "&cat=lmsearch";
     }
 
     private IdopeSearchResult fromMatcher(SearchMatcher matcher) {
@@ -168,6 +169,13 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
         LOG.warn("Full page length: " + page.length());
         LOG.warn("First 1000 chars of page: " + (page.length() > 1000 ? page.substring(0, 1000) : page));
         
+        // Check for JavaScript-loaded content indicators
+        if (page.contains("<!--firstresult();-->") || page.contains("firstresult()")) {
+            LOG.warn("DETECTED: Page uses JavaScript to load search results dynamically");
+            LOG.warn("This indicates the search results are not in the initial HTML but loaded via AJAX");
+            LOG.warn("Consider switching to idope.hair domain which may use static HTML");
+        }
+        
         // Log what structural elements we can find
         if (page.contains("<main>")) {
             LOG.warn("Found <main> tag at position: " + page.indexOf("<main>"));
@@ -204,6 +212,14 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             if (page.toLowerCase().contains(pattern.toLowerCase())) {
                 int pos = page.toLowerCase().indexOf(pattern.toLowerCase());
                 LOG.warn("Found potential result container: " + pattern + " at position: " + pos);
+            }
+        }
+        
+        // Check for JavaScript-based dynamic loading patterns
+        String[] jsPatterns = {"jquery", "ajax", "fetch(", "XMLHttpRequest", ".load(", "getJSON"};
+        for (String pattern : jsPatterns) {
+            if (page.toLowerCase().contains(pattern.toLowerCase())) {
+                LOG.warn("Found JavaScript dynamic loading indicator: " + pattern);
             }
         }
     }
