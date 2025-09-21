@@ -32,6 +32,7 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
     private static final Logger LOG = Logger.getLogger(IdopeSearchPerformer.class);
     private static Pattern pattern;
     private static Pattern oldPattern; // For fallback to original idope.se structure
+    private static Pattern modernPattern; // For modern Bootstrap-based structure
     private boolean isDDOSProtectionActive;
 
     public IdopeSearchPerformer(long token, String keywords, int timeout) {
@@ -52,6 +53,12 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
                     "<div class=\"resultdivbottontime\">(?<age>.*?)</div>.*?" +
                     "<div class=\"resultdivbottonlength\">(?<filesize>.*?)\\p{Z}(?<unit>.*?)</div>.*?" +
                     "<div class=\"resultdivbottonseed\">(?<seeds>.*?)</div>");
+            
+            // Modern pattern for Bootstrap-based layouts (more generic)
+            modernPattern = Pattern.compile("(?is)<a[^>]*href=\"(?<magnet>magnet:[^\"]+)\"[^>]*>.*?" +
+                    "(?:<div[^>]*>|<span[^>]*>|<p[^>]*>)(?<title>[^<]+)(?:</div>|</span>|</p>).*?" +
+                    "(?:<div[^>]*>|<span[^>]*>)(?<fileSizeMagnitude>[0-9\\.]+)\\s*(?<fileSizeUnit>[KMGT]?B)(?:</div>|</span>).*?" +
+                    "(?:<div[^>]*>|<span[^>]*>)(?<seeds>[0-9]+)(?:</div>|</span>)");
         }
     }
 
@@ -125,6 +132,67 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
         return new IdopeSearchResult(detailsURL, infoHash, filename, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
     }
 
+    private IdopeSearchResult fromModernMatcher(SearchMatcher matcher) {
+        String magnet = matcher.group("magnet");
+        String title = matcher.group("title");
+        String fileSizeMagnitude = matcher.group("fileSizeMagnitude");
+        String fileSizeUnit = matcher.group("fileSizeUnit");
+        String seedsStr = matcher.group("seeds");
+        
+        // For modern pattern, we might not have age or detail URL
+        String ageString = "Unknown";
+        String detailsURL = "https://" + getDomainName() + "/"; // Fallback URL
+        
+        int seeds = 0;
+        try {
+            seeds = Integer.parseInt(seedsStr.trim());
+        } catch (NumberFormatException e) {
+            // Default to 0 if seeds can't be parsed
+        }
+        
+        // Extract info hash from magnet URL
+        String infoHash = "";
+        if (magnet != null && magnet.contains("xt=urn:btih:")) {
+            int start = magnet.indexOf("xt=urn:btih:") + 12;
+            int end = magnet.indexOf("&", start);
+            if (end == -1) end = magnet.length();
+            if (start < magnet.length() && end > start) {
+                infoHash = magnet.substring(start, Math.min(start + 40, end));
+            }
+        }
+        
+        return new IdopeSearchResult(detailsURL, infoHash, title, fileSizeMagnitude, fileSizeUnit, ageString, seeds, UrlUtils.USUAL_TORRENT_TRACKERS_MAGNET_URL_PARAMETERS);
+    }
+
+    private void logHtmlStructureDebug(String page) {
+        LOG.warn("First 1000 chars of page: " + (page.length() > 1000 ? page.substring(0, 1000) : page));
+        
+        // Log what structural elements we can find
+        if (page.contains("<main>")) {
+            LOG.warn("Found <main> tag");
+        }
+        if (page.contains("container-fluid")) {
+            LOG.warn("Found container-fluid class");
+        }
+        if (page.contains("<table")) {
+            LOG.warn("Found table elements");
+        }
+        if (page.contains("<tbody")) {
+            LOG.warn("Found tbody elements");
+        }
+        if (page.contains("bootstrap")) {
+            LOG.warn("Found Bootstrap framework");
+        }
+        
+        // Look for potential content indicators
+        String[] searchTerms = {"magnet:", "torrent", "download", "size", "seed", "leech"};
+        for (String term : searchTerms) {
+            if (page.toLowerCase().contains(term.toLowerCase())) {
+                LOG.warn("Found potential content indicator: " + term);
+            }
+        }
+    }
+
     @Override
     protected List<? extends IdopeSearchResult> searchPage(String page) {
         if (null == page || page.isEmpty()) {
@@ -152,12 +220,36 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             }
             
             if (htmlPrefixIndex == -1) {
+                // Try looking for modern Bootstrap containers
+                HTML_PREFIX_MARKER = "<main>";
+                HTML_SUFFIX_MARKER = "</main>";
+                htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+            }
+            
+            if (htmlPrefixIndex == -1) {
+                // Try looking for container-fluid or similar modern structures
+                HTML_PREFIX_MARKER = "container-fluid";
+                htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER);
+                if (htmlPrefixIndex > 0) {
+                    // Find the start of the div that contains this class
+                    int divStart = page.lastIndexOf("<div", htmlPrefixIndex);
+                    if (divStart != -1) {
+                        htmlPrefixIndex = divStart;
+                        HTML_PREFIX_MARKER = "<div";
+                        HTML_SUFFIX_MARKER = "</main>";  // Try to end at main tag
+                    } else {
+                        htmlPrefixIndex = -1;
+                    }
+                }
+            }
+            
+            if (htmlPrefixIndex == -1) {
                 // Check for DDOS protection or completely different structure
                 isDDOSProtectionActive = page.contains("Cloudflare") || page.contains("ddos") || page.contains("bot protection");
                 if (!isDDOSProtectionActive) {
                     LOG.warn("IdopeSearchPerformer search HTML structure not found. Page length: " + page.length() + ". Please notify at https://github.com/frostwire/frostwire/issues/new");
-                    // Log first 500 characters for debugging
-                    LOG.warn("First 500 chars of page: " + (page.length() > 500 ? page.substring(0, 500) : page));
+                    // Log sections that might contain relevant markers
+                    logHtmlStructureDebug(page);
                 } else {
                     LOG.warn("IdopeSearchPerformer search disabled. DDOS protection active.");
                 }
@@ -175,7 +267,7 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
         // Try the new MagnetDL-like pattern first
         SearchMatcher matcher = new SearchMatcher((pattern.matcher(reducedHtml)));
         boolean matcherFound;
-        boolean usingOldPattern = false;
+        String usingPattern = "new";
         int MAX_RESULTS = 10;
         
         do {
@@ -191,11 +283,31 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             }
         } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
         
-        // If new pattern didn't work, try the old pattern
+        // If new pattern didn't work, try the modern pattern
+        if (results.isEmpty() && !isStopped()) {
+            LOG.info("IdopeSearchPerformer: Trying modern Bootstrap pattern");
+            matcher = new SearchMatcher((modernPattern.matcher(reducedHtml)));
+            usingPattern = "modern";
+            
+            do {
+                try {
+                    matcherFound = matcher.find();
+                } catch (Throwable t) {
+                    matcherFound = false;
+                    LOG.error("searchPage() has failed with modern pattern.\n" + t.getMessage(), t);
+                }
+                if (matcherFound) {
+                    IdopeSearchResult sr = fromModernMatcher(matcher);
+                    results.add(sr);
+                }
+            } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
+        }
+        
+        // If modern pattern didn't work, try the old pattern
         if (results.isEmpty() && !isStopped()) {
             LOG.info("IdopeSearchPerformer: Trying fallback to old pattern format");
             matcher = new SearchMatcher((oldPattern.matcher(reducedHtml)));
-            usingOldPattern = true;
+            usingPattern = "old";
             
             do {
                 try {
@@ -211,17 +323,17 @@ public class IdopeSearchPerformer extends SimpleTorrentSearchPerformer {
             } while (matcherFound && !isStopped() && results.size() < MAX_RESULTS);
         }
         
-        // If both patterns failed, check for DDOS protection
+        // If all patterns failed, check for DDOS protection
         if (results.isEmpty() && !isStopped()) {
             isDDOSProtectionActive = reducedHtml.contains("Cloudflare") || reducedHtml.contains("ddos") || reducedHtml.contains("bot protection");
             if (!isDDOSProtectionActive) {
-                LOG.warn("IdopeSearchPerformer search matcher broken. Tried both new and old patterns. Please notify at https://github.com/frostwire/frostwire/issues/new");
-                LOG.warn("Reduced HTML length: " + reducedHtml.length() + ", first 200 chars: " + (reducedHtml.length() > 200 ? reducedHtml.substring(0, 200) : reducedHtml));
+                LOG.warn("IdopeSearchPerformer search matcher broken. Tried all patterns (new, modern, old). Please notify at https://github.com/frostwire/frostwire/issues/new");
+                LOG.warn("Reduced HTML length: " + reducedHtml.length() + ", first 500 chars: " + (reducedHtml.length() > 500 ? reducedHtml.substring(0, 500) : reducedHtml));
             } else {
                 LOG.warn("IdopeSearchPerformer search matcher disabled. DDOS protection active.");
             }
         } else if (!results.isEmpty()) {
-            LOG.info("IdopeSearchPerformer: Found " + results.size() + " results using " + (usingOldPattern ? "old" : "new") + " pattern");
+            LOG.info("IdopeSearchPerformer: Found " + results.size() + " results using " + usingPattern + " pattern");
         }
         
         return results;
