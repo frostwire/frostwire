@@ -1,4 +1,4 @@
-FrostWire 3.0.0 build <UNRELEASED> SEP/19/2025
+FrostWire 3.0.0 build <UNRELEASED> SEP/21/2025
  - new: Powered by jlibtorrent 2.0.12.5 with bittorrent v2 protocol support with hundreds of bug fixes and performance improvements
  - new: Knaben search performer, a new torrent search source
  - new: TorrentCSV search performer, a new torrent search source
