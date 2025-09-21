@@ -18,23 +18,62 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.*;
-import com.frostwire.jlibtorrent.swig.*;
+import static com.frostwire.jlibtorrent.alerts.AlertType.ADD_TORRENT;
+import static com.frostwire.jlibtorrent.alerts.AlertType.DHT_BOOTSTRAP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.EXTERNAL_IP;
+import static com.frostwire.jlibtorrent.alerts.AlertType.FASTRESUME_REJECTED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_FAILED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.LISTEN_SUCCEEDED;
+import static com.frostwire.jlibtorrent.alerts.AlertType.PEER_LOG;
+import static com.frostwire.jlibtorrent.alerts.AlertType.TORRENT_LOG;
+
+import com.frostwire.concurrent.concurrent.ThreadExecutor;
+import com.frostwire.jlibtorrent.AlertListener;
+import com.frostwire.jlibtorrent.ErrorCode;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.SessionManager;
+import com.frostwire.jlibtorrent.SessionParams;
+import com.frostwire.jlibtorrent.SettingsPack;
+import com.frostwire.jlibtorrent.Sha1Hash;
+import com.frostwire.jlibtorrent.Sha256Hash;
+import com.frostwire.jlibtorrent.TcpEndpoint;
+import com.frostwire.jlibtorrent.TorrentFlags;
+import com.frostwire.jlibtorrent.TorrentHandle;
+import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.jlibtorrent.Vectors;
+import com.frostwire.jlibtorrent.alerts.Alert;
+import com.frostwire.jlibtorrent.alerts.AlertType;
+import com.frostwire.jlibtorrent.alerts.ExternalIpAlert;
+import com.frostwire.jlibtorrent.alerts.FastresumeRejectedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenFailedAlert;
+import com.frostwire.jlibtorrent.alerts.ListenSucceededAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentAlert;
+import com.frostwire.jlibtorrent.swig.bdecode_node;
+import com.frostwire.jlibtorrent.swig.byte_vector;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.error_code;
+import com.frostwire.jlibtorrent.swig.libtorrent;
+import com.frostwire.jlibtorrent.swig.save_state_flags_t;
+import com.frostwire.jlibtorrent.swig.session_params;
+import com.frostwire.jlibtorrent.swig.settings_pack;
 import com.frostwire.platform.FileSystem;
 import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
-import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
-
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -143,7 +182,6 @@ public final class BTEngine extends SessionManager {
     /**
      * @see com.frostwire.android.gui.MainApplication::onCreate() for ctx.interfaces and the rest of the context
      */
-    @SuppressWarnings("JavadocReference")
     @Override
     public void start() {
         SessionParams params = loadSettings();
@@ -196,14 +234,14 @@ public final class BTEngine extends SessionManager {
     @Override
     protected void onAfterStart() {
         // Initialize cached paused state on start in the background thread to avoid EDT blocking
-        BackgroundQueuedExecutorService.schedule(() -> {
+        ThreadExecutor.startThread(() -> {
             try {
                 cachedPausedState = super.isPaused();
             } catch (Exception e) {
                 // If there's an issue getting the initial state, assume it not paused
                 cachedPausedState = false;
             }
-        });
+        }, "BTEngine::onAfterStart() cache BTEngine's first paused state in the background");
         fireStarted();
     }
 
