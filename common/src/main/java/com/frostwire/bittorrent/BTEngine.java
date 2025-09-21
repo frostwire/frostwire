@@ -26,6 +26,7 @@ import com.frostwire.platform.Platforms;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.Logger;
 import com.frostwire.util.OSUtils;
+import com.limegroup.gnutella.gui.util.BackgroundQueuedExecutorService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -191,15 +192,15 @@ public final class BTEngine extends SessionManager {
 
     @Override
     protected void onAfterStart() {
-        // Initialize cached paused state on start in background thread to avoid EDT blocking
-        new Thread(() -> {
+        // Initialize cached paused state on start in the background thread to avoid EDT blocking
+        BackgroundQueuedExecutorService.schedule(() -> {
             try {
                 cachedPausedState = super.isPaused();
             } catch (Exception e) {
-                // If there's an issue getting the initial state, assume not paused
+                // If there's an issue getting the initial state, assume it not paused
                 cachedPausedState = false;
             }
-        }, "BTEngine-PausedStateInit").start();
+        });
         fireStarted();
     }
 
