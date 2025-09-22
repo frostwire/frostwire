@@ -80,7 +80,9 @@ public class ImageFetcher extends ImageWorker {
         if (currentAlbumId == 0) {
             Context context = imageView.getContext();
             Bitmap defaultArtwork = ImageFetcher.getInstance(context).getDefaultArtwork();
-            imageView.setImageBitmap(defaultArtwork);
+            if (defaultArtwork != null) {
+                imageView.setImageBitmap(defaultArtwork);
+            }
             return;
         }
 
