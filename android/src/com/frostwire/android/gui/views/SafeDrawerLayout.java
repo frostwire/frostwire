@@ -22,12 +22,15 @@ import android.content.Context;
 import android.util.AttributeSet;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.frostwire.util.Logger;
+
 /**
  * A DrawerLayout that safely falls back to the provided measure specs
  * even when not measured with MeasureSpec.EXACTLY, preventing the
  * IllegalStateException thrown by DrawerLayout.onMeasure().
  */
 public class SafeDrawerLayout extends DrawerLayout {
+    private final Logger LOG = Logger.getLogger(SafeDrawerLayout.class);
 
     public SafeDrawerLayout(Context context) {
         super(context);
@@ -43,14 +46,21 @@ public class SafeDrawerLayout extends DrawerLayout {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = android.view.View.MeasureSpec.getSize(widthMeasureSpec);
+        int height = android.view.View.MeasureSpec.getSize(heightMeasureSpec);
+        boolean measureSuccess = false;
+
         try {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            measureSuccess = true;
         } catch (IllegalStateException e) {
-            // Fallback to whatever size the parent imposed, even if not EXACTLY
-            setMeasuredDimension(
-                    android.view.View.MeasureSpec.getSize(widthMeasureSpec),
-                    android.view.View.MeasureSpec.getSize(heightMeasureSpec)
-            );
+            LOG.error("IllegalStateException in DrawerLayout.onMeasure()", e);
+        }
+
+        // If super.onMeasure() didn't successfully set the dimensions,
+        // we need to explicitly call setMeasuredDimension()
+        if (!measureSuccess) {
+            setMeasuredDimension(width, height);
         }
     }
 }
