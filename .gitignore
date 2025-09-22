@@ -64,8 +64,6 @@ android/obj/
 android/pepk.jar
 common/src/main/cpp/
 desktop/gradle/
-desktop/gradlew
-desktop/gradlew.bat
 desktop/seenDomains.txt
 gradle/
 gradlew
