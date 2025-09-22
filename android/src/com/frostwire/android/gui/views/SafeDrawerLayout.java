@@ -48,8 +48,8 @@ public class SafeDrawerLayout extends DrawerLayout {
         } catch (IllegalStateException e) {
             // Fallback to whatever size the parent imposed, even if not EXACTLY
             setMeasuredDimension(
-                    MeasureSpec.getSize(widthMeasureSpec),
-                    MeasureSpec.getSize(heightMeasureSpec)
+                    android.view.View.MeasureSpec.getSize(widthMeasureSpec),
+                    android.view.View.MeasureSpec.getSize(heightMeasureSpec)
             );
         }
     }
