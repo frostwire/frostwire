@@ -1,29 +1,32 @@
 frostwire (7.0.0) stable; urgency=high
- * New: Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
- * New TorrentCSV search performer
- * New Knaben Database Search Performer
- * New: Partial selection file dialog now allows shift-click to select ranges of files in torrents
- * New: settings panel to pick location for .torrent files
- * New: FlatLaf light theme
- * New: Header bar rearranged, search bar goes to the center, nav buttons on the left, FW Logo first
- * New: Torrent Transfer > Advanced > Check local data feature. If a file belonging to a torrent is now on disk it can be force checked
- * Maintenance: mplayer not available in linux warning can now not be shown ever again
- * Removed: Torlock search performer (old site is down, new site is malicious)
- * Maintenance: MacEventHandler is now compatible with JDK 23 and JDK 24
- * Maintenance: Archive.org search
- * Maintenance: GloTorrents search
+ * New:Powered by Jlibtorrent 2.0.12.5 with bittorrent 2.0 support and hundreds of optimizations
+ * New:TorrentCSV search performer
+ * New:Knaben Database Search Performer
+ * New:Partial selection file dialog now allows shift-click to select ranges of files in torrents
+ * New:settings panel to pick location for .torrent files
+ * New:FlatLaf light theme
+ * New:Header bar rearranged, search bar goes to the center, nav buttons on the left, FW Logo first
+ * New:Torrent Transfer > Advanced > Check local data feature. If a file belonging to a torrent is now on disk it can be force checked
+ * Maintenance:mplayer not available in linux warning can now not be shown ever again
+ * Removed:Torlock search performer (old site is down, new site is malicious)
+ * Maintenance:MacEventHandler is now compatible with JDK 23 and JDK 24
+ * Maintenance:Archive.org search
+ * Maintenance:GloTorrents search
  * Crash: fixed NPE in MultilineToolTip.updateUI() when switching from Synth L&F
- * New: Strict EDT Mode to catch long running tasks stalling event dispatch thread
- * EDT freeze: moved media checks off EDT; coalesce selection; add EDT I/O guard
- * Cleanup: removed all remnants of azureus source code
- * Optimization: PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
- * Fixed: logic bug in PerformersHelper.countMatchedTokens()
- * Cleanup: apple libdispatch removal
- * Cleanup: deprecated iTunes integration removed after cleanups. Users can manage their own playlists on Apple Music.
- * new libtorrent::set_piece_hashes_posix_disk_io to avoid SIGSEGV/SIGBUS leaks to macos when creating torrents
- * crash: don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
- * Cleanup: Remove unused sun.awt.X11 classes (linux)
+ * New:Strict EDT Mode to catch long running tasks stalling event dispatch thread
+ * EDT freeze:moved media checks off EDT; coalesce selection; add EDT I/O guard
+ * Cleanup:removed all remnants of azureus source code
+ * Optimization:PerformersHelper.sanitize() 8.8x speed gains in title normalization by not using a regex and instead simple string replacements
+ * Fixed:logic bug in PerformersHelper.countMatchedTokens()
+ * Cleanup:apple libdispatch removal
+ * Cleanup:deprecated iTunes integration removed after cleanups. Users can manage their own playlists on Apple Music.
+ * New: libtorrent::set_piece_hashes_posix_disk_io to avoid SIGSEGV/SIGBUS leaks to macos when creating torrents
+ * Crash:don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
+ * Crash:StatusLine seedingStatusButton.getText()
+ * Cleanup:Remove unused sun.awt.X11 classes (linux)
  * Maintenance:all license headers are consistent with GPL 3.0
+ * Maintenance:simplified donations buttons in status bar to a single 'Donate' button
+ * Maintenance:added don't show me again for linux warning when mplayer isn't found
  * jlibtorrent:libraries are now compiled with C++20 (ming/windows with C++2a which is the same)
  * jlibtorrent:g++-9 upgraded to g++-11 for linux build
  * jlibtorrent:new Sha256Hash::swig()
@@ -40,7 +43,7 @@ frostwire (7.0.0) stable; urgency=high
  * jlibtorrent:OpenSSL 3.5.2 upgrade (from 1.1.1t)
  * jlibtorrent:Upgraded SWIG to 4.3.1
  * jlibtorrent:Gradle 9.0.0
- * dev: junit upgraded from 4.13.1 -> 4.13.2
+ * dev:junit upgraded from 4.13.1 -> 4.13.2
  * lt:add option to send host header in HTTP proxy CONNECT command
  * lt:cache DNS failures for a shorter time
  * lt:file_renamed_alert is always posted, regardless of alert mask
@@ -48,14 +51,14 @@ frostwire (7.0.0) stable; urgency=high
  * lt:don't leak file descriptors to child processes (O_CLOEXEC)
  * lt:optimize the utp resend
  * lt:optimize tracker announcements
- * fix handling of invalid filenames
- * add support for I2CP inbound.lengthVariance and outbound.lengthVariance tunnel settings
- * lt: validate add_torrent_params::save_path at run-time
- * lt: use stricter rules for what filenames are valid on Android
- * lt: fix applying IP filter to DHT traffic (HanabishiRecca)
- * lt: fix race condition when cancelling requests after becoming a seed
- * lt: fix performance bug in the file pool, evicting MRU instead of LRU (HanabishiRecca)
- * lt: fix bug where file_progress could sometimes be reported as >100%
+ * lt:fix handling of invalid filenames
+ * lt:add support for I2CP inbound.lengthVariance and outbound.lengthVariance tunnel settings
+ * lt:validate add_torrent_params::save_path at run-time
+ * lt:use stricter rules for what filenames are valid on Android
+ * lt:fix applying IP filter to DHT traffic (HanabishiRecca)
+ * lt:fix race condition when cancelling requests after becoming a seed
+ * lt:fix performance bug in the file pool, evicting MRU instead of LRU (HanabishiRecca)
+ * lt:fix bug where file_progress could sometimes be reported as >100%
  * jlibtorrent:BDecodeNode: hasList, hasDict, hasString, hasInt, getList, getDict, getString, getInt
  * lt:limit piece size in torrent creator
  * lt:don't hint FADV_RANDOM on posix systems. May improve seeding performance
@@ -75,7 +78,7 @@ frostwire (7.0.0) stable; urgency=high
  * jlibtorrent:Added `--swig-only` and `--build-only` options to swig/build scripts
  * jlibtorrent:Added `prepare-macos.sh` script for macOS build setup
  * jlibtorrent:Updated `run-swig.sh` script for improved SWIG processing
-  * jlibtorrent:Enhanced exception handling in SWIG interfaces
+ * jlibtorrent:Enhanced exception handling in SWIG interfaces
  * jlibtorrent:Fixed issues in file_storage.hpp and ip_filter.hpp
  * jlibtorrent:Adjusted build flags and macros for Boost and libtorrent compatibility
  * jlibtorrent:Enabled SWIG directors for specific classes
