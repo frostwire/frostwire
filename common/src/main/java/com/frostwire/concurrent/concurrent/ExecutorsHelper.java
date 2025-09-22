@@ -76,7 +76,7 @@ public class ExecutorsHelper {
      *
      * @param factory the factory used for creating a new processing thread
      */
-    private static java.util.concurrent.ThreadPoolExecutor newSingleThreadExecutor(ThreadFactory factory) {
+    private static ThreadPoolExecutor newSingleThreadExecutor(ThreadFactory factory) {
         ThreadPoolExecutor tpe = new ThreadPoolExecutor(1, 1,
                 5L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(),
