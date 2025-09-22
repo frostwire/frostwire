@@ -20,6 +20,7 @@ package com.frostwire.android.gui.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.View;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 /**
@@ -48,8 +49,8 @@ public class SafeDrawerLayout extends DrawerLayout {
         } catch (IllegalStateException e) {
             // Fallback to whatever size the parent imposed, even if not EXACTLY
             setMeasuredDimension(
-                    MeasureSpec.getSize(widthMeasureSpec),
-                    MeasureSpec.getSize(heightMeasureSpec)
+                    View.MeasureSpec.getSize(widthMeasureSpec),
+                    View.MeasureSpec.getSize(heightMeasureSpec)
             );
         }
     }

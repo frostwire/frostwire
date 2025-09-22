@@ -1,0 +1,56 @@
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:21: error: package android.content does not exist
+import android.content.Context;
+                      ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:22: error: package android.util does not exist
+import android.util.AttributeSet;
+                   ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:23: error: package android.view does not exist
+import android.view.View;
+                   ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:24: error: package androidx.drawerlayout.widget does not exist
+import androidx.drawerlayout.widget.DrawerLayout;
+                                   ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:31: error: cannot find symbol
+public class SafeDrawerLayout extends DrawerLayout {
+                                      ^
+  symbol: class DrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:33: error: cannot find symbol
+    public SafeDrawerLayout(Context context) {
+                            ^
+  symbol:   class Context
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:37: error: cannot find symbol
+    public SafeDrawerLayout(Context context, AttributeSet attrs) {
+                            ^
+  symbol:   class Context
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:37: error: cannot find symbol
+    public SafeDrawerLayout(Context context, AttributeSet attrs) {
+                                             ^
+  symbol:   class AttributeSet
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:41: error: cannot find symbol
+    public SafeDrawerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+                            ^
+  symbol:   class Context
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:41: error: cannot find symbol
+    public SafeDrawerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+                                             ^
+  symbol:   class AttributeSet
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:45: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:48: error: cannot find symbol
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            ^
+  symbol:   variable super
+  location: class SafeDrawerLayout
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:52: error: package View does not exist
+                    View.MeasureSpec.getSize(widthMeasureSpec),
+                        ^
+src/com/frostwire/android/gui/views/SafeDrawerLayout.java:53: error: package View does not exist
+                    View.MeasureSpec.getSize(heightMeasureSpec)
+                        ^
+14 errors
