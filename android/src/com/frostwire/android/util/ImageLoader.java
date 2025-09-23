@@ -72,10 +72,26 @@ public final class ImageLoader {
     private static ImageLoader instance;
 
     public static ImageLoader getInstance(Context context) {
-        if (instance == null) {
-            instance = new ImageLoader(context);
+        if (instance == null || instance.shutdown) {
+            synchronized (ImageLoader.class) {
+                if (instance == null || instance.shutdown) {
+                    LOG.info("Creating new ImageLoader instance" + (instance != null && instance.shutdown ? " (previous was shutdown)" : ""));
+                    instance = new ImageLoader(context);
+                }
+            }
         }
         return instance;
+    }
+    
+    /**
+     * Checks if the current ImageLoader instance is healthy and recreates it if needed.
+     * This helps recover from Picasso internal crashes.
+     */
+    public static synchronized void ensureHealthyInstance(Context context) {
+        if (instance == null || instance.shutdown || instance.picasso == null) {
+            LOG.info("Recreating ImageLoader instance due to unhealthy state");
+            instance = new ImageLoader(context);
+        }
     }
 
     public static Uri getAlbumArtUri(long albumId) {
@@ -93,10 +109,24 @@ public final class ImageLoader {
         if (DEBUG_ERRORS) {
             picassoBuilder.listener((picasso, uri, exception) -> LOG.error("ImageLoader::onImageLoadFailed(" + uri + ")", exception));
         }
-        this.picasso = picassoBuilder.build();
+        
+        // Build Picasso with defensive error handling to prevent HandlerDispatcher crashes
         try {
-            this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
-        } catch (Throwable ignored) {
+            this.picasso = picassoBuilder.build();
+            try {
+                this.picasso.setIndicatorsEnabled(DEBUG_ERRORS);
+            } catch (Throwable ignored) {
+                LOG.warn("Failed to set Picasso indicators enabled", ignored);
+            }
+        } catch (Throwable t) {
+            LOG.error("Failed to build Picasso instance", t);
+            // Create a fallback builder with minimal configuration
+            try {
+                this.picasso = new Builder(context).build();
+            } catch (Throwable fallbackError) {
+                LOG.error("Failed to create fallback Picasso instance", fallbackError);
+                throw new RuntimeException("Unable to initialize Picasso", fallbackError);
+            }
         }
     }
 
@@ -198,6 +228,14 @@ public final class ImageLoader {
     }
 
     private void load(int resourceId, Uri uri, ImageView target, Params p) {
+        if (shutdown) {
+            LOG.info("ImageLoader is shutdown, skipping load request");
+            return;
+        }
+        if (picasso == null) {
+            LOG.warn("Picasso instance is null, cannot load image");
+            return;
+        }
         AsyncLoader asyncLoader = new AsyncLoader(
                 resourceId,
                 uri,
@@ -205,7 +243,18 @@ public final class ImageLoader {
                 p,
                 shutdown,
                 Ref.weak(picasso));
-        handler.post(asyncLoader);
+        
+        try {
+            handler.post(asyncLoader);
+        } catch (Throwable t) {
+            LOG.error("Failed to post AsyncLoader to handler", t);
+            // Try to run directly on current thread if handler is not available
+            try {
+                asyncLoader.run();
+            } catch (Throwable fallbackError) {
+                LOG.error("Failed to run AsyncLoader directly", fallbackError);
+            }
+        }
     }
 
     private static class AsyncLoader implements Runnable {
@@ -249,23 +298,31 @@ public final class ImageLoader {
             if (p.filter != null && Debug.hasContext(p.filter)) {
                 throw new RuntimeException("Possible context leak");
             }
+            
             RequestCreator rc;
-            if (uri != null) {
-                rc = picasso.get().load(uri);
-            } else if (resourceId != -1) {
-                rc = picasso.get().load(resourceId);
-            } else {
-                throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
+            try {
+                if (uri != null) {
+                    rc = picasso.get().load(uri);
+                } else if (resourceId != -1) {
+                    rc = picasso.get().load(resourceId);
+                } else {
+                    throw new IllegalArgumentException("resourceId == -1 and uri == null, check your logic");
+                }
+                
+                if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
+                if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
+                if (p.fit) rc.fit();
+                if (p.centerInside) rc.centerInside();
+                if (p.noFade) rc.noFade();
+                if (p.noCache) {
+                    rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
+                    rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
+                }
+            } catch (Throwable t) {
+                LOG.error("Failed to create RequestCreator or configure request", t);
+                return;
             }
-            if (p.targetWidth != 0 || p.targetHeight != 0) rc.resize(p.targetWidth, p.targetHeight);
-            if (p.placeholderResId != 0) rc.placeholder(p.placeholderResId);
-            if (p.fit) rc.fit();
-            if (p.centerInside) rc.centerInside();
-            if (p.noFade) rc.noFade();
-            if (p.noCache) {
-                rc.memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE);
-                rc.networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE);
-            }
+            
             SystemUtils.postToUIThread(
                     () -> {
                         try {
@@ -280,6 +337,7 @@ public final class ImageLoader {
                             }
                         } catch (Throwable t) {
                             if (BuildConfig.DEBUG) {
+                                LOG.error("ImageLoader::AsyncLoader::run() error posting to main looper in DEBUG mode", t);
                                 throw t;
                             }
                             LOG.error("ImageLoader::AsyncLoader::run() error posted caught posting to main looper: " + t.getMessage(), t);
@@ -289,37 +347,76 @@ public final class ImageLoader {
     }
 
     public Bitmap get(Uri uri) {
+        if (shutdown || picasso == null) {
+            LOG.info("ImageLoader is shutdown or picasso is null, returning null for get() request");
+            return null;
+        }
         try {
             return picasso.load(uri).get();
         } catch (IOException e) {
+            LOG.warn("IOException while getting bitmap for URI: " + uri, e);
+            return null;
+        } catch (Throwable t) {
+            LOG.error("Unexpected error while getting bitmap for URI: " + uri, t);
             return null;
         }
     }
 
     public void clear() {
-        //cache.clear();
-        picasso.evictAll();
+        if (picasso != null) {
+            try {
+                //cache.clear();
+                picasso.evictAll();
+            } catch (Throwable t) {
+                LOG.error("Error while clearing Picasso cache", t);
+            }
+        }
     }
 
     public void shutdown() {
         shutdown = true;
-        try {
-            picasso.getClass().getMethod("shutdown").invoke(picasso);
-        } catch (Throwable ignored) {
+        if (picasso != null) {
+            try {
+                picasso.getClass().getMethod("shutdown").invoke(picasso);
+            } catch (Throwable ignored) {
+                LOG.warn("Failed to shutdown Picasso gracefully", ignored);
+            }
         }
     }
 
     public static void start(final MainApplication mainApplication) {
-        if (!imageLoaderThread.isAlive()) {
-            imageLoaderThread.start();
-            handler = new Handler(imageLoaderThread.getLooper());
+        try {
+            if (!imageLoaderThread.isAlive()) {
+                imageLoaderThread.start();
+                handler = new Handler(imageLoaderThread.getLooper());
+            }
+            if (handler != null) {
+                handler.postAtFrontOfQueue(() -> startImageLoaderBackground(mainApplication));
+            } else {
+                LOG.error("Handler is null after thread start, running directly");
+                startImageLoaderBackground(mainApplication);
+            }
+        } catch (Throwable t) {
+            LOG.error("Error starting ImageLoader", t);
+            // Try to initialize directly if thread approach fails
+            try {
+                startImageLoaderBackground(mainApplication);
+            } catch (Throwable fallbackError) {
+                LOG.error("Failed to start ImageLoader with fallback", fallbackError);
+            }
         }
-        handler.postAtFrontOfQueue(() -> startImageLoaderBackground(mainApplication));
     }
 
     private static void startImageLoaderBackground(MainApplication mainApplication) {
-        if (instance == null) {
-            ImageLoader.getInstance(mainApplication);
+        try {
+            if (instance == null || instance.shutdown) {
+                LOG.info("Creating ImageLoader instance in background thread");
+                ImageLoader.getInstance(mainApplication);
+            } else {
+                LOG.info("ImageLoader instance already exists and is healthy");
+            }
+        } catch (Throwable t) {
+            LOG.error("Error creating ImageLoader instance in background", t);
         }
     }
 
@@ -399,8 +496,15 @@ public final class ImageLoader {
 
         @Override
         public void onError(Throwable e) {
+            LOG.warn("RetryCallback.onError() attempting retry for URI: " + uri, e);
             if (Ref.alive(target) && Ref.alive(loader)) {
-                loader.get().load(uri, target.get(), params);
+                try {
+                    loader.get().load(uri, target.get(), params);
+                } catch (Throwable retryError) {
+                    LOG.error("Failed to retry image loading for URI: " + uri, retryError);
+                }
+            } else {
+                LOG.info("RetryCallback.onError() skipping retry due to dead references");
             }
         }
     }
