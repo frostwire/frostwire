@@ -45,7 +45,6 @@ import com.frostwire.platform.SystemPaths;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.LibTorrentMagnetDownloader;
 import com.frostwire.util.Logger;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 
 import org.apache.commons.io.FileUtils;
 
