@@ -20,6 +20,7 @@ package com.frostwire.android.gui;
 
 import static com.frostwire.android.util.RunStrict.runStrict;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
@@ -116,6 +117,9 @@ public class MainApplication extends MultiDexApplication implements Configuratio
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             TellurideCourier.ytDlpVersion((version) -> LOG.info("MainApplication::onCreate -> yt_dlp version: " + version));
         });
+        
+        // Register lifecycle callbacks to handle app background/foreground transitions
+        registerActivityLifecycleCallbacks(new ImageLoaderLifecycleCallbacks());
     }
 
     @Override
@@ -218,6 +222,53 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             }
         } catch (Throwable e) {
             LOG.error("Error during setup of temp directory", e);
+        }
+    }
+
+    /**
+     * Lifecycle callbacks to handle ImageLoader health during app transitions.
+     * This helps prevent crashes when the app is backgrounded and foregrounded.
+     */
+    private static class ImageLoaderLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+        
+        @Override
+        public void onActivityCreated(android.app.Activity activity, android.os.Bundle savedInstanceState) {
+            // No action needed
+        }
+
+        @Override
+        public void onActivityStarted(android.app.Activity activity) {
+            // No action needed
+        }
+
+        @Override
+        public void onActivityResumed(android.app.Activity activity) {
+            // Ensure ImageLoader is healthy when activities resume
+            try {
+                ImageLoader.ensureHealthyInstance(activity.getApplicationContext());
+            } catch (Throwable t) {
+                LOG.error("Error ensuring ImageLoader health on activity resume", t);
+            }
+        }
+
+        @Override
+        public void onActivityPaused(android.app.Activity activity) {
+            // No action needed
+        }
+
+        @Override
+        public void onActivityStopped(android.app.Activity activity) {
+            // No action needed
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(android.app.Activity activity, android.os.Bundle outState) {
+            // No action needed
+        }
+
+        @Override
+        public void onActivityDestroyed(android.app.Activity activity) {
+            // No action needed
         }
     }
 }
