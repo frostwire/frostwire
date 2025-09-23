@@ -1088,7 +1088,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.POSITION, false);
         } else {
-            lastKnownPosition = MusicUtils.position();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownPosition = MusicUtils.position();
+            }
         }
         return lastKnownPosition;
     }
@@ -1097,7 +1099,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.DURATION, false);
         } else {
-            lastKnownDuration = MusicUtils.duration();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownDuration = MusicUtils.duration();
+            }
         }
         return lastKnownDuration;
     }
@@ -1106,7 +1110,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
         } else {
-            lastKnownIsPlaying = MusicUtils.isPlaying();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownIsPlaying = MusicUtils.isPlaying();
+            }
         }
         return lastKnownIsPlaying;
     }
@@ -1117,7 +1123,12 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressWarnings("CatchMayIgnoreException")
     private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
         if (MusicUtils.getMusicPlaybackService() == null) {
-            return 500L;
+            // Service not available yet - show initial state and retry sooner
+            runOnUiThread(() -> {
+                mCurrentTime.setText("--:--");
+                mProgress.setProgress(0);
+            });
+            return 250L; // Retry faster when service is not available
         }
 
 

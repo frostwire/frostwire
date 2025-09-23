@@ -390,6 +390,7 @@ public final class MusicUtils {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             LOG.info("onServiceDisconnected() invoked!");
+            musicPlaybackService = null; // Clear the static reference to prevent stale references
             callback = null;
             bound.set(false);
         }
