@@ -145,7 +145,18 @@ public class MainApplication extends MultiDexApplication implements Configuratio
     public void onLowMemory() {
         ImageCache.getInstance(this).evictAll();
         ImageLoader.getInstance(this).clear();
+        // Ensure ImageLoader instance is healthy after memory pressure
+        ImageLoader.ensureHealthyInstance(this);
         super.onLowMemory();
+    }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        if (level >= TRIM_MEMORY_MODERATE) {
+            // On moderate to severe memory pressure, ensure our ImageLoader is healthy
+            ImageLoader.ensureHealthyInstance(this);
+        }
     }
 
 
