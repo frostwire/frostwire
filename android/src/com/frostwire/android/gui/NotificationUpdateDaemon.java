@@ -66,6 +66,12 @@ public final class NotificationUpdateDaemon {
     }
 
     public void start() {
+        // Use TaskThrottle to prevent rapid restart of the daemon
+        if (!com.frostwire.util.TaskThrottle.isReadyToSubmitTask("NotificationUpdateDaemon", 60000)) { // 1 minute minimum interval
+            LOG.info("NotificationUpdateDaemon start throttled - too soon since last start");
+            return;
+        }
+        
         LOG.info("Starting NotificationUpdateDaemon with WorkManager");
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
                 NotificationWorker.class,

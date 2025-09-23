@@ -171,7 +171,17 @@ public class EngineForegroundService extends Service implements IEngineService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LOG.info("EngineForegroundService::onDestroy() - Stopping service");
+        LOG.info("EngineForegroundService::onDestroy() - Stopping service and cleaning up WorkManager jobs");
+        
+        // Cancel all WorkManager jobs to prevent alarm limit issues
+        try {
+            WorkManager.getInstance(this).cancelUniqueWork("TorrentEngineWork");
+            WorkManager.getInstance(this).cancelUniqueWork("NotificationWork");
+            LOG.info("EngineForegroundService::onDestroy() - Cancelled WorkManager jobs");
+        } catch (Exception e) {
+            LOG.warn("EngineForegroundService::onDestroy() - Error cancelling WorkManager jobs: " + e.getMessage(), e);
+        }
+        
         if (notificationUpdateDaemon != null) {
             cancelAllNotificationsTask(this);
             notificationUpdateDaemon.stop();
@@ -227,13 +237,36 @@ public class EngineForegroundService extends Service implements IEngineService {
     }
 
     private void scheduleTorrentEngineWork() {
+        // Use TaskThrottle to prevent rapid re-scheduling of the same work
+        if (!TaskThrottle.isReadyToSubmitTask("TorrentEngineWork", 30000)) { // 30 second minimum interval
+            LOG.info("TorrentEngineWork throttled - too soon since last execution");
+            return;
+        }
+        
+        // Use unique work name to prevent duplicate scheduling
         WorkManager.getInstance(this)
-                .enqueue(new OneTimeWorkRequest.Builder(TorrentEngineWorker.class).build());
+                .enqueueUniqueWork(
+                    "TorrentEngineWork",
+                    androidx.work.ExistingWorkPolicy.KEEP, // Don't replace if already running
+                    new OneTimeWorkRequest.Builder(TorrentEngineWorker.class).build()
+                );
+        LOG.info("TorrentEngineWork scheduled");
     }
 
     private void scheduleNotificationWork() {
+        // Cancel any existing notification work to prevent duplicates
+        WorkManager.getInstance(this).cancelUniqueWork("NotificationWork");
+        
+        // The NotificationUpdateDaemon is already being started, so we don't need this duplicate work
+        // Commenting out to prevent duplicate periodic work scheduling
+        /*
         WorkManager.getInstance(this)
-                .enqueue(new androidx.work.PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.MINUTES).build());
+                .enqueueUniquePeriodicWork(
+                    "NotificationWork",
+                    androidx.work.ExistingPeriodicWorkPolicy.REPLACE,
+                    new androidx.work.PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.MINUTES).build()
+                );
+        */
     }
 
     public void shutdown() {
@@ -248,6 +281,18 @@ public class EngineForegroundService extends Service implements IEngineService {
 
     private void shutdownSupport() {
         LOG.debug("shutdownSupport");
+        
+        // Cancel all WorkManager jobs first to prevent scheduling conflicts
+        try {
+            WorkManager workManager = WorkManager.getInstance(this);
+            workManager.cancelUniqueWork("TorrentEngineWork");
+            workManager.cancelUniqueWork("NotificationWork");
+            workManager.cancelUniqueWork("NotificationUpdateDaemon"); // From NotificationUpdateDaemon
+            LOG.debug("shutdownSupport - cancelled all WorkManager jobs");
+        } catch (Exception e) {
+            LOG.warn("shutdownSupport - error cancelling WorkManager jobs: " + e.getMessage(), e);
+        }
+        
         Librarian.instance().shutdownHandler();
         stopPermanentNotificationUpdates();
         cancelAllNotificationsTask(this);
