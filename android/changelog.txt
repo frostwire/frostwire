@@ -13,6 +13,7 @@ FrostWire 3.0.0 build <UNRELEASED> SEP/23/2025
  - fix: Android 14+ ForegroundServiceStartNotAllowedException in MusicPlaybackService
  - fix: Android JobScheduler alarm limit exceeded crashes by configuring WorkManager
  - fix: ClassCastException in SearchResultListAdapter OnLinkClickListener
+ - fix: HandlerDispatcher NullPointerException crashes in Picasso image loading
  - freeze: in playFDs
  - freeze in MusicPlaybackService.setDataSource
  - crash: NPE in ImagfeFetcher.loadCurrentArtwork()
