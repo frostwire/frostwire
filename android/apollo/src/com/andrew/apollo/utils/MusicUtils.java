@@ -2031,13 +2031,17 @@ public final class MusicUtils {
         if (list.length == 0) {
             pos = 0;
         }
-        if (getMusicPlaybackService() == null) {
-            // first time they invoke us from an ApolloFragment the service
-            // needs to be started and we need can get a callback from it
+        
+        // Always use the service callback mechanism to ensure proper initialization
+        // especially on first startup when service might not be fully connected
+        if (!isMusicPlaybackServiceRunning()) {
+            LOG.info("playAllFromUserItemClick() service not running, starting it with callback");
             final Context context = adapter.getContext();
             final int posCopy = pos;
-            startMusicPlaybackService(context, buildStartMusicPlaybackServiceIntent(context), () -> MusicUtils.playFDs(list, posCopy, MusicUtils.isShuffleEnabled()));
+            startMusicPlaybackService(context, buildStartMusicPlaybackServiceIntent(context), 
+                () -> MusicUtils.playFDs(list, posCopy, MusicUtils.isShuffleEnabled()));
         } else {
+            LOG.info("playAllFromUserItemClick() service running, playing directly");
             MusicUtils.playFDs(list, pos, MusicUtils.isShuffleEnabled());
         }
     }
