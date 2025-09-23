@@ -24,6 +24,8 @@ import android.content.Context;
 import android.os.Build;
 
 import androidx.multidex.MultiDexApplication;
+import androidx.work.Configuration;
+import androidx.work.WorkManager;
 
 import com.andrew.apollo.cache.ImageCache;
 import com.frostwire.android.AndroidPlatform;
@@ -57,7 +59,7 @@ import dalvik.system.ZipPathValidator;
  * @author gubatron
  * @author aldenml
  */
-public class MainApplication extends MultiDexApplication {
+public class MainApplication extends MultiDexApplication implements Configuration.Provider {
 
     private static final Logger LOG = Logger.getLogger(MainApplication.class);
 
@@ -68,9 +70,12 @@ public class MainApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        // schedule our forever‐running status notification update exactly once
+        // Configure WorkManager with limited jobs to prevent JobScheduler alarm limits
+        initializeWorkManager();
+        
         runStrict(this::onCreateStrict);
-        new NotificationUpdateDaemon(this).start();
+        // Note: NotificationUpdateDaemon will be started by EngineForegroundService
+        // to avoid duplicate scheduling issues
 
         RunStrict.enableStrictModePolicies(BuildConfig.DEBUG);
         //RunStrict.disableStrictModePolicyForUnbufferedIO();
@@ -112,6 +117,25 @@ public class MainApplication extends MultiDexApplication {
         SystemUtils.postToHandler(SystemUtils.HandlerThreadName.MISC, () -> {
             TellurideCourier.ytDlpVersion((version) -> LOG.info("MainApplication::onCreate -> yt_dlp version: " + version));
         });
+    }
+
+    @Override
+    public Configuration getWorkManagerConfiguration() {
+        return new Configuration.Builder()
+                .setMaxSchedulerLimit(20) // Reduced from default 100 to prevent alarm limit issues
+                .setMinimumLoggingLevel(BuildConfig.DEBUG ? android.util.Log.DEBUG : android.util.Log.ERROR)
+                .build();
+    }
+
+    private void initializeWorkManager() {
+        try {
+            // Ensure WorkManager is initialized with our custom configuration
+            WorkManager.initialize(this, getWorkManagerConfiguration());
+            LOG.info("WorkManager initialized with reduced scheduler limit to prevent alarm overflow");
+        } catch (IllegalStateException e) {
+            // WorkManager already initialized, that's fine
+            LOG.info("WorkManager was already initialized");
+        }
     }
 
     public static Context context() {
