@@ -415,8 +415,19 @@ public abstract class SearchResultListAdapter extends AbstractListAdapter<Search
             if (!v.isClickable() || v.getTag() == null) {
                 return;
             }
-            String url = (String) v.getTag();
-            UIUtils.openURL(v.getContext(), url);
+            Object tag = v.getTag();
+            String url = null;
+            
+            if (tag instanceof String) {
+                url = (String) tag;
+            } else if (tag instanceof SearchResult) {
+                SearchResult sr = (SearchResult) tag;
+                url = sr.getDetailsUrl();
+            }
+            
+            if (url != null && !url.isEmpty()) {
+                UIUtils.openURL(v.getContext(), url);
+            }
         }
     }
 
