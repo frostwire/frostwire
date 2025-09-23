@@ -1088,7 +1088,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.POSITION, false);
         } else {
-            lastKnownPosition = MusicUtils.position();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownPosition = MusicUtils.position();
+            }
         }
         return lastKnownPosition;
     }
@@ -1097,7 +1099,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.DURATION, false);
         } else {
-            lastKnownDuration = MusicUtils.duration();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownDuration = MusicUtils.duration();
+            }
         }
         return lastKnownDuration;
     }
@@ -1106,7 +1110,9 @@ public final class AudioPlayerActivity extends AbstractActivity implements
         if (!blockingMusicServiceRequest) {
             updateLastKnown(MusicServiceRequestType.IS_PLAYING, false);
         } else {
-            lastKnownIsPlaying = MusicUtils.isPlaying();
+            if (MusicUtils.getMusicPlaybackService() != null) {
+                lastKnownIsPlaying = MusicUtils.isPlaying();
+            }
         }
         return lastKnownIsPlaying;
     }
@@ -1117,14 +1123,21 @@ public final class AudioPlayerActivity extends AbstractActivity implements
     @SuppressWarnings("CatchMayIgnoreException")
     private long refreshCurrentTime(boolean blockingMusicServiceRequest) {
         if (MusicUtils.getMusicPlaybackService() == null) {
-            return 500L;
+            // Service not available yet - show initial state and retry sooner
+            runOnUiThread(() -> {
+                mCurrentTime.setText("--:--");
+                mProgress.setProgress(0);
+            });
+            return 250L; // Retry faster when service is not available
         }
 
 
         try {
             final long pos = mPosOverride < 0 ? lastKnownPosition(blockingMusicServiceRequest) : mPosOverride;
-            long duration = lastKnownDuration(false);
-            if (pos >= 0 && duration > 0) {
+            long duration = lastKnownDuration(blockingMusicServiceRequest);
+            // When first starting playback, duration might be 0 temporarily while media is loading
+            // Only show progress when we have a valid duration, otherwise wait
+            if (duration > 0 && pos >= 0) {
                 refreshCurrentTimeText(pos);
                 final int progress = (int) (1000 * pos / duration);
 
@@ -1144,10 +1157,17 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     runOnUiThread(() -> mCurrentTime.setVisibility(vis == View.INVISIBLE ? View.VISIBLE : View.INVISIBLE));
                     return 500L;
                 }
+            } else if (duration <= 0) {
+                // Duration not available yet - keep progress at 0 and wait
+                runOnUiThread(() -> {
+                    mCurrentTime.setText("--:--");
+                    mProgress.setProgress(0);
+                });
+                return 250L; // Retry faster when waiting for duration to become available
             } else {
                 runOnUiThread(() -> {
                     mCurrentTime.setText("--:--");
-                    mProgress.setProgress(1000);
+                    mProgress.setProgress(0);
                 });
             }
             // calculate the number of milliseconds until the next full second,
