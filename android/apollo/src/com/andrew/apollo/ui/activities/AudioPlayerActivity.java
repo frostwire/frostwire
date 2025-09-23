@@ -1123,7 +1123,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
 
         try {
             final long pos = mPosOverride < 0 ? lastKnownPosition(blockingMusicServiceRequest) : mPosOverride;
-            long duration = lastKnownDuration(false);
+            long duration = lastKnownDuration(blockingMusicServiceRequest);
             // When first starting playback, duration might be 0 temporarily while media is loading
             // Only show progress when we have a valid duration, otherwise wait
             if (duration > 0 && pos >= 0) {
@@ -1152,7 +1152,7 @@ public final class AudioPlayerActivity extends AbstractActivity implements
                     mCurrentTime.setText("--:--");
                     mProgress.setProgress(0);
                 });
-                return 500L; // Retry sooner when waiting for duration
+                return 250L; // Retry faster when waiting for duration to become available
             } else {
                 runOnUiThread(() -> {
                     mCurrentTime.setText("--:--");
