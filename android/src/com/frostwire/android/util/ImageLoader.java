@@ -64,8 +64,7 @@ public final class ImageLoader {
 
     private static final boolean DEBUG_ERRORS = false;
 
-    //private final ImageCache cache;
-    private final Picasso picasso;
+    private Picasso picasso;
 
     private boolean shutdown;
 
