@@ -3151,6 +3151,15 @@ public class MusicPlaybackService extends Service {
         public void stop() {
             if (mCurrentMediaPlayer != null) {
                 try {
+                    // First, ensure any currently playing media stops immediately
+                    if (mCurrentMediaPlayer.isPlaying()) {
+                        mCurrentMediaPlayer.stop();
+                    }
+                    if (mNextMediaPlayer != null && mNextMediaPlayer.isPlaying()) {
+                        mNextMediaPlayer.stop();
+                    }
+                    
+                    // Reset both players
                     mediaPlayerAsyncAction(mCurrentMediaPlayer, MediaPlayerAction.RESET);
                     mediaPlayerAsyncAction(mNextMediaPlayer, MediaPlayerAction.RESET);
                     releaseCurrentMediaPlayer();
