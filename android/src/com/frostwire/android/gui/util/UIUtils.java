@@ -586,15 +586,11 @@ public final class UIUtils {
                 }
             };
 
-            if (MusicUtils.getMusicPlaybackService() == null) {
-                //LOG.info("playEphemeralPlaylistTask() service is not there, and it's null");
-                MusicUtils.startMusicPlaybackService(context,
-                        MusicUtils.buildStartMusicPlaybackServiceIntent(context),
-                        playEphemeralPlaylistOfOneCallback);
-            } else {
-                //LOG.info("playEphemeralPlaylistTask() calling playEphemeralPlaylistOfOneCallback directly, had music service already");
-                playEphemeralPlaylistOfOneCallback.run();
-            }
+            // Service not running - start it and wait for connection before playing
+            LOG.info("playEphemeralPlaylistTask() service is not running, starting it and waiting for connection");
+            MusicUtils.startMusicPlaybackService(context,
+                    MusicUtils.buildStartMusicPlaybackServiceIntent(context),
+                    playEphemeralPlaylistOfOneCallback);
 
         } else {
             try {

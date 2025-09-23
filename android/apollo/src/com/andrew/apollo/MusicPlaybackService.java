@@ -3357,10 +3357,12 @@ public class MusicPlaybackService extends Service {
         @Override
         public void onPrepared(MediaPlayer mp) {
             if (Ref.alive(serviceRef) && serviceRef.get().launchPlayerActivity) {
-                serviceRef.get().launchPlayerActivity = false;
-                Intent i = new Intent(serviceRef.get(), AudioPlayerActivity.class);
+                MusicPlaybackService service = serviceRef.get();
+                service.launchPlayerActivity = false; // Clear flag immediately to prevent multiple launches
+                LOG.info("AudioOnPreparedListener.onPrepared() launching AudioPlayerActivity");
+                Intent i = new Intent(service, AudioPlayerActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                serviceRef.get().startActivity(i);
+                service.startActivity(i);
             }
         }
 
