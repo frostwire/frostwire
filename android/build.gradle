@@ -144,12 +144,16 @@ android {
                 srcDir '../common/src/main/java'
                 srcDir 'apollo/src'
                 srcDir 'src'
+                exclude 'test/**'
             }
             jniLibs.srcDirs = ['libs']
             // Ensure Chaquopy packages our Python code from src/main/python
             python {
                 srcDir 'src/main/python'
             }
+        }
+        test {
+            java.srcDirs = ['src/test/java']
         }
     }
 
@@ -262,6 +266,8 @@ dependencies {
     implementation 'com.frostwire:jlibtorrent-android-arm64:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-x86:' + jlibtorrent_version
     implementation 'com.frostwire:jlibtorrent-android-x86_64:' + jlibtorrent_version
+
+    testImplementation 'junit:junit:4.13.2'
 }
 
 afterEvaluate {
