@@ -194,9 +194,29 @@ public class MainApplication extends MultiDexApplication implements Configuratio
             ctx.dataDir = paths.data();
             ctx.optimizeMemory = true;
 
-            // port range [37000, 57000]
-            int port0 = 37000 + new Random().nextInt(20000);
-            int port1 = port0 + 10; // 10 retries
+            // Get configured port range or use default range [0, 65535]
+            ConfigurationManager cm = ConfigurationManager.instance();
+            int configuredStartPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START);
+            int configuredEndPort = cm.getInt(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END);
+            
+            int port0, port1;
+            if (configuredStartPort == 0 && configuredEndPort == 65535) {
+                // Use default port range [37000, 57000] when user hasn't configured specific ports
+                port0 = 37000 + new Random().nextInt(20000);
+                port1 = port0 + 10; // 10 retries
+            } else {
+                // Use user-configured port range
+                if (configuredStartPort == configuredEndPort) {
+                    // Single port specified
+                    port0 = configuredStartPort;
+                    port1 = port0 + 1; // Just try the single port
+                } else {
+                    // Port range specified
+                    port0 = configuredStartPort;
+                    port1 = configuredEndPort;
+                }
+            }
+            
             String iface = "0.0.0.0:%1$d,[::]:%1$d";
             ctx.interfaces = String.format(Locale.US, iface, port0);
             ctx.retries = port1 - port0;

@@ -129,6 +129,10 @@ final class ConfigurationDefaults {
         defaultValues.put(Constants.PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX, 1); // pieces
         defaultValues.put(Constants.PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED, false);
 
+        // Incoming connection port range settings
+        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_START, 0);
+        defaultValues.put(Constants.PREF_KEY_TORRENT_INCOMING_PORT_END, 65535);
+
         defaultValues.put(Constants.PREF_KEY_STORAGE_PATH, Environment.getExternalStorageDirectory().getAbsolutePath()); // /mnt/sdcard
 
         defaultValues.put(Constants.PREF_KEY_GUI_PLAYER_REPEAT_MODE, MusicPlaybackService.REPEAT_ALL);
