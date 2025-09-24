@@ -19,9 +19,8 @@
 package com.frostwire.search.magnetdl;
 
 import com.frostwire.regex.Pattern;
-import com.frostwire.search.SearchError;
-import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.torrent.SimpleTorrentSearchPerformer;
+import com.frostwire.util.JsonUtils;
 import com.frostwire.util.Logger;
 
 import java.util.ArrayList;
@@ -31,6 +30,29 @@ import java.util.List;
  * @author gubatron
  */
 public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
+    /**
+     * A MagnetDL search result, as represented in FrostWire.
+     * <p>
+     * MagnetDL's internal search API sends a large JSON array of objects. We retrieve this array in the performer and
+     * then parse it into an instance of this class, which contains the data we want.
+     * <p>
+     * Each search result contains the following:
+     * - Name
+     * - ID (used for constructing the details page in MagnetDLSearchResult)
+     * - Size (in bytes)
+     * - Date added
+     * - Hash (used for constructing the magnet link)
+     * - Number of seeders
+     */
+    private static class Result {
+        public int id;           // Used for the information page
+        public String name;      // The name of the torrent
+        public String info_hash; // idope's hash of the torrent (used for getting the torrent's details page)
+        public int seeders;      // How many seeders are currently seeding the torrent
+        public long size;        // The torrent's size (in bytes)
+        public long added;       // How old the torrent is
+    }
+
     private static Logger LOG = Logger.getLogger(MagnetDLSearchPerformer.class);
     private static Pattern pattern;
     private final String nonEncodedKeywords;
@@ -39,13 +61,6 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     public MagnetDLSearchPerformer(long token, String keywords, int timeout) {
         super("magnetdl.homes", token, keywords, timeout, 1, 0);
         nonEncodedKeywords = keywords;
-        if (pattern == null) {
-            pattern = Pattern.compile("(?is)<td class=\"m\"><a href=\"(?<magnet>.*?)\" title=.*?<img.*?</td>" +
-                    "<td class=\"n\"><a href=\"(?<detailUrl>.*?)\" title=\"(?<title>.*?)\">.*?</td>" +
-                    "<td>(?<age>.*?)</td>" +
-                    "<td class=\"t[0-9]\">.*?</td><td>.*?</td>.*?<td>(?<fileSizeMagnitude>.*?) (?<fileSizeUnit>[A-Z]+)</td>" +
-                    "<td class=\"s\">(?<seeds>.*?)</td>");
-        }
     }
 
     public void setMinSeeds(int minSeeds) {
@@ -56,57 +71,28 @@ public class MagnetDLSearchPerformer extends SimpleTorrentSearchPerformer {
     protected String getSearchUrl(int page, String encodedKeywords) {
         //disregard encoded keywords when it comes to the URL
         String transformedKeywords = nonEncodedKeywords.replace("%20", "-");
-        return "https://" + getDomainName() + "/lmsearch?q=" + transformedKeywords + "&cat=lmsearch";
+        return "https://" + getDomainName() + "/api.php?url=/q.php?q=" + transformedKeywords;
     }
 
     @Override
     protected List<MagnetDLSearchResult> searchPage(String page) {
-        final String HTML_PREFIX_MARKER = "<tbody>";
-        int htmlPrefixIndex = page.indexOf(HTML_PREFIX_MARKER) + HTML_PREFIX_MARKER.length();
-        final String HTML_SUFFIX_MARKER = "Download Search Help";
-        int htmlSuffixIndex = page.indexOf(HTML_SUFFIX_MARKER);
-
-        String reducedHtml = page.substring(htmlPrefixIndex, htmlSuffixIndex > 0 ? htmlSuffixIndex : page.length() - htmlPrefixIndex);
-
+        Result[] searchResults = JsonUtils.toObject(page, Result[].class);
         ArrayList<MagnetDLSearchResult> results = new ArrayList<>(0);
-        SearchMatcher matcher = new SearchMatcher((pattern.matcher(reducedHtml)));
-        boolean matcherFound;
-        int MAX_RESULTS = 50;
-        do {
-            try {
-                matcherFound = matcher.find();
-            } catch (Throwable t) {
-                matcherFound = false;
-                LOG.error("searchPage() has failed.\n" + t.getMessage(), t);
-            }
-            if (matcherFound) {
-                MagnetDLSearchResult sr = fromMatcher(matcher);
-                if (sr.getSeeds() >= minSeeds) {
-                    //LOG.info("Adding a new search result -> " + sr.getHash());
-                    results.add(sr);
-                } 
-            } else {
-                LOG.warn("MagnetDLSearchPerformer::searchPage(String page): search matcher broken. Please notify at https://github.com/frostwire/frostwire/issues/new");
-                //LOG.warn("========");
-                //LOG.warn(reducedHtml);
-                //LOG.warn("========");
-                if (getListener() != null && results.size() < 5) {
-                    getListener().onError(getToken(), new SearchError(0, "Search Matcher Broken"));
-                }
-            }
-        } while (matcherFound && !isStopped() && results.size() <= MAX_RESULTS);
-        return results;
-    }
 
-    private MagnetDLSearchResult fromMatcher(SearchMatcher matcher) {
-        String magnet = matcher.group("magnet");
-        String detailsURL = "https://" + getDomainName() + matcher.group("detailUrl");
-        String title = matcher.group("title");
-        String ageString = matcher.group("age");
-        String fileSizeMagnitude = matcher.group("fileSizeMagnitude");
-        String fileSizeUnit = matcher.group("fileSizeUnit");
-        String seeds = matcher.group("seeds");
-        return new MagnetDLSearchResult(detailsURL, magnet, fileSizeMagnitude, fileSizeUnit, ageString, seeds, title);
+        for (Result result : searchResults) {
+            results.add(
+                new MagnetDLSearchResult(
+                    result.id,
+                    result.name,
+                    result.info_hash,
+                    result.size,
+                    result.added,
+                    result.seeders
+                )
+            );
+        }
+
+        return results;
     }
 
     @Override
