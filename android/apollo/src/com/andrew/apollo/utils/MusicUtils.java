@@ -2023,6 +2023,12 @@ public final class MusicUtils {
     }
 
     public static void playAllFromUserItemClick(final ArrayAdapter<Song> adapter, final int position) {
+        playAllFromUserItemClick(adapter, position, null);
+    }
+
+    public static void playAllFromUserItemClick(final ArrayAdapter<Song> adapter,
+                                                final int position,
+                                                final Runnable playbackReadyCallback) {
         if (adapter.getViewTypeCount() > 1 && position == 0) {
             return;
         }
@@ -2031,18 +2037,28 @@ public final class MusicUtils {
         if (list.length == 0) {
             pos = 0;
         }
-        
+
+        Runnable notifyPlaybackReady = () -> {
+            if (playbackReadyCallback != null) {
+                SystemUtils.postToUIThread(playbackReadyCallback);
+            }
+        };
+
         // Always use the service callback mechanism to ensure proper initialization
         // especially on first startup when service might not be fully connected
         if (!isMusicPlaybackServiceRunning()) {
             LOG.info("playAllFromUserItemClick() service not running, starting it with callback");
             final Context context = adapter.getContext();
             final int posCopy = pos;
-            startMusicPlaybackService(context, buildStartMusicPlaybackServiceIntent(context), 
-                () -> MusicUtils.playFDs(list, posCopy, MusicUtils.isShuffleEnabled()));
+            startMusicPlaybackService(context, buildStartMusicPlaybackServiceIntent(context),
+                    () -> {
+                        MusicUtils.playFDs(list, posCopy, MusicUtils.isShuffleEnabled());
+                        notifyPlaybackReady.run();
+                    });
         } else {
             LOG.info("playAllFromUserItemClick() service running, playing directly");
             MusicUtils.playFDs(list, pos, MusicUtils.isShuffleEnabled());
+            notifyPlaybackReady.run();
         }
     }
 

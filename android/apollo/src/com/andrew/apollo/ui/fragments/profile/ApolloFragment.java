@@ -150,7 +150,7 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     protected void onSongItemClick(int position) {
         if (mAdapter != null) {
-            MusicPlaybackService.safePost(() -> songClickTask(position));
+            songClickTask(position);
         }
     }
 
@@ -690,13 +690,23 @@ public abstract class ApolloFragment<T extends ApolloFragmentAdapter<I>, I>
 
     private void songClickTask(int position) {
         try {
-            ApolloFragmentAdapter adapter = getAdapter(); // in multiple lines for easier debugging
-            MusicUtils.playAllFromUserItemClick(adapter, position);
-            Activity activity = getActivity();
-            activity.runOnUiThread(adapter::notifyDataSetChanged);
-            NavUtils.openAudioPlayer(activity);
+            final ApolloFragmentAdapter adapter = getAdapter();
+            if (adapter == null) {
+                return;
+            }
+            MusicUtils.playAllFromUserItemClick(adapter, position, () -> {
+                if (!isAdded()) {
+                    return;
+                }
+                Activity activity = getActivity();
+                if (activity == null) {
+                    return;
+                }
+                adapter.notifyDataSetChanged();
+                NavUtils.openAudioPlayer(activity);
+            });
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOG.error("songClickTask() error", t);
         }
     }
 }
