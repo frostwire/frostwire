@@ -25,14 +25,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 
 import com.andrew.apollo.MusicPlaybackService;
 import com.frostwire.android.R;
@@ -43,11 +40,9 @@ import com.frostwire.android.gui.transfers.TransferManager;
 import com.frostwire.android.gui.util.UIUtils;
 import com.frostwire.util.Logger;
 
-import java.util.concurrent.TimeUnit;
-
 /**
- * NotificationUpdateDaemon handles updates to the FrostWire notification
- * using WorkManager for periodic background tasks.
+ * NotificationUpdateDaemon handles updates to the FrostWire notification using
+ * a dedicated background thread that periodically refreshes transfer statistics.
  *
  * @author gubatron
  * @author aldenml
@@ -56,39 +51,63 @@ public final class NotificationUpdateDaemon {
 
     private static final Logger LOG = Logger.getLogger(NotificationUpdateDaemon.class);
 
+    private static final long ACTIVE_UPDATE_INTERVAL_MS = 1000;
+    private static final long IDLE_UPDATE_INTERVAL_MS = 15000;
+
     private final Context mParentContext;
     private RemoteViews notificationViews;
     private Notification notificationObject;
+    private final Object lock = new Object();
+    private HandlerThread handlerThread;
+    private Handler handler;
+    private boolean running;
 
     public NotificationUpdateDaemon(Context parentContext) {
-        mParentContext = parentContext;
+        mParentContext = parentContext.getApplicationContext();
         setupNotification();
     }
 
     public void start() {
-        // Use TaskThrottle to prevent rapid restart of the daemon
-        if (!com.frostwire.util.TaskThrottle.isReadyToSubmitTask("NotificationUpdateDaemon", 60000)) { // 1 minute minimum interval
-            LOG.info("NotificationUpdateDaemon start throttled - too soon since last start");
+        if (!ensureNotificationEnabled()) {
+            LOG.info("NotificationUpdateDaemon start aborted - permanent notification disabled");
             return;
         }
-        
-        LOG.info("Starting NotificationUpdateDaemon with WorkManager");
-        PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
-                NotificationWorker.class,
-                15, // Minimum interval for PeriodicWorkRequest
-                TimeUnit.MINUTES
-        ).build();
 
-        WorkManager.getInstance(mParentContext).enqueueUniquePeriodicWork(
-                "NotificationUpdateDaemon",
-                androidx.work.ExistingPeriodicWorkPolicy.REPLACE,
-                workRequest
-        );
+        synchronized (lock) {
+            if (running) {
+                LOG.debug("NotificationUpdateDaemon is already running");
+                return;
+            }
+            running = true;
+            ensureHandlerLocked();
+            LOG.info("NotificationUpdateDaemon started");
+            handler.post(updateRunnable);
+        }
     }
 
     public void stop() {
-        LOG.info("Stopping NotificationUpdateDaemon with WorkManager");
-        WorkManager.getInstance(mParentContext).cancelUniqueWork("NotificationUpdateDaemon");
+        LOG.info("Stopping NotificationUpdateDaemon");
+        HandlerThread threadToQuit = null;
+        synchronized (lock) {
+            if (!running && handlerThread == null) {
+                return;
+            }
+            running = false;
+            if (handler != null) {
+                handler.removeCallbacksAndMessages(null);
+            }
+            threadToQuit = handlerThread;
+            handlerThread = null;
+            handler = null;
+        }
+
+        if (threadToQuit != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                threadToQuit.quitSafely();
+            } else {
+                threadToQuit.quit();
+            }
+        }
 
         NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager != null) {
@@ -182,58 +201,81 @@ public final class NotificationUpdateDaemon {
         return mParentContext;
     }
 
-    /**
-     * Worker for updating the FrostWire notification periodically.
-     */
-    public static class NotificationWorker extends Worker {
-
-        public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters params) {
-            super(context, params);
+    private boolean ensureNotificationEnabled() {
+        if (!ConfigurationManager.instance().getBoolean(Constants.PREF_KEY_GUI_ENABLE_PERMANENT_STATUS_NOTIFICATION)) {
+            return false;
         }
 
-        @NonNull
+        if (notificationViews == null || notificationObject == null) {
+            setupNotification();
+        }
+
+        return notificationViews != null && notificationObject != null;
+    }
+
+    private void ensureHandlerLocked() {
+        if (handlerThread == null) {
+            handlerThread = new HandlerThread("NotificationUpdateDaemon");
+            handlerThread.start();
+            handler = new Handler(handlerThread.getLooper());
+        }
+    }
+
+    private final Runnable updateRunnable = new Runnable() {
         @Override
-        public Result doWork() {
-            LOG.info("Executing NotificationWorker");
-
-            Context context = getApplicationContext();
-            NotificationUpdateDaemon daemon = new NotificationUpdateDaemon(context);
-
-            TransferManager transferManager = TransferManager.instance();
-
-            if (transferManager == null) {
-                LOG.warn("TransferManager instance is null. Skipping notification update.");
-                return Result.success();
+        public void run() {
+            long delay = IDLE_UPDATE_INTERVAL_MS;
+            try {
+                delay = updateNotification();
+            } catch (Exception e) {
+                LOG.error("Failed to update notification", e);
             }
 
-            int downloads = transferManager.getActiveDownloads();
-            int uploads = transferManager.getActiveUploads();
-
-            if (downloads == 0 && uploads == 0) {
-                LOG.info("No active transfers. Clearing notification.");
-                NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                if (manager != null) {
-                    manager.cancel(Constants.NOTIFICATION_FROSTWIRE_STATUS);
+            synchronized (lock) {
+                if (!running || handler == null) {
+                    return;
                 }
-                return Result.success();
+                handler.postDelayed(this, delay);
             }
-
-            // Update notification
-            String sDown = UIUtils.rate2speed((double) transferManager.getDownloadsBandwidth() / 1024);
-            String sUp = UIUtils.rate2speed(transferManager.getUploadsBandwidth() / 1024);
-
-            RemoteViews notificationViews = daemon.getNotificationViews();
-            if (notificationViews != null) {
-                notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
-                notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
-            }
-
-            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (manager != null) {
-                manager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, daemon.getNotificationObject());
-            }
-
-            return Result.success();
         }
+    };
+
+    private long updateNotification() {
+        if (!ensureNotificationEnabled()) {
+            return IDLE_UPDATE_INTERVAL_MS;
+        }
+
+        TransferManager transferManager = TransferManager.instance();
+        if (transferManager == null) {
+            LOG.warn("TransferManager instance is null. Skipping notification update.");
+            return IDLE_UPDATE_INTERVAL_MS;
+        }
+
+        int downloads = transferManager.getActiveDownloads();
+        int uploads = transferManager.getActiveUploads();
+
+        double downloadRate = (double) transferManager.getDownloadsBandwidth() / 1024d;
+        double uploadRate = (double) transferManager.getUploadsBandwidth() / 1024d;
+
+        String sDown = UIUtils.rate2speed(downloadRate);
+        String sUp = UIUtils.rate2speed(uploadRate);
+
+        if (notificationViews != null) {
+            notificationViews.setTextViewText(R.id.view_permanent_status_text_downloads, downloads + " @ " + sDown);
+            notificationViews.setTextViewText(R.id.view_permanent_status_text_uploads, uploads + " @ " + sUp);
+        }
+
+        NotificationManager manager = (NotificationManager) mParentContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager != null && notificationObject != null) {
+            try {
+                manager.notify(Constants.NOTIFICATION_FROSTWIRE_STATUS, notificationObject);
+            } catch (SecurityException t) {
+                LOG.warn(t.getMessage(), t);
+            }
+        } else {
+            LOG.warn("NotificationManager or notificationObject is null. Cannot update notification.");
+        }
+
+        return (downloads > 0 || uploads > 0) ? ACTIVE_UPDATE_INTERVAL_MS : IDLE_UPDATE_INTERVAL_MS;
     }
 }

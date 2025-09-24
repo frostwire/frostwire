@@ -44,7 +44,6 @@ import com.frostwire.android.gui.Librarian;
 import com.frostwire.android.gui.NotificationUpdateDaemon;
 import com.frostwire.android.gui.activities.MainActivity;
 import com.frostwire.android.gui.transfers.TransferManager;
-import com.frostwire.android.gui.workers.NotificationWorker;
 import com.frostwire.android.gui.workers.TorrentEngineWorker;
 import com.frostwire.android.util.SystemUtils;
 import com.frostwire.bittorrent.BTEngine;
@@ -53,7 +52,6 @@ import com.frostwire.util.TaskThrottle;
 import com.frostwire.util.http.OkHttpClientWrapper;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import okhttp3.ConnectionPool;
@@ -287,7 +285,6 @@ public class EngineForegroundService extends Service implements IEngineService {
             WorkManager workManager = WorkManager.getInstance(this);
             workManager.cancelUniqueWork("TorrentEngineWork");
             workManager.cancelUniqueWork("NotificationWork");
-            workManager.cancelUniqueWork("NotificationUpdateDaemon"); // From NotificationUpdateDaemon
             LOG.debug("shutdownSupport - cancelled all WorkManager jobs");
         } catch (Exception e) {
             LOG.warn("shutdownSupport - error cancelling WorkManager jobs: " + e.getMessage(), e);
