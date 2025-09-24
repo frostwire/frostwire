@@ -367,7 +367,7 @@ public abstract class MediaPlayer implements RefreshListener, MPlayerUIEventList
     /**
      * Sets the gain(volume) for the output line.
      *
-     * @param fGain - [0.0 <-> 1.0]
+     * @param fGain The gain level. Valid values range between 0.0 and 1.0 inclusive.
      */
     public void setVolume(double fGain) {
         volume = Math.max(Math.min(fGain, 1.0), 0.0);

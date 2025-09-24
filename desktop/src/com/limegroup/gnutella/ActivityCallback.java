@@ -7,7 +7,6 @@ import java.io.File;
 /**
  * Callback to notify the GUI of asynchronous backend events.
  * The methods in this fall into the following categories:
- * <p/>
  * <ul>
  * <li>Query replies (for displaying results) and query strings
  * (for the monitor)

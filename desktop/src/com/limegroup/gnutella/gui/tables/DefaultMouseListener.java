@@ -17,7 +17,7 @@ public final class DefaultMouseListener implements MouseListener {
     /**
      * Invoked when the mouse has been clicked on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseClicked(MouseEvent event) {
         if (tryPopup(event))
@@ -34,7 +34,7 @@ public final class DefaultMouseListener implements MouseListener {
     /**
      * Invoked when a mouse button has been pressed on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mousePressed(MouseEvent event) {
         tryPopup(event);
@@ -43,7 +43,7 @@ public final class DefaultMouseListener implements MouseListener {
     /**
      * Invoked when a mouse button has been released on a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseReleased(MouseEvent event) {
         tryPopup(event);
@@ -52,7 +52,7 @@ public final class DefaultMouseListener implements MouseListener {
     /**
      * Invoked when the mouse enters a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseEntered(MouseEvent event) {
     }
@@ -60,7 +60,7 @@ public final class DefaultMouseListener implements MouseListener {
     /**
      * Invoked when the mouse exits a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseExited(MouseEvent event) {
     }

@@ -58,7 +58,7 @@ final class Initializer {
 
     /**
      * Initializes all of the necessary application classes.
-     * <p/>
+     * <p>
      * If this throws any exceptions, then LimeWire was not able to construct
      * properly and must be shut down.
      */
@@ -291,7 +291,7 @@ final class Initializer {
     }
 
     /**
-     * Initializes any early UI tasks, such as HTML loading & the Bug Manager.
+     * Initializes any early UI tasks, such as HTML loading and the Bug Manager.
      */
     private void initializeEarlyUI() {
         // Load up the HTML engine.

@@ -45,7 +45,7 @@ public class MagnetOptions implements Serializable {
     /**
      * Returns an empty array if the string could not be parsed.
      *
-     * @param arg a string like "magnet:?xt.1=urn:sha1:49584DFD03&xt.2=urn:sha1:495345k"
+     * @param arg a string like {@literal magnet:?xt.1=urn:sha1:49584DFD03&xt.2=urn:sha1:495345k}
      * @return array may be empty, but is never <code>null</code>
      */
     public static MagnetOptions[] parseMagnet(String arg) {

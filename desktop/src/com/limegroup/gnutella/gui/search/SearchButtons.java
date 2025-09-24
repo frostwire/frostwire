@@ -57,9 +57,9 @@ final class SearchButtons {
     }
 
     /**
-     * Returns the <tt>Component</tt> instance containing all of the buttons.
+     * Returns the `Component` instance containing all of the buttons.
      *
-     * @return the <tt>Component</tt> instance containing all of the buttons
+     * @return the `Component` instance containing all of the buttons
      */
     ButtonRow getComponent() {
         return BUTTONS;

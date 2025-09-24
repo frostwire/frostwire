@@ -47,31 +47,31 @@ import java.util.Map;
 import static com.limegroup.gnutella.settings.UISettings.UI_SEARCH_TRANSFERS_SPLIT_VIEW;
 
 /**
- * This class constructs the main <tt>JFrame</tt> for the program as well as
+ * This class constructs the main `JFrame` for the program as well as
  * all of the other GUI classes.
  */
 public final class MainFrame {
     /**
-     * The main <tt>JFrame</tt> for the application.
+     * The main `JFrame` for the application.
      */
     private final JFrame FRAME;
     /**
-     * Handle to the <tt>JTabbedPane</tt> instance.
+     * Handle to the `JTabbedPane` instance.
      */
     private final JPanel TABBED_PANE;
     private BTDownloadMediator BT_DOWNLOAD_MEDIATOR;
     /**
-     * Constant handle to the <tt>LibraryView</tt> class that is
+     * Constant handle to the `LibraryView` class that is
      * responsible for displaying files in the user's repository.
      */
     private LibraryMediator LIBRARY_MEDIATOR;
     /**
-     * Constant handle to the <tt>OptionsMediator</tt> class that is
+     * Constant handle to the `OptionsMediator` class that is
      * responsible for displaying customizable options to the user.
      */
     private OptionsMediator OPTIONS_MEDIATOR;
     /**
-     * Constant handle to the <tt>StatusLine</tt> class that is
+     * Constant handle to the `StatusLine` class that is
      * responsible for displaying the status of the network and
      * connectivity to the user.
      */
@@ -91,7 +91,7 @@ public final class MainFrame {
 
     /**
      * Initializes the primary components of the main application window,
-     * including the <tt>JFrame</tt> and the <tt>JTabbedPane</tt>
+     * including the `JFrame` and the `JTabbedPane`
      * contained in that window.
      */
     MainFrame(JFrame frame) {
@@ -260,10 +260,10 @@ public final class MainFrame {
     }
 
     /**
-     * Adds a tab to the <tt>JTabbedPane</tt> based on the data supplied
-     * in the <tt>Tab</tt> instance.
+     * Adds a tab to the `JTabbedPane` based on the data supplied
+     * in the `Tab` instance.
      *
-     * @param tab the <tt>Tab</tt> instance containing data for the tab to
+     * @param tab the `Tab` instance containing data for the tab to
      *            add
      */
     private void addTab(Tab tab) {
@@ -283,7 +283,7 @@ public final class MainFrame {
 
     /**
      * Sets the x,y location as well as the height and width of the main
-     * application <tt>Frame</tt>.
+     * application `Frame`.
      */
     private void setFrameDimensions() {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -331,9 +331,9 @@ public final class MainFrame {
     }
 
     /**
-     * Returns a reference to the <tt>LibraryMediator</tt> instance.
+     * Returns a reference to the `LibraryMediator` instance.
      *
-     * @return a reference to the <tt>LibraryMediator</tt> instance
+     * @return a reference to the `LibraryMediator` instance
      */
     private LibraryMediator getLibraryMediator() {
         if (LIBRARY_MEDIATOR == null) {
@@ -343,9 +343,9 @@ public final class MainFrame {
     }
 
     /**
-     * Returns a reference to the <tt>StatusLine</tt> instance.
+     * Returns a reference to the `StatusLine` instance.
      *
-     * @return a reference to the <tt>StatusLine</tt> instance
+     * @return a reference to the `StatusLine` instance
      */
     final StatusLine getStatusLine() {
         if (STATUS_LINE == null) {
@@ -355,9 +355,9 @@ public final class MainFrame {
     }
 
     /**
-     * Returns a reference to the <tt>OptionsMediator</tt> instance.
+     * Returns a reference to the `OptionsMediator` instance.
      *
-     * @return a reference to the <tt>OptionsMediator</tt> instance
+     * @return a reference to the `OptionsMediator` instance
      */
     final OptionsMediator getOptionsMediator() {
         if (OPTIONS_MEDIATOR == null) {
@@ -380,7 +380,7 @@ public final class MainFrame {
     }
 
     /**
-     * Sets the selected index in the wrapped <tt>JTabbedPane</tt>.
+     * Sets the selected index in the wrapped `JTabbedPane`.
      *
      * @param tab index to select
      */

@@ -27,7 +27,7 @@ import java.awt.event.KeyListener;
  */
 public class LabeledTextField extends JPanel {
     /**
-     * The <tt>JTextField</tt> part of this component.
+     * The `JTextField` part of this component.
      */
     private final JTextField _field;
 
@@ -68,18 +68,18 @@ public class LabeledTextField extends JPanel {
     }
 
     /**
-     * Returns the String contained in the <tt>JTextField</tt>.
+     * Returns the String contained in the `JTextField`.
      *
-     * @return the text in the <tt>JTextField</tt>
+     * @return the text in the `JTextField`
      */
     public String getText() {
         return _field.getText();
     }
 
     /**
-     * Sets the String contained in the <tt>JTextField</tt>.
+     * Sets the String contained in the `JTextField`.
      *
-     * @param text the text to place in the <tt>JTextField</tt>
+     * @param text the text to place in the `JTextField`
      */
     public void setText(String text) {
         _field.setText(text);
@@ -88,7 +88,7 @@ public class LabeledTextField extends JPanel {
     /**
      * Sets the tooltip for the JTextField.
      *
-     * @param text the text to set as the tooltip for the <tt>JTextField</tt>
+     * @param text the text to set as the tooltip for the `JTextField`
      */
     public void setToolTipText(String text) {
         _field.setToolTipText(text);

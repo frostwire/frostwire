@@ -36,14 +36,14 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * This class constructs an <tt>Initializer</tt> instance that constructs
+ * This class constructs an `Initializer` instance that constructs
  * all the necessary classes for the application.
  */
 public class Main {
     private static URL CHOSEN_SPLASH_URL = null;
 
     /**
-     * Creates an <tt>Initializer</tt> instance that constructs the
+     * Creates an `Initializer` instance that constructs the
      * necessary classes for the application.
      *
      * @param args the array of command line arguments

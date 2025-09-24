@@ -180,7 +180,7 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
     }
 
     /**
-     * Sets up drag & drop for the table.
+     * Sets up drag and drop for the table.
      */
     protected void setupDragAndDrop() {
         TABLE.setDragEnabled(true);
@@ -392,12 +392,11 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     /**
      * Overrides the default add.
-     * <p/>
+     * <p>
      * Adds a new Downloads to the list of Downloads, obtaining the necessary
-     * information from the supplied <tt>Downloader</tt>.
-     * <p/>
+     * information from the supplied `Downloader`.
+     * <p>
      * If the download is not already in the list, then it is added.
-     * <p/>
      */
     public void add(BTDownload downloader) {
         if (!DATA_MODEL.contains(downloader)) {
@@ -414,15 +413,15 @@ public final class BTDownloadMediator extends AbstractTableMediator<BTDownloadRo
 
     /**
      * Overrides the default remove.
-     * <p/>
+     * <p>
      * Takes action upon downloaded theme files, asking if the user wants to
      * apply the theme.
-     * <p/>
+     * <p>
      * Removes a download from the list if the user has configured their system
      * to automatically clear completed download and if the download is
      * complete.
      *
-     * @param downloader the <tt>Downloader</tt> to remove from the list if it is
+     * @param downloader the `Downloader` to remove from the list if it is
      *                   complete.
      */
     public void remove(BTDownload downloader) {

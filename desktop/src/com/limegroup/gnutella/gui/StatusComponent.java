@@ -26,7 +26,7 @@ import java.text.NumberFormat;
 
 /**
  * Displays a status update in various ways, depending on the
- * operating system & JDK.
+ * operating system and JDK.
  * <p>
  * OSX:
  * - Displays an indeterminate JProgressBar with a JLabel

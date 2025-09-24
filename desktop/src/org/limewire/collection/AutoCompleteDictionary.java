@@ -18,8 +18,8 @@ import java.util.Iterator;
  *
  * @author Matt Welsh (matt@matt-welsh.com)
  * <br>
- * @modified David Soh (yunharla00@hotmail.com)
- * added getIterator() & getIterator(String) for enhanced
+ * Modified by David Soh (yunharla00@hotmail.com):
+ * added getIterator() and getIterator(String) for enhanced
  * AutoCompleteTextField use.
  */
 public interface AutoCompleteDictionary extends Iterable<String> {

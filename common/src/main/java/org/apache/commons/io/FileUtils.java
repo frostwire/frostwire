@@ -578,7 +578,6 @@ public class FileUtils {
      * <p>
      * This method checks to see if the two files point to the same file,
      * before resorting to line-by-line comparison of the contents.
-     * <p>
      *
      * @param file1       the first file
      * @param file2       the second file

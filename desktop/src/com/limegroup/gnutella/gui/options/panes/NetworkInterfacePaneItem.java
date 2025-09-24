@@ -125,7 +125,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Applies the options currently set in this <tt>PaneItem</tt>.
+     * Applies the options currently set in this `PaneItem`.
      */
     public boolean applyOptions() {
         boolean isDirty = isDirty();
@@ -176,7 +176,7 @@ public class NetworkInterfacePaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {

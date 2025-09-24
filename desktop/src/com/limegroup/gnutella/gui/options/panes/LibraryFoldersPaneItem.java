@@ -92,9 +92,9 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -107,13 +107,13 @@ public final class LibraryFoldersPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
      * This makes sure that the shared directories have, in fact, changed to
-     * make sure that we don't load the <tt>FileManager</tt> twice.  This is
+     * make sure that we don't load the `FileManager` twice.  This is
      * particularly relevant to the case where the save directory has changed,
-     * in which case we only want to reload the <tt>FileManager</tt> once for
-     * any changes.<p>
+     * in which case we only want to reload the `FileManager` once for
+     * any changes.
      * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.

@@ -31,7 +31,7 @@ import java.io.IOException;
 /**
  * This class acts as a mediator for the different components of the options
  * window.  This class maintains references to the
- * <tt>OptionsTreeManager</tt> and <tt>OptionsPaneManager</tt>, the two
+ * `OptionsTreeManager` and `OptionsPaneManager`, the two
  * primary classes that it delegates to.
  */
 public final class OptionsMediator {
@@ -73,7 +73,7 @@ public final class OptionsMediator {
     /**
      * Singleton accessor for this class.
      *
-     * @return the <tt>OptionsMediator</tt> instance
+     * @return the `OptionsMediator` instance
      */
     public static synchronized OptionsMediator instance() {
         return INSTANCE;
@@ -83,7 +83,7 @@ public final class OptionsMediator {
      * Makes the options window either visible or not visible depending
      * on the boolean argument.
      *
-     * @param visible <tt>boolean</tt> value specifying whether the
+     * @param visible `boolean` value specifying whether the
      *                options window should be made visible or not visible
      * @param key     the unique identifying key of the panel to show
      */
@@ -123,7 +123,7 @@ public final class OptionsMediator {
      * Makes the options window either visible or not visible depending
      * on the boolean argument.
      *
-     * @param visible <tt>boolean</tt> value specifying whether the
+     * @param visible `boolean` value specifying whether the
      *                options window should be made visible or not visible
      */
     public final void setOptionsVisible(boolean visible) {
@@ -144,7 +144,7 @@ public final class OptionsMediator {
 
     /**
      * Applies the current settings in the options windows, storing them
-     * to disk.  This method delegates to the <tt>OptionsPaneManager</tt>.
+     * to disk.  This method delegates to the `OptionsPaneManager`.
      *
      * @throws IOException if the options could not be fully applied
      */
@@ -173,10 +173,10 @@ public final class OptionsMediator {
     }
 
     /**
-     * Returns the main <tt>JDialog</tt> instance for the options window,
+     * Returns the main `JDialog` instance for the options window,
      * allowing other components to position themselves accordingly.
      *
-     * @return the main options <tt>JDialog</tt> window
+     * @return the main options `JDialog` window
      */
     public JDialog getMainOptionsComponent() {
         if (_constructor == null)

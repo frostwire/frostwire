@@ -16,7 +16,7 @@ public final class CharArraySetting extends AbstractSetting {
     private char[] value;
 
     /**
-     * Creates a new <tt>SettingBool</tt> instance with the specified
+     * Creates a new `SettingBool` instance with the specified
      * key and default value.
      *
      * @param defaultProps the default properties

@@ -31,7 +31,6 @@ import java.util.*;
  * An association could be registered into or unregistered from the system using
  * certain methods of <code>AssociationService</code>. An association for a particular
  * file type could be returned by certain methods of <code>AssociationService</code>.
- * <p>
  *
  * @see Action
  * @see AssociationService
@@ -325,7 +324,7 @@ public class Association {
      * <p>
      * Returns the hashcode for this <code>Association</code>.
      *
-     * @return a hash code for this <code>Association<code>.
+     * @return a hash code for this <code>Association</code>.
      */
     public int hashCode() {
         if (hashcode != 0) {

@@ -33,7 +33,6 @@ public class CheckBoxListPanel<E> extends BoxPanel {
 
     /**
      * Constructs a checkbox list panel for an array of objects.
-     * <p>
      */
     public CheckBoxListPanel(Collection<E> elements, CheckBoxList.TextProvider<E> provider,
                              boolean selected) {

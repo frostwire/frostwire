@@ -24,7 +24,7 @@ import com.limegroup.gnutella.gui.tables.BasicDataLineModel;
 import java.util.HashSet;
 
 /**
- * This class provides access to the <tt>ArrayList</tt> that stores all of the
+ * This class provides access to the `ArrayList` that stores all of the
  * downloads displayed in the download window.
  */
 public class BTDownloadModel extends BasicDataLineModel<BTDownloadDataLine, BTDownload> {

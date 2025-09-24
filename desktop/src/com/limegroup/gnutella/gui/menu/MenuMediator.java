@@ -42,38 +42,38 @@ public final class MenuMediator {
     }
 
     /**
-     * Constant handle to the <tt>JMenuBar</tt> instance that holds all
-     * of the <tt>JMenu</tt> instances.
+     * Constant handle to the `JMenuBar` instance that holds all
+     * of the `JMenu` instances.
      */
     private final JMenuBar MENU_BAR = new JMenuBar();
 
     /**
-     * Private constructor that ensures that a <tt>MenuMediator</tt>
+     * Private constructor that ensures that a `MenuMediator`
      * cannot be constructed from outside this class.  It adds all of
      * the menus.
      */
     private MenuMediator() {
         GUIMediator.setSplashScreenString(I18n.tr("Loading Menus..."));
         /*
-          Constant handle to the single <tt>FileMenu</tt> instance for
+          Constant handle to the single `FileMenu` instance for
           the application.
          */
         FileMenu FILE_MENU = new FileMenu();
         addMenu(FILE_MENU);
         /*
-          Constant handle to the single <tt>ViewMenu</tt> instance for
+          Constant handle to the single `ViewMenu` instance for
           the application.
          */
         Menu VIEW_MENU = new ViewMenu();
         addMenu(VIEW_MENU);
         /*
-          Constant handle to the single <tt>ToolsMenu</tt> instance for
+          Constant handle to the single `ToolsMenu` instance for
           the application.
          */
         Menu TOOLS_MENU = new ToolsMenu();
         addMenu(TOOLS_MENU);
         /*
-          Constant handle to the single <tt>HelpMenu</tt> instance for
+          Constant handle to the single `HelpMenu` instance for
           the application.
          */
         Menu HELP_MENU = new HelpMenu();
@@ -81,10 +81,10 @@ public final class MenuMediator {
     }
 
     /**
-     * Singleton accessor method for obtaining the <tt>MenuMediator</tt>
+     * Singleton accessor method for obtaining the `MenuMediator`
      * instance.
      *
-     * @return the <tt>MenuMediator</tt> instance
+     * @return the `MenuMediator` instance
      */
     public static MenuMediator instance() {
         if (INSTANCE == null) {
@@ -94,19 +94,19 @@ public final class MenuMediator {
     }
 
     /**
-     * Returns the <tt>JMenuBar</tt> for the application.
+     * Returns the `JMenuBar` for the application.
      *
-     * @return the application's <tt>JMenuBar</tt> instance
+     * @return the application's `JMenuBar` instance
      */
     public JMenuBar getMenuBar() {
         return MENU_BAR;
     }
 
     /**
-     * Adds a <tt>Menu</tt> to the next position on the menu bar.
+     * Adds a `Menu` to the next position on the menu bar.
      *
-     * @param menu to the <tt>Menu</tt> instance that allows access to
-     *             its wrapped <tt>JMenu</tt> instance
+     * @param menu to the `Menu` instance that allows access to
+     *             its wrapped `JMenu` instance
      */
     private void addMenu(Menu menu) {
         MENU_BAR.add(menu.getMenu());

@@ -38,7 +38,7 @@ import java.util.List;
  * This is a utility class that displays a file chooser dialog to the user,
  * automatically selecting the appropriate dialog based on the operating system,
  * the current theme, etc. For example, if the user is on OS X and is not using
- * the default theme, this displays the standard <tt>MetalLookAndFeel</tt>
+ * the default theme, this displays the standard `MetalLookAndFeel`
  * file chooser, as that is the only one that will appear with themes.
  */
 public final class FileChooserHandler {
@@ -71,11 +71,11 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputDirectory</tt> that takes no arguments, except this
+     * Same as `getInputDirectory` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser.
      *
-     * @param parent the <tt>Component</tt> that should be the dialog's parent
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @param parent the `Component` that should be the dialog's parent
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     public static File getInputDirectory(Component parent) {
@@ -85,15 +85,15 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser as well
      * as other options.
      *
-     * @param parent    the <tt>Component</tt> that should be the dialog's parent
+     * @param parent    the `Component` that should be the dialog's parent
      * @param titleKey  the key for the locale-specific string to use for the
      *                  file dialog title
      * @param directory the directory to open the dialog to
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     private static File getInputDirectory(Component parent, String titleKey,
@@ -105,17 +105,17 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser as well
      * as other options.
      *
-     * @param parent     the <tt>Component</tt> that should be the dialog's parent
+     * @param parent     the `Component` that should be the dialog's parent
      * @param titleKey   the key for the locale-specific string to use for the
      *                   file dialog title
      * @param approveKey the key for the locale-specific string to use for the
      *                   approve button text
      * @param directory  the directory to open the dialog to
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     private static File getInputDirectory(Component parent, String titleKey,
@@ -128,19 +128,19 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser as well
      * as other options.
      *
-     * @param parent     the <tt>Component</tt> that should be the dialog's parent
+     * @param parent     the `Component` that should be the dialog's parent
      * @param titleKey   the key for the locale-specific string to use for the
      *                   file dialog title
      * @param approveKey the key for the locale-specific string to use for the
      *                   approve button text
      * @param directory  the directory to open the dialog to
-     * @param filter     the <tt>FileFilter</tt> instance for customizing the
+     * @param filter     the `FileFilter` instance for customizing the
      *                   files that are displayed -- if this is null, no filter is used
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     public static File getInputDirectory(Component parent, String titleKey,
@@ -158,13 +158,13 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser.
      *
-     * @param parent the <tt>Component</tt> that should be the dialog's parent
-     * @param filter the <tt>FileFilter</tt> instance for customizing the
+     * @param parent the `Component` that should be the dialog's parent
+     * @param filter the `FileFilter` instance for customizing the
      *               files that are displayed -- if this is null, no filter is used
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     public static File getInputFile(Component parent, FileFilter filter) {
@@ -176,16 +176,16 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser.
      *
-     * @param parent    the <tt>Component</tt> that should be the dialog's parent
+     * @param parent    the `Component` that should be the dialog's parent
      * @param titleKey  the key for the locale-specific string to use for the
      *                  file dialog title
      * @param directory the directory to open the dialog to
-     * @param filter    the <tt>FileFilter</tt> instance for customizing the
+     * @param filter    the `FileFilter` instance for customizing the
      *                  files that are displayed -- if this is null, no filter is used
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     public static File getInputFile(Component parent, String titleKey,
@@ -198,18 +198,18 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Same as <tt>getInputFile</tt> that takes no arguments, except this
+     * Same as `getInputFile` that takes no arguments, except this
      * allows the caller to specify the parent component of the chooser.
      *
-     * @param parent     the <tt>Component</tt> that should be the dialog's parent
+     * @param parent     the `Component` that should be the dialog's parent
      * @param titleKey   the key for the locale-specific string to use for the
      *                   file dialog title
      * @param approveKey the key for the locale-specific string to use for the
      *                   approve button text
      * @param directory  the directory to open the dialog to
-     * @param filter     the <tt>FileFilter</tt> instance for customizing the
+     * @param filter     the `FileFilter` instance for customizing the
      *                   files that are displayed -- if this is null, no filter is used
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     private static File getInputFile(Component parent, String titleKey,
@@ -315,26 +315,26 @@ public final class FileChooserHandler {
     /**
      * The implementation that the other methods delegate to. This provides the
      * caller with all available options for customizing the
-     * <tt>JFileChooser</tt> instance. If a <tt>FileDialog</tt> is displayed
-     * instead of a <tt>JFileChooser</tt> (on OS X, for example), most or all
+     * `JFileChooser` instance. If a `FileDialog` is displayed
+     * instead of a `JFileChooser` (on OS X, for example), most or all
      * of these options have no effect.
      *
-     * @param parent           the <tt>Component</tt> that should be the dialog's parent
+     * @param parent           the `Component` that should be the dialog's parent
      * @param titleKey         the key for the locale-specific string to use for the
      *                         file dialog title
      * @param approveKey       the key for the locale-specific string to use for the
      *                         approve button text
      * @param directory        the directory to open the dialog to
-     * @param mode             the "mode" to open the <tt>JFileChooser</tt> in from the
-     *                         <tt>JFileChooser</tt> class, such as
-     *                         <tt>JFileChooser.DIRECTORIES_ONLY</tt>
+     * @param mode             the "mode" to open the `JFileChooser` in from the
+     *                         `JFileChooser` class, such as
+     *                         `JFileChooser.DIRECTORIES_ONLY`
      * @param option           the option to look for in the return code, such as
-     *                         <tt>JFileChooser.APPROVE_OPTION</tt>
+     *                         `JFileChooser.APPROVE_OPTION`
      * @param allowMultiSelect true if the chooser allows multiple files to be
      *                         chosen
-     * @param filter           the <tt>FileFilter</tt> instance for customizing the
+     * @param filter           the `FileFilter` instance for customizing the
      *                         files that are displayed -- if this is null, no filter is used
-     * @return the selected <tt>File</tt> instance, or <tt>null</tt> if a
+     * @return the selected `File` instance, or `null` if a
      * file was not selected correctly
      */
     private static List<File> getInput(Component parent, String titleKey,
@@ -402,14 +402,14 @@ public final class FileChooserHandler {
     }
 
     /**
-     * Returns a new <tt>JFileChooser</tt> instance for selecting directories
+     * Returns a new `JFileChooser` instance for selecting directories
      * and with internationalized strings for the caption and the selection
      * button.
      *
      * @param approveKey can be <code>null</code>
      * @param directory  can be <code>null</code>
      * @param filter     can be <code>null</code>
-     * @return a new <tt>JFileChooser</tt> instance for selecting directories.
+     * @return a new `JFileChooser` instance for selecting directories.
      */
     private static JFileChooser getDirectoryChooser(String titleKey,
                                                     String approveKey, File directory, int mode, FileFilter filter) {

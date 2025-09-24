@@ -46,13 +46,13 @@ import java.util.Date;
  * The basics of a ComponentMediator for a Table.
  * Used for:
  * Associating a LimeJTable (TABLE) with a DataLineModel (DATA_MODEL).
- * Associating a JPopupMenu & ButtonRow (BUTTON_ROW)
+ * Associating a JPopupMenu and ButtonRow (BUTTON_ROW)
  * with the DATA_MODEL.
  * Holding common Action/Mouse/ListSelection listeners.
  * (REMOVE_LISTENER, DEFAULT_LISTENER, HEADER_LISTENER, SELECTION_LISTENER)
  * Holding common TableCellRenderers. [static]
  * (PROGRESS_BAR_RENDERER, CHAT_RENDERER)
- * Building a JPanel (MAIN_PANEL) of the LimeJTable, ButtonRow & JPopupMenu.
+ * Building a JPanel (MAIN_PANEL) of the LimeJTable, ButtonRow and JPopupMenu.
  * Handling mouse interactions and displaying the appropriate menus.
  * A popup menu if right-click over table.
  * ColumnSelectionMenu if right-click over the header.
@@ -154,12 +154,12 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
      */
     private Resorter RESORTER = new Resorter();
     /**
-     * The <tt>Component</tt> containing the <tt>JScrollPane</tt> for the
+     * The `Component` containing the `JScrollPane` for the
      * table.
      */
     protected JComponent TABLE_PANE;
     /**
-     * The <tt>JScrollPane</tt> instance for scrolling through the table.
+     * The `JScrollPane` instance for scrolling through the table.
      */
     protected JScrollPane SCROLL_PANE;
     /**
@@ -172,7 +172,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Basic constructor that uses a Template Pattern to delegate the
      * setup functions to individual methods.  The following methods
-     * are called in the order they are listed.<p>
+     * are called in the order they are listed.
      * <ul>
      * <li> updateSplashScreen </li>
      * <li> buildSettings </li>
@@ -247,10 +247,10 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     }
 
     /**
-     * Sets up Drag & Drop for the table.
+     * Sets up Drag and Drop for the table.
      * Default implementation does nothing.
      * <p>
-     * This is called prior to addListeners, because D&D wraps all
+     * This is called prior to addListeners, because D&amp;D wraps all
      * Mouse[Motion]Listeners behind a proxy, and we don't need to
      * proxy listeners added from here.
      */
@@ -446,7 +446,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     }
 
     /**
-     * Sets up & gets the table inside a JScrollPanel inside a JPanel.
+     * Sets up and gets the table inside a JScrollPanel inside a JPanel.
      */
     protected JComponent getScrolledTablePane() {
         // if it already exists, return it
@@ -582,7 +582,7 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Implements RefreshListener
      * Wraps the doRefresh call so that extending classes
-     * can maintain the resort & isShowing checks.
+     * can maintain the resort and isShowing checks.
      * Extending classes should NOT override this.
      * Instead, they should override doRefresh.
      */
@@ -830,9 +830,9 @@ public abstract class AbstractTableMediator<T extends DataLineModel<E, I>, E ext
     /**
      * Abstract method for creating a right-click popup menu for the
      * table.  If an implementation does not support a right-click
-     * popup menu, it should return <tt>null</tt>.
+     * popup menu, it should return `null`.
      *
-     * @return a new <tt>JPopupMenu</tt> to display on right-click
+     * @return a new `JPopupMenu` to display on right-click
      */
     protected abstract JPopupMenu createPopupMenu();
 

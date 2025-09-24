@@ -167,7 +167,7 @@ public final class SetupManager {
     }
 
     /*
-     * Creates the main <tt>JDialog</tt> instance and
+     * Creates the main `JDialog` instance and
      * creates all of the setup window classes, buttons, etc.
      */
     private void createDialog(SetupWindow firstWindow) {

@@ -162,7 +162,6 @@ public class AssociationService {
 
     /**
      * Registers the given association in the user specific level.
-     * <p>
      * <ul>
      *   <li> For Microsoft Windows platforms: the file extension list and MIME
      *        type can't both be null. If any of the description, icon file name, action
@@ -203,7 +202,6 @@ public class AssociationService {
 
     /**
      * Unregisters the given association in the user specific level.
-     * <p>
      * <ul>
      *   <li> For Microsoft Windows platforms: either the MIME type or the file extension
      *        list field needs to be specified to perform this operation.
@@ -217,7 +215,6 @@ public class AssociationService {
      *   <li> For Gnome/Unix platforms: only the name field needs to be specified to
      *        perform this operation.
      * </ul>
-     * <p>
      *
      * @param assoc a given Association object.
      * @throws IllegalArgumentException          if the given association is not valid for

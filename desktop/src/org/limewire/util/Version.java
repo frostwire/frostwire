@@ -6,17 +6,16 @@ package org.limewire.util;
  * fields. When applicable, the string version must have a dot between the
  * major, minor and service, however any-non digit separates service from
  * revision.
- * <table>
- * <tr><td><b>String</b></td>  <td><b>Major</b></td><td><b>Minor</b></td><td><b>Service</b></td><td><b>Revision</b></td></tr>
- * <tr><td>1</td>              <td>1</td>              <td>0</td>              <td>0</td>          <td>0</td></tr>
- * <tr><td>1.2</td>            <td>1</td>              <td>2</td>              <td>0</td>          <td>0</td></tr>
- * <tr><td>1.2.3</td>          <td>1</td>              <td>2</td>              <td>3</td>          <td>0</td></tr>
- * <tr><td>1.2.3_4</td>        <td>1</td>              <td>2</td>              <td>3</td>          <td>4</td></tr>
- * <tr><td>1.2.3a</td>         <td>1</td>              <td>2</td>              <td>3</td>          <td>0</td></tr>
- * <tr><td>1.2.3_4a</td>       <td>1</td>              <td>2</td>              <td>3</td>          <td>4</td></tr>
- * <tr><td>1.2.3 A</td>        <td>1</td>              <td>2</td>              <td>3</td>          <td>0</td></tr>
- * <tr><td>1.2.3a4</td>        <td>1</td>              <td>2</td>              <td>3</td>          <td>4</td></tr>
- * </table>
+ * | String   | Major | Minor | Service | Revision |
+ * | -------- | ----- | ----- | ------- | -------- |
+ * | 1        | 1     | 0     | 0       | 0        |
+ * | 1.2      | 1     | 2     | 0       | 0        |
+ * | 1.2.3    | 1     | 2     | 3       | 0        |
+ * | 1.2.3_4  | 1     | 2     | 3       | 4        |
+ * | 1.2.3a   | 1     | 2     | 3       | 0        |
+ * | 1.2.3_4a | 1     | 2     | 3       | 4        |
+ * | 1.2.3 A  | 1     | 2     | 3       | 0        |
+ * | 1.2.3a4  | 1     | 2     | 3       | 4        |
  * <p>
  * Unsupported versions include: <i>1a</i>, <i>1.2a</i>, <i>1.a</i>, <i>1.2.a</i>, etc.
  */
@@ -98,7 +97,7 @@ class Version implements Comparable<Version> {
     }
 
     /**
-     * Parses a version for major/minor/service & revision.
+     * Parses a version for major/minor/service and revision.
      * Only Major is required.  If Minor, Service or Revision don't exist,
      * they are assumed to be 0.
      */

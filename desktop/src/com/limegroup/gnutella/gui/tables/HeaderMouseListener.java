@@ -57,7 +57,7 @@ final class HeaderMouseListener implements MouseInputListener {
     /**
      * Invoked when the mouse enters a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseEntered(MouseEvent event) {
     }
@@ -65,7 +65,7 @@ final class HeaderMouseListener implements MouseInputListener {
     /**
      * Invoked when the mouse exits a component.
      *
-     * @param event the <tt>MouseEvent</tt> that triggered this call
+     * @param event the `MouseEvent` that triggered this call
      */
     public void mouseExited(MouseEvent event) {
     }

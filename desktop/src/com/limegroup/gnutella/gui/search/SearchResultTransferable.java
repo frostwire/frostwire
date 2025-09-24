@@ -23,7 +23,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 
 /**
- * A Search Result transferable.  Contains the ResultPanel & TableLines
+ * A Search Result transferable.  Contains the ResultPanel and TableLines
  * that are being transferred.
  */
 public class SearchResultTransferable implements Transferable {

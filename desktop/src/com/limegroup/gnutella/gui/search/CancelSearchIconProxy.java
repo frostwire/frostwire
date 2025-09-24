@@ -40,7 +40,7 @@ final class CancelSearchIconProxy implements Icon {
      */
     private final int style;
     /**
-     * The <tt>ImageIcon</tt> for our cancel image.
+     * The `ImageIcon` for our cancel image.
      */
     private Icon _cancelIcon;
     /**
@@ -163,8 +163,8 @@ final class CancelSearchIconProxy implements Icon {
      *
      * @param x the x location of the mouse event
      * @param y the y location of the mouse event
-     * @return <tt>true</tt> if the mouse event occurred within the
-     * bounding rectangle of the icon, <tt>false</tt> otherwise.
+     * @return `true` if the mouse event occurred within the
+     * bounding rectangle of the icon, `false` otherwise.
      */
     boolean shouldKill(int x, int y) {
         int xMax = _x + _width;

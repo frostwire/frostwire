@@ -24,7 +24,7 @@ import java.util.Properties;
  * For example, if your subclass is for an integer setting you can
  * have a integer field i.e. <code>myIntValue</code>, in the class. Then you
  * would set <code>myIntValue</code> with the integer converted
- * <code>String<code> argument, for example:
+ * <code>String</code> argument, for example:
  * <pre>
  * protected void loadValue(String sValue) {
  * try {
@@ -50,15 +50,15 @@ import java.util.Properties;
  */
 public abstract class AbstractSetting implements Setting {
     /**
-     * Constant for the default value for this <tt>Setting</tt>.
+     * Constant for the default value for this `Setting`.
      */
     final String DEFAULT_VALUE;
     /**
-     * Protected default <tt>Properties</tt> instance for subclasses.
+     * Protected default `Properties` instance for subclasses.
      */
     private final Properties DEFAULT_PROPS;
     /**
-     * Protected <tt>Properties</tt> instance containing properties for any
+     * Protected `Properties` instance containing properties for any
      * subclasses.
      */
     private final Properties PROPS;
@@ -83,7 +83,7 @@ public abstract class AbstractSetting implements Setting {
     /**
      * Constructs a new setting with the specified key and default
      * value.  Private access ensures that only this class can construct
-     * new <tt>Setting</tt>s.
+     * new `Setting`s.
      *
      * @param key          the key for the setting
      * @param defaultValue the defaultValue for the setting

@@ -1513,7 +1513,7 @@ public final class Grid {
      * line the property to layout by base line.
      *
      * @param isRows If rows, and not columns, are to be divided.
-     * @return One <code>ArrayList<LinkedDimGroup></code> for every row/column.
+     * @return One {@code ArrayList<LinkedDimGroup>} for every row/column.
      */
     private ArrayList<LinkedDimGroup>[] divideIntoLinkedGroups(boolean isRows) {
         boolean fromEnd = !(isRows ? lc.isTopToBottom() : LayoutUtil.isLeftToRight(lc, container));

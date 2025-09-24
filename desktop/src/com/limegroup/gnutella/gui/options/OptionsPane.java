@@ -9,36 +9,36 @@ import java.io.IOException;
  * An object that defines the basic functionality of an <i>OptionsPane</i>,
  * or one panel specifying a set of options in the options window.<p>
  * <p>
- * Each <tt>OptionsPane</tt> has a unique identifying name that allows it
- * to be displayed in the <tt>CardLayout</tt>.
+ * Each `OptionsPane` has a unique identifying name that allows it
+ * to be displayed in the `CardLayout`.
  */
 //2345678|012345678|012345678|012345678|012345678|012345678|012345678|012345678|
 interface OptionsPane {
     /**
-     * Returns the name of this <tt>OptionsPane</tt>.
+     * Returns the name of this `OptionsPane`.
      *
-     * @return the name of this <tt>OptionsPane</tt>
+     * @return the name of this `OptionsPane`
      */
     String getName();
 
     /**
-     * Returns the <tt>Container</tt> instance that holds the different
-     * elements of this <tt>OptionsPane</tt>.
+     * Returns the `Container` instance that holds the different
+     * elements of this `OptionsPane`.
      *
-     * @return the <tt>Container</tt> associated with this <tt>OptionsPane</tt>
+     * @return the `Container` associated with this `OptionsPane`
      */
     Container getContainer();
 
     /**
      * Adds a new option item to this pane.
      *
-     * @param item the <tt>PaneItem</tt> instance to add to this
-     *             <tt>OptionsPane</tt>
+     * @param item the `PaneItem` instance to add to this
+     *             `OptionsPane`
      */
     void add(PaneItem item);
 
     /**
-     * Sets the options for the fields in this <tt>OptionsPane</tt> when
+     * Sets the options for the fields in this `OptionsPane` when
      * the window is shown.
      */
     void initOptions();

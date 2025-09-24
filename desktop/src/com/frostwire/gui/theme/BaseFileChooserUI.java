@@ -44,7 +44,7 @@ import java.util.Objects;
 import java.util.Vector;
 
 /**
- * Metal L&F implementation of a FileChooser.
+ * Metal L&amp;F implementation of a FileChooser.
  *
  * @author Jeff Dinkins
  */

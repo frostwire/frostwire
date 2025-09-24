@@ -273,7 +273,7 @@ public final class SearchMediator {
 
     /**
      * Downloads the selected files in the currently displayed
-     * <tt>ResultPanel</tt> if there is one.
+     * `ResultPanel` if there is one.
      */
     static void doDownload(final SearchResultMediator rp) {
         final SearchResultDataLine[] lines = rp.getAllSelectedLines();
@@ -347,9 +347,9 @@ public final class SearchMediator {
     }
 
     /**
-     * Returns the <tt>ResultPanel</tt> for the specified GUID.
+     * Returns the `ResultPanel` for the specified GUID.
      *
-     * @return the <tt>ResultPanel</tt> that matches the GUID, or null
+     * @return the `ResultPanel` that matches the GUID, or null
      * if none match.
      */
     private static SearchResultMediator getResultPanelForGUID(long token) {
@@ -357,10 +357,10 @@ public final class SearchMediator {
     }
 
     /**
-     * Returns the <tt>JComponent</tt> instance containing all of the
+     * Returns the `JComponent` instance containing all of the
      * search result UI components.
      *
-     * @return the <tt>JComponent</tt> instance containing all of the
+     * @return the `JComponent` instance containing all of the
      * search result UI components
      */
     public static JComponent getResultComponent() {
@@ -396,7 +396,7 @@ public final class SearchMediator {
 
     /**
      * Initiates a new search with the specified SearchInformation.
-     * <p/>
+     * <p>
      * Returns the GUID of the search if a search was initiated,
      * otherwise returns null.
      */

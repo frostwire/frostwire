@@ -31,21 +31,21 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     protected T initializer;
 
     /**
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public void initialize(T o) {
         initializer = o;
     }
 
     /**
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public T getInitializeObject() {
         return initializer;
     }
 
     /**
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public void setInitializeObject(T o) {
         initializer = o;
@@ -54,7 +54,7 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     /**
      * A blank implementation of setValueAt, because it is not necessary.
      *
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public void setValueAt(Object o, int col) {
     }
@@ -62,7 +62,7 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     /**
      * A blank implementatino of cleanup, because it is not necessary.
      *
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public void cleanup() {
     }
@@ -70,7 +70,7 @@ public abstract class AbstractDataLine<T> implements DataLine<T> {
     /**
      * A blank implementation of update, because it is not necessary.
      *
-     * @implements DataLine interface
+     * Implements DataLine interface
      */
     public void update() {
     }

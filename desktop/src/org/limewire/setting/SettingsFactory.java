@@ -96,11 +96,11 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      */
     private final String HEADING;
     /**
-     * <tt>Properties</tt> instance for the default values.
+     * `Properties` instance for the default values.
      */
     private final Properties DEFAULT_PROPS = new Properties();
     /**
-     * The <tt>Properties</tt> instance containing all settings.
+     * The `Properties` instance containing all settings.
      */
     private final Properties PROPS = new Properties(DEFAULT_PROPS);
     /**
@@ -108,7 +108,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
      */
     private LongSetting LAST_EXPIRE_TIME = null;
     /**
-     * <tt>File</tt> object from which settings are loaded and saved
+     * `File` object from which settings are loaded and saved
      */
     private final File SETTINGS_FILE;
     /**
@@ -122,7 +122,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     private boolean expired = false;
 
     /**
-     * Creates a new <tt>SettingsFactory</tt> instance with the specified file
+     * Creates a new `SettingsFactory` instance with the specified file
      * to read from and write to.
      *
      * @param settingsFile the file to read from and to write to
@@ -302,7 +302,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>StringSetting</tt> instance with the specified
+     * Creates a new `StringSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -317,7 +317,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>BooleanSetting</tt> instance with the specified
+     * Creates a new `BooleanSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -332,7 +332,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>IntSetting</tt> instance with the specified
+     * Creates a new `IntSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -347,7 +347,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>ByteSetting</tt> instance with the specified
+     * Creates a new `ByteSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -362,7 +362,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>LongSetting</tt> instance with the specified
+     * Creates a new `LongSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -377,7 +377,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>FileSetting</tt> instance with the specified
+     * Creates a new `FileSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -399,7 +399,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>ColorSetting</tt> instance with the specified
+     * Creates a new `ColorSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -414,7 +414,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>CharArraySetting</tt> instance for a character array
+     * Creates a new `CharArraySetting` instance for a character array
      * setting with the specified key and default value.
      *
      * @param key          the key for the setting
@@ -428,7 +428,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>FloatSetting</tt> instance with the specified
+     * Creates a new `FloatSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -443,7 +443,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>StringArraySetting</tt> instance for a String array
+     * Creates a new `StringArraySetting` instance for a String array
      * setting with the specified key and default value.
      *
      * @param key          the key for the setting
@@ -467,7 +467,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>FileArraySetting</tt> instance for a File array
+     * Creates a new `FileArraySetting` instance for a File array
      * setting with the specified key and default value.
      *
      * @param key          the key for the setting
@@ -481,7 +481,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>FileSetSetting</tt> instance for a File array
+     * Creates a new `FileSetSetting` instance for a File array
      * setting with the specified key and default value.
      *
      * @param key          the key for the setting
@@ -494,7 +494,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new expiring <tt>IntSetting</tt> instance with the specified
+     * Creates a new expiring `IntSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting
@@ -510,7 +510,7 @@ public final class SettingsFactory implements Iterable<AbstractSetting> {
     }
 
     /**
-     * Creates a new <tt>FontNameSetting</tt> instance with the specified
+     * Creates a new `FontNameSetting` instance with the specified
      * key and default value.
      *
      * @param key          the key for the setting

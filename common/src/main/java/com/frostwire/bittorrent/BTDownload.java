@@ -182,7 +182,7 @@ public final class BTDownload implements BittorrentDownload {
     /**
      * If we have a torrent which is downloaded as a folder, this will return the parent of that folder.
      * (e.g. default save location for torrents)
-     * <p/>
+     * <p>
      * If you want to have the folder where the torrent's data files are located you
      * want to use getContentSavePath().
      */

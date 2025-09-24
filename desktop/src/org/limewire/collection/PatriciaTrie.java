@@ -27,7 +27,7 @@ import java.util.*;
  * closeness is determined by the {@link KeyAnalyzer} returning true or
  * false for a bit being set or not in a given key.
  * <p>
- * This PATRICIA Trie supports both variable length & fixed length keys.
+ * This PATRICIA Trie supports both variable length and fixed length keys.
  * Some methods, such as <code>getPrefixedBy(...)</code> are suited only to
  * variable length keys, whereas <code>getPrefixedByBits(...)</code> is suited
  * to fixed-size keys.
@@ -37,7 +37,7 @@ import java.util.*;
  * for more information.
  * <p>
  * Any methods here that take an <code>Object</code> may throw a
- * <code>ClassCastException<code> if the method is expecting an instance of K
+ * <code>ClassCastException</code> if the method is expecting an instance of K
  * (and it isn't K).
  *
  * <pre>
@@ -196,7 +196,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
     }
 
     /**
-     * Adds a new <key, value> pair to the Trie and if a pair already
+     * Adds a new [key, value] pair to the Trie and if a pair already
      * exists it will be replaced. In the latter case it will return
      * the old value.
      */
@@ -462,7 +462,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * a lookup of 'Lime' would return 'Lime', 'LimeRadio', and 'LimeWire'.
      * <p>
      * The view that this returns is optimized to have a very efficient
-     * Iterator. The firstKey, lastKey & size methods must iterate
+     * Iterator. The firstKey, lastKey and size methods must iterate
      * over all possible values in order to determine the results. This
      * information is cached until the Patricia tree changes. All other
      * methods (except Iterator) must compare the given key to the prefix
@@ -490,7 +490,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * return 'Lime', 'LimeRadio', and 'LimeWire'.
      * <p>
      * The view that this returns is optimized to have a very efficient
-     * Iterator.  The firstKey, lastKey & size methods must iterate
+     * Iterator.  The firstKey, lastKey and size methods must iterate
      * over all possible values in order to determine the results.  This
      * information is cached until the Patricia tree changes.  All other
      * methods (except Iterator) must compare the given key to the prefix
@@ -519,7 +519,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * length of 4 would return 'Lime', 'LimeRadio', and 'LimeWire'.
      * <p>
      * The view that this returns is optimized to have a very efficient
-     * Iterator.  The firstKey, lastKey & size methods must iterate
+     * Iterator.  The firstKey, lastKey and size methods must iterate
      * over all possible values in order to determine the results.  This
      * information is cached until the Patricia tree changes.  All other
      * methods (except Iterator) must compare the given key to the prefix
@@ -547,7 +547,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * would return all addresses that begin with '192.168'.
      * <p>
      * The view that this returns is optimized to have a very efficient
-     * Iterator.  The firstKey, lastKey & size methods must iterate
+     * Iterator.  The firstKey, lastKey and size methods must iterate
      * over all possible values in order to determine the results.  This
      * information is cached until the Patricia tree changes.  All other
      * methods (except Iterator) must compare the given key to the prefix
@@ -569,7 +569,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * and 'length' in the given key.
      * <p>
      * The view that this returns is optimized to have a very efficient
-     * Iterator.  The firstKey, lastKey & size methods must iterate
+     * Iterator.  The firstKey, lastKey and size methods must iterate
      * over all possible values in order to determine the results.  This
      * information is cached until the Patricia tree changes.  All other
      * methods (except Iterator) must compare the given key to the prefix
@@ -772,8 +772,8 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * node != node.parent.left.
      * - If node.parent.left is uplink from node.parent:
      * - If node.parent.left is not root, return it.
-     * - If it is root & root isEmpty, return null.
-     * - If it is root & root !isEmpty, return root.
+     * - If it is root and root isEmpty, return null.
+     * - If it is root and root !isEmpty, return root.
      * - If node.parent.left is not uplink from node.parent:
      * - Follow right path for first right child from node.parent.left
      *
@@ -865,7 +865,7 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * Otherwise, use it.
      * <p>
      * 6) If the right child of the parent is the parent itself, we've
-     * already found & returned the end of the Trie, so exit.
+     * already found and returned the end of the Trie, so exit.
      * <p>
      * 7) Do Step 1 on the parent's right child.
      */
@@ -1023,10 +1023,10 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * Returns a set view of the keys contained in this map.  The set is
      * backed by the map, so changes to the map are reflected in the set, and
      * vice-versa.  The set supports element removal, which removes the
-     * corresponding mapping from this map, via the <tt>Iterator.remove</tt>,
-     * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
-     * <tt>clear</tt> operations.  It does not support the <tt>add</tt> or
-     * <tt>addAll</tt> operations.
+     * corresponding mapping from this map, via the `Iterator.remove`,
+     * `Set.remove`, `removeAll`, `retainAll`, and
+     * `clear` operations.  It does not support the `add` or
+     * `addAll` operations.
      *
      * @return a set view of the keys contained in this map.
      */
@@ -1040,9 +1040,9 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * collection is backed by the map, so changes to the map are reflected in
      * the collection, and vice-versa. The collection supports element
      * removal, which removes the corresponding mapping from this map, via the
-     * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-     * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-     * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
+     * `Iterator.remove`, `Collection.remove`,
+     * `removeAll`, `retainAll`, and `clear` operations.
+     * It does not support the `add` or `addAll` operations.
      *
      * @return a collection view of the values contained in this map.
      */
@@ -1368,10 +1368,8 @@ public class PatriciaTrie<K, V> extends AbstractMap<K, V> implements Trie<K, V>,
      * the key and found key are equal than the return value is EQUAL_BIT_KEY).
      * <p>
      * <code>KeyAnalyzer</code> defines:<br>
-     * <table cellspace="5">
-     * <tr><td>NULL_BIT_KEY</td><td>When key's bits are all zero</td></tr>
-     * <tr><td> EQUAL_BIT_KEY </td><td>When keys are the same </td></tr>
-     * </table>
+     * - NULL_BIT_KEY - When key's bits are all zero
+     * - EQUAL_BIT_KEY - When keys are the same
      */
     public interface KeyAnalyzer<K> extends Comparator<K>, Serializable {
         /**

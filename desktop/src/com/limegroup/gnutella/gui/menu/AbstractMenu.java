@@ -28,18 +28,18 @@ import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 
 /**
- * Provides a skeletal implementation of the <tt>Menu</tt> interface to
- * minimize the necessary work in classes that extend <tt>AbstractMenu</tt>.
+ * Provides a skeletal implementation of the `Menu` interface to
+ * minimize the necessary work in classes that extend `AbstractMenu`.
  */
 abstract class AbstractMenu implements Menu {
     /**
-     * Constant handle to the <tt>JMenu</tt> instance for this
-     * <tt>AbstractMenu</tt>.
+     * Constant handle to the `JMenu` instance for this
+     * `AbstractMenu`.
      */
     final JMenu MENU;
 
     /**
-     * Creates a new <tt>AbstractMenu</tt>, using the <tt>key</tt>
+     * Creates a new `AbstractMenu`, using the `key`
      * argument for setting the locale-specific title and
      * accessibility text.
      *
@@ -51,9 +51,9 @@ abstract class AbstractMenu implements Menu {
     }
 
     /**
-     * Returns the <tt>JMenu</tt> instance for this <tt>AbstractMenu</tt>.
+     * Returns the `JMenu` instance for this `AbstractMenu`.
      *
-     * @return the <tt>JMenu</tt> instance for this <tt>AbstractMenu</tt>
+     * @return the `JMenu` instance for this `AbstractMenu`
      */
     public JMenu getMenu() {
         return MENU;
@@ -91,7 +91,7 @@ abstract class AbstractMenu implements Menu {
     }
 
     /**
-     * Adds a separator to the <tt>JMenu</tt> instance.
+     * Adds a separator to the `JMenu` instance.
      */
     void addSeparator() {
         MENU.addSeparator();

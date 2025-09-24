@@ -8,7 +8,7 @@ package com.frostwire.service;
  */
 public class MessageService {
     /**
-     * Variable for the <tt>MessageCallback</tt> implementation to use for
+     * Variable for the `MessageCallback` implementation to use for
      * displaying messages.
      */
     private volatile static MessageCallback _callback = new ShellMessageService();
@@ -26,7 +26,7 @@ public class MessageService {
     /**
      * Sets the class to use for making callbacks to the user.
      *
-     * @param callback the <tt>MessageCallback</tt> instance to use
+     * @param callback the `MessageCallback` instance to use
      */
     public static void setCallback(MessageCallback callback) {
         _callback = callback;

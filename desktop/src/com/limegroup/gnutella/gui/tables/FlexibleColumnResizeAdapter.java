@@ -10,18 +10,18 @@ import java.awt.event.MouseEvent;
  * User: Miguel Mu&ntilde;oz (SwingGuy1024@yahoo.com)
  * Date: Jul 17, 2005
  * Time: 2:50:40 AM
- * <p/>
+ * <p>
  * It drives me crazy that LimeWire's JTables use AUTO_RESIZE_NEXT_COLUMN. But
  * rather than trying to persuade you to choose a different mode, I wrote
  * this class to throw that decision into the hands of the end user.
- * <p/>
+ * <p>
  * Add this MouseListener to any JTableHeader, and the user will be able to
  * choose the resize mode by holding down the appropriate modifier keys.Guil
  * With no modifiers, this class leaves the behavior of LimeWire's resize mode
  * unchanged. The shift, control, and alt keys each give the user a different
  * resize mode. Multiple modifiers have no effect -- shift overrides control,
  * which overrides Alt.
- * <p/>
+ * <p>
  * The default setting is as follows: <br>
  * &nbsp;&nbsp; No modifiers:   AUTO_RESIZE_NEXT_COLUMN <br>
  * &nbsp;&nbsp; Shift key: AUTO_RESIZE_LAST_COLUMN <br>

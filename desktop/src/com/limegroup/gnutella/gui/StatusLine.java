@@ -633,10 +633,10 @@ public final class StatusLine implements VPNStatusRefresher.VPNStatusListener {
     }
 
     /**
-     * Accessor for the <tt>JComponent</tt> instance that contains all
+     * Accessor for the `JComponent` instance that contains all
      * of the panels for the status line.
      *
-     * @return the <tt>JComponent</tt> instance that contains all
+     * @return the `JComponent` instance that contains all
      * of the panels for the status line
      */
     public JComponent getComponent() {

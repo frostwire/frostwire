@@ -90,7 +90,7 @@ public class BoundSize implements Serializable {
     }
 
     /**
-     * Constructor. <b>This method is here for serilization only and should normally not be used. Use
+     * Constructor. <b>This method is here for serilization only and should normally not be used.</b> Use
      * {@link ConstraintParser#parseBoundSize(String, boolean, boolean)} instead.
      *
      * @param min          The minimum size. May be <code>null</code>.
@@ -104,7 +104,7 @@ public class BoundSize implements Serializable {
     }
 
     /**
-     * Constructor. <b>This method is here for serilization only and should normally not be used. Use
+     * Constructor. <b>This method is here for serilization only and should normally not be used.</b> Use
      * {@link ConstraintParser#parseBoundSize(String, boolean, boolean)} instead.
      *
      * @param min          The minimum size. May be <code>null</code>.

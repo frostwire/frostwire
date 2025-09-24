@@ -36,7 +36,7 @@ public class FileSetSetting extends AbstractSetting {
     private Set<File> value;
 
     /**
-     * Creates a new <tt>FileSetSetting</tt> instance with the specified
+     * Creates a new `FileSetSetting` instance with the specified
      * key and default value.
      *
      * @param key          the constant key to use for the setting

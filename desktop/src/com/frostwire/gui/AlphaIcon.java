@@ -11,7 +11,7 @@ import java.awt.*;
  * <P>
  * <B>Note:</B> This class is not suitable for wrapping an <CODE>ImageIcon</CODE>
  * that holds an animated image.  To show an animated ImageIcon with transparency,
- * use the companion class {@link AlphaImageIcon}.
+ * use the companion class AlphaImageIcon.
  *
  * @version 1.0 08/16/10
  * @author Darryl

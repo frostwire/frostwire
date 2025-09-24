@@ -31,7 +31,7 @@ public class DitherPanel extends JPanel {
     /**
      * Creates a FlowLayout.LEADING layout.
      *
-     * @param ditherer the <tt>Ditherer</tt> that paints the dithered
+     * @param ditherer the `Ditherer` that paints the dithered
      *                 background
      */
     public DitherPanel(Ditherer ditherer) {

@@ -36,7 +36,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
     private final static String TITLE = I18n.tr("Filter Results");
     private final static String LABEL = I18n.tr("You can filter out search results containing specific words.");
     /**
-     * Constant handle to the <tt>ListEditor</tt> that adds and removes
+     * Constant handle to the `ListEditor` that adds and removes
      * word to ignore.
      */
     private final ListEditor RESULTS_LIST = new ListEditor();
@@ -47,7 +47,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      *
      */
     public IgnoreResultsPaneItem() {
@@ -63,9 +63,9 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
-     * Sets the options for the fields in this <tt>PaneItem</tt> when the
+     * Sets the options for the fields in this `PaneItem` when the
      * window is shown.
      */
     public void initOptions() {
@@ -75,7 +75,7 @@ public final class IgnoreResultsPaneItem extends AbstractPaneItem {
     }
 
     /**
-     * Defines the abstract method in <tt>AbstractPaneItem</tt>.<p>
+     * Defines the abstract method in `AbstractPaneItem`.
      * <p>
      * Applies the options currently set in this window, displaying an
      * error message to the user if a setting could not be applied.

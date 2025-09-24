@@ -25,7 +25,7 @@ import java.io.IOException;
  * <code>I18NConvert</code>'s current implementation delegates the
  * internationalization conversion through the ICU4J library.
  * <p>
- * For example, &#195 is normalized to a, &#153 is normalized to tm and LiMEWirE is
+ * For example, &amp;&#035;195; is normalized to a, &amp;&#035;153; is normalized to tm and LiMEWirE is
  * normalized to limewire. See
  * <a href = "http://en.wikipedia.org/wiki/International_Components_for_Unicode">
  * Unicode</a> for more information about international components.

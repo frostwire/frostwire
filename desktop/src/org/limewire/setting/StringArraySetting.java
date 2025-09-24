@@ -20,7 +20,7 @@ public class StringArraySetting extends AbstractSetting {
     private String[] value;
 
     /**
-     * Creates a new <tt>StringArraySetting</tt> instance with the specified
+     * Creates a new `StringArraySetting` instance with the specified
      * key and default value.
      *
      * @param key          the constant key to use for the setting

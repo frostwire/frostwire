@@ -75,19 +75,19 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
     }
 
     /**
-     * Returns <tt>true</tt> if this set contains no elements.
+     * Returns `true` if this set contains no elements.
      *
-     * @return <tt>true</tt> if this set contains no elements.
+     * @return `true` if this set contains no elements.
      */
     public boolean isEmpty() {
         return map.isEmpty();
     }
 
     /**
-     * Returns <tt>true</tt> if this set contains the specified element.
+     * Returns `true` if this set contains the specified element.
      *
      * @param o element whose presence in this set is to be tested.
-     * @return <tt>true</tt> if this set contains the specified element.
+     * @return `true` if this set contains the specified element.
      */
     public boolean contains(Object o) {
         return map.containsKey(o);
@@ -98,7 +98,7 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      * present.
      *
      * @param o element to be added to this set.
-     * @return <tt>true</tt> if the set did not already contain the specified
+     * @return `true` if the set did not already contain the specified
      * element.
      */
     public boolean add(E o) {
@@ -109,7 +109,7 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
      * Removes the specified element from this set if it is present.
      *
      * @param o object to be removed from this set, if present.
-     * @return <tt>true</tt> if the set contained the specified element.
+     * @return `true` if the set contained the specified element.
      */
     public boolean remove(Object o) {
         return map.remove(o) == PRESENT;
@@ -123,7 +123,7 @@ public class FixedsizeForgetfulHashSet<E> extends AbstractSet<E> implements Set<
     }
 
     /**
-     * Returns a shallow copy of this <tt>FixedsizeForgetfulHashSet</tt> instance: the elements
+     * Returns a shallow copy of this `FixedsizeForgetfulHashSet` instance: the elements
      * themselves are not cloned.
      *
      * @return a shallow copy of this set.

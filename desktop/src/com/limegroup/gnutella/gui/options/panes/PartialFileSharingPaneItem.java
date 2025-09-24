@@ -38,7 +38,7 @@ public final class PartialFileSharingPaneItem extends AbstractPaneItem {
 
     /**
      * The constructor constructs all of the elements of this
-     * <tt>AbstractPaneItem</tt>.
+     * `AbstractPaneItem`.
      */
     public PartialFileSharingPaneItem() {
         super(TITLE, LABEL);

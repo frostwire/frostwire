@@ -18,7 +18,7 @@ public class FileArraySetting extends AbstractSetting {
     private File[] value;
 
     /**
-     * Creates a new <tt>FileArraySetting</tt> instance with the specified
+     * Creates a new `FileArraySetting` instance with the specified
      * key and default value.
      *
      * @param key          the constant key to use for the setting

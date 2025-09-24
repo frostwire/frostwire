@@ -134,7 +134,7 @@ class ResultPanelModel extends BasicDataLineModel<SearchResultDataLine, UISearch
     }
 
     /**
-     * Maintains the indexes HashMap & MetadataModel.
+     * Maintains the indexes HashMap and MetadataModel.
      */
     public int add(SearchResultDataLine tl, int row) {
         _numResults += 1;

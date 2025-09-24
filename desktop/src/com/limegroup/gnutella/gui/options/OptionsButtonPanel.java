@@ -11,12 +11,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 /**
- * This class contains the <tt>ButtonRow</tt> instance for the options
+ * This class contains the `ButtonRow` instance for the options
  * window.
  */
 final class OptionsButtonPanel {
     /**
-     * Handle to the enclosed <tt>ButtonRow</tt> instance.
+     * Handle to the enclosed `ButtonRow` instance.
      */
     private final ButtonRow _buttonRow;
     /**
@@ -25,7 +25,7 @@ final class OptionsButtonPanel {
     private final ButtonRow _revertRow;
 
     /**
-     * The constructor creates the <tt>ButtonRow</tt>.
+     * The constructor creates the `ButtonRow`.
      */
     OptionsButtonPanel() {
         String[] buttonLabelKeys = {
@@ -51,7 +51,7 @@ final class OptionsButtonPanel {
     }
 
     /**
-     * Returns the <tt>Component</tt> that contains the <tt>ButtonRow</tt>.
+     * Returns the `Component` that contains the `ButtonRow`.
      */
     Component getComponent() {
         JPanel box = new BoxPanel(BoxPanel.X_AXIS);

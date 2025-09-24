@@ -36,8 +36,8 @@ import java.util.Map;
 import java.util.MissingResourceException;
 
 /**
- * Manages application resources, including the custom <tt>LookAndFeel</tt>,
- * the locale-specific <tt>String</tt> instances, and any <tt>Icon</tt>
+ * Manages application resources, including the custom `LookAndFeel`,
+ * the locale-specific `String` instances, and any `Icon`
  * instances needed by the application.
  */
 public final class ResourceManager {
@@ -58,16 +58,16 @@ public final class ResourceManager {
      */
     private static final Map<String, ImageIcon> THEME_IMAGES = new HashMap<>();
     /**
-     * Instance of this <tt>ResourceManager</tt>, following singleton.
+     * Instance of this `ResourceManager`, following singleton.
      */
     private static ResourceManager _instance;
     /**
-     * Boolean status that controls whever the shared <tt>Locale</tt> instance
+     * Boolean status that controls whever the shared `Locale` instance
      * needs to be loaded, and locale-specific options need to be setup.
      */
     private static boolean _localeOptionsSet;
     /**
-     * Static variable for the loaded <tt>Locale</tt> instance.
+     * Static variable for the loaded `Locale` instance.
      */
     private static Locale _locale;
     /**
@@ -80,7 +80,7 @@ public final class ResourceManager {
     }
 
     /**
-     * Private constructor to ensure that a <tt>ResourceManager</tt> cannot be
+     * Private constructor to ensure that a `ResourceManager` cannot be
      * constructed from outside this class.
      */
     private ResourceManager() {
@@ -105,9 +105,9 @@ public final class ResourceManager {
     }
 
     /**
-     * Returns the <tt>Locale</tt> instance currently in use.
+     * Returns the `Locale` instance currently in use.
      *
-     * @return the <tt>Locale</tt> instance currently in use
+     * @return the `Locale` instance currently in use
      */
     static Locale getLocale() {
         return _locale;
@@ -132,8 +132,8 @@ public final class ResourceManager {
      * directly from the file system for themes.
      *
      * @param name The name of the image (excluding the extension) to locate.
-     * @return a new <tt>ImageIcon</tt> instance for the specified file, or
-     * <tt>null</tt> if the resource could not be loaded
+     * @return a new `ImageIcon` instance for the specified file, or
+     * `null` if the resource could not be loaded
      */
     static ImageIcon getThemeImage(final String name) {
         if (name == null)
@@ -207,19 +207,19 @@ public final class ResourceManager {
     }
 
     /**
-     * Returns a new <tt>URL</tt> instance for the specified file in the
+     * Returns a new `URL` instance for the specified file in the
      * "resources" directory.
      *
      * @param FILE_NAME the name of the resource file
-     * @return a new <tt>URL</tt> instance for the desired file, or
-     * <tt>null</tt> if the <tt>URL</tt> could not be loaded
+     * @return a new `URL` instance for the desired file, or
+     * `null` if the `URL` could not be loaded
      */
     public static URL getURLResource(final String FILE_NAME) {
         return ResourceManager.getURL(RESOURCES_PATH + FILE_NAME);
     }
 
     /**
-     * Returns a new <tt>URL</tt> instance for the resource at the specified
+     * Returns a new `URL` instance for the resource at the specified
      * local path. The path should be the full path within the jar file, such
      * as:
      * <p>
@@ -228,8 +228,8 @@ public final class ResourceManager {
      * <p>
      *
      * @param PATH the path to the resource file within the jar
-     * @return a new <tt>URL</tt> instance for the desired file, or
-     * <tt>null</tt> if the <tt>URL</tt> could not be loaded
+     * @return a new `URL` instance for the desired file, or
+     * `null` if the `URL` could not be loaded
      */
     private static URL getURL(final String PATH) {
         ClassLoader cl = ResourceManager.class.getClassLoader();

@@ -32,7 +32,7 @@ public final class IconRenderer extends DefaultTableBevelledCellRenderer {
     private static final long serialVersionUID = 8144602599802586291L;
 
     /**
-     * The constructor sets this <tt>JLabel</tt> to be opaque and sets the
+     * The constructor sets this `JLabel` to be opaque and sets the
      * border.
      */
     public IconRenderer() {
@@ -40,8 +40,8 @@ public final class IconRenderer extends DefaultTableBevelledCellRenderer {
     }
 
     /**
-     * Returns the <tt>Component</tt> that displays the stars based
-     * on the number of stars in the <tt>QualityHolder</tt> object.
+     * Returns the `Component` that displays the stars based
+     * on the number of stars in the `QualityHolder` object.
      */
     public Component getTableCellRendererComponent
     (JTable table, Object value, boolean isSelected,

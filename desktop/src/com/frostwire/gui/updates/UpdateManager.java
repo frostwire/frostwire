@@ -37,12 +37,12 @@ import java.util.HashSet;
  * Reads an update.xml file from frostwire.com The update xml file can also come
  * with special announcements for the community.
  * <p>
- * The correct syntax of the update.xml file should be as follows: <update
+ * The correct syntax of the update.xml file should be as follows: &lt;update
  * time="${server_time_here}" version="${update_manager_version}"
- * buyUrl="${proxy_buy_url}" />
+ * buyUrl="${proxy_buy_url}" /\&gt;
  * <p>
- * <message type="{update | announcement | overlay | hostiles }"
- * value="<text message goes here>" [version="${version_string}"] //version is
+ * &lt;message type="{update | announcement | overlay | hostiles }"
+ * value="[text message goes here]" [version="${version_string}"] //version is
  * mandatory for message type in ['update','hostiles'] [url="${url}"] //url is
  * mandatory for message type = 'update' and type='overlay'. Optional for
  * announcements. [expires="${server_timestamp}] //mandatory only for message
@@ -57,10 +57,10 @@ import java.util.HashSet;
  * es*. If language is not present message is always valid language wise.
  * [md5=""] //optional, used for the MD5 of the overlay image so we can cache
  * them or refresh them. Also to check the MD5 of the hostiles.version.txt.zip
- * when the torrent has been downloaded /> <![CDATA[ Put all the text you want
+ * when the torrent has been downloaded /&gt; &lt;![CDATA[ Put all the text you want
  * here, with tags, it doesn't matter cause its CDATA. Could be HTML if you want
- * in theory. Just dont put a ]]> in it. ]]> <!-- there can be many messages -->
- * </message> </update>
+ * in theory. Just dont put a ]]&gt; in it. ]]&gt; &lt;!-- there can be many messages --&gt;
+ * &lt;/message&gt; &lt;/update&gt;
  *
  * @author gubatron
  */
@@ -81,7 +81,9 @@ public final class UpdateManager implements Serializable {
     }
 
     /**
-     * Starts an Update Task in <secondsAfter> seconds after.
+     * Starts an Update Task in a specified number of seconds.
+     * @param secondsAfter The number of seconds after to start the task.
+     * @param force Whether or not to force the update.
      */
     static void scheduleUpdateCheckTask(final int secondsAfter, final boolean force) {
         if (OSUtils.isWindowsAppStoreInstall()){
@@ -103,8 +105,9 @@ public final class UpdateManager implements Serializable {
     }
 
     /**
-     * Starts an Update Task in <secondsAfter> seconds after at a custom update
+     * Starts an Update Task in a specified number of seconds after at a custom update
      * URL
+     * @param secondsAfter The number of seconds after to start the task.
      */
     public static void scheduleUpdateCheckTask(int secondsAfter) {
         scheduleUpdateCheckTask(secondsAfter, false);

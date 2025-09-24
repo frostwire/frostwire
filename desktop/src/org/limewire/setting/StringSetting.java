@@ -31,7 +31,7 @@ public final class StringSetting extends AbstractSetting {
     private String value;
 
     /**
-     * Creates a new <tt>SettingBool</tt> instance with the specified
+     * Creates a new `SettingBool` instance with the specified
      * key and default value.
      *
      * @param key        the constant key to use for the setting
@@ -54,7 +54,7 @@ public final class StringSetting extends AbstractSetting {
     /**
      * Mutator for this setting.
      *
-     * @param str the <tt>String</tt> to store
+     * @param str the `String` to store
      */
     public void setValue(String str) {
         setValueInternal(str);

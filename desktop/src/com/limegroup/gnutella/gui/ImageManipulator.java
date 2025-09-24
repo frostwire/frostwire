@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.*;
 
 /**
- * Utility class for manipulating images & icons.
+ * Utility class for manipulating images and icons.
  */
 public class ImageManipulator extends RGBImageFilter {
     /**

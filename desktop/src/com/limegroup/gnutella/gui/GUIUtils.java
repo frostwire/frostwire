@@ -132,8 +132,8 @@ public final class GUIUtils {
      * <code>bytes</code> argument evaluates to, with
      * "KB"/"MB"/"GB"/TB" appended at the end. If the input value is
      * negative, the string returned will be "? KB".
-     * @see GUIUtils::rate2speed() if you want to deal with download speeds
-     * //
+     * @see GUIUtils#rate2speed(double) GUIUtils.rate2speed() if you want to deal with download speeds
+     *
      */
     public static String getBytesInHuman(double bytes) {
         if (bytes < 0) {
@@ -437,7 +437,7 @@ public final class GUIUtils {
     }
 
     /**
-     * Sets the location of <tt>dialog</tt> so it appears centered regarding
+     * Sets the location of `dialog` so it appears centered regarding
      * the main application or centered on the screen if the main application is
      * not visible.
      */
@@ -485,7 +485,7 @@ public final class GUIUtils {
      *            look up -- the key as it appears in the locale-specific
      *            properties file
      * @return the code for the passed-in key as defined in
-     * <tt>java.awt.event.KeyEvent</tt>, or -1 if no key code
+     * `java.awt.event.KeyEvent`, or -1 if no key code
      * could be found
      */
     private static int getCodeForCharKey(String str) {

@@ -28,10 +28,10 @@ import java.awt.*;
 /**
  * This is a reusable class that creates a titled panel with the specified
  * title and the specified padding both surrounding the panel and inside
- * the panel.  This panel also uses <tt>BoxLayout</tt> on the outer panels
+ * the panel.  This panel also uses `BoxLayout` on the outer panels
  * for layout purposes.<p>
  * <p>
- * The inner panel also defaults to <tt>BoxLayout</tt>, but the user can change
+ * The inner panel also defaults to `BoxLayout`, but the user can change
  * the layout with the overridden setLayout method.
  */
 public class TitledPaddedPanel extends JPanel {
@@ -56,15 +56,15 @@ public class TitledPaddedPanel extends JPanel {
      */
     private final BoxPanel _mainPanel;
     /**
-     * The <tt>TitledBorder</tt> for the panel, stored to allow changing
+     * The `TitledBorder` for the panel, stored to allow changing
      * the title.
      */
     private final TitledBorder _titledBorder;
 
     /**
-     * Creates a <tt>TitledPaddedPanel</tt> with the specified title
+     * Creates a `TitledPaddedPanel` with the specified title
      * and the specified outer and inner padding.  The underlying
-     * <tt>JPanel</tt> uses <tt>BoxLayout</tt> oriented along the y axis.
+     * `JPanel` uses `BoxLayout` oriented along the y axis.
      *
      * @param title    the title of the panel
      * @param outerPad the padding to use on the outside of the titled border
@@ -90,7 +90,7 @@ public class TitledPaddedPanel extends JPanel {
     }
 
     /**
-     * Creates a <tt>TitledPaddedPanel</tt> with the empty string as
+     * Creates a `TitledPaddedPanel` with the empty string as
      * its title.
      */
     public TitledPaddedPanel() {
@@ -107,10 +107,10 @@ public class TitledPaddedPanel extends JPanel {
     }
 
     /**
-     * Overrides the add(Component comp) method in the <tt>Container</tt>
-     * class, adding the <tt>Component</tt> to the inner panel.
+     * Overrides the add(Component comp) method in the `Container`
+     * class, adding the `Component` to the inner panel.
      *
-     * @param comp the <tt>Component</tt> to add
+     * @param comp the `Component` to add
      */
     @Override
     public Component add(Component comp) {

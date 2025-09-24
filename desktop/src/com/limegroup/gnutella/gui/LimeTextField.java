@@ -153,7 +153,7 @@ public class LimeTextField extends JTextField {
     }
 
     /**
-     * Constructs a new LimeTextField with the given text & number of columns.
+     * Constructs a new LimeTextField with the given text and number of columns.
      */
     public LimeTextField(String text, int columns) {
         super(text, columns);

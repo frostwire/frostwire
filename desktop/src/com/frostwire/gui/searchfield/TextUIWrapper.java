@@ -13,7 +13,7 @@ import java.beans.PropertyChangeListener;
  * TODO:
  *
  * @param <UI>
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public abstract class TextUIWrapper<UI extends TextUI> {
     private static final DefaultWrapper defaultWrapper = new DefaultWrapper();
@@ -100,7 +100,7 @@ public abstract class TextUIWrapper<UI extends TextUI> {
          * <code>textUI</code> will be returned. If <code>textUI</code> is
          * of type {@link BasicTextFieldUI} a {@link BuddyTextFieldUI} object
          * will be returned. If <code>textUI</code> is of type
-         * {@link BasicTextAreaUI} a {@link PromptTextAreaUI} object will be
+         * {@link BasicTextAreaUI} a `PromptTextAreaUI` object will be
          * returned.
          * </p>
          *

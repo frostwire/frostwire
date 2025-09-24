@@ -35,7 +35,7 @@ import java.awt.event.KeyEvent;
  * {@link ActionEvent}s command property contains the text to search for. The
  * search should be cancelled, when the command text is empty or null.
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  * @see RecentSearches
  */
 public class JXSearchField extends JXTextField {

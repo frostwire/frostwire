@@ -14,12 +14,12 @@ public final class ColorSetting extends AbstractSetting {
     private Color value;
 
     /**
-     * Creates a new <tt>ColorSetting</tt> instance with the specified
+     * Creates a new `ColorSetting` instance with the specified
      * key and default value.
      *
-     * @param defaultProps the <tt>Properties</tt> file that stores the
+     * @param defaultProps the `Properties` file that stores the
      *                     defaults
-     * @param props        the <tt>Properties</tt> file to store this color
+     * @param props        the `Properties` file to store this color
      * @param key          the constant key to use for the setting
      * @param value        the default value to use for the setting
      */
@@ -29,7 +29,7 @@ public final class ColorSetting extends AbstractSetting {
     }
 
     /**
-     * Creates a new <tt>ColorSetting</tt> instance with the specified
+     * Creates a new `ColorSetting` instance with the specified
      * key and default value.
      *
      * @param key          the constant key to use for the setting

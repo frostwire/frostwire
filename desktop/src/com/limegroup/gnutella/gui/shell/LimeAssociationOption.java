@@ -21,7 +21,7 @@ package com.limegroup.gnutella.gui.shell;
 import org.limewire.setting.BooleanSetting;
 
 /**
- * Links a ShellAssociation with FrostWire settings, name & description,
+ * Links a ShellAssociation with FrostWire settings, name and description,
  * in order to have a single object that can display the association
  * and determine if it should be registered or not.
  */

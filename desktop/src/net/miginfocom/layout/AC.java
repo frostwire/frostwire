@@ -61,7 +61,7 @@ public final class AC implements Externalizable {
 
     /**
      * Property. The different {@link net.miginfocom.layout.DimConstraint}s that this object consists of.
-     * These <code><DimConstraints/code> contains all information in this class.
+     * These <code><DimConstraints</code> contains all information in this class.
      * <p>
      * Yes, we are embarrassingly aware that the method is misspelled.
      *

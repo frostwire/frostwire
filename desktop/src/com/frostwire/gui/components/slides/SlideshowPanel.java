@@ -21,7 +21,7 @@ package com.frostwire.gui.components.slides;
 import javax.swing.*;
 
 /**
- * The panel that displays <SlidePanel></SlidePanel> slide show
+ * The panel that displays {@link SlidePanel} slide show
  * @author gubatron
  * @author aldenml
  */

@@ -28,7 +28,7 @@ import java.util.function.Function;
  * the prompt text.
  * </p>
  *
- * @author Peter Weishapl <petw@gmx.net>
+ * @author Peter Weishapl (petw@gmx.net)
  */
 public abstract class PromptTextUI extends TextUI {
     private static final FocusHandler focusHandler = new FocusHandler();

@@ -81,8 +81,8 @@ public class CommonUtils {
     /**
      * Returns the user home directory.
      *
-     * @return the <tt>File</tt> instance denoting the abstract pathname of
-     * the user's home directory, or <tt>null</tt> if the home directory
+     * @return the `File` instance denoting the abstract pathname of
+     * the user's home directory, or `null` if the home directory
      * does not exist
      */
     public static File getUserHomeDir() {
@@ -93,7 +93,7 @@ public class CommonUtils {
      * Gets an InputStream from a resource file.
      *
      * @param location the location of the resource in the resource file
-     * @return an <tt>InputStream</tt> for the resource
+     * @return an `InputStream` for the resource
      * @throws IOException if the resource could not be located or there was
      *                     another IO error accessing the resource
      */
@@ -145,8 +145,8 @@ public class CommonUtils {
     /**
      * Converts a value in seconds to:
      * "d:hh:mm:ss" where d=days, hh=hours, mm=minutes, ss=seconds, or
-     * "h:mm:ss" where h=hours<24, mm=minutes, ss=seconds, or
-     * "m:ss" where m=minutes<60, ss=seconds
+     * "h:mm:ss" where h=hours&lt;24, mm=minutes, ss=seconds, or
+     * "m:ss" where m=minutes&lt;60, ss=seconds
      */
     public static String seconds2time(long seconds) {
         int minutes = (int) (seconds / 60);
@@ -306,11 +306,11 @@ public class CommonUtils {
     }
 
     /**
-     * Returns the user's current working directory as a <tt>File</tt>
-     * instance, or <tt>null</tt> if the property is not set.
+     * Returns the user's current working directory as a `File`
+     * instance, or `null` if the property is not set.
      *
-     * @return the user's current working directory as a <tt>File</tt>
-     * instance, or <tt>null</tt> if the property is not set
+     * @return the user's current working directory as a `File`
+     * instance, or `null` if the property is not set
      */
     public static File getCurrentDirectory() {
         return new File(System.getProperty("user.dir"));
@@ -465,9 +465,9 @@ public class CommonUtils {
      * Looks for a ".meta" configuration file on the same folder as the FrostWire executable.
      * If found this file should contain the following configuration values:
      * <p>
-     * user.settings.dir.windows = <relative path to frostwire settings directory for windows installation>
-     * user.settings.dir.mac = <relative path to frostwire settings directory for windows installation>
-     * user.settings.dir.posix = <relative path to frostwire settings directory for posix installation>
+     * user.settings.dir.windows = [relative path to frostwire settings directory for windows installation]
+     * user.settings.dir.mac = [relative path to frostwire settings directory for windows installation]
+     * user.settings.dir.posix = [relative path to frostwire settings directory for posix installation]
      *
      * @return A Properties object, if the .meta file is not found returns an empty Properties object.
      */

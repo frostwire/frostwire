@@ -72,8 +72,8 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * L = 1001100 <br>
      * <p>
      * If the Trie contained 'H' and 'L', a lookup of 'D' would return 'L',
-     * because the XOR distance between D & L is smaller than the XOR distance
-     * between D & H.
+     * because the XOR distance between D and L is smaller than the XOR distance
+     * between D and H.
      */
     V select(K key);
 
@@ -119,13 +119,12 @@ public interface Trie<K, V> extends SortedMap<K, V> {
      * what to do next.
      * <p>
      * <code>Cursor</code> returns status/selection status might be:
-     * <table cellspace="5">
-     * <tr><td><b>Return Value</b></td><td><b>Status</b></td></tr>
-     * <tr><td>EXIT</td><td>Finish the Trie operation</td></tr>
-     * <tr><td>CONTINUE</td><td>Look at the next element in the traversal</td></tr>
-     * <tr><td>REMOVE_AND_EXIT</td><td>Remove the entry and stop iterating</td></tr>
-     * <tr><td>REMOVE</td><td>Remove the entry and continue iterating</td></tr>
-     * </table>
+     * | Return Value    | Status                                    |
+     * | --------------- | ----------------------------------------- |
+     * | EXIT            | Finish the Trie operation                 |
+     * | CONTINUE        | Look at the next element in the traversal |
+     * | REMOVE_AND_EXIT | Remove the entry and stop iterating       |
+     * | REMOVE          | Remove the entry and continue iterating   |
      * <p>
      * Note: {@link Trie#select(Object, org.limewire.collection.Trie.Cursor)} does
      * not support <code>REMOVE</code>.

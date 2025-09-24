@@ -1681,7 +1681,6 @@ public class IOUtils {
      * <p>
      * This method uses the provided buffer, so there is no need to use a
      * <code>BufferedInputStream</code>.
-     * <p>
      *
      * @param input  the <code>InputStream</code> to read from
      * @param output the <code>OutputStream</code> to write to
@@ -1732,7 +1731,6 @@ public class IOUtils {
      * <p>
      * This method uses the provided buffer, so there is no need to use a
      * <code>BufferedInputStream</code>.
-     * <p>
      *
      * @param input       the <code>InputStream</code> to read from
      * @param output      the <code>OutputStream</code> to write to
@@ -1889,7 +1887,6 @@ public class IOUtils {
      * <p>
      * This method uses the provided buffer, so there is no need to use a
      * <code>BufferedReader</code>.
-     * <p>
      *
      * @param input  the <code>Reader</code> to read from
      * @param output the <code>Writer</code> to write to
@@ -1939,7 +1936,6 @@ public class IOUtils {
      * <p>
      * This method uses the provided buffer, so there is no need to use a
      * <code>BufferedReader</code>.
-     * <p>
      *
      * @param input       the <code>Reader</code> to read from
      * @param output      the <code>Writer</code> to write to

@@ -29,8 +29,8 @@ import java.io.File;
  * This class is the gateway from the backend to the frontend.  It
  * delegates all callbacks to the appropriate frontend classes, and it
  * also handles putting calls onto the Swing thread as necessary.
- * <p/>
- * It implements the <tt>ActivityCallback</tt> callback interface, designed
+ * <p>
+ * It implements the `ActivityCallback` callback interface, designed
  * to make it easy to swap UIs.
  */
 public final class VisualConnectionCallback implements ActivityCallback {

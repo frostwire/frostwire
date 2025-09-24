@@ -77,7 +77,7 @@ public final class OptionsConstructor {
     private static final String NETWORK_INTERFACE_KEY = "OPTIONS_NETWORK_INTERFACE_MAIN_TITLE";
     private static final String ASSOCIATIONS_KEY = "OPTIONS_ASSOCIATIONS_MAIN_TITLE";
     /**
-     * Handle to the top-level <tt>JDialog</tt window that contains all
+     * Handle to the top-level `JDialog</tt window that contains all
      * of the other GUI components.
      */
     private final JDialog DIALOG;
@@ -93,10 +93,10 @@ public final class OptionsConstructor {
      * The constructor create all the options windows and their
      * components.
      *
-     * @param treeManager the <tt>OptionsTreeManager</tt> instance to
+     * @param treeManager the `OptionsTreeManager` instance to
      *                    use for constructing the main panels and
      *                    adding elements
-     * @param paneManager the <tt>OptionsPaneManager</tt> instance to
+     * @param paneManager the `OptionsPaneManager` instance to
      *                    use for constructing the main panels and
      *                    adding elements
      */
@@ -232,23 +232,23 @@ public final class OptionsConstructor {
 
     /**
      * Adds a parent node to the tree.  This node serves navigational
-     * purposes only, and so has no corresponding <tt>OptionsPane</tt>.
+     * purposes only, and so has no corresponding `OptionsPane`.
      * This method allows for multiple tiers of parent nodes, not only
      * top-level parents.
      *
      * @param parentKey the key of the parent node to add this parent
      *                  node to
      * @param childKey  the key of the new parent node that is a child of
-     *                  the <tt>parentKey</tt> argument
+     *                  the `parentKey` argument
      */
     private void addGroupTreeNode(final String parentKey, final String childKey, String label) {
         TREE_MANAGER.addNode(parentKey, childKey, label, label);
     }
 
     /**
-     * Adds the specified key and <tt>OptionsPane</tt> to current set of
-     * options. This adds this <tt>OptionsPane</tt> to the set of
-     * <tt>OptionsPane</tt>s the user can select.
+     * Adds the specified key and `OptionsPane` to current set of
+     * options. This adds this `OptionsPane` to the set of
+     * `OptionsPane`s the user can select.
      *
      * @param parentKey the key of the parent node to add the new node to
      */
@@ -281,7 +281,7 @@ public final class OptionsConstructor {
      * Makes the options window either visible or not visible depending on the
      * boolean argument.
      *
-     * @param visible <tt>boolean</tt> value specifying whether the options
+     * @param visible `boolean` value specifying whether the options
      *                window should be made visible or not visible
      * @param key     the unique identifying key of the panel to show
      */
@@ -313,10 +313,10 @@ public final class OptionsConstructor {
     }
 
     /**
-     * Returns the main <tt>JDialog</tt> instance for the options window,
+     * Returns the main `JDialog` instance for the options window,
      * allowing other components to position themselves accordingly.
      *
-     * @return the main options <tt>JDialog</tt> window
+     * @return the main options `JDialog` window
      */
     JDialog getMainOptionsComponent() {
         return DIALOG;

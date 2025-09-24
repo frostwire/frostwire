@@ -132,8 +132,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is some version of Windows.
      *
-     * @return <tt>true</tt> if the application is running on some Windows
-     * version, <tt>false</tt> otherwise
+     * @return `true` if the application is running on some Windows
+     * version, `false` otherwise
      */
     public static boolean isWindows() {
         return _isWindows;
@@ -142,8 +142,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is OS/2.
      *
-     * @return <tt>true</tt> if the application is running on OS/2,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on OS/2,
+     * `false` otherwise
      */
     public static boolean isOS2() {
         return _isOS2;
@@ -152,8 +152,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is Mac OS X.
      *
-     * @return <tt>true</tt> if the application is running on Mac OS X,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on Mac OS X,
+     * `false` otherwise
      */
     public static boolean isMacOSX() {
         return _isMacOSX;
@@ -162,8 +162,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is any macOS.
      *
-     * @return <tt>true</tt> if the application is running on Mac OSX
-     * or any previous mac version, <tt>false</tt> otherwise
+     * @return `true` if the application is running on Mac OSX
+     * or any previous mac version, `false` otherwise
      */
     public static boolean isAnyMac() {
         return _isMacOSX;
@@ -172,8 +172,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is Solaris.
      *
-     * @return <tt>true</tt> if the application is running on Solaris,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on Solaris,
+     * `false` otherwise
      */
     public static boolean isSolaris() {
         return _isSolaris;
@@ -182,8 +182,8 @@ public class OSUtils {
     /**
      * Returns whether the OS is Linux.
      *
-     * @return <tt>true</tt> if the application is running on Linux,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on Linux,
+     * `false` otherwise
      */
     public static boolean isLinux() {
         return _isLinux;
@@ -192,8 +192,8 @@ public class OSUtils {
     /**
      * Returns whether the Linux distribution is Ubuntu or Debian.
      *
-     * @return <tt>true</tt> if the application is running on Ubuntu or Debian distributions,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on Ubuntu or Debian distributions,
+     * `false` otherwise
      */
     public static boolean isUbuntu() {
         return _isUbuntu;
@@ -202,8 +202,8 @@ public class OSUtils {
     /**
      * Returns whether the Linux distribution is Fedora or Red Hat
      *
-     * @return <tt>true</tt> if the application is running on Fedora or Red Hat distributions,
-     * <tt>false</tt> otherwise
+     * @return `true` if the application is running on Fedora or Red Hat distributions,
+     * `false` otherwise
      */
     public static boolean isFedora() {
         return _isFedora;

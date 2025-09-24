@@ -81,7 +81,7 @@ class BitTorrentSettingsWindow extends SetupWindow {
 
     /**
      * Overrides applySettings method in SetupWindow.
-     * <p/>
+     * <p>
      * This method applies any settings associated with this setup window.
      */
     public void applySettings(boolean loadCoreComponents) throws ApplySettingsException {

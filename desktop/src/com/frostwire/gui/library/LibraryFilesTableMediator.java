@@ -267,7 +267,7 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
     }
 
     /**
-     * Sets up drag & drop for the table.
+     * Sets up drag and drop for the table.
      */
     protected void setupDragAndDrop() {
         TABLE.setDragEnabled(true);
@@ -323,11 +323,11 @@ final public class LibraryFilesTableMediator extends AbstractLibraryTableMediato
     }
 
     /**
-     * Returns the <tt>File</tt> stored at the specified row in the list.
+     * Returns the `File` stored at the specified row in the list.
      *
-     * @param row the row of the desired <tt>File</tt> instance in the
+     * @param row the row of the desired `File` instance in the
      *            list
-     * @return a <tt>File</tt> instance associated with the specified row
+     * @return a `File` instance associated with the specified row
      * in the table
      */
     private File getFile(int row) {

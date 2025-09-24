@@ -62,7 +62,7 @@ public final class SearchResultDisplayer implements RefreshListener {
      */
     private final PaneListener PANE_LISTENER = new PaneListener();
     /**
-     * <tt>JPanel</tt> containing the primary components of the search result
+     * `JPanel` containing the primary components of the search result
      * display.
      */
     private final JPanel MAIN_PANEL;
@@ -337,10 +337,10 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     /**
-     * Returns the currently selected <tt>ResultPanel</tt> instance.
+     * Returns the currently selected `ResultPanel` instance.
      *
-     * @return the currently selected <tt>ResultPanel</tt> instance,
-     * or <tt>null</tt> if there is no currently selected panel
+     * @return the currently selected `ResultPanel` instance,
+     * or `null` if there is no currently selected panel
      */
     SearchResultMediator getSelectedResultPanel() {
         int i = tabbedPane.getSelectedIndex();
@@ -354,7 +354,7 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     /**
-     * Returns the <tt>ResultPanel</tt> for the specified GUID.
+     * Returns the `ResultPanel` for the specified GUID.
      *
      * @return the ResultPanel that matches the specified GUID, or null
      * if none match.
@@ -479,10 +479,10 @@ public final class SearchResultDisplayer implements RefreshListener {
     }
 
     /**
-     * Returns the <tt>JComponent</tt> instance containing all of the search
+     * Returns the `JComponent` instance containing all of the search
      * result ui components.
      *
-     * @return the <tt>JComponent</tt> instance containing all of the search
+     * @return the `JComponent` instance containing all of the search
      * result ui components
      */
     JComponent getComponent() {
