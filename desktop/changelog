@@ -24,6 +24,7 @@ frostwire (7.0.0) stable; urgency=high
  * Crash:don't crash if a null set_piece_hashes_listener is passed to set_piece_hashes_ex
  * Crash:StatusLine seedingStatusButton.getText()
  * Cleanup:Remove unused sun.awt.X11 classes (linux)
+ * Maintenance:fix javadoc errors, javadoc cleanup
  * Maintenance:all license headers are consistent with GPL 3.0
  * Maintenance:simplified donations buttons in status bar to a single 'Donate' button
  * Maintenance:added don't show me again for linux warning when mplayer isn't found
@@ -253,7 +254,7 @@ frostwire (7.0.0) stable; urgency=high
  * lt:fix renaming of filenames that are too long for the filesystem
  * lt:made UPnP and LSD code avoid using select_reactor (to work around an issue on windows in boost.asio < 1.80)
 
- -- FrostWire Team <contact@frostwire.com>  Wed, 21 Sep 2025 15:51:00 -0600
+ -- FrostWire Team <contact@frostwire.com>  Thu, 25 Sep 2025 11:46:00 -0600
 
 frostwire (6.14.0) stable; urgency=high
  * Telluride Video Downloader build 38
