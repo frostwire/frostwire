@@ -424,4 +424,26 @@
     <string name="subs_details">Während des 7-tägigen Probezeitraums fallen keine Gebühren an.\n\nDas Abonnement wird berechnet, sobald der 7-tägige Probezeitraum endet oder sofort für frühere Abonnenten.\n\nDas Abonnement wird automatisch erneuert, es sei denn, es wird mindestens 24 Stunden vor Ende des Abonnementzeitraums gekündigt.\n\nDrücken Sie \'Abonnements verwalten\' für automatische Erneuerungen und Kündigungen in Google Play.</string>
     <string name="subscriptions">📅 Abonnements</string>
     <string name="rewarded_video_ad">📺 Belohnte Videoanzeige</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Port-Bereich für Eingehende Verbindungen</string>
+    <string name="incoming_connection_port_range_summary">Ports für eingehende Verbindungen konfigurieren</string>
+    <string name="port_range_dialog_title">Port-Bereich Festlegen</string>
+    <string name="port_range_start_port">Start-Port</string>
+    <string name="port_range_end_port">End-Port</string>
+    <string name="port_range_reset_default">Auf Standard Zurücksetzen</string>
+    <string name="port_range_current_range">Aktueller Bereich: %1$d - %2$d</string>
+    <string name="port_range_default_range">Standard-Bereich: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Ungültiger Port-Bereich. Start-Port muss kleiner oder gleich dem End-Port sein.</string>
+    <string name="port_range_invalid_port">Port-Werte müssen zwischen 1024 und 65535 liegen.</string>
+    <string name="restart_torrent_engine_title">Torrent-Engine Neustarten?</string>
+    <string name="restart_torrent_engine_message">Port-Bereich-Einstellungen wurden gespeichert. Möchten Sie die Torrent-Engine jetzt neustarten, um die neuen Port-Einstellungen anzuwenden?\n\nHinweis: Dies stoppt vorübergehend alle aktiven Übertragungen und speichert deren Fortschritt.</string>
+    <string name="restart_now">Jetzt Neustarten</string>
+    <string name="restart_later">Später Neustarten</string>
+    <string name="port_settings_saved_restart_later">Port-Einstellungen gespeichert. Änderungen werden beim Neustart von FrostWire angewendet.</string>
+    <string name="restarting_torrent_engine">Neustart der Torrent-Engine mit neuen Port-Einstellungen…</string>
+    <string name="torrent_engine_restarted">Torrent-Engine mit neuen Port-Einstellungen neu gestartet</string>
+    <string name="error_restarting_torrent_engine">Fehler beim Neustart der Torrent-Engine: %s</string>
+    <string name="apply">Anwenden</string>
+    <string name="port_range_cancel">Abbrechen</string>
 </resources>

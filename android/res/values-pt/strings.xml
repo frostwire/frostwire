@@ -421,4 +421,26 @@
     <string name="subs_details">Não será cobrado durante o período de teste de 7 dias.\n\nA assinatura é cobrada assim que o período de teste de 7 dias termina ou imediatamente para assinantes anteriores.\n\nA assinatura é renovada automaticamente, a menos que seja cancelada pelo menos 24 horas antes do fim do período de assinatura.\n\nPressione \'Gerenciar Assinaturas\' para renovações automáticas e cancelamentos no Google Play.</string>
     <string name="subscriptions">📅 Assinaturas</string>
     <string name="rewarded_video_ad">📺 Anúncio de Vídeo Remunerado</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Faixa de Portas para Conexões Entrantes</string>
+    <string name="incoming_connection_port_range_summary">Configurar portas para conexões entrantes</string>
+    <string name="port_range_dialog_title">Definir Faixa de Portas</string>
+    <string name="port_range_start_port">Porta Inicial</string>
+    <string name="port_range_end_port">Porta Final</string>
+    <string name="port_range_reset_default">Restaurar Padrão</string>
+    <string name="port_range_current_range">Faixa atual: %1$d - %2$d</string>
+    <string name="port_range_default_range">Faixa padrão: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Faixa de portas inválida. A porta inicial deve ser menor ou igual à porta final.</string>
+    <string name="port_range_invalid_port">Valores de porta devem estar entre 1024 e 65535.</string>
+    <string name="restart_torrent_engine_title">Reiniciar Motor de Torrent?</string>
+    <string name="restart_torrent_engine_message">As configurações de faixa de portas foram salvas. Deseja reiniciar o motor de torrent agora para aplicar as novas configurações de porta?\n\nNota: Isso irá parar temporariamente todas as transferências ativas e salvar seu progresso.</string>
+    <string name="restart_now">Reiniciar Agora</string>
+    <string name="restart_later">Reiniciar Depois</string>
+    <string name="port_settings_saved_restart_later">Configurações de porta salvas. As alterações serão aplicadas quando o FrostWire for reiniciado.</string>
+    <string name="restarting_torrent_engine">Reiniciando motor de torrent com novas configurações de porta…</string>
+    <string name="torrent_engine_restarted">Motor de torrent reiniciado com novas configurações de porta</string>
+    <string name="error_restarting_torrent_engine">Erro ao reiniciar motor de torrent: %s</string>
+    <string name="apply">Aplicar</string>
+    <string name="port_range_cancel">Cancelar</string>
 </resources>

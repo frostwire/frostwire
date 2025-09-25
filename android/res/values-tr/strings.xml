@@ -413,4 +413,26 @@
     <string name="subs_details">7 günlük deneme süresi boyunca herhangi bir ücret alınmayacak.\n\nAbonelik, 7 günlük deneme süresinin sona ermesinin hemen ardından veya önceki aboneler için hemen tahsil edilecektir.\n\nAbonelik, abonelik süresinin bitiminden en az 24 saat önce iptal edilmediği takdirde otomatik olarak yenilenecektir.\n\nGoogle Play\'de otomatik yenileme ve iptaller için \'Abonelikleri Yönet\'e basın.</string>
     <string name="subscriptions">📅 Abonelikler</string>
     <string name="rewarded_video_ad">📺 Ödüllü Video Reklam</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Gelen Bağlantı Port Aralığı</string>
+    <string name="incoming_connection_port_range_summary">Gelen bağlantılar için portları yapılandır</string>
+    <string name="port_range_dialog_title">Port Aralığı Ayarla</string>
+    <string name="port_range_start_port">Başlangıç Portu</string>
+    <string name="port_range_end_port">Bitiş Portu</string>
+    <string name="port_range_reset_default">Varsayılana Sıfırla</string>
+    <string name="port_range_current_range">Mevcut aralık: %1$d - %2$d</string>
+    <string name="port_range_default_range">Varsayılan aralık: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Geçersiz port aralığı. Başlangıç portu bitiş portundan küçük veya eşit olmalıdır.</string>
+    <string name="port_range_invalid_port">Port değerleri 1024 ile 65535 arasında olmalıdır.</string>
+    <string name="restart_torrent_engine_title">Torrent Motorunu Yeniden Başlat?</string>
+    <string name="restart_torrent_engine_message">Port aralığı ayarları kaydedildi. Yeni port ayarlarını uygulamak için torrent motorunu şimdi yeniden başlatmak istiyor musunuz?\n\nNot: Bu, tüm aktif transferleri geçici olarak durdurur ve ilerlemelerini kaydeder.</string>
+    <string name="restart_now">Şimdi Yeniden Başlat</string>
+    <string name="restart_later">Sonra Yeniden Başlat</string>
+    <string name="port_settings_saved_restart_later">Port ayarları kaydedildi. Değişiklikler FrostWire yeniden başlatıldığında uygulanacaktır.</string>
+    <string name="restarting_torrent_engine">Yeni port ayarlarıyla torrent motoru yeniden başlatılıyor…</string>
+    <string name="torrent_engine_restarted">Torrent motoru yeni port ayarlarıyla yeniden başlatıldı</string>
+    <string name="error_restarting_torrent_engine">Torrent motoru yeniden başlatma hatası: %s</string>
+    <string name="apply">Uygula</string>
+    <string name="port_range_cancel">İptal</string>
 </resources>

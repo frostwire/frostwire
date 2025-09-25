@@ -29,11 +29,10 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
-
-import java.lang.reflect.Field;
 
 /**
  * @author gubatron
@@ -105,21 +104,45 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Context context = getActivity();
+            Context context = requireContext();
+            DialogPreference preference = getPreference();
+
             // initialize private super.mWhichButtonClicked
             onClick(null, DialogInterface.BUTTON_NEGATIVE);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                    .setIcon(this.getValue("mDialogIcon"))
-                    .setPositiveButton(get("mPositiveButtonText"), this)
-                    .setNegativeButton(get("mNegativeButtonText"), this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            CharSequence dialogTitle = preference.getDialogTitle();
+            if (dialogTitle != null) {
+                builder.setTitle(dialogTitle);
+            }
+
+            if (preference.getDialogIcon() != null) {
+                builder.setIcon(preference.getDialogIcon());
+            }
+
+            CharSequence positiveText = preference.getPositiveButtonText();
+            if (positiveText == null) {
+                positiveText = getString(android.R.string.ok);
+            }
+
+            CharSequence negativeText = preference.getNegativeButtonText();
+            if (negativeText == null) {
+                negativeText = getString(android.R.string.cancel);
+            }
+
+            builder.setPositiveButton(positiveText, this)
+                    .setNegativeButton(negativeText, this);
 
             View contentView = onCreateDialogView(context);
             if (contentView != null) {
                 onBindDialogView(contentView);
                 builder.setView(contentView);
             } else {
-                builder.setMessage(get("mDialogMessage"));
+                CharSequence dialogMessage = preference.getDialogMessage();
+                if (dialogMessage != null) {
+                    builder.setMessage(dialogMessage);
+                }
             }
 
             //onPrepareDialogBuilder(builder);
@@ -135,22 +158,6 @@ public abstract class AbstractPreferenceFragment extends PreferenceFragmentCompa
 
         // final to effectively hide it
         protected final void onPrepareDialogBuilder(@NonNull android.app.AlertDialog.Builder builder) {
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> T getValue(String name) {
-            try {
-                Field f = androidx.preference.PreferenceDialogFragment.class.getDeclaredField(name);
-                f.setAccessible(true);
-                return (T) f.get(this);
-            } catch (Throwable e) {
-                // ignore
-            }
-            return null;
-        }
-
-        private String get(String name) {
-            return getValue(name);
         }
     }
 }

@@ -134,6 +134,10 @@ public final class Constants {
     public static final String PREF_KEY_TORRENT_TRANSFER_DETAIL_LAST_SELECTED_TAB_INDEX = "frostwire.prefs.torrent.transfer_detail_last_selected_tab_index";
     public static final String PREF_KEY_TORRENT_SEQUENTIAL_TRANSFERS_ENABLED = "frostwire.prefs.torrent.sequential_transfers_enabled";
 
+    // Incoming connection port range settings
+    public static final String PREF_KEY_TORRENT_INCOMING_PORT_START = "frostwire.prefs.torrent.incoming_port_start";
+    public static final String PREF_KEY_TORRENT_INCOMING_PORT_END = "frostwire.prefs.torrent.incoming_port_end";
+
     public static final String PREF_KEY_STORAGE_PATH = "frostwire.prefs.storage.path";
 
     public static final String ACTION_REQUEST_SHUTDOWN = "com.frostwire.android.ACTION_REQUEST_SHUTDOWN";

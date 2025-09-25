@@ -417,4 +417,26 @@
     <string name="subs_details">Nie zostaniesz obciążony opłatami w okresie 7-dniowego bezpłatnego okresu próbnego.\n\nSubskrypcja zostanie naliczona natychmiast po zakończeniu 7-dniowego okresu próbnego lub natychmiast dla dotychczasowych subskrybentów.\n\nSubskrypcja jest automatycznie odnawiana, chyba że zostanie anulowana co najmniej 24 godziny przed zakończeniem okresu subskrypcji.\n\nNaciśnij \'Zarządzaj subskrypcjami\' dla automatycznych odnowień i anulacji w Google Play.</string>
     <string name="subscriptions">📅 Subskrypcje</string>
     <string name="rewarded_video_ad">📺 Nagrodzona reklama wideo</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Zakres Portów dla Połączeń Przychodzących</string>
+    <string name="incoming_connection_port_range_summary">Skonfiguruj porty dla połączeń przychodzących</string>
+    <string name="port_range_dialog_title">Ustaw Zakres Portów</string>
+    <string name="port_range_start_port">Port Początkowy</string>
+    <string name="port_range_end_port">Port Końcowy</string>
+    <string name="port_range_reset_default">Resetuj do Domyślnych</string>
+    <string name="port_range_current_range">Obecny zakres: %1$d - %2$d</string>
+    <string name="port_range_default_range">Domyślny zakres: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Nieprawidłowy zakres portów. Port początkowy musi być mniejszy lub równy portowi końcowemu.</string>
+    <string name="port_range_invalid_port">Wartości portów muszą być między 1024 a 65535.</string>
+    <string name="restart_torrent_engine_title">Uruchomić Ponownie Silnik Torrent?</string>
+    <string name="restart_torrent_engine_message">Ustawienia zakresu portów zostały zapisane. Czy chcesz teraz ponownie uruchomić silnik torrent, aby zastosować nowe ustawienia portów?\n\nUwaga: Spowoduje to tymczasowe zatrzymanie wszystkich aktywnych transferów i zapisanie ich postępu.</string>
+    <string name="restart_now">Uruchom Teraz Ponownie</string>
+    <string name="restart_later">Uruchom Ponownie Później</string>
+    <string name="port_settings_saved_restart_later">Ustawienia portów zapisane. Zmiany zostaną zastosowane po ponownym uruchomieniu FrostWire.</string>
+    <string name="restarting_torrent_engine">Ponowne uruchamianie silnika torrent z nowymi ustawieniami portów…</string>
+    <string name="torrent_engine_restarted">Silnik torrent uruchomiony ponownie z nowymi ustawieniami portów</string>
+    <string name="error_restarting_torrent_engine">Błąd ponownego uruchamiania silnika torrent: %s</string>
+    <string name="apply">Zastosuj</string>
+    <string name="port_range_cancel">Anuluj</string>
 </resources>

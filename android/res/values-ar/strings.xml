@@ -411,4 +411,26 @@
     <string name="subs_details">لن يتم فرض رسوم عليك خلال فترة التجربة المجانية التي تمتد لـ7 أيام.\n\nسيتم فرض رسوم الاشتراك فور انتهاء فترة التجربة البالغة 7 أيام أو فورًا للمشتركين السابقين.\n\nيتم تجديد الاشتراك تلقائيًا ما لم يتم إلغاؤه قبل 24 ساعة على الأقل من نهاية فترة الاشتراك.\n\nاضغط على \'إدارة الاشتراكات\' للتجديد التلقائي والإلغاء في Google Play.</string>
     <string name="subscriptions">📅 الاشتراكات</string>
     <string name="rewarded_video_ad">📺 إعلان الفيديو المكافأ</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">نطاق منافذ الاتصالات الواردة</string>
+    <string name="incoming_connection_port_range_summary">تكوين منافذ للاتصالات الواردة</string>
+    <string name="port_range_dialog_title">تعيين نطاق المنافذ</string>
+    <string name="port_range_start_port">منفذ البداية</string>
+    <string name="port_range_end_port">منفذ النهاية</string>
+    <string name="port_range_reset_default">إعادة تعيين إلى الافتراضي</string>
+    <string name="port_range_current_range">النطاق الحالي: %1$d - %2$d</string>
+    <string name="port_range_default_range">النطاق الافتراضي: 1024 - 57000</string>
+    <string name="port_range_invalid_range">نطاق منافذ غير صالح. يجب أن يكون منفذ البداية أقل من أو يساوي منفذ النهاية.</string>
+    <string name="port_range_invalid_port">يجب أن تكون قيم المنافذ بين 1024 و 65535.</string>
+    <string name="restart_torrent_engine_title">إعادة تشغيل محرك التورنت؟</string>
+    <string name="restart_torrent_engine_message">تم حفظ إعدادات نطاق المنافذ. هل تريد إعادة تشغيل محرك التورنت الآن لتطبيق إعدادات المنافذ الجديدة؟\n\nملاحظة: سيؤدي هذا إلى إيقاف جميع النقل النشط مؤقتًا وحفظ تقدمها.</string>
+    <string name="restart_now">إعادة التشغيل الآن</string>
+    <string name="restart_later">إعادة التشغيل لاحقًا</string>
+    <string name="port_settings_saved_restart_later">تم حفظ إعدادات المنفذ. سيتم تطبيق التغييرات عند إعادة تشغيل FrostWire.</string>
+    <string name="restarting_torrent_engine">إعادة تشغيل محرك التورنت بإعدادات المنافذ الجديدة…</string>
+    <string name="torrent_engine_restarted">تم إعادة تشغيل محرك التورنت بإعدادات المنافذ الجديدة</string>
+    <string name="error_restarting_torrent_engine">خطأ في إعادة تشغيل محرك التورنت: %s</string>
+    <string name="apply">تطبيق</string>
+    <string name="port_range_cancel">إلغاء</string>
 </resources>

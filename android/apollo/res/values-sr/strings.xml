@@ -17,81 +17,80 @@
 -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="page_recent">Недавне</string>
-  <string name="page_artists">Извођачи</string>
-  <string name="page_albums">Албуми</string>
-  <string name="page_songs">Песме</string>
-  <string name="page_playlists">Листе песама</string>
-  <string name="page_genres">Жанрови</string>
-  <string name="menu_search">Претрага</string>
-  <string name="menu_shuffle">Репродукуј све насумично</string>
-  <string name="menu_play_all">Пусти све</string>
-  <string name="menu_sort_by">Сортирај по</string>
+    <string name="page_recent">Недавне</string>
+    <string name="page_artists">Извођачи</string>
+    <string name="page_albums">Албуми</string>
+    <string name="page_songs">Песме</string>
+    <string name="page_playlists">Листе песама</string>
+    <string name="page_genres">Жанрови</string>
+    <string name="menu_search">Претрага</string>
+    <string name="menu_shuffle">Репродукуј све насумично</string>
+    <string name="menu_play_all">Пусти све</string>
+    <string name="menu_sort_by">Сортирај по</string>
     <string name="menu_clear_queue">Избриши редослед</string>
-  <string name="menu_save_queue">Сачувај редослед</string>
-  <string name="menu_share">Дели</string>
-  <string name="menu_add_to_homescreen">Закачи на почетни екран</string>
-  <string name="menu_equalizer">Еквилајзер</string>
-  <string name="menu_simple">Једноставно</string>
-  <string name="menu_detailed">Детаљно</string>
-  <string name="menu_grid">Мрежа</string>
-  <string name="menu_view_as">Погледај као</string>
-  <string name="add_to_playlist">Додај на плејлисту</string>
-  <string name="add_to_favorites">Додај у омиљене</string>
-  <string name="add_to_queue">Додај у редослед</string>
-  <string name="remove_from_favorites">Уклони из омиљених</string>
+    <string name="menu_save_queue">Сачувај редослед</string>
+    <string name="menu_share">Дели</string>
+    <string name="menu_add_to_homescreen">Закачи на почетни екран</string>
+    <string name="menu_equalizer">Еквилајзер</string>
+    <string name="menu_simple">Једноставно</string>
+    <string name="menu_detailed">Детаљно</string>
+    <string name="menu_grid">Мрежа</string>
+    <string name="menu_view_as">Погледај као</string>
+    <string name="add_to_playlist">Додај на плејлисту</string>
+    <string name="add_to_favorites">Додај у омиљене</string>
+    <string name="add_to_queue">Додај у редослед</string>
+    <string name="remove_from_favorites">Уклони из омиљених</string>
     <string name="sort_order_entry_az">A-Z</string>
-  <string name="sort_order_entry_za">Z-A</string>
-  <string name="sort_order_entry_artist">Извођач</string>
-  <string name="sort_order_entry_album">Албум</string>
-  <string name="sort_order_entry_year">Година</string>
-  <string name="sort_order_entry_duration">Трајање</string>
-  <string name="sort_order_entry_date_added">Датум додавања</string>
-  <string name="sort_order_entry_track_list">Листа песама</string>
-  <string name="sort_order_entry_number_of_songs">Број песама</string>
-  <string name="sort_order_entry_number_of_albums">Број албума</string>
-  <string name="sort_order_entry_filename">Име фајла</string>
-  <string name="playlist_favorite">Омиљена</string>
-  <string name="playlist_favorites">Омиљене</string>
-  <string name="playlist_last_added">Последње додате</string>
-  <string name="new_empty_playlist">Нова плејлиста</string>
-  <string name="save">Сачувај</string>
-  <string name="cancel">Поништи</string>
-  <string name="overwrite">Пресними</string>
-  <string name="new_playlist_name_template">Плејлиста <xliff:g id="број">%d</xliff:g></string>
-  <string name="create_playlist_prompt">Име плејлисте</string>
-  <string name="delete_dialog_title">Избриши <xliff:g id="item" example="album">%s</xliff:g>?</string>
+    <string name="sort_order_entry_za">Z-A</string>
+    <string name="sort_order_entry_artist">Извођач</string>
+    <string name="sort_order_entry_album">Албум</string>
+    <string name="sort_order_entry_year">Година</string>
+    <string name="sort_order_entry_duration">Трајање</string>
+    <string name="sort_order_entry_date_added">Датум додавања</string>
+    <string name="sort_order_entry_track_list">Листа песама</string>
+    <string name="sort_order_entry_number_of_songs">Број песама</string>
+    <string name="sort_order_entry_number_of_albums">Број албума</string>
+    <string name="sort_order_entry_filename">Име фајла</string>
+    <string name="playlist_favorite">Омиљена</string>
+    <string name="playlist_favorites">Омиљене</string>
+    <string name="playlist_last_added">Последње додате</string>
+    <string name="new_empty_playlist">Нова плејлиста</string>
+    <string name="save">Сачувај</string>
+    <string name="overwrite">Пресними</string>
+    <string name="new_playlist_name_template">Плејлиста <xliff:g id="број">%d</xliff:g></string>
+    <string name="create_playlist_prompt">Име плејлисте</string>
+    <string name="delete_dialog_title">Избриши <xliff:g id="item" example="album">%s</xliff:g>?</string>
     <string name="context_menu_play_selection">Пусти</string>
-  <string name="context_menu_play_next">Пусти следећу</string>
-  <string name="context_menu_more_by_artist">Више о извођачу</string>
-  <string name="context_menu_rename_playlist">Преименуј</string>
-  <string name="context_menu_delete">Избриши</string>
+    <string name="context_menu_play_next">Пусти следећу</string>
+    <string name="context_menu_more_by_artist">Више о извођачу</string>
+    <string name="context_menu_rename_playlist">Преименуј</string>
+    <string name="context_menu_delete">Избриши</string>
     <string name="context_menu_remove_from_recent">Уклони из недавних</string>
-  <string name="context_menu_use_as_ringtone">Користи као тон звона</string>
-  <string name="context_menu_remove_from_playlist">Уклони из плејлисте</string>
-  <string name="accessibility_play">Пусти</string>
-  <string name="accessibility_pause">Пауза</string>
-  <string name="accessibility_next">Следећа</string>
-  <string name="accessibility_prev">Претходна</string>
-  <string name="accessibility_shuffle">Насумично</string>
-  <string name="accessibility_shuffle_all">Насумично све</string>
-  <string name="accessibility_repeat">Понови</string>
-  <string name="accessibility_repeat_all">Понови све</string>
-  <string name="accessibility_repeat_one">Понови једну</string>
-  <string name="pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> додато на твој почетни екран</string>
-  <string name="could_not_be_pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> није могуће додати на твој почетни екран</string>
-  <string name="set_as_ringtone">\'<xliff:g id="name" example="Alarm Bell">%s</xliff:g>\' постављено као тон звона</string>
+    <string name="context_menu_use_as_ringtone">Користи као тон звона</string>
+    <string name="context_menu_remove_from_playlist">Уклони из плејлисте</string>
+    <string name="accessibility_play">Пусти</string>
+    <string name="accessibility_pause">Пауза</string>
+    <string name="accessibility_next">Следећа</string>
+    <string name="accessibility_prev">Претходна</string>
+    <string name="accessibility_shuffle">Насумично</string>
+    <string name="accessibility_shuffle_all">Насумично све</string>
+    <string name="accessibility_repeat">Понови</string>
+    <string name="accessibility_repeat_all">Понови све</string>
+    <string name="accessibility_repeat_one">Понови једну</string>
+    <string name="pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> додато на твој почетни екран</string>
+    <string name="could_not_be_pinned_to_home_screen"><xliff:g id="name">%s</xliff:g> није могуће додати на твој почетни екран</string>
+    <string name="set_as_ringtone">\'<xliff:g id="name" example="Alarm Bell">%s</xliff:g>\' постављено као тон звона</string>
     <string name="now_listening_to">#Тренутно се слуша <xliff:g id="title">%1$s</xliff:g> од <xliff:g id="artist">%2$s</xliff:g> #FrostWire</string>
-  <string name="share_track_using">Дели песму путем:</string>
+    <string name="share_track_using">Дели песму путем:</string>
     <string name="no_effects_for_you">Еквилајзер не може бити отворен.</string>
-  <string name="empty_music">Да копираш музику са рачунара на твој уређај, користи USB кабал.</string>
-  <string name="empty_last_added">Песме које си додао током претходног месеца ће бити приказане овде.</string>
-  <string name="empty_search">Нема пронађених резултата</string>
+    <string name="empty_music">Да копираш музику са рачунара на твој уређај, користи USB кабал.</string>
+    <string name="empty_last_added">Песме које си додао током претходног месеца ће бити приказане овде.</string>
+    <string name="empty_search">Нема пронађених резултата</string>
     <string name="empty_recent">Албуми које си слушао ће бити приказани овде. Пробај да пустиш неку музику.</string>
-  <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" на #FrostWire</string>
-  <string name="delete_files_title">Брисање датотека</string>
-  <string name="page_last_added">Последње додато</string>
-  <string name="empty_playlist">Ова листа песама је празна.\n\nКликните овде да бисте сазнали како додати песме.</string>
-  <string name="are_you_sure_delete_files_text">Да ли сте сигурни да желите трајно избрисати одабране датотеке са вашег уређаја?</string>
-  <string name="frostwire_player">ФростВире медиа плаиер</string>
+    <string name="now_listening_to_no_artist_available">#NowPlaying \"<xliff:g id="title">%1$s</xliff:g>\" на #FrostWire</string>
+    <string name="delete_files_title">Брисање датотека</string>
+    <string name="page_last_added">Последње додато</string>
+    <string name="empty_playlist">Ова листа песама је празна.\n\nКликните овде да бисте сазнали како додати песме.</string>
+    <string name="are_you_sure_delete_files_text">Да ли сте сигурни да желите трајно избрисати одабране датотеке са вашег уређаја?</string>
+    <string name="frostwire_player">ФростВире медиа плаиер</string>
 </resources>

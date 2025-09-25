@@ -414,4 +414,26 @@
     <string name="subs_details">Tijekom 7-dnevnog probnog razdoblja neće se naplaćivati nikakve naknade.\n\nPretplata se naplaćuje čim završi 7-dnevno probno razdoblje ili odmah za prethodne pretplatnike.\n\nPretplata se automatski obnavlja, osim ako se ne otkaže najmanje 24 sata prije kraja razdoblja pretplate.\n\nPritisnite \'Upravljanje pretplatama\' za automatska obnavljanja i otkazivanja u Google Playu.</string>
     <string name="subscriptions">📅 Pretplate</string>
     <string name="rewarded_video_ad">📺 Nagrađeni video oglas</string>
+
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Incoming Connection Port Range</string>
+    <string name="incoming_connection_port_range_summary">Configure ports for incoming connections</string>
+    <string name="port_range_dialog_title">Set Port Range</string>
+    <string name="port_range_start_port">Starting Port</string>
+    <string name="port_range_end_port">Ending Port</string>
+    <string name="port_range_reset_default">Reset to Default</string>
+    <string name="port_range_current_range">Current range: %1$d - %2$d</string>
+    <string name="port_range_default_range">Default range: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Invalid port range. Start port must be less than or equal to end port.</string>
+    <string name="port_range_invalid_port">Port values must be between 1024 and 65535.</string>
+    <string name="restart_torrent_engine_title">Restart Torrent Engine?</string>
+    <string name="restart_torrent_engine_message">Port range settings have been saved. Do you want to restart the torrent engine now to apply the new port settings?\n\nNote: This will temporarily stop all active transfers and save their progress.</string>
+    <string name="restart_now">Restart Now</string>
+    <string name="restart_later">Restart Later</string>
+    <string name="port_settings_saved_restart_later">Port settings saved. Changes will be applied when FrostWire is restarted.</string>
+    <string name="restarting_torrent_engine">Restarting torrent engine with new port settings…</string>
+    <string name="torrent_engine_restarted">Torrent engine restarted with new port settings</string>
+    <string name="error_restarting_torrent_engine">Error restarting torrent engine: %s</string>
+    <string name="apply">Apply</string>
+    <string name="port_range_cancel">Cancel</string>
 </resources>

@@ -420,4 +420,26 @@
     <string name="subs_details">Non saranno addebitati costi durante il periodo di prova di 7 giorni.\n\nL\'abbonamento sarà addebitato non appena il periodo di prova di 7 giorni termina o immediatamente per gli abbonati precedenti.\n\nL\'abbonamento si rinnova automaticamente a meno che non venga cancellato almeno 24 ore prima della fine del periodo di abbonamento.\n\nPremi \'Gestisci Abbonamenti\' per rinnovi automatici e cancellazioni su Google Play.</string>
     <string name="subscriptions">📅 Abbonamenti</string>
     <string name="rewarded_video_ad">📺 Annuncio Video Premiato</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Intervallo Porte per Connessioni in Entrata</string>
+    <string name="incoming_connection_port_range_summary">Configura porte per connessioni in entrata</string>
+    <string name="port_range_dialog_title">Imposta Intervallo Porte</string>
+    <string name="port_range_start_port">Porta Iniziale</string>
+    <string name="port_range_end_port">Porta Finale</string>
+    <string name="port_range_reset_default">Ripristina Predefinito</string>
+    <string name="port_range_current_range">Intervallo attuale: %1$d - %2$d</string>
+    <string name="port_range_default_range">Intervallo predefinito: 1024 - 57000</string>
+    <string name="port_range_invalid_range">Intervallo porte non valido. La porta iniziale deve essere minore o uguale alla porta finale.</string>
+    <string name="port_range_invalid_port">I valori delle porte devono essere tra 1024 e 65535.</string>
+    <string name="restart_torrent_engine_title">Riavviare Motore Torrent?</string>
+    <string name="restart_torrent_engine_message">Le impostazioni dell\'intervallo porte sono state salvate. Vuoi riavviare il motore torrent ora per applicare le nuove impostazioni porte?\n\nNota: Questo fermerà temporaneamente tutti i trasferimenti attivi e salverà il loro progresso.</string>
+    <string name="restart_now">Riavvia Ora</string>
+    <string name="restart_later">Riavvia Dopo</string>
+    <string name="port_settings_saved_restart_later">Impostazioni porte salvate. I cambiamenti saranno applicati al riavvio di FrostWire.</string>
+    <string name="restarting_torrent_engine">Riavvio motore torrent con nuove impostazioni porte…</string>
+    <string name="torrent_engine_restarted">Motore torrent riavviato con nuove impostazioni porte</string>
+    <string name="error_restarting_torrent_engine">Errore nel riavvio del motore torrent: %s</string>
+    <string name="apply">Applica</string>
+    <string name="port_range_cancel">Annulla</string>
 </resources>

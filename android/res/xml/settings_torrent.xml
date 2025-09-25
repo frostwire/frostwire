@@ -98,5 +98,10 @@
             frostwire:seekbar_endRange="200"
             frostwire:seekbar_pluralUnitResourceId="@plurals/unit_peers"
             frostwire:seekbar_startRange="10"/>
+
+        <com.frostwire.android.gui.views.preference.PortRangePreference
+            android:key="frostwire.prefs.torrent.incoming_connection_port_range"
+            android:summary="@string/incoming_connection_port_range_summary"
+            android:title="@string/incoming_connection_port_range"/>
     </PreferenceCategory>
 </PreferenceScreen>

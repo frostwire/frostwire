@@ -432,4 +432,26 @@
     <string name="subs_details">Aucun frais ne sera facturé pendant la période d\'essai de 7 jours.\n\nL\'abonnement est facturé dès la fin de la période d\'essai de 7 jours ou immédiatement pour les abonnés précédents.\n\nL\'abonnement est renouvelé automatiquement sauf s\'il est annulé au moins 24 heures avant la fin de la période d\'abonnement.\n\nAppuyez sur \'Gérer les abonnements\' pour les renouvellements automatiques et les annulations dans Google Play.</string>
     <string name="subscriptions">📅 Abonnements</string>
     <string name="rewarded_video_ad">📺 Publicité vidéo récompensée</string>
+    
+    <!-- Port Range Settings -->
+    <string name="incoming_connection_port_range">Plage de Ports pour Connexions Entrantes</string>
+    <string name="incoming_connection_port_range_summary">Configurer les ports pour les connexions entrantes</string>
+    <string name="port_range_dialog_title">Définir la Plage de Ports</string>
+    <string name="port_range_start_port">Port de Début</string>
+    <string name="port_range_end_port">Port de Fin</string>
+    <string name="port_range_reset_default">Rétablir par Défaut</string>
+    <string name="port_range_current_range">Plage actuelle : %1$d - %2$d</string>
+    <string name="port_range_default_range">Plage par défaut : 1024 - 57000</string>
+    <string name="port_range_invalid_range">Plage de ports invalide. Le port de début doit être inférieur ou égal au port de fin.</string>
+    <string name="port_range_invalid_port">Les valeurs de port doivent être entre 1024 et 65535.</string>
+    <string name="restart_torrent_engine_title">Redémarrer le Moteur Torrent ?</string>
+    <string name="restart_torrent_engine_message">Les paramètres de plage de ports ont été sauvegardés. Voulez-vous redémarrer le moteur torrent maintenant pour appliquer les nouveaux paramètres de ports ?\n\nNote : Ceci arrêtera temporairement tous les transferts actifs et sauvegardera leur progression.</string>
+    <string name="restart_now">Redémarrer Maintenant</string>
+    <string name="restart_later">Redémarrer Plus Tard</string>
+    <string name="port_settings_saved_restart_later">Paramètres de ports sauvegardés. Les changements seront appliqués au redémarrage de FrostWire.</string>
+    <string name="restarting_torrent_engine">Redémarrage du moteur torrent avec nouveaux paramètres de ports…</string>
+    <string name="torrent_engine_restarted">Moteur torrent redémarré avec nouveaux paramètres de ports</string>
+    <string name="error_restarting_torrent_engine">Erreur lors du redémarrage du moteur torrent : %s</string>
+    <string name="apply">Appliquer</string>
+    <string name="port_range_cancel">Annuler</string>
 </resources>
