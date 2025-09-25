@@ -122,7 +122,7 @@ android {
                 }
             }
             pip {
-                install "yt_dlp==2025.09.05"
+                install "yt_dlp==2025.09.23"
                 // helps a lot with debugging
                 //options "--verbose"
             }
