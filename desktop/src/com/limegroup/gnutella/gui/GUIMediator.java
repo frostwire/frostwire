@@ -287,7 +287,7 @@ public final class GUIMediator {
 
     /**
      * Returns a `Point` instance containing the x, y position of the
-     * wrapped ` on the screen.
+     * wrapped `JFrame` on the screen.
      *
      * @return a `Point` instance containing the x, y position of the
      * wrapped JFrame
